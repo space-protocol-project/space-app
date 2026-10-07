@@ -5,14 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:space_client/app.dart';
 
 void main() {
+  setUp(() => SharedPreferences.setMockInitialValues({}));
   testWidgets(
     'Подключение обязательно; интерфейс помещается в широкое и узкое окно',
     (tester) async {
       tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.physicalSize = const Size(1440, 900);
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       final font = File('C:/Windows/Fonts/segoeui.ttf');
@@ -35,7 +37,10 @@ void main() {
         RepaintBoundary(key: boundary, child: const SpaceApp()),
       );
       await tester.pumpAndSettle();
-      expect(find.text('Проверить сервер'), findsOneWidget);
+      expect(find.text('Хорошо, что вы здесь.'), findsOneWidget);
+      expect(find.text('О пространстве'), findsOneWidget);
+      await tester.tap(find.widgetWithText(ListTile, 'Общий чат'));
+      await tester.pumpAndSettle();
       expect(
         tester
             .widget<IconButton>(
@@ -61,12 +66,13 @@ void main() {
           image.dispose();
         });
       }
-      tester.view.physicalSize = const Size(500, 800);
+      tester.view.physicalSize = const Size(390, 844);
       await tester.pumpAndSettle();
-      expect(find.text('Space · подключение'), findsOneWidget);
+      expect(find.byType(NavigationBar), findsOneWidget);
       expect(tester.takeException(), isNull);
-      await tester.tap(find.text('Space · подключение'));
+      await tester.tap(find.byTooltip('Подключение к серверу'));
       await tester.pumpAndSettle();
+      expect(find.text('Проверить сервер'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );

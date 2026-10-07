@@ -161,6 +161,28 @@ class ChatController extends ChangeNotifier {
     }
   }
 
+  Future<void> disconnect() async {
+    if (busy) return;
+    busy = true;
+    connected = false;
+    _timer?.cancel();
+    _update();
+    try {
+      await _session?.close();
+      _session = null;
+      preview = null;
+      fingerprint = '';
+      cursor = '';
+      _messages.clear();
+      _pendingKey = '';
+      _pendingText = '';
+      error = '';
+    } finally {
+      busy = false;
+      _update();
+    }
+  }
+
   @override
   void dispose() {
     _disposed = true;
