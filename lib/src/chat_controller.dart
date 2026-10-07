@@ -249,8 +249,9 @@ class ChatController extends ChangeNotifier {
       error = 'Доступ этого устройства отозван. Ключи сохранены; новый grant автоматически не создаётся.';
     } catch (e) {
       error = _explain(e);
-      if (_session != null && connected)
+      if (_session != null && connected) {
         unawaited(_watch(_session!, ++_generation));
+      }
     } finally {
       busy = false;
       _update();
