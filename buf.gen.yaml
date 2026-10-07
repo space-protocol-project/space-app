@@ -1,0 +1,5 @@
+version: v2
+plugins:
+  - local: [dart, pub, global, run, protoc_plugin:protoc_plugin]
+    out: client/lib/src/generated
+    opt: grpc
