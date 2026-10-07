@@ -43,7 +43,10 @@ class _SpaceShellState extends State<SpaceShell> {
     final route = await showSearch<String>(
       context: context,
       delegate: SpaceSearch({
-        for (final section in Section.values) section.name: section.label,
+        for (final section in Section.values)
+          section.name: section == Section.chat
+              ? controller.chatTitle
+              : section.label,
       }, controller.messages),
     );
     if (!mounted || route == null || route.isEmpty) return;
@@ -136,8 +139,9 @@ class _SpaceShellState extends State<SpaceShell> {
     if (accepted == true && mounted) await controller.revoke();
   }
 
-  String get spaceLabel =>
-      controller.preview?.origin.authority ?? 'Ваше пространство';
+  String get spaceLabel => controller.spaceTitle.isNotEmpty
+      ? controller.spaceTitle
+      : controller.preview?.origin.authority ?? 'Ваше пространство';
   Widget sidebar() => SizedBox(
     width: 248,
     child: Material(
@@ -209,7 +213,11 @@ class _SpaceShellState extends State<SpaceShell> {
                     .colorScheme
                     .primaryContainer,
                 leading: Icon(section.icon, size: 20),
-                title: Text(section.label),
+                title: Text(
+                  section == Section.chat
+                      ? controller.chatTitle
+                      : section.label,
+                ),
                 onTap: () => select(section),
               ),
             ),
@@ -397,7 +405,7 @@ class _SpaceShellState extends State<SpaceShell> {
           ),
         Expanded(
           child: Text(
-            selected.label,
+            selected == Section.chat ? controller.chatTitle : selected.label,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleMedium,
           ),

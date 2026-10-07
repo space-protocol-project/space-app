@@ -17,6 +17,685 @@ import 'package:protobuf/protobuf.dart' as $pb;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
+class LogoutRequest extends $pb.GeneratedMessage {
+  factory LogoutRequest() => LogoutRequest._();
+
+  LogoutRequest._();
+
+  factory LogoutRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      LogoutRequest()..mergeFromBuffer(data, registry);
+  factory LogoutRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      LogoutRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'LogoutRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: LogoutRequest.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  LogoutRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  LogoutRequest copyWith(void Function(LogoutRequest) updates) =>
+      super.copyWith((message) => updates(message as LogoutRequest))
+          as LogoutRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use LogoutRequest() / LogoutRequest.new instead')
+  static LogoutRequest create() => LogoutRequest._();
+  static $pb.GeneratedMessage $_createMessage() => LogoutRequest._();
+  @$core.override
+  LogoutRequest createEmptyInstance() => LogoutRequest._();
+  @$core.pragma('dart2js:noInline')
+  static LogoutRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LogoutRequest>(
+          LogoutRequest.$_createMessage);
+  static LogoutRequest? _defaultInstance;
+}
+
+class LogoutResponse extends $pb.GeneratedMessage {
+  factory LogoutResponse() => LogoutResponse._();
+
+  LogoutResponse._();
+
+  factory LogoutResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      LogoutResponse()..mergeFromBuffer(data, registry);
+  factory LogoutResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      LogoutResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'LogoutResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: LogoutResponse.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  LogoutResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  LogoutResponse copyWith(void Function(LogoutResponse) updates) =>
+      super.copyWith((message) => updates(message as LogoutResponse))
+          as LogoutResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use LogoutResponse() / LogoutResponse.new instead')
+  static LogoutResponse create() => LogoutResponse._();
+  static $pb.GeneratedMessage $_createMessage() => LogoutResponse._();
+  @$core.override
+  LogoutResponse createEmptyInstance() => LogoutResponse._();
+  @$core.pragma('dart2js:noInline')
+  static LogoutResponse getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LogoutResponse>(
+          LogoutResponse.$_createMessage);
+  static LogoutResponse? _defaultInstance;
+}
+
+class GetSetupStatusRequest extends $pb.GeneratedMessage {
+  factory GetSetupStatusRequest() => GetSetupStatusRequest._();
+
+  GetSetupStatusRequest._();
+
+  factory GetSetupStatusRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetSetupStatusRequest()..mergeFromBuffer(data, registry);
+  factory GetSetupStatusRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetSetupStatusRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetSetupStatusRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetSetupStatusRequest.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetSetupStatusRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetSetupStatusRequest copyWith(
+          void Function(GetSetupStatusRequest) updates) =>
+      super.copyWith((message) => updates(message as GetSetupStatusRequest))
+          as GetSetupStatusRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetSetupStatusRequest() / GetSetupStatusRequest.new instead')
+  static GetSetupStatusRequest create() => GetSetupStatusRequest._();
+  static $pb.GeneratedMessage $_createMessage() => GetSetupStatusRequest._();
+  @$core.override
+  GetSetupStatusRequest createEmptyInstance() => GetSetupStatusRequest._();
+  @$core.pragma('dart2js:noInline')
+  static GetSetupStatusRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetSetupStatusRequest>(
+          GetSetupStatusRequest.$_createMessage);
+  static GetSetupStatusRequest? _defaultInstance;
+}
+
+class GetSetupStatusResponse extends $pb.GeneratedMessage {
+  factory GetSetupStatusResponse({
+    $core.bool? initialized,
+  }) {
+    final result = GetSetupStatusResponse._();
+    if (initialized != null) result.initialized = initialized;
+    return result;
+  }
+
+  GetSetupStatusResponse._();
+
+  factory GetSetupStatusResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetSetupStatusResponse()..mergeFromBuffer(data, registry);
+  factory GetSetupStatusResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetSetupStatusResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetSetupStatusResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetSetupStatusResponse.$_createMessage)
+    ..aOB(1, _omitFieldNames ? '' : 'initialized')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetSetupStatusResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetSetupStatusResponse copyWith(
+          void Function(GetSetupStatusResponse) updates) =>
+      super.copyWith((message) => updates(message as GetSetupStatusResponse))
+          as GetSetupStatusResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetSetupStatusResponse() / GetSetupStatusResponse.new instead')
+  static GetSetupStatusResponse create() => GetSetupStatusResponse._();
+  static $pb.GeneratedMessage $_createMessage() => GetSetupStatusResponse._();
+  @$core.override
+  GetSetupStatusResponse createEmptyInstance() => GetSetupStatusResponse._();
+  @$core.pragma('dart2js:noInline')
+  static GetSetupStatusResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetSetupStatusResponse>(
+          GetSetupStatusResponse.$_createMessage);
+  static GetSetupStatusResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.bool get initialized => $_getBF(0);
+  @$pb.TagNumber(1)
+  set initialized($core.bool value) => $_setBool(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasInitialized() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearInitialized() => $_clearField(1);
+}
+
+class ClaimOwnerRequest extends $pb.GeneratedMessage {
+  factory ClaimOwnerRequest({
+    $core.String? setupCode,
+  }) {
+    final result = ClaimOwnerRequest._();
+    if (setupCode != null) result.setupCode = setupCode;
+    return result;
+  }
+
+  ClaimOwnerRequest._();
+
+  factory ClaimOwnerRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ClaimOwnerRequest()..mergeFromBuffer(data, registry);
+  factory ClaimOwnerRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ClaimOwnerRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ClaimOwnerRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ClaimOwnerRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'setupCode')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ClaimOwnerRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ClaimOwnerRequest copyWith(void Function(ClaimOwnerRequest) updates) =>
+      super.copyWith((message) => updates(message as ClaimOwnerRequest))
+          as ClaimOwnerRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ClaimOwnerRequest() / ClaimOwnerRequest.new instead')
+  static ClaimOwnerRequest create() => ClaimOwnerRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ClaimOwnerRequest._();
+  @$core.override
+  ClaimOwnerRequest createEmptyInstance() => ClaimOwnerRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ClaimOwnerRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ClaimOwnerRequest>(
+          ClaimOwnerRequest.$_createMessage);
+  static ClaimOwnerRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get setupCode => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set setupCode($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasSetupCode() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearSetupCode() => $_clearField(1);
+}
+
+class GetSettingsRequest extends $pb.GeneratedMessage {
+  factory GetSettingsRequest() => GetSettingsRequest._();
+
+  GetSettingsRequest._();
+
+  factory GetSettingsRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetSettingsRequest()..mergeFromBuffer(data, registry);
+  factory GetSettingsRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetSettingsRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetSettingsRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetSettingsRequest.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetSettingsRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetSettingsRequest copyWith(void Function(GetSettingsRequest) updates) =>
+      super.copyWith((message) => updates(message as GetSettingsRequest))
+          as GetSettingsRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use GetSettingsRequest() / GetSettingsRequest.new instead')
+  static GetSettingsRequest create() => GetSettingsRequest._();
+  static $pb.GeneratedMessage $_createMessage() => GetSettingsRequest._();
+  @$core.override
+  GetSettingsRequest createEmptyInstance() => GetSettingsRequest._();
+  @$core.pragma('dart2js:noInline')
+  static GetSettingsRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetSettingsRequest>(
+          GetSettingsRequest.$_createMessage);
+  static GetSettingsRequest? _defaultInstance;
+}
+
+class ClaimOwnerResponse extends $pb.GeneratedMessage {
+  factory ClaimOwnerResponse({
+    SpaceSettings? settings,
+  }) {
+    final result = ClaimOwnerResponse._();
+    if (settings != null) result.settings = settings;
+    return result;
+  }
+
+  ClaimOwnerResponse._();
+
+  factory ClaimOwnerResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ClaimOwnerResponse()..mergeFromBuffer(data, registry);
+  factory ClaimOwnerResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ClaimOwnerResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ClaimOwnerResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ClaimOwnerResponse.$_createMessage)
+    ..aOM<SpaceSettings>(1, _omitFieldNames ? '' : 'settings',
+        subBuilder: SpaceSettings.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ClaimOwnerResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ClaimOwnerResponse copyWith(void Function(ClaimOwnerResponse) updates) =>
+      super.copyWith((message) => updates(message as ClaimOwnerResponse))
+          as ClaimOwnerResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ClaimOwnerResponse() / ClaimOwnerResponse.new instead')
+  static ClaimOwnerResponse create() => ClaimOwnerResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ClaimOwnerResponse._();
+  @$core.override
+  ClaimOwnerResponse createEmptyInstance() => ClaimOwnerResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ClaimOwnerResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ClaimOwnerResponse>(
+          ClaimOwnerResponse.$_createMessage);
+  static ClaimOwnerResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  SpaceSettings get settings => $_getN(0);
+  @$pb.TagNumber(1)
+  set settings(SpaceSettings value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasSettings() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearSettings() => $_clearField(1);
+  @$pb.TagNumber(1)
+  SpaceSettings ensureSettings() => $_ensure(0);
+}
+
+class GetSettingsResponse extends $pb.GeneratedMessage {
+  factory GetSettingsResponse({
+    SpaceSettings? settings,
+  }) {
+    final result = GetSettingsResponse._();
+    if (settings != null) result.settings = settings;
+    return result;
+  }
+
+  GetSettingsResponse._();
+
+  factory GetSettingsResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetSettingsResponse()..mergeFromBuffer(data, registry);
+  factory GetSettingsResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetSettingsResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetSettingsResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetSettingsResponse.$_createMessage)
+    ..aOM<SpaceSettings>(1, _omitFieldNames ? '' : 'settings',
+        subBuilder: SpaceSettings.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetSettingsResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetSettingsResponse copyWith(void Function(GetSettingsResponse) updates) =>
+      super.copyWith((message) => updates(message as GetSettingsResponse))
+          as GetSettingsResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use GetSettingsResponse() / GetSettingsResponse.new instead')
+  static GetSettingsResponse create() => GetSettingsResponse._();
+  static $pb.GeneratedMessage $_createMessage() => GetSettingsResponse._();
+  @$core.override
+  GetSettingsResponse createEmptyInstance() => GetSettingsResponse._();
+  @$core.pragma('dart2js:noInline')
+  static GetSettingsResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetSettingsResponse>(
+          GetSettingsResponse.$_createMessage);
+  static GetSettingsResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  SpaceSettings get settings => $_getN(0);
+  @$pb.TagNumber(1)
+  set settings(SpaceSettings value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasSettings() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearSettings() => $_clearField(1);
+  @$pb.TagNumber(1)
+  SpaceSettings ensureSettings() => $_ensure(0);
+}
+
+class UpdateSettingsResponse extends $pb.GeneratedMessage {
+  factory UpdateSettingsResponse({
+    SpaceSettings? settings,
+  }) {
+    final result = UpdateSettingsResponse._();
+    if (settings != null) result.settings = settings;
+    return result;
+  }
+
+  UpdateSettingsResponse._();
+
+  factory UpdateSettingsResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateSettingsResponse()..mergeFromBuffer(data, registry);
+  factory UpdateSettingsResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateSettingsResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UpdateSettingsResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: UpdateSettingsResponse.$_createMessage)
+    ..aOM<SpaceSettings>(1, _omitFieldNames ? '' : 'settings',
+        subBuilder: SpaceSettings.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateSettingsResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateSettingsResponse copyWith(
+          void Function(UpdateSettingsResponse) updates) =>
+      super.copyWith((message) => updates(message as UpdateSettingsResponse))
+          as UpdateSettingsResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use UpdateSettingsResponse() / UpdateSettingsResponse.new instead')
+  static UpdateSettingsResponse create() => UpdateSettingsResponse._();
+  static $pb.GeneratedMessage $_createMessage() => UpdateSettingsResponse._();
+  @$core.override
+  UpdateSettingsResponse createEmptyInstance() => UpdateSettingsResponse._();
+  @$core.pragma('dart2js:noInline')
+  static UpdateSettingsResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UpdateSettingsResponse>(
+          UpdateSettingsResponse.$_createMessage);
+  static UpdateSettingsResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  SpaceSettings get settings => $_getN(0);
+  @$pb.TagNumber(1)
+  set settings(SpaceSettings value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasSettings() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearSettings() => $_clearField(1);
+  @$pb.TagNumber(1)
+  SpaceSettings ensureSettings() => $_ensure(0);
+}
+
+class SpaceSettings extends $pb.GeneratedMessage {
+  factory SpaceSettings({
+    $core.String? title,
+    $core.String? chatTitle,
+    $core.bool? chatEnabled,
+    $core.String? registrationPolicy,
+    $fixnum.Int64? revision,
+  }) {
+    final result = SpaceSettings._();
+    if (title != null) result.title = title;
+    if (chatTitle != null) result.chatTitle = chatTitle;
+    if (chatEnabled != null) result.chatEnabled = chatEnabled;
+    if (registrationPolicy != null)
+      result.registrationPolicy = registrationPolicy;
+    if (revision != null) result.revision = revision;
+    return result;
+  }
+
+  SpaceSettings._();
+
+  factory SpaceSettings.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SpaceSettings()..mergeFromBuffer(data, registry);
+  factory SpaceSettings.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SpaceSettings()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'SpaceSettings',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: SpaceSettings.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'title')
+    ..aOS(2, _omitFieldNames ? '' : 'chatTitle')
+    ..aOB(3, _omitFieldNames ? '' : 'chatEnabled')
+    ..aOS(4, _omitFieldNames ? '' : 'registrationPolicy')
+    ..aInt64(5, _omitFieldNames ? '' : 'revision')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SpaceSettings clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SpaceSettings copyWith(void Function(SpaceSettings) updates) =>
+      super.copyWith((message) => updates(message as SpaceSettings))
+          as SpaceSettings;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use SpaceSettings() / SpaceSettings.new instead')
+  static SpaceSettings create() => SpaceSettings._();
+  static $pb.GeneratedMessage $_createMessage() => SpaceSettings._();
+  @$core.override
+  SpaceSettings createEmptyInstance() => SpaceSettings._();
+  @$core.pragma('dart2js:noInline')
+  static SpaceSettings getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SpaceSettings>(
+          SpaceSettings.$_createMessage);
+  static SpaceSettings? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get title => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set title($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasTitle() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearTitle() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get chatTitle => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set chatTitle($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasChatTitle() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearChatTitle() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get chatEnabled => $_getBF(2);
+  @$pb.TagNumber(3)
+  set chatEnabled($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasChatEnabled() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearChatEnabled() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get registrationPolicy => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set registrationPolicy($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasRegistrationPolicy() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearRegistrationPolicy() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get revision => $_getI64(4);
+  @$pb.TagNumber(5)
+  set revision($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasRevision() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearRevision() => $_clearField(5);
+}
+
+class UpdateSettingsRequest extends $pb.GeneratedMessage {
+  factory UpdateSettingsRequest({
+    $core.String? title,
+    $core.String? chatTitle,
+    $core.bool? chatEnabled,
+    $core.String? registrationPolicy,
+    $fixnum.Int64? expectedRevision,
+  }) {
+    final result = UpdateSettingsRequest._();
+    if (title != null) result.title = title;
+    if (chatTitle != null) result.chatTitle = chatTitle;
+    if (chatEnabled != null) result.chatEnabled = chatEnabled;
+    if (registrationPolicy != null)
+      result.registrationPolicy = registrationPolicy;
+    if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    return result;
+  }
+
+  UpdateSettingsRequest._();
+
+  factory UpdateSettingsRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateSettingsRequest()..mergeFromBuffer(data, registry);
+  factory UpdateSettingsRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateSettingsRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UpdateSettingsRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: UpdateSettingsRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'title')
+    ..aOS(2, _omitFieldNames ? '' : 'chatTitle')
+    ..aOB(3, _omitFieldNames ? '' : 'chatEnabled')
+    ..aOS(4, _omitFieldNames ? '' : 'registrationPolicy')
+    ..aInt64(5, _omitFieldNames ? '' : 'expectedRevision')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateSettingsRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateSettingsRequest copyWith(
+          void Function(UpdateSettingsRequest) updates) =>
+      super.copyWith((message) => updates(message as UpdateSettingsRequest))
+          as UpdateSettingsRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use UpdateSettingsRequest() / UpdateSettingsRequest.new instead')
+  static UpdateSettingsRequest create() => UpdateSettingsRequest._();
+  static $pb.GeneratedMessage $_createMessage() => UpdateSettingsRequest._();
+  @$core.override
+  UpdateSettingsRequest createEmptyInstance() => UpdateSettingsRequest._();
+  @$core.pragma('dart2js:noInline')
+  static UpdateSettingsRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UpdateSettingsRequest>(
+          UpdateSettingsRequest.$_createMessage);
+  static UpdateSettingsRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get title => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set title($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasTitle() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearTitle() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get chatTitle => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set chatTitle($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasChatTitle() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearChatTitle() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get chatEnabled => $_getBF(2);
+  @$pb.TagNumber(3)
+  set chatEnabled($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasChatEnabled() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearChatEnabled() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get registrationPolicy => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set registrationPolicy($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasRegistrationPolicy() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearRegistrationPolicy() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get expectedRevision => $_getI64(4);
+  @$pb.TagNumber(5)
+  set expectedRevision($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasExpectedRevision() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearExpectedRevision() => $_clearField(5);
+}
+
 class SubscribeRequest extends $pb.GeneratedMessage {
   factory SubscribeRequest({
     $core.String? channelId,
@@ -176,12 +855,14 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
     $core.List<$core.int>? rootPublicKey,
     $core.List<$core.int>? devicePublicKey,
     $core.String? grantId,
+    $core.bool? administrative,
   }) {
     final result = CreateChallengeRequest._();
     if (purpose != null) result.purpose = purpose;
     if (rootPublicKey != null) result.rootPublicKey = rootPublicKey;
     if (devicePublicKey != null) result.devicePublicKey = devicePublicKey;
     if (grantId != null) result.grantId = grantId;
+    if (administrative != null) result.administrative = administrative;
     return result;
   }
 
@@ -204,6 +885,7 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
     ..a<$core.List<$core.int>>(
         3, _omitFieldNames ? '' : 'devicePublicKey', $pb.PbFieldType.OY)
     ..aOS(4, _omitFieldNames ? '' : 'grantId')
+    ..aOB(5, _omitFieldNames ? '' : 'administrative')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -266,6 +948,16 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
   $core.bool hasGrantId() => $_has(3);
   @$pb.TagNumber(4)
   void clearGrantId() => $_clearField(4);
+
+  /// Только регистрация: root явно разрешает space.manage этому устройству.
+  @$pb.TagNumber(5)
+  $core.bool get administrative => $_getBF(4);
+  @$pb.TagNumber(5)
+  set administrative($core.bool value) => $_setBool(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasAdministrative() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearAdministrative() => $_clearField(5);
 }
 
 class CreateChallengeResponse extends $pb.GeneratedMessage {
@@ -772,11 +1464,13 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     $core.String? protocolVersion,
     $core.String? serverId,
     $core.Iterable<Channel>? channels,
+    $core.String? title,
   }) {
     final result = GetManifestResponse._();
     if (protocolVersion != null) result.protocolVersion = protocolVersion;
     if (serverId != null) result.serverId = serverId;
     if (channels != null) result.channels.addAll(channels);
+    if (title != null) result.title = title;
     return result;
   }
 
@@ -797,6 +1491,7 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'serverId')
     ..pPM<Channel>(3, _omitFieldNames ? '' : 'channels',
         subBuilder: Channel.$_createMessage)
+    ..aOS(4, _omitFieldNames ? '' : 'title')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -842,6 +1537,15 @@ class GetManifestResponse extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(3)
   $pb.PbList<Channel> get channels => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $core.String get title => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set title($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasTitle() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearTitle() => $_clearField(4);
 }
 
 class Channel extends $pb.GeneratedMessage {

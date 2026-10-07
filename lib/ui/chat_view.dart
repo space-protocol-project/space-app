@@ -67,7 +67,7 @@ class _ChatViewState extends State<ChatView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Общий чат',
+                      c.chatTitle,
                       style: Theme.of(context).textTheme.titleLarge
                           ?.copyWith(fontWeight: FontWeight.w700),
                     ),

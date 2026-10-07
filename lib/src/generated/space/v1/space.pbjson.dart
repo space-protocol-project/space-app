@@ -15,6 +15,185 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use logoutRequestDescriptor instead')
+const LogoutRequest$json = {
+  '1': 'LogoutRequest',
+};
+
+/// Descriptor for `LogoutRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List logoutRequestDescriptor =
+    $convert.base64Decode('Cg1Mb2dvdXRSZXF1ZXN0');
+
+@$core.Deprecated('Use logoutResponseDescriptor instead')
+const LogoutResponse$json = {
+  '1': 'LogoutResponse',
+};
+
+/// Descriptor for `LogoutResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List logoutResponseDescriptor =
+    $convert.base64Decode('Cg5Mb2dvdXRSZXNwb25zZQ==');
+
+@$core.Deprecated('Use getSetupStatusRequestDescriptor instead')
+const GetSetupStatusRequest$json = {
+  '1': 'GetSetupStatusRequest',
+};
+
+/// Descriptor for `GetSetupStatusRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getSetupStatusRequestDescriptor =
+    $convert.base64Decode('ChVHZXRTZXR1cFN0YXR1c1JlcXVlc3Q=');
+
+@$core.Deprecated('Use getSetupStatusResponseDescriptor instead')
+const GetSetupStatusResponse$json = {
+  '1': 'GetSetupStatusResponse',
+  '2': [
+    {'1': 'initialized', '3': 1, '4': 1, '5': 8, '10': 'initialized'},
+  ],
+};
+
+/// Descriptor for `GetSetupStatusResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getSetupStatusResponseDescriptor =
+    $convert.base64Decode(
+        'ChZHZXRTZXR1cFN0YXR1c1Jlc3BvbnNlEiAKC2luaXRpYWxpemVkGAEgASgIUgtpbml0aWFsaX'
+        'plZA==');
+
+@$core.Deprecated('Use claimOwnerRequestDescriptor instead')
+const ClaimOwnerRequest$json = {
+  '1': 'ClaimOwnerRequest',
+  '2': [
+    {'1': 'setup_code', '3': 1, '4': 1, '5': 9, '10': 'setupCode'},
+  ],
+};
+
+/// Descriptor for `ClaimOwnerRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List claimOwnerRequestDescriptor = $convert.base64Decode(
+    'ChFDbGFpbU93bmVyUmVxdWVzdBIdCgpzZXR1cF9jb2RlGAEgASgJUglzZXR1cENvZGU=');
+
+@$core.Deprecated('Use getSettingsRequestDescriptor instead')
+const GetSettingsRequest$json = {
+  '1': 'GetSettingsRequest',
+};
+
+/// Descriptor for `GetSettingsRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getSettingsRequestDescriptor =
+    $convert.base64Decode('ChJHZXRTZXR0aW5nc1JlcXVlc3Q=');
+
+@$core.Deprecated('Use claimOwnerResponseDescriptor instead')
+const ClaimOwnerResponse$json = {
+  '1': 'ClaimOwnerResponse',
+  '2': [
+    {
+      '1': 'settings',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.SpaceSettings',
+      '10': 'settings'
+    },
+  ],
+};
+
+/// Descriptor for `ClaimOwnerResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List claimOwnerResponseDescriptor = $convert.base64Decode(
+    'ChJDbGFpbU93bmVyUmVzcG9uc2USMwoIc2V0dGluZ3MYASABKAsyFy5zcGFjZS52MS5TcGFjZV'
+    'NldHRpbmdzUghzZXR0aW5ncw==');
+
+@$core.Deprecated('Use getSettingsResponseDescriptor instead')
+const GetSettingsResponse$json = {
+  '1': 'GetSettingsResponse',
+  '2': [
+    {
+      '1': 'settings',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.SpaceSettings',
+      '10': 'settings'
+    },
+  ],
+};
+
+/// Descriptor for `GetSettingsResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getSettingsResponseDescriptor = $convert.base64Decode(
+    'ChNHZXRTZXR0aW5nc1Jlc3BvbnNlEjMKCHNldHRpbmdzGAEgASgLMhcuc3BhY2UudjEuU3BhY2'
+    'VTZXR0aW5nc1IIc2V0dGluZ3M=');
+
+@$core.Deprecated('Use updateSettingsResponseDescriptor instead')
+const UpdateSettingsResponse$json = {
+  '1': 'UpdateSettingsResponse',
+  '2': [
+    {
+      '1': 'settings',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.SpaceSettings',
+      '10': 'settings'
+    },
+  ],
+};
+
+/// Descriptor for `UpdateSettingsResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List updateSettingsResponseDescriptor =
+    $convert.base64Decode(
+        'ChZVcGRhdGVTZXR0aW5nc1Jlc3BvbnNlEjMKCHNldHRpbmdzGAEgASgLMhcuc3BhY2UudjEuU3'
+        'BhY2VTZXR0aW5nc1IIc2V0dGluZ3M=');
+
+@$core.Deprecated('Use spaceSettingsDescriptor instead')
+const SpaceSettings$json = {
+  '1': 'SpaceSettings',
+  '2': [
+    {'1': 'title', '3': 1, '4': 1, '5': 9, '10': 'title'},
+    {'1': 'chat_title', '3': 2, '4': 1, '5': 9, '10': 'chatTitle'},
+    {'1': 'chat_enabled', '3': 3, '4': 1, '5': 8, '10': 'chatEnabled'},
+    {
+      '1': 'registration_policy',
+      '3': 4,
+      '4': 1,
+      '5': 9,
+      '10': 'registrationPolicy'
+    },
+    {'1': 'revision', '3': 5, '4': 1, '5': 3, '10': 'revision'},
+  ],
+};
+
+/// Descriptor for `SpaceSettings`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List spaceSettingsDescriptor = $convert.base64Decode(
+    'Cg1TcGFjZVNldHRpbmdzEhQKBXRpdGxlGAEgASgJUgV0aXRsZRIdCgpjaGF0X3RpdGxlGAIgAS'
+    'gJUgljaGF0VGl0bGUSIQoMY2hhdF9lbmFibGVkGAMgASgIUgtjaGF0RW5hYmxlZBIvChNyZWdp'
+    'c3RyYXRpb25fcG9saWN5GAQgASgJUhJyZWdpc3RyYXRpb25Qb2xpY3kSGgoIcmV2aXNpb24YBS'
+    'ABKANSCHJldmlzaW9u');
+
+@$core.Deprecated('Use updateSettingsRequestDescriptor instead')
+const UpdateSettingsRequest$json = {
+  '1': 'UpdateSettingsRequest',
+  '2': [
+    {'1': 'title', '3': 1, '4': 1, '5': 9, '10': 'title'},
+    {'1': 'chat_title', '3': 2, '4': 1, '5': 9, '10': 'chatTitle'},
+    {'1': 'chat_enabled', '3': 3, '4': 1, '5': 8, '10': 'chatEnabled'},
+    {
+      '1': 'registration_policy',
+      '3': 4,
+      '4': 1,
+      '5': 9,
+      '10': 'registrationPolicy'
+    },
+    {
+      '1': 'expected_revision',
+      '3': 5,
+      '4': 1,
+      '5': 3,
+      '10': 'expectedRevision'
+    },
+  ],
+};
+
+/// Descriptor for `UpdateSettingsRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List updateSettingsRequestDescriptor = $convert.base64Decode(
+    'ChVVcGRhdGVTZXR0aW5nc1JlcXVlc3QSFAoFdGl0bGUYASABKAlSBXRpdGxlEh0KCmNoYXRfdG'
+    'l0bGUYAiABKAlSCWNoYXRUaXRsZRIhCgxjaGF0X2VuYWJsZWQYAyABKAhSC2NoYXRFbmFibGVk'
+    'Ei8KE3JlZ2lzdHJhdGlvbl9wb2xpY3kYBCABKAlSEnJlZ2lzdHJhdGlvblBvbGljeRIrChFleH'
+    'BlY3RlZF9yZXZpc2lvbhgFIAEoA1IQZXhwZWN0ZWRSZXZpc2lvbg==');
+
 @$core.Deprecated('Use subscribeRequestDescriptor instead')
 const SubscribeRequest$json = {
   '1': 'SubscribeRequest',
@@ -66,6 +245,7 @@ const CreateChallengeRequest$json = {
       '10': 'devicePublicKey'
     },
     {'1': 'grant_id', '3': 4, '4': 1, '5': 9, '10': 'grantId'},
+    {'1': 'administrative', '3': 5, '4': 1, '5': 8, '10': 'administrative'},
   ],
 };
 
@@ -73,7 +253,8 @@ const CreateChallengeRequest$json = {
 final $typed_data.Uint8List createChallengeRequestDescriptor = $convert.base64Decode(
     'ChZDcmVhdGVDaGFsbGVuZ2VSZXF1ZXN0EhgKB3B1cnBvc2UYASABKAlSB3B1cnBvc2USJgoPcm'
     '9vdF9wdWJsaWNfa2V5GAIgASgMUg1yb290UHVibGljS2V5EioKEWRldmljZV9wdWJsaWNfa2V5'
-    'GAMgASgMUg9kZXZpY2VQdWJsaWNLZXkSGQoIZ3JhbnRfaWQYBCABKAlSB2dyYW50SWQ=');
+    'GAMgASgMUg9kZXZpY2VQdWJsaWNLZXkSGQoIZ3JhbnRfaWQYBCABKAlSB2dyYW50SWQSJgoOYW'
+    'RtaW5pc3RyYXRpdmUYBSABKAhSDmFkbWluaXN0cmF0aXZl');
 
 @$core.Deprecated('Use createChallengeResponseDescriptor instead')
 const CreateChallengeResponse$json = {
@@ -202,6 +383,7 @@ const GetManifestResponse$json = {
       '6': '.space.v1.Channel',
       '10': 'channels'
     },
+    {'1': 'title', '3': 4, '4': 1, '5': 9, '10': 'title'},
   ],
 };
 
@@ -209,7 +391,7 @@ const GetManifestResponse$json = {
 final $typed_data.Uint8List getManifestResponseDescriptor = $convert.base64Decode(
     'ChNHZXRNYW5pZmVzdFJlc3BvbnNlEikKEHByb3RvY29sX3ZlcnNpb24YASABKAlSD3Byb3RvY2'
     '9sVmVyc2lvbhIbCglzZXJ2ZXJfaWQYAiABKAlSCHNlcnZlcklkEi0KCGNoYW5uZWxzGAMgAygL'
-    'MhEuc3BhY2UudjEuQ2hhbm5lbFIIY2hhbm5lbHM=');
+    'MhEuc3BhY2UudjEuQ2hhbm5lbFIIY2hhbm5lbHMSFAoFdGl0bGUYBCABKAlSBXRpdGxl');
 
 @$core.Deprecated('Use channelDescriptor instead')
 const Channel$json = {

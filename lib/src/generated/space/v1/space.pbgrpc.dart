@@ -169,6 +169,13 @@ class AuthServiceClient extends $grpc.Client {
 
   AuthServiceClient(super.channel, {super.options, super.interceptors});
 
+  $grpc.ResponseFuture<$0.LogoutResponse> logout(
+    $0.LogoutRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$logout, request, options: options);
+  }
+
   $grpc.ResponseFuture<$0.CreateChallengeResponse> createChallenge(
     $0.CreateChallengeRequest request, {
     $grpc.CallOptions? options,
@@ -185,6 +192,11 @@ class AuthServiceClient extends $grpc.Client {
 
   // method descriptors
 
+  static final _$logout =
+      $grpc.ClientMethod<$0.LogoutRequest, $0.LogoutResponse>(
+          '/space.v1.AuthService/Logout',
+          ($0.LogoutRequest value) => value.writeToBuffer(),
+          $0.LogoutResponse.fromBuffer);
   static final _$createChallenge =
       $grpc.ClientMethod<$0.CreateChallengeRequest, $0.CreateChallengeResponse>(
           '/space.v1.AuthService/CreateChallenge',
@@ -202,6 +214,13 @@ abstract class AuthServiceBase extends $grpc.Service {
   $core.String get $name => 'space.v1.AuthService';
 
   AuthServiceBase() {
+    $addMethod($grpc.ServiceMethod<$0.LogoutRequest, $0.LogoutResponse>(
+        'Logout',
+        logout_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.LogoutRequest.fromBuffer(value),
+        ($0.LogoutResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.CreateChallengeRequest,
             $0.CreateChallengeResponse>(
         'CreateChallenge',
@@ -221,6 +240,14 @@ abstract class AuthServiceBase extends $grpc.Service {
             $0.CompleteChallengeRequest.fromBuffer(value),
         ($0.CompleteChallengeResponse value) => value.writeToBuffer()));
   }
+
+  $async.Future<$0.LogoutResponse> logout_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.LogoutRequest> $request) async {
+    return logout($call, await $request);
+  }
+
+  $async.Future<$0.LogoutResponse> logout(
+      $grpc.ServiceCall call, $0.LogoutRequest request);
 
   $async.Future<$0.CreateChallengeResponse> createChallenge_Pre(
       $grpc.ServiceCall $call,
@@ -319,4 +346,144 @@ abstract class SyncServiceBase extends $grpc.Service {
 
   $async.Future<$0.ListEventsResponse> listEvents(
       $grpc.ServiceCall call, $0.ListEventsRequest request);
+}
+
+@$pb.GrpcServiceName('space.v1.AdminService')
+class AdminServiceClient extends $grpc.Client {
+  /// The hostname for this service.
+  static const $core.String defaultHost = '';
+
+  /// OAuth scopes needed for the client.
+  static const $core.List<$core.String> oauthScopes = [
+    '',
+  ];
+
+  AdminServiceClient(super.channel, {super.options, super.interceptors});
+
+  $grpc.ResponseFuture<$0.GetSetupStatusResponse> getSetupStatus(
+    $0.GetSetupStatusRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$getSetupStatus, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.ClaimOwnerResponse> claimOwner(
+    $0.ClaimOwnerRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$claimOwner, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.GetSettingsResponse> getSettings(
+    $0.GetSettingsRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$getSettings, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.UpdateSettingsResponse> updateSettings(
+    $0.UpdateSettingsRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$updateSettings, request, options: options);
+  }
+
+  // method descriptors
+
+  static final _$getSetupStatus =
+      $grpc.ClientMethod<$0.GetSetupStatusRequest, $0.GetSetupStatusResponse>(
+          '/space.v1.AdminService/GetSetupStatus',
+          ($0.GetSetupStatusRequest value) => value.writeToBuffer(),
+          $0.GetSetupStatusResponse.fromBuffer);
+  static final _$claimOwner =
+      $grpc.ClientMethod<$0.ClaimOwnerRequest, $0.ClaimOwnerResponse>(
+          '/space.v1.AdminService/ClaimOwner',
+          ($0.ClaimOwnerRequest value) => value.writeToBuffer(),
+          $0.ClaimOwnerResponse.fromBuffer);
+  static final _$getSettings =
+      $grpc.ClientMethod<$0.GetSettingsRequest, $0.GetSettingsResponse>(
+          '/space.v1.AdminService/GetSettings',
+          ($0.GetSettingsRequest value) => value.writeToBuffer(),
+          $0.GetSettingsResponse.fromBuffer);
+  static final _$updateSettings =
+      $grpc.ClientMethod<$0.UpdateSettingsRequest, $0.UpdateSettingsResponse>(
+          '/space.v1.AdminService/UpdateSettings',
+          ($0.UpdateSettingsRequest value) => value.writeToBuffer(),
+          $0.UpdateSettingsResponse.fromBuffer);
+}
+
+@$pb.GrpcServiceName('space.v1.AdminService')
+abstract class AdminServiceBase extends $grpc.Service {
+  $core.String get $name => 'space.v1.AdminService';
+
+  AdminServiceBase() {
+    $addMethod($grpc.ServiceMethod<$0.GetSetupStatusRequest,
+            $0.GetSetupStatusResponse>(
+        'GetSetupStatus',
+        getSetupStatus_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) =>
+            $0.GetSetupStatusRequest.fromBuffer(value),
+        ($0.GetSetupStatusResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.ClaimOwnerRequest, $0.ClaimOwnerResponse>(
+        'ClaimOwner',
+        claimOwner_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.ClaimOwnerRequest.fromBuffer(value),
+        ($0.ClaimOwnerResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.GetSettingsRequest, $0.GetSettingsResponse>(
+            'GetSettings',
+            getSettings_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.GetSettingsRequest.fromBuffer(value),
+            ($0.GetSettingsResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.UpdateSettingsRequest,
+            $0.UpdateSettingsResponse>(
+        'UpdateSettings',
+        updateSettings_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) =>
+            $0.UpdateSettingsRequest.fromBuffer(value),
+        ($0.UpdateSettingsResponse value) => value.writeToBuffer()));
+  }
+
+  $async.Future<$0.GetSetupStatusResponse> getSetupStatus_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.GetSetupStatusRequest> $request) async {
+    return getSetupStatus($call, await $request);
+  }
+
+  $async.Future<$0.GetSetupStatusResponse> getSetupStatus(
+      $grpc.ServiceCall call, $0.GetSetupStatusRequest request);
+
+  $async.Future<$0.ClaimOwnerResponse> claimOwner_Pre($grpc.ServiceCall $call,
+      $async.Future<$0.ClaimOwnerRequest> $request) async {
+    return claimOwner($call, await $request);
+  }
+
+  $async.Future<$0.ClaimOwnerResponse> claimOwner(
+      $grpc.ServiceCall call, $0.ClaimOwnerRequest request);
+
+  $async.Future<$0.GetSettingsResponse> getSettings_Pre($grpc.ServiceCall $call,
+      $async.Future<$0.GetSettingsRequest> $request) async {
+    return getSettings($call, await $request);
+  }
+
+  $async.Future<$0.GetSettingsResponse> getSettings(
+      $grpc.ServiceCall call, $0.GetSettingsRequest request);
+
+  $async.Future<$0.UpdateSettingsResponse> updateSettings_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.UpdateSettingsRequest> $request) async {
+    return updateSettings($call, await $request);
+  }
+
+  $async.Future<$0.UpdateSettingsResponse> updateSettings(
+      $grpc.ServiceCall call, $0.UpdateSettingsRequest request);
 }

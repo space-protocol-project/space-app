@@ -166,13 +166,22 @@ abstract interface class LiveSession {
   Future<void> close();
 }
 
-class SpaceSession implements LiveSession {
+abstract interface class SpacePresentation {
+  String get spaceTitle;
+  String get chatTitle;
+}
+
+class SpaceSession implements LiveSession, SpacePresentation {
   SpaceSession._(this.server, this.record, this.vault, this.channel);
   final Discovery server;
   final DeviceRecord record;
   final IdentityVault vault;
   final ClientChannel channel;
   String _token = '';
+  @override
+  String spaceTitle = '';
+  @override
+  String chatTitle = 'Общий чат';
   int _expiresAt = 0;
   Future<void>? _loginTask;
   @override
@@ -213,6 +222,13 @@ class SpaceSession implements LiveSession {
         GetManifestRequest(),
         options: CallOptions(timeout: const Duration(seconds: 10)),
       );
+      session.spaceTitle = manifest.title;
+      session.chatTitle =
+          manifest.channels
+              .where((channel) => channel.id == 'general')
+              .firstOrNull
+              ?.title ??
+          'Общий чат';
       if (manifest.serverId != server.serverId ||
           manifest.protocolVersion != '0.1-experimental' ||
           !manifest.channels.any(

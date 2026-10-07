@@ -33,6 +33,12 @@ class ChatController extends ChangeNotifier {
   final Map<String, Content> _messages = {};
   List<Content> get messages => _messages.values.toList();
   String get principalId => _session?.principalId ?? '';
+  String get spaceTitle => _session is SpacePresentation
+      ? (_session as SpacePresentation).spaceTitle
+      : '';
+  String get chatTitle => _session is SpacePresentation
+      ? (_session as SpacePresentation).chatTitle
+      : 'Общий чат';
   void _update() {
     if (!_disposed) notifyListeners();
   }
@@ -209,6 +215,7 @@ class ChatController extends ChangeNotifier {
             StatusCode.permissionDenied,
             StatusCode.invalidArgument,
             StatusCode.unimplemented,
+            StatusCode.notFound,
           ].contains(problem.code);
   Future<bool> send(String text) async {
     final session = _session;
