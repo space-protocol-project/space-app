@@ -169,6 +169,20 @@ class AuthServiceClient extends $grpc.Client {
 
   AuthServiceClient(super.channel, {super.options, super.interceptors});
 
+  $grpc.ResponseFuture<$0.RevokeCurrentDeviceResponse> revokeCurrentDevice(
+    $0.RevokeCurrentDeviceRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$revokeCurrentDevice, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.ListDevicesResponse> listDevices(
+    $0.ListDevicesRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$listDevices, request, options: options);
+  }
+
   $grpc.ResponseFuture<$0.LogoutResponse> logout(
     $0.LogoutRequest request, {
     $grpc.CallOptions? options,
@@ -192,6 +206,16 @@ class AuthServiceClient extends $grpc.Client {
 
   // method descriptors
 
+  static final _$revokeCurrentDevice = $grpc.ClientMethod<
+          $0.RevokeCurrentDeviceRequest, $0.RevokeCurrentDeviceResponse>(
+      '/space.v1.AuthService/RevokeCurrentDevice',
+      ($0.RevokeCurrentDeviceRequest value) => value.writeToBuffer(),
+      $0.RevokeCurrentDeviceResponse.fromBuffer);
+  static final _$listDevices =
+      $grpc.ClientMethod<$0.ListDevicesRequest, $0.ListDevicesResponse>(
+          '/space.v1.AuthService/ListDevices',
+          ($0.ListDevicesRequest value) => value.writeToBuffer(),
+          $0.ListDevicesResponse.fromBuffer);
   static final _$logout =
       $grpc.ClientMethod<$0.LogoutRequest, $0.LogoutResponse>(
           '/space.v1.AuthService/Logout',
@@ -214,6 +238,24 @@ abstract class AuthServiceBase extends $grpc.Service {
   $core.String get $name => 'space.v1.AuthService';
 
   AuthServiceBase() {
+    $addMethod($grpc.ServiceMethod<$0.RevokeCurrentDeviceRequest,
+            $0.RevokeCurrentDeviceResponse>(
+        'RevokeCurrentDevice',
+        revokeCurrentDevice_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) =>
+            $0.RevokeCurrentDeviceRequest.fromBuffer(value),
+        ($0.RevokeCurrentDeviceResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.ListDevicesRequest, $0.ListDevicesResponse>(
+            'ListDevices',
+            listDevices_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.ListDevicesRequest.fromBuffer(value),
+            ($0.ListDevicesResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.LogoutRequest, $0.LogoutResponse>(
         'Logout',
         logout_Pre,
@@ -240,6 +282,23 @@ abstract class AuthServiceBase extends $grpc.Service {
             $0.CompleteChallengeRequest.fromBuffer(value),
         ($0.CompleteChallengeResponse value) => value.writeToBuffer()));
   }
+
+  $async.Future<$0.RevokeCurrentDeviceResponse> revokeCurrentDevice_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.RevokeCurrentDeviceRequest> $request) async {
+    return revokeCurrentDevice($call, await $request);
+  }
+
+  $async.Future<$0.RevokeCurrentDeviceResponse> revokeCurrentDevice(
+      $grpc.ServiceCall call, $0.RevokeCurrentDeviceRequest request);
+
+  $async.Future<$0.ListDevicesResponse> listDevices_Pre($grpc.ServiceCall $call,
+      $async.Future<$0.ListDevicesRequest> $request) async {
+    return listDevices($call, await $request);
+  }
+
+  $async.Future<$0.ListDevicesResponse> listDevices(
+      $grpc.ServiceCall call, $0.ListDevicesRequest request);
 
   $async.Future<$0.LogoutResponse> logout_Pre(
       $grpc.ServiceCall $call, $async.Future<$0.LogoutRequest> $request) async {

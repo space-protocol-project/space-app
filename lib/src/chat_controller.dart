@@ -36,6 +36,8 @@ class ChatController extends ChangeNotifier {
   bool get canWrite =>
       _session is SpaceAccess ? (_session as SpaceAccess).canWrite : connected;
   String get principalId => _session?.principalId ?? '';
+  DeviceManagement? get deviceManagement =>
+      _session is DeviceManagement ? _session as DeviceManagement : null;
   String get spaceTitle => _session is SpacePresentation
       ? (_session as SpacePresentation).spaceTitle
       : '';
@@ -88,7 +90,7 @@ class ChatController extends ChangeNotifier {
     }
   }
 
-  Future<void> connect() async {
+  Future<void> connect({DeviceRecord? restoredRecord}) async {
     final server = preview;
     if (busy || server == null) return;
     busy = true;
@@ -99,12 +101,13 @@ class ChatController extends ChangeNotifier {
     try {
       await _session?.close();
       _session = null;
-      final session = _invitationToken.isEmpty
+      final session = _invitationToken.isEmpty && restoredRecord == null
           ? await openSession(server, vault)
           : await SpaceSession.connect(
               server,
               vault,
               invitationToken: _invitationToken,
+              restoredRecord: restoredRecord,
             );
       if (_disposed) {
         await session.close();

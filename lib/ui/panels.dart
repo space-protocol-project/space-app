@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'recovery_panel.dart';
+
 import '../src/chat_controller.dart';
 import '../src/preferences.dart';
 import 'components.dart';
@@ -273,12 +275,14 @@ class IdentityPanel extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             const Text(
-              'Карточка восстановления ещё недоступна в этой версии. Пока ключи нельзя восстановить после удаления локального хранилища. Не удаляйте его для переподключения.',
+              'Карточка относится к выбранному серверу. Она не содержит историю сообщений; права и сохранённая история загружаются с сервера после восстановления.',
               style: TextStyle(height: 1.7),
             ),
           ],
         ),
       ),
+      const SizedBox(height: 20),
+      RecoveryPanel(controller: controller),
     ],
   );
 }

@@ -33,6 +33,74 @@ const LogoutResponse$json = {
 final $typed_data.Uint8List logoutResponseDescriptor =
     $convert.base64Decode('Cg5Mb2dvdXRSZXNwb25zZQ==');
 
+@$core.Deprecated('Use listDevicesRequestDescriptor instead')
+const ListDevicesRequest$json = {
+  '1': 'ListDevicesRequest',
+};
+
+/// Descriptor for `ListDevicesRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listDevicesRequestDescriptor =
+    $convert.base64Decode('ChJMaXN0RGV2aWNlc1JlcXVlc3Q=');
+
+@$core.Deprecated('Use revokeCurrentDeviceRequestDescriptor instead')
+const RevokeCurrentDeviceRequest$json = {
+  '1': 'RevokeCurrentDeviceRequest',
+};
+
+/// Descriptor for `RevokeCurrentDeviceRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List revokeCurrentDeviceRequestDescriptor =
+    $convert.base64Decode('ChpSZXZva2VDdXJyZW50RGV2aWNlUmVxdWVzdA==');
+
+@$core.Deprecated('Use revokeCurrentDeviceResponseDescriptor instead')
+const RevokeCurrentDeviceResponse$json = {
+  '1': 'RevokeCurrentDeviceResponse',
+};
+
+/// Descriptor for `RevokeCurrentDeviceResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List revokeCurrentDeviceResponseDescriptor =
+    $convert.base64Decode('ChtSZXZva2VDdXJyZW50RGV2aWNlUmVzcG9uc2U=');
+
+@$core.Deprecated('Use deviceGrantDescriptor instead')
+const DeviceGrant$json = {
+  '1': 'DeviceGrant',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    {'1': 'public_key', '3': 2, '4': 1, '5': 12, '10': 'publicKey'},
+    {'1': 'scopes', '3': 3, '4': 3, '5': 9, '10': 'scopes'},
+    {'1': 'expires_at', '3': 4, '4': 1, '5': 3, '10': 'expiresAt'},
+    {'1': 'revoked', '3': 5, '4': 1, '5': 8, '10': 'revoked'},
+    {'1': 'parent_grant_id', '3': 6, '4': 1, '5': 9, '10': 'parentGrantId'},
+    {'1': 'recovery', '3': 7, '4': 1, '5': 8, '10': 'recovery'},
+  ],
+};
+
+/// Descriptor for `DeviceGrant`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deviceGrantDescriptor = $convert.base64Decode(
+    'CgtEZXZpY2VHcmFudBIOCgJpZBgBIAEoCVICaWQSHQoKcHVibGljX2tleRgCIAEoDFIJcHVibG'
+    'ljS2V5EhYKBnNjb3BlcxgDIAMoCVIGc2NvcGVzEh0KCmV4cGlyZXNfYXQYBCABKANSCWV4cGly'
+    'ZXNBdBIYCgdyZXZva2VkGAUgASgIUgdyZXZva2VkEiYKD3BhcmVudF9ncmFudF9pZBgGIAEoCV'
+    'INcGFyZW50R3JhbnRJZBIaCghyZWNvdmVyeRgHIAEoCFIIcmVjb3Zlcnk=');
+
+@$core.Deprecated('Use listDevicesResponseDescriptor instead')
+const ListDevicesResponse$json = {
+  '1': 'ListDevicesResponse',
+  '2': [
+    {
+      '1': 'devices',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.DeviceGrant',
+      '10': 'devices'
+    },
+  ],
+};
+
+/// Descriptor for `ListDevicesResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listDevicesResponseDescriptor = $convert.base64Decode(
+    'ChNMaXN0RGV2aWNlc1Jlc3BvbnNlEi8KB2RldmljZXMYASADKAsyFS5zcGFjZS52MS5EZXZpY2'
+    'VHcmFudFIHZGV2aWNlcw==');
+
 @$core.Deprecated('Use memberDescriptor instead')
 const Member$json = {
   '1': 'Member',
@@ -541,6 +609,8 @@ const CreateChallengeRequest$json = {
     },
     {'1': 'grant_id', '3': 4, '4': 1, '5': 9, '10': 'grantId'},
     {'1': 'administrative', '3': 5, '4': 1, '5': 8, '10': 'administrative'},
+    {'1': 'recovery', '3': 6, '4': 1, '5': 8, '10': 'recovery'},
+    {'1': 'recovery_grant_id', '3': 7, '4': 1, '5': 9, '10': 'recoveryGrantId'},
   ],
 };
 
@@ -549,7 +619,8 @@ final $typed_data.Uint8List createChallengeRequestDescriptor = $convert.base64De
     'ChZDcmVhdGVDaGFsbGVuZ2VSZXF1ZXN0EhgKB3B1cnBvc2UYASABKAlSB3B1cnBvc2USJgoPcm'
     '9vdF9wdWJsaWNfa2V5GAIgASgMUg1yb290UHVibGljS2V5EioKEWRldmljZV9wdWJsaWNfa2V5'
     'GAMgASgMUg9kZXZpY2VQdWJsaWNLZXkSGQoIZ3JhbnRfaWQYBCABKAlSB2dyYW50SWQSJgoOYW'
-    'RtaW5pc3RyYXRpdmUYBSABKAhSDmFkbWluaXN0cmF0aXZl');
+    'RtaW5pc3RyYXRpdmUYBSABKAhSDmFkbWluaXN0cmF0aXZlEhoKCHJlY292ZXJ5GAYgASgIUghy'
+    'ZWNvdmVyeRIqChFyZWNvdmVyeV9ncmFudF9pZBgHIAEoCVIPcmVjb3ZlcnlHcmFudElk');
 
 @$core.Deprecated('Use createChallengeResponseDescriptor instead')
 const CreateChallengeResponse$json = {

@@ -105,21 +105,33 @@ class DeviceRecord {
     required this.rootSeed,
     required this.deviceSeed,
     this.grantId = '',
+    this.rootPublicKey = const [],
+    this.recoverySeed = const [],
+    this.recoveryGrantId = '',
+    this.administrative = false,
   });
   final String origin, serverId, serverKey;
   final List<int> rootSeed, deviceSeed;
+  final List<int> rootPublicKey;
+  List<int> recoverySeed;
+  final String recoveryGrantId;
+  final bool administrative;
   String grantId;
   Map<String, Object> toJson() => {
-    'v': 1,
+    'v': 2,
     'origin': origin,
     'serverId': serverId,
     'serverKey': serverKey,
     'rootSeed': url64(rootSeed),
     'deviceSeed': url64(deviceSeed),
     'grantId': grantId,
+    'rootPublicKey': url64(rootPublicKey),
+    'recoverySeed': url64(recoverySeed),
+    'recoveryGrantId': recoveryGrantId,
+    'administrative': administrative,
   };
   static DeviceRecord fromJson(Map<String, dynamic> data) {
-    if (data['v'] != 1) {
+    if (data['v'] != 1 && data['v'] != 2) {
       throw const FormatException('Неизвестная версия хранилища ключей');
     }
     final record = DeviceRecord(
@@ -133,8 +145,23 @@ class DeviceRecord {
         base64Url.normalize(data['deviceSeed'] as String),
       ),
       grantId: data['grantId'] as String,
+      rootPublicKey: base64Url.decode(
+        base64Url.normalize(data['rootPublicKey'] as String? ?? ''),
+      ),
+      recoverySeed: base64Url.decode(
+        base64Url.normalize(data['recoverySeed'] as String? ?? ''),
+      ),
+      recoveryGrantId: data['recoveryGrantId'] as String? ?? '',
+      administrative: data['administrative'] as bool? ?? false,
     );
-    if (record.rootSeed.length != 32 || record.deviceSeed.length != 32) {
+    if ((record.rootSeed.length != 32 &&
+            !(record.rootSeed.isEmpty &&
+                record.rootPublicKey.length == 32 &&
+                (record.recoverySeed.isEmpty ||
+                    (record.recoverySeed.length == 32 &&
+                        RegExp(r'^dg_[A-Za-z0-9_-]{43}$')
+                            .hasMatch(record.recoveryGrantId))))) ||
+        record.deviceSeed.length != 32) {
       throw const FormatException('Повреждено хранилище ключей');
     }
     return record;
@@ -175,7 +202,16 @@ abstract interface class SpaceAccess {
   bool get canWrite;
 }
 
-class SpaceSession implements LiveSession, SpacePresentation, SpaceAccess {
+abstract interface class DeviceManagement {
+  String get currentGrantId;
+  bool get hasRootAuthority;
+  Future<List<DeviceGrant>> listDevices();
+  Future<void> revokeDevice(DeviceGrant grant, {DeviceRecord? authority});
+  Future<Map<String, dynamic>> recoveryPayload();
+}
+
+class SpaceSession
+    implements LiveSession, SpacePresentation, SpaceAccess, DeviceManagement {
   SpaceSession._(this.server, this.record, this.vault, this.channel);
   final Discovery server;
   final DeviceRecord record;
@@ -202,8 +238,9 @@ class SpaceSession implements LiveSession, SpacePresentation, SpaceAccess {
     Discovery server,
     IdentityVault vault, {
     String invitationToken = '',
+    DeviceRecord? restoredRecord,
   }) async {
-    var record = await vault.load(server.origin.toString());
+    var record = restoredRecord ?? await vault.load(server.origin.toString());
     if (record != null) {
       checkTrust(server, record);
     } else {
@@ -250,6 +287,7 @@ class SpaceSession implements LiveSession, SpacePresentation, SpaceAccess {
           invitationToken: invitationToken,
         );
         record.grantId = result.grantId;
+        if (record.rootSeed.isEmpty) record.recoverySeed = [];
         await vault.save(record);
       }
       await session.login();
@@ -292,20 +330,49 @@ class SpaceSession implements LiveSession, SpacePresentation, SpaceAccess {
   Future<CompleteChallengeResponse> _authorize(
     String purpose, {
     String invitationToken = '',
+    DeviceGrant? target,
+    DeviceRecord? authority,
   }) async {
+    final credentials = authority ?? record;
     final algorithm = Ed25519();
-    final root = await algorithm.newKeyPairFromSeed(record.rootSeed);
-    final device = await algorithm.newKeyPairFromSeed(record.deviceSeed);
-    final rootPublic = (await root.extractPublicKey()).bytes;
-    final devicePublic = (await device.extractPublicKey()).bytes;
+    final root = credentials.rootSeed.isEmpty
+        ? null
+        : await algorithm.newKeyPairFromSeed(credentials.rootSeed);
+    final device = await algorithm.newKeyPairFromSeed(credentials.deviceSeed);
+    final rootPublic = root == null
+        ? credentials.rootPublicKey
+        : (await root.extractPublicKey()).bytes;
+    final devicePublic =
+        target?.publicKey ?? (await device.extractPublicKey()).bytes;
+    if (root == null && purpose == 'device.register') {
+      purpose = 'device.delegate';
+    }
+    if (root == null && purpose == 'device.revoke') {
+      purpose = 'recovery.device.revoke';
+    }
+    if (root == null &&
+        credentials.recoverySeed.isEmpty &&
+        purpose != "auth.login") {
+      throw const FormatException(
+        "Откройте карточку для управления устройствами",
+      );
+    }
+    final delegated =
+        purpose == 'device.delegate' || purpose == 'recovery.device.revoke';
+    final grantId = target?.id ?? credentials.grantId;
     final request = CreateChallengeRequest(purpose: purpose);
     if (purpose == 'device.register') {
       request.rootPublicKey = rootPublic;
       request.devicePublicKey = devicePublic;
+      request.administrative = credentials.administrative;
+    } else if (purpose == 'device.delegate') {
+      request.devicePublicKey = devicePublic;
+      request.administrative = credentials.administrative;
     } else {
-      request.grantId = record.grantId;
+      request.grantId = grantId;
     }
     if (purpose == 'device.revoke') request.rootPublicKey = rootPublic;
+    if (delegated) request.recoveryGrantId = credentials.recoveryGrantId;
     final auth = AuthServiceClient(channel);
     final options = CallOptions(timeout: const Duration(seconds: 10));
     final challenge = await auth.createChallenge(request, options: options);
@@ -315,9 +382,21 @@ class SpaceSession implements LiveSession, SpacePresentation, SpaceAccess {
       rootPublic,
       devicePublic,
       purpose,
-      record.grantId,
+      grantId,
+      expectedScopes:
+          target?.scopes ??
+          [
+            'chat.read',
+            'chat.write',
+            if (credentials.administrative) 'space.manage',
+          ],
+      authorizerGrantId: delegated ? credentials.recoveryGrantId : '',
     );
-    final key = purpose == 'auth.login' ? device : root;
+    final key = purpose == 'auth.login'
+        ? device
+        : delegated
+        ? await algorithm.newKeyPairFromSeed(credentials.recoverySeed)
+        : root!;
     final signature = await algorithm.sign(signing, keyPair: key);
     final result = await auth.completeChallenge(
       CompleteChallengeRequest(
@@ -331,7 +410,9 @@ class SpaceSession implements LiveSession, SpacePresentation, SpaceAccess {
         'u_${(await Sha256().hash(rootPublic)).bytes.map((v) => v.toRadixString(16).padLeft(2, '0')).join()}';
     if (result.principalId != principal ||
         !RegExp(r'^dg_[A-Za-z0-9_-]{43}$').hasMatch(result.grantId) ||
-        (purpose != 'device.register' && result.grantId != record.grantId)) {
+        (purpose != 'device.register' &&
+            purpose != 'device.delegate' &&
+            result.grantId != grantId)) {
       throw const FormatException('Ответ входа не соответствует ключам');
     }
     return result;
@@ -445,13 +526,144 @@ class SpaceSession implements LiveSession, SpacePresentation, SpaceAccess {
 
   @override
   Future<void> revoke() async {
-    await _authorize('device.revoke');
+    await _ensureSession();
+    await AuthServiceClient(channel)
+        .revokeCurrentDevice(RevokeCurrentDeviceRequest(), options: _options);
     _token = '';
     _expiresAt = 0;
   }
 
   @override
   Future<void> close() => channel.shutdown();
+  @override
+  Future<List<DeviceGrant>> listDevices() async {
+    await _ensureSession();
+    return (await AuthServiceClient(
+      channel,
+    ).listDevices(ListDevicesRequest(), options: _options)).devices;
+  }
+
+  @override
+  String get currentGrantId => record.grantId;
+  @override
+  bool get hasRootAuthority => record.rootSeed.isNotEmpty;
+  @override
+  Future<void> revokeDevice(
+    DeviceGrant grant, {
+    DeviceRecord? authority,
+  }) async {
+    if (grant.id == record.grantId) {
+      await revoke();
+      return;
+    }
+    if (authority != null) {
+      checkTrust(server, authority);
+      final rootPublic = authority.rootSeed.isEmpty
+          ? authority.rootPublicKey
+          : (await (await Ed25519().newKeyPairFromSeed(
+              authority.rootSeed,
+            )).extractPublicKey()).bytes;
+      final id =
+          'u_${(await Sha256().hash(rootPublic)).bytes.map((v) => v.toRadixString(16).padLeft(2, '0')).join()}';
+      if (id != principalId) {
+        throw const FormatException('Карточка относится к другой идентичности');
+      }
+    }
+    await _authorize('device.revoke', target: grant, authority: authority);
+  }
+
+  @override
+  Future<Map<String, dynamic>> recoveryPayload() async {
+    if (!hasRootAuthority && record.recoverySeed.isEmpty) {
+      throw const FormatException(
+        'Для этой операции нужна исходная карточка. Ключ восстановления не сохраняется в рабочем устройстве.',
+      );
+    }
+    final rootPublic = record.rootSeed.isEmpty
+        ? record.rootPublicKey
+        : (await (await Ed25519().newKeyPairFromSeed(
+            record.rootSeed,
+          )).extractPublicKey()).bytes;
+    final payload = <String, dynamic>{
+      'v': 1,
+      'origin': record.origin,
+      'server_id': record.serverId,
+      'server_key': record.serverKey,
+      'root_public_key': url64(rootPublic),
+      'credential': record.rootSeed.isEmpty ? 'recovery' : 'root',
+      'secret': url64(
+        record.rootSeed.isEmpty ? record.recoverySeed : record.rootSeed,
+      ),
+    };
+    if (record.rootSeed.isEmpty) {
+      final parent = (await listDevices())
+          .where((g) => g.id == record.recoveryGrantId)
+          .firstOrNull;
+      if (parent == null ||
+          parent.revoked ||
+          parent.expiresAt.toInt() <=
+              DateTime.now().millisecondsSinceEpoch ~/ 1000) {
+        throw const FormatException('Ключ восстановления недействителен');
+      }
+      payload.addAll({
+        'recovery_grant_id': parent.id,
+        'expires_at': parent.expiresAt.toInt(),
+        'credential_public_key': url64(parent.publicKey),
+      });
+    }
+    return payload;
+  }
+}
+
+Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
+  if (payload['v'] != 1 ||
+      !['root', 'recovery'].contains(payload['credential'])) {
+    throw const FormatException('Неподдерживаемая карточка');
+  }
+  final origin = localOrigin(payload['origin'] as String).toString();
+  final rootPublic = base64Url.decode(
+    base64Url.normalize(payload['root_public_key'] as String),
+  );
+  final secret = base64Url.decode(
+    base64Url.normalize(payload['secret'] as String),
+  );
+  final serverKey = payload['server_key'] as String,
+      serverId = payload['server_id'] as String;
+  if (rootPublic.length != 32 ||
+      secret.length != 32 ||
+      !RegExp(r'^srv_[0-9a-f]{32}$').hasMatch(serverId) ||
+      !RegExp(r'^[A-Za-z0-9_-]{43}$').hasMatch(serverKey)) {
+    throw const FormatException('Повреждены сведения о сервере или ключах');
+  }
+  final pair = await Ed25519().newKeyPairFromSeed(secret);
+  final actual = url64((await pair.extractPublicKey()).bytes);
+  final isRoot = payload['credential'] == 'root';
+  if (actual !=
+      (isRoot ? url64(rootPublic) : payload['credential_public_key'])) {
+    throw const FormatException(
+      'Ключ карточки не соответствует публичному ключу',
+    );
+  }
+  if (!isRoot &&
+      (payload['expires_at'] is! int ||
+          (payload['expires_at'] as int) <=
+              DateTime.now().millisecondsSinceEpoch ~/ 1000 ||
+          !RegExp(r'^dg_[A-Za-z0-9_-]{43}$')
+              .hasMatch(payload['recovery_grant_id'] as String))) {
+    throw const FormatException('Разрешение восстановления недействительно');
+  }
+  final device = await Ed25519().newKeyPair();
+  return DeviceRecord(
+    origin: origin,
+    serverId: serverId,
+    serverKey: serverKey,
+    rootSeed: isRoot ? secret : [],
+    deviceSeed: await device.extractPrivateKeyBytes(),
+    rootPublicKey: rootPublic,
+    recoverySeed: isRoot ? [] : secret,
+    recoveryGrantId: isRoot ? '' : payload['recovery_grant_id'] as String,
+    administrative: !isRoot,
+  );
 }
 
 String newRequestKey() =>
@@ -463,8 +675,10 @@ Future<List<int>> checkedSigningBytes(
   List<int> root,
   List<int> device,
   String purpose,
-  String grantId,
-) async {
+  String grantId, {
+  List<String> expectedScopes = const ['chat.read', 'chat.write'],
+  String authorizerGrantId = '',
+}) async {
   final transcript =
       jsonDecode(utf8.decode(response.transcript)) as Map<String, dynamic>;
   final keys = transcript.keys.toList()..sort();
@@ -487,6 +701,9 @@ Future<List<int>> checkedSigningBytes(
     'v',
   ];
   final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  if (authorizerGrantId.isNotEmpty) {
+    expectedKeys.insert(1, 'authorizer_grant_id');
+  }
   final principal =
       'u_${(await Sha256().hash(root)).bytes.map((v) => v.toRadixString(16).padLeft(2, '0')).join()}';
   final nonce = base64Url.decode(
@@ -511,13 +728,17 @@ Future<List<int>> checkedSigningBytes(
       RegExp(r'^dg_[A-Za-z0-9_-]{43}$')
           .hasMatch(transcript['grant_id'] as String) &&
       nonce.length == 32 &&
-      jsonEncode(transcript['scopes']) == '["chat.read","chat.write"]' &&
+      jsonEncode(transcript['scopes']) == jsonEncode(expectedScopes) &&
+      (authorizerGrantId.isEmpty ||
+          transcript['authorizer_grant_id'] == authorizerGrantId) &&
       expiry == issued + 60 &&
       expiry > now &&
       issued <= now + 5 &&
       grantExpiry > expiry &&
-      (purpose == 'device.register'
-          ? grantExpiry == issued + 30 * 86400
+      (purpose == 'device.register' || purpose == 'device.delegate'
+          ? (purpose == 'device.register'
+                ? grantExpiry == issued + 30 * 86400
+                : grantExpiry <= issued + 30 * 86400)
           : transcript['grant_id'] == grantId);
   if (!valid) {
     throw const FormatException(
@@ -528,6 +749,8 @@ Future<List<int>> checkedSigningBytes(
     'device.register': 'space/device-register/v1',
     'auth.login': 'space/auth-login/v1',
     'device.revoke': 'space/device-revoke/v1',
+    'device.delegate': 'space/device-delegate/v1',
+    'recovery.device.revoke': 'space/recovery-device-revoke/v1',
   }[purpose];
   if (prefix == null) {
     throw const FormatException('Неизвестное назначение подписи');

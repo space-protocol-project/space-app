@@ -99,6 +99,317 @@ class LogoutResponse extends $pb.GeneratedMessage {
   static LogoutResponse? _defaultInstance;
 }
 
+class ListDevicesRequest extends $pb.GeneratedMessage {
+  factory ListDevicesRequest() => ListDevicesRequest._();
+
+  ListDevicesRequest._();
+
+  factory ListDevicesRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListDevicesRequest()..mergeFromBuffer(data, registry);
+  factory ListDevicesRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListDevicesRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListDevicesRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListDevicesRequest.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListDevicesRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListDevicesRequest copyWith(void Function(ListDevicesRequest) updates) =>
+      super.copyWith((message) => updates(message as ListDevicesRequest))
+          as ListDevicesRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ListDevicesRequest() / ListDevicesRequest.new instead')
+  static ListDevicesRequest create() => ListDevicesRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ListDevicesRequest._();
+  @$core.override
+  ListDevicesRequest createEmptyInstance() => ListDevicesRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ListDevicesRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListDevicesRequest>(
+          ListDevicesRequest.$_createMessage);
+  static ListDevicesRequest? _defaultInstance;
+}
+
+class RevokeCurrentDeviceRequest extends $pb.GeneratedMessage {
+  factory RevokeCurrentDeviceRequest() => RevokeCurrentDeviceRequest._();
+
+  RevokeCurrentDeviceRequest._();
+
+  factory RevokeCurrentDeviceRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      RevokeCurrentDeviceRequest()..mergeFromBuffer(data, registry);
+  factory RevokeCurrentDeviceRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      RevokeCurrentDeviceRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'RevokeCurrentDeviceRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: RevokeCurrentDeviceRequest.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RevokeCurrentDeviceRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RevokeCurrentDeviceRequest copyWith(
+          void Function(RevokeCurrentDeviceRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as RevokeCurrentDeviceRequest))
+          as RevokeCurrentDeviceRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RevokeCurrentDeviceRequest() / RevokeCurrentDeviceRequest.new instead')
+  static RevokeCurrentDeviceRequest create() => RevokeCurrentDeviceRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      RevokeCurrentDeviceRequest._();
+  @$core.override
+  RevokeCurrentDeviceRequest createEmptyInstance() =>
+      RevokeCurrentDeviceRequest._();
+  @$core.pragma('dart2js:noInline')
+  static RevokeCurrentDeviceRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<RevokeCurrentDeviceRequest>(
+          RevokeCurrentDeviceRequest.$_createMessage);
+  static RevokeCurrentDeviceRequest? _defaultInstance;
+}
+
+class RevokeCurrentDeviceResponse extends $pb.GeneratedMessage {
+  factory RevokeCurrentDeviceResponse() => RevokeCurrentDeviceResponse._();
+
+  RevokeCurrentDeviceResponse._();
+
+  factory RevokeCurrentDeviceResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      RevokeCurrentDeviceResponse()..mergeFromBuffer(data, registry);
+  factory RevokeCurrentDeviceResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      RevokeCurrentDeviceResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'RevokeCurrentDeviceResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: RevokeCurrentDeviceResponse.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RevokeCurrentDeviceResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RevokeCurrentDeviceResponse copyWith(
+          void Function(RevokeCurrentDeviceResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as RevokeCurrentDeviceResponse))
+          as RevokeCurrentDeviceResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RevokeCurrentDeviceResponse() / RevokeCurrentDeviceResponse.new instead')
+  static RevokeCurrentDeviceResponse create() =>
+      RevokeCurrentDeviceResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      RevokeCurrentDeviceResponse._();
+  @$core.override
+  RevokeCurrentDeviceResponse createEmptyInstance() =>
+      RevokeCurrentDeviceResponse._();
+  @$core.pragma('dart2js:noInline')
+  static RevokeCurrentDeviceResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<RevokeCurrentDeviceResponse>(
+          RevokeCurrentDeviceResponse.$_createMessage);
+  static RevokeCurrentDeviceResponse? _defaultInstance;
+}
+
+class DeviceGrant extends $pb.GeneratedMessage {
+  factory DeviceGrant({
+    $core.String? id,
+    $core.List<$core.int>? publicKey,
+    $core.Iterable<$core.String>? scopes,
+    $fixnum.Int64? expiresAt,
+    $core.bool? revoked,
+    $core.String? parentGrantId,
+    $core.bool? recovery,
+  }) {
+    final result = DeviceGrant._();
+    if (id != null) result.id = id;
+    if (publicKey != null) result.publicKey = publicKey;
+    if (scopes != null) result.scopes.addAll(scopes);
+    if (expiresAt != null) result.expiresAt = expiresAt;
+    if (revoked != null) result.revoked = revoked;
+    if (parentGrantId != null) result.parentGrantId = parentGrantId;
+    if (recovery != null) result.recovery = recovery;
+    return result;
+  }
+
+  DeviceGrant._();
+
+  factory DeviceGrant.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeviceGrant()..mergeFromBuffer(data, registry);
+  factory DeviceGrant.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeviceGrant()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'DeviceGrant',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: DeviceGrant.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'id')
+    ..a<$core.List<$core.int>>(
+        2, _omitFieldNames ? '' : 'publicKey', $pb.PbFieldType.OY)
+    ..pPS(3, _omitFieldNames ? '' : 'scopes')
+    ..aInt64(4, _omitFieldNames ? '' : 'expiresAt')
+    ..aOB(5, _omitFieldNames ? '' : 'revoked')
+    ..aOS(6, _omitFieldNames ? '' : 'parentGrantId')
+    ..aOB(7, _omitFieldNames ? '' : 'recovery')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeviceGrant clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeviceGrant copyWith(void Function(DeviceGrant) updates) =>
+      super.copyWith((message) => updates(message as DeviceGrant))
+          as DeviceGrant;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use DeviceGrant() / DeviceGrant.new instead')
+  static DeviceGrant create() => DeviceGrant._();
+  static $pb.GeneratedMessage $_createMessage() => DeviceGrant._();
+  @$core.override
+  DeviceGrant createEmptyInstance() => DeviceGrant._();
+  @$core.pragma('dart2js:noInline')
+  static DeviceGrant getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DeviceGrant>(
+          DeviceGrant.$_createMessage);
+  static DeviceGrant? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get publicKey => $_getN(1);
+  @$pb.TagNumber(2)
+  set publicKey($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasPublicKey() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearPublicKey() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $pb.PbList<$core.String> get scopes => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get expiresAt => $_getI64(3);
+  @$pb.TagNumber(4)
+  set expiresAt($fixnum.Int64 value) => $_setInt64(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasExpiresAt() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearExpiresAt() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get revoked => $_getBF(4);
+  @$pb.TagNumber(5)
+  set revoked($core.bool value) => $_setBool(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasRevoked() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearRevoked() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get parentGrantId => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set parentGrantId($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasParentGrantId() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearParentGrantId() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.bool get recovery => $_getBF(6);
+  @$pb.TagNumber(7)
+  set recovery($core.bool value) => $_setBool(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasRecovery() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearRecovery() => $_clearField(7);
+}
+
+class ListDevicesResponse extends $pb.GeneratedMessage {
+  factory ListDevicesResponse({
+    $core.Iterable<DeviceGrant>? devices,
+  }) {
+    final result = ListDevicesResponse._();
+    if (devices != null) result.devices.addAll(devices);
+    return result;
+  }
+
+  ListDevicesResponse._();
+
+  factory ListDevicesResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListDevicesResponse()..mergeFromBuffer(data, registry);
+  factory ListDevicesResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListDevicesResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListDevicesResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListDevicesResponse.$_createMessage)
+    ..pPM<DeviceGrant>(1, _omitFieldNames ? '' : 'devices',
+        subBuilder: DeviceGrant.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListDevicesResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListDevicesResponse copyWith(void Function(ListDevicesResponse) updates) =>
+      super.copyWith((message) => updates(message as ListDevicesResponse))
+          as ListDevicesResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use ListDevicesResponse() / ListDevicesResponse.new instead')
+  static ListDevicesResponse create() => ListDevicesResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ListDevicesResponse._();
+  @$core.override
+  ListDevicesResponse createEmptyInstance() => ListDevicesResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ListDevicesResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListDevicesResponse>(
+          ListDevicesResponse.$_createMessage);
+  static ListDevicesResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<DeviceGrant> get devices => $_getList(0);
+}
+
 class Member extends $pb.GeneratedMessage {
   factory Member({
     $core.String? principalId,
@@ -2092,6 +2403,8 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
     $core.List<$core.int>? devicePublicKey,
     $core.String? grantId,
     $core.bool? administrative,
+    $core.bool? recovery,
+    $core.String? recoveryGrantId,
   }) {
     final result = CreateChallengeRequest._();
     if (purpose != null) result.purpose = purpose;
@@ -2099,6 +2412,8 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
     if (devicePublicKey != null) result.devicePublicKey = devicePublicKey;
     if (grantId != null) result.grantId = grantId;
     if (administrative != null) result.administrative = administrative;
+    if (recovery != null) result.recovery = recovery;
+    if (recoveryGrantId != null) result.recoveryGrantId = recoveryGrantId;
     return result;
   }
 
@@ -2122,6 +2437,8 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
         3, _omitFieldNames ? '' : 'devicePublicKey', $pb.PbFieldType.OY)
     ..aOS(4, _omitFieldNames ? '' : 'grantId')
     ..aOB(5, _omitFieldNames ? '' : 'administrative')
+    ..aOB(6, _omitFieldNames ? '' : 'recovery')
+    ..aOS(7, _omitFieldNames ? '' : 'recoveryGrantId')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -2194,6 +2511,26 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
   $core.bool hasAdministrative() => $_has(4);
   @$pb.TagNumber(5)
   void clearAdministrative() => $_clearField(5);
+
+  /// Root явно делегирует восстановление отдельному ключу.
+  @$pb.TagNumber(6)
+  $core.bool get recovery => $_getBF(5);
+  @$pb.TagNumber(6)
+  set recovery($core.bool value) => $_setBool(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasRecovery() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearRecovery() => $_clearField(6);
+
+  /// device.delegate / recovery.device.revoke: действующий recovery grant.
+  @$pb.TagNumber(7)
+  $core.String get recoveryGrantId => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set recoveryGrantId($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasRecoveryGrantId() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearRecoveryGrantId() => $_clearField(7);
 }
 
 class CreateChallengeResponse extends $pb.GeneratedMessage {
