@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 
 import 'package:grpc/grpc.dart';
 
@@ -40,7 +41,45 @@ Future<void> main(List<String> arguments) async {
     if (!events.events.any((e) => e.content.id == original.id)) {
       throw StateError('Событие не найдено');
     }
+    var iterator = StreamIterator(session.subscribe(events.nextCursor));
+    if (!await iterator.moveNext() || !iterator.current.heartbeat) {
+      throw StateError('Нет первого heartbeat');
+    }
+    final streamed = await session.send(
+      'Сообщение для живой подписки',
+      newRequestKey(),
+    );
+    if (!await iterator.moveNext() ||
+        iterator.current.event.content.id != streamed.id) {
+      throw StateError('Live stream не получил сообщение');
+    }
+    final cursor = iterator.current.cursor;
+    await iterator.cancel();
+    final missed = await session.send(
+      'Сообщение во время отключения',
+      newRequestKey(),
+    );
+    iterator = StreamIterator(session.subscribe(cursor));
+    if (!await iterator.moveNext() || !iterator.current.heartbeat) {
+      throw StateError('Нет resume heartbeat');
+    }
+    if (!await iterator.moveNext() ||
+        iterator.current.event.content.id != missed.id) {
+      throw StateError('Replay не получил пропущенное сообщение');
+    }
     await session.revoke();
+    var streamRefused = false;
+    try {
+      await iterator.moveNext();
+    } on GrpcError catch (error) {
+      if (error.code != StatusCode.unauthenticated) rethrow;
+      streamRefused = true;
+    } finally {
+      await iterator.cancel();
+    }
+    if (!streamRefused) {
+      throw StateError('Активная подписка не закрылась после revoke');
+    }
     var refused = false;
     try {
       await session.login();
@@ -52,7 +91,7 @@ Future<void> main(List<String> arguments) async {
     }
     if (!refused) throw StateError('Отзыв не сработал');
     stdout.writeln(
-      'Dart/Go: register, login, message, retry, reconnect, events, revoke — успешно.',
+      'Dart/Go: register, login, message, retry, stream, replay, revoke — успешно.',
     );
   } finally {
     await session.close();

@@ -406,7 +406,11 @@ class _SpaceShellState extends State<SpaceShell> {
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: Text(
-              controller.connected ? 'Вход по ключу' : 'Не подключено',
+              controller.reconnecting
+                  ? 'Восстанавливаем соединение'
+                  : controller.connected
+                  ? 'Вход по ключу'
+                  : 'Не подключено',
               style: TextStyle(
                 fontSize: 12,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -444,6 +448,32 @@ class _SpaceShellState extends State<SpaceShell> {
         final workspace = Column(
           children: [
             header(compact),
+            if (controller.reconnecting)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Восстанавливаем события. Сообщения и черновик сохранены.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             if (controller.busy) const LinearProgressIndicator(minHeight: 2),
             if (controller.error.isNotEmpty)
               Padding(

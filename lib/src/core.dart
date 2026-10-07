@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -155,7 +156,17 @@ void checkTrust(Discovery server, DeviceRecord record) {
   }
 }
 
-class SpaceSession {
+abstract interface class LiveSession {
+  String get principalId;
+  Future<void> login();
+  Future<List<Content>> messages();
+  Future<Content> send(String text, String key);
+  Stream<SubscribeResponse> subscribe(String after);
+  Future<void> revoke();
+  Future<void> close();
+}
+
+class SpaceSession implements LiveSession {
   SpaceSession._(this.server, this.record, this.vault, this.channel);
   final Discovery server;
   final DeviceRecord record;
@@ -164,6 +175,7 @@ class SpaceSession {
   String _token = '';
   int _expiresAt = 0;
   Future<void>? _loginTask;
+  @override
   String principalId = '';
   CallOptions get _options => CallOptions(
     timeout: const Duration(seconds: 10),
@@ -221,6 +233,7 @@ class SpaceSession {
     }
   }
 
+  @override
   Future<void> login() =>
       _loginTask ??= _login().whenComplete(() => _loginTask = null);
   Future<void> _login() async {
@@ -286,6 +299,7 @@ class SpaceSession {
     return result;
   }
 
+  @override
   Future<List<Content>> messages() async {
     await _ensureSession();
     final result = <Content>[];
@@ -305,6 +319,7 @@ class SpaceSession {
     throw const FormatException('Слишком много страниц');
   }
 
+  @override
   Future<Content> send(String text, String key) async {
     await _ensureSession();
     final result = await ContentServiceClient(channel).createContent(
@@ -326,12 +341,37 @@ class SpaceSession {
     );
   }
 
+  @override
+  Stream<SubscribeResponse> subscribe(String after) async* {
+    await _ensureSession();
+    final stream = SyncServiceClient(channel).subscribe(
+      SubscribeRequest(channelId: 'general', after: after),
+      options: CallOptions(
+        timeout: const Duration(minutes: 11),
+        metadata: {'authorization': 'Bearer $_token'},
+      ),
+    );
+    try {
+      yield* stream.timeout(
+        const Duration(seconds: 35),
+        onTimeout: (sink) {
+          sink.addError(TimeoutException('Поток не отвечает'));
+          sink.close();
+        },
+      );
+    } finally {
+      await stream.cancel();
+    }
+  }
+
+  @override
   Future<void> revoke() async {
     await _authorize('device.revoke');
     _token = '';
     _expiresAt = 0;
   }
 
+  @override
   Future<void> close() => channel.shutdown();
 }
 

@@ -17,6 +17,159 @@ import 'package:protobuf/protobuf.dart' as $pb;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
+class SubscribeRequest extends $pb.GeneratedMessage {
+  factory SubscribeRequest({
+    $core.String? channelId,
+    $core.String? after,
+  }) {
+    final result = SubscribeRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (after != null) result.after = after;
+    return result;
+  }
+
+  SubscribeRequest._();
+
+  factory SubscribeRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SubscribeRequest()..mergeFromBuffer(data, registry);
+  factory SubscribeRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SubscribeRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'SubscribeRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: SubscribeRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'after')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SubscribeRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SubscribeRequest copyWith(void Function(SubscribeRequest) updates) =>
+      super.copyWith((message) => updates(message as SubscribeRequest))
+          as SubscribeRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use SubscribeRequest() / SubscribeRequest.new instead')
+  static SubscribeRequest create() => SubscribeRequest._();
+  static $pb.GeneratedMessage $_createMessage() => SubscribeRequest._();
+  @$core.override
+  SubscribeRequest createEmptyInstance() => SubscribeRequest._();
+  @$core.pragma('dart2js:noInline')
+  static SubscribeRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SubscribeRequest>(
+          SubscribeRequest.$_createMessage);
+  static SubscribeRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get after => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set after($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasAfter() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAfter() => $_clearField(2);
+}
+
+class SubscribeResponse extends $pb.GeneratedMessage {
+  factory SubscribeResponse({
+    Event? event,
+    $core.String? cursor,
+    $core.bool? heartbeat,
+  }) {
+    final result = SubscribeResponse._();
+    if (event != null) result.event = event;
+    if (cursor != null) result.cursor = cursor;
+    if (heartbeat != null) result.heartbeat = heartbeat;
+    return result;
+  }
+
+  SubscribeResponse._();
+
+  factory SubscribeResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SubscribeResponse()..mergeFromBuffer(data, registry);
+  factory SubscribeResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SubscribeResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'SubscribeResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: SubscribeResponse.$_createMessage)
+    ..aOM<Event>(1, _omitFieldNames ? '' : 'event',
+        subBuilder: Event.$_createMessage)
+    ..aOS(2, _omitFieldNames ? '' : 'cursor')
+    ..aOB(3, _omitFieldNames ? '' : 'heartbeat')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SubscribeResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SubscribeResponse copyWith(void Function(SubscribeResponse) updates) =>
+      super.copyWith((message) => updates(message as SubscribeResponse))
+          as SubscribeResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use SubscribeResponse() / SubscribeResponse.new instead')
+  static SubscribeResponse create() => SubscribeResponse._();
+  static $pb.GeneratedMessage $_createMessage() => SubscribeResponse._();
+  @$core.override
+  SubscribeResponse createEmptyInstance() => SubscribeResponse._();
+  @$core.pragma('dart2js:noInline')
+  static SubscribeResponse getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SubscribeResponse>(
+          SubscribeResponse.$_createMessage);
+  static SubscribeResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Event get event => $_getN(0);
+  @$pb.TagNumber(1)
+  set event(Event value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasEvent() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearEvent() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Event ensureEvent() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.String get cursor => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set cursor($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasCursor() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearCursor() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get heartbeat => $_getBF(2);
+  @$pb.TagNumber(3)
+  set heartbeat($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasHeartbeat() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearHeartbeat() => $_clearField(3);
+}
+
 class CreateChallengeRequest extends $pb.GeneratedMessage {
   factory CreateChallengeRequest({
     $core.String? purpose,

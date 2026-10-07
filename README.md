@@ -21,7 +21,8 @@
 - Подтверждение первого доверия; сохранение `origin + server ID + public key`. Изменение identity блокирует подключение.
 - Независимые root/device Ed25519-ключи для сервера, проверка challenge перед подписью.
 - Root-authorized registration, device login и root-authorized revoke.
-- Текстовый чат, страницы истории, polling durable events каждые две секунды, дедупликация.
+- Текстовый чат, страницы истории, gRPC-подписка durable events с heartbeat, cursor replay и дедупликацией.
+- Восстановление потока после transient error/EOF с backoff; истёкший token обновляется через device login. Отозванный grant не регистрируется заново.
 - Повтор неудачной отправки с тем же текстом использует прежний idempotency key в рамках процесса.
 - Вход с сохранённым grant после перезапуска; токен только в памяти. Перед expiry выполняется новый device login, без refresh token.
 
@@ -81,6 +82,6 @@ buf generate protocol/proto --template client/buf.gen.yaml
 
 ## Что дальше
 
-Server streaming, reconnect/backoff, ACL/invites, список пространств, backup/recovery, полноценный vault UX, Android, Flutter Web с HTTP adapter, медиа и уведомления. Сейчас один общий чат, open registration и локальные insecure transports. Подписанный manifest, TLS-профиль и key migration ещё не реализованы; клиент не предназначен для публичного сервера.
+ACL/invites, несколько одновременных пространств, backup/recovery, полноценный vault UX, Android, Flutter Web с HTTP adapter, медиа и уведомления. Сейчас один общий чат, open registration и локальные insecure transports. Подписанный manifest, TLS-профиль и key migration ещё не реализованы; клиент не предназначен для публичного сервера. [Профиль подписки и ограничения](../docs/adr/018-event-stream.md).
 
 Форум, лента и встречи представлены состояниями «Пока недоступно», без демонстрационных участников или публикаций. Клиент не запускает микрофон/камеру. Custom color editor и серверное оформление по согласию пока остаются в HTML-прототипе: текущий manifest не предоставляет theme extension. Поиск работает в загруженных данных, не выполняет серверный full-text запрос. Несколько одновременных сессий и сохраняемая история/черновики требуют отдельной реализации.

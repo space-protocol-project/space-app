@@ -15,6 +15,43 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use subscribeRequestDescriptor instead')
+const SubscribeRequest$json = {
+  '1': 'SubscribeRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'after', '3': 2, '4': 1, '5': 9, '10': 'after'},
+  ],
+};
+
+/// Descriptor for `SubscribeRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List subscribeRequestDescriptor = $convert.base64Decode(
+    'ChBTdWJzY3JpYmVSZXF1ZXN0Eh0KCmNoYW5uZWxfaWQYASABKAlSCWNoYW5uZWxJZBIUCgVhZn'
+    'RlchgCIAEoCVIFYWZ0ZXI=');
+
+@$core.Deprecated('Use subscribeResponseDescriptor instead')
+const SubscribeResponse$json = {
+  '1': 'SubscribeResponse',
+  '2': [
+    {
+      '1': 'event',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Event',
+      '10': 'event'
+    },
+    {'1': 'cursor', '3': 2, '4': 1, '5': 9, '10': 'cursor'},
+    {'1': 'heartbeat', '3': 3, '4': 1, '5': 8, '10': 'heartbeat'},
+  ],
+};
+
+/// Descriptor for `SubscribeResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List subscribeResponseDescriptor = $convert.base64Decode(
+    'ChFTdWJzY3JpYmVSZXNwb25zZRIlCgVldmVudBgBIAEoCzIPLnNwYWNlLnYxLkV2ZW50UgVldm'
+    'VudBIWCgZjdXJzb3IYAiABKAlSBmN1cnNvchIcCgloZWFydGJlYXQYAyABKAhSCWhlYXJ0YmVh'
+    'dA==');
+
 @$core.Deprecated('Use createChallengeRequestDescriptor instead')
 const CreateChallengeRequest$json = {
   '1': 'CreateChallengeRequest',

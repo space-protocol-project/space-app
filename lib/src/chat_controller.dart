@@ -7,12 +7,24 @@ import 'core.dart';
 import 'generated/space/v1/space.pb.dart';
 
 class ChatController extends ChangeNotifier {
-  ChatController(this.vault);
+  ChatController(
+    this.vault, {
+    this.openSession = SpaceSession.connect,
+    this.retryDelay = defaultRetryDelay,
+  });
   final IdentityVault vault;
   Discovery? preview;
-  SpaceSession? _session;
-  Timer? _timer;
-  bool busy = false, connected = false, _polling = false, _disposed = false;
+  LiveSession? _session;
+  StreamIterator<SubscribeResponse>? _activeIterator;
+  final Future<LiveSession> Function(Discovery, IdentityVault) openSession;
+  final Duration Function(int) retryDelay;
+  Timer? _retryTimer;
+  Completer<void>? _retryDone;
+  int _generation = 0;
+  bool reconnecting = false;
+  static Duration defaultRetryDelay(int attempt) =>
+      Duration(seconds: 1 << (attempt > 5 ? 5 : attempt));
+  bool busy = false, connected = false, _disposed = false;
   String error = '',
       fingerprint = '',
       cursor = '',
@@ -61,13 +73,13 @@ class ChatController extends ChangeNotifier {
     if (busy || server == null) return;
     busy = true;
     error = '';
-    _timer?.cancel();
+    _stopSubscription();
     connected = false;
     _update();
     try {
       await _session?.close();
       _session = null;
-      final session = await SpaceSession.connect(server, vault);
+      final session = await openSession(server, vault);
       if (_disposed) {
         await session.close();
         return;
@@ -80,8 +92,7 @@ class ChatController extends ChangeNotifier {
       }
       cursor = '';
       connected = true;
-      _timer = Timer.periodic(const Duration(seconds: 2), (_) => poll());
-      await poll();
+      unawaited(_watch(session, ++_generation));
     } catch (e) {
       error = _explain(e);
     } finally {
@@ -90,32 +101,115 @@ class ChatController extends ChangeNotifier {
     }
   }
 
-  Future<void> poll() async {
-    final session = _session;
-    if (session == null || !connected || _polling || _disposed) return;
-    _polling = true;
+  bool _current(LiveSession session, int generation) =>
+      !_disposed && _session == session && _generation == generation;
+  void _stopSubscription() {
+    _generation++;
+    _retryTimer?.cancel();
+    if (_retryDone != null && !_retryDone!.isCompleted) _retryDone!.complete();
+    reconnecting = false;
+    final iterator = _activeIterator;
+    _activeIterator = null;
+    if (iterator != null) unawaited(_cancelIterator(iterator));
+  }
+
+  Future<void> _cancelIterator(
+    StreamIterator<SubscribeResponse> iterator,
+  ) async {
     try {
-      final events = await session.events(cursor);
-      if (_session != session || _disposed) return;
-      for (final event in events.events) {
-        if (event.type != 'content.created' || !event.hasContent()) {
-          throw const FormatException('Неподдерживаемое событие');
+      await iterator.cancel();
+    } catch (_) {}
+  }
+
+  Future<void> _pause(int attempt) async {
+    final done = Completer<void>();
+    _retryDone = done;
+    _retryTimer = Timer(retryDelay(attempt), () => done.complete());
+    await done.future;
+  }
+
+  Future<void> _watch(LiveSession session, int generation) async {
+    var attempt = 0;
+    while (_current(session, generation)) {
+      final started = DateTime.now();
+      final iterator = StreamIterator(session.subscribe(cursor));
+      _activeIterator = iterator;
+      try {
+        while (await iterator.moveNext()) {
+          final frame = iterator.current;
+          if (!_current(session, generation)) return;
+          if (frame.heartbeat) {
+            if (frame.hasEvent() || frame.cursor != cursor) {
+              throw const FormatException('Heartbeat содержит неверный курсор');
+            }
+          } else {
+            if (!frame.hasEvent() ||
+                frame.event.type != 'content.created' ||
+                !frame.event.hasContent() ||
+                frame.event.content.channelId != 'general' ||
+                frame.event.content.id.isEmpty ||
+                frame.cursor.isEmpty ||
+                frame.event.cursor != frame.cursor) {
+              throw const FormatException('Неподдерживаемое событие потока');
+            }
+            _messages[frame.event.content.id] = frame.event.content;
+            cursor = frame.cursor;
+          }
+          reconnecting = false;
+          if (DateTime.now().difference(started) >
+              const Duration(seconds: 20)) {
+            attempt = 0;
+          }
+          _update();
         }
-        _messages[event.content.id] = event.content;
+      } catch (problem) {
+        if (!_current(session, generation)) return;
+        if (problem is GrpcError &&
+            problem.code == StatusCode.unauthenticated) {
+          try {
+            await session.login();
+          } catch (loginError) {
+            if (!_current(session, generation)) return;
+            if (_terminal(loginError)) {
+              connected = false;
+              error = _explain(loginError);
+              _update();
+              return;
+            }
+          }
+        } else if (_terminal(problem)) {
+          connected = false;
+          error =
+              problem is GrpcError && problem.code == StatusCode.unimplemented
+              ? 'Сервер пока не поддерживает подписку событий. Обновите сервер.'
+              : problem is GrpcError &&
+                    problem.code == StatusCode.invalidArgument
+              ? 'Сервер не принял курсор истории. Подключитесь заново для загрузки сообщений.'
+              : _explain(problem);
+          _update();
+          return;
+        }
+      } finally {
+        if (identical(_activeIterator, iterator)) _activeIterator = null;
+        await _cancelIterator(iterator);
       }
-      cursor = events.nextCursor;
-    } catch (e) {
-      if (_session == session && !_disposed) {
-        error = _explain(e);
-        connected = false;
-        _timer?.cancel();
-      }
-    } finally {
-      _polling = false;
+      if (!_current(session, generation)) return;
+      reconnecting = true;
       _update();
+      await _pause(attempt);
+      if (attempt < 5) attempt++;
     }
   }
 
+  bool _terminal(Object problem) =>
+      problem is FormatException ||
+      problem is GrpcError &&
+          [
+            StatusCode.unauthenticated,
+            StatusCode.permissionDenied,
+            StatusCode.invalidArgument,
+            StatusCode.unimplemented,
+          ].contains(problem.code);
   Future<bool> send(String text) async {
     final session = _session;
     if (busy || !connected || session == null || text.trim().isEmpty) {
@@ -147,7 +241,7 @@ class ChatController extends ChangeNotifier {
   Future<void> revoke() async {
     if (busy || _session == null) return;
     busy = true;
-    _timer?.cancel();
+    _stopSubscription();
     _update();
     try {
       await _session!.revoke();
@@ -155,6 +249,8 @@ class ChatController extends ChangeNotifier {
       error = 'Доступ этого устройства отозван. Ключи сохранены; новый grant автоматически не создаётся.';
     } catch (e) {
       error = _explain(e);
+      if (_session != null && connected)
+        unawaited(_watch(_session!, ++_generation));
     } finally {
       busy = false;
       _update();
@@ -165,7 +261,7 @@ class ChatController extends ChangeNotifier {
     if (busy) return;
     busy = true;
     connected = false;
-    _timer?.cancel();
+    _stopSubscription();
     _update();
     try {
       await _session?.close();
@@ -186,7 +282,7 @@ class ChatController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
-    _timer?.cancel();
+    _stopSubscription();
     unawaited(_session?.close());
     super.dispose();
   }

@@ -253,6 +253,15 @@ class SyncServiceClient extends $grpc.Client {
 
   SyncServiceClient(super.channel, {super.options, super.interceptors});
 
+  $grpc.ResponseStream<$0.SubscribeResponse> subscribe(
+    $0.SubscribeRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createStreamingCall(
+        _$subscribe, $async.Stream.fromIterable([request]),
+        options: options);
+  }
+
   $grpc.ResponseFuture<$0.ListEventsResponse> listEvents(
     $0.ListEventsRequest request, {
     $grpc.CallOptions? options,
@@ -262,6 +271,11 @@ class SyncServiceClient extends $grpc.Client {
 
   // method descriptors
 
+  static final _$subscribe =
+      $grpc.ClientMethod<$0.SubscribeRequest, $0.SubscribeResponse>(
+          '/space.v1.SyncService/Subscribe',
+          ($0.SubscribeRequest value) => value.writeToBuffer(),
+          $0.SubscribeResponse.fromBuffer);
   static final _$listEvents =
       $grpc.ClientMethod<$0.ListEventsRequest, $0.ListEventsResponse>(
           '/space.v1.SyncService/ListEvents',
@@ -274,6 +288,13 @@ abstract class SyncServiceBase extends $grpc.Service {
   $core.String get $name => 'space.v1.SyncService';
 
   SyncServiceBase() {
+    $addMethod($grpc.ServiceMethod<$0.SubscribeRequest, $0.SubscribeResponse>(
+        'Subscribe',
+        subscribe_Pre,
+        false,
+        true,
+        ($core.List<$core.int> value) => $0.SubscribeRequest.fromBuffer(value),
+        ($0.SubscribeResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.ListEventsRequest, $0.ListEventsResponse>(
         'ListEvents',
         listEvents_Pre,
@@ -282,6 +303,14 @@ abstract class SyncServiceBase extends $grpc.Service {
         ($core.List<$core.int> value) => $0.ListEventsRequest.fromBuffer(value),
         ($0.ListEventsResponse value) => value.writeToBuffer()));
   }
+
+  $async.Stream<$0.SubscribeResponse> subscribe_Pre($grpc.ServiceCall $call,
+      $async.Future<$0.SubscribeRequest> $request) async* {
+    yield* subscribe($call, await $request);
+  }
+
+  $async.Stream<$0.SubscribeResponse> subscribe(
+      $grpc.ServiceCall call, $0.SubscribeRequest request);
 
   $async.Future<$0.ListEventsResponse> listEvents_Pre($grpc.ServiceCall $call,
       $async.Future<$0.ListEventsRequest> $request) async {
