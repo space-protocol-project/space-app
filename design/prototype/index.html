@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light dark" />
+    <title>Space — место для своих</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="dark">
+    <a class="skip" href="#content">Перейти к содержимому</a>
+    <div class="app">
+      <nav class="space-rail" aria-label="Пространства" id="spaces"></nav>
+      <aside
+        class="space-sidebar"
+        id="sidebar"
+        aria-label="Навигация пространства"
+      ></aside>
+      <main class="workspace">
+        <header class="topbar">
+          <button
+            class="icon mobile-menu"
+            data-action="navigation"
+            aria-label="Открыть навигацию"
+          ></button>
+          <div class="breadcrumbs">
+            <span>Лесная мастерская</span><span class="crumb-arrow">/</span
+            ><strong id="page-title">Общий чат</strong>
+          </div>
+          <span class="demo-tag">Демо</span>
+          <div class="top-actions">
+            <button
+              class="search-button"
+              data-action="search"
+              aria-label="Поиск по пространству"
+            >
+              <span id="search-icon"></span><span>Найти что-нибудь</span
+              ><kbd>⌘ K</kbd>
+            </button>
+            <button
+              class="icon"
+              data-action="notifications"
+              aria-label="Открыть уведомления"
+              id="notification-button"
+            ></button>
+            <button
+              class="icon"
+              data-action="theme"
+              aria-label="Сменить тему"
+              id="theme-button"
+            ></button>
+          </div>
+        </header>
+        <div class="content-layout">
+          <section id="content" tabindex="-1"></section>
+          <aside
+            class="context-panel"
+            id="context"
+            aria-label="Контекст и участники"
+          ></aside>
+        </div>
+      </main>
+    </div>
+    <nav class="bottom-nav" id="bottom-nav" aria-label="Основные разделы"></nav>
+    <div id="callbar"></div>
+    <dialog id="modal"><div id="modal-body"></div></dialog>
+    <div class="toast" role="status" aria-live="polite" id="toast"></div>
+    <script src="theme.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

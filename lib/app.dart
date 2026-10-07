@@ -13,10 +13,19 @@ class SpaceApp extends StatelessWidget {
       brightness: Brightness.dark,
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFFB9A1FF),
+        seedColor: const Color(0xFFFABD2F),
         brightness: Brightness.dark,
+        primary: const Color(0xFFFABD2F),
+        onPrimary: const Color(0xFF282828),
+        secondary: const Color(0xFFB8BB26),
+        onSecondary: const Color(0xFF282828),
+        surface: const Color(0xFF32302F),
+        onSurface: const Color(0xFFEBDBB2),
+        onSurfaceVariant: const Color(0xFFBDAE93),
+        outline: const Color(0xFF928374),
+        error: const Color(0xFFFB4934),
       ),
-      scaffoldBackgroundColor: const Color(0xFF10121A),
+      scaffoldBackgroundColor: const Color(0xFF282828),
       inputDecorationTheme: const InputDecorationTheme(
         border: OutlineInputBorder(),
         filled: true,
@@ -57,14 +66,14 @@ class _ChatPageState extends State<ChatPage> {
   Widget sidebar() => Container(
     width: 300,
     padding: const EdgeInsets.all(24),
-    color: const Color(0xFF191C27),
+    color: const Color(0xFF1D2021),
     child: SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Row(
             children: [
-              Icon(Icons.auto_awesome, color: Color(0xFFB9A1FF)),
+              Icon(Icons.auto_awesome, color: Color(0xFFFABD2F)),
               SizedBox(width: 12),
               Text(
                 'Space',
@@ -75,7 +84,7 @@ class _ChatPageState extends State<ChatPage> {
           const SizedBox(height: 8),
           const Text(
             'Ваши пространства',
-            style: TextStyle(color: Color(0xFF9CA3B8)),
+            style: TextStyle(color: Color(0xFFBDAE93)),
           ),
           const SizedBox(height: 32),
           TextField(
@@ -105,7 +114,7 @@ class _ChatPageState extends State<ChatPage> {
             const SizedBox(height: 8),
             const Text(
               'Отпечаток ключа',
-              style: TextStyle(fontSize: 12, color: Color(0xFF9CA3B8)),
+              style: TextStyle(fontSize: 12, color: Color(0xFFBDAE93)),
             ),
             SelectableText(
               controller.fingerprint,
@@ -137,12 +146,12 @@ class _ChatPageState extends State<ChatPage> {
           const SizedBox(height: 24),
           const Text(
             'Локальный прототип · Windows',
-            style: TextStyle(fontSize: 12, color: Color(0xFF9CA3B8)),
+            style: TextStyle(fontSize: 12, color: Color(0xFFBDAE93)),
           ),
           const SizedBox(height: 8),
           const Text(
             'Первый вход создаёт ключи для этого сервера. Recovery пока недоступно.',
-            style: TextStyle(fontSize: 12, color: Color(0xFF9CA3B8)),
+            style: TextStyle(fontSize: 12, color: Color(0xFFBDAE93)),
           ),
         ],
       ),
@@ -174,7 +183,7 @@ class _ChatPageState extends State<ChatPage> {
                   controller.connected
                       ? 'Вход по ключу устройства'
                       : 'Не подключён',
-                  style: const TextStyle(color: Color(0xFF9CA3B8)),
+                  style: const TextStyle(color: Color(0xFFBDAE93)),
                 ),
               if (controller.connected)
                 IconButton(
@@ -193,7 +202,7 @@ class _ChatPageState extends State<ChatPage> {
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF33263A),
+              color: const Color(0xFF442F2B),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(controller.error),
@@ -207,7 +216,7 @@ class _ChatPageState extends State<ChatPage> {
                       Icon(
                         Icons.forum_outlined,
                         size: 64,
-                        color: Color(0xFFB9A1FF),
+                        color: Color(0xFFFABD2F),
                       ),
                       SizedBox(height: 20),
                       Text(
@@ -220,7 +229,7 @@ class _ChatPageState extends State<ChatPage> {
                         child: Text(
                           'Подключите своё пространство по адресу сервера.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Color(0xFF9CA3B8)),
+                          style: TextStyle(color: Color(0xFFBDAE93)),
                         ),
                       ),
                     ],
@@ -245,8 +254,8 @@ class _ChatPageState extends State<ChatPage> {
                         children: [
                           CircleAvatar(
                             backgroundColor: mine
-                                ? const Color(0xFF544479)
-                                : const Color(0xFF293449),
+                                ? const Color(0xFF504945)
+                                : const Color(0xFF3C3836),
                             child: Icon(
                               mine ? Icons.person_outline : Icons.person,
                               size: 20,
@@ -261,7 +270,7 @@ class _ChatPageState extends State<ChatPage> {
                                   author,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFFC7B6F5),
+                                    color: Color(0xFFB8BB26),
                                   ),
                                 ),
                                 const SizedBox(height: 6),
