@@ -140,7 +140,7 @@ class _SpaceShellState extends State<SpaceShell> {
   Widget sidebar() => SizedBox(
     width: 248,
     child: Material(
-      color: Theme.of(context).colorScheme.surface,
+      color: Theme.of(context).colorScheme.surfaceContainerLowest,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 24, 16, 18),
         children: [
@@ -250,18 +250,42 @@ class _SpaceShellState extends State<SpaceShell> {
         const SizedBox(height: 24),
         IconButton.filledTonal(
           tooltip: 'Выбранное пространство',
+          style: IconButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            minimumSize: const Size(48, 48),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(17),
+            ),
+          ),
           onPressed: () => select(Section.overview),
           icon: const Icon(Icons.public),
         ),
         const SizedBox(height: 12),
         IconButton(
           tooltip: 'Добавить пространство',
+          style: IconButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            foregroundColor: Theme.of(context).colorScheme.onSurface,
+            minimumSize: const Size(48, 48),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(17),
+            ),
+          ),
           onPressed: controller.busy ? null : () => connection(),
           icon: const Icon(Icons.add),
         ),
         const Spacer(),
         IconButton(
           tooltip: 'Моя идентичность',
+          style: IconButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            foregroundColor: Theme.of(context).colorScheme.onSurface,
+            minimumSize: const Size(48, 48),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(17),
+            ),
+          ),
           onPressed: () => select(Section.identity),
           icon: const Icon(Icons.shield_outlined),
         ),

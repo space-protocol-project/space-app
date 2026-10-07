@@ -77,12 +77,29 @@ class AppPreferences extends ChangeNotifier {
     final background = dark ? const Color(0xFF282828) : const Color(0xFFFBF1C7);
     final surface = dark ? const Color(0xFF32302F) : const Color(0xFFF9F5D7);
     final text = dark ? const Color(0xFFEBDBB2) : const Color(0xFF3C3836);
+    final sidebar = dark ? const Color(0xFF1D2021) : const Color(0xFFF2E5BC);
+    final soft = dark ? const Color(0xFF3C3836) : const Color(0xFFEBDBB2);
+    final raised = dark ? const Color(0xFF504945) : const Color(0xFFD5C4A1);
     final scheme = ColorScheme.fromSeed(
       seedColor: primary,
       brightness: brightness,
       primary: primary,
       onPrimary: background,
       surface: surface,
+      surfaceContainerLowest: sidebar,
+      surfaceContainerLow: background,
+      surfaceContainer: surface,
+      surfaceContainerHigh: soft,
+      surfaceContainerHighest: raised,
+      surfaceBright: raised,
+      surfaceDim: sidebar,
+      surfaceTint: Colors.transparent,
+      primaryContainer: soft,
+      onPrimaryContainer: primary,
+      secondaryContainer: soft,
+      onSecondaryContainer: text,
+      tertiaryContainer: soft,
+      onTertiaryContainer: text,
       onSurface: text,
       secondary: dark ? const Color(0xFFB8BB26) : const Color(0xFF427B58),
       onSecondary: background,
@@ -90,6 +107,7 @@ class AppPreferences extends ChangeNotifier {
           ? const Color(0xFFBDAE93)
           : const Color(0xFF665C54),
       outline: dark ? const Color(0xFF928374) : const Color(0xFF7C6F64),
+      outlineVariant: dark ? const Color(0xFF504945) : const Color(0xFFD5C4A1),
       error: dark ? const Color(0xFFFB4934) : const Color(0xFF9D0006),
     );
     return ThemeData(
