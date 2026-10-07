@@ -10,6 +10,7 @@ import 'chat_view.dart';
 import 'connection_panel.dart';
 import 'panels.dart';
 import 'search.dart';
+import 'components.dart';
 
 enum Section {
   overview('Обзор', Icons.home_outlined),
@@ -506,13 +507,27 @@ class _SpaceShellState extends State<SpaceShell> {
                     )
                   : null,
               body: SafeArea(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (!compact) ...[rail(), sidebar()],
-                    Expanded(child: workspace),
-                    if (box.maxWidth >= 1320) contextPanel(),
-                  ],
+                child: Padding(
+                  padding: EdgeInsets.all(compact ? 6 : 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (!compact) ...[
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(areaRadius),
+                          child: rail(),
+                        ),
+                        const SizedBox(width: 8),
+                        RegionFrame(child: sidebar()),
+                        const SizedBox(width: 8),
+                      ],
+                      Expanded(child: RegionFrame(child: workspace)),
+                      if (box.maxWidth >= 1320) ...[
+                        const SizedBox(width: 8),
+                        RegionFrame(child: contextPanel()),
+                      ],
+                    ],
+                  ),
                 ),
               ),
             ),

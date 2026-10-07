@@ -2134,3 +2134,6 @@ svg {
 .dark .feed-art:after {
   border-color: #d7992140;
 }
+
+/* Единый радиус областей оболочки. */
+.app{padding:8px;gap:8px}.space-rail,.space-sidebar,.workspace,.context-panel{border-radius:12px;overflow:hidden}.space-sidebar,.context-panel{overflow-y:auto}.workspace{border:1px solid var(--line)}.context-panel{margin:8px;border:1px solid var(--line)}.card,.feed-card,.topic,.media-scene,.participant-tile{border-radius:12px}@media(max-width:760px){.app{padding:6px;gap:0}.workspace{border-radius:12px}.modal-nav .space-sidebar{overflow-y:auto}}

@@ -1,5 +1,26 @@
 import 'package:flutter/material.dart';
 
+const areaRadius = 12.0;
+
+class RegionFrame extends StatelessWidget {
+  const RegionFrame({super.key, required this.child});
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(areaRadius),
+      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(1),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(areaRadius - 1),
+        child: child,
+      ),
+    ),
+  );
+}
+
 class SurfaceCard extends StatelessWidget {
   const SurfaceCard({
     super.key,
@@ -12,7 +33,7 @@ class SurfaceCard extends StatelessWidget {
   Widget build(BuildContext context) => Material(
     color: Theme.of(context).colorScheme.surface,
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(areaRadius),
       side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
     ),
     child: Padding(padding: padding, child: child),
