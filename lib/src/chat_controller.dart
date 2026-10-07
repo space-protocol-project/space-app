@@ -32,6 +32,9 @@ class ChatController extends ChangeNotifier {
       _pendingKey = '';
   final Map<String, Content> _messages = {};
   List<Content> get messages => _messages.values.toList();
+  String _invitationToken = '', invitationRole = '';
+  bool get canWrite =>
+      _session is SpaceAccess ? (_session as SpaceAccess).canWrite : connected;
   String get principalId => _session?.principalId ?? '';
   String get spaceTitle => _session is SpacePresentation
       ? (_session as SpacePresentation).spaceTitle
@@ -44,6 +47,9 @@ class ChatController extends ChangeNotifier {
   }
 
   String _explain(Object problem) {
+    if (problem is GrpcError && problem.code == StatusCode.permissionDenied) {
+      return 'Недостаточно прав: доступ заблокирован, приглашение недействительно или роль разрешает только чтение.';
+    }
     if (problem is FormatException) return problem.message.toString();
     if (problem is GrpcError && problem.code == StatusCode.unauthenticated) {
       return 'Устройство отозвано или разрешение истекло. Автоматическая перерегистрация отключена.';
@@ -54,17 +60,25 @@ class ChatController extends ChangeNotifier {
     return 'Не удалось выполнить операцию. Проверьте сервер, соединение и доступ к хранилищу ключей.';
   }
 
-  Future<void> inspect(String address) async {
+  Future<void> inspect(String address, {String invitationToken = ''}) async {
     if (busy) return;
     busy = true;
     error = '';
     preview = null;
+    _invitationToken = '';
+    invitationRole = '';
     _update();
     try {
       final server = await discover(address);
       final saved = await vault.load(server.origin.toString());
       if (saved != null) checkTrust(server, saved);
       fingerprint = await server.fingerprint();
+      final invite = invitationToken.trim();
+      if (invite.isNotEmpty) {
+        final result = await SpaceSession.previewInvitation(server, invite);
+        _invitationToken = invite;
+        invitationRole = result.role;
+      }
       preview = server;
     } catch (e) {
       error = _explain(e);
@@ -85,7 +99,13 @@ class ChatController extends ChangeNotifier {
     try {
       await _session?.close();
       _session = null;
-      final session = await openSession(server, vault);
+      final session = _invitationToken.isEmpty
+          ? await openSession(server, vault)
+          : await SpaceSession.connect(
+              server,
+              vault,
+              invitationToken: _invitationToken,
+            );
       if (_disposed) {
         await session.close();
         return;

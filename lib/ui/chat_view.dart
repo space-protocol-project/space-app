@@ -203,19 +203,21 @@ class _ChatViewState extends State<ChatView> {
                 child: TextField(
                   key: const ValueKey('chat-draft'),
                   controller: draft,
-                  enabled: c.connected && !c.busy,
+                  enabled: c.connected && c.canWrite && !c.busy,
                   minLines: 1,
                   maxLines: 4,
                   maxLength: 1024,
-                  decoration: const InputDecoration(
-                    hintText: 'Что у вас нового?',
+                  decoration: InputDecoration(
+                    hintText: c.connected && !c.canWrite
+                        ? 'Ваша роль разрешает только чтение'
+                        : 'Что у вас нового?',
                     counterText: '',
                   ),
                 ),
               ),
               const SizedBox(width: 12),
               IconButton.filled(
-                onPressed: c.connected && !c.busy ? send : null,
+                onPressed: c.connected && c.canWrite && !c.busy ? send : null,
                 tooltip: 'Отправить',
                 icon: const Icon(Icons.arrow_upward),
               ),

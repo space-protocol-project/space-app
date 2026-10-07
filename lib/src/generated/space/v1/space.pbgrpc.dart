@@ -360,6 +360,41 @@ class AdminServiceClient extends $grpc.Client {
 
   AdminServiceClient(super.channel, {super.options, super.interceptors});
 
+  $grpc.ResponseFuture<$0.ListMembersResponse> listMembers(
+    $0.ListMembersRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$listMembers, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.UpdateMemberResponse> updateMember(
+    $0.UpdateMemberRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$updateMember, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.CreateInviteResponse> createInvite(
+    $0.CreateInviteRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$createInvite, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.ListInvitesResponse> listInvites(
+    $0.ListInvitesRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$listInvites, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.RevokeInviteResponse> revokeInvite(
+    $0.RevokeInviteRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$revokeInvite, request, options: options);
+  }
+
   $grpc.ResponseFuture<$0.GetSetupStatusResponse> getSetupStatus(
     $0.GetSetupStatusRequest request, {
     $grpc.CallOptions? options,
@@ -390,6 +425,31 @@ class AdminServiceClient extends $grpc.Client {
 
   // method descriptors
 
+  static final _$listMembers =
+      $grpc.ClientMethod<$0.ListMembersRequest, $0.ListMembersResponse>(
+          '/space.v1.AdminService/ListMembers',
+          ($0.ListMembersRequest value) => value.writeToBuffer(),
+          $0.ListMembersResponse.fromBuffer);
+  static final _$updateMember =
+      $grpc.ClientMethod<$0.UpdateMemberRequest, $0.UpdateMemberResponse>(
+          '/space.v1.AdminService/UpdateMember',
+          ($0.UpdateMemberRequest value) => value.writeToBuffer(),
+          $0.UpdateMemberResponse.fromBuffer);
+  static final _$createInvite =
+      $grpc.ClientMethod<$0.CreateInviteRequest, $0.CreateInviteResponse>(
+          '/space.v1.AdminService/CreateInvite',
+          ($0.CreateInviteRequest value) => value.writeToBuffer(),
+          $0.CreateInviteResponse.fromBuffer);
+  static final _$listInvites =
+      $grpc.ClientMethod<$0.ListInvitesRequest, $0.ListInvitesResponse>(
+          '/space.v1.AdminService/ListInvites',
+          ($0.ListInvitesRequest value) => value.writeToBuffer(),
+          $0.ListInvitesResponse.fromBuffer);
+  static final _$revokeInvite =
+      $grpc.ClientMethod<$0.RevokeInviteRequest, $0.RevokeInviteResponse>(
+          '/space.v1.AdminService/RevokeInvite',
+          ($0.RevokeInviteRequest value) => value.writeToBuffer(),
+          $0.RevokeInviteResponse.fromBuffer);
   static final _$getSetupStatus =
       $grpc.ClientMethod<$0.GetSetupStatusRequest, $0.GetSetupStatusResponse>(
           '/space.v1.AdminService/GetSetupStatus',
@@ -417,6 +477,51 @@ abstract class AdminServiceBase extends $grpc.Service {
   $core.String get $name => 'space.v1.AdminService';
 
   AdminServiceBase() {
+    $addMethod(
+        $grpc.ServiceMethod<$0.ListMembersRequest, $0.ListMembersResponse>(
+            'ListMembers',
+            listMembers_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.ListMembersRequest.fromBuffer(value),
+            ($0.ListMembersResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.UpdateMemberRequest, $0.UpdateMemberResponse>(
+            'UpdateMember',
+            updateMember_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.UpdateMemberRequest.fromBuffer(value),
+            ($0.UpdateMemberResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.CreateInviteRequest, $0.CreateInviteResponse>(
+            'CreateInvite',
+            createInvite_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.CreateInviteRequest.fromBuffer(value),
+            ($0.CreateInviteResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.ListInvitesRequest, $0.ListInvitesResponse>(
+            'ListInvites',
+            listInvites_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.ListInvitesRequest.fromBuffer(value),
+            ($0.ListInvitesResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.RevokeInviteRequest, $0.RevokeInviteResponse>(
+            'RevokeInvite',
+            revokeInvite_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.RevokeInviteRequest.fromBuffer(value),
+            ($0.RevokeInviteResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.GetSetupStatusRequest,
             $0.GetSetupStatusResponse>(
         'GetSetupStatus',
@@ -453,6 +558,49 @@ abstract class AdminServiceBase extends $grpc.Service {
         ($0.UpdateSettingsResponse value) => value.writeToBuffer()));
   }
 
+  $async.Future<$0.ListMembersResponse> listMembers_Pre($grpc.ServiceCall $call,
+      $async.Future<$0.ListMembersRequest> $request) async {
+    return listMembers($call, await $request);
+  }
+
+  $async.Future<$0.ListMembersResponse> listMembers(
+      $grpc.ServiceCall call, $0.ListMembersRequest request);
+
+  $async.Future<$0.UpdateMemberResponse> updateMember_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.UpdateMemberRequest> $request) async {
+    return updateMember($call, await $request);
+  }
+
+  $async.Future<$0.UpdateMemberResponse> updateMember(
+      $grpc.ServiceCall call, $0.UpdateMemberRequest request);
+
+  $async.Future<$0.CreateInviteResponse> createInvite_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.CreateInviteRequest> $request) async {
+    return createInvite($call, await $request);
+  }
+
+  $async.Future<$0.CreateInviteResponse> createInvite(
+      $grpc.ServiceCall call, $0.CreateInviteRequest request);
+
+  $async.Future<$0.ListInvitesResponse> listInvites_Pre($grpc.ServiceCall $call,
+      $async.Future<$0.ListInvitesRequest> $request) async {
+    return listInvites($call, await $request);
+  }
+
+  $async.Future<$0.ListInvitesResponse> listInvites(
+      $grpc.ServiceCall call, $0.ListInvitesRequest request);
+
+  $async.Future<$0.RevokeInviteResponse> revokeInvite_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.RevokeInviteRequest> $request) async {
+    return revokeInvite($call, await $request);
+  }
+
+  $async.Future<$0.RevokeInviteResponse> revokeInvite(
+      $grpc.ServiceCall call, $0.RevokeInviteRequest request);
+
   $async.Future<$0.GetSetupStatusResponse> getSetupStatus_Pre(
       $grpc.ServiceCall $call,
       $async.Future<$0.GetSetupStatusRequest> $request) async {
@@ -486,4 +634,118 @@ abstract class AdminServiceBase extends $grpc.Service {
 
   $async.Future<$0.UpdateSettingsResponse> updateSettings(
       $grpc.ServiceCall call, $0.UpdateSettingsRequest request);
+}
+
+@$pb.GrpcServiceName('space.v1.MembershipService')
+class MembershipServiceClient extends $grpc.Client {
+  /// The hostname for this service.
+  static const $core.String defaultHost = '';
+
+  /// OAuth scopes needed for the client.
+  static const $core.List<$core.String> oauthScopes = [
+    '',
+  ];
+
+  MembershipServiceClient(super.channel, {super.options, super.interceptors});
+
+  $grpc.ResponseFuture<$0.PreviewInviteResponse> previewInvite(
+    $0.PreviewInviteRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$previewInvite, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.AcceptInviteResponse> acceptInvite(
+    $0.AcceptInviteRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$acceptInvite, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.GetMembershipResponse> getMembership(
+    $0.GetMembershipRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$getMembership, request, options: options);
+  }
+
+  // method descriptors
+
+  static final _$previewInvite =
+      $grpc.ClientMethod<$0.PreviewInviteRequest, $0.PreviewInviteResponse>(
+          '/space.v1.MembershipService/PreviewInvite',
+          ($0.PreviewInviteRequest value) => value.writeToBuffer(),
+          $0.PreviewInviteResponse.fromBuffer);
+  static final _$acceptInvite =
+      $grpc.ClientMethod<$0.AcceptInviteRequest, $0.AcceptInviteResponse>(
+          '/space.v1.MembershipService/AcceptInvite',
+          ($0.AcceptInviteRequest value) => value.writeToBuffer(),
+          $0.AcceptInviteResponse.fromBuffer);
+  static final _$getMembership =
+      $grpc.ClientMethod<$0.GetMembershipRequest, $0.GetMembershipResponse>(
+          '/space.v1.MembershipService/GetMembership',
+          ($0.GetMembershipRequest value) => value.writeToBuffer(),
+          $0.GetMembershipResponse.fromBuffer);
+}
+
+@$pb.GrpcServiceName('space.v1.MembershipService')
+abstract class MembershipServiceBase extends $grpc.Service {
+  $core.String get $name => 'space.v1.MembershipService';
+
+  MembershipServiceBase() {
+    $addMethod(
+        $grpc.ServiceMethod<$0.PreviewInviteRequest, $0.PreviewInviteResponse>(
+            'PreviewInvite',
+            previewInvite_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.PreviewInviteRequest.fromBuffer(value),
+            ($0.PreviewInviteResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.AcceptInviteRequest, $0.AcceptInviteResponse>(
+            'AcceptInvite',
+            acceptInvite_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.AcceptInviteRequest.fromBuffer(value),
+            ($0.AcceptInviteResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.GetMembershipRequest, $0.GetMembershipResponse>(
+            'GetMembership',
+            getMembership_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.GetMembershipRequest.fromBuffer(value),
+            ($0.GetMembershipResponse value) => value.writeToBuffer()));
+  }
+
+  $async.Future<$0.PreviewInviteResponse> previewInvite_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.PreviewInviteRequest> $request) async {
+    return previewInvite($call, await $request);
+  }
+
+  $async.Future<$0.PreviewInviteResponse> previewInvite(
+      $grpc.ServiceCall call, $0.PreviewInviteRequest request);
+
+  $async.Future<$0.AcceptInviteResponse> acceptInvite_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.AcceptInviteRequest> $request) async {
+    return acceptInvite($call, await $request);
+  }
+
+  $async.Future<$0.AcceptInviteResponse> acceptInvite(
+      $grpc.ServiceCall call, $0.AcceptInviteRequest request);
+
+  $async.Future<$0.GetMembershipResponse> getMembership_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.GetMembershipRequest> $request) async {
+    return getMembership($call, await $request);
+  }
+
+  $async.Future<$0.GetMembershipResponse> getMembership(
+      $grpc.ServiceCall call, $0.GetMembershipRequest request);
 }

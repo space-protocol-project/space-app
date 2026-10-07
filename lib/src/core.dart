@@ -171,7 +171,11 @@ abstract interface class SpacePresentation {
   String get chatTitle;
 }
 
-class SpaceSession implements LiveSession, SpacePresentation {
+abstract interface class SpaceAccess {
+  bool get canWrite;
+}
+
+class SpaceSession implements LiveSession, SpacePresentation, SpaceAccess {
   SpaceSession._(this.server, this.record, this.vault, this.channel);
   final Discovery server;
   final DeviceRecord record;
@@ -182,6 +186,9 @@ class SpaceSession implements LiveSession, SpacePresentation {
   String spaceTitle = '';
   @override
   String chatTitle = 'Общий чат';
+  String role = '';
+  @override
+  bool get canWrite => ['owner', 'admin', 'member'].contains(role);
   int _expiresAt = 0;
   Future<void>? _loginTask;
   @override
@@ -193,8 +200,9 @@ class SpaceSession implements LiveSession, SpacePresentation {
 
   static Future<SpaceSession> connect(
     Discovery server,
-    IdentityVault vault,
-  ) async {
+    IdentityVault vault, {
+    String invitationToken = '',
+  }) async {
     var record = await vault.load(server.origin.toString());
     if (record != null) {
       checkTrust(server, record);
@@ -237,11 +245,21 @@ class SpaceSession implements LiveSession, SpacePresentation {
         throw const FormatException('gRPC manifest не соответствует discovery');
       }
       if (record.grantId.isEmpty) {
-        final result = await session._authorize('device.register');
+        final result = await session._authorize(
+          'device.register',
+          invitationToken: invitationToken,
+        );
         record.grantId = result.grantId;
         await vault.save(record);
       }
       await session.login();
+      if (invitationToken.isNotEmpty) {
+        await MembershipServiceClient(channel).acceptInvite(
+          AcceptInviteRequest(token: invitationToken),
+          options: session._options,
+        );
+      }
+      await session.refreshMembership();
       return session;
     } catch (_) {
       await channel.shutdown();
@@ -271,7 +289,10 @@ class SpaceSession implements LiveSession, SpacePresentation {
     }
   }
 
-  Future<CompleteChallengeResponse> _authorize(String purpose) async {
+  Future<CompleteChallengeResponse> _authorize(
+    String purpose, {
+    String invitationToken = '',
+  }) async {
     final algorithm = Ed25519();
     final root = await algorithm.newKeyPairFromSeed(record.rootSeed);
     final device = await algorithm.newKeyPairFromSeed(record.deviceSeed);
@@ -302,6 +323,7 @@ class SpaceSession implements LiveSession, SpacePresentation {
       CompleteChallengeRequest(
         challengeId: challenge.challengeId,
         signature: signature.bytes,
+        invitationToken: invitationToken,
       ),
       options: options,
     );
@@ -368,15 +390,56 @@ class SpaceSession implements LiveSession, SpacePresentation {
       ),
     );
     try {
-      yield* stream.timeout(
+      final frames = stream.timeout(
         const Duration(seconds: 35),
         onTimeout: (sink) {
           sink.addError(TimeoutException('Поток не отвечает'));
           sink.close();
         },
       );
+      await for (final frame in frames) {
+        if (frame.heartbeat) await refreshMembership();
+        yield frame;
+      }
     } finally {
       await stream.cancel();
+    }
+  }
+
+  Future<void> refreshMembership() async {
+    await _ensureSession();
+    final result = await MembershipServiceClient(channel)
+        .getMembership(GetMembershipRequest(), options: _options);
+    if (result.member.blocked) {
+      throw const GrpcError.permissionDenied('Доступ заблокирован');
+    }
+    role = result.member.role;
+    if (!['owner', 'admin', 'member', 'reader'].contains(role)) {
+      throw const FormatException('Неизвестная роль');
+    }
+  }
+
+  static Future<PreviewInviteResponse> previewInvitation(
+    Discovery server,
+    String token,
+  ) async {
+    final channel = ClientChannel(
+      server.origin.host,
+      port: server.grpcPort,
+      options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
+    );
+    try {
+      final result = await MembershipServiceClient(channel).previewInvite(
+        PreviewInviteRequest(token: token),
+        options: CallOptions(timeout: const Duration(seconds: 10)),
+      );
+      if (result.serverId != server.serverId ||
+          !['reader', 'member'].contains(result.role)) {
+        throw const FormatException('Приглашение не соответствует серверу');
+      }
+      return result;
+    } finally {
+      await channel.shutdown();
     }
   }
 

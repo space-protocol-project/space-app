@@ -33,6 +33,301 @@ const LogoutResponse$json = {
 final $typed_data.Uint8List logoutResponseDescriptor =
     $convert.base64Decode('Cg5Mb2dvdXRSZXNwb25zZQ==');
 
+@$core.Deprecated('Use memberDescriptor instead')
+const Member$json = {
+  '1': 'Member',
+  '2': [
+    {'1': 'principal_id', '3': 1, '4': 1, '5': 9, '10': 'principalId'},
+    {'1': 'role', '3': 2, '4': 1, '5': 9, '10': 'role'},
+    {'1': 'blocked', '3': 3, '4': 1, '5': 8, '10': 'blocked'},
+    {'1': 'revision', '3': 4, '4': 1, '5': 3, '10': 'revision'},
+  ],
+};
+
+/// Descriptor for `Member`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List memberDescriptor = $convert.base64Decode(
+    'CgZNZW1iZXISIQoMcHJpbmNpcGFsX2lkGAEgASgJUgtwcmluY2lwYWxJZBISCgRyb2xlGAIgAS'
+    'gJUgRyb2xlEhgKB2Jsb2NrZWQYAyABKAhSB2Jsb2NrZWQSGgoIcmV2aXNpb24YBCABKANSCHJl'
+    'dmlzaW9u');
+
+@$core.Deprecated('Use listMembersRequestDescriptor instead')
+const ListMembersRequest$json = {
+  '1': 'ListMembersRequest',
+  '2': [
+    {'1': 'after', '3': 1, '4': 1, '5': 9, '10': 'after'},
+  ],
+};
+
+/// Descriptor for `ListMembersRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listMembersRequestDescriptor = $convert
+    .base64Decode('ChJMaXN0TWVtYmVyc1JlcXVlc3QSFAoFYWZ0ZXIYASABKAlSBWFmdGVy');
+
+@$core.Deprecated('Use listMembersResponseDescriptor instead')
+const ListMembersResponse$json = {
+  '1': 'ListMembersResponse',
+  '2': [
+    {
+      '1': 'members',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.Member',
+      '10': 'members'
+    },
+    {'1': 'next_cursor', '3': 2, '4': 1, '5': 9, '10': 'nextCursor'},
+  ],
+};
+
+/// Descriptor for `ListMembersResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listMembersResponseDescriptor = $convert.base64Decode(
+    'ChNMaXN0TWVtYmVyc1Jlc3BvbnNlEioKB21lbWJlcnMYASADKAsyEC5zcGFjZS52MS5NZW1iZX'
+    'JSB21lbWJlcnMSHwoLbmV4dF9jdXJzb3IYAiABKAlSCm5leHRDdXJzb3I=');
+
+@$core.Deprecated('Use updateMemberRequestDescriptor instead')
+const UpdateMemberRequest$json = {
+  '1': 'UpdateMemberRequest',
+  '2': [
+    {'1': 'principal_id', '3': 1, '4': 1, '5': 9, '10': 'principalId'},
+    {'1': 'role', '3': 2, '4': 1, '5': 9, '10': 'role'},
+    {'1': 'blocked', '3': 3, '4': 1, '5': 8, '10': 'blocked'},
+    {
+      '1': 'expected_revision',
+      '3': 4,
+      '4': 1,
+      '5': 3,
+      '10': 'expectedRevision'
+    },
+  ],
+};
+
+/// Descriptor for `UpdateMemberRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List updateMemberRequestDescriptor = $convert.base64Decode(
+    'ChNVcGRhdGVNZW1iZXJSZXF1ZXN0EiEKDHByaW5jaXBhbF9pZBgBIAEoCVILcHJpbmNpcGFsSW'
+    'QSEgoEcm9sZRgCIAEoCVIEcm9sZRIYCgdibG9ja2VkGAMgASgIUgdibG9ja2VkEisKEWV4cGVj'
+    'dGVkX3JldmlzaW9uGAQgASgDUhBleHBlY3RlZFJldmlzaW9u');
+
+@$core.Deprecated('Use updateMemberResponseDescriptor instead')
+const UpdateMemberResponse$json = {
+  '1': 'UpdateMemberResponse',
+  '2': [
+    {
+      '1': 'member',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Member',
+      '10': 'member'
+    },
+  ],
+};
+
+/// Descriptor for `UpdateMemberResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List updateMemberResponseDescriptor = $convert.base64Decode(
+    'ChRVcGRhdGVNZW1iZXJSZXNwb25zZRIoCgZtZW1iZXIYASABKAsyEC5zcGFjZS52MS5NZW1iZX'
+    'JSBm1lbWJlcg==');
+
+@$core.Deprecated('Use inviteDescriptor instead')
+const Invite$json = {
+  '1': 'Invite',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    {'1': 'role', '3': 2, '4': 1, '5': 9, '10': 'role'},
+    {'1': 'expires_at', '3': 3, '4': 1, '5': 3, '10': 'expiresAt'},
+    {'1': 'max_uses', '3': 4, '4': 1, '5': 5, '10': 'maxUses'},
+    {'1': 'uses', '3': 5, '4': 1, '5': 5, '10': 'uses'},
+    {'1': 'revoked', '3': 6, '4': 1, '5': 8, '10': 'revoked'},
+  ],
+};
+
+/// Descriptor for `Invite`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List inviteDescriptor = $convert.base64Decode(
+    'CgZJbnZpdGUSDgoCaWQYASABKAlSAmlkEhIKBHJvbGUYAiABKAlSBHJvbGUSHQoKZXhwaXJlc1'
+    '9hdBgDIAEoA1IJZXhwaXJlc0F0EhkKCG1heF91c2VzGAQgASgFUgdtYXhVc2VzEhIKBHVzZXMY'
+    'BSABKAVSBHVzZXMSGAoHcmV2b2tlZBgGIAEoCFIHcmV2b2tlZA==');
+
+@$core.Deprecated('Use createInviteRequestDescriptor instead')
+const CreateInviteRequest$json = {
+  '1': 'CreateInviteRequest',
+  '2': [
+    {'1': 'role', '3': 1, '4': 1, '5': 9, '10': 'role'},
+    {'1': 'ttl_seconds', '3': 2, '4': 1, '5': 5, '10': 'ttlSeconds'},
+    {'1': 'max_uses', '3': 3, '4': 1, '5': 5, '10': 'maxUses'},
+  ],
+};
+
+/// Descriptor for `CreateInviteRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List createInviteRequestDescriptor = $convert.base64Decode(
+    'ChNDcmVhdGVJbnZpdGVSZXF1ZXN0EhIKBHJvbGUYASABKAlSBHJvbGUSHwoLdHRsX3NlY29uZH'
+    'MYAiABKAVSCnR0bFNlY29uZHMSGQoIbWF4X3VzZXMYAyABKAVSB21heFVzZXM=');
+
+@$core.Deprecated('Use createInviteResponseDescriptor instead')
+const CreateInviteResponse$json = {
+  '1': 'CreateInviteResponse',
+  '2': [
+    {
+      '1': 'invite',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Invite',
+      '10': 'invite'
+    },
+    {'1': 'token', '3': 2, '4': 1, '5': 9, '10': 'token'},
+  ],
+};
+
+/// Descriptor for `CreateInviteResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List createInviteResponseDescriptor = $convert.base64Decode(
+    'ChRDcmVhdGVJbnZpdGVSZXNwb25zZRIoCgZpbnZpdGUYASABKAsyEC5zcGFjZS52MS5JbnZpdG'
+    'VSBmludml0ZRIUCgV0b2tlbhgCIAEoCVIFdG9rZW4=');
+
+@$core.Deprecated('Use listInvitesRequestDescriptor instead')
+const ListInvitesRequest$json = {
+  '1': 'ListInvitesRequest',
+  '2': [
+    {'1': 'after', '3': 1, '4': 1, '5': 9, '10': 'after'},
+  ],
+};
+
+/// Descriptor for `ListInvitesRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listInvitesRequestDescriptor = $convert
+    .base64Decode('ChJMaXN0SW52aXRlc1JlcXVlc3QSFAoFYWZ0ZXIYASABKAlSBWFmdGVy');
+
+@$core.Deprecated('Use listInvitesResponseDescriptor instead')
+const ListInvitesResponse$json = {
+  '1': 'ListInvitesResponse',
+  '2': [
+    {
+      '1': 'invites',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.Invite',
+      '10': 'invites'
+    },
+    {'1': 'next_cursor', '3': 2, '4': 1, '5': 9, '10': 'nextCursor'},
+  ],
+};
+
+/// Descriptor for `ListInvitesResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listInvitesResponseDescriptor = $convert.base64Decode(
+    'ChNMaXN0SW52aXRlc1Jlc3BvbnNlEioKB2ludml0ZXMYASADKAsyEC5zcGFjZS52MS5JbnZpdG'
+    'VSB2ludml0ZXMSHwoLbmV4dF9jdXJzb3IYAiABKAlSCm5leHRDdXJzb3I=');
+
+@$core.Deprecated('Use revokeInviteRequestDescriptor instead')
+const RevokeInviteRequest$json = {
+  '1': 'RevokeInviteRequest',
+  '2': [
+    {'1': 'invite_id', '3': 1, '4': 1, '5': 9, '10': 'inviteId'},
+  ],
+};
+
+/// Descriptor for `RevokeInviteRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List revokeInviteRequestDescriptor =
+    $convert.base64Decode(
+        'ChNSZXZva2VJbnZpdGVSZXF1ZXN0EhsKCWludml0ZV9pZBgBIAEoCVIIaW52aXRlSWQ=');
+
+@$core.Deprecated('Use revokeInviteResponseDescriptor instead')
+const RevokeInviteResponse$json = {
+  '1': 'RevokeInviteResponse',
+};
+
+/// Descriptor for `RevokeInviteResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List revokeInviteResponseDescriptor =
+    $convert.base64Decode('ChRSZXZva2VJbnZpdGVSZXNwb25zZQ==');
+
+@$core.Deprecated('Use previewInviteRequestDescriptor instead')
+const PreviewInviteRequest$json = {
+  '1': 'PreviewInviteRequest',
+  '2': [
+    {'1': 'token', '3': 1, '4': 1, '5': 9, '10': 'token'},
+  ],
+};
+
+/// Descriptor for `PreviewInviteRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List previewInviteRequestDescriptor =
+    $convert.base64Decode(
+        'ChRQcmV2aWV3SW52aXRlUmVxdWVzdBIUCgV0b2tlbhgBIAEoCVIFdG9rZW4=');
+
+@$core.Deprecated('Use previewInviteResponseDescriptor instead')
+const PreviewInviteResponse$json = {
+  '1': 'PreviewInviteResponse',
+  '2': [
+    {'1': 'role', '3': 1, '4': 1, '5': 9, '10': 'role'},
+    {'1': 'server_id', '3': 2, '4': 1, '5': 9, '10': 'serverId'},
+    {'1': 'title', '3': 3, '4': 1, '5': 9, '10': 'title'},
+    {'1': 'expires_at', '3': 4, '4': 1, '5': 3, '10': 'expiresAt'},
+  ],
+};
+
+/// Descriptor for `PreviewInviteResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List previewInviteResponseDescriptor = $convert.base64Decode(
+    'ChVQcmV2aWV3SW52aXRlUmVzcG9uc2USEgoEcm9sZRgBIAEoCVIEcm9sZRIbCglzZXJ2ZXJfaW'
+    'QYAiABKAlSCHNlcnZlcklkEhQKBXRpdGxlGAMgASgJUgV0aXRsZRIdCgpleHBpcmVzX2F0GAQg'
+    'ASgDUglleHBpcmVzQXQ=');
+
+@$core.Deprecated('Use acceptInviteRequestDescriptor instead')
+const AcceptInviteRequest$json = {
+  '1': 'AcceptInviteRequest',
+  '2': [
+    {'1': 'token', '3': 1, '4': 1, '5': 9, '10': 'token'},
+  ],
+};
+
+/// Descriptor for `AcceptInviteRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List acceptInviteRequestDescriptor =
+    $convert.base64Decode(
+        'ChNBY2NlcHRJbnZpdGVSZXF1ZXN0EhQKBXRva2VuGAEgASgJUgV0b2tlbg==');
+
+@$core.Deprecated('Use acceptInviteResponseDescriptor instead')
+const AcceptInviteResponse$json = {
+  '1': 'AcceptInviteResponse',
+  '2': [
+    {
+      '1': 'member',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Member',
+      '10': 'member'
+    },
+  ],
+};
+
+/// Descriptor for `AcceptInviteResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List acceptInviteResponseDescriptor = $convert.base64Decode(
+    'ChRBY2NlcHRJbnZpdGVSZXNwb25zZRIoCgZtZW1iZXIYASABKAsyEC5zcGFjZS52MS5NZW1iZX'
+    'JSBm1lbWJlcg==');
+
+@$core.Deprecated('Use getMembershipRequestDescriptor instead')
+const GetMembershipRequest$json = {
+  '1': 'GetMembershipRequest',
+};
+
+/// Descriptor for `GetMembershipRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getMembershipRequestDescriptor =
+    $convert.base64Decode('ChRHZXRNZW1iZXJzaGlwUmVxdWVzdA==');
+
+@$core.Deprecated('Use getMembershipResponseDescriptor instead')
+const GetMembershipResponse$json = {
+  '1': 'GetMembershipResponse',
+  '2': [
+    {
+      '1': 'member',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Member',
+      '10': 'member'
+    },
+  ],
+};
+
+/// Descriptor for `GetMembershipResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getMembershipResponseDescriptor = $convert.base64Decode(
+    'ChVHZXRNZW1iZXJzaGlwUmVzcG9uc2USKAoGbWVtYmVyGAEgASgLMhAuc3BhY2UudjEuTWVtYm'
+    'VyUgZtZW1iZXI=');
+
 @$core.Deprecated('Use getSetupStatusRequestDescriptor instead')
 const GetSetupStatusRequest$json = {
   '1': 'GetSetupStatusRequest',
@@ -277,14 +572,15 @@ const CompleteChallengeRequest$json = {
   '2': [
     {'1': 'challenge_id', '3': 1, '4': 1, '5': 9, '10': 'challengeId'},
     {'1': 'signature', '3': 2, '4': 1, '5': 12, '10': 'signature'},
+    {'1': 'invitation_token', '3': 3, '4': 1, '5': 9, '10': 'invitationToken'},
   ],
 };
 
 /// Descriptor for `CompleteChallengeRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List completeChallengeRequestDescriptor =
-    $convert.base64Decode(
-        'ChhDb21wbGV0ZUNoYWxsZW5nZVJlcXVlc3QSIQoMY2hhbGxlbmdlX2lkGAEgASgJUgtjaGFsbG'
-        'VuZ2VJZBIcCglzaWduYXR1cmUYAiABKAxSCXNpZ25hdHVyZQ==');
+final $typed_data.Uint8List completeChallengeRequestDescriptor = $convert.base64Decode(
+    'ChhDb21wbGV0ZUNoYWxsZW5nZVJlcXVlc3QSIQoMY2hhbGxlbmdlX2lkGAEgASgJUgtjaGFsbG'
+    'VuZ2VJZBIcCglzaWduYXR1cmUYAiABKAxSCXNpZ25hdHVyZRIpChBpbnZpdGF0aW9uX3Rva2Vu'
+    'GAMgASgJUg9pbnZpdGF0aW9uVG9rZW4=');
 
 @$core.Deprecated('Use completeChallengeResponseDescriptor instead')
 const CompleteChallengeResponse$json = {

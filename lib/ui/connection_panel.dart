@@ -17,12 +17,14 @@ class ConnectionPanel extends StatefulWidget {
 }
 
 class _ConnectionPanelState extends State<ConnectionPanel> {
+  final invitation = TextEditingController();
   late final TextEditingController address = TextEditingController(
     text: widget.origin,
   );
   @override
   void dispose() {
     address.dispose();
+    invitation.dispose();
     super.dispose();
   }
 
@@ -75,10 +77,22 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
               ),
             ),
             const SizedBox(height: 14),
+            TextField(
+              controller: invitation,
+              enabled: !c.busy && !c.connected,
+              decoration: const InputDecoration(
+                labelText: 'Код приглашения (необязательно)',
+                hintText: 'iv_…',
+              ),
+            ),
+            const SizedBox(height: 14),
             FilledButton.tonalIcon(
               onPressed: c.busy || c.connected
                   ? null
-                  : () => c.inspect(address.text),
+                  : () => c.inspect(
+                      address.text,
+                      invitationToken: invitation.text,
+                    ),
               icon: const Icon(Icons.search),
               label: const Text('Проверить сервер'),
             ),
@@ -113,6 +127,12 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
                 'При первом визите сравните адрес и отпечаток с известными данными владельца. Первый вход создаёт отдельные ключи для этого сервера.',
               ),
               const SizedBox(height: 20),
+              if (c.invitationRole.isNotEmpty)
+                Text(
+                  c.invitationRole == 'reader'
+                      ? 'Приглашение: читатель — только чтение чата.'
+                      : 'Приглашение: участник — читать и писать в чате.',
+                ),
               FilledButton(
                 onPressed: c.busy || c.connected ? null : connect,
                 child: const Text('Доверять и подключиться'),
