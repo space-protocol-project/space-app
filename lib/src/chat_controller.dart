@@ -111,6 +111,7 @@ class ChatController extends ChangeNotifier {
         return;
       }
       _session = session;
+      _invitationToken = '';
       final initial = await session.messages();
       _messages.clear();
       for (final message in initial) {
@@ -239,7 +240,11 @@ class ChatController extends ChangeNotifier {
           ].contains(problem.code);
   Future<bool> send(String text) async {
     final session = _session;
-    if (busy || !connected || session == null || text.trim().isEmpty) {
+    if (busy ||
+        !connected ||
+        !canWrite ||
+        session == null ||
+        text.trim().isEmpty) {
       return false;
     }
     if (_pendingText != text || _pendingKey.isEmpty) {

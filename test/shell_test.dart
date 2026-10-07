@@ -15,6 +15,9 @@ class TestVault implements IdentityVault {
 
 class TestController extends ChatController {
   TestController() : super(TestVault());
+  bool readOnly = false;
+  @override
+  bool get canWrite => connected && !readOnly;
   void server(Discovery value) {
     preview = value;
     notifyListeners();
@@ -23,6 +26,39 @@ class TestController extends ChatController {
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
+  testWidgets('Читатель видит чат без возможности отправки', (tester) async {
+    tester.view.physicalSize = const Size(1100, 850);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final controller = TestController()
+      ..connected = true
+      ..readOnly = true;
+    controller.server(
+      Discovery(
+        localOrigin('http://127.0.0.1:8080'),
+        'srv_test',
+        List.filled(32, 1),
+        9090,
+      ),
+    );
+    await tester.pumpWidget(SpaceApp(controller: controller));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Общий чат'));
+    await tester.pumpAndSettle();
+    final field = tester.widget<TextField>(
+      find.byKey(const ValueKey('chat-draft')),
+    );
+    expect(field.enabled, false);
+    expect(field.decoration?.hintText, 'Ваша роль разрешает только чтение');
+    final send = tester.widget<IconButton>(
+      find.byWidgetPredicate(
+        (widget) => widget is IconButton && widget.tooltip == 'Отправить',
+      ),
+    );
+    expect(send.onPressed, isNull);
+    controller.dispose();
+  });
   test('Личные настройки сохраняются отдельно от ключей', () async {
     final settings = AppPreferences();
     await settings.load();
