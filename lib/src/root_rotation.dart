@@ -25,6 +25,7 @@ Future<Map<String, dynamic>> prepareRootRotation(
   if (current.rootSeed.length != 32) {
     throw const FormatException('Для смены root нужен исходный корневой ключ');
   }
+  checkTrust(server, current);
   final existing = await vault.loadRotation(current.origin);
   if (existing != null && !renew) {
     throw const FormatException('Сначала завершите предыдущую ротацию');
@@ -44,6 +45,7 @@ Future<Map<String, dynamic>> prepareRootRotation(
       ? null
       : DeviceRecord.fromJson(existing['next'] as Map<String, dynamic>);
   if (saved != null) {
+    checkTrust(server, saved);
     final checked = await saved.identity();
     if (existing!['old_digest'] != await _digest(current) ||
         checked.principalId != identity.principalId ||
@@ -194,6 +196,9 @@ Future<DeviceRecord?> finishRootRotation(
     // Частично записанный active slot после commit восстанавливается из отдельного
     // защищённого журнала, только после проверки обеих подписей и receipt сервера.
     current = null;
+  }
+  if (current != null) {
+    checkTrust(server, current);
   }
   final oldState =
       current == null || await _digest(current) == pending['old_digest'];

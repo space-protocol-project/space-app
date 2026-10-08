@@ -694,7 +694,11 @@ class SpaceSession
     DeviceRecord? authority,
   }) async {
     final credentials = authority ?? record;
-    if(credentials.rootHistory.isNotEmpty) {throw const FormatException('Сопряжение после ротации ещё обновляется. Подключите устройство новой recovery-карточкой.');}
+    if (credentials.rootHistory.isNotEmpty) {
+      throw const FormatException(
+        'Сопряжение после ротации ещё обновляется. Подключите устройство новой recovery-карточкой.',
+      );
+    }
     if (credentials.rootSeed.isEmpty && credentials.recoverySeed.length != 32) {
       throw const FormatException(
         'Откройте корневую или recovery-карточку для подтверждения',
@@ -732,7 +736,11 @@ class SpaceSession
     DeviceRecord? authority,
   }) async {
     final credentials = authority ?? record;
-    if(credentials.rootHistory.isNotEmpty) {throw const FormatException('Сопряжение после ротации ещё обновляется. Подключите устройство новой recovery-карточкой.');}
+    if (credentials.rootHistory.isNotEmpty) {
+      throw const FormatException(
+        'Сопряжение после ротации ещё обновляется. Подключите устройство новой recovery-карточкой.',
+      );
+    }
     if (credentials.rootSeed.isEmpty && credentials.recoverySeed.length != 32) {
       throw const FormatException('Нужен root или recovery-карточка');
     }
