@@ -1098,3 +1098,94 @@ const ListContentResponse$json = {
 final $typed_data.Uint8List listContentResponseDescriptor = $convert.base64Decode(
     'ChNMaXN0Q29udGVudFJlc3BvbnNlEi0KCGNvbnRlbnRzGAEgAygLMhEuc3BhY2UudjEuQ29udG'
     'VudFIIY29udGVudHMSHwoLbmV4dF9jdXJzb3IYAiABKAlSCm5leHRDdXJzb3I=');
+
+@$core.Deprecated('Use createRootRotationRequestDescriptor instead')
+const CreateRootRotationRequest$json = {
+  '1': 'CreateRootRotationRequest',
+  '2': [
+    {'1': 'operation_id', '3': 1, '4': 1, '5': 9, '10': 'operationId'},
+    {
+      '1': 'expected_auth_epoch',
+      '3': 2,
+      '4': 1,
+      '5': 3,
+      '10': 'expectedAuthEpoch'
+    },
+    {
+      '1': 'new_root_public_key',
+      '3': 3,
+      '4': 1,
+      '5': 12,
+      '10': 'newRootPublicKey'
+    },
+    {
+      '1': 'new_device_public_key',
+      '3': 4,
+      '4': 1,
+      '5': 12,
+      '10': 'newDevicePublicKey'
+    },
+    {'1': 'profile', '3': 5, '4': 1, '5': 9, '10': 'profile'},
+  ],
+};
+
+/// Descriptor for `CreateRootRotationRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List createRootRotationRequestDescriptor = $convert.base64Decode(
+    'ChlDcmVhdGVSb290Um90YXRpb25SZXF1ZXN0EiEKDG9wZXJhdGlvbl9pZBgBIAEoCVILb3Blcm'
+    'F0aW9uSWQSLgoTZXhwZWN0ZWRfYXV0aF9lcG9jaBgCIAEoA1IRZXhwZWN0ZWRBdXRoRXBvY2gS'
+    'LQoTbmV3X3Jvb3RfcHVibGljX2tleRgDIAEoDFIQbmV3Um9vdFB1YmxpY0tleRIxChVuZXdfZG'
+    'V2aWNlX3B1YmxpY19rZXkYBCABKAxSEm5ld0RldmljZVB1YmxpY0tleRIYCgdwcm9maWxlGAUg'
+    'ASgJUgdwcm9maWxl');
+
+@$core.Deprecated('Use createRootRotationResponseDescriptor instead')
+const CreateRootRotationResponse$json = {
+  '1': 'CreateRootRotationResponse',
+  '2': [
+    {'1': 'challenge_id', '3': 1, '4': 1, '5': 9, '10': 'challengeId'},
+    {'1': 'transcript', '3': 2, '4': 1, '5': 12, '10': 'transcript'},
+  ],
+};
+
+/// Descriptor for `CreateRootRotationResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List createRootRotationResponseDescriptor =
+    $convert.base64Decode(
+        'ChpDcmVhdGVSb290Um90YXRpb25SZXNwb25zZRIhCgxjaGFsbGVuZ2VfaWQYASABKAlSC2NoYW'
+        'xsZW5nZUlkEh4KCnRyYW5zY3JpcHQYAiABKAxSCnRyYW5zY3JpcHQ=');
+
+@$core.Deprecated('Use completeRootRotationRequestDescriptor instead')
+const CompleteRootRotationRequest$json = {
+  '1': 'CompleteRootRotationRequest',
+  '2': [
+    {'1': 'challenge_id', '3': 1, '4': 1, '5': 9, '10': 'challengeId'},
+    {'1': 'old_signature', '3': 2, '4': 1, '5': 12, '10': 'oldSignature'},
+    {'1': 'new_signature', '3': 3, '4': 1, '5': 12, '10': 'newSignature'},
+  ],
+};
+
+/// Descriptor for `CompleteRootRotationRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List completeRootRotationRequestDescriptor =
+    $convert.base64Decode(
+        'ChtDb21wbGV0ZVJvb3RSb3RhdGlvblJlcXVlc3QSIQoMY2hhbGxlbmdlX2lkGAEgASgJUgtjaG'
+        'FsbGVuZ2VJZBIjCg1vbGRfc2lnbmF0dXJlGAIgASgMUgxvbGRTaWduYXR1cmUSIwoNbmV3X3Np'
+        'Z25hdHVyZRgDIAEoDFIMbmV3U2lnbmF0dXJl');
+
+@$core.Deprecated('Use completeRootRotationResponseDescriptor instead')
+const CompleteRootRotationResponse$json = {
+  '1': 'CompleteRootRotationResponse',
+  '2': [
+    {'1': 'principal_id', '3': 1, '4': 1, '5': 9, '10': 'principalId'},
+    {'1': 'auth_epoch', '3': 2, '4': 1, '5': 3, '10': 'authEpoch'},
+    {'1': 'grant_id', '3': 3, '4': 1, '5': 9, '10': 'grantId'},
+    {'1': 'transcript', '3': 4, '4': 1, '5': 12, '10': 'transcript'},
+    {'1': 'old_signature', '3': 5, '4': 1, '5': 12, '10': 'oldSignature'},
+    {'1': 'new_signature', '3': 6, '4': 1, '5': 12, '10': 'newSignature'},
+  ],
+};
+
+/// Descriptor for `CompleteRootRotationResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List completeRootRotationResponseDescriptor = $convert.base64Decode(
+    'ChxDb21wbGV0ZVJvb3RSb3RhdGlvblJlc3BvbnNlEiEKDHByaW5jaXBhbF9pZBgBIAEoCVILcH'
+    'JpbmNpcGFsSWQSHQoKYXV0aF9lcG9jaBgCIAEoA1IJYXV0aEVwb2NoEhkKCGdyYW50X2lkGAMg'
+    'ASgJUgdncmFudElkEh4KCnRyYW5zY3JpcHQYBCABKAxSCnRyYW5zY3JpcHQSIwoNb2xkX3NpZ2'
+    '5hdHVyZRgFIAEoDFIMb2xkU2lnbmF0dXJlEiMKDW5ld19zaWduYXR1cmUYBiABKAxSDG5ld1Np'
+    'Z25hdHVyZQ==');

@@ -169,6 +169,21 @@ class AuthServiceClient extends $grpc.Client {
 
   AuthServiceClient(super.channel, {super.options, super.interceptors});
 
+  /// Экспериментальный API; требует поддержки stable principal у клиента.
+  $grpc.ResponseFuture<$0.CreateRootRotationResponse> createRootRotation(
+    $0.CreateRootRotationRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$createRootRotation, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.CompleteRootRotationResponse> completeRootRotation(
+    $0.CompleteRootRotationRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$completeRootRotation, request, options: options);
+  }
+
   $grpc.ResponseFuture<$0.ProposePairingResponse> proposePairing(
     $0.ProposePairingRequest request, {
     $grpc.CallOptions? options,
@@ -248,6 +263,16 @@ class AuthServiceClient extends $grpc.Client {
 
   // method descriptors
 
+  static final _$createRootRotation = $grpc.ClientMethod<
+          $0.CreateRootRotationRequest, $0.CreateRootRotationResponse>(
+      '/space.v1.AuthService/CreateRootRotation',
+      ($0.CreateRootRotationRequest value) => value.writeToBuffer(),
+      $0.CreateRootRotationResponse.fromBuffer);
+  static final _$completeRootRotation = $grpc.ClientMethod<
+          $0.CompleteRootRotationRequest, $0.CompleteRootRotationResponse>(
+      '/space.v1.AuthService/CompleteRootRotation',
+      ($0.CompleteRootRotationRequest value) => value.writeToBuffer(),
+      $0.CompleteRootRotationResponse.fromBuffer);
   static final _$proposePairing =
       $grpc.ClientMethod<$0.ProposePairingRequest, $0.ProposePairingResponse>(
           '/space.v1.AuthService/ProposePairing',
@@ -310,6 +335,24 @@ abstract class AuthServiceBase extends $grpc.Service {
   $core.String get $name => 'space.v1.AuthService';
 
   AuthServiceBase() {
+    $addMethod($grpc.ServiceMethod<$0.CreateRootRotationRequest,
+            $0.CreateRootRotationResponse>(
+        'CreateRootRotation',
+        createRootRotation_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) =>
+            $0.CreateRootRotationRequest.fromBuffer(value),
+        ($0.CreateRootRotationResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.CompleteRootRotationRequest,
+            $0.CompleteRootRotationResponse>(
+        'CompleteRootRotation',
+        completeRootRotation_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) =>
+            $0.CompleteRootRotationRequest.fromBuffer(value),
+        ($0.CompleteRootRotationResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.ProposePairingRequest,
             $0.ProposePairingResponse>(
         'ProposePairing',
@@ -408,6 +451,24 @@ abstract class AuthServiceBase extends $grpc.Service {
             $0.CompleteChallengeRequest.fromBuffer(value),
         ($0.CompleteChallengeResponse value) => value.writeToBuffer()));
   }
+
+  $async.Future<$0.CreateRootRotationResponse> createRootRotation_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.CreateRootRotationRequest> $request) async {
+    return createRootRotation($call, await $request);
+  }
+
+  $async.Future<$0.CreateRootRotationResponse> createRootRotation(
+      $grpc.ServiceCall call, $0.CreateRootRotationRequest request);
+
+  $async.Future<$0.CompleteRootRotationResponse> completeRootRotation_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.CompleteRootRotationRequest> $request) async {
+    return completeRootRotation($call, await $request);
+  }
+
+  $async.Future<$0.CompleteRootRotationResponse> completeRootRotation(
+      $grpc.ServiceCall call, $0.CompleteRootRotationRequest request);
 
   $async.Future<$0.ProposePairingResponse> proposePairing_Pre(
       $grpc.ServiceCall $call,

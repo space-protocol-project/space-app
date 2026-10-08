@@ -4601,6 +4601,408 @@ class ListContentResponse extends $pb.GeneratedMessage {
   void clearNextCursor() => $_clearField(2);
 }
 
+class CreateRootRotationRequest extends $pb.GeneratedMessage {
+  factory CreateRootRotationRequest({
+    $core.String? operationId,
+    $fixnum.Int64? expectedAuthEpoch,
+    $core.List<$core.int>? newRootPublicKey,
+    $core.List<$core.int>? newDevicePublicKey,
+    $core.String? profile,
+  }) {
+    final result = CreateRootRotationRequest._();
+    if (operationId != null) result.operationId = operationId;
+    if (expectedAuthEpoch != null) result.expectedAuthEpoch = expectedAuthEpoch;
+    if (newRootPublicKey != null) result.newRootPublicKey = newRootPublicKey;
+    if (newDevicePublicKey != null)
+      result.newDevicePublicKey = newDevicePublicKey;
+    if (profile != null) result.profile = profile;
+    return result;
+  }
+
+  CreateRootRotationRequest._();
+
+  factory CreateRootRotationRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CreateRootRotationRequest()..mergeFromBuffer(data, registry);
+  factory CreateRootRotationRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CreateRootRotationRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CreateRootRotationRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: CreateRootRotationRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'operationId')
+    ..aInt64(2, _omitFieldNames ? '' : 'expectedAuthEpoch')
+    ..a<$core.List<$core.int>>(
+        3, _omitFieldNames ? '' : 'newRootPublicKey', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        4, _omitFieldNames ? '' : 'newDevicePublicKey', $pb.PbFieldType.OY)
+    ..aOS(5, _omitFieldNames ? '' : 'profile')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreateRootRotationRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreateRootRotationRequest copyWith(
+          void Function(CreateRootRotationRequest) updates) =>
+      super.copyWith((message) => updates(message as CreateRootRotationRequest))
+          as CreateRootRotationRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CreateRootRotationRequest() / CreateRootRotationRequest.new instead')
+  static CreateRootRotationRequest create() => CreateRootRotationRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      CreateRootRotationRequest._();
+  @$core.override
+  CreateRootRotationRequest createEmptyInstance() =>
+      CreateRootRotationRequest._();
+  @$core.pragma('dart2js:noInline')
+  static CreateRootRotationRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CreateRootRotationRequest>(
+          CreateRootRotationRequest.$_createMessage);
+  static CreateRootRotationRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get operationId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set operationId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasOperationId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearOperationId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get expectedAuthEpoch => $_getI64(1);
+  @$pb.TagNumber(2)
+  set expectedAuthEpoch($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasExpectedAuthEpoch() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearExpectedAuthEpoch() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get newRootPublicKey => $_getN(2);
+  @$pb.TagNumber(3)
+  set newRootPublicKey($core.List<$core.int> value) => $_setBytes(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasNewRootPublicKey() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearNewRootPublicKey() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.List<$core.int> get newDevicePublicKey => $_getN(3);
+  @$pb.TagNumber(4)
+  set newDevicePublicKey($core.List<$core.int> value) => $_setBytes(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasNewDevicePublicKey() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearNewDevicePublicKey() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get profile => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set profile($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasProfile() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearProfile() => $_clearField(5);
+}
+
+class CreateRootRotationResponse extends $pb.GeneratedMessage {
+  factory CreateRootRotationResponse({
+    $core.String? challengeId,
+    $core.List<$core.int>? transcript,
+  }) {
+    final result = CreateRootRotationResponse._();
+    if (challengeId != null) result.challengeId = challengeId;
+    if (transcript != null) result.transcript = transcript;
+    return result;
+  }
+
+  CreateRootRotationResponse._();
+
+  factory CreateRootRotationResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CreateRootRotationResponse()..mergeFromBuffer(data, registry);
+  factory CreateRootRotationResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CreateRootRotationResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CreateRootRotationResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: CreateRootRotationResponse.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'challengeId')
+    ..a<$core.List<$core.int>>(
+        2, _omitFieldNames ? '' : 'transcript', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreateRootRotationResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreateRootRotationResponse copyWith(
+          void Function(CreateRootRotationResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as CreateRootRotationResponse))
+          as CreateRootRotationResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CreateRootRotationResponse() / CreateRootRotationResponse.new instead')
+  static CreateRootRotationResponse create() => CreateRootRotationResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      CreateRootRotationResponse._();
+  @$core.override
+  CreateRootRotationResponse createEmptyInstance() =>
+      CreateRootRotationResponse._();
+  @$core.pragma('dart2js:noInline')
+  static CreateRootRotationResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CreateRootRotationResponse>(
+          CreateRootRotationResponse.$_createMessage);
+  static CreateRootRotationResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get challengeId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set challengeId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChallengeId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChallengeId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get transcript => $_getN(1);
+  @$pb.TagNumber(2)
+  set transcript($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasTranscript() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearTranscript() => $_clearField(2);
+}
+
+class CompleteRootRotationRequest extends $pb.GeneratedMessage {
+  factory CompleteRootRotationRequest({
+    $core.String? challengeId,
+    $core.List<$core.int>? oldSignature,
+    $core.List<$core.int>? newSignature,
+  }) {
+    final result = CompleteRootRotationRequest._();
+    if (challengeId != null) result.challengeId = challengeId;
+    if (oldSignature != null) result.oldSignature = oldSignature;
+    if (newSignature != null) result.newSignature = newSignature;
+    return result;
+  }
+
+  CompleteRootRotationRequest._();
+
+  factory CompleteRootRotationRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CompleteRootRotationRequest()..mergeFromBuffer(data, registry);
+  factory CompleteRootRotationRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CompleteRootRotationRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CompleteRootRotationRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: CompleteRootRotationRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'challengeId')
+    ..a<$core.List<$core.int>>(
+        2, _omitFieldNames ? '' : 'oldSignature', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        3, _omitFieldNames ? '' : 'newSignature', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CompleteRootRotationRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CompleteRootRotationRequest copyWith(
+          void Function(CompleteRootRotationRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as CompleteRootRotationRequest))
+          as CompleteRootRotationRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CompleteRootRotationRequest() / CompleteRootRotationRequest.new instead')
+  static CompleteRootRotationRequest create() =>
+      CompleteRootRotationRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      CompleteRootRotationRequest._();
+  @$core.override
+  CompleteRootRotationRequest createEmptyInstance() =>
+      CompleteRootRotationRequest._();
+  @$core.pragma('dart2js:noInline')
+  static CompleteRootRotationRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CompleteRootRotationRequest>(
+          CompleteRootRotationRequest.$_createMessage);
+  static CompleteRootRotationRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get challengeId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set challengeId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChallengeId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChallengeId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get oldSignature => $_getN(1);
+  @$pb.TagNumber(2)
+  set oldSignature($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasOldSignature() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearOldSignature() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get newSignature => $_getN(2);
+  @$pb.TagNumber(3)
+  set newSignature($core.List<$core.int> value) => $_setBytes(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasNewSignature() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearNewSignature() => $_clearField(3);
+}
+
+class CompleteRootRotationResponse extends $pb.GeneratedMessage {
+  factory CompleteRootRotationResponse({
+    $core.String? principalId,
+    $fixnum.Int64? authEpoch,
+    $core.String? grantId,
+    $core.List<$core.int>? transcript,
+    $core.List<$core.int>? oldSignature,
+    $core.List<$core.int>? newSignature,
+  }) {
+    final result = CompleteRootRotationResponse._();
+    if (principalId != null) result.principalId = principalId;
+    if (authEpoch != null) result.authEpoch = authEpoch;
+    if (grantId != null) result.grantId = grantId;
+    if (transcript != null) result.transcript = transcript;
+    if (oldSignature != null) result.oldSignature = oldSignature;
+    if (newSignature != null) result.newSignature = newSignature;
+    return result;
+  }
+
+  CompleteRootRotationResponse._();
+
+  factory CompleteRootRotationResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CompleteRootRotationResponse()..mergeFromBuffer(data, registry);
+  factory CompleteRootRotationResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CompleteRootRotationResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CompleteRootRotationResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: CompleteRootRotationResponse.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'principalId')
+    ..aInt64(2, _omitFieldNames ? '' : 'authEpoch')
+    ..aOS(3, _omitFieldNames ? '' : 'grantId')
+    ..a<$core.List<$core.int>>(
+        4, _omitFieldNames ? '' : 'transcript', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        5, _omitFieldNames ? '' : 'oldSignature', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        6, _omitFieldNames ? '' : 'newSignature', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CompleteRootRotationResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CompleteRootRotationResponse copyWith(
+          void Function(CompleteRootRotationResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as CompleteRootRotationResponse))
+          as CompleteRootRotationResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CompleteRootRotationResponse() / CompleteRootRotationResponse.new instead')
+  static CompleteRootRotationResponse create() =>
+      CompleteRootRotationResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      CompleteRootRotationResponse._();
+  @$core.override
+  CompleteRootRotationResponse createEmptyInstance() =>
+      CompleteRootRotationResponse._();
+  @$core.pragma('dart2js:noInline')
+  static CompleteRootRotationResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CompleteRootRotationResponse>(
+          CompleteRootRotationResponse.$_createMessage);
+  static CompleteRootRotationResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get principalId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set principalId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPrincipalId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPrincipalId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get authEpoch => $_getI64(1);
+  @$pb.TagNumber(2)
+  set authEpoch($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasAuthEpoch() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAuthEpoch() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get grantId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set grantId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasGrantId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearGrantId() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.List<$core.int> get transcript => $_getN(3);
+  @$pb.TagNumber(4)
+  set transcript($core.List<$core.int> value) => $_setBytes(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasTranscript() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearTranscript() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.List<$core.int> get oldSignature => $_getN(4);
+  @$pb.TagNumber(5)
+  set oldSignature($core.List<$core.int> value) => $_setBytes(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasOldSignature() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearOldSignature() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.List<$core.int> get newSignature => $_getN(5);
+  @$pb.TagNumber(6)
+  set newSignature($core.List<$core.int> value) => $_setBytes(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasNewSignature() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearNewSignature() => $_clearField(6);
+}
+
 const $core.bool _omitFieldNames =
     $core.bool.fromEnvironment('protobuf.omit_field_names');
 const $core.bool _omitMessageNames =
