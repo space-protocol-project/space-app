@@ -76,6 +76,26 @@ Future<void> main(List<String> args) async {
       'Идентичность после восстановления изменилась',
     );
     check(session.role == 'owner', 'Роль владельца потеряна');
+    check(session.canManageSpace, 'Управление не доступно владельцу');
+    final adminIdentity = await session.adminIdentity();
+    check(
+      adminIdentity['principalId'] == session.principalId,
+      'Управление создало другую identity',
+    );
+    final adminSettings = await session.adminRequest('/api/v1/space/settings');
+    final values = adminSettings['settings'] as Map;
+    await session.adminRequest(
+      '/api/v1/space/settings',
+      method: 'PATCH',
+      body: {
+        'title': values['title'],
+        'chatTitle': values['chatTitle'],
+        'chatEnabled': values['chatEnabled'] ?? false,
+        'registrationPolicy': values['registrationPolicy'],
+        'expectedRevision': values['revision'],
+      },
+    );
+
     check(
       vault.record!.rootSeed.isEmpty && vault.record!.recoverySeed.isEmpty,
       'Рабочее устройство сохранило управляющий секрет',

@@ -244,6 +244,16 @@ abstract interface class DeviceManagement {
   Future<String> preparePairing(Pairing pairing, {DeviceRecord? authority});
 }
 
+abstract interface class SpaceAdministration {
+  bool get canManageSpace;
+  Future<Map<String, dynamic>> adminIdentity();
+  Future<Map<String, dynamic>> adminRequest(
+    String path, {
+    Map<String, dynamic>? body,
+    String? method,
+  });
+}
+
 abstract interface class RootRotationControl {
   Future<void> prepareRotation({bool renew = false});
 }
@@ -255,7 +265,8 @@ class SpaceSession
         SpaceAccess,
         DeviceManagement,
         RootRotationControl,
-        ChannelNavigation {
+        ChannelNavigation,
+        SpaceAdministration {
   SpaceSession._(this.server, this.record, this.vault, this.channel);
   final Discovery server;
   final DeviceRecord record;
@@ -341,6 +352,61 @@ class SpaceSession
     timeout: const Duration(seconds: 10),
     metadata: {'authorization': 'Bearer $_token'},
   );
+
+  @override
+  bool get canManageSpace => ['owner', 'admin'].contains(role);
+  @override
+  Future<Map<String, dynamic>> adminIdentity() async {
+    await refreshMembership();
+    return {
+      'origin': server.origin.toString(),
+      'serverId': server.serverId,
+      'principalId': principalId,
+      'role': role,
+      'token': '',
+      'expires': DateTime.now().millisecondsSinceEpoch ~/ 1000 + 600,
+    };
+  }
+
+  @override
+  Future<Map<String, dynamic>> adminRequest(
+    String path, {
+    Map<String, dynamic>? body,
+    String? method,
+  }) async {
+    await _ensureSession();
+    final client = AdminServiceClient(channel);
+    switch (path) {
+      case '/api/v1/space/setup':
+        return Map<String, dynamic>.from(
+          (await client.getSetupStatus(
+                GetSetupStatusRequest(),
+                options: _options,
+              )).toProto3Json()
+              as Map,
+        );
+      case '/api/v1/space/settings':
+        if (method == 'PATCH') {
+          final request = UpdateSettingsRequest()..mergeFromProto3Json(body!);
+          return Map<String, dynamic>.from(
+            (await client.updateSettings(
+                  request,
+                  options: _options,
+                )).toProto3Json()
+                as Map,
+          );
+        }
+        return Map<String, dynamic>.from(
+          (await client.getSettings(
+                GetSettingsRequest(),
+                options: _options,
+              )).toProto3Json()
+              as Map,
+        );
+      default:
+        throw const GrpcError.unimplemented('Операция ещё не перенесена');
+    }
+  }
 
   static Future<SpaceSession> connect(
     Discovery server,

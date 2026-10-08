@@ -1,3 +1,5 @@
+import 'admin_panel.dart';
+
 import 'package:flutter/material.dart';
 
 import 'recovery_panel.dart';
@@ -281,6 +283,14 @@ class IdentityPanel extends StatelessWidget {
           ],
         ),
       ),
+      const SizedBox(height: 20),
+      if (controller.administration != null)
+        FilledButton.icon(
+          onPressed: () =>
+              openServerAdministration(context, controller.administration!),
+          icon: const Icon(Icons.settings_outlined),
+          label: const Text('Управление пространством'),
+        ),
       const SizedBox(height: 20),
       RecoveryPanel(controller: controller),
     ],

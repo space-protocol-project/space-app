@@ -31,6 +31,10 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  space_admin_ui:
+    path: ../packages/space_admin_ui
+  space_api:
+    path: ../packages/space_api
   flutter:
     sdk: flutter
 

@@ -116,6 +116,11 @@ class ChatController extends ChangeNotifier {
   bool get canWrite =>
       _session is SpaceAccess ? (_session as SpaceAccess).canWrite : connected;
   String get principalId => _session?.principalId ?? '';
+  SpaceAdministration? get administration =>
+      _session is SpaceAdministration &&
+          (_session as SpaceAdministration).canManageSpace
+      ? _session as SpaceAdministration
+      : null;
   DeviceManagement? get deviceManagement =>
       _session is DeviceManagement ? _session as DeviceManagement : null;
   String get spaceTitle => _session is SpacePresentation

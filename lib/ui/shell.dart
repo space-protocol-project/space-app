@@ -1,3 +1,5 @@
+import 'admin_panel.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -257,6 +259,20 @@ class _SpaceShellState extends State<SpaceShell> {
                       },
               ),
           ],
+          if (controller.administration != null)
+            ListTile(
+              leading: const Icon(Icons.settings_suggest_outlined),
+              title: const Text('Управление пространством'),
+              onTap: controller.busy
+                  ? null
+                  : () {
+                      scaffold.currentState?.closeDrawer();
+                      openServerAdministration(
+                        context,
+                        controller.administration!,
+                      );
+                    },
+            ),
           if (widget.preferences.origins.isNotEmpty) ...[
             const Divider(height: 30),
             const Text('Недавние пространства', style: TextStyle(fontSize: 12)),
