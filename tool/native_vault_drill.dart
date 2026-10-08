@@ -41,7 +41,8 @@ Future<void> main(List<String> args) async {
       } catch (_) {
         unreadable = true;
       }
-      if (unreadable) throw StateError('Атомарная запись повредила прежний active slot');
+      if (unreadable)
+        throw StateError('Атомарная запись повредила прежний active slot');
       final journal = await vault.loadRotation(origin);
       if (journal == null) throw StateError('Отдельный journal потерян');
       final record = DeviceRecord.fromJson(

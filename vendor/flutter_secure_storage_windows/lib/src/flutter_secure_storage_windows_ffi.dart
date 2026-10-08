@@ -491,9 +491,10 @@ class DpapiJsonFileMapStorage extends MapStorage {
                   temporary.path.toPcwstr(allocator: alloc),
                   file.path.toPcwstr(allocator: alloc),
                   MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH);
-              if (!result.value)
+              if (!result.value) {
                 throw WindowsException(result.error.toHRESULT(),
                     message: 'Atomic replace failed');
+              }
             } finally {
               if (await temporary.exists()) await temporary.delete();
             }

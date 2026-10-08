@@ -41,7 +41,7 @@ class PlatformKeyStorage implements SecureKeyStorage {
   @override
   Future<void> delete({required String key}) async {
     await _storage.delete(key: key, wOptions: options(key));
-    if (Platform.isWindows) await _storage.delete(key: key);
+    if (Platform.isWindows && await _storage.read(key:key)!=null) await _storage.delete(key:key);
   }
 }
 
