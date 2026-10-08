@@ -19,7 +19,7 @@ void check(bool v, String text) {
 }
 
 Future<void> main(List<String> args) async {
-  if (args.length != 3) {
+  if (args.length < 3 || args.length > 4) {
     throw ArgumentError('Нужны тестовая папка, origin и principal');
   }
   final directory = Directory(args[0]);
@@ -63,7 +63,7 @@ Future<void> main(List<String> args) async {
     try {
       pending.claimed = true;
       check(
-        session.principalId == args[2] && session.role == 'owner',
+        session.principalId == args[2] && session.role == (args.length>3?args[3]:'owner'),
         'Pairing изменило owner/identity',
       );
       check(
