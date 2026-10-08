@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:grpc/grpc.dart';
 
 import 'core.dart';
+import 'channel_positions.dart';
 import 'generated/space/v1/space.pb.dart';
 
 class ChatController extends ChangeNotifier {
@@ -11,7 +12,86 @@ class ChatController extends ChangeNotifier {
     this.vault, {
     this.openSession = SpaceSession.connect,
     this.retryDelay = defaultRetryDelay,
-  });
+    ChannelPositionStore? positions,
+  }) : positions = positions ?? LocalChannelPositions();
+  final ChannelPositionStore positions;
+  Timer? _positionTimer;
+  void _queuePositions() {
+    _positionTimer?.cancel();
+    _positionTimer = Timer(
+      const Duration(milliseconds: 250),
+      () => unawaited(_savePositions()),
+    );
+  }
+
+  final Map<String, String> _cursors = {}, _readThrough = {};
+  ChannelNavigation? get navigation =>
+      _session is ChannelNavigation ? _session as ChannelNavigation : null;
+  List<Channel> get channels => navigation?.availableChannels ?? [];
+  String get channelId => navigation?.selectedChannelId ?? 'general';
+  bool get canRead => navigation?.canRead ?? connected;
+  String get readThrough => _readThrough[channelId] ?? '';
+  String get draftScope =>
+      '${preview?.origin}|${preview?.serverId}|$principalId|$channelId';
+
+  Future<void> _loadPositions() async {
+    final nav = navigation;
+    _cursors.clear();
+    _readThrough.clear();
+    if (nav == null) return;
+    try {
+      final data = await positions.load(nav.positionScope);
+      final savedChannels = data['channels'];
+      for (final entry in channels) {
+        final item = savedChannels is Map ? savedChannels[entry.id] : null;
+        if (item is Map) {
+          if (item['cursor'] is String &&
+              (item['cursor'] as String).length <= 128) {
+            _cursors[entry.id] = item['cursor'];
+          }
+          if (item['readThrough'] is String &&
+              (item['readThrough'] as String).length <= 128) {
+            _readThrough[entry.id] = item['readThrough'];
+          }
+        }
+      }
+      final selected = data['selected'];
+      if (selected is String && channels.any((c) => c.id == selected)) {
+        nav.selectChannel(selected);
+      }
+    } catch (_) {
+      error = 'Не удалось загрузить позиции чтения. История будет загружена заново.';
+    }
+  }
+
+  Future<void> _savePositions() async {
+    final nav = navigation;
+    if (nav == null) return;
+    final channelData = <String, dynamic>{};
+    for (final c in channels) {
+      channelData[c.id] = {
+        'cursor': _cursors[c.id] ?? '',
+        'readThrough': _readThrough[c.id] ?? '',
+      };
+    }
+    try {
+      await positions.save(nav.positionScope, {
+        'selected': channelId,
+        'channels': channelData,
+      });
+    } catch (_) {
+      error =
+          'Позиция чтения обновлена, но сохранить её на устройстве не удалось.';
+      _update();
+    }
+  }
+
+  void markRead(String id) {
+    if (!canRead || id.isEmpty || _readThrough[channelId] == id) return;
+    _readThrough[channelId] = id;
+    _queuePositions();
+  }
+
   final IdentityVault vault;
   Discovery? preview;
   LiveSession? _session;
@@ -100,8 +180,13 @@ class ChatController extends ChangeNotifier {
     error = '';
     _stopSubscription();
     connected = false;
+    _messages.clear();
+    _pendingKey = '';
+    _pendingText = '';
     _update();
     try {
+      _positionTimer?.cancel();
+      await _savePositions();
       await _session?.close();
       _session = null;
       final session = _invitationToken.isEmpty && restoredRecord == null
@@ -119,20 +204,121 @@ class ChatController extends ChangeNotifier {
       }
       _session = session;
       _invitationToken = '';
+      await _loadPositions();
       final initial = await session.messages();
       _messages.clear();
       for (final message in initial) {
+        if (navigation != null && message.channelId != channelId) {
+          throw const FormatException('История другого канала');
+        }
         _messages[message.id] = message;
       }
-      cursor = '';
+      cursor = _cursors[channelId] ?? '';
       connected = true;
-      unawaited(_watch(session, ++_generation));
+      if (canRead) unawaited(_watch(session, ++_generation));
     } catch (e) {
       error = _explain(e);
     } finally {
       busy = false;
       _update();
     }
+  }
+
+  Future<void> selectChannel(String id) async {
+    final nav = navigation;
+    final session = _session;
+    if (busy || nav == null || session == null) return;
+    busy = true;
+    error = '';
+    _stopSubscription();
+    _messages.clear();
+    cursor = '';
+    _pendingText = '';
+    _pendingKey = '';
+    _update();
+    try {
+      await nav.refreshChannels();
+      final nextId = id.isEmpty ? nav.selectedChannelId : id;
+      if (nextId.isEmpty) {
+        connected = true;
+        return;
+      }
+      nav.selectChannel(nextId);
+      cursor = _cursors[nextId] ?? '';
+      final initial = await session.messages();
+      if (_disposed) return;
+      for (final m in initial) {
+        if (m.channelId != nextId) {
+          throw const FormatException('История другого канала');
+        }
+        _messages[m.id] = m;
+      }
+      connected = true;
+      await _savePositions();
+      if (canRead) unawaited(_watch(session, ++_generation));
+    } catch (e) {
+      _messages.clear();
+      error = _explain(e);
+    } finally {
+      busy = false;
+      _update();
+    }
+  }
+
+  Future<void> refreshChannels() async {
+    final nav = navigation;
+    if (busy || nav == null) return;
+    busy = true;
+    error = '';
+    _update();
+    try {
+      await nav.refreshChannels();
+      if (!canRead) {
+        _stopSubscription();
+        _messages.clear();
+      }
+    } catch (e) {
+      _stopSubscription();
+      _messages.clear();
+      connected = false;
+      error = _explain(e);
+    } finally {
+      busy = false;
+      _update();
+    }
+  }
+
+  Future<bool> _channelDenied(Object problem) async {
+    final nav = navigation;
+    if (nav == null ||
+        problem is! GrpcError ||
+        ![
+          StatusCode.permissionDenied,
+          StatusCode.notFound,
+        ].contains(problem.code)) {
+      return false;
+    }
+    final generation = _generation;
+    try {
+      await nav.refreshChannels();
+      if (_disposed || generation != _generation) return true;
+      if (!canRead) {
+        _messages.clear();
+        _pendingText = '';
+        _pendingKey = '';
+        cursor = '';
+      }
+      error = canRead
+          ? 'Права канала изменились. Обновите чат перед повтором.'
+          : 'Доступ к этому каналу изменён. Выберите доступный чат.';
+    } catch (e) {
+      if (_disposed || generation != _generation) return true;
+      _messages.clear();
+      connected = false;
+      error = _explain(e);
+    }
+    _update();
+    return true;
   }
 
   bool _current(LiveSession session, int generation) =>
@@ -163,6 +349,7 @@ class ChatController extends ChangeNotifier {
   }
 
   Future<void> _watch(LiveSession session, int generation) async {
+    final watchedChannel = channelId;
     var attempt = 0;
     while (_current(session, generation)) {
       final started = DateTime.now();
@@ -172,15 +359,27 @@ class ChatController extends ChangeNotifier {
         while (await iterator.moveNext()) {
           final frame = iterator.current;
           if (!_current(session, generation)) return;
+          if (navigation != null && (!canRead || channelId != watchedChannel)) {
+            _messages.clear();
+            error = 'Канал больше не доступен для чтения.';
+            _update();
+            return;
+          }
           if (frame.heartbeat) {
             if (frame.hasEvent() || frame.cursor != cursor) {
               throw const FormatException('Heartbeat содержит неверный курсор');
+            }
+            if (!canRead || channelId != watchedChannel) {
+              _messages.clear();
+              error = 'Канал больше не доступен для чтения.';
+              _update();
+              return;
             }
           } else {
             if (!frame.hasEvent() ||
                 frame.event.type != 'content.created' ||
                 !frame.event.hasContent() ||
-                frame.event.content.channelId != 'general' ||
+                frame.event.content.channelId != watchedChannel ||
                 frame.event.content.id.isEmpty ||
                 frame.cursor.isEmpty ||
                 frame.event.cursor != frame.cursor) {
@@ -188,6 +387,8 @@ class ChatController extends ChangeNotifier {
             }
             _messages[frame.event.content.id] = frame.event.content;
             cursor = frame.cursor;
+            _cursors[watchedChannel] = cursor;
+            _queuePositions();
           }
           reconnecting = false;
           if (DateTime.now().difference(started) >
@@ -198,6 +399,7 @@ class ChatController extends ChangeNotifier {
         }
       } catch (problem) {
         if (!_current(session, generation)) return;
+        if (await _channelDenied(problem)) return;
         if (problem is GrpcError &&
             problem.code == StatusCode.unauthenticated) {
           try {
@@ -212,6 +414,12 @@ class ChatController extends ChangeNotifier {
             }
           }
         } else if (_terminal(problem)) {
+          if (problem is GrpcError &&
+              problem.code == StatusCode.invalidArgument) {
+            _cursors.remove(watchedChannel);
+            cursor = '';
+            await _savePositions();
+          }
           connected = false;
           error =
               problem is GrpcError && problem.code == StatusCode.unimplemented
@@ -263,11 +471,15 @@ class ChatController extends ChangeNotifier {
     _update();
     try {
       final content = await session.send(text, _pendingKey);
+      if (navigation != null && content.channelId != channelId) {
+        throw const FormatException('Ответ другого канала');
+      }
       _messages[content.id] = content;
       _pendingKey = '';
       _pendingText = '';
       return true;
     } catch (e) {
+      if (await _channelDenied(e)) return false;
       error =
           '${_explain(e)} Повтор с тем же текстом использует прежний ключ запроса.';
       return false;
@@ -304,6 +516,8 @@ class ChatController extends ChangeNotifier {
     _stopSubscription();
     _update();
     try {
+      _positionTimer?.cancel();
+      await _savePositions();
       await _session?.close();
       _session = null;
       preview = null;
@@ -312,6 +526,8 @@ class ChatController extends ChangeNotifier {
       _messages.clear();
       _pendingKey = '';
       _pendingText = '';
+      _cursors.clear();
+      _readThrough.clear();
       error = '';
     } finally {
       busy = false;
@@ -322,6 +538,8 @@ class ChatController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _positionTimer?.cancel();
+    unawaited(_savePositions());
     _stopSubscription();
     unawaited(_session?.close());
     super.dispose();

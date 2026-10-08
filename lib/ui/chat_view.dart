@@ -7,9 +7,11 @@ class ChatView extends StatefulWidget {
     super.key,
     required this.controller,
     required this.openConnection,
+    this.active = true,
   });
   final ChatController controller;
   final VoidCallback openConnection;
+  final bool active;
   @override
   State<ChatView> createState() => _ChatViewState();
 }
@@ -18,21 +20,37 @@ class _ChatViewState extends State<ChatView> {
   final draft = TextEditingController();
   final scroll = ScrollController();
   final Map<String, String> drafts = {};
+  final Map<String, double> offsets = {};
+  bool restoreScroll = true;
   String scope = '';
   @override
   void initState() {
     super.initState();
-    scope = widget.controller.preview?.origin.toString() ?? '';
+    scope = widget.controller.draftScope;
+    scroll.addListener(markRead);
   }
 
   @override
   void didUpdateWidget(covariant ChatView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final next = widget.controller.preview?.origin.toString() ?? '';
+    final next = widget.controller.draftScope;
     if (next != scope) {
       drafts[scope] = draft.text;
       scope = next;
       draft.text = drafts[scope] ?? '';
+      restoreScroll = true;
+    }
+  }
+
+  void markRead() {
+    final c = widget.controller;
+    if (scroll.hasClients) offsets[scope] = scroll.offset;
+    if (widget.active &&
+        c.canRead &&
+        scroll.hasClients &&
+        scroll.position.extentAfter < 24 &&
+        c.messages.isNotEmpty) {
+      c.markRead(c.messages.last.id);
     }
   }
 
@@ -54,6 +72,22 @@ class _ChatViewState extends State<ChatView> {
   Widget build(BuildContext context) {
     final c = widget.controller;
     final colors = Theme.of(context).colorScheme;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (restoreScroll && scroll.hasClients) {
+        restoreScroll = false;
+        final saved = offsets[scope];
+        final atEnd =
+            c.messages.isNotEmpty && c.readThrough == c.messages.last.id;
+        scroll.jumpTo(
+          (saved ?? (atEnd ? scroll.position.maxScrollExtent : 0)).clamp(
+            0,
+            scroll.position.maxScrollExtent,
+          ),
+        );
+      }
+      markRead();
+    });
     return Column(
       children: [
         Padding(
@@ -91,6 +125,50 @@ class _ChatViewState extends State<ChatView> {
           ),
         ),
         const Divider(height: 1),
+        if (c.channels.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    key: ValueKey(
+                      'channels-${c.channelId}-${c.channels.map((v) => v.id).join(',')}',
+                    ),
+                    initialValue: c.channels.any((v) => v.id == c.channelId)
+                        ? c.channelId
+                        : null,
+                    isExpanded: true,
+                    decoration: const InputDecoration(labelText: 'Канал'),
+                    items: [
+                      for (final channel in c.channels)
+                        DropdownMenuItem(
+                          value: channel.id,
+                          child: Text(
+                            '${channel.title}${channel.archived ? ' · Архив' : ''}${!channel.permissions.read ? ' · Нет чтения' : ''}',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                    ],
+                    onChanged: c.busy
+                        ? null
+                        : (id) {
+                            if (id != null) c.selectChannel(id);
+                          },
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Обновить каналы и чат',
+                  onPressed: c.busy
+                      ? null
+                      : () {
+                          c.selectChannel(c.channelId);
+                        },
+                  icon: const Icon(Icons.refresh),
+                ),
+              ],
+            ),
+          ),
         Expanded(
           child: c.messages.isEmpty
               ? LayoutBuilder(
@@ -109,7 +187,9 @@ class _ChatViewState extends State<ChatView> {
                             ),
                             const SizedBox(height: 20),
                             Text(
-                              c.connected
+                              c.connected && !c.canRead
+                                  ? 'Нет доступа к сообщениям'
+                                  : c.connected
                                   ? 'Начните разговор'
                                   : 'Здесь начинается разговор',
                               textAlign: TextAlign.center,
@@ -117,7 +197,11 @@ class _ChatViewState extends State<ChatView> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              c.connected ? 'В этом чате пока нет сообщений.' : 'Подключите своё пространство. Ваши ключи останутся на этом устройстве.',
+                              c.connected && !c.canRead
+                                  ? 'Выберите другой канал или обратитесь к владельцу пространства.'
+                                  : c.connected
+                                  ? 'В этом чате пока нет сообщений.'
+                                  : 'Подключите своё пространство. Ваши ключи останутся на этом устройстве.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: colors.onSurfaceVariant,
@@ -185,6 +269,18 @@ class _ChatViewState extends State<ChatView> {
                                     height: 1.65,
                                   ),
                                 ),
+                                if (message.id == c.readThrough &&
+                                    index < c.messages.length - 1)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    child: Text(
+                                      'Прочитано до этого места',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: colors.primary,
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                           ),
@@ -209,7 +305,7 @@ class _ChatViewState extends State<ChatView> {
                   maxLength: 1024,
                   decoration: InputDecoration(
                     hintText: c.connected && !c.canWrite
-                        ? 'Ваша роль разрешает только чтение'
+                        ? 'В этом канале нельзя отправлять сообщения'
                         : 'Что у вас нового?',
                     counterText: '',
                   ),

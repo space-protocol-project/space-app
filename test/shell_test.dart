@@ -50,7 +50,7 @@ void main() {
       find.byKey(const ValueKey('chat-draft')),
     );
     expect(field.enabled, false);
-    expect(field.decoration?.hintText, 'Ваша роль разрешает только чтение');
+    expect(field.decoration?.hintText, 'В этом канале нельзя отправлять сообщения');
     final send = tester.widget<IconButton>(
       find.byWidgetPredicate(
         (widget) => widget is IconButton && widget.tooltip == 'Отправить',

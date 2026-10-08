@@ -221,6 +221,15 @@ abstract interface class SpacePresentation {
   String get chatTitle;
 }
 
+abstract interface class ChannelNavigation {
+  List<Channel> get availableChannels;
+  String get selectedChannelId;
+  String get positionScope;
+  bool get canRead;
+  Future<void> refreshChannels();
+  void selectChannel(String id);
+}
+
 abstract interface class SpaceAccess {
   bool get canWrite;
 }
@@ -245,7 +254,8 @@ class SpaceSession
         SpacePresentation,
         SpaceAccess,
         DeviceManagement,
-        RootRotationControl {
+        RootRotationControl,
+        ChannelNavigation {
   SpaceSession._(this.server, this.record, this.vault, this.channel);
   final Discovery server;
   final DeviceRecord record;
@@ -258,7 +268,71 @@ class SpaceSession
   String chatTitle = 'Общий чат';
   String role = '';
   @override
-  bool get canWrite => ['owner', 'admin', 'member'].contains(role);
+  bool get canWrite =>
+      selectedChannel?.permissions.write == true &&
+      selectedChannel?.archived != true;
+  @override
+  bool get canRead => selectedChannel?.permissions.read == true;
+  @override
+  List<Channel> availableChannels = [];
+  @override
+  String selectedChannelId = '';
+  Channel? get selectedChannel =>
+      availableChannels.where((c) => c.id == selectedChannelId).firstOrNull;
+  @override
+  String get positionScope =>
+      '${server.origin}|${server.serverId}|$principalId';
+  @override
+  void selectChannel(String id) {
+    final chosen = availableChannels.where((c) => c.id == id).firstOrNull;
+    if (chosen == null) throw const FormatException('Канал больше не доступен');
+    selectedChannelId = id;
+    chatTitle = chosen.title;
+  }
+
+  @override
+  Future<void> refreshChannels() async {
+    await _ensureSession();
+    final manifest = await ChannelServiceClient(channel)
+        .getManifest(GetManifestRequest(), options: _options);
+    if (manifest.serverId != server.serverId ||
+        manifest.protocolVersion != '0.1-experimental') {
+      throw const FormatException('Manifest не соответствует серверу');
+    }
+    final result = await ChannelServiceClient(channel).listChannels(
+      ListChannelsRequest(includeArchived: true),
+      options: _options,
+    );
+    final seen = <String>{};
+    for (final c in result.channels) {
+      if (!RegExp(r'^[a-z][a-z0-9_-]{0,63}$').hasMatch(c.id) ||
+          !seen.add(c.id) ||
+          c.title.isEmpty ||
+          !c.views.any((v) => v.type == 'chat') ||
+          !c.hasPermissions()) {
+        throw const FormatException('Некорректный список каналов');
+      }
+    }
+    spaceTitle = manifest.title;
+    availableChannels = List.unmodifiable(result.channels);
+    if (selectedChannelId.isNotEmpty) {
+      final current = selectedChannel;
+      chatTitle = current?.title ?? 'Канал недоступен';
+      return;
+    }
+    final initial =
+        availableChannels
+            .where((c) => c.permissions.read && !c.archived)
+            .firstOrNull ??
+        availableChannels.where((c) => c.permissions.read).firstOrNull ??
+        availableChannels.firstOrNull;
+    if (initial != null) {
+      selectChannel(initial.id);
+    } else {
+      chatTitle = 'Нет доступных каналов';
+    }
+  }
+
   int _expiresAt = 0;
   Future<void>? _loginTask;
   @override
@@ -318,10 +392,7 @@ class SpaceSession
               ?.title ??
           'Общий чат';
       if (manifest.serverId != server.serverId ||
-          manifest.protocolVersion != '0.1-experimental' ||
-          !manifest.channels.any(
-            (c) => c.id == 'general' && c.views.any((v) => v.type == 'chat'),
-          )) {
+          manifest.protocolVersion != '0.1-experimental') {
         throw const FormatException('gRPC manifest не соответствует discovery');
       }
       if (record.grantId.isEmpty) {
@@ -348,6 +419,7 @@ class SpaceSession
         );
       }
       await session.refreshMembership();
+      await session.refreshChannels();
       return session;
     } catch (_) {
       await channel.shutdown();
@@ -491,11 +563,13 @@ class SpaceSession
   @override
   Future<List<Content>> messages() async {
     await _ensureSession();
+    final id = selectedChannelId;
+    if (!canRead) return [];
     final result = <Content>[];
     var cursor = '';
     for (var page = 0; page < 11; page++) {
       final response = await ContentServiceClient(channel).listContent(
-        ListContentRequest(channelId: 'general', after: cursor),
+        ListContentRequest(channelId: id, after: cursor),
         options: _options,
       );
       result.addAll(response.contents);
@@ -510,13 +584,13 @@ class SpaceSession
 
   @override
   Future<Content> send(String text, String key) async {
+    final id = selectedChannelId;
+    if (!canWrite) {
+      throw const GrpcError.permissionDenied('В этом канале нельзя писать');
+    }
     await _ensureSession();
     final result = await ContentServiceClient(channel).createContent(
-      CreateContentRequest(
-        channelId: 'general',
-        text: text,
-        idempotencyKey: key,
-      ),
+      CreateContentRequest(channelId: id, text: text, idempotencyKey: key),
       options: _options,
     );
     return result.content;
@@ -525,16 +599,18 @@ class SpaceSession
   Future<ListEventsResponse> events(String after) async {
     await _ensureSession();
     return SyncServiceClient(channel).listEvents(
-      ListEventsRequest(channelId: 'general', after: after),
+      ListEventsRequest(channelId: selectedChannelId, after: after),
       options: _options,
     );
   }
 
   @override
   Stream<SubscribeResponse> subscribe(String after) async* {
+    final id = selectedChannelId;
+    if (!canRead) return;
     await _ensureSession();
     final stream = SyncServiceClient(channel).subscribe(
-      SubscribeRequest(channelId: 'general', after: after),
+      SubscribeRequest(channelId: id, after: after),
       options: CallOptions(
         timeout: const Duration(minutes: 11),
         metadata: {'authorization': 'Bearer $_token'},
@@ -549,7 +625,10 @@ class SpaceSession
         },
       );
       await for (final frame in frames) {
-        if (frame.heartbeat) await refreshMembership();
+        if (frame.heartbeat) {
+          await refreshMembership();
+          await refreshChannels();
+        }
         yield frame;
       }
     } finally {

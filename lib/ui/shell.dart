@@ -215,12 +215,48 @@ class _SpaceShellState extends State<SpaceShell> {
                 leading: Icon(section.icon, size: 20),
                 title: Text(
                   section == Section.chat
-                      ? controller.chatTitle
+                      ? controller.channels.isEmpty
+                            ? controller.chatTitle
+                            : 'Чаты'
                       : section.label,
                 ),
                 onTap: () => select(section),
               ),
             ),
+          if (controller.channels.isNotEmpty) ...[
+            const Divider(height: 24),
+            const Text('Каналы', style: TextStyle(fontSize: 12)),
+            for (final channel in controller.channels)
+              ListTile(
+                dense: true,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                selected:
+                    selected == Section.chat &&
+                    controller.channelId == channel.id,
+                leading: Icon(
+                  channel.archived
+                      ? Icons.archive_outlined
+                      : !channel.permissions.read
+                      ? Icons.lock_outline
+                      : Icons.tag,
+                  size: 18,
+                ),
+                title: Text(channel.title, overflow: TextOverflow.ellipsis),
+                subtitle: channel.archived
+                    ? const Text('Архив')
+                    : !channel.permissions.read
+                    ? const Text('Без доступа к сообщениям')
+                    : null,
+                onTap: controller.busy
+                    ? null
+                    : () {
+                        controller.selectChannel(channel.id);
+                        select(Section.chat);
+                      },
+              ),
+          ],
           if (widget.preferences.origins.isNotEmpty) ...[
             const Divider(height: 30),
             const Text('Недавние пространства', style: TextStyle(fontSize: 12)),
@@ -370,6 +406,7 @@ class _SpaceShellState extends State<SpaceShell> {
       ChatView(
         key: const ValueKey('live-chat'),
         controller: controller,
+        active: selected == Section.chat,
         openConnection: () => connection(),
       ),
       const UnavailablePanel(
