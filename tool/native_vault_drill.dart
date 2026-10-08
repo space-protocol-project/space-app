@@ -5,7 +5,6 @@ import 'dart:io';
 
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/secure_vault.dart';
 
@@ -30,8 +29,9 @@ Future<void> main(List<String> args) async {
   try {
     if (args[0] == 'crash-active') {
       final record = await vault.load(origin);
-      if (record == null || await vault.loadRotation(origin) == null)
+      if (record == null || await vault.loadRotation(origin) == null) {
         throw StateError('Нет исходного состояния');
+      }
       await vault.save(record);
       throw StateError('Crash checkpoint не включён');
     } else if (args[0] == 'recover-crash') {
@@ -41,7 +41,7 @@ Future<void> main(List<String> args) async {
       } catch (_) {
         unreadable = true;
       }
-      if (!unreadable) throw StateError('Прерывание не повредило active slot');
+      if (unreadable) throw StateError('Атомарная запись повредила прежний active slot');
       final journal = await vault.loadRotation(origin);
       if (journal == null) throw StateError('Отдельный journal потерян');
       final record = DeviceRecord.fromJson(
@@ -55,8 +55,9 @@ Future<void> main(List<String> args) async {
           utf8.encode(jsonEncode((await vault.load(origin))!.toJson())),
         )).bytes,
       );
-      if (digest != expected['digest'])
+      if (digest != expected['digest']) {
         throw StateError('Восстановлены другие ключи');
+      }
       await report.writeAsString(
         jsonEncode({...expected, 'crash': true, 'recovered': true}),
       );
@@ -117,7 +118,7 @@ Future<void> main(List<String> args) async {
       }
       final key =
           'space.identity.v1.${url64((await Sha256().hash(utf8.encode(origin))).bytes)}';
-      await const FlutterSecureStorage().delete(key: key);
+      await const PlatformKeyStorage().delete(key: key);
       if (await vault.load(origin) != null) {
         throw StateError('Тестовый слот не удалён');
       }

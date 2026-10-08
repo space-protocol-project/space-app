@@ -498,18 +498,6 @@ namespace flutter_secure_storage_windows
       }
       fs.write(iv, NONCE_SIZE);
       fs.write(authInfo.pbTag, authInfo.cbTag);
-#ifdef SPACE_VAULT_CRASH_TEST
-      // Проверочный checkpoint только для отдельной crash-drill сборки.
-      char drill_key[256] = {}; char drill_ready[4096] = {};
-      DWORD key_length = GetEnvironmentVariableA("SPACE_VAULT_DRILL_KEY", drill_key, sizeof(drill_key));
-      DWORD ready_length = GetEnvironmentVariableA("SPACE_VAULT_DRILL_READY", drill_ready, sizeof(drill_ready));
-      if (key_length > 0 && key_length < sizeof(drill_key) && ready_length > 0 && ready_length < sizeof(drill_ready) && key == drill_key) {
-          fs.flush();
-          std::ofstream marker(drill_ready, std::ios::binary | std::ios::trunc);
-          marker << "paused"; marker.close();
-          Sleep(30000);
-      }
-#endif
       fs.write(ciphertext, ciphertextSize);
       fs.close();
       HeapFree(GetProcessHeap(), 0, iv);

@@ -1,7 +1,5 @@
-# Проверочный патч flutter_secure_storage_windows 4.2.2
+# Адаптация flutter_secure_storage_windows 4.2.2
 
-Источник: https://pub.dev/packages/flutter_secure_storage_windows/versions/4.2.2. Лицензия upstream сохранена.
+Лицензия upstream сохранена. Реально используемый Dart/DPAPI backend получил безопасное имя partition-файла и atomic replace: зашифрованный временный файл → flush → MoveFileEx(REPLACE_EXISTING | WRITE_THROUGH). Активная запись и журнал используют разные partitions. Legacy общий файл читается и мигрируется при первом обращении.
 
-Checkpoint после IV/tag и до ciphertext компилируется только при SPACE_VAULT_CRASH_BUILD=1. Проверочный процесс передаёт exact key собственного случайного test namespace. В этой точке файл уже реально частично записан и flush выполнен; test runner завершает только созданный процесс с проверенным путём EXE.
-
-Production сборка выполняется без SPACE_VAULT_CRASH_BUILD. В ней нет crash hook и чтения тестовых env-переменных; штатная запись не изменена. После crash-drill следует явно пересобрать lib/main.dart с удалённым флагом.
+Crash checkpoint находится после половины encrypted temp write и включается только --dart-define=SPACE_VAULT_CRASH_TEST=true. Обычная сборка использует compile-time false и не содержит рабочий checkpoint. Тест завершает exact созданный процесс; active file должен остаться целым, журнал — читаемым. Это process-crash тест, не гарантия от сбоя диска/питания.

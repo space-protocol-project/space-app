@@ -7,9 +7,6 @@ cmake_minimum_required(VERSION 3.14)
 # Project-level configuration.
 set(PROJECT_NAME "flutter_secure_storage_windows")
 project(${PROJECT_NAME} LANGUAGES CXX)
-if("$ENV{SPACE_VAULT_CRASH_BUILD}" STREQUAL "1")
-  add_compile_definitions(SPACE_VAULT_CRASH_TEST=1)
-endif()
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.

@@ -272,20 +272,25 @@ class DpapiJsonFileMapStorage extends MapStorage {
   ///
   /// Returns:
   /// - A [FutureOr] resolving to the canonical file path as a string.
-  FutureOr<String> _getJsonFilePath() async {
+  FutureOr<String> _getJsonFilePath(Map<String, String> options) async {
     final appDataDirectory = await getApplicationSupportDirectory();
+    final partition = options["spaceStoragePartition"];
+    if (partition != null &&
+        !RegExp(r"^[A-Za-z0-9._-]{1,150}$").hasMatch(partition)) {
+      throw const FormatException("Недопустимый раздел хранилища");
+    }
 
     return path.canonicalize(
       path.join(
         appDataDirectory.path,
-        encryptedJsonFileName,
+        partition == null ? encryptedJsonFileName : "space_$partition.dat",
       ),
     );
   }
 
   @override
   FutureOr<Map<String, String>> load(Map<String, String> options) async {
-    final file = File(await _getJsonFilePath());
+    final file = File(await _getJsonFilePath(options));
     if (!file.existsSync()) {
       return {};
     }
@@ -409,7 +414,7 @@ class DpapiJsonFileMapStorage extends MapStorage {
     Map<String, String> data,
     Map<String, String> options,
   ) async {
-    final file = File(await _getJsonFilePath());
+    final file = File(await _getJsonFilePath(options));
     final json = jsonEncode(data);
     final plainText = utf8.encode(json);
 
@@ -456,8 +461,42 @@ class DpapiJsonFileMapStorage extends MapStorage {
         // Loop to handle race condition.
         while (true) {
           try {
-            await (await file.create(recursive: true))
-                .writeAsBytes(encryptedText, flush: true);
+            await file.parent.create(recursive: true);
+            final temporary = File(
+                '${file.path}.${pid}_${DateTime.now().microsecondsSinceEpoch}.tmp');
+            try {
+              final handle = await temporary.open(mode: FileMode.write);
+              try {
+                final middle = encryptedText.length ~/ 2;
+                await handle.writeFrom(encryptedText, 0, middle);
+                await handle.flush();
+                if (const bool.fromEnvironment('SPACE_VAULT_CRASH_TEST')) {
+                  final selected =
+                      Platform.environment['SPACE_VAULT_DRILL_KEY'];
+                  final marker =
+                      Platform.environment['SPACE_VAULT_DRILL_READY'];
+                  if (selected != null &&
+                      marker != null &&
+                      options['spaceStoragePartition'] == selected) {
+                    await File(marker).writeAsString('paused', flush: true);
+                    await Future<void>.delayed(const Duration(seconds: 30));
+                  }
+                }
+                await handle.writeFrom(encryptedText, middle);
+                await handle.flush();
+              } finally {
+                await handle.close();
+              }
+              final result = MoveFileEx(
+                  temporary.path.toPcwstr(allocator: alloc),
+                  file.path.toPcwstr(allocator: alloc),
+                  MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH);
+              if (!result.value)
+                throw WindowsException(result.error.toHRESULT(),
+                    message: 'Atomic replace failed');
+            } finally {
+              if (await temporary.exists()) await temporary.delete();
+            }
             // If success, finish loop.
             break;
           } on FileSystemException catch (e) {
@@ -486,7 +525,7 @@ class DpapiJsonFileMapStorage extends MapStorage {
 
   @override
   FutureOr<void> clear(Map<String, String> options) async {
-    final file = File(await _getJsonFilePath());
+    final file = File(await _getJsonFilePath(options));
     if (file.existsSync()) {
       try {
         await file.delete();
