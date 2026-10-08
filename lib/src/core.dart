@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 
 import 'generated/space/v1/space.pbgrpc.dart';
+import 'root_history.dart';
 
 String url64(List<int> value) => base64Url.encode(value).replaceAll('=', '');
 
@@ -109,6 +110,7 @@ class DeviceRecord {
     this.recoverySeed = const [],
     this.recoveryGrantId = '',
     this.administrative = false,
+    this.rootHistory = const [],
   });
   final String origin, serverId, serverKey;
   final List<int> rootSeed, deviceSeed;
@@ -117,8 +119,18 @@ class DeviceRecord {
   final String recoveryGrantId;
   final bool administrative;
   String grantId;
+  final List<Map<String, dynamic>> rootHistory;
+  Future<RootIdentity> identity() async {
+    final public = rootSeed.isEmpty
+        ? rootPublicKey
+        : (await (await Ed25519().newKeyPairFromSeed(
+            rootSeed,
+          )).extractPublicKey()).bytes;
+    return verifyRootHistory(rootHistory, public, origin, serverId);
+  }
+
   Map<String, Object> toJson() => {
-    'v': 2,
+    'v': 3,
     'origin': origin,
     'serverId': serverId,
     'serverKey': serverKey,
@@ -129,9 +141,10 @@ class DeviceRecord {
     'recoverySeed': url64(recoverySeed),
     'recoveryGrantId': recoveryGrantId,
     'administrative': administrative,
+    'rootHistory': rootHistory,
   };
   static DeviceRecord fromJson(Map<String, dynamic> data) {
-    if (data['v'] != 1 && data['v'] != 2) {
+    if (data['v'] != 1 && data['v'] != 2 && data['v'] != 3) {
       throw const FormatException('Неизвестная версия хранилища ключей');
     }
     final record = DeviceRecord(
@@ -153,6 +166,9 @@ class DeviceRecord {
       ),
       recoveryGrantId: data['recoveryGrantId'] as String? ?? '',
       administrative: data['administrative'] as bool? ?? false,
+      rootHistory: (data['rootHistory'] as List? ?? [])
+          .map((v) => Map<String, dynamic>.from(v as Map))
+          .toList(),
     );
     if ((record.rootSeed.length != 32 &&
             !(record.rootSeed.isEmpty &&
@@ -171,6 +187,12 @@ class DeviceRecord {
 abstract interface class IdentityVault {
   Future<DeviceRecord?> load(String origin);
   Future<void> save(DeviceRecord record);
+}
+
+abstract interface class RotationJournalVault implements IdentityVault {
+  Future<Map<String, dynamic>?> loadRotation(String origin);
+  Future<void> saveRotation(String origin, Map<String, dynamic> pending);
+  Future<void> clearRotation(String origin);
 }
 
 void checkTrust(Discovery server, DeviceRecord record) {
@@ -246,6 +268,7 @@ class SpaceSession
     var record = restoredRecord ?? await vault.load(server.origin.toString());
     if (record != null) {
       checkTrust(server, record);
+      await record.identity();
     } else {
       final algorithm = Ed25519();
       final root = await algorithm.newKeyPair();
@@ -397,6 +420,7 @@ class SpaceSession
     final auth = AuthServiceClient(channel);
     final options = CallOptions(timeout: const Duration(seconds: 10));
     final challenge = await auth.createChallenge(request, options: options);
+    final checkedIdentity = await credentials.identity();
     final signing = await checkedSigningBytes(
       challenge,
       server,
@@ -419,6 +443,8 @@ class SpaceSession
           ],
       authorizerGrantId: delegated ? credentials.recoveryGrantId : '',
       pairingId: pairing?.id ?? '',
+      expectedPrincipal: checkedIdentity.principalId,
+      expectedEpoch: checkedIdentity.epoch,
     );
     final key = purpose == 'auth.login'
         ? device
@@ -434,8 +460,7 @@ class SpaceSession
       ),
       options: options,
     );
-    final principal =
-        'u_${(await Sha256().hash(rootPublic)).bytes.map((v) => v.toRadixString(16).padLeft(2, '0')).join()}';
+    final principal = checkedIdentity.principalId;
     if (result.principalId != principal ||
         !RegExp(r'^dg_[A-Za-z0-9_-]{43}$').hasMatch(result.grantId) ||
         (purpose != 'device.register' &&
@@ -586,13 +611,7 @@ class SpaceSession
     }
     if (authority != null) {
       checkTrust(server, authority);
-      final rootPublic = authority.rootSeed.isEmpty
-          ? authority.rootPublicKey
-          : (await (await Ed25519().newKeyPairFromSeed(
-              authority.rootSeed,
-            )).extractPublicKey()).bytes;
-      final id =
-          'u_${(await Sha256().hash(rootPublic)).bytes.map((v) => v.toRadixString(16).padLeft(2, '0')).join()}';
+      final id = (await authority.identity()).principalId;
       if (id != principalId) {
         throw const FormatException('Карточка относится к другой идентичности');
       }
@@ -613,7 +632,7 @@ class SpaceSession
             record.rootSeed,
           )).extractPublicKey()).bytes;
     final payload = <String, dynamic>{
-      'v': 1,
+      'v': record.rootHistory.isEmpty ? 1 : 2,
       'origin': record.origin,
       'server_id': record.serverId,
       'server_key': record.serverKey,
@@ -622,6 +641,7 @@ class SpaceSession
       'secret': url64(
         record.rootSeed.isEmpty ? record.recoverySeed : record.rootSeed,
       ),
+      if (record.rootHistory.isNotEmpty) 'root_history': record.rootHistory,
     };
     if (record.rootSeed.isEmpty) {
       final parent = (await listDevices())
@@ -659,8 +679,7 @@ class SpaceSession
         : (await (await Ed25519().newKeyPairFromSeed(
             credentials.rootSeed,
           )).extractPublicKey()).bytes;
-    final id =
-        'u_${(await Sha256().hash(root)).bytes.map((v) => v.toRadixString(16).padLeft(2, '0')).join()}';
+    final id = (await credentials.identity()).principalId;
     if (id != principalId) {
       throw const FormatException(
         'Корневая карточка относится к другой идентичности',
@@ -695,8 +714,7 @@ class SpaceSession
         : (await (await Ed25519().newKeyPairFromSeed(
             credentials.rootSeed,
           )).extractPublicKey()).bytes;
-    final id =
-        'u_${(await Sha256().hash(root)).bytes.map((v) => v.toRadixString(16).padLeft(2, '0')).join()}';
+    final id = (await credentials.identity()).principalId;
     if (id != principalId) {
       throw const FormatException('Карточка относится к другой идентичности');
     }
@@ -738,7 +756,7 @@ Future<String> pairVerificationCode(
 }
 
 Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
-  if (payload['v'] != 1 ||
+  if ((payload['v'] != 1 && payload['v'] != 2) ||
       !['root', 'recovery'].contains(payload['credential'])) {
     throw const FormatException('Неподдерживаемая карточка');
   }
@@ -775,7 +793,16 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
     throw const FormatException('Разрешение восстановления недействительно');
   }
   final device = await Ed25519().newKeyPair();
-  return DeviceRecord(
+  final history = (payload['root_history'] as List? ?? [])
+      .map((v) => Map<String, dynamic>.from(v as Map))
+      .toList();
+  if (payload['v'] == 1 && history.isNotEmpty ||
+      payload['v'] == 2 && history.isEmpty) {
+    throw const FormatException(
+      'Версия карточки не соответствует истории ключей',
+    );
+  }
+  final record = DeviceRecord(
     origin: origin,
     serverId: serverId,
     serverKey: serverKey,
@@ -785,7 +812,10 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
     recoverySeed: isRoot ? [] : secret,
     recoveryGrantId: isRoot ? '' : payload['recovery_grant_id'] as String,
     administrative: !isRoot,
+    rootHistory: history,
   );
+  await record.identity();
+  return record;
 }
 
 String newRequestKey() =>
@@ -803,6 +833,8 @@ Future<List<int>> checkedSigningBytes(
   String pairingId = '',
   bool allowHistorical = false,
   int registrationDays = 30,
+  String expectedPrincipal = '',
+  int expectedEpoch = 1,
 }) async {
   final transcript =
       jsonDecode(utf8.decode(response.transcript)) as Map<String, dynamic>;
@@ -833,8 +865,9 @@ Future<List<int>> checkedSigningBytes(
     expectedKeys.add('pairing_id');
     expectedKeys.sort();
   }
-  final principal =
-      'u_${(await Sha256().hash(root)).bytes.map((v) => v.toRadixString(16).padLeft(2, '0')).join()}';
+  final principal = expectedPrincipal.isEmpty
+      ? await rootPrincipal(root)
+      : expectedPrincipal;
   final nonce = base64Url.decode(
     base64Url.normalize(transcript['nonce'] as String),
   );
@@ -845,7 +878,7 @@ Future<List<int>> checkedSigningBytes(
       utf8.decode(response.transcript) == canonical &&
       jsonEncode(keys) == jsonEncode(expectedKeys) &&
       transcript['v'] == 1 &&
-      transcript['auth_epoch'] == 1 &&
+      transcript['auth_epoch'] == expectedEpoch &&
       transcript['purpose'] == purpose &&
       transcript['origin'] == server.origin.toString() &&
       transcript['server_id'] == server.serverId &&
