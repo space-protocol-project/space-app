@@ -8,6 +8,7 @@ import '../src/chat_controller.dart';
 import '../src/core.dart';
 import '../src/generated/space/v1/space.pb.dart';
 import '../src/recovery_card.dart';
+import '../src/recovery_qr.dart';
 import '../src/pairing.dart';
 import 'components.dart';
 
@@ -35,7 +36,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
   }
 
   static const files = [
-    XTypeGroup(label: 'Карточка Space', extensions: ['json']),
+    XTypeGroup(label: 'Карточка Space', extensions: ['json', 'png']),
   ];
   Future<void> run(Future<void> Function() action) async {
     if (pending || widget.controller.busy) return;
@@ -149,15 +150,42 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       await manager.recoveryPayload(),
       pass,
     ]);
+    if (!mounted) return;
+    final png = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Формат карточки'),
+        content: const Text(
+          'PNG содержит зашифрованный QR и подходит для печати. JSON — компактный резервный файл. Пароль храните отдельно.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('JSON'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('QR в PNG'),
+          ),
+        ],
+      ),
+    );
+    if (png == null) return;
+    final extension = png ? 'png' : 'json';
+    final content = png
+        ? await compute(pngInWorker, packet)
+        : Uint8List.fromList(utf8.encode(packet));
     final destination = await getSaveLocation(
-      suggestedName: 'space-recovery.json',
-      acceptedTypeGroups: files,
+      suggestedName: 'space-recovery.$extension',
+      acceptedTypeGroups: [
+        XTypeGroup(label: 'Карточка Space', extensions: [extension]),
+      ],
     );
     if (destination == null) return;
     await XFile.fromData(
-      Uint8List.fromList(utf8.encode(packet)),
-      mimeType: 'application/json',
-      name: 'space-recovery.json',
+      content,
+      mimeType: png ? 'image/png' : 'application/json',
+      name: 'space-recovery.$extension',
     ).saveTo(destination.path);
     if (mounted) {
       setState(
@@ -169,13 +197,13 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
   Future<void> restore() async {
     final file = await openFile(acceptedTypeGroups: files);
     if (file == null) return;
-    if (await file.length() > 16384) {
+    if (await file.length() > maxRecoveryImageBytes) {
       throw const FormatException('Карточка слишком большая');
     }
     final pass = await password(false);
     if (pass == null) return;
     final payload = await compute(openCardInWorker, [
-      await file.readAsString(),
+      await compute(artifactInWorker, await file.readAsBytes()),
       pass,
     ]);
     final record = await recordFromRecovery(payload);
@@ -224,13 +252,16 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     if (!manager.hasRootAuthority && grant.id != manager.currentGrantId) {
       final file = await openFile(acceptedTypeGroups: files);
       if (file == null) return;
-      if (await file.length() > 16384) {
+      if (await file.length() > maxRecoveryImageBytes) {
         throw const FormatException('Карточка слишком большая');
       }
       final pass = await password(false);
       if (pass == null) return;
       authority = await recordFromRecovery(
-        await compute(openCardInWorker, [await file.readAsString(), pass]),
+        await compute(openCardInWorker, [
+          await compute(artifactInWorker, await file.readAsBytes()),
+          pass,
+        ]),
       );
     }
     await manager.revokeDevice(grant, authority: authority);
@@ -260,13 +291,16 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     if (!manager.hasRootAuthority) {
       final file = await openFile(acceptedTypeGroups: files);
       if (file == null) return;
-      if (await file.length() > 16384) {
+      if (await file.length() > maxRecoveryImageBytes) {
         throw const FormatException('Карточка слишком большая');
       }
       final pass = await password(false);
       if (pass == null) return;
       authority = await recordFromRecovery(
-        await compute(openCardInWorker, [await file.readAsString(), pass]),
+        await compute(openCardInWorker, [
+          await compute(artifactInWorker, await file.readAsBytes()),
+          pass,
+        ]),
       );
     }
     final code = await manager.preparePairing(pair, authority: authority);
@@ -321,7 +355,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
             ),
             const SizedBox(height: 12),
             const Text(
-              'Введите одноразовый код с нового устройства. Подпись требует исходный root или корневую карточку Flutter. Делегированная recovery-карточка пока не подтверждает сопряжение.',
+              'Введите одноразовый код с нового устройства. Подпись требует root или открытую recovery-карточку. Для recovery-карточки новое устройство проверяет цепочку от исходного root.',
             ),
             const SizedBox(height: 12),
             TextField(
@@ -383,7 +417,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
             ),
             const SizedBox(height: 12),
             const Text(
-              'Зашифрованная карточка сохраняет доступ к этой идентичности на выбранном сервере. Рабочий ключ устройства в неё не копируется. Владение карточкой и паролем позволяет подключать новые устройства. Устройство из карточки панели не сохраняет управляющий секрет; для отзыва других устройств её нужно открыть заново. Корневая карточка Flutter восстанавливает полный управляющий root. Сейчас используется файл JSON; QR-импорт появится отдельно.',
+              'Зашифрованная карточка сохраняет доступ к этой идентичности на выбранном сервере. Рабочий ключ устройства в неё не копируется. Владение карточкой и паролем позволяет подключать новые устройства. Устройство из карточки панели не сохраняет управляющий секрет; для отзыва других устройств её нужно открыть заново. Корневая карточка Flutter восстанавливает полный управляющий root. Карточку можно сохранить как QR в PNG или JSON и восстановить из выбранного файла.',
             ),
             const SizedBox(height: 16),
             Wrap(

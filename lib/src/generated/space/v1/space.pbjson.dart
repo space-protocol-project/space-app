@@ -232,6 +232,15 @@ const PollPairingResponse$json = {
     {'1': 'root_public_key', '3': 3, '4': 1, '5': 12, '10': 'rootPublicKey'},
     {'1': 'transcript', '3': 4, '4': 1, '5': 12, '10': 'transcript'},
     {'1': 'signature', '3': 5, '4': 1, '5': 12, '10': 'signature'},
+    {
+      '1': 'parent_transcript',
+      '3': 6,
+      '4': 1,
+      '5': 12,
+      '10': 'parentTranscript'
+    },
+    {'1': 'parent_signature', '3': 7, '4': 1, '5': 12, '10': 'parentSignature'},
+    {'1': 'parent_grant_id', '3': 8, '4': 1, '5': 9, '10': 'parentGrantId'},
   ],
 };
 
@@ -240,7 +249,9 @@ final $typed_data.Uint8List pollPairingResponseDescriptor = $convert.base64Decod
     'ChNQb2xsUGFpcmluZ1Jlc3BvbnNlEisKB3BhaXJpbmcYASABKAsyES5zcGFjZS52MS5QYWlyaW'
     '5nUgdwYWlyaW5nEhkKCGdyYW50X2lkGAIgASgJUgdncmFudElkEiYKD3Jvb3RfcHVibGljX2tl'
     'eRgDIAEoDFINcm9vdFB1YmxpY0tleRIeCgp0cmFuc2NyaXB0GAQgASgMUgp0cmFuc2NyaXB0Eh'
-    'wKCXNpZ25hdHVyZRgFIAEoDFIJc2lnbmF0dXJl');
+    'wKCXNpZ25hdHVyZRgFIAEoDFIJc2lnbmF0dXJlEisKEXBhcmVudF90cmFuc2NyaXB0GAYgASgM'
+    'UhBwYXJlbnRUcmFuc2NyaXB0EikKEHBhcmVudF9zaWduYXR1cmUYByABKAxSD3BhcmVudFNpZ2'
+    '5hdHVyZRImCg9wYXJlbnRfZ3JhbnRfaWQYCCABKAlSDXBhcmVudEdyYW50SWQ=');
 
 @$core.Deprecated('Use cancelPairingRequestDescriptor instead')
 const CancelPairingRequest$json = {

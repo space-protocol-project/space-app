@@ -907,6 +907,9 @@ class PollPairingResponse extends $pb.GeneratedMessage {
     $core.List<$core.int>? rootPublicKey,
     $core.List<$core.int>? transcript,
     $core.List<$core.int>? signature,
+    $core.List<$core.int>? parentTranscript,
+    $core.List<$core.int>? parentSignature,
+    $core.String? parentGrantId,
   }) {
     final result = PollPairingResponse._();
     if (pairing != null) result.pairing = pairing;
@@ -914,6 +917,9 @@ class PollPairingResponse extends $pb.GeneratedMessage {
     if (rootPublicKey != null) result.rootPublicKey = rootPublicKey;
     if (transcript != null) result.transcript = transcript;
     if (signature != null) result.signature = signature;
+    if (parentTranscript != null) result.parentTranscript = parentTranscript;
+    if (parentSignature != null) result.parentSignature = parentSignature;
+    if (parentGrantId != null) result.parentGrantId = parentGrantId;
     return result;
   }
 
@@ -939,6 +945,11 @@ class PollPairingResponse extends $pb.GeneratedMessage {
         4, _omitFieldNames ? '' : 'transcript', $pb.PbFieldType.OY)
     ..a<$core.List<$core.int>>(
         5, _omitFieldNames ? '' : 'signature', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        6, _omitFieldNames ? '' : 'parentTranscript', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        7, _omitFieldNames ? '' : 'parentSignature', $pb.PbFieldType.OY)
+    ..aOS(8, _omitFieldNames ? '' : 'parentGrantId')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1010,6 +1021,33 @@ class PollPairingResponse extends $pb.GeneratedMessage {
   $core.bool hasSignature() => $_has(4);
   @$pb.TagNumber(5)
   void clearSignature() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.List<$core.int> get parentTranscript => $_getN(5);
+  @$pb.TagNumber(6)
+  set parentTranscript($core.List<$core.int> value) => $_setBytes(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasParentTranscript() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearParentTranscript() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.List<$core.int> get parentSignature => $_getN(6);
+  @$pb.TagNumber(7)
+  set parentSignature($core.List<$core.int> value) => $_setBytes(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasParentSignature() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearParentSignature() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.String get parentGrantId => $_getSZ(7);
+  @$pb.TagNumber(8)
+  set parentGrantId($core.String value) => $_setString(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasParentGrantId() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearParentGrantId() => $_clearField(8);
 }
 
 class CancelPairingRequest extends $pb.GeneratedMessage {

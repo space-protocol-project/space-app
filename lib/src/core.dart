@@ -390,6 +390,10 @@ class SpaceSession
     }
     if (purpose == 'device.revoke') request.rootPublicKey = rootPublic;
     if (delegated) request.recoveryGrantId = credentials.recoveryGrantId;
+    if (pairing != null) {
+      request.pairingId = pairing.id;
+      request.administrative = pairing.administrative;
+    }
     final auth = AuthServiceClient(channel);
     final options = CallOptions(timeout: const Duration(seconds: 10));
     final challenge = await auth.createChallenge(request, options: options);
@@ -644,15 +648,17 @@ class SpaceSession
     DeviceRecord? authority,
   }) async {
     final credentials = authority ?? record;
-    if (credentials.rootSeed.isEmpty) {
+    if (credentials.rootSeed.isEmpty && credentials.recoverySeed.length != 32) {
       throw const FormatException(
-        'Подтвердите на исходном устройстве или откройте корневую карточку Flutter. Делегированная карточка пока не подписывает сопряжение.',
+        'Откройте корневую или recovery-карточку для подтверждения',
       );
     }
     checkTrust(server, credentials);
-    final root = (await (await Ed25519().newKeyPairFromSeed(
-      credentials.rootSeed,
-    )).extractPublicKey()).bytes;
+    final root = credentials.rootSeed.isEmpty
+        ? credentials.rootPublicKey
+        : (await (await Ed25519().newKeyPairFromSeed(
+            credentials.rootSeed,
+          )).extractPublicKey()).bytes;
     final id =
         'u_${(await Sha256().hash(root)).bytes.map((v) => v.toRadixString(16).padLeft(2, '0')).join()}';
     if (id != principalId) {
@@ -680,15 +686,15 @@ class SpaceSession
     DeviceRecord? authority,
   }) async {
     final credentials = authority ?? record;
-    if (credentials.rootSeed.isEmpty) {
-      throw const FormatException(
-        'Нужен исходный root или корневая карточка Flutter',
-      );
+    if (credentials.rootSeed.isEmpty && credentials.recoverySeed.length != 32) {
+      throw const FormatException('Нужен root или recovery-карточка');
     }
     checkTrust(server, credentials);
-    final root = (await (await Ed25519().newKeyPairFromSeed(
-      credentials.rootSeed,
-    )).extractPublicKey()).bytes;
+    final root = credentials.rootSeed.isEmpty
+        ? credentials.rootPublicKey
+        : (await (await Ed25519().newKeyPairFromSeed(
+            credentials.rootSeed,
+          )).extractPublicKey()).bytes;
     final id =
         'u_${(await Sha256().hash(root)).bytes.map((v) => v.toRadixString(16).padLeft(2, '0')).join()}';
     if (id != principalId) {
@@ -796,6 +802,7 @@ Future<List<int>> checkedSigningBytes(
   String authorizerGrantId = '',
   String pairingId = '',
   bool allowHistorical = false,
+  int registrationDays = 30,
 }) async {
   final transcript =
       jsonDecode(utf8.decode(response.transcript)) as Map<String, dynamic>;
@@ -861,7 +868,7 @@ Future<List<int>> checkedSigningBytes(
       (pairingId.isEmpty || transcript['pairing_id'] == pairingId) &&
       (purpose == 'device.register' || purpose == 'device.delegate'
           ? (purpose == 'device.register'
-                ? grantExpiry == issued + 30 * 86400
+                ? grantExpiry == issued + registrationDays * 86400
                 : grantExpiry <= issued + 30 * 86400)
           : transcript['grant_id'] == grantId);
   if (!valid) {

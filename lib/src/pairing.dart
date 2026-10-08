@@ -118,6 +118,66 @@ class PendingPairing {
         (transcript['issued_at'] as int) >= p.expiresAt.toInt()) {
       throw const FormatException('Подтверждение не относится к запросу');
     }
+    final delegated = transcript['purpose'] == 'device.delegate';
+    List<int> signer = response.rootPublicKey;
+    if (delegated) {
+      if (response.parentTranscript.isEmpty ||
+          response.parentSignature.length != 64 ||
+          response.parentGrantId != transcript['authorizer_grant_id']) {
+        throw const FormatException('Нет доказательства recovery authority');
+      }
+      final parent = jsonDecode(
+        utf8.decode(response.parentTranscript),
+      ) as Map<String, dynamic>;
+      signer = base64Url.decode(
+        base64Url.normalize(parent['device_public_key'] as String),
+      );
+      final scopes = (parent['scopes'] as List).cast<String>();
+      final managed = scopes.contains('space.manage');
+      if (parent['grant_id'] != response.parentGrantId ||
+          !scopes.contains('identity.recover') ||
+          (p.administrative && !managed) ||
+          (parent['issued_at'] as int) > (transcript['issued_at'] as int) + 5 ||
+          (parent['grant_expires_at'] as int) <
+              (transcript['grant_expires_at'] as int)) {
+        throw const FormatException('Неподходящая цепочка recovery');
+      }
+      final parentSigning = await checkedSigningBytes(
+        CreateChallengeResponse(
+          challengeId: parent['challenge_id'] as String,
+          transcript: response.parentTranscript,
+        ),
+        server,
+        response.rootPublicKey,
+        signer,
+        'device.register',
+        '',
+        expectedScopes: [
+          'chat.read',
+          'chat.write',
+          if (managed) 'space.manage',
+          'identity.recover',
+        ],
+        allowHistorical: true,
+        registrationDays: 3650,
+      );
+      if (!await Ed25519().verify(
+        parentSigning,
+        signature: Signature(
+          response.parentSignature,
+          publicKey: SimplePublicKey(
+            response.rootPublicKey,
+            type: KeyPairType.ed25519,
+          ),
+        ),
+      )) {
+        throw const FormatException('Root-подпись recovery не прошла проверку');
+      }
+    } else if (response.parentGrantId.isNotEmpty ||
+        response.parentTranscript.isNotEmpty ||
+        response.parentSignature.isNotEmpty) {
+      throw const FormatException('Неожиданная цепочка подписи');
+    }
     final signing = await checkedSigningBytes(
       CreateChallengeResponse(
         challengeId: transcript['challenge_id'] as String,
@@ -126,7 +186,7 @@ class PendingPairing {
       server,
       response.rootPublicKey,
       p.publicKey,
-      'device.register',
+      delegated ? 'device.delegate' : 'device.register',
       '',
       expectedScopes: [
         'chat.read',
@@ -135,15 +195,13 @@ class PendingPairing {
       ],
       pairingId: p.id,
       allowHistorical: true,
+      authorizerGrantId: delegated ? response.parentGrantId : '',
     );
     final valid = await Ed25519().verify(
       signing,
       signature: Signature(
         response.signature,
-        publicKey: SimplePublicKey(
-          response.rootPublicKey,
-          type: KeyPairType.ed25519,
-        ),
+        publicKey: SimplePublicKey(signer, type: KeyPairType.ed25519),
       ),
     );
     if (!valid) {

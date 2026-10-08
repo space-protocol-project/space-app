@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/recovery_card.dart';
+import 'package:space_client/src/recovery_qr.dart';
 
 class RecoveryTestVault implements IdentityVault {
   DeviceRecord? record;
@@ -24,12 +25,13 @@ Future<void> main(List<String> args) async {
     );
   }
   final payload = await openRecoveryCard(
-    await File(args[0]).readAsString(),
+    cardFromArtifact(await File(args[0]).readAsBytes()),
     args[1],
   );
   final record = await recordFromRecovery(payload);
-  await File('${args[0]}.dart.json')
-      .writeAsString(await sealRecoveryCard(payload, args[1]));
+  final nativePacket = await sealRecoveryCard(payload, args[1]);
+  await File('${args[0]}.dart.json').writeAsString(nativePacket);
+  await File('${args[0]}.dart.png').writeAsBytes(recoveryPng(nativePacket));
   final server = await discover(record.origin);
   checkTrust(server, record);
   final vault = RecoveryTestVault();
