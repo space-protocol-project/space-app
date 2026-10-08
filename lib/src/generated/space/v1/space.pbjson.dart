@@ -634,6 +634,7 @@ const GetSetupStatusResponse$json = {
   '1': 'GetSetupStatusResponse',
   '2': [
     {'1': 'initialized', '3': 1, '4': 1, '5': 8, '10': 'initialized'},
+    {'1': 'first_login_owner', '3': 2, '4': 1, '5': 8, '10': 'firstLoginOwner'},
   ],
 };
 
@@ -641,7 +642,7 @@ const GetSetupStatusResponse$json = {
 final $typed_data.Uint8List getSetupStatusResponseDescriptor =
     $convert.base64Decode(
         'ChZHZXRTZXR1cFN0YXR1c1Jlc3BvbnNlEiAKC2luaXRpYWxpemVkGAEgASgIUgtpbml0aWFsaX'
-        'plZA==');
+        'plZBIqChFmaXJzdF9sb2dpbl9vd25lchgCIAEoCFIPZmlyc3RMb2dpbk93bmVy');
 
 @$core.Deprecated('Use claimOwnerRequestDescriptor instead')
 const ClaimOwnerRequest$json = {

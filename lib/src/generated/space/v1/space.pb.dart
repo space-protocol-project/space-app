@@ -2642,9 +2642,11 @@ class GetSetupStatusRequest extends $pb.GeneratedMessage {
 class GetSetupStatusResponse extends $pb.GeneratedMessage {
   factory GetSetupStatusResponse({
     $core.bool? initialized,
+    $core.bool? firstLoginOwner,
   }) {
     final result = GetSetupStatusResponse._();
     if (initialized != null) result.initialized = initialized;
+    if (firstLoginOwner != null) result.firstLoginOwner = firstLoginOwner;
     return result;
   }
 
@@ -2662,6 +2664,7 @@ class GetSetupStatusResponse extends $pb.GeneratedMessage {
       package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
       createEmptyInstance: GetSetupStatusResponse.$_createMessage)
     ..aOB(1, _omitFieldNames ? '' : 'initialized')
+    ..aOB(2, _omitFieldNames ? '' : 'firstLoginOwner')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -2696,6 +2699,15 @@ class GetSetupStatusResponse extends $pb.GeneratedMessage {
   $core.bool hasInitialized() => $_has(0);
   @$pb.TagNumber(1)
   void clearInitialized() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.bool get firstLoginOwner => $_getBF(1);
+  @$pb.TagNumber(2)
+  set firstLoginOwner($core.bool value) => $_setBool(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasFirstLoginOwner() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearFirstLoginOwner() => $_clearField(2);
 }
 
 class ClaimOwnerRequest extends $pb.GeneratedMessage {

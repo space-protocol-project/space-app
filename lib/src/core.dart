@@ -486,10 +486,36 @@ class SpaceSession
         'Сначала завершите сохранённую смену ключа для этого сервера',
       );
     }
+    final setupChannel = ClientChannel(
+      server.origin.host,
+      port: server.grpcPort,
+      options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
+    );
+    bool automatic = false;
+    try {
+      automatic = (await AdminServiceClient(setupChannel).getSetupStatus(
+        GetSetupStatusRequest(),
+        options: CallOptions(timeout: const Duration(seconds: 10)),
+      )).firstLoginOwner;
+    } finally {
+      await setupChannel.shutdown();
+    }
     var record = restoredRecord ?? await vault.load(server.origin.toString());
     if (record != null) {
       checkTrust(server, record);
       await record.identity();
+      if (automatic && !record.administrative && record.rootSeed.isNotEmpty) {
+        record = DeviceRecord(
+          origin: record.origin,
+          serverId: record.serverId,
+          serverKey: record.serverKey,
+          rootSeed: record.rootSeed,
+          deviceSeed: record.deviceSeed,
+          rootPublicKey: record.rootPublicKey,
+          rootHistory: record.rootHistory,
+          administrative: true,
+        );
+      }
     } else {
       final algorithm = Ed25519();
       final root = await algorithm.newKeyPair();
@@ -500,6 +526,7 @@ class SpaceSession
         serverKey: url64(server.publicKey),
         rootSeed: await root.extractPrivateKeyBytes(),
         deviceSeed: await device.extractPrivateKeyBytes(),
+        administrative: automatic,
       );
       await vault.save(record);
     }
