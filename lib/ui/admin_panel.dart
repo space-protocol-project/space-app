@@ -20,7 +20,11 @@ class NativeAdminGateway extends SpaceGateway {
     } on GrpcError catch (e) {
       final status = switch (e.code) {
         StatusCode.permissionDenied => 403,
-        StatusCode.aborted => 409,
+        StatusCode.aborted || StatusCode.alreadyExists => 409,
+        StatusCode.invalidArgument => 400,
+        StatusCode.notFound => 404,
+        StatusCode.resourceExhausted => 429,
+        StatusCode.failedPrecondition => 412,
         StatusCode.unauthenticated => 401,
         _ => 503,
       };
