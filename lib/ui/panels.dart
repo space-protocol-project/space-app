@@ -286,8 +286,10 @@ class IdentityPanel extends StatelessWidget {
       const SizedBox(height: 20),
       if (controller.administration != null)
         FilledButton.icon(
-          onPressed: () =>
-              openServerAdministration(context, controller.administration!),
+          onPressed: () async {
+            await openServerAdministration(context, controller.administration!);
+            await controller.refreshChannels();
+          },
           icon: const Icon(Icons.settings_outlined),
           label: const Text('Управление пространством'),
         ),

@@ -265,12 +265,13 @@ class _SpaceShellState extends State<SpaceShell> {
               title: const Text('Управление пространством'),
               onTap: controller.busy
                   ? null
-                  : () {
+                  : () async {
                       scaffold.currentState?.closeDrawer();
-                      openServerAdministration(
+                      await openServerAdministration(
                         context,
                         controller.administration!,
                       );
+                      await controller.refreshChannels();
                     },
             ),
           if (widget.preferences.origins.isNotEmpty) ...[
