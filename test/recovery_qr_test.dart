@@ -1,11 +1,25 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
 import 'package:space_client/src/recovery_qr.dart';
 
 void main() {
+  test('Плотные QR с разными масками читаются без эвристических сбоев', () {
+    final random = Random(7);
+    for (var i = 0; i < 12; i++) {
+      final packet = jsonEncode({
+        'v': 1,
+        'kind': 'space-recovery-card',
+        'ciphertext': base64Url.encode(
+          List.generate(1000 + i * 13, (_) => random.nextInt(256)),
+        ),
+      });
+      expect(cardFromArtifact(recoveryPng(packet)), packet);
+    }
+  });
   test(
     'QR PNG читается после поворота и уменьшения; опасные размеры отклоняются',
     () {

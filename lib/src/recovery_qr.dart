@@ -81,7 +81,19 @@ String cardFromArtifact(Uint8List bytes) {
     final bitmap = zx.BinaryBitmap(
       zx.HybridBinarizer(zx.RGBLuminanceSource(width, height, pixels)),
     );
-    final text = reader.decode(bitmap).text;
+    String text;
+    try {
+      text = reader.decode(bitmap).text;
+    } catch (_) {
+      // Чистый экспортированный PNG может обмануть эвристику поиска finder patterns.
+      // Повтор считывает точную монохромную сетку с теми же проверками QR/checksum.
+      text = reader
+          .decode(
+            bitmap,
+            hints: zx.DecodeHints()..put(zx.DecodeHintType.pureBarcode, null),
+          )
+          .text;
+    }
     if (!text.startsWith(recoveryQrPrefix) || utf8.encode(text).length > 2048) {
       throw const FormatException('QR не является карточкой Space');
     }
