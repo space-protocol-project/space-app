@@ -14,6 +14,7 @@ import '../src/pairing.dart';
 import '../src/root_rotation.dart' as rotation;
 import '../src/generated/space/v1/space.pbgrpc.dart' show AuthServiceClient;
 import 'components.dart';
+import 'camera_scanner.dart';
 
 class RecoveryPanel extends StatefulWidget {
   const RecoveryPanel({super.key, required this.controller});
@@ -197,18 +198,21 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     }
   }
 
-  Future<void> restore() async {
-    final file = await openFile(acceptedTypeGroups: files);
-    if (file == null) return;
-    if (await file.length() > maxRecoveryImageBytes) {
-      throw const FormatException('Карточка слишком большая');
+  Future<void> restore({String? cameraPacket}) async {
+    String packet;
+    if (cameraPacket != null) {
+      packet = cameraPacket;
+    } else {
+      final file = await openFile(acceptedTypeGroups: files);
+      if (file == null) return;
+      if (await file.length() > maxRecoveryImageBytes) {
+        throw const FormatException('Карточка слишком большая');
+      }
+      packet = await compute(artifactInWorker, await file.readAsBytes());
     }
     final pass = await password(false);
     if (pass == null) return;
-    final payload = await compute(openCardInWorker, [
-      await compute(artifactInWorker, await file.readAsBytes()),
-      pass,
-    ]);
+    final payload = await compute(openCardInWorker, [packet, pass]);
     final record = await recordFromRecovery(payload);
     final server = await discover(record.origin);
     checkTrust(server, record);
@@ -539,6 +543,18 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
                   onPressed: pending ? null : () => run(restore),
                   icon: const Icon(Icons.restore),
                   label: const Text('Восстановить из файла'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: pending
+                      ? null
+                      : () => run(() async {
+                          final packet = await scanRecoveryCamera(context);
+                          if (packet != null && mounted) {
+                            await restore(cameraPacket: packet);
+                          }
+                        }),
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: const Text('Сканировать камерой'),
                 ),
               ],
             ),

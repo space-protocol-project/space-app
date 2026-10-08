@@ -45,6 +45,9 @@ dependencies:
   qr: ^4.0.0
   image: ^4.10.1
   zxing2: ^0.2.4
+  camera: ^0.12.1
+  camera_windows:
+    path: vendor/camera_windows
 
 dev_dependencies:
   flutter_test:
