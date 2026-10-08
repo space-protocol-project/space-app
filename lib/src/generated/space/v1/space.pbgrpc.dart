@@ -33,6 +33,41 @@ class ChannelServiceClient extends $grpc.Client {
 
   ChannelServiceClient(super.channel, {super.options, super.interceptors});
 
+  $grpc.ResponseFuture<$0.ListChannelsResponse> listChannels(
+    $0.ListChannelsRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$listChannels, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.CreateChannelResponse> createChannel(
+    $0.CreateChannelRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$createChannel, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.UpdateChannelResponse> updateChannel(
+    $0.UpdateChannelRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$updateChannel, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.GetChannelAccessResponse> getChannelAccess(
+    $0.GetChannelAccessRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$getChannelAccess, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.UpdateChannelAccessResponse> updateChannelAccess(
+    $0.UpdateChannelAccessRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$updateChannelAccess, request, options: options);
+  }
+
   $grpc.ResponseFuture<$0.GetManifestResponse> getManifest(
     $0.GetManifestRequest request, {
     $grpc.CallOptions? options,
@@ -42,6 +77,31 @@ class ChannelServiceClient extends $grpc.Client {
 
   // method descriptors
 
+  static final _$listChannels =
+      $grpc.ClientMethod<$0.ListChannelsRequest, $0.ListChannelsResponse>(
+          '/space.v1.ChannelService/ListChannels',
+          ($0.ListChannelsRequest value) => value.writeToBuffer(),
+          $0.ListChannelsResponse.fromBuffer);
+  static final _$createChannel =
+      $grpc.ClientMethod<$0.CreateChannelRequest, $0.CreateChannelResponse>(
+          '/space.v1.ChannelService/CreateChannel',
+          ($0.CreateChannelRequest value) => value.writeToBuffer(),
+          $0.CreateChannelResponse.fromBuffer);
+  static final _$updateChannel =
+      $grpc.ClientMethod<$0.UpdateChannelRequest, $0.UpdateChannelResponse>(
+          '/space.v1.ChannelService/UpdateChannel',
+          ($0.UpdateChannelRequest value) => value.writeToBuffer(),
+          $0.UpdateChannelResponse.fromBuffer);
+  static final _$getChannelAccess = $grpc.ClientMethod<
+          $0.GetChannelAccessRequest, $0.GetChannelAccessResponse>(
+      '/space.v1.ChannelService/GetChannelAccess',
+      ($0.GetChannelAccessRequest value) => value.writeToBuffer(),
+      $0.GetChannelAccessResponse.fromBuffer);
+  static final _$updateChannelAccess = $grpc.ClientMethod<
+          $0.UpdateChannelAccessRequest, $0.UpdateChannelAccessResponse>(
+      '/space.v1.ChannelService/UpdateChannelAccess',
+      ($0.UpdateChannelAccessRequest value) => value.writeToBuffer(),
+      $0.UpdateChannelAccessResponse.fromBuffer);
   static final _$getManifest =
       $grpc.ClientMethod<$0.GetManifestRequest, $0.GetManifestResponse>(
           '/space.v1.ChannelService/GetManifest',
@@ -55,6 +115,51 @@ abstract class ChannelServiceBase extends $grpc.Service {
 
   ChannelServiceBase() {
     $addMethod(
+        $grpc.ServiceMethod<$0.ListChannelsRequest, $0.ListChannelsResponse>(
+            'ListChannels',
+            listChannels_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.ListChannelsRequest.fromBuffer(value),
+            ($0.ListChannelsResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.CreateChannelRequest, $0.CreateChannelResponse>(
+            'CreateChannel',
+            createChannel_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.CreateChannelRequest.fromBuffer(value),
+            ($0.CreateChannelResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.UpdateChannelRequest, $0.UpdateChannelResponse>(
+            'UpdateChannel',
+            updateChannel_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.UpdateChannelRequest.fromBuffer(value),
+            ($0.UpdateChannelResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GetChannelAccessRequest,
+            $0.GetChannelAccessResponse>(
+        'GetChannelAccess',
+        getChannelAccess_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) =>
+            $0.GetChannelAccessRequest.fromBuffer(value),
+        ($0.GetChannelAccessResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.UpdateChannelAccessRequest,
+            $0.UpdateChannelAccessResponse>(
+        'UpdateChannelAccess',
+        updateChannelAccess_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) =>
+            $0.UpdateChannelAccessRequest.fromBuffer(value),
+        ($0.UpdateChannelAccessResponse value) => value.writeToBuffer()));
+    $addMethod(
         $grpc.ServiceMethod<$0.GetManifestRequest, $0.GetManifestResponse>(
             'GetManifest',
             getManifest_Pre,
@@ -64,6 +169,51 @@ abstract class ChannelServiceBase extends $grpc.Service {
                 $0.GetManifestRequest.fromBuffer(value),
             ($0.GetManifestResponse value) => value.writeToBuffer()));
   }
+
+  $async.Future<$0.ListChannelsResponse> listChannels_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.ListChannelsRequest> $request) async {
+    return listChannels($call, await $request);
+  }
+
+  $async.Future<$0.ListChannelsResponse> listChannels(
+      $grpc.ServiceCall call, $0.ListChannelsRequest request);
+
+  $async.Future<$0.CreateChannelResponse> createChannel_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.CreateChannelRequest> $request) async {
+    return createChannel($call, await $request);
+  }
+
+  $async.Future<$0.CreateChannelResponse> createChannel(
+      $grpc.ServiceCall call, $0.CreateChannelRequest request);
+
+  $async.Future<$0.UpdateChannelResponse> updateChannel_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.UpdateChannelRequest> $request) async {
+    return updateChannel($call, await $request);
+  }
+
+  $async.Future<$0.UpdateChannelResponse> updateChannel(
+      $grpc.ServiceCall call, $0.UpdateChannelRequest request);
+
+  $async.Future<$0.GetChannelAccessResponse> getChannelAccess_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.GetChannelAccessRequest> $request) async {
+    return getChannelAccess($call, await $request);
+  }
+
+  $async.Future<$0.GetChannelAccessResponse> getChannelAccess(
+      $grpc.ServiceCall call, $0.GetChannelAccessRequest request);
+
+  $async.Future<$0.UpdateChannelAccessResponse> updateChannelAccess_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.UpdateChannelAccessRequest> $request) async {
+    return updateChannelAccess($call, await $request);
+  }
+
+  $async.Future<$0.UpdateChannelAccessResponse> updateChannelAccess(
+      $grpc.ServiceCall call, $0.UpdateChannelAccessRequest request);
 
   $async.Future<$0.GetManifestResponse> getManifest_Pre($grpc.ServiceCall $call,
       $async.Future<$0.GetManifestRequest> $request) async {

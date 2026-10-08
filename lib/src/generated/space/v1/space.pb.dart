@@ -4102,11 +4102,21 @@ class Channel extends $pb.GeneratedMessage {
     $core.String? id,
     $core.String? title,
     $core.Iterable<View>? views,
+    $core.int? position,
+    $core.bool? archived,
+    $fixnum.Int64? revision,
+    ChannelPermissions? permissions,
+    $core.bool? publicPreview,
   }) {
     final result = Channel._();
     if (id != null) result.id = id;
     if (title != null) result.title = title;
     if (views != null) result.views.addAll(views);
+    if (position != null) result.position = position;
+    if (archived != null) result.archived = archived;
+    if (revision != null) result.revision = revision;
+    if (permissions != null) result.permissions = permissions;
+    if (publicPreview != null) result.publicPreview = publicPreview;
     return result;
   }
 
@@ -4127,6 +4137,12 @@ class Channel extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'title')
     ..pPM<View>(3, _omitFieldNames ? '' : 'views',
         subBuilder: View.$_createMessage)
+    ..aI(4, _omitFieldNames ? '' : 'position')
+    ..aOB(5, _omitFieldNames ? '' : 'archived')
+    ..aInt64(6, _omitFieldNames ? '' : 'revision')
+    ..aOM<ChannelPermissions>(7, _omitFieldNames ? '' : 'permissions',
+        subBuilder: ChannelPermissions.$_createMessage)
+    ..aOB(8, _omitFieldNames ? '' : 'publicPreview')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -4169,6 +4185,910 @@ class Channel extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(3)
   $pb.PbList<View> get views => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $core.int get position => $_getIZ(3);
+  @$pb.TagNumber(4)
+  set position($core.int value) => $_setSignedInt32(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasPosition() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearPosition() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get archived => $_getBF(4);
+  @$pb.TagNumber(5)
+  set archived($core.bool value) => $_setBool(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasArchived() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearArchived() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $fixnum.Int64 get revision => $_getI64(5);
+  @$pb.TagNumber(6)
+  set revision($fixnum.Int64 value) => $_setInt64(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasRevision() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearRevision() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  ChannelPermissions get permissions => $_getN(6);
+  @$pb.TagNumber(7)
+  set permissions(ChannelPermissions value) => $_setField(7, value);
+  @$pb.TagNumber(7)
+  $core.bool hasPermissions() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearPermissions() => $_clearField(7);
+  @$pb.TagNumber(7)
+  ChannelPermissions ensurePermissions() => $_ensure(6);
+
+  @$pb.TagNumber(8)
+  $core.bool get publicPreview => $_getBF(7);
+  @$pb.TagNumber(8)
+  set publicPreview($core.bool value) => $_setBool(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasPublicPreview() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearPublicPreview() => $_clearField(8);
+}
+
+/// write требует read, read и manage требуют visible.
+class ChannelPermissions extends $pb.GeneratedMessage {
+  factory ChannelPermissions({
+    $core.bool? visible,
+    $core.bool? read,
+    $core.bool? write,
+    $core.bool? manage,
+  }) {
+    final result = ChannelPermissions._();
+    if (visible != null) result.visible = visible;
+    if (read != null) result.read = read;
+    if (write != null) result.write = write;
+    if (manage != null) result.manage = manage;
+    return result;
+  }
+
+  ChannelPermissions._();
+
+  factory ChannelPermissions.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ChannelPermissions()..mergeFromBuffer(data, registry);
+  factory ChannelPermissions.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ChannelPermissions()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ChannelPermissions',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ChannelPermissions.$_createMessage)
+    ..aOB(1, _omitFieldNames ? '' : 'visible')
+    ..aOB(2, _omitFieldNames ? '' : 'read')
+    ..aOB(3, _omitFieldNames ? '' : 'write')
+    ..aOB(4, _omitFieldNames ? '' : 'manage')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ChannelPermissions clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ChannelPermissions copyWith(void Function(ChannelPermissions) updates) =>
+      super.copyWith((message) => updates(message as ChannelPermissions))
+          as ChannelPermissions;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ChannelPermissions() / ChannelPermissions.new instead')
+  static ChannelPermissions create() => ChannelPermissions._();
+  static $pb.GeneratedMessage $_createMessage() => ChannelPermissions._();
+  @$core.override
+  ChannelPermissions createEmptyInstance() => ChannelPermissions._();
+  @$core.pragma('dart2js:noInline')
+  static ChannelPermissions getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ChannelPermissions>(
+          ChannelPermissions.$_createMessage);
+  static ChannelPermissions? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.bool get visible => $_getBF(0);
+  @$pb.TagNumber(1)
+  set visible($core.bool value) => $_setBool(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasVisible() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearVisible() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.bool get read => $_getBF(1);
+  @$pb.TagNumber(2)
+  set read($core.bool value) => $_setBool(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasRead() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRead() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get write => $_getBF(2);
+  @$pb.TagNumber(3)
+  set write($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasWrite() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearWrite() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get manage => $_getBF(3);
+  @$pb.TagNumber(4)
+  set manage($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasManage() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearManage() => $_clearField(4);
+}
+
+/// Ровно один субъект: role (member/reader) или principal_id.
+class ChannelAccessRule extends $pb.GeneratedMessage {
+  factory ChannelAccessRule({
+    $core.String? role,
+    $core.String? principalId,
+    ChannelPermissions? permissions,
+  }) {
+    final result = ChannelAccessRule._();
+    if (role != null) result.role = role;
+    if (principalId != null) result.principalId = principalId;
+    if (permissions != null) result.permissions = permissions;
+    return result;
+  }
+
+  ChannelAccessRule._();
+
+  factory ChannelAccessRule.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ChannelAccessRule()..mergeFromBuffer(data, registry);
+  factory ChannelAccessRule.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ChannelAccessRule()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ChannelAccessRule',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ChannelAccessRule.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'role')
+    ..aOS(2, _omitFieldNames ? '' : 'principalId')
+    ..aOM<ChannelPermissions>(3, _omitFieldNames ? '' : 'permissions',
+        subBuilder: ChannelPermissions.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ChannelAccessRule clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ChannelAccessRule copyWith(void Function(ChannelAccessRule) updates) =>
+      super.copyWith((message) => updates(message as ChannelAccessRule))
+          as ChannelAccessRule;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ChannelAccessRule() / ChannelAccessRule.new instead')
+  static ChannelAccessRule create() => ChannelAccessRule._();
+  static $pb.GeneratedMessage $_createMessage() => ChannelAccessRule._();
+  @$core.override
+  ChannelAccessRule createEmptyInstance() => ChannelAccessRule._();
+  @$core.pragma('dart2js:noInline')
+  static ChannelAccessRule getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ChannelAccessRule>(
+          ChannelAccessRule.$_createMessage);
+  static ChannelAccessRule? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get role => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set role($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasRole() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearRole() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get principalId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set principalId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasPrincipalId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearPrincipalId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  ChannelPermissions get permissions => $_getN(2);
+  @$pb.TagNumber(3)
+  set permissions(ChannelPermissions value) => $_setField(3, value);
+  @$pb.TagNumber(3)
+  $core.bool hasPermissions() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearPermissions() => $_clearField(3);
+  @$pb.TagNumber(3)
+  ChannelPermissions ensurePermissions() => $_ensure(2);
+}
+
+class ListChannelsRequest extends $pb.GeneratedMessage {
+  factory ListChannelsRequest({
+    $core.bool? includeArchived,
+  }) {
+    final result = ListChannelsRequest._();
+    if (includeArchived != null) result.includeArchived = includeArchived;
+    return result;
+  }
+
+  ListChannelsRequest._();
+
+  factory ListChannelsRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListChannelsRequest()..mergeFromBuffer(data, registry);
+  factory ListChannelsRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListChannelsRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListChannelsRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListChannelsRequest.$_createMessage)
+    ..aOB(1, _omitFieldNames ? '' : 'includeArchived')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListChannelsRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListChannelsRequest copyWith(void Function(ListChannelsRequest) updates) =>
+      super.copyWith((message) => updates(message as ListChannelsRequest))
+          as ListChannelsRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use ListChannelsRequest() / ListChannelsRequest.new instead')
+  static ListChannelsRequest create() => ListChannelsRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ListChannelsRequest._();
+  @$core.override
+  ListChannelsRequest createEmptyInstance() => ListChannelsRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ListChannelsRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListChannelsRequest>(
+          ListChannelsRequest.$_createMessage);
+  static ListChannelsRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.bool get includeArchived => $_getBF(0);
+  @$pb.TagNumber(1)
+  set includeArchived($core.bool value) => $_setBool(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasIncludeArchived() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearIncludeArchived() => $_clearField(1);
+}
+
+class ListChannelsResponse extends $pb.GeneratedMessage {
+  factory ListChannelsResponse({
+    $core.Iterable<Channel>? channels,
+  }) {
+    final result = ListChannelsResponse._();
+    if (channels != null) result.channels.addAll(channels);
+    return result;
+  }
+
+  ListChannelsResponse._();
+
+  factory ListChannelsResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListChannelsResponse()..mergeFromBuffer(data, registry);
+  factory ListChannelsResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListChannelsResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListChannelsResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListChannelsResponse.$_createMessage)
+    ..pPM<Channel>(1, _omitFieldNames ? '' : 'channels',
+        subBuilder: Channel.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListChannelsResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListChannelsResponse copyWith(void Function(ListChannelsResponse) updates) =>
+      super.copyWith((message) => updates(message as ListChannelsResponse))
+          as ListChannelsResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListChannelsResponse() / ListChannelsResponse.new instead')
+  static ListChannelsResponse create() => ListChannelsResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ListChannelsResponse._();
+  @$core.override
+  ListChannelsResponse createEmptyInstance() => ListChannelsResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ListChannelsResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListChannelsResponse>(
+          ListChannelsResponse.$_createMessage);
+  static ListChannelsResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<Channel> get channels => $_getList(0);
+}
+
+class CreateChannelRequest extends $pb.GeneratedMessage {
+  factory CreateChannelRequest({
+    $core.String? channelId,
+    $core.String? title,
+    $core.String? viewType,
+    $core.int? position,
+    $core.bool? publicPreview,
+  }) {
+    final result = CreateChannelRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (title != null) result.title = title;
+    if (viewType != null) result.viewType = viewType;
+    if (position != null) result.position = position;
+    if (publicPreview != null) result.publicPreview = publicPreview;
+    return result;
+  }
+
+  CreateChannelRequest._();
+
+  factory CreateChannelRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CreateChannelRequest()..mergeFromBuffer(data, registry);
+  factory CreateChannelRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CreateChannelRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CreateChannelRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: CreateChannelRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'title')
+    ..aOS(3, _omitFieldNames ? '' : 'viewType')
+    ..aI(4, _omitFieldNames ? '' : 'position')
+    ..aOB(5, _omitFieldNames ? '' : 'publicPreview')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreateChannelRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreateChannelRequest copyWith(void Function(CreateChannelRequest) updates) =>
+      super.copyWith((message) => updates(message as CreateChannelRequest))
+          as CreateChannelRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CreateChannelRequest() / CreateChannelRequest.new instead')
+  static CreateChannelRequest create() => CreateChannelRequest._();
+  static $pb.GeneratedMessage $_createMessage() => CreateChannelRequest._();
+  @$core.override
+  CreateChannelRequest createEmptyInstance() => CreateChannelRequest._();
+  @$core.pragma('dart2js:noInline')
+  static CreateChannelRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CreateChannelRequest>(
+          CreateChannelRequest.$_createMessage);
+  static CreateChannelRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get title => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set title($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasTitle() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearTitle() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get viewType => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set viewType($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasViewType() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearViewType() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.int get position => $_getIZ(3);
+  @$pb.TagNumber(4)
+  set position($core.int value) => $_setSignedInt32(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasPosition() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearPosition() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get publicPreview => $_getBF(4);
+  @$pb.TagNumber(5)
+  set publicPreview($core.bool value) => $_setBool(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasPublicPreview() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearPublicPreview() => $_clearField(5);
+}
+
+class UpdateChannelRequest extends $pb.GeneratedMessage {
+  factory UpdateChannelRequest({
+    $core.String? channelId,
+    $core.String? title,
+    $core.int? position,
+    $core.bool? archived,
+    $core.bool? publicPreview,
+    $fixnum.Int64? expectedRevision,
+  }) {
+    final result = UpdateChannelRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (title != null) result.title = title;
+    if (position != null) result.position = position;
+    if (archived != null) result.archived = archived;
+    if (publicPreview != null) result.publicPreview = publicPreview;
+    if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    return result;
+  }
+
+  UpdateChannelRequest._();
+
+  factory UpdateChannelRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateChannelRequest()..mergeFromBuffer(data, registry);
+  factory UpdateChannelRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateChannelRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UpdateChannelRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: UpdateChannelRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'title')
+    ..aI(3, _omitFieldNames ? '' : 'position')
+    ..aOB(4, _omitFieldNames ? '' : 'archived')
+    ..aOB(5, _omitFieldNames ? '' : 'publicPreview')
+    ..aInt64(6, _omitFieldNames ? '' : 'expectedRevision')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateChannelRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateChannelRequest copyWith(void Function(UpdateChannelRequest) updates) =>
+      super.copyWith((message) => updates(message as UpdateChannelRequest))
+          as UpdateChannelRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use UpdateChannelRequest() / UpdateChannelRequest.new instead')
+  static UpdateChannelRequest create() => UpdateChannelRequest._();
+  static $pb.GeneratedMessage $_createMessage() => UpdateChannelRequest._();
+  @$core.override
+  UpdateChannelRequest createEmptyInstance() => UpdateChannelRequest._();
+  @$core.pragma('dart2js:noInline')
+  static UpdateChannelRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UpdateChannelRequest>(
+          UpdateChannelRequest.$_createMessage);
+  static UpdateChannelRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get title => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set title($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasTitle() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearTitle() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.int get position => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set position($core.int value) => $_setSignedInt32(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasPosition() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearPosition() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get archived => $_getBF(3);
+  @$pb.TagNumber(4)
+  set archived($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasArchived() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearArchived() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get publicPreview => $_getBF(4);
+  @$pb.TagNumber(5)
+  set publicPreview($core.bool value) => $_setBool(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasPublicPreview() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearPublicPreview() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $fixnum.Int64 get expectedRevision => $_getI64(5);
+  @$pb.TagNumber(6)
+  set expectedRevision($fixnum.Int64 value) => $_setInt64(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasExpectedRevision() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearExpectedRevision() => $_clearField(6);
+}
+
+class CreateChannelResponse extends $pb.GeneratedMessage {
+  factory CreateChannelResponse({
+    Channel? channel,
+  }) {
+    final result = CreateChannelResponse._();
+    if (channel != null) result.channel = channel;
+    return result;
+  }
+
+  CreateChannelResponse._();
+
+  factory CreateChannelResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CreateChannelResponse()..mergeFromBuffer(data, registry);
+  factory CreateChannelResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CreateChannelResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CreateChannelResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: CreateChannelResponse.$_createMessage)
+    ..aOM<Channel>(1, _omitFieldNames ? '' : 'channel',
+        subBuilder: Channel.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreateChannelResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreateChannelResponse copyWith(
+          void Function(CreateChannelResponse) updates) =>
+      super.copyWith((message) => updates(message as CreateChannelResponse))
+          as CreateChannelResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CreateChannelResponse() / CreateChannelResponse.new instead')
+  static CreateChannelResponse create() => CreateChannelResponse._();
+  static $pb.GeneratedMessage $_createMessage() => CreateChannelResponse._();
+  @$core.override
+  CreateChannelResponse createEmptyInstance() => CreateChannelResponse._();
+  @$core.pragma('dart2js:noInline')
+  static CreateChannelResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CreateChannelResponse>(
+          CreateChannelResponse.$_createMessage);
+  static CreateChannelResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Channel get channel => $_getN(0);
+  @$pb.TagNumber(1)
+  set channel(Channel value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannel() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannel() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Channel ensureChannel() => $_ensure(0);
+}
+
+class UpdateChannelResponse extends $pb.GeneratedMessage {
+  factory UpdateChannelResponse({
+    Channel? channel,
+  }) {
+    final result = UpdateChannelResponse._();
+    if (channel != null) result.channel = channel;
+    return result;
+  }
+
+  UpdateChannelResponse._();
+
+  factory UpdateChannelResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateChannelResponse()..mergeFromBuffer(data, registry);
+  factory UpdateChannelResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateChannelResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UpdateChannelResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: UpdateChannelResponse.$_createMessage)
+    ..aOM<Channel>(1, _omitFieldNames ? '' : 'channel',
+        subBuilder: Channel.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateChannelResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateChannelResponse copyWith(
+          void Function(UpdateChannelResponse) updates) =>
+      super.copyWith((message) => updates(message as UpdateChannelResponse))
+          as UpdateChannelResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use UpdateChannelResponse() / UpdateChannelResponse.new instead')
+  static UpdateChannelResponse create() => UpdateChannelResponse._();
+  static $pb.GeneratedMessage $_createMessage() => UpdateChannelResponse._();
+  @$core.override
+  UpdateChannelResponse createEmptyInstance() => UpdateChannelResponse._();
+  @$core.pragma('dart2js:noInline')
+  static UpdateChannelResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UpdateChannelResponse>(
+          UpdateChannelResponse.$_createMessage);
+  static UpdateChannelResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Channel get channel => $_getN(0);
+  @$pb.TagNumber(1)
+  set channel(Channel value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannel() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannel() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Channel ensureChannel() => $_ensure(0);
+}
+
+class GetChannelAccessRequest extends $pb.GeneratedMessage {
+  factory GetChannelAccessRequest({
+    $core.String? channelId,
+  }) {
+    final result = GetChannelAccessRequest._();
+    if (channelId != null) result.channelId = channelId;
+    return result;
+  }
+
+  GetChannelAccessRequest._();
+
+  factory GetChannelAccessRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetChannelAccessRequest()..mergeFromBuffer(data, registry);
+  factory GetChannelAccessRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetChannelAccessRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetChannelAccessRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetChannelAccessRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetChannelAccessRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetChannelAccessRequest copyWith(
+          void Function(GetChannelAccessRequest) updates) =>
+      super.copyWith((message) => updates(message as GetChannelAccessRequest))
+          as GetChannelAccessRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetChannelAccessRequest() / GetChannelAccessRequest.new instead')
+  static GetChannelAccessRequest create() => GetChannelAccessRequest._();
+  static $pb.GeneratedMessage $_createMessage() => GetChannelAccessRequest._();
+  @$core.override
+  GetChannelAccessRequest createEmptyInstance() => GetChannelAccessRequest._();
+  @$core.pragma('dart2js:noInline')
+  static GetChannelAccessRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetChannelAccessRequest>(
+          GetChannelAccessRequest.$_createMessage);
+  static GetChannelAccessRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+}
+
+class UpdateChannelAccessRequest extends $pb.GeneratedMessage {
+  factory UpdateChannelAccessRequest({
+    $core.String? channelId,
+    $fixnum.Int64? expectedRevision,
+    $core.Iterable<ChannelAccessRule>? rules,
+  }) {
+    final result = UpdateChannelAccessRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    if (rules != null) result.rules.addAll(rules);
+    return result;
+  }
+
+  UpdateChannelAccessRequest._();
+
+  factory UpdateChannelAccessRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateChannelAccessRequest()..mergeFromBuffer(data, registry);
+  factory UpdateChannelAccessRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateChannelAccessRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UpdateChannelAccessRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: UpdateChannelAccessRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aInt64(2, _omitFieldNames ? '' : 'expectedRevision')
+    ..pPM<ChannelAccessRule>(3, _omitFieldNames ? '' : 'rules',
+        subBuilder: ChannelAccessRule.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateChannelAccessRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateChannelAccessRequest copyWith(
+          void Function(UpdateChannelAccessRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as UpdateChannelAccessRequest))
+          as UpdateChannelAccessRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use UpdateChannelAccessRequest() / UpdateChannelAccessRequest.new instead')
+  static UpdateChannelAccessRequest create() => UpdateChannelAccessRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      UpdateChannelAccessRequest._();
+  @$core.override
+  UpdateChannelAccessRequest createEmptyInstance() =>
+      UpdateChannelAccessRequest._();
+  @$core.pragma('dart2js:noInline')
+  static UpdateChannelAccessRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UpdateChannelAccessRequest>(
+          UpdateChannelAccessRequest.$_createMessage);
+  static UpdateChannelAccessRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get expectedRevision => $_getI64(1);
+  @$pb.TagNumber(2)
+  set expectedRevision($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasExpectedRevision() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearExpectedRevision() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $pb.PbList<ChannelAccessRule> get rules => $_getList(2);
+}
+
+class GetChannelAccessResponse extends $pb.GeneratedMessage {
+  factory GetChannelAccessResponse({
+    $core.String? channelId,
+    $fixnum.Int64? revision,
+    $core.Iterable<ChannelAccessRule>? rules,
+  }) {
+    final result = GetChannelAccessResponse._();
+    if (channelId != null) result.channelId = channelId;
+    if (revision != null) result.revision = revision;
+    if (rules != null) result.rules.addAll(rules);
+    return result;
+  }
+
+  GetChannelAccessResponse._();
+
+  factory GetChannelAccessResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetChannelAccessResponse()..mergeFromBuffer(data, registry);
+  factory GetChannelAccessResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetChannelAccessResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetChannelAccessResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetChannelAccessResponse.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aInt64(2, _omitFieldNames ? '' : 'revision')
+    ..pPM<ChannelAccessRule>(3, _omitFieldNames ? '' : 'rules',
+        subBuilder: ChannelAccessRule.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetChannelAccessResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetChannelAccessResponse copyWith(
+          void Function(GetChannelAccessResponse) updates) =>
+      super.copyWith((message) => updates(message as GetChannelAccessResponse))
+          as GetChannelAccessResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetChannelAccessResponse() / GetChannelAccessResponse.new instead')
+  static GetChannelAccessResponse create() => GetChannelAccessResponse._();
+  static $pb.GeneratedMessage $_createMessage() => GetChannelAccessResponse._();
+  @$core.override
+  GetChannelAccessResponse createEmptyInstance() =>
+      GetChannelAccessResponse._();
+  @$core.pragma('dart2js:noInline')
+  static GetChannelAccessResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetChannelAccessResponse>(
+          GetChannelAccessResponse.$_createMessage);
+  static GetChannelAccessResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get revision => $_getI64(1);
+  @$pb.TagNumber(2)
+  set revision($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasRevision() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRevision() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $pb.PbList<ChannelAccessRule> get rules => $_getList(2);
 }
 
 class View extends $pb.GeneratedMessage {
@@ -5092,6 +6012,88 @@ class RootHistoryProof extends $pb.GeneratedMessage {
   $core.bool hasNewSignature() => $_has(2);
   @$pb.TagNumber(3)
   void clearNewSignature() => $_clearField(3);
+}
+
+class UpdateChannelAccessResponse extends $pb.GeneratedMessage {
+  factory UpdateChannelAccessResponse({
+    $core.String? channelId,
+    $fixnum.Int64? revision,
+    $core.Iterable<ChannelAccessRule>? rules,
+  }) {
+    final result = UpdateChannelAccessResponse._();
+    if (channelId != null) result.channelId = channelId;
+    if (revision != null) result.revision = revision;
+    if (rules != null) result.rules.addAll(rules);
+    return result;
+  }
+
+  UpdateChannelAccessResponse._();
+
+  factory UpdateChannelAccessResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateChannelAccessResponse()..mergeFromBuffer(data, registry);
+  factory UpdateChannelAccessResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateChannelAccessResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UpdateChannelAccessResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: UpdateChannelAccessResponse.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aInt64(2, _omitFieldNames ? '' : 'revision')
+    ..pPM<ChannelAccessRule>(3, _omitFieldNames ? '' : 'rules',
+        subBuilder: ChannelAccessRule.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateChannelAccessResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateChannelAccessResponse copyWith(
+          void Function(UpdateChannelAccessResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as UpdateChannelAccessResponse))
+          as UpdateChannelAccessResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use UpdateChannelAccessResponse() / UpdateChannelAccessResponse.new instead')
+  static UpdateChannelAccessResponse create() =>
+      UpdateChannelAccessResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      UpdateChannelAccessResponse._();
+  @$core.override
+  UpdateChannelAccessResponse createEmptyInstance() =>
+      UpdateChannelAccessResponse._();
+  @$core.pragma('dart2js:noInline')
+  static UpdateChannelAccessResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UpdateChannelAccessResponse>(
+          UpdateChannelAccessResponse.$_createMessage);
+  static UpdateChannelAccessResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get revision => $_getI64(1);
+  @$pb.TagNumber(2)
+  set revision($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasRevision() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRevision() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $pb.PbList<ChannelAccessRule> get rules => $_getList(2);
 }
 
 const $core.bool _omitFieldNames =

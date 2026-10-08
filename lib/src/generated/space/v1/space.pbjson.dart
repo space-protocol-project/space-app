@@ -1000,13 +1000,253 @@ const Channel$json = {
       '6': '.space.v1.View',
       '10': 'views'
     },
+    {'1': 'position', '3': 4, '4': 1, '5': 5, '10': 'position'},
+    {'1': 'archived', '3': 5, '4': 1, '5': 8, '10': 'archived'},
+    {'1': 'revision', '3': 6, '4': 1, '5': 3, '10': 'revision'},
+    {
+      '1': 'permissions',
+      '3': 7,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.ChannelPermissions',
+      '10': 'permissions'
+    },
+    {'1': 'public_preview', '3': 8, '4': 1, '5': 8, '10': 'publicPreview'},
   ],
 };
 
 /// Descriptor for `Channel`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List channelDescriptor = $convert.base64Decode(
     'CgdDaGFubmVsEg4KAmlkGAEgASgJUgJpZBIUCgV0aXRsZRgCIAEoCVIFdGl0bGUSJAoFdmlld3'
-    'MYAyADKAsyDi5zcGFjZS52MS5WaWV3UgV2aWV3cw==');
+    'MYAyADKAsyDi5zcGFjZS52MS5WaWV3UgV2aWV3cxIaCghwb3NpdGlvbhgEIAEoBVIIcG9zaXRp'
+    'b24SGgoIYXJjaGl2ZWQYBSABKAhSCGFyY2hpdmVkEhoKCHJldmlzaW9uGAYgASgDUghyZXZpc2'
+    'lvbhI+CgtwZXJtaXNzaW9ucxgHIAEoCzIcLnNwYWNlLnYxLkNoYW5uZWxQZXJtaXNzaW9uc1IL'
+    'cGVybWlzc2lvbnMSJQoOcHVibGljX3ByZXZpZXcYCCABKAhSDXB1YmxpY1ByZXZpZXc=');
+
+@$core.Deprecated('Use channelPermissionsDescriptor instead')
+const ChannelPermissions$json = {
+  '1': 'ChannelPermissions',
+  '2': [
+    {'1': 'visible', '3': 1, '4': 1, '5': 8, '10': 'visible'},
+    {'1': 'read', '3': 2, '4': 1, '5': 8, '10': 'read'},
+    {'1': 'write', '3': 3, '4': 1, '5': 8, '10': 'write'},
+    {'1': 'manage', '3': 4, '4': 1, '5': 8, '10': 'manage'},
+  ],
+};
+
+/// Descriptor for `ChannelPermissions`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List channelPermissionsDescriptor = $convert.base64Decode(
+    'ChJDaGFubmVsUGVybWlzc2lvbnMSGAoHdmlzaWJsZRgBIAEoCFIHdmlzaWJsZRISCgRyZWFkGA'
+    'IgASgIUgRyZWFkEhQKBXdyaXRlGAMgASgIUgV3cml0ZRIWCgZtYW5hZ2UYBCABKAhSBm1hbmFn'
+    'ZQ==');
+
+@$core.Deprecated('Use channelAccessRuleDescriptor instead')
+const ChannelAccessRule$json = {
+  '1': 'ChannelAccessRule',
+  '2': [
+    {'1': 'role', '3': 1, '4': 1, '5': 9, '10': 'role'},
+    {'1': 'principal_id', '3': 2, '4': 1, '5': 9, '10': 'principalId'},
+    {
+      '1': 'permissions',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.ChannelPermissions',
+      '10': 'permissions'
+    },
+  ],
+};
+
+/// Descriptor for `ChannelAccessRule`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List channelAccessRuleDescriptor = $convert.base64Decode(
+    'ChFDaGFubmVsQWNjZXNzUnVsZRISCgRyb2xlGAEgASgJUgRyb2xlEiEKDHByaW5jaXBhbF9pZB'
+    'gCIAEoCVILcHJpbmNpcGFsSWQSPgoLcGVybWlzc2lvbnMYAyABKAsyHC5zcGFjZS52MS5DaGFu'
+    'bmVsUGVybWlzc2lvbnNSC3Blcm1pc3Npb25z');
+
+@$core.Deprecated('Use listChannelsRequestDescriptor instead')
+const ListChannelsRequest$json = {
+  '1': 'ListChannelsRequest',
+  '2': [
+    {'1': 'include_archived', '3': 1, '4': 1, '5': 8, '10': 'includeArchived'},
+  ],
+};
+
+/// Descriptor for `ListChannelsRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listChannelsRequestDescriptor = $convert.base64Decode(
+    'ChNMaXN0Q2hhbm5lbHNSZXF1ZXN0EikKEGluY2x1ZGVfYXJjaGl2ZWQYASABKAhSD2luY2x1ZG'
+    'VBcmNoaXZlZA==');
+
+@$core.Deprecated('Use listChannelsResponseDescriptor instead')
+const ListChannelsResponse$json = {
+  '1': 'ListChannelsResponse',
+  '2': [
+    {
+      '1': 'channels',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.Channel',
+      '10': 'channels'
+    },
+  ],
+};
+
+/// Descriptor for `ListChannelsResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listChannelsResponseDescriptor = $convert.base64Decode(
+    'ChRMaXN0Q2hhbm5lbHNSZXNwb25zZRItCghjaGFubmVscxgBIAMoCzIRLnNwYWNlLnYxLkNoYW'
+    '5uZWxSCGNoYW5uZWxz');
+
+@$core.Deprecated('Use createChannelRequestDescriptor instead')
+const CreateChannelRequest$json = {
+  '1': 'CreateChannelRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'title', '3': 2, '4': 1, '5': 9, '10': 'title'},
+    {'1': 'view_type', '3': 3, '4': 1, '5': 9, '10': 'viewType'},
+    {'1': 'position', '3': 4, '4': 1, '5': 5, '10': 'position'},
+    {'1': 'public_preview', '3': 5, '4': 1, '5': 8, '10': 'publicPreview'},
+  ],
+};
+
+/// Descriptor for `CreateChannelRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List createChannelRequestDescriptor = $convert.base64Decode(
+    'ChRDcmVhdGVDaGFubmVsUmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSWQSFA'
+    'oFdGl0bGUYAiABKAlSBXRpdGxlEhsKCXZpZXdfdHlwZRgDIAEoCVIIdmlld1R5cGUSGgoIcG9z'
+    'aXRpb24YBCABKAVSCHBvc2l0aW9uEiUKDnB1YmxpY19wcmV2aWV3GAUgASgIUg1wdWJsaWNQcm'
+    'V2aWV3');
+
+@$core.Deprecated('Use updateChannelRequestDescriptor instead')
+const UpdateChannelRequest$json = {
+  '1': 'UpdateChannelRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'title', '3': 2, '4': 1, '5': 9, '10': 'title'},
+    {'1': 'position', '3': 3, '4': 1, '5': 5, '10': 'position'},
+    {'1': 'archived', '3': 4, '4': 1, '5': 8, '10': 'archived'},
+    {'1': 'public_preview', '3': 5, '4': 1, '5': 8, '10': 'publicPreview'},
+    {
+      '1': 'expected_revision',
+      '3': 6,
+      '4': 1,
+      '5': 3,
+      '10': 'expectedRevision'
+    },
+  ],
+};
+
+/// Descriptor for `UpdateChannelRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List updateChannelRequestDescriptor = $convert.base64Decode(
+    'ChRVcGRhdGVDaGFubmVsUmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSWQSFA'
+    'oFdGl0bGUYAiABKAlSBXRpdGxlEhoKCHBvc2l0aW9uGAMgASgFUghwb3NpdGlvbhIaCghhcmNo'
+    'aXZlZBgEIAEoCFIIYXJjaGl2ZWQSJQoOcHVibGljX3ByZXZpZXcYBSABKAhSDXB1YmxpY1ByZX'
+    'ZpZXcSKwoRZXhwZWN0ZWRfcmV2aXNpb24YBiABKANSEGV4cGVjdGVkUmV2aXNpb24=');
+
+@$core.Deprecated('Use createChannelResponseDescriptor instead')
+const CreateChannelResponse$json = {
+  '1': 'CreateChannelResponse',
+  '2': [
+    {
+      '1': 'channel',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Channel',
+      '10': 'channel'
+    },
+  ],
+};
+
+/// Descriptor for `CreateChannelResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List createChannelResponseDescriptor = $convert.base64Decode(
+    'ChVDcmVhdGVDaGFubmVsUmVzcG9uc2USKwoHY2hhbm5lbBgBIAEoCzIRLnNwYWNlLnYxLkNoYW'
+    '5uZWxSB2NoYW5uZWw=');
+
+@$core.Deprecated('Use updateChannelResponseDescriptor instead')
+const UpdateChannelResponse$json = {
+  '1': 'UpdateChannelResponse',
+  '2': [
+    {
+      '1': 'channel',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Channel',
+      '10': 'channel'
+    },
+  ],
+};
+
+/// Descriptor for `UpdateChannelResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List updateChannelResponseDescriptor = $convert.base64Decode(
+    'ChVVcGRhdGVDaGFubmVsUmVzcG9uc2USKwoHY2hhbm5lbBgBIAEoCzIRLnNwYWNlLnYxLkNoYW'
+    '5uZWxSB2NoYW5uZWw=');
+
+@$core.Deprecated('Use getChannelAccessRequestDescriptor instead')
+const GetChannelAccessRequest$json = {
+  '1': 'GetChannelAccessRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+  ],
+};
+
+/// Descriptor for `GetChannelAccessRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getChannelAccessRequestDescriptor =
+    $convert.base64Decode(
+        'ChdHZXRDaGFubmVsQWNjZXNzUmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSW'
+        'Q=');
+
+@$core.Deprecated('Use updateChannelAccessRequestDescriptor instead')
+const UpdateChannelAccessRequest$json = {
+  '1': 'UpdateChannelAccessRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {
+      '1': 'expected_revision',
+      '3': 2,
+      '4': 1,
+      '5': 3,
+      '10': 'expectedRevision'
+    },
+    {
+      '1': 'rules',
+      '3': 3,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.ChannelAccessRule',
+      '10': 'rules'
+    },
+  ],
+};
+
+/// Descriptor for `UpdateChannelAccessRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List updateChannelAccessRequestDescriptor =
+    $convert.base64Decode(
+        'ChpVcGRhdGVDaGFubmVsQWNjZXNzUmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubm'
+        'VsSWQSKwoRZXhwZWN0ZWRfcmV2aXNpb24YAiABKANSEGV4cGVjdGVkUmV2aXNpb24SMQoFcnVs'
+        'ZXMYAyADKAsyGy5zcGFjZS52MS5DaGFubmVsQWNjZXNzUnVsZVIFcnVsZXM=');
+
+@$core.Deprecated('Use getChannelAccessResponseDescriptor instead')
+const GetChannelAccessResponse$json = {
+  '1': 'GetChannelAccessResponse',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'revision', '3': 2, '4': 1, '5': 3, '10': 'revision'},
+    {
+      '1': 'rules',
+      '3': 3,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.ChannelAccessRule',
+      '10': 'rules'
+    },
+  ],
+};
+
+/// Descriptor for `GetChannelAccessResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getChannelAccessResponseDescriptor = $convert.base64Decode(
+    'ChhHZXRDaGFubmVsQWNjZXNzUmVzcG9uc2USHQoKY2hhbm5lbF9pZBgBIAEoCVIJY2hhbm5lbE'
+    'lkEhoKCHJldmlzaW9uGAIgASgDUghyZXZpc2lvbhIxCgVydWxlcxgDIAMoCzIbLnNwYWNlLnYx'
+    'LkNoYW5uZWxBY2Nlc3NSdWxlUgVydWxlcw==');
 
 @$core.Deprecated('Use viewDescriptor instead')
 const View$json = {
@@ -1214,3 +1454,27 @@ final $typed_data.Uint8List rootHistoryProofDescriptor = $convert.base64Decode(
     'ChBSb290SGlzdG9yeVByb29mEh4KCnRyYW5zY3JpcHQYASABKAxSCnRyYW5zY3JpcHQSIwoNb2'
     'xkX3NpZ25hdHVyZRgCIAEoDFIMb2xkU2lnbmF0dXJlEiMKDW5ld19zaWduYXR1cmUYAyABKAxS'
     'DG5ld1NpZ25hdHVyZQ==');
+
+@$core.Deprecated('Use updateChannelAccessResponseDescriptor instead')
+const UpdateChannelAccessResponse$json = {
+  '1': 'UpdateChannelAccessResponse',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'revision', '3': 2, '4': 1, '5': 3, '10': 'revision'},
+    {
+      '1': 'rules',
+      '3': 3,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.ChannelAccessRule',
+      '10': 'rules'
+    },
+  ],
+};
+
+/// Descriptor for `UpdateChannelAccessResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List updateChannelAccessResponseDescriptor =
+    $convert.base64Decode(
+        'ChtVcGRhdGVDaGFubmVsQWNjZXNzUmVzcG9uc2USHQoKY2hhbm5lbF9pZBgBIAEoCVIJY2hhbm'
+        '5lbElkEhoKCHJldmlzaW9uGAIgASgDUghyZXZpc2lvbhIxCgVydWxlcxgDIAMoCzIbLnNwYWNl'
+        'LnYxLkNoYW5uZWxBY2Nlc3NSdWxlUgVydWxlcw==');
