@@ -169,6 +169,48 @@ class AuthServiceClient extends $grpc.Client {
 
   AuthServiceClient(super.channel, {super.options, super.interceptors});
 
+  $grpc.ResponseFuture<$0.ProposePairingResponse> proposePairing(
+    $0.ProposePairingRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$proposePairing, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.CreatePairingResponse> createPairing(
+    $0.CreatePairingRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$createPairing, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.InspectPairingResponse> inspectPairing(
+    $0.InspectPairingRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$inspectPairing, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.PollPairingResponse> pollPairing(
+    $0.PollPairingRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$pollPairing, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.CancelPairingResponse> cancelPairing(
+    $0.CancelPairingRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$cancelPairing, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.ClaimPairingResponse> claimPairing(
+    $0.ClaimPairingRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$claimPairing, request, options: options);
+  }
+
   $grpc.ResponseFuture<$0.RevokeCurrentDeviceResponse> revokeCurrentDevice(
     $0.RevokeCurrentDeviceRequest request, {
     $grpc.CallOptions? options,
@@ -206,6 +248,36 @@ class AuthServiceClient extends $grpc.Client {
 
   // method descriptors
 
+  static final _$proposePairing =
+      $grpc.ClientMethod<$0.ProposePairingRequest, $0.ProposePairingResponse>(
+          '/space.v1.AuthService/ProposePairing',
+          ($0.ProposePairingRequest value) => value.writeToBuffer(),
+          $0.ProposePairingResponse.fromBuffer);
+  static final _$createPairing =
+      $grpc.ClientMethod<$0.CreatePairingRequest, $0.CreatePairingResponse>(
+          '/space.v1.AuthService/CreatePairing',
+          ($0.CreatePairingRequest value) => value.writeToBuffer(),
+          $0.CreatePairingResponse.fromBuffer);
+  static final _$inspectPairing =
+      $grpc.ClientMethod<$0.InspectPairingRequest, $0.InspectPairingResponse>(
+          '/space.v1.AuthService/InspectPairing',
+          ($0.InspectPairingRequest value) => value.writeToBuffer(),
+          $0.InspectPairingResponse.fromBuffer);
+  static final _$pollPairing =
+      $grpc.ClientMethod<$0.PollPairingRequest, $0.PollPairingResponse>(
+          '/space.v1.AuthService/PollPairing',
+          ($0.PollPairingRequest value) => value.writeToBuffer(),
+          $0.PollPairingResponse.fromBuffer);
+  static final _$cancelPairing =
+      $grpc.ClientMethod<$0.CancelPairingRequest, $0.CancelPairingResponse>(
+          '/space.v1.AuthService/CancelPairing',
+          ($0.CancelPairingRequest value) => value.writeToBuffer(),
+          $0.CancelPairingResponse.fromBuffer);
+  static final _$claimPairing =
+      $grpc.ClientMethod<$0.ClaimPairingRequest, $0.ClaimPairingResponse>(
+          '/space.v1.AuthService/ClaimPairing',
+          ($0.ClaimPairingRequest value) => value.writeToBuffer(),
+          $0.ClaimPairingResponse.fromBuffer);
   static final _$revokeCurrentDevice = $grpc.ClientMethod<
           $0.RevokeCurrentDeviceRequest, $0.RevokeCurrentDeviceResponse>(
       '/space.v1.AuthService/RevokeCurrentDevice',
@@ -238,6 +310,60 @@ abstract class AuthServiceBase extends $grpc.Service {
   $core.String get $name => 'space.v1.AuthService';
 
   AuthServiceBase() {
+    $addMethod($grpc.ServiceMethod<$0.ProposePairingRequest,
+            $0.ProposePairingResponse>(
+        'ProposePairing',
+        proposePairing_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) =>
+            $0.ProposePairingRequest.fromBuffer(value),
+        ($0.ProposePairingResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.CreatePairingRequest, $0.CreatePairingResponse>(
+            'CreatePairing',
+            createPairing_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.CreatePairingRequest.fromBuffer(value),
+            ($0.CreatePairingResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.InspectPairingRequest,
+            $0.InspectPairingResponse>(
+        'InspectPairing',
+        inspectPairing_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) =>
+            $0.InspectPairingRequest.fromBuffer(value),
+        ($0.InspectPairingResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.PollPairingRequest, $0.PollPairingResponse>(
+            'PollPairing',
+            pollPairing_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.PollPairingRequest.fromBuffer(value),
+            ($0.PollPairingResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.CancelPairingRequest, $0.CancelPairingResponse>(
+            'CancelPairing',
+            cancelPairing_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.CancelPairingRequest.fromBuffer(value),
+            ($0.CancelPairingResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.ClaimPairingRequest, $0.ClaimPairingResponse>(
+            'ClaimPairing',
+            claimPairing_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.ClaimPairingRequest.fromBuffer(value),
+            ($0.ClaimPairingResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.RevokeCurrentDeviceRequest,
             $0.RevokeCurrentDeviceResponse>(
         'RevokeCurrentDevice',
@@ -282,6 +408,59 @@ abstract class AuthServiceBase extends $grpc.Service {
             $0.CompleteChallengeRequest.fromBuffer(value),
         ($0.CompleteChallengeResponse value) => value.writeToBuffer()));
   }
+
+  $async.Future<$0.ProposePairingResponse> proposePairing_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.ProposePairingRequest> $request) async {
+    return proposePairing($call, await $request);
+  }
+
+  $async.Future<$0.ProposePairingResponse> proposePairing(
+      $grpc.ServiceCall call, $0.ProposePairingRequest request);
+
+  $async.Future<$0.CreatePairingResponse> createPairing_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.CreatePairingRequest> $request) async {
+    return createPairing($call, await $request);
+  }
+
+  $async.Future<$0.CreatePairingResponse> createPairing(
+      $grpc.ServiceCall call, $0.CreatePairingRequest request);
+
+  $async.Future<$0.InspectPairingResponse> inspectPairing_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.InspectPairingRequest> $request) async {
+    return inspectPairing($call, await $request);
+  }
+
+  $async.Future<$0.InspectPairingResponse> inspectPairing(
+      $grpc.ServiceCall call, $0.InspectPairingRequest request);
+
+  $async.Future<$0.PollPairingResponse> pollPairing_Pre($grpc.ServiceCall $call,
+      $async.Future<$0.PollPairingRequest> $request) async {
+    return pollPairing($call, await $request);
+  }
+
+  $async.Future<$0.PollPairingResponse> pollPairing(
+      $grpc.ServiceCall call, $0.PollPairingRequest request);
+
+  $async.Future<$0.CancelPairingResponse> cancelPairing_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.CancelPairingRequest> $request) async {
+    return cancelPairing($call, await $request);
+  }
+
+  $async.Future<$0.CancelPairingResponse> cancelPairing(
+      $grpc.ServiceCall call, $0.CancelPairingRequest request);
+
+  $async.Future<$0.ClaimPairingResponse> claimPairing_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.ClaimPairingRequest> $request) async {
+    return claimPairing($call, await $request);
+  }
+
+  $async.Future<$0.ClaimPairingResponse> claimPairing(
+      $grpc.ServiceCall call, $0.ClaimPairingRequest request);
 
   $async.Future<$0.RevokeCurrentDeviceResponse> revokeCurrentDevice_Pre(
       $grpc.ServiceCall $call,

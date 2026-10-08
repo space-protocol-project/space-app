@@ -410,6 +410,911 @@ class ListDevicesResponse extends $pb.GeneratedMessage {
   $pb.PbList<DeviceGrant> get devices => $_getList(0);
 }
 
+class Pairing extends $pb.GeneratedMessage {
+  factory Pairing({
+    $core.String? id,
+    $core.String? deviceName,
+    $core.List<$core.int>? publicKey,
+    $core.bool? administrative,
+    $fixnum.Int64? createdAt,
+    $fixnum.Int64? expiresAt,
+    $core.String? state,
+    $core.List<$core.int>? proposedRootPublicKey,
+  }) {
+    final result = Pairing._();
+    if (id != null) result.id = id;
+    if (deviceName != null) result.deviceName = deviceName;
+    if (publicKey != null) result.publicKey = publicKey;
+    if (administrative != null) result.administrative = administrative;
+    if (createdAt != null) result.createdAt = createdAt;
+    if (expiresAt != null) result.expiresAt = expiresAt;
+    if (state != null) result.state = state;
+    if (proposedRootPublicKey != null)
+      result.proposedRootPublicKey = proposedRootPublicKey;
+    return result;
+  }
+
+  Pairing._();
+
+  factory Pairing.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      Pairing()..mergeFromBuffer(data, registry);
+  factory Pairing.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      Pairing()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'Pairing',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: Pairing.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'id')
+    ..aOS(2, _omitFieldNames ? '' : 'deviceName')
+    ..a<$core.List<$core.int>>(
+        3, _omitFieldNames ? '' : 'publicKey', $pb.PbFieldType.OY)
+    ..aOB(4, _omitFieldNames ? '' : 'administrative')
+    ..aInt64(5, _omitFieldNames ? '' : 'createdAt')
+    ..aInt64(6, _omitFieldNames ? '' : 'expiresAt')
+    ..aOS(7, _omitFieldNames ? '' : 'state')
+    ..a<$core.List<$core.int>>(
+        8, _omitFieldNames ? '' : 'proposedRootPublicKey', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  Pairing clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  Pairing copyWith(void Function(Pairing) updates) =>
+      super.copyWith((message) => updates(message as Pairing)) as Pairing;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Pairing() / Pairing.new instead')
+  static Pairing create() => Pairing._();
+  static $pb.GeneratedMessage $_createMessage() => Pairing._();
+  @$core.override
+  Pairing createEmptyInstance() => Pairing._();
+  @$core.pragma('dart2js:noInline')
+  static Pairing getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Pairing>(Pairing.$_createMessage);
+  static Pairing? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get deviceName => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set deviceName($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasDeviceName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearDeviceName() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get publicKey => $_getN(2);
+  @$pb.TagNumber(3)
+  set publicKey($core.List<$core.int> value) => $_setBytes(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasPublicKey() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearPublicKey() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get administrative => $_getBF(3);
+  @$pb.TagNumber(4)
+  set administrative($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasAdministrative() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearAdministrative() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get createdAt => $_getI64(4);
+  @$pb.TagNumber(5)
+  set createdAt($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasCreatedAt() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearCreatedAt() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $fixnum.Int64 get expiresAt => $_getI64(5);
+  @$pb.TagNumber(6)
+  set expiresAt($fixnum.Int64 value) => $_setInt64(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasExpiresAt() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearExpiresAt() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.String get state => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set state($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasState() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearState() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.List<$core.int> get proposedRootPublicKey => $_getN(7);
+  @$pb.TagNumber(8)
+  set proposedRootPublicKey($core.List<$core.int> value) =>
+      $_setBytes(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasProposedRootPublicKey() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearProposedRootPublicKey() => $_clearField(8);
+}
+
+class CreatePairingRequest extends $pb.GeneratedMessage {
+  factory CreatePairingRequest({
+    $core.List<$core.int>? publicKey,
+    $core.String? deviceName,
+    $core.bool? administrative,
+  }) {
+    final result = CreatePairingRequest._();
+    if (publicKey != null) result.publicKey = publicKey;
+    if (deviceName != null) result.deviceName = deviceName;
+    if (administrative != null) result.administrative = administrative;
+    return result;
+  }
+
+  CreatePairingRequest._();
+
+  factory CreatePairingRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CreatePairingRequest()..mergeFromBuffer(data, registry);
+  factory CreatePairingRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CreatePairingRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CreatePairingRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: CreatePairingRequest.$_createMessage)
+    ..a<$core.List<$core.int>>(
+        1, _omitFieldNames ? '' : 'publicKey', $pb.PbFieldType.OY)
+    ..aOS(2, _omitFieldNames ? '' : 'deviceName')
+    ..aOB(3, _omitFieldNames ? '' : 'administrative')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreatePairingRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreatePairingRequest copyWith(void Function(CreatePairingRequest) updates) =>
+      super.copyWith((message) => updates(message as CreatePairingRequest))
+          as CreatePairingRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CreatePairingRequest() / CreatePairingRequest.new instead')
+  static CreatePairingRequest create() => CreatePairingRequest._();
+  static $pb.GeneratedMessage $_createMessage() => CreatePairingRequest._();
+  @$core.override
+  CreatePairingRequest createEmptyInstance() => CreatePairingRequest._();
+  @$core.pragma('dart2js:noInline')
+  static CreatePairingRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CreatePairingRequest>(
+          CreatePairingRequest.$_createMessage);
+  static CreatePairingRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.List<$core.int> get publicKey => $_getN(0);
+  @$pb.TagNumber(1)
+  set publicKey($core.List<$core.int> value) => $_setBytes(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPublicKey() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPublicKey() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get deviceName => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set deviceName($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasDeviceName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearDeviceName() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get administrative => $_getBF(2);
+  @$pb.TagNumber(3)
+  set administrative($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAdministrative() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAdministrative() => $_clearField(3);
+}
+
+class CreatePairingResponse extends $pb.GeneratedMessage {
+  factory CreatePairingResponse({
+    Pairing? pairing,
+    $core.String? code,
+    $core.String? pollToken,
+  }) {
+    final result = CreatePairingResponse._();
+    if (pairing != null) result.pairing = pairing;
+    if (code != null) result.code = code;
+    if (pollToken != null) result.pollToken = pollToken;
+    return result;
+  }
+
+  CreatePairingResponse._();
+
+  factory CreatePairingResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CreatePairingResponse()..mergeFromBuffer(data, registry);
+  factory CreatePairingResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CreatePairingResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CreatePairingResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: CreatePairingResponse.$_createMessage)
+    ..aOM<Pairing>(1, _omitFieldNames ? '' : 'pairing',
+        subBuilder: Pairing.$_createMessage)
+    ..aOS(2, _omitFieldNames ? '' : 'code')
+    ..aOS(3, _omitFieldNames ? '' : 'pollToken')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreatePairingResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CreatePairingResponse copyWith(
+          void Function(CreatePairingResponse) updates) =>
+      super.copyWith((message) => updates(message as CreatePairingResponse))
+          as CreatePairingResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CreatePairingResponse() / CreatePairingResponse.new instead')
+  static CreatePairingResponse create() => CreatePairingResponse._();
+  static $pb.GeneratedMessage $_createMessage() => CreatePairingResponse._();
+  @$core.override
+  CreatePairingResponse createEmptyInstance() => CreatePairingResponse._();
+  @$core.pragma('dart2js:noInline')
+  static CreatePairingResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CreatePairingResponse>(
+          CreatePairingResponse.$_createMessage);
+  static CreatePairingResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Pairing get pairing => $_getN(0);
+  @$pb.TagNumber(1)
+  set pairing(Pairing value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPairing() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPairing() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Pairing ensurePairing() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.String get code => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set code($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasCode() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearCode() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get pollToken => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set pollToken($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasPollToken() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearPollToken() => $_clearField(3);
+}
+
+class InspectPairingRequest extends $pb.GeneratedMessage {
+  factory InspectPairingRequest({
+    $core.String? code,
+  }) {
+    final result = InspectPairingRequest._();
+    if (code != null) result.code = code;
+    return result;
+  }
+
+  InspectPairingRequest._();
+
+  factory InspectPairingRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      InspectPairingRequest()..mergeFromBuffer(data, registry);
+  factory InspectPairingRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      InspectPairingRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'InspectPairingRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: InspectPairingRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'code')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  InspectPairingRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  InspectPairingRequest copyWith(
+          void Function(InspectPairingRequest) updates) =>
+      super.copyWith((message) => updates(message as InspectPairingRequest))
+          as InspectPairingRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use InspectPairingRequest() / InspectPairingRequest.new instead')
+  static InspectPairingRequest create() => InspectPairingRequest._();
+  static $pb.GeneratedMessage $_createMessage() => InspectPairingRequest._();
+  @$core.override
+  InspectPairingRequest createEmptyInstance() => InspectPairingRequest._();
+  @$core.pragma('dart2js:noInline')
+  static InspectPairingRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<InspectPairingRequest>(
+          InspectPairingRequest.$_createMessage);
+  static InspectPairingRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get code => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set code($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasCode() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearCode() => $_clearField(1);
+}
+
+class InspectPairingResponse extends $pb.GeneratedMessage {
+  factory InspectPairingResponse({
+    Pairing? pairing,
+  }) {
+    final result = InspectPairingResponse._();
+    if (pairing != null) result.pairing = pairing;
+    return result;
+  }
+
+  InspectPairingResponse._();
+
+  factory InspectPairingResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      InspectPairingResponse()..mergeFromBuffer(data, registry);
+  factory InspectPairingResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      InspectPairingResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'InspectPairingResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: InspectPairingResponse.$_createMessage)
+    ..aOM<Pairing>(1, _omitFieldNames ? '' : 'pairing',
+        subBuilder: Pairing.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  InspectPairingResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  InspectPairingResponse copyWith(
+          void Function(InspectPairingResponse) updates) =>
+      super.copyWith((message) => updates(message as InspectPairingResponse))
+          as InspectPairingResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use InspectPairingResponse() / InspectPairingResponse.new instead')
+  static InspectPairingResponse create() => InspectPairingResponse._();
+  static $pb.GeneratedMessage $_createMessage() => InspectPairingResponse._();
+  @$core.override
+  InspectPairingResponse createEmptyInstance() => InspectPairingResponse._();
+  @$core.pragma('dart2js:noInline')
+  static InspectPairingResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<InspectPairingResponse>(
+          InspectPairingResponse.$_createMessage);
+  static InspectPairingResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Pairing get pairing => $_getN(0);
+  @$pb.TagNumber(1)
+  set pairing(Pairing value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPairing() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPairing() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Pairing ensurePairing() => $_ensure(0);
+}
+
+class PollPairingRequest extends $pb.GeneratedMessage {
+  factory PollPairingRequest({
+    $core.String? pollToken,
+  }) {
+    final result = PollPairingRequest._();
+    if (pollToken != null) result.pollToken = pollToken;
+    return result;
+  }
+
+  PollPairingRequest._();
+
+  factory PollPairingRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      PollPairingRequest()..mergeFromBuffer(data, registry);
+  factory PollPairingRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      PollPairingRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'PollPairingRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: PollPairingRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'pollToken')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PollPairingRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PollPairingRequest copyWith(void Function(PollPairingRequest) updates) =>
+      super.copyWith((message) => updates(message as PollPairingRequest))
+          as PollPairingRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use PollPairingRequest() / PollPairingRequest.new instead')
+  static PollPairingRequest create() => PollPairingRequest._();
+  static $pb.GeneratedMessage $_createMessage() => PollPairingRequest._();
+  @$core.override
+  PollPairingRequest createEmptyInstance() => PollPairingRequest._();
+  @$core.pragma('dart2js:noInline')
+  static PollPairingRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<PollPairingRequest>(
+          PollPairingRequest.$_createMessage);
+  static PollPairingRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get pollToken => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set pollToken($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPollToken() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPollToken() => $_clearField(1);
+}
+
+class PollPairingResponse extends $pb.GeneratedMessage {
+  factory PollPairingResponse({
+    Pairing? pairing,
+    $core.String? grantId,
+    $core.List<$core.int>? rootPublicKey,
+    $core.List<$core.int>? transcript,
+    $core.List<$core.int>? signature,
+  }) {
+    final result = PollPairingResponse._();
+    if (pairing != null) result.pairing = pairing;
+    if (grantId != null) result.grantId = grantId;
+    if (rootPublicKey != null) result.rootPublicKey = rootPublicKey;
+    if (transcript != null) result.transcript = transcript;
+    if (signature != null) result.signature = signature;
+    return result;
+  }
+
+  PollPairingResponse._();
+
+  factory PollPairingResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      PollPairingResponse()..mergeFromBuffer(data, registry);
+  factory PollPairingResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      PollPairingResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'PollPairingResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: PollPairingResponse.$_createMessage)
+    ..aOM<Pairing>(1, _omitFieldNames ? '' : 'pairing',
+        subBuilder: Pairing.$_createMessage)
+    ..aOS(2, _omitFieldNames ? '' : 'grantId')
+    ..a<$core.List<$core.int>>(
+        3, _omitFieldNames ? '' : 'rootPublicKey', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        4, _omitFieldNames ? '' : 'transcript', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        5, _omitFieldNames ? '' : 'signature', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PollPairingResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PollPairingResponse copyWith(void Function(PollPairingResponse) updates) =>
+      super.copyWith((message) => updates(message as PollPairingResponse))
+          as PollPairingResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use PollPairingResponse() / PollPairingResponse.new instead')
+  static PollPairingResponse create() => PollPairingResponse._();
+  static $pb.GeneratedMessage $_createMessage() => PollPairingResponse._();
+  @$core.override
+  PollPairingResponse createEmptyInstance() => PollPairingResponse._();
+  @$core.pragma('dart2js:noInline')
+  static PollPairingResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<PollPairingResponse>(
+          PollPairingResponse.$_createMessage);
+  static PollPairingResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Pairing get pairing => $_getN(0);
+  @$pb.TagNumber(1)
+  set pairing(Pairing value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPairing() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPairing() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Pairing ensurePairing() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.String get grantId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set grantId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasGrantId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearGrantId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get rootPublicKey => $_getN(2);
+  @$pb.TagNumber(3)
+  set rootPublicKey($core.List<$core.int> value) => $_setBytes(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasRootPublicKey() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearRootPublicKey() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.List<$core.int> get transcript => $_getN(3);
+  @$pb.TagNumber(4)
+  set transcript($core.List<$core.int> value) => $_setBytes(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasTranscript() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearTranscript() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.List<$core.int> get signature => $_getN(4);
+  @$pb.TagNumber(5)
+  set signature($core.List<$core.int> value) => $_setBytes(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasSignature() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearSignature() => $_clearField(5);
+}
+
+class CancelPairingRequest extends $pb.GeneratedMessage {
+  factory CancelPairingRequest({
+    $core.String? pollToken,
+  }) {
+    final result = CancelPairingRequest._();
+    if (pollToken != null) result.pollToken = pollToken;
+    return result;
+  }
+
+  CancelPairingRequest._();
+
+  factory CancelPairingRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CancelPairingRequest()..mergeFromBuffer(data, registry);
+  factory CancelPairingRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CancelPairingRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CancelPairingRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: CancelPairingRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'pollToken')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CancelPairingRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CancelPairingRequest copyWith(void Function(CancelPairingRequest) updates) =>
+      super.copyWith((message) => updates(message as CancelPairingRequest))
+          as CancelPairingRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CancelPairingRequest() / CancelPairingRequest.new instead')
+  static CancelPairingRequest create() => CancelPairingRequest._();
+  static $pb.GeneratedMessage $_createMessage() => CancelPairingRequest._();
+  @$core.override
+  CancelPairingRequest createEmptyInstance() => CancelPairingRequest._();
+  @$core.pragma('dart2js:noInline')
+  static CancelPairingRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CancelPairingRequest>(
+          CancelPairingRequest.$_createMessage);
+  static CancelPairingRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get pollToken => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set pollToken($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPollToken() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPollToken() => $_clearField(1);
+}
+
+class CancelPairingResponse extends $pb.GeneratedMessage {
+  factory CancelPairingResponse() => CancelPairingResponse._();
+
+  CancelPairingResponse._();
+
+  factory CancelPairingResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CancelPairingResponse()..mergeFromBuffer(data, registry);
+  factory CancelPairingResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CancelPairingResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CancelPairingResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: CancelPairingResponse.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CancelPairingResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CancelPairingResponse copyWith(
+          void Function(CancelPairingResponse) updates) =>
+      super.copyWith((message) => updates(message as CancelPairingResponse))
+          as CancelPairingResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CancelPairingResponse() / CancelPairingResponse.new instead')
+  static CancelPairingResponse create() => CancelPairingResponse._();
+  static $pb.GeneratedMessage $_createMessage() => CancelPairingResponse._();
+  @$core.override
+  CancelPairingResponse createEmptyInstance() => CancelPairingResponse._();
+  @$core.pragma('dart2js:noInline')
+  static CancelPairingResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CancelPairingResponse>(
+          CancelPairingResponse.$_createMessage);
+  static CancelPairingResponse? _defaultInstance;
+}
+
+class ClaimPairingRequest extends $pb.GeneratedMessage {
+  factory ClaimPairingRequest({
+    $core.String? pairingId,
+  }) {
+    final result = ClaimPairingRequest._();
+    if (pairingId != null) result.pairingId = pairingId;
+    return result;
+  }
+
+  ClaimPairingRequest._();
+
+  factory ClaimPairingRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ClaimPairingRequest()..mergeFromBuffer(data, registry);
+  factory ClaimPairingRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ClaimPairingRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ClaimPairingRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ClaimPairingRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'pairingId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ClaimPairingRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ClaimPairingRequest copyWith(void Function(ClaimPairingRequest) updates) =>
+      super.copyWith((message) => updates(message as ClaimPairingRequest))
+          as ClaimPairingRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use ClaimPairingRequest() / ClaimPairingRequest.new instead')
+  static ClaimPairingRequest create() => ClaimPairingRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ClaimPairingRequest._();
+  @$core.override
+  ClaimPairingRequest createEmptyInstance() => ClaimPairingRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ClaimPairingRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ClaimPairingRequest>(
+          ClaimPairingRequest.$_createMessage);
+  static ClaimPairingRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get pairingId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set pairingId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPairingId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPairingId() => $_clearField(1);
+}
+
+class ClaimPairingResponse extends $pb.GeneratedMessage {
+  factory ClaimPairingResponse() => ClaimPairingResponse._();
+
+  ClaimPairingResponse._();
+
+  factory ClaimPairingResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ClaimPairingResponse()..mergeFromBuffer(data, registry);
+  factory ClaimPairingResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ClaimPairingResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ClaimPairingResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ClaimPairingResponse.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ClaimPairingResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ClaimPairingResponse copyWith(void Function(ClaimPairingResponse) updates) =>
+      super.copyWith((message) => updates(message as ClaimPairingResponse))
+          as ClaimPairingResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ClaimPairingResponse() / ClaimPairingResponse.new instead')
+  static ClaimPairingResponse create() => ClaimPairingResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ClaimPairingResponse._();
+  @$core.override
+  ClaimPairingResponse createEmptyInstance() => ClaimPairingResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ClaimPairingResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ClaimPairingResponse>(
+          ClaimPairingResponse.$_createMessage);
+  static ClaimPairingResponse? _defaultInstance;
+}
+
+class ProposePairingRequest extends $pb.GeneratedMessage {
+  factory ProposePairingRequest({
+    $core.String? pairingId,
+  }) {
+    final result = ProposePairingRequest._();
+    if (pairingId != null) result.pairingId = pairingId;
+    return result;
+  }
+
+  ProposePairingRequest._();
+
+  factory ProposePairingRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ProposePairingRequest()..mergeFromBuffer(data, registry);
+  factory ProposePairingRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ProposePairingRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ProposePairingRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ProposePairingRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'pairingId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ProposePairingRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ProposePairingRequest copyWith(
+          void Function(ProposePairingRequest) updates) =>
+      super.copyWith((message) => updates(message as ProposePairingRequest))
+          as ProposePairingRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ProposePairingRequest() / ProposePairingRequest.new instead')
+  static ProposePairingRequest create() => ProposePairingRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ProposePairingRequest._();
+  @$core.override
+  ProposePairingRequest createEmptyInstance() => ProposePairingRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ProposePairingRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ProposePairingRequest>(
+          ProposePairingRequest.$_createMessage);
+  static ProposePairingRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get pairingId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set pairingId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPairingId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPairingId() => $_clearField(1);
+}
+
+class ProposePairingResponse extends $pb.GeneratedMessage {
+  factory ProposePairingResponse() => ProposePairingResponse._();
+
+  ProposePairingResponse._();
+
+  factory ProposePairingResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ProposePairingResponse()..mergeFromBuffer(data, registry);
+  factory ProposePairingResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ProposePairingResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ProposePairingResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ProposePairingResponse.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ProposePairingResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ProposePairingResponse copyWith(
+          void Function(ProposePairingResponse) updates) =>
+      super.copyWith((message) => updates(message as ProposePairingResponse))
+          as ProposePairingResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ProposePairingResponse() / ProposePairingResponse.new instead')
+  static ProposePairingResponse create() => ProposePairingResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ProposePairingResponse._();
+  @$core.override
+  ProposePairingResponse createEmptyInstance() => ProposePairingResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ProposePairingResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ProposePairingResponse>(
+          ProposePairingResponse.$_createMessage);
+  static ProposePairingResponse? _defaultInstance;
+}
+
 class Member extends $pb.GeneratedMessage {
   factory Member({
     $core.String? principalId,
@@ -2405,6 +3310,7 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
     $core.bool? administrative,
     $core.bool? recovery,
     $core.String? recoveryGrantId,
+    $core.String? pairingId,
   }) {
     final result = CreateChallengeRequest._();
     if (purpose != null) result.purpose = purpose;
@@ -2414,6 +3320,7 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
     if (administrative != null) result.administrative = administrative;
     if (recovery != null) result.recovery = recovery;
     if (recoveryGrantId != null) result.recoveryGrantId = recoveryGrantId;
+    if (pairingId != null) result.pairingId = pairingId;
     return result;
   }
 
@@ -2439,6 +3346,7 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
     ..aOB(5, _omitFieldNames ? '' : 'administrative')
     ..aOB(6, _omitFieldNames ? '' : 'recovery')
     ..aOS(7, _omitFieldNames ? '' : 'recoveryGrantId')
+    ..aOS(8, _omitFieldNames ? '' : 'pairingId')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -2531,6 +3439,16 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
   $core.bool hasRecoveryGrantId() => $_has(6);
   @$pb.TagNumber(7)
   void clearRecoveryGrantId() => $_clearField(7);
+
+  /// Root-подписанное сопряжение с неизменяемым целевым public key.
+  @$pb.TagNumber(8)
+  $core.String get pairingId => $_getSZ(7);
+  @$pb.TagNumber(8)
+  set pairingId($core.String value) => $_setString(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasPairingId() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearPairingId() => $_clearField(8);
 }
 
 class CreateChallengeResponse extends $pb.GeneratedMessage {

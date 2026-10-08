@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../src/chat_controller.dart';
+import 'pairing_panel.dart';
 
 class ConnectionPanel extends StatefulWidget {
   const ConnectionPanel({
@@ -137,6 +138,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
                 onPressed: c.busy || c.connected ? null : connect,
                 child: const Text('Доверять и подключиться'),
               ),
+              PairingStartPanel(controller: c, onConnected: widget.onConnected),
             ],
             if (c.connected) ...[
               const SizedBox(height: 18),

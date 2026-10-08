@@ -208,6 +208,8 @@ abstract interface class DeviceManagement {
   Future<List<DeviceGrant>> listDevices();
   Future<void> revokeDevice(DeviceGrant grant, {DeviceRecord? authority});
   Future<Map<String, dynamic>> recoveryPayload();
+  Future<String> approvePairing(Pairing pairing, {DeviceRecord? authority});
+  Future<String> preparePairing(Pairing pairing, {DeviceRecord? authority});
 }
 
 class SpaceSession
@@ -239,6 +241,7 @@ class SpaceSession
     IdentityVault vault, {
     String invitationToken = '',
     DeviceRecord? restoredRecord,
+    String pairingId = '',
   }) async {
     var record = restoredRecord ?? await vault.load(server.origin.toString());
     if (record != null) {
@@ -291,6 +294,13 @@ class SpaceSession
         await vault.save(record);
       }
       await session.login();
+      if (pairingId.isNotEmpty) {
+        await AuthServiceClient(channel).claimPairing(
+          ClaimPairingRequest(pairingId: pairingId),
+          options: session._options,
+        );
+        await vault.save(record);
+      }
       if (invitationToken.isNotEmpty) {
         await MembershipServiceClient(channel).acceptInvite(
           AcceptInviteRequest(token: invitationToken),
@@ -332,6 +342,7 @@ class SpaceSession
     String invitationToken = '',
     DeviceGrant? target,
     DeviceRecord? authority,
+    Pairing? pairing,
   }) async {
     final credentials = authority ?? record;
     final algorithm = Ed25519();
@@ -343,7 +354,9 @@ class SpaceSession
         ? credentials.rootPublicKey
         : (await root.extractPublicKey()).bytes;
     final devicePublic =
-        target?.publicKey ?? (await device.extractPublicKey()).bytes;
+        pairing?.publicKey ??
+        target?.publicKey ??
+        (await device.extractPublicKey()).bytes;
     if (root == null && purpose == 'device.register') {
       purpose = 'device.delegate';
     }
@@ -365,6 +378,10 @@ class SpaceSession
       request.rootPublicKey = rootPublic;
       request.devicePublicKey = devicePublic;
       request.administrative = credentials.administrative;
+      if (pairing != null) {
+        request.administrative = pairing.administrative;
+        request.pairingId = pairing.id;
+      }
     } else if (purpose == 'device.delegate') {
       request.devicePublicKey = devicePublic;
       request.administrative = credentials.administrative;
@@ -384,13 +401,20 @@ class SpaceSession
       purpose,
       grantId,
       expectedScopes:
-          target?.scopes ??
+          (pairing == null
+              ? target?.scopes
+              : [
+                  'chat.read',
+                  'chat.write',
+                  if (pairing.administrative) 'space.manage',
+                ]) ??
           [
             'chat.read',
             'chat.write',
             if (credentials.administrative) 'space.manage',
           ],
       authorizerGrantId: delegated ? credentials.recoveryGrantId : '',
+      pairingId: pairing?.id ?? '',
     );
     final key = purpose == 'auth.login'
         ? device
@@ -613,6 +637,98 @@ class SpaceSession
     }
     return payload;
   }
+
+  @override
+  Future<String> approvePairing(
+    Pairing pairing, {
+    DeviceRecord? authority,
+  }) async {
+    final credentials = authority ?? record;
+    if (credentials.rootSeed.isEmpty) {
+      throw const FormatException(
+        'Подтвердите на исходном устройстве или откройте корневую карточку Flutter. Делегированная карточка пока не подписывает сопряжение.',
+      );
+    }
+    checkTrust(server, credentials);
+    final root = (await (await Ed25519().newKeyPairFromSeed(
+      credentials.rootSeed,
+    )).extractPublicKey()).bytes;
+    final id =
+        'u_${(await Sha256().hash(root)).bytes.map((v) => v.toRadixString(16).padLeft(2, '0')).join()}';
+    if (id != principalId) {
+      throw const FormatException(
+        'Корневая карточка относится к другой идентичности',
+      );
+    }
+    await _authorize(
+      'device.register',
+      authority: credentials,
+      pairing: pairing,
+    );
+    return pairVerificationCode(
+      server.serverId,
+      pairing.id,
+      root,
+      pairing.publicKey,
+      administrative: pairing.administrative,
+    );
+  }
+
+  @override
+  Future<String> preparePairing(
+    Pairing pairing, {
+    DeviceRecord? authority,
+  }) async {
+    final credentials = authority ?? record;
+    if (credentials.rootSeed.isEmpty) {
+      throw const FormatException(
+        'Нужен исходный root или корневая карточка Flutter',
+      );
+    }
+    checkTrust(server, credentials);
+    final root = (await (await Ed25519().newKeyPairFromSeed(
+      credentials.rootSeed,
+    )).extractPublicKey()).bytes;
+    final id =
+        'u_${(await Sha256().hash(root)).bytes.map((v) => v.toRadixString(16).padLeft(2, '0')).join()}';
+    if (id != principalId) {
+      throw const FormatException('Карточка относится к другой идентичности');
+    }
+    await _ensureSession();
+    await AuthServiceClient(channel).proposePairing(
+      ProposePairingRequest(pairingId: pairing.id),
+      options: _options,
+    );
+    return pairVerificationCode(
+      server.serverId,
+      pairing.id,
+      root,
+      pairing.publicKey,
+      administrative: pairing.administrative,
+    );
+  }
+}
+
+Future<String> pairVerificationCode(
+  String serverId,
+  String pairId,
+  List<int> root,
+  List<int> device, {
+  bool administrative = false,
+}) async {
+  final bytes = (await Sha256().hash([
+    ...utf8.encode(
+      'space/pair-check/v1\u0000$serverId\u0000$pairId\u0000${administrative ? 'manage' : 'chat'}\u0000',
+    ),
+    ...root,
+    ...device,
+  ])).bytes;
+  final hex = bytes
+      .take(8)
+      .map((b) => b.toRadixString(16).padLeft(2, '0'))
+      .join()
+      .toUpperCase();
+  return List.generate(4, (i) => hex.substring(i * 4, i * 4 + 4)).join('-');
 }
 
 Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
@@ -678,6 +794,8 @@ Future<List<int>> checkedSigningBytes(
   String grantId, {
   List<String> expectedScopes = const ['chat.read', 'chat.write'],
   String authorizerGrantId = '',
+  String pairingId = '',
+  bool allowHistorical = false,
 }) async {
   final transcript =
       jsonDecode(utf8.decode(response.transcript)) as Map<String, dynamic>;
@@ -703,6 +821,10 @@ Future<List<int>> checkedSigningBytes(
   final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   if (authorizerGrantId.isNotEmpty) {
     expectedKeys.insert(1, 'authorizer_grant_id');
+  }
+  if (pairingId.isNotEmpty) {
+    expectedKeys.add('pairing_id');
+    expectedKeys.sort();
   }
   final principal =
       'u_${(await Sha256().hash(root)).bytes.map((v) => v.toRadixString(16).padLeft(2, '0')).join()}';
@@ -732,9 +854,11 @@ Future<List<int>> checkedSigningBytes(
       (authorizerGrantId.isEmpty ||
           transcript['authorizer_grant_id'] == authorizerGrantId) &&
       expiry == issued + 60 &&
-      expiry > now &&
+      (allowHistorical || expiry > now) &&
       issued <= now + 5 &&
       grantExpiry > expiry &&
+      grantExpiry > now &&
+      (pairingId.isEmpty || transcript['pairing_id'] == pairingId) &&
       (purpose == 'device.register' || purpose == 'device.delegate'
           ? (purpose == 'device.register'
                 ? grantExpiry == issued + 30 * 86400

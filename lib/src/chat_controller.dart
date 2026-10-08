@@ -90,7 +90,10 @@ class ChatController extends ChangeNotifier {
     }
   }
 
-  Future<void> connect({DeviceRecord? restoredRecord}) async {
+  Future<void> connect({
+    DeviceRecord? restoredRecord,
+    String pairingId = '',
+  }) async {
     final server = preview;
     if (busy || server == null) return;
     busy = true;
@@ -106,8 +109,9 @@ class ChatController extends ChangeNotifier {
           : await SpaceSession.connect(
               server,
               vault,
-              invitationToken: _invitationToken,
+              invitationToken: pairingId.isEmpty ? _invitationToken : '',
               restoredRecord: restoredRecord,
+              pairingId: pairingId,
             );
       if (_disposed) {
         await session.close();

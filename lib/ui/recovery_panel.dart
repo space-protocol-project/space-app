@@ -8,6 +8,7 @@ import '../src/chat_controller.dart';
 import '../src/core.dart';
 import '../src/generated/space/v1/space.pb.dart';
 import '../src/recovery_card.dart';
+import '../src/pairing.dart';
 import 'components.dart';
 
 class RecoveryPanel extends StatefulWidget {
@@ -21,6 +22,18 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
   bool pending = false;
   String message = '';
   List<DeviceGrant> devices = [];
+  final pairingCode = TextEditingController();
+  final pairingEntered = TextEditingController();
+  Pairing? preparedPair;
+  DeviceRecord? preparedAuthority;
+  String pairingCheck = '';
+  @override
+  void dispose() {
+    pairingCode.dispose();
+    pairingEntered.dispose();
+    super.dispose();
+  }
+
   static const files = [
     XTypeGroup(label: 'Карточка Space', extensions: ['json']),
   ];
@@ -230,10 +243,136 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     if (mounted) setState(() => message = 'Разрешение отозвано на сервере.');
   }
 
+  Future<void> approve() async {
+    final server = widget.controller.preview,
+        manager = widget.controller.deviceManagement;
+    if (server == null || manager == null) return;
+    final pair = await inspectPairing(server, pairingCode.text);
+    if (pair.state != 'pending') {
+      throw const FormatException('Код уже использован или отменён');
+    }
+    if (!await confirm(
+      'Подготовить подключение «${pair.deviceName}» к вашей идентичности? ${pair.administrative ? 'Запрошено также управление пространством, если роль это разрешает.' : 'Запрошен доступ к чату с вашими правами.'} Подпись ещё не выдаётся. Сначала сравните код на обоих экранах.',
+    )) {
+      return;
+    }
+    DeviceRecord? authority;
+    if (!manager.hasRootAuthority) {
+      final file = await openFile(acceptedTypeGroups: files);
+      if (file == null) return;
+      if (await file.length() > 16384) {
+        throw const FormatException('Карточка слишком большая');
+      }
+      final pass = await password(false);
+      if (pass == null) return;
+      authority = await recordFromRecovery(
+        await compute(openCardInWorker, [await file.readAsString(), pass]),
+      );
+    }
+    final code = await manager.preparePairing(pair, authority: authority);
+    if (mounted) {
+      setState(() {
+        pairingCheck = code;
+        preparedPair = pair;
+        preparedAuthority = authority;
+        pairingEntered.clear();
+        message = 'Код появится также на новом устройстве. Введите показанный там код проверки перед выдачей подписи.';
+      });
+    }
+  }
+
+  Future<void> finishPairing() async {
+    final manager = widget.controller.deviceManagement, pair = preparedPair;
+    if (manager == null || pair == null) return;
+    if (pairingEntered.text.replaceAll(RegExp(r'[\s-]'), '').toUpperCase() !=
+        pairingCheck.replaceAll('-', '')) {
+      throw const FormatException(
+        'Коды проверки не совпадают. Не подтверждайте подключение.',
+      );
+    }
+    if (!await confirm(
+      'Коды на двух устройствах совпадают? Выдать root-подпись для нового устройства с указанными правами?',
+    )) {
+      return;
+    }
+    await manager.approvePairing(pair, authority: preparedAuthority);
+    if (mounted) {
+      setState(() {
+        preparedPair = null;
+        preparedAuthority = null;
+        pairingEntered.clear();
+        pairingCode.clear();
+        message = 'Подпись выдана. Завершите вход на новом устройстве.';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
+      SurfaceCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Подтвердить устройство',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Введите одноразовый код с нового устройства. Подпись требует исходный root или корневую карточку Flutter. Делегированная recovery-карточка пока не подтверждает сопряжение.',
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: pairingCode,
+              onChanged: (_) => setState(() {
+                preparedPair = null;
+                preparedAuthority = null;
+                pairingCheck = '';
+              }),
+              decoration: const InputDecoration(
+                labelText: 'Код сопряжения',
+                hintText: 'pc_…',
+              ),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed:
+                  pending ||
+                      !widget.controller.connected ||
+                      widget.controller.deviceManagement == null
+                  ? null
+                  : () => run(approve),
+              icon: const Icon(Icons.verified_user_outlined),
+              label: const Text('Проверить и подтвердить'),
+            ),
+            if (pairingCheck.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              const Text('Код проверки для сравнения с новым устройством'),
+              SelectableText(
+                pairingCheck,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              if (preparedPair != null) ...[
+                const SizedBox(height: 12),
+                TextField(
+                  controller: pairingEntered,
+                  decoration: const InputDecoration(
+                    labelText: 'Код проверки с нового устройства',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: pending ? null : () => run(finishPairing),
+                  child: const Text('Коды совпадают — подписать'),
+                ),
+              ],
+            ],
+          ],
+        ),
+      ),
+      const SizedBox(height: 20),
       SurfaceCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

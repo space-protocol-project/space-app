@@ -101,6 +101,210 @@ final $typed_data.Uint8List listDevicesResponseDescriptor = $convert.base64Decod
     'ChNMaXN0RGV2aWNlc1Jlc3BvbnNlEi8KB2RldmljZXMYASADKAsyFS5zcGFjZS52MS5EZXZpY2'
     'VHcmFudFIHZGV2aWNlcw==');
 
+@$core.Deprecated('Use pairingDescriptor instead')
+const Pairing$json = {
+  '1': 'Pairing',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    {'1': 'device_name', '3': 2, '4': 1, '5': 9, '10': 'deviceName'},
+    {'1': 'public_key', '3': 3, '4': 1, '5': 12, '10': 'publicKey'},
+    {'1': 'administrative', '3': 4, '4': 1, '5': 8, '10': 'administrative'},
+    {'1': 'created_at', '3': 5, '4': 1, '5': 3, '10': 'createdAt'},
+    {'1': 'expires_at', '3': 6, '4': 1, '5': 3, '10': 'expiresAt'},
+    {'1': 'state', '3': 7, '4': 1, '5': 9, '10': 'state'},
+    {
+      '1': 'proposed_root_public_key',
+      '3': 8,
+      '4': 1,
+      '5': 12,
+      '10': 'proposedRootPublicKey'
+    },
+  ],
+};
+
+/// Descriptor for `Pairing`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List pairingDescriptor = $convert.base64Decode(
+    'CgdQYWlyaW5nEg4KAmlkGAEgASgJUgJpZBIfCgtkZXZpY2VfbmFtZRgCIAEoCVIKZGV2aWNlTm'
+    'FtZRIdCgpwdWJsaWNfa2V5GAMgASgMUglwdWJsaWNLZXkSJgoOYWRtaW5pc3RyYXRpdmUYBCAB'
+    'KAhSDmFkbWluaXN0cmF0aXZlEh0KCmNyZWF0ZWRfYXQYBSABKANSCWNyZWF0ZWRBdBIdCgpleH'
+    'BpcmVzX2F0GAYgASgDUglleHBpcmVzQXQSFAoFc3RhdGUYByABKAlSBXN0YXRlEjcKGHByb3Bv'
+    'c2VkX3Jvb3RfcHVibGljX2tleRgIIAEoDFIVcHJvcG9zZWRSb290UHVibGljS2V5');
+
+@$core.Deprecated('Use createPairingRequestDescriptor instead')
+const CreatePairingRequest$json = {
+  '1': 'CreatePairingRequest',
+  '2': [
+    {'1': 'public_key', '3': 1, '4': 1, '5': 12, '10': 'publicKey'},
+    {'1': 'device_name', '3': 2, '4': 1, '5': 9, '10': 'deviceName'},
+    {'1': 'administrative', '3': 3, '4': 1, '5': 8, '10': 'administrative'},
+  ],
+};
+
+/// Descriptor for `CreatePairingRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List createPairingRequestDescriptor = $convert.base64Decode(
+    'ChRDcmVhdGVQYWlyaW5nUmVxdWVzdBIdCgpwdWJsaWNfa2V5GAEgASgMUglwdWJsaWNLZXkSHw'
+    'oLZGV2aWNlX25hbWUYAiABKAlSCmRldmljZU5hbWUSJgoOYWRtaW5pc3RyYXRpdmUYAyABKAhS'
+    'DmFkbWluaXN0cmF0aXZl');
+
+@$core.Deprecated('Use createPairingResponseDescriptor instead')
+const CreatePairingResponse$json = {
+  '1': 'CreatePairingResponse',
+  '2': [
+    {
+      '1': 'pairing',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Pairing',
+      '10': 'pairing'
+    },
+    {'1': 'code', '3': 2, '4': 1, '5': 9, '10': 'code'},
+    {'1': 'poll_token', '3': 3, '4': 1, '5': 9, '10': 'pollToken'},
+  ],
+};
+
+/// Descriptor for `CreatePairingResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List createPairingResponseDescriptor = $convert.base64Decode(
+    'ChVDcmVhdGVQYWlyaW5nUmVzcG9uc2USKwoHcGFpcmluZxgBIAEoCzIRLnNwYWNlLnYxLlBhaX'
+    'JpbmdSB3BhaXJpbmcSEgoEY29kZRgCIAEoCVIEY29kZRIdCgpwb2xsX3Rva2VuGAMgASgJUglw'
+    'b2xsVG9rZW4=');
+
+@$core.Deprecated('Use inspectPairingRequestDescriptor instead')
+const InspectPairingRequest$json = {
+  '1': 'InspectPairingRequest',
+  '2': [
+    {'1': 'code', '3': 1, '4': 1, '5': 9, '10': 'code'},
+  ],
+};
+
+/// Descriptor for `InspectPairingRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List inspectPairingRequestDescriptor =
+    $convert.base64Decode(
+        'ChVJbnNwZWN0UGFpcmluZ1JlcXVlc3QSEgoEY29kZRgBIAEoCVIEY29kZQ==');
+
+@$core.Deprecated('Use inspectPairingResponseDescriptor instead')
+const InspectPairingResponse$json = {
+  '1': 'InspectPairingResponse',
+  '2': [
+    {
+      '1': 'pairing',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Pairing',
+      '10': 'pairing'
+    },
+  ],
+};
+
+/// Descriptor for `InspectPairingResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List inspectPairingResponseDescriptor =
+    $convert.base64Decode(
+        'ChZJbnNwZWN0UGFpcmluZ1Jlc3BvbnNlEisKB3BhaXJpbmcYASABKAsyES5zcGFjZS52MS5QYW'
+        'lyaW5nUgdwYWlyaW5n');
+
+@$core.Deprecated('Use pollPairingRequestDescriptor instead')
+const PollPairingRequest$json = {
+  '1': 'PollPairingRequest',
+  '2': [
+    {'1': 'poll_token', '3': 1, '4': 1, '5': 9, '10': 'pollToken'},
+  ],
+};
+
+/// Descriptor for `PollPairingRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List pollPairingRequestDescriptor =
+    $convert.base64Decode(
+        'ChJQb2xsUGFpcmluZ1JlcXVlc3QSHQoKcG9sbF90b2tlbhgBIAEoCVIJcG9sbFRva2Vu');
+
+@$core.Deprecated('Use pollPairingResponseDescriptor instead')
+const PollPairingResponse$json = {
+  '1': 'PollPairingResponse',
+  '2': [
+    {
+      '1': 'pairing',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Pairing',
+      '10': 'pairing'
+    },
+    {'1': 'grant_id', '3': 2, '4': 1, '5': 9, '10': 'grantId'},
+    {'1': 'root_public_key', '3': 3, '4': 1, '5': 12, '10': 'rootPublicKey'},
+    {'1': 'transcript', '3': 4, '4': 1, '5': 12, '10': 'transcript'},
+    {'1': 'signature', '3': 5, '4': 1, '5': 12, '10': 'signature'},
+  ],
+};
+
+/// Descriptor for `PollPairingResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List pollPairingResponseDescriptor = $convert.base64Decode(
+    'ChNQb2xsUGFpcmluZ1Jlc3BvbnNlEisKB3BhaXJpbmcYASABKAsyES5zcGFjZS52MS5QYWlyaW'
+    '5nUgdwYWlyaW5nEhkKCGdyYW50X2lkGAIgASgJUgdncmFudElkEiYKD3Jvb3RfcHVibGljX2tl'
+    'eRgDIAEoDFINcm9vdFB1YmxpY0tleRIeCgp0cmFuc2NyaXB0GAQgASgMUgp0cmFuc2NyaXB0Eh'
+    'wKCXNpZ25hdHVyZRgFIAEoDFIJc2lnbmF0dXJl');
+
+@$core.Deprecated('Use cancelPairingRequestDescriptor instead')
+const CancelPairingRequest$json = {
+  '1': 'CancelPairingRequest',
+  '2': [
+    {'1': 'poll_token', '3': 1, '4': 1, '5': 9, '10': 'pollToken'},
+  ],
+};
+
+/// Descriptor for `CancelPairingRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List cancelPairingRequestDescriptor = $convert.base64Decode(
+    'ChRDYW5jZWxQYWlyaW5nUmVxdWVzdBIdCgpwb2xsX3Rva2VuGAEgASgJUglwb2xsVG9rZW4=');
+
+@$core.Deprecated('Use cancelPairingResponseDescriptor instead')
+const CancelPairingResponse$json = {
+  '1': 'CancelPairingResponse',
+};
+
+/// Descriptor for `CancelPairingResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List cancelPairingResponseDescriptor =
+    $convert.base64Decode('ChVDYW5jZWxQYWlyaW5nUmVzcG9uc2U=');
+
+@$core.Deprecated('Use claimPairingRequestDescriptor instead')
+const ClaimPairingRequest$json = {
+  '1': 'ClaimPairingRequest',
+  '2': [
+    {'1': 'pairing_id', '3': 1, '4': 1, '5': 9, '10': 'pairingId'},
+  ],
+};
+
+/// Descriptor for `ClaimPairingRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List claimPairingRequestDescriptor = $convert.base64Decode(
+    'ChNDbGFpbVBhaXJpbmdSZXF1ZXN0Eh0KCnBhaXJpbmdfaWQYASABKAlSCXBhaXJpbmdJZA==');
+
+@$core.Deprecated('Use claimPairingResponseDescriptor instead')
+const ClaimPairingResponse$json = {
+  '1': 'ClaimPairingResponse',
+};
+
+/// Descriptor for `ClaimPairingResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List claimPairingResponseDescriptor =
+    $convert.base64Decode('ChRDbGFpbVBhaXJpbmdSZXNwb25zZQ==');
+
+@$core.Deprecated('Use proposePairingRequestDescriptor instead')
+const ProposePairingRequest$json = {
+  '1': 'ProposePairingRequest',
+  '2': [
+    {'1': 'pairing_id', '3': 1, '4': 1, '5': 9, '10': 'pairingId'},
+  ],
+};
+
+/// Descriptor for `ProposePairingRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List proposePairingRequestDescriptor = $convert.base64Decode(
+    'ChVQcm9wb3NlUGFpcmluZ1JlcXVlc3QSHQoKcGFpcmluZ19pZBgBIAEoCVIJcGFpcmluZ0lk');
+
+@$core.Deprecated('Use proposePairingResponseDescriptor instead')
+const ProposePairingResponse$json = {
+  '1': 'ProposePairingResponse',
+};
+
+/// Descriptor for `ProposePairingResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List proposePairingResponseDescriptor =
+    $convert.base64Decode('ChZQcm9wb3NlUGFpcmluZ1Jlc3BvbnNl');
+
 @$core.Deprecated('Use memberDescriptor instead')
 const Member$json = {
   '1': 'Member',
@@ -611,6 +815,7 @@ const CreateChallengeRequest$json = {
     {'1': 'administrative', '3': 5, '4': 1, '5': 8, '10': 'administrative'},
     {'1': 'recovery', '3': 6, '4': 1, '5': 8, '10': 'recovery'},
     {'1': 'recovery_grant_id', '3': 7, '4': 1, '5': 9, '10': 'recoveryGrantId'},
+    {'1': 'pairing_id', '3': 8, '4': 1, '5': 9, '10': 'pairingId'},
   ],
 };
 
@@ -620,7 +825,8 @@ final $typed_data.Uint8List createChallengeRequestDescriptor = $convert.base64De
     '9vdF9wdWJsaWNfa2V5GAIgASgMUg1yb290UHVibGljS2V5EioKEWRldmljZV9wdWJsaWNfa2V5'
     'GAMgASgMUg9kZXZpY2VQdWJsaWNLZXkSGQoIZ3JhbnRfaWQYBCABKAlSB2dyYW50SWQSJgoOYW'
     'RtaW5pc3RyYXRpdmUYBSABKAhSDmFkbWluaXN0cmF0aXZlEhoKCHJlY292ZXJ5GAYgASgIUghy'
-    'ZWNvdmVyeRIqChFyZWNvdmVyeV9ncmFudF9pZBgHIAEoCVIPcmVjb3ZlcnlHcmFudElk');
+    'ZWNvdmVyeRIqChFyZWNvdmVyeV9ncmFudF9pZBgHIAEoCVIPcmVjb3ZlcnlHcmFudElkEh0KCn'
+    'BhaXJpbmdfaWQYCCABKAlSCXBhaXJpbmdJZA==');
 
 @$core.Deprecated('Use createChallengeResponseDescriptor instead')
 const CreateChallengeResponse$json = {
