@@ -19,13 +19,18 @@ Future<Map<String, dynamic>> prepareRootRotation(
   DeviceRecord current,
   RotationJournalVault vault,
   AuthServiceClient auth,
-  CallOptions options,
-) async {
+  CallOptions options, {
+  bool renew = false,
+}) async {
   if (current.rootSeed.length != 32) {
     throw const FormatException('Для смены root нужен исходный корневой ключ');
   }
-  if (await vault.loadRotation(current.origin) != null) {
+  final existing = await vault.loadRotation(current.origin);
+  if (existing != null && !renew) {
     throw const FormatException('Сначала завершите предыдущую ротацию');
+  }
+  if (renew && existing == null) {
+    throw const FormatException('Нет сохранённого запроса ротации');
   }
   final identity = await current.identity();
   if (current.rootHistory.length >= 16) {
@@ -35,12 +40,39 @@ Future<Map<String, dynamic>> prepareRootRotation(
   }
   final algorithm = Ed25519();
   final oldRoot = await algorithm.newKeyPairFromSeed(current.rootSeed);
-  final newRoot = await algorithm.newKeyPair(),
-      device = await algorithm.newKeyPair();
+  final saved = existing == null
+      ? null
+      : DeviceRecord.fromJson(existing['next'] as Map<String, dynamic>);
+  if (saved != null) {
+    final checked = await saved.identity();
+    if (existing!['old_digest'] != await _digest(current) ||
+        checked.principalId != identity.principalId ||
+        checked.epoch != identity.epoch + 1 ||
+        jsonEncode(
+              saved.rootHistory.take(saved.rootHistory.length - 1).toList(),
+            ) !=
+            jsonEncode(current.rootHistory)) {
+      throw const FormatException(
+        'Сохранённая ротация относится к другой записи',
+      );
+    }
+  }
+  final newRoot = saved == null
+          ? await algorithm.newKeyPair()
+          : await algorithm.newKeyPairFromSeed(saved.rootSeed),
+      device = saved == null
+          ? await algorithm.newKeyPair()
+          : await algorithm.newKeyPairFromSeed(saved.deviceSeed);
   final public = (await newRoot.extractPublicKey()).bytes;
   final devicePublic = (await device.extractPublicKey()).bytes;
-  final operation =
-      'ro_${url64(List<int>.generate(32, (_) => Random.secure().nextInt(256)))}';
+  final operation = saved == null
+      ? 'ro_${url64(List<int>.generate(32, (_) => Random.secure().nextInt(256)))}'
+      : (jsonDecode(
+              utf8.decode(
+                _decode(saved.rootHistory.last['transcript'] as String),
+              ),
+            ) as Map<String, dynamic>)['operation_id']
+            as String;
   final challenge = await auth.createRootRotation(
     CreateRootRotationRequest(
       profile: 'root-rotation-v1',
@@ -99,6 +131,25 @@ Future<Map<String, dynamic>> prepareRootRotation(
     rootHistory: [...current.rootHistory, proof],
   );
   final nextIdentity = await next.identity();
+  final recoverySize = utf8
+      .encode(
+        jsonEncode({
+          'v': 2,
+          'origin': next.origin,
+          'server_id': next.serverId,
+          'server_key': next.serverKey,
+          'root_public_key': url64(public),
+          'credential': 'root',
+          'secret': url64(next.rootSeed),
+          'root_history': next.rootHistory,
+        }),
+      )
+      .length;
+  if (recoverySize > 8176) {
+    throw const FormatException(
+      'История не помещается в recovery-карточку; смена не отправлена',
+    );
+  }
   if (nextIdentity.principalId != identity.principalId ||
       nextIdentity.epoch != identity.epoch + 1) {
     throw const FormatException('Ротация меняет идентичность');

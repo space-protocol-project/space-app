@@ -44,6 +44,7 @@ Future<RootIdentity> verifyRootHistory(
   String? principal;
   List<int>? previous;
   var issuedBefore = 0;
+  final seenRoots = <String>{};
   for (var index = 0; index < history.length; index++) {
     final proof = history[index];
     final raw = _bytes(proof['transcript'], null);
@@ -58,6 +59,10 @@ Future<RootIdentity> verifyRootHistory(
     final newRoot = _bytes(t['new_root_public_key'], 32);
     final device = _bytes(t['new_device_public_key'], 32);
     principal ??= await rootPrincipal(oldRoot);
+    if (index == 0) seenRoots.add(_url(oldRoot));
+    if (!seenRoots.add(_url(newRoot))) {
+      throw const FormatException('История повторно использует прежний root');
+    }
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final integers = ['auth_epoch', 'expires_at', 'issued_at', 'v'];
     final numbers = integers.every(

@@ -5,7 +5,7 @@ import 'package:cryptography/cryptography.dart';
 import 'package:grpc/grpc.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/root_rotation.dart';
-import 'package:space_client/src/secure_vault.dart';
+import 'package:space_client/src/key_vault.dart';
 import 'package:space_client/src/recovery_card.dart';
 import 'package:space_client/src/generated/space/v1/space.pbgrpc.dart';
 
@@ -36,7 +36,7 @@ void check(bool ok, String message) {
 Future<void> main(List<String> args) async {
   final server = await discover(args.single);
   final storage = CrashStorage();
-  var vault = SecureIdentityVault(storage: storage);
+  var vault = KeyIdentityVault(storage);
   final original = await SpaceSession.connect(server, vault);
   final old = await vault.load(server.origin.toString());
   final auth = AuthServiceClient(original.channel);
@@ -86,7 +86,7 @@ Future<void> main(List<String> args) async {
   );
   storage.failActivation = false;
   storage.failCleanup = true;
-  vault = SecureIdentityVault(storage: storage);
+  vault = KeyIdentityVault(storage);
   failed = false;
   try {
     await finishRootRotation(server, vault, auth);
@@ -128,7 +128,7 @@ Future<void> main(List<String> args) async {
     );
     final restored = await SpaceSession.connect(
       server,
-      SecureIdentityVault(storage: CrashStorage()),
+      KeyIdentityVault(CrashStorage()),
       restoredRecord: reopened,
     );
     await restored.messages();

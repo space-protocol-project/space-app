@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:grpc/grpc.dart';
 
 import '../src/chat_controller.dart';
 import '../src/core.dart';
@@ -10,6 +11,8 @@ import '../src/generated/space/v1/space.pb.dart';
 import '../src/recovery_card.dart';
 import '../src/recovery_qr.dart';
 import '../src/pairing.dart';
+import '../src/root_rotation.dart' as rotation;
+import '../src/generated/space/v1/space.pbgrpc.dart' show AuthServiceClient;
 import 'components.dart';
 
 class RecoveryPanel extends StatefulWidget {
@@ -238,6 +241,63 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     if (mounted) setState(() => devices = result ?? []);
   }
 
+  Future<void> rotate({bool renew = false}) async {
+    final manager = widget.controller.deviceManagement;
+    if (manager is! RootRotationControl) return;
+    if (!await confirm(
+      renew
+          ? 'Обновить истёкший запрос с теми же сохранёнными новыми ключами? Если сервер уже завершил переход, используйте завершение сохранённой смены.'
+          : 'Сменить корневой ключ? Ваш ID, права и история сохранятся. Прежние устройства и карточки потеряют доступ. Новый секрет сначала сохраняется в защищённый журнал. После перехода обязательно сохраните новую карточку.',
+    )) {
+      return;
+    }
+    await (manager as RootRotationControl).prepareRotation(renew: renew);
+    await finishRotation();
+  }
+
+  Future<void> finishRotation() async {
+    final server = widget.controller.preview, vault = widget.controller.vault;
+    if (server == null || vault is! RotationJournalVault) {
+      throw const FormatException('Сначала проверьте адрес прежнего сервера');
+    }
+    final channel = ClientChannel(
+      server.origin.host,
+      port: server.grpcPort,
+      options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
+    );
+    try {
+      final record = await rotation.finishRootRotation(
+        server,
+        vault,
+        AuthServiceClient(channel),
+      );
+      if (record == null) {
+        if (mounted) {
+          setState(
+            () => message = 'Для этого сервера нет сохранённой смены ключа.',
+          );
+        }
+        return;
+      }
+      await widget.controller.disconnect();
+      await widget.controller.inspect(record.origin);
+      await widget.controller.connect();
+      if (!widget.controller.connected) {
+        throw const FormatException(
+          'Новый ключ сохранён. Проверьте доступность сервера и подключитесь повторно.',
+        );
+      }
+      await refresh();
+      if (mounted) {
+        setState(
+          () => message = 'Корневой ключ сменён, прежний ID сохранён. Сохраните новую карточку; старые карточки и устройства больше не работают.',
+        );
+      }
+    } finally {
+      await channel.shutdown();
+    }
+  }
+
   Future<void> revoke(DeviceGrant grant) async {
     final manager = widget.controller.deviceManagement;
     if (manager == null) return;
@@ -345,6 +405,43 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
+      SurfaceCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Смена корневого ключа',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Сохраняет вашу идентичность и закрывает доступ прежним ключам. Начать переход может устройство с root. После сбоя завершите сохранённую смену; если запрос истёк до commit, подключитесь прежним ключом и обновите его.',
+            ),
+            const SizedBox(height: 12),
+            if (widget.controller.connected &&
+                widget.controller.deviceManagement?.hasRootAuthority == true &&
+                widget.controller.deviceManagement is RootRotationControl) ...[
+              OutlinedButton(
+                onPressed: pending ? null : () => run(rotate),
+                child: const Text('Сменить корневой ключ'),
+              ),
+              TextButton(
+                onPressed: pending
+                    ? null
+                    : () => run(() => rotate(renew: true)),
+                child: const Text('Обновить истёкший запрос'),
+              ),
+            ],
+            OutlinedButton(
+              onPressed: pending || widget.controller.preview == null
+                  ? null
+                  : () => run(finishRotation),
+              child: const Text('Завершить сохранённую смену'),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 20),
       SurfaceCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

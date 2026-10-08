@@ -10,6 +10,7 @@ import 'package:http/io_client.dart';
 
 import 'generated/space/v1/space.pbgrpc.dart';
 import 'root_history.dart';
+import 'root_rotation.dart' as rotation;
 
 String url64(List<int> value) => base64Url.encode(value).replaceAll('=', '');
 
@@ -234,8 +235,17 @@ abstract interface class DeviceManagement {
   Future<String> preparePairing(Pairing pairing, {DeviceRecord? authority});
 }
 
+abstract interface class RootRotationControl {
+  Future<void> prepareRotation({bool renew = false});
+}
+
 class SpaceSession
-    implements LiveSession, SpacePresentation, SpaceAccess, DeviceManagement {
+    implements
+        LiveSession,
+        SpacePresentation,
+        SpaceAccess,
+        DeviceManagement,
+        RootRotationControl {
   SpaceSession._(this.server, this.record, this.vault, this.channel);
   final Discovery server;
   final DeviceRecord record;
@@ -600,6 +610,22 @@ class SpaceSession
   String get currentGrantId => record.grantId;
   @override
   bool get hasRootAuthority => record.rootSeed.isNotEmpty;
+  @override
+  Future<void> prepareRotation({bool renew = false}) async {
+    await _ensureSession();
+    if (vault is! RotationJournalVault) {
+      throw const FormatException('Нет защищённого журнала ротации');
+    }
+    await rotation.prepareRootRotation(
+      server,
+      record,
+      vault as RotationJournalVault,
+      AuthServiceClient(channel),
+      _options,
+      renew: renew,
+    );
+  }
+
   @override
   Future<void> revokeDevice(
     DeviceGrant grant, {

@@ -32,11 +32,15 @@ Future<String> sealRecoveryCard(
   Map<String, dynamic> payload,
   String password,
 ) async {
+  final plain = utf8.encode(jsonEncode(payload));
+  if (plain.length > 8176) {
+    throw const FormatException('Карточка превышает безопасный размер формата');
+  }
   final random = Random.secure();
   final salt = List<int>.generate(16, (_) => random.nextInt(256));
   final nonce = List<int>.generate(12, (_) => random.nextInt(256));
   final box = await AesGcm.with256bits().encrypt(
-    utf8.encode(jsonEncode(payload)),
+    plain,
     secretKey: await _key(password, salt),
     nonce: nonce,
     aad: utf8.encode(cardDomain),
