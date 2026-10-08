@@ -65,6 +65,20 @@ void main() {
               .writeAsBytesSync(data!.buffer.asUint8List());
           image.dispose();
         });
+        for (final screen in {
+          'Идентичность': 'client-identity',
+          'Настройки': 'client-settings',
+        }.entries) {
+          await tester.tap(find.widgetWithText(ListTile, screen.key));
+          await tester.pumpAndSettle();
+          await tester.runAsync(() async {
+            final image = await render.toImage();
+            final data = await image.toByteData(format: ui.ImageByteFormat.png);
+            File('$output/${screen.value}.png')
+                .writeAsBytesSync(data!.buffer.asUint8List());
+            image.dispose();
+          });
+        }
       }
       tester.view.physicalSize = const Size(390, 844);
       await tester.pumpAndSettle();
