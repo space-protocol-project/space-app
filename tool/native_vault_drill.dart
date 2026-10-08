@@ -14,7 +14,13 @@ Future<void> main(List<String> args) async {
   if (!Platform.isWindows ||
       args.length != 3 ||
       !RegExp(r'^[a-f0-9]{32}$').hasMatch(args[1]) ||
-      !['write', 'reopen', 'cleanup'].contains(args[0])) {
+      ![
+        'write',
+        'reopen',
+        'cleanup',
+        'crash-active',
+        'recover-crash',
+      ].contains(args[0])) {
     exit(2);
   }
   // Этот origin никогда не используется подключением: отдельный случайный test slot.
@@ -22,7 +28,39 @@ Future<void> main(List<String> args) async {
   final report = File(args[2]);
   final vault = SecureIdentityVault();
   try {
-    if (args[0] == 'write') {
+    if (args[0] == 'crash-active') {
+      final record = await vault.load(origin);
+      if (record == null || await vault.loadRotation(origin) == null)
+        throw StateError('Нет исходного состояния');
+      await vault.save(record);
+      throw StateError('Crash checkpoint не включён');
+    } else if (args[0] == 'recover-crash') {
+      bool unreadable = false;
+      try {
+        unreadable = await vault.load(origin) == null;
+      } catch (_) {
+        unreadable = true;
+      }
+      if (!unreadable) throw StateError('Прерывание не повредило active slot');
+      final journal = await vault.loadRotation(origin);
+      if (journal == null) throw StateError('Отдельный journal потерян');
+      final record = DeviceRecord.fromJson(
+        journal['next'] as Map<String, dynamic>,
+      );
+      await vault.save(record);
+      final expected =
+          jsonDecode(await report.readAsString()) as Map<String, dynamic>;
+      final digest = url64(
+        (await Sha256().hash(
+          utf8.encode(jsonEncode((await vault.load(origin))!.toJson())),
+        )).bytes,
+      );
+      if (digest != expected['digest'])
+        throw StateError('Восстановлены другие ключи');
+      await report.writeAsString(
+        jsonEncode({...expected, 'crash': true, 'recovered': true}),
+      );
+    } else if (args[0] == 'write') {
       if (await vault.load(origin) != null) {
         throw StateError('Тестовый слот уже занят');
       }

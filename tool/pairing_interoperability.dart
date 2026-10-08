@@ -63,7 +63,8 @@ Future<void> main(List<String> args) async {
     try {
       pending.claimed = true;
       check(
-        session.principalId == args[2] && session.role == (args.length>3?args[3]:'owner'),
+        session.principalId == args[2] &&
+            session.role == (args.length > 3 ? args[3] : 'owner'),
         'Pairing изменило owner/identity',
       );
       check(

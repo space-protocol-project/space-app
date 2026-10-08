@@ -1,4 +1,7 @@
 name: space_client
+dependency_overrides:
+  flutter_secure_storage_windows:
+    path: vendor/flutter_secure_storage_windows
 description: "Клиент Space для локального протокольного прототипа."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
