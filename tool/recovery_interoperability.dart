@@ -31,12 +31,13 @@ Future<void> main(List<String> args) async {
     );
     final server = await discover(args[2]);
     checkTrust(server, vault.record!);
+    final expectedGrantId = vault.record!.grantId;
     final session = await SpaceSession.connect(server, vault);
     try {
       check(session.principalId == args[3], 'Перезапуск изменил principal');
       check(session.role == 'owner', 'Перезапуск изменил роль');
       check(
-        session.currentGrantId == vault.record!.grantId,
+        session.currentGrantId == expectedGrantId,
         'Перезапуск создал другое разрешение',
       );
       await session.messages();
