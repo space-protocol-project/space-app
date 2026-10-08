@@ -87,6 +87,7 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
         }
       });
     } on CameraException catch (e) {
+      await stop();
       if (mounted) {
         setState(
           () => error = e.code.contains('AccessDenied')
@@ -95,6 +96,7 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
         );
       }
     } catch (_) {
+      await stop();
       if (mounted) {
         setState(
           () => error = 'Не удалось открыть камеру. Используйте PNG или JSON.',
