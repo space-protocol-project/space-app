@@ -34,7 +34,7 @@ void check(bool ok, String message) {
 }
 
 Future<void> main(List<String> args) async {
-  final server = await discover(args.single);
+  final server = await discover(args.first);
   final storage = CrashStorage();
   var vault = KeyIdentityVault(storage);
   final original = await SpaceSession.connect(server, vault);
@@ -119,6 +119,9 @@ Future<void> main(List<String> args) async {
       payload,
       'Disposable rotation card password',
     );
+    if (args.length > 1) {
+      await File(args[1]).writeAsString(encrypted);
+    }
     final reopened = await recordFromRecovery(
       await openRecoveryCard(encrypted, 'Disposable rotation card password'),
     );
