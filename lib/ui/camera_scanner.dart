@@ -42,9 +42,11 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
     timer = null;
     final camera = controller;
     controller = null;
-    await frameJob;
     try {
       await camera?.dispose();
+    } catch (_) {}
+    try {
+      await frameJob?.timeout(const Duration(seconds: 3));
     } catch (_) {}
   }
 

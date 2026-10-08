@@ -87,7 +87,7 @@ std::string GetCurrentTimeString() {
 
 // Builds file path for picture capture.
 std::optional<std::string> GetFilePathForPicture() {
-  // Space: camera frames must not enter Pictures/OneDrive.
+  // Space: QR frames use Temp instead of synced Pictures.
   std::vector<wchar_t> temp_path(MAX_PATH + 1);
   DWORD length = GetTempPathW(static_cast<DWORD>(temp_path.size()), temp_path.data());
   if (length == 0 || length >= temp_path.size()) {
