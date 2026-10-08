@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:space_client/src/core.dart';
@@ -19,6 +20,34 @@ void check(bool value, String message) {
 }
 
 Future<void> main(List<String> args) async {
+  if (args.length == 4 && args[0] == '--reopen') {
+    final vault = RecoveryTestVault()
+      ..record = DeviceRecord.fromJson(
+        jsonDecode(await File(args[1]).readAsString()) as Map<String, dynamic>,
+      );
+    check(
+      vault.record!.rootSeed.isEmpty && vault.record!.recoverySeed.isEmpty,
+      'Запись после перезапуска содержит управляющий секрет',
+    );
+    final server = await discover(args[2]);
+    checkTrust(server, vault.record!);
+    final session = await SpaceSession.connect(server, vault);
+    try {
+      check(session.principalId == args[3], 'Перезапуск изменил principal');
+      check(session.role == 'owner', 'Перезапуск изменил роль');
+      check(
+        session.currentGrantId == vault.record!.grantId,
+        'Перезапуск создал другое разрешение',
+      );
+      await session.messages();
+    } finally {
+      await session.close();
+    }
+    stdout.writeln(
+      'Dart: новый процесс сохранил principal, owner и рабочий grant.',
+    );
+    return;
+  }
   if (args.length != 3) {
     throw ArgumentError(
       'Нужны тестовая карточка, пароль и ожидаемый principal',
@@ -63,6 +92,21 @@ Future<void> main(List<String> args) async {
   } finally {
     await session.close();
   }
+  final restartPath = '${args[0]}.working-device.json';
+  await File(restartPath).writeAsString(jsonEncode(vault.record!.toJson()));
+  final restart = await Process.run(Platform.resolvedExecutable, [
+    'run',
+    'tool/recovery_interoperability.dart',
+    '--reopen',
+    restartPath,
+    record.origin,
+    args[2],
+  ]);
+  check(
+    restart.exitCode == 0,
+    'Проверка нового процесса не прошла: ${restart.stderr}',
+  );
+  stdout.write(restart.stdout);
   final reopened = await SpaceSession.connect(server, vault);
   try {
     check(
