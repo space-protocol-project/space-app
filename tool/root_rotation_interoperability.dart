@@ -7,15 +7,20 @@ import 'package:space_client/src/core.dart';
 import 'package:space_client/src/root_rotation.dart';
 import 'package:space_client/src/key_vault.dart';
 import 'package:space_client/src/recovery_card.dart';
+import 'package:space_client/src/recovery_qr.dart';
 import 'package:space_client/src/generated/space/v1/space.pbgrpc.dart';
 
 class CrashStorage implements SecureKeyStorage {
   final values = <String, String>{};
-  bool failActivation = false, failCleanup = false;
+  bool failActivation = false, failCleanup = false, corruptActivation = false;
   @override
   Future<String?> read({required String key}) async => values[key];
   @override
   Future<void> write({required String key, required String value}) async {
+    if (corruptActivation && !key.endsWith('.rotation')) {
+      values[key] = 'broken';
+      throw StateError('Частичная запись active slot');
+    }
     if (failActivation && !key.endsWith('.rotation')) {
       throw StateError('Потеря записи после commit');
     }
@@ -85,6 +90,19 @@ Future<void> main(List<String> args) async {
     'Новый секрет потерян после commit',
   );
   storage.failActivation = false;
+  storage.corruptActivation = true;
+  failed = false;
+  try {
+    await finishRootRotation(server, vault, auth);
+  } catch (_) {
+    failed = true;
+  }
+  check(failed, 'Не смоделирована частичная запись');
+  check(
+    await vault.loadRotation(old.origin) != null,
+    'Защищённый журнал повреждён вместе с active slot',
+  );
+  storage.corruptActivation = false;
   storage.failCleanup = true;
   vault = KeyIdentityVault(storage);
   failed = false;
@@ -121,6 +139,12 @@ Future<void> main(List<String> args) async {
     );
     if (args.length > 1) {
       await File(args[1]).writeAsString(encrypted);
+      final png = recoveryPng(encrypted);
+      check(
+        cardFromArtifact(png) == encrypted,
+        'QR v2 не прочитан после ротации',
+      );
+      await File('${args[1]}.png').writeAsBytes(png);
     }
     final reopened = await recordFromRecovery(
       await openRecoveryCard(encrypted, 'Disposable rotation card password'),

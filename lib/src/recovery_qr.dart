@@ -10,7 +10,7 @@ const maxRecoveryImageBytes = 8 * 1024 * 1024;
 const _pngSignature = [137, 80, 78, 71, 13, 10, 26, 10];
 Uint8List recoveryPng(String packet) {
   final text = recoveryQrPrefix + packet;
-  if (utf8.encode(text).length > 2048) {
+  if (utf8.encode(text).length > 2800) {
     throw const FormatException(
       'Карточка слишком большая для QR; сохраните JSON',
     );
@@ -18,7 +18,9 @@ Uint8List recoveryPng(String packet) {
   final matrix = QrImage(
     QrCode(
       payload: QrPayload.fromTypedData(Uint8List.fromList(utf8.encode(text))),
-      errorCorrectLevel: QrErrorCorrectLevel.medium,
+      errorCorrectLevel: utf8.encode(text).length <= 2048
+          ? QrErrorCorrectLevel.medium
+          : QrErrorCorrectLevel.low,
     ),
   );
   const scale = 6, margin = 4;
@@ -94,7 +96,7 @@ String cardFromArtifact(Uint8List bytes) {
           )
           .text;
     }
-    if (!text.startsWith(recoveryQrPrefix) || utf8.encode(text).length > 2048) {
+    if (!text.startsWith(recoveryQrPrefix) || utf8.encode(text).length > 2800) {
       throw const FormatException('QR не является карточкой Space');
     }
     return text.substring(recoveryQrPrefix.length);

@@ -187,12 +187,18 @@ Future<DeviceRecord?> finishRootRotation(
       t['new_device_public_key']) {
     throw const FormatException('Журнал содержит другое устройство');
   }
-  final current = await vault.load(next.origin);
-  if (current == null) {
-    throw const FormatException('Исходная запись хранилища отсутствует');
+  DeviceRecord? current;
+  try {
+    current = await vault.load(next.origin);
+  } catch (_) {
+    // Частично записанный active slot после commit восстанавливается из отдельного
+    // защищённого журнала, только после проверки обеих подписей и receipt сервера.
+    current = null;
   }
-  final oldState = await _digest(current) == pending['old_digest'];
+  final oldState =
+      current == null || await _digest(current) == pending['old_digest'];
   final alreadyActivated =
+      current != null &&
       current.grantId.isNotEmpty &&
       jsonEncode(current.rootHistory) == jsonEncode(next.rootHistory) &&
       url64(current.rootSeed) == url64(next.rootSeed) &&

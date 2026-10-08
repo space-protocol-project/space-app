@@ -39,6 +39,11 @@ Future<void> main(List<String> args) async {
         grantId: 'dg_${url64(List.filled(32, 2))}',
       );
       await vault.save(record);
+      await vault.saveRotation(origin, {
+        'v': 1,
+        'next': record.toJson(),
+        'test_only': true,
+      });
       final digest = url64(
         (await Sha256().hash(utf8.encode(jsonEncode(record.toJson())))).bytes,
       );
@@ -60,8 +65,18 @@ Future<void> main(List<String> args) async {
       if (digest != expected['digest']) {
         throw StateError('Системное хранилище изменило ключи');
       }
+      final journal = await vault.loadRotation(origin);
+      if (journal == null ||
+          jsonEncode(journal['next']) != jsonEncode(record.toJson())) {
+        throw StateError('Журнал не сохранился после перезапуска');
+      }
       await report.writeAsString(jsonEncode({...expected, 'reopen': true}));
     } else {
+      await vault.clearRotation(origin);
+      if (await vault.loadRotation(origin) != null ||
+          await vault.load(origin) == null) {
+        throw StateError('Очистка журнала затронула active slot');
+      }
       final key =
           'space.identity.v1.${url64((await Sha256().hash(utf8.encode(origin))).bytes)}';
       await const FlutterSecureStorage().delete(key: key);
