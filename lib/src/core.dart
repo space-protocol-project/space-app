@@ -275,6 +275,9 @@ class SpaceSession
     DeviceRecord? restoredRecord,
     String pairingId = '',
   }) async {
+    if(restoredRecord!=null && vault is RotationJournalVault && await vault.loadRotation(server.origin.toString())!=null) {
+      throw const FormatException('Сначала завершите сохранённую смену ключа для этого сервера');
+    }
     var record = restoredRecord ?? await vault.load(server.origin.toString());
     if (record != null) {
       checkTrust(server, record);
