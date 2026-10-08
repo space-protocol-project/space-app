@@ -151,7 +151,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
             ],
             const SizedBox(height: 20),
             Text(
-              'Сейчас поддерживаются локальные серверы. Карточка восстановления ещё недоступна.',
+              'Сейчас поддерживаются локальные серверы. Карточку восстановления можно открыть в разделе «Идентичность».',
               style: TextStyle(
                 fontSize: 12,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
