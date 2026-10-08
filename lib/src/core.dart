@@ -275,8 +275,12 @@ class SpaceSession
     DeviceRecord? restoredRecord,
     String pairingId = '',
   }) async {
-    if(restoredRecord!=null && vault is RotationJournalVault && await vault.loadRotation(server.origin.toString())!=null) {
-      throw const FormatException('Сначала завершите сохранённую смену ключа для этого сервера');
+    if (restoredRecord != null &&
+        vault is RotationJournalVault &&
+        await vault.loadRotation(server.origin.toString()) != null) {
+      throw const FormatException(
+        'Сначала завершите сохранённую смену ключа для этого сервера',
+      );
     }
     var record = restoredRecord ?? await vault.load(server.origin.toString());
     if (record != null) {
@@ -697,11 +701,7 @@ class SpaceSession
     DeviceRecord? authority,
   }) async {
     final credentials = authority ?? record;
-    if (credentials.rootHistory.isNotEmpty) {
-      throw const FormatException(
-        'Сопряжение после ротации ещё обновляется. Подключите устройство новой recovery-карточкой.',
-      );
-    }
+
     if (credentials.rootSeed.isEmpty && credentials.recoverySeed.length != 32) {
       throw const FormatException(
         'Откройте корневую или recovery-карточку для подтверждения',
@@ -739,11 +739,7 @@ class SpaceSession
     DeviceRecord? authority,
   }) async {
     final credentials = authority ?? record;
-    if (credentials.rootHistory.isNotEmpty) {
-      throw const FormatException(
-        'Сопряжение после ротации ещё обновляется. Подключите устройство новой recovery-карточкой.',
-      );
-    }
+
     if (credentials.rootSeed.isEmpty && credentials.recoverySeed.length != 32) {
       throw const FormatException('Нужен root или recovery-карточка');
     }

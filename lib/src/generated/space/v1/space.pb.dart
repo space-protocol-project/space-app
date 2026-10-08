@@ -910,6 +910,7 @@ class PollPairingResponse extends $pb.GeneratedMessage {
     $core.List<$core.int>? parentTranscript,
     $core.List<$core.int>? parentSignature,
     $core.String? parentGrantId,
+    $core.Iterable<RootHistoryProof>? rootHistory,
   }) {
     final result = PollPairingResponse._();
     if (pairing != null) result.pairing = pairing;
@@ -920,6 +921,7 @@ class PollPairingResponse extends $pb.GeneratedMessage {
     if (parentTranscript != null) result.parentTranscript = parentTranscript;
     if (parentSignature != null) result.parentSignature = parentSignature;
     if (parentGrantId != null) result.parentGrantId = parentGrantId;
+    if (rootHistory != null) result.rootHistory.addAll(rootHistory);
     return result;
   }
 
@@ -950,6 +952,8 @@ class PollPairingResponse extends $pb.GeneratedMessage {
     ..a<$core.List<$core.int>>(
         7, _omitFieldNames ? '' : 'parentSignature', $pb.PbFieldType.OY)
     ..aOS(8, _omitFieldNames ? '' : 'parentGrantId')
+    ..pPM<RootHistoryProof>(9, _omitFieldNames ? '' : 'rootHistory',
+        subBuilder: RootHistoryProof.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1048,6 +1052,9 @@ class PollPairingResponse extends $pb.GeneratedMessage {
   $core.bool hasParentGrantId() => $_has(7);
   @$pb.TagNumber(8)
   void clearParentGrantId() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $pb.PbList<RootHistoryProof> get rootHistory => $_getList(8);
 }
 
 class CancelPairingRequest extends $pb.GeneratedMessage {
@@ -5001,6 +5008,90 @@ class CompleteRootRotationResponse extends $pb.GeneratedMessage {
   $core.bool hasNewSignature() => $_has(5);
   @$pb.TagNumber(6)
   void clearNewSignature() => $_clearField(6);
+}
+
+class RootHistoryProof extends $pb.GeneratedMessage {
+  factory RootHistoryProof({
+    $core.List<$core.int>? transcript,
+    $core.List<$core.int>? oldSignature,
+    $core.List<$core.int>? newSignature,
+  }) {
+    final result = RootHistoryProof._();
+    if (transcript != null) result.transcript = transcript;
+    if (oldSignature != null) result.oldSignature = oldSignature;
+    if (newSignature != null) result.newSignature = newSignature;
+    return result;
+  }
+
+  RootHistoryProof._();
+
+  factory RootHistoryProof.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      RootHistoryProof()..mergeFromBuffer(data, registry);
+  factory RootHistoryProof.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      RootHistoryProof()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'RootHistoryProof',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: RootHistoryProof.$_createMessage)
+    ..a<$core.List<$core.int>>(
+        1, _omitFieldNames ? '' : 'transcript', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        2, _omitFieldNames ? '' : 'oldSignature', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        3, _omitFieldNames ? '' : 'newSignature', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RootHistoryProof clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RootHistoryProof copyWith(void Function(RootHistoryProof) updates) =>
+      super.copyWith((message) => updates(message as RootHistoryProof))
+          as RootHistoryProof;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use RootHistoryProof() / RootHistoryProof.new instead')
+  static RootHistoryProof create() => RootHistoryProof._();
+  static $pb.GeneratedMessage $_createMessage() => RootHistoryProof._();
+  @$core.override
+  RootHistoryProof createEmptyInstance() => RootHistoryProof._();
+  @$core.pragma('dart2js:noInline')
+  static RootHistoryProof getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<RootHistoryProof>(
+          RootHistoryProof.$_createMessage);
+  static RootHistoryProof? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.List<$core.int> get transcript => $_getN(0);
+  @$pb.TagNumber(1)
+  set transcript($core.List<$core.int> value) => $_setBytes(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasTranscript() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearTranscript() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get oldSignature => $_getN(1);
+  @$pb.TagNumber(2)
+  set oldSignature($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasOldSignature() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearOldSignature() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get newSignature => $_getN(2);
+  @$pb.TagNumber(3)
+  set newSignature($core.List<$core.int> value) => $_setBytes(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasNewSignature() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearNewSignature() => $_clearField(3);
 }
 
 const $core.bool _omitFieldNames =

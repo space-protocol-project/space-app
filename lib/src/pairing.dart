@@ -4,6 +4,7 @@ import 'package:cryptography/cryptography.dart';
 import 'package:grpc/grpc.dart';
 
 import 'core.dart';
+import 'root_history.dart';
 import 'generated/space/v1/space.pbgrpc.dart';
 
 ClientChannel _channel(Discovery server) => ClientChannel(
@@ -97,6 +98,21 @@ class PendingPairing {
   }
 
   Future<DeviceRecord> verifiedRecord(PollPairingResponse response) async {
+    final history = response.rootHistory
+        .map(
+          (v) => <String, dynamic>{
+            'transcript': url64(v.transcript),
+            'old_signature': url64(v.oldSignature),
+            'new_signature': url64(v.newSignature),
+          },
+        )
+        .toList();
+    final identity = await verifyRootHistory(
+      history,
+      response.rootPublicKey,
+      server.origin.toString(),
+      server.serverId,
+    );
     final p = response.pairing, expected = request.pairing;
     if (p.id != expected.id ||
         p.state != 'approved' ||
@@ -160,6 +176,8 @@ class PendingPairing {
         ],
         allowHistorical: true,
         registrationDays: 3650,
+        expectedPrincipal: identity.principalId,
+        expectedEpoch: identity.epoch,
       );
       if (!await Ed25519().verify(
         parentSigning,
@@ -196,6 +214,8 @@ class PendingPairing {
       pairingId: p.id,
       allowHistorical: true,
       authorizerGrantId: delegated ? response.parentGrantId : '',
+      expectedPrincipal: identity.principalId,
+      expectedEpoch: identity.epoch,
     );
     final valid = await Ed25519().verify(
       signing,
@@ -216,6 +236,7 @@ class PendingPairing {
       deviceSeed: seed,
       grantId: response.grantId,
       administrative: p.administrative,
+      rootHistory: history,
     );
   }
 

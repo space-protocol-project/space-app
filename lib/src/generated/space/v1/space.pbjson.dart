@@ -241,6 +241,14 @@ const PollPairingResponse$json = {
     },
     {'1': 'parent_signature', '3': 7, '4': 1, '5': 12, '10': 'parentSignature'},
     {'1': 'parent_grant_id', '3': 8, '4': 1, '5': 9, '10': 'parentGrantId'},
+    {
+      '1': 'root_history',
+      '3': 9,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.RootHistoryProof',
+      '10': 'rootHistory'
+    },
   ],
 };
 
@@ -251,7 +259,8 @@ final $typed_data.Uint8List pollPairingResponseDescriptor = $convert.base64Decod
     'eRgDIAEoDFINcm9vdFB1YmxpY0tleRIeCgp0cmFuc2NyaXB0GAQgASgMUgp0cmFuc2NyaXB0Eh'
     'wKCXNpZ25hdHVyZRgFIAEoDFIJc2lnbmF0dXJlEisKEXBhcmVudF90cmFuc2NyaXB0GAYgASgM'
     'UhBwYXJlbnRUcmFuc2NyaXB0EikKEHBhcmVudF9zaWduYXR1cmUYByABKAxSD3BhcmVudFNpZ2'
-    '5hdHVyZRImCg9wYXJlbnRfZ3JhbnRfaWQYCCABKAlSDXBhcmVudEdyYW50SWQ=');
+    '5hdHVyZRImCg9wYXJlbnRfZ3JhbnRfaWQYCCABKAlSDXBhcmVudEdyYW50SWQSPQoMcm9vdF9o'
+    'aXN0b3J5GAkgAygLMhouc3BhY2UudjEuUm9vdEhpc3RvcnlQcm9vZlILcm9vdEhpc3Rvcnk=');
 
 @$core.Deprecated('Use cancelPairingRequestDescriptor instead')
 const CancelPairingRequest$json = {
@@ -1189,3 +1198,19 @@ final $typed_data.Uint8List completeRootRotationResponseDescriptor = $convert.ba
     'ASgJUgdncmFudElkEh4KCnRyYW5zY3JpcHQYBCABKAxSCnRyYW5zY3JpcHQSIwoNb2xkX3NpZ2'
     '5hdHVyZRgFIAEoDFIMb2xkU2lnbmF0dXJlEiMKDW5ld19zaWduYXR1cmUYBiABKAxSDG5ld1Np'
     'Z25hdHVyZQ==');
+
+@$core.Deprecated('Use rootHistoryProofDescriptor instead')
+const RootHistoryProof$json = {
+  '1': 'RootHistoryProof',
+  '2': [
+    {'1': 'transcript', '3': 1, '4': 1, '5': 12, '10': 'transcript'},
+    {'1': 'old_signature', '3': 2, '4': 1, '5': 12, '10': 'oldSignature'},
+    {'1': 'new_signature', '3': 3, '4': 1, '5': 12, '10': 'newSignature'},
+  ],
+};
+
+/// Descriptor for `RootHistoryProof`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List rootHistoryProofDescriptor = $convert.base64Decode(
+    'ChBSb290SGlzdG9yeVByb29mEh4KCnRyYW5zY3JpcHQYASABKAxSCnRyYW5zY3JpcHQSIwoNb2'
+    'xkX3NpZ25hdHVyZRgCIAEoDFIMb2xkU2lnbmF0dXJlEiMKDW5ld19zaWduYXR1cmUYAyABKAxS'
+    'DG5ld1NpZ25hdHVyZQ==');
