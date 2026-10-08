@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:cryptography/cryptography.dart';
 import 'package:grpc/grpc.dart';
+import 'package:protobuf/protobuf.dart' show GeneratedMessage;
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 
@@ -375,6 +376,69 @@ class SpaceSession
     String? method,
   }) async {
     await _ensureSession();
+    Map<String, dynamic> json(GeneratedMessage value) =>
+        Map<String, dynamic>.from(value.toProto3Json() as Map);
+    final uri = Uri.parse(path);
+    final channelClient = ChannelServiceClient(channel);
+    if (uri.path == '/api/v1/channels') {
+      if (method == 'POST') {
+        return json(
+          await channelClient.createChannel(
+            CreateChannelRequest()..mergeFromProto3Json(body!),
+            options: _options,
+          ),
+        );
+      }
+      return json(
+        await channelClient.listChannels(
+          ListChannelsRequest(
+            includeArchived: uri.queryParameters['includeArchived'] == 'true',
+          ),
+          options: _options,
+        ),
+      );
+    }
+    final target = RegExp(
+      r'^/api/v1/channels/([a-z][a-z0-9_-]{0,63})(/access)?$',
+    ).firstMatch(uri.path);
+    if (target != null) {
+      final id = target.group(1)!;
+      if (target.group(2) != null) {
+        if (method == 'PUT') {
+          return json(
+            await channelClient.updateChannelAccess(
+              UpdateChannelAccessRequest()
+                ..mergeFromProto3Json({...body!, 'channelId': id}),
+              options: _options,
+            ),
+          );
+        }
+        return json(
+          await channelClient.getChannelAccess(
+            GetChannelAccessRequest(channelId: id),
+            options: _options,
+          ),
+        );
+      }
+      if (method != 'PATCH') {
+        throw const GrpcError.unimplemented('Неподдерживаемая операция канала');
+      }
+      return json(
+        await channelClient.updateChannel(
+          UpdateChannelRequest()
+            ..mergeFromProto3Json({...body!, 'channelId': id}),
+          options: _options,
+        ),
+      );
+    }
+    if (uri.path == '/api/v1/space/members') {
+      return json(
+        await AdminServiceClient(channel).listMembers(
+          ListMembersRequest(after: uri.queryParameters['after'] ?? ''),
+          options: _options,
+        ),
+      );
+    }
     final client = AdminServiceClient(channel);
     switch (path) {
       case '/api/v1/space/setup':

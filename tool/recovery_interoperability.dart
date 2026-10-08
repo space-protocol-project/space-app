@@ -100,6 +100,52 @@ Future<void> main(List<String> args) async {
       vault.record!.rootSeed.isEmpty && vault.record!.recoverySeed.isEmpty,
       'Рабочее устройство сохранило управляющий секрет',
     );
+    final channelId =
+        'native-admin-${newRequestKey().toLowerCase().replaceAll('_', 'a').replaceAll('-', 'b')}';
+    final made = await session.adminRequest(
+      '/api/v1/channels',
+      method: 'POST',
+      body: {
+        'channelId': channelId,
+        'title': 'Проверка управления из приложения',
+        'position': 100,
+        'viewType': 'chat',
+      },
+    );
+    final channelMap = made['channel'] as Map;
+    final acl = await session.adminRequest(
+      '/api/v1/channels/$channelId/access',
+    );
+    final privateAcl = await session.adminRequest(
+      '/api/v1/channels/$channelId/access',
+      method: 'PUT',
+      body: {'expectedRevision': acl['revision'], 'rules': []},
+    );
+    await session.adminRequest(
+      '/api/v1/channels/$channelId',
+      method: 'PATCH',
+      body: {
+        'title': channelMap['title'],
+        'position': 100,
+        'archived': true,
+        'publicPreview': false,
+        'expectedRevision': privateAcl['revision'],
+      },
+    );
+    final allChannels = await session.adminRequest(
+      '/api/v1/channels?includeArchived=true',
+    );
+    check(
+      (allChannels['channels'] as List).any(
+        (c) => c['id'] == channelId && c['archived'] == true,
+      ),
+      'Архив канала не сохранён',
+    );
+    check(
+      (await session.adminRequest('/api/v1/space/members'))
+          .containsKey('members'),
+      'Нет списка участников для правил',
+    );
     final grants = await session.listDevices();
     check(
       grants.any(
