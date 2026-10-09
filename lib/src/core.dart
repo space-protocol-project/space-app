@@ -439,6 +439,46 @@ class SpaceSession
         ),
       );
     }
+    final memberTarget = RegExp(r'^/api/v1/space/members/(u_[0-9a-f]{64})$')
+        .firstMatch(uri.path);
+    if (memberTarget != null && method == 'PATCH') {
+      return json(
+        await AdminServiceClient(channel).updateMember(
+          UpdateMemberRequest()..mergeFromProto3Json({
+            ...body!,
+            'principalId': memberTarget.group(1)!,
+          }),
+          options: _options,
+        ),
+      );
+    }
+    if (uri.path == '/api/v1/space/invites') {
+      if (method == 'POST') {
+        return json(
+          await AdminServiceClient(channel).createInvite(
+            CreateInviteRequest()..mergeFromProto3Json(body!),
+            options: _options,
+          ),
+        );
+      }
+      return json(
+        await AdminServiceClient(channel).listInvites(
+          ListInvitesRequest(after: uri.queryParameters['after'] ?? ''),
+          options: _options,
+        ),
+      );
+    }
+    final inviteTarget = RegExp(
+      r'^/api/v1/space/invites/(in_[A-Za-z0-9_-]+)/revoke$',
+    ).firstMatch(uri.path);
+    if (inviteTarget != null && method == 'POST') {
+      return json(
+        await AdminServiceClient(channel).revokeInvite(
+          RevokeInviteRequest(inviteId: inviteTarget.group(1)!),
+          options: _options,
+        ),
+      );
+    }
     final client = AdminServiceClient(channel);
     switch (path) {
       case '/api/v1/space/setup':

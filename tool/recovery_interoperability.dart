@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:grpc/grpc.dart';
+
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/recovery_card.dart';
 import 'package:space_client/src/recovery_qr.dart';
@@ -146,6 +148,65 @@ Future<void> main(List<String> args) async {
           .containsKey('members'),
       'Нет списка участников для правил',
     );
+    final issued = await session.adminRequest(
+      '/api/v1/space/invites',
+      method: 'POST',
+      body: {'role': 'reader', 'ttlSeconds': 3600, 'maxUses': 1},
+    );
+    final inviteId = (issued['invite'] as Map)['id'] as String;
+    final joined = await SpaceSession.connect(
+      server,
+      RecoveryTestVault(),
+      invitationToken: issued['token'] as String,
+    );
+    try {
+      check(joined.role == 'reader', 'Приглашение не назначило читателя');
+      var list = await session.adminRequest('/api/v1/space/members');
+      var member = (list['members'] as List).cast<Map>().firstWhere(
+        (m) => m['principalId'] == joined.principalId,
+      );
+      final blocked = await session.adminRequest(
+        '/api/v1/space/members/${joined.principalId}',
+        method: 'PATCH',
+        body: {
+          'role': 'member',
+          'blocked': true,
+          'expectedRevision': member['revision'],
+        },
+      );
+      var denied = false;
+      try {
+        await joined.messages();
+      } on GrpcError catch (e) {
+        denied = e.code == StatusCode.permissionDenied;
+      }
+      check(denied, 'Блокировка не закрыла чтение');
+      member = blocked['member'] as Map;
+      await session.adminRequest(
+        '/api/v1/space/members/${joined.principalId}',
+        method: 'PATCH',
+        body: {
+          'role': 'reader',
+          'blocked': false,
+          'expectedRevision': member['revision'],
+        },
+      );
+      final invitations = await session.adminRequest('/api/v1/space/invites');
+      check(
+        (invitations['invites'] as List).cast<Map>().every(
+          (i) => !i.containsKey('token'),
+        ),
+        'Список раскрывает секретные коды',
+      );
+      await session.adminRequest(
+        '/api/v1/space/invites/$inviteId/revoke',
+        method: 'POST',
+        body: {},
+      );
+      await joined.revoke();
+    } finally {
+      await joined.close();
+    }
     final grants = await session.listDevices();
     check(
       grants.any(
