@@ -138,6 +138,27 @@ class ChannelSession
   }
 }
 
+class CatalogSession extends ChannelSession implements ChannelUpdates {
+  final catalog = StreamController<void>.broadcast();
+  int watchStarts = 0;
+  @override
+  Stream<void> watchChannelChanges() {
+    watchStarts++;
+    return catalog.stream;
+  }
+
+  void change(List<Channel> channels) {
+    availableChannels = channels;
+    catalog.add(null);
+  }
+
+  @override
+  Future<void> close() async {
+    await catalog.close();
+    await super.close();
+  }
+}
+
 Future<void> settle() async =>
     Future<void>.delayed(const Duration(milliseconds: 20));
 Future<ChatController> connected(
@@ -161,6 +182,78 @@ Future<ChatController> connected(
 }
 
 void main() {
+  test(
+    'Каталог переподключается после сбоя и отменяет retry при отключении',
+    () async {
+      final session = CatalogSession();
+      final controller = ChatController(
+        ChannelVault(),
+        openSession: (_, _) async => session,
+        positions: MemoryPositions(),
+        retryDelay: (_) => const Duration(milliseconds: 5),
+      );
+      controller.preview = Discovery(
+        localOrigin('http://127.0.0.1:8080'),
+        'srv_test',
+        List.filled(32, 1),
+        9090,
+      );
+      await controller.connect();
+      await settle();
+      session.catalog.addError(const GrpcError.unavailable('Сбой сети'));
+      await settle();
+      await settle();
+      expect(session.watchStarts, greaterThanOrEqualTo(2));
+      expect(controller.connected, isTrue);
+      session.change([chat('general')..title = 'После reconnect']);
+      await settle();
+      expect(controller.chatTitle, 'После reconnect');
+      await controller.disconnect();
+      final starts = session.watchStarts;
+      await settle();
+      expect(session.watchStarts, starts);
+      expect(session.catalog.hasListener, isFalse);
+      controller.dispose();
+    },
+  );
+
+  test(
+    'Каталог обновляется без читаемого чата и переживает отзыв/возврат прав',
+    () async {
+      final session = CatalogSession()
+        ..availableChannels = []
+        ..selectedChannelId = '';
+      final controller = await connected(session, MemoryPositions());
+      var notifications = 0;
+      controller.addListener(() => notifications++);
+      session.change([chat('general')]);
+      session.selectedChannelId = 'general';
+      await settle();
+      await settle();
+      expect(controller.canRead, isTrue);
+      expect(controller.messages, isNotEmpty);
+      final renamed = chat('general')..title = 'Новое название';
+      session.change([renamed, chat('new')]);
+      await settle();
+      expect(controller.chatTitle, 'Новое название');
+      expect(controller.navigation!.availableChannels.length, 2);
+      session.change([chat('general', read: false), chat('new')]);
+      await settle();
+      expect(controller.canRead, isFalse);
+      expect(controller.messages, isEmpty);
+      expect(session.catalog.hasListener, isTrue);
+      session.change([chat('general'), chat('new')]);
+      await settle();
+      await settle();
+      expect(controller.messages, isNotEmpty);
+      expect(controller.canWrite, isTrue);
+      expect(notifications, greaterThan(3));
+      await controller.disconnect();
+      expect(session.catalog.hasListener, isFalse);
+      controller.dispose();
+    },
+  );
+
   test('Переключение изолирует одинаковые id, отменяет старый поток и сохраняет позиции', () async {
     final positions = MemoryPositions();
     final session = ChannelSession();

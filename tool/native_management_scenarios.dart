@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 
 import 'package:grpc/grpc.dart';
 import 'package:space_client/src/core.dart';
@@ -73,6 +74,58 @@ Future<void> nativeManagementScenarios(SpaceSession owner) async {
     }
   } finally {
     http.close(force: true);
+  }
+  final updates = StreamIterator(owner.watchChannelChanges());
+  try {
+    require(
+      await updates.moveNext().timeout(const Duration(seconds: 5)),
+      'Нет исходного каталога',
+    );
+    final watched = await owner.adminRequest(
+      '/api/v1/channels',
+      method: 'POST',
+      body: {
+        'channelId': 'native-watch',
+        'title': 'До изменения',
+        'viewType': 'chat',
+        'position': 300,
+      },
+    );
+    require(
+      await updates.moveNext().timeout(const Duration(seconds: 5)),
+      'Нет обновления нового канала',
+    );
+    final entry = owner.availableChannels.firstWhere(
+      (c) => c.id == 'native-watch',
+    );
+    require(
+      entry.title == 'До изменения',
+      'Новый канал не появился автоматически',
+    );
+    await owner.adminRequest(
+      '/api/v1/channels/native-watch',
+      method: 'PATCH',
+      body: {
+        'title': 'После изменения',
+        'position': 300,
+        'archived': true,
+        'publicPreview': false,
+        'expectedRevision': (watched['channel'] as Map)['revision'],
+      },
+    );
+    require(
+      await updates.moveNext().timeout(const Duration(seconds: 5)),
+      'Нет обновления метаданных',
+    );
+    final renamed = owner.availableChannels.firstWhere(
+      (c) => c.id == 'native-watch',
+    );
+    require(
+      renamed.title == 'После изменения' && renamed.archived,
+      'Название или архив не обновились',
+    );
+  } finally {
+    await updates.cancel();
   }
   final created = await owner.adminRequest(
     '/api/v1/channels',

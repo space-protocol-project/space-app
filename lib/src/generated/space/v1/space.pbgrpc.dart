@@ -33,6 +33,15 @@ class ChannelServiceClient extends $grpc.Client {
 
   ChannelServiceClient(super.channel, {super.options, super.interceptors});
 
+  $grpc.ResponseStream<$0.WatchChannelsResponse> watchChannels(
+    $0.WatchChannelsRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createStreamingCall(
+        _$watchChannels, $async.Stream.fromIterable([request]),
+        options: options);
+  }
+
   $grpc.ResponseFuture<$0.ListChannelsResponse> listChannels(
     $0.ListChannelsRequest request, {
     $grpc.CallOptions? options,
@@ -77,6 +86,11 @@ class ChannelServiceClient extends $grpc.Client {
 
   // method descriptors
 
+  static final _$watchChannels =
+      $grpc.ClientMethod<$0.WatchChannelsRequest, $0.WatchChannelsResponse>(
+          '/space.v1.ChannelService/WatchChannels',
+          ($0.WatchChannelsRequest value) => value.writeToBuffer(),
+          $0.WatchChannelsResponse.fromBuffer);
   static final _$listChannels =
       $grpc.ClientMethod<$0.ListChannelsRequest, $0.ListChannelsResponse>(
           '/space.v1.ChannelService/ListChannels',
@@ -114,6 +128,15 @@ abstract class ChannelServiceBase extends $grpc.Service {
   $core.String get $name => 'space.v1.ChannelService';
 
   ChannelServiceBase() {
+    $addMethod(
+        $grpc.ServiceMethod<$0.WatchChannelsRequest, $0.WatchChannelsResponse>(
+            'WatchChannels',
+            watchChannels_Pre,
+            false,
+            true,
+            ($core.List<$core.int> value) =>
+                $0.WatchChannelsRequest.fromBuffer(value),
+            ($0.WatchChannelsResponse value) => value.writeToBuffer()));
     $addMethod(
         $grpc.ServiceMethod<$0.ListChannelsRequest, $0.ListChannelsResponse>(
             'ListChannels',
@@ -169,6 +192,15 @@ abstract class ChannelServiceBase extends $grpc.Service {
                 $0.GetManifestRequest.fromBuffer(value),
             ($0.GetManifestResponse value) => value.writeToBuffer()));
   }
+
+  $async.Stream<$0.WatchChannelsResponse> watchChannels_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.WatchChannelsRequest> $request) async* {
+    yield* watchChannels($call, await $request);
+  }
+
+  $async.Stream<$0.WatchChannelsResponse> watchChannels(
+      $grpc.ServiceCall call, $0.WatchChannelsRequest request);
 
   $async.Future<$0.ListChannelsResponse> listChannels_Pre(
       $grpc.ServiceCall $call,

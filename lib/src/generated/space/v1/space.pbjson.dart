@@ -1479,3 +1479,42 @@ final $typed_data.Uint8List updateChannelAccessResponseDescriptor =
         'ChtVcGRhdGVDaGFubmVsQWNjZXNzUmVzcG9uc2USHQoKY2hhbm5lbF9pZBgBIAEoCVIJY2hhbm'
         '5lbElkEhoKCHJldmlzaW9uGAIgASgDUghyZXZpc2lvbhIxCgVydWxlcxgDIAMoCzIbLnNwYWNl'
         'LnYxLkNoYW5uZWxBY2Nlc3NSdWxlUgVydWxlcw==');
+
+@$core.Deprecated('Use watchChannelsRequestDescriptor instead')
+const WatchChannelsRequest$json = {
+  '1': 'WatchChannelsRequest',
+  '2': [
+    {'1': 'include_archived', '3': 1, '4': 1, '5': 8, '10': 'includeArchived'},
+  ],
+};
+
+/// Descriptor for `WatchChannelsRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List watchChannelsRequestDescriptor = $convert.base64Decode(
+    'ChRXYXRjaENoYW5uZWxzUmVxdWVzdBIpChBpbmNsdWRlX2FyY2hpdmVkGAEgASgIUg9pbmNsdW'
+    'RlQXJjaGl2ZWQ=');
+
+@$core.Deprecated('Use watchChannelsResponseDescriptor instead')
+const WatchChannelsResponse$json = {
+  '1': 'WatchChannelsResponse',
+  '2': [
+    {
+      '1': 'channels',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.Channel',
+      '10': 'channels'
+    },
+    {'1': 'space_title', '3': 2, '4': 1, '5': 9, '10': 'spaceTitle'},
+    {'1': 'role', '3': 3, '4': 1, '5': 9, '10': 'role'},
+    {'1': 'heartbeat', '3': 4, '4': 1, '5': 8, '10': 'heartbeat'},
+    {'1': 'server_id', '3': 5, '4': 1, '5': 9, '10': 'serverId'},
+  ],
+};
+
+/// Descriptor for `WatchChannelsResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List watchChannelsResponseDescriptor = $convert.base64Decode(
+    'ChVXYXRjaENoYW5uZWxzUmVzcG9uc2USLQoIY2hhbm5lbHMYASADKAsyES5zcGFjZS52MS5DaG'
+    'FubmVsUghjaGFubmVscxIfCgtzcGFjZV90aXRsZRgCIAEoCVIKc3BhY2VUaXRsZRISCgRyb2xl'
+    'GAMgASgJUgRyb2xlEhwKCWhlYXJ0YmVhdBgEIAEoCFIJaGVhcnRiZWF0EhsKCXNlcnZlcl9pZB'
+    'gFIAEoCVIIc2VydmVySWQ=');

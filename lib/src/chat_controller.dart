@@ -96,6 +96,10 @@ class ChatController extends ChangeNotifier {
   Discovery? preview;
   LiveSession? _session;
   StreamIterator<SubscribeResponse>? _activeIterator;
+  StreamIterator<void>? _catalogIterator;
+  int _catalogGeneration = 0;
+  Timer? _catalogRetryTimer;
+  Completer<void>? _catalogRetryDone;
   final Future<LiveSession> Function(Discovery, IdentityVault) openSession;
   final Duration Function(int) retryDelay;
   Timer? _retryTimer;
@@ -197,6 +201,7 @@ class ChatController extends ChangeNotifier {
     try {
       _positionTimer?.cancel();
       await _savePositions();
+      _stopCatalog();
       await _session?.close();
       _session = null;
       final session = _invitationToken.isEmpty && restoredRecord == null
@@ -225,6 +230,9 @@ class ChatController extends ChangeNotifier {
       }
       cursor = _cursors[channelId] ?? '';
       connected = true;
+      if (session is ChannelUpdates) {
+        unawaited(_watchCatalog(session, ++_catalogGeneration));
+      }
       if (canRead) unawaited(_watch(session, ++_generation));
     } catch (e) {
       error = _explain(e);
@@ -331,6 +339,86 @@ class ChatController extends ChangeNotifier {
     return true;
   }
 
+  void _stopCatalog() {
+    _catalogGeneration++;
+    _catalogRetryTimer?.cancel();
+    if (_catalogRetryDone != null && !_catalogRetryDone!.isCompleted) {
+      _catalogRetryDone!.complete();
+    }
+    final iterator = _catalogIterator;
+    _catalogIterator = null;
+    if (iterator != null) unawaited(_cancelIterator(iterator));
+  }
+
+  Future<void> _watchCatalog(LiveSession session, int generation) async {
+    bool active() =>
+        !_disposed &&
+        connected &&
+        identical(session, _session) &&
+        generation == _catalogGeneration;
+    var attempt = 0;
+    while (active()) {
+      final iterator = StreamIterator(
+        (session as ChannelUpdates).watchChannelChanges(),
+      );
+      _catalogIterator = iterator;
+      try {
+        while (await iterator.moveNext()) {
+          if (!active()) return;
+          attempt = 0;
+          if (!canRead) {
+            _stopSubscription();
+            _messages.clear();
+            cursor = '';
+            _pendingKey = '';
+            _pendingText = '';
+            error = 'Доступ к этому каналу изменён. Выберите доступный чат.';
+          } else if (_activeIterator == null && !busy && channelId.isNotEmpty) {
+            await selectChannel(channelId);
+          }
+          _update();
+        }
+      } catch (problem) {
+        if (!active()) return;
+        if (problem is GrpcError && problem.code == StatusCode.unimplemented) {
+          return;
+        }
+        if (problem is GrpcError &&
+            problem.code == StatusCode.unauthenticated) {
+          try {
+            await session.login();
+          } catch (error) {
+            if (!active()) return;
+            if (_terminal(error)) {
+              connected = false;
+              this.error = _explain(error);
+              _stopSubscription();
+              _messages.clear();
+              _update();
+              return;
+            }
+          }
+        } else if (_terminal(problem)) {
+          connected = false;
+          error = _explain(problem);
+          _stopSubscription();
+          _messages.clear();
+          _update();
+          return;
+        }
+      } finally {
+        if (identical(_catalogIterator, iterator)) _catalogIterator = null;
+        await _cancelIterator(iterator);
+      }
+      if (!active()) return;
+      final done = Completer<void>();
+      _catalogRetryDone = done;
+      _catalogRetryTimer = Timer(retryDelay(attempt), () => done.complete());
+      await done.future;
+      if (attempt < 5) attempt++;
+    }
+  }
+
   bool _current(LiveSession session, int generation) =>
       !_disposed && _session == session && _generation == generation;
   void _stopSubscription() {
@@ -343,9 +431,7 @@ class ChatController extends ChangeNotifier {
     if (iterator != null) unawaited(_cancelIterator(iterator));
   }
 
-  Future<void> _cancelIterator(
-    StreamIterator<SubscribeResponse> iterator,
-  ) async {
+  Future<void> _cancelIterator<T>(StreamIterator<T> iterator) async {
     try {
       await iterator.cancel();
     } catch (_) {}
@@ -506,6 +592,7 @@ class ChatController extends ChangeNotifier {
     _update();
     try {
       await _session!.revoke();
+      _stopCatalog();
       connected = false;
       error = 'Доступ этого устройства отозван. Ключи сохранены; новый grant автоматически не создаётся.';
     } catch (e) {
@@ -523,11 +610,13 @@ class ChatController extends ChangeNotifier {
     if (busy) return;
     busy = true;
     connected = false;
+    _stopCatalog();
     _stopSubscription();
     _update();
     try {
       _positionTimer?.cancel();
       await _savePositions();
+      _stopCatalog();
       await _session?.close();
       _session = null;
       preview = null;
@@ -548,6 +637,7 @@ class ChatController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _stopCatalog();
     _positionTimer?.cancel();
     unawaited(_savePositions());
     _stopSubscription();

@@ -6108,6 +6108,167 @@ class UpdateChannelAccessResponse extends $pb.GeneratedMessage {
   $pb.PbList<ChannelAccessRule> get rules => $_getList(2);
 }
 
+/// Полный авторизованный каталог; его изменения не используют курсор сообщений.
+class WatchChannelsRequest extends $pb.GeneratedMessage {
+  factory WatchChannelsRequest({
+    $core.bool? includeArchived,
+  }) {
+    final result = WatchChannelsRequest._();
+    if (includeArchived != null) result.includeArchived = includeArchived;
+    return result;
+  }
+
+  WatchChannelsRequest._();
+
+  factory WatchChannelsRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      WatchChannelsRequest()..mergeFromBuffer(data, registry);
+  factory WatchChannelsRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      WatchChannelsRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'WatchChannelsRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: WatchChannelsRequest.$_createMessage)
+    ..aOB(1, _omitFieldNames ? '' : 'includeArchived')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  WatchChannelsRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  WatchChannelsRequest copyWith(void Function(WatchChannelsRequest) updates) =>
+      super.copyWith((message) => updates(message as WatchChannelsRequest))
+          as WatchChannelsRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WatchChannelsRequest() / WatchChannelsRequest.new instead')
+  static WatchChannelsRequest create() => WatchChannelsRequest._();
+  static $pb.GeneratedMessage $_createMessage() => WatchChannelsRequest._();
+  @$core.override
+  WatchChannelsRequest createEmptyInstance() => WatchChannelsRequest._();
+  @$core.pragma('dart2js:noInline')
+  static WatchChannelsRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<WatchChannelsRequest>(
+          WatchChannelsRequest.$_createMessage);
+  static WatchChannelsRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.bool get includeArchived => $_getBF(0);
+  @$pb.TagNumber(1)
+  set includeArchived($core.bool value) => $_setBool(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasIncludeArchived() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearIncludeArchived() => $_clearField(1);
+}
+
+class WatchChannelsResponse extends $pb.GeneratedMessage {
+  factory WatchChannelsResponse({
+    $core.Iterable<Channel>? channels,
+    $core.String? spaceTitle,
+    $core.String? role,
+    $core.bool? heartbeat,
+    $core.String? serverId,
+  }) {
+    final result = WatchChannelsResponse._();
+    if (channels != null) result.channels.addAll(channels);
+    if (spaceTitle != null) result.spaceTitle = spaceTitle;
+    if (role != null) result.role = role;
+    if (heartbeat != null) result.heartbeat = heartbeat;
+    if (serverId != null) result.serverId = serverId;
+    return result;
+  }
+
+  WatchChannelsResponse._();
+
+  factory WatchChannelsResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      WatchChannelsResponse()..mergeFromBuffer(data, registry);
+  factory WatchChannelsResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      WatchChannelsResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'WatchChannelsResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: WatchChannelsResponse.$_createMessage)
+    ..pPM<Channel>(1, _omitFieldNames ? '' : 'channels',
+        subBuilder: Channel.$_createMessage)
+    ..aOS(2, _omitFieldNames ? '' : 'spaceTitle')
+    ..aOS(3, _omitFieldNames ? '' : 'role')
+    ..aOB(4, _omitFieldNames ? '' : 'heartbeat')
+    ..aOS(5, _omitFieldNames ? '' : 'serverId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  WatchChannelsResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  WatchChannelsResponse copyWith(
+          void Function(WatchChannelsResponse) updates) =>
+      super.copyWith((message) => updates(message as WatchChannelsResponse))
+          as WatchChannelsResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WatchChannelsResponse() / WatchChannelsResponse.new instead')
+  static WatchChannelsResponse create() => WatchChannelsResponse._();
+  static $pb.GeneratedMessage $_createMessage() => WatchChannelsResponse._();
+  @$core.override
+  WatchChannelsResponse createEmptyInstance() => WatchChannelsResponse._();
+  @$core.pragma('dart2js:noInline')
+  static WatchChannelsResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<WatchChannelsResponse>(
+          WatchChannelsResponse.$_createMessage);
+  static WatchChannelsResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<Channel> get channels => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $core.String get spaceTitle => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set spaceTitle($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasSpaceTitle() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearSpaceTitle() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get role => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set role($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasRole() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearRole() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get heartbeat => $_getBF(3);
+  @$pb.TagNumber(4)
+  set heartbeat($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasHeartbeat() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearHeartbeat() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get serverId => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set serverId($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasServerId() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearServerId() => $_clearField(5);
+}
+
 const $core.bool _omitFieldNames =
     $core.bool.fromEnvironment('protobuf.omit_field_names');
 const $core.bool _omitMessageNames =

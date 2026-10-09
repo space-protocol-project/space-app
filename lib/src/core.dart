@@ -256,6 +256,10 @@ abstract interface class SpacePresentation {
   String get chatTitle;
 }
 
+abstract interface class ChannelUpdates {
+  Stream<void> watchChannelChanges();
+}
+
 abstract interface class ChannelNavigation {
   List<Channel> get availableChannels;
   String get selectedChannelId;
@@ -307,6 +311,7 @@ class SpaceSession
         AdministrativeDeviceControl,
         RootRotationControl,
         ChannelNavigation,
+        ChannelUpdates,
         SpaceAdministration {
   SpaceSession._(this.server, this.record, this.vault, this.channel);
   final Discovery server;
@@ -355,8 +360,12 @@ class SpaceSession
       ListChannelsRequest(includeArchived: true),
       options: _options,
     );
+    _applyCatalog(result.channels, manifest.title);
+  }
+
+  void _applyCatalog(List<Channel> channels, String title) {
     final seen = <String>{};
-    for (final c in result.channels) {
+    for (final c in channels) {
       if (!RegExp(r'^[a-z][a-z0-9_-]{0,63}$').hasMatch(c.id) ||
           !seen.add(c.id) ||
           c.title.isEmpty ||
@@ -365,8 +374,8 @@ class SpaceSession
         throw const FormatException('Некорректный список каналов');
       }
     }
-    spaceTitle = manifest.title;
-    availableChannels = List.unmodifiable(result.channels);
+    spaceTitle = title;
+    availableChannels = List.unmodifiable(channels);
     if (selectedChannelId.isNotEmpty) {
       final current = selectedChannel;
       chatTitle = current?.title ?? 'Канал недоступен';
@@ -382,6 +391,42 @@ class SpaceSession
       selectChannel(initial.id);
     } else {
       chatTitle = 'Нет доступных каналов';
+    }
+  }
+
+  @override
+  Stream<void> watchChannelChanges() async* {
+    await _ensureSession();
+    final stream = ChannelServiceClient(channel).watchChannels(
+      WatchChannelsRequest(includeArchived: true),
+      options: CallOptions(
+        timeout: const Duration(minutes: 11),
+        metadata: {'authorization': 'Bearer $_token'},
+      ),
+    );
+    try {
+      await for (final frame in stream.timeout(const Duration(seconds: 35))) {
+        if (frame.serverId != server.serverId) {
+          throw const FormatException('Каталог относится к другому серверу');
+        }
+        if (frame.heartbeat) {
+          if (frame.channels.isNotEmpty ||
+              frame.spaceTitle.isNotEmpty ||
+              frame.role.isNotEmpty) {
+            throw const FormatException('Heartbeat каталога содержит данные');
+          }
+          continue;
+        }
+        if (!['owner', 'admin', 'member', 'reader'].contains(frame.role) ||
+            frame.spaceTitle.isEmpty) {
+          throw const FormatException('Некорректный снимок каталога');
+        }
+        _applyCatalog(frame.channels, frame.spaceTitle);
+        role = frame.role;
+        yield null;
+      }
+    } finally {
+      await stream.cancel();
     }
   }
 
