@@ -218,6 +218,23 @@ class _SpaceShellState extends State<SpaceShell> {
                   size: 18,
                 ),
                 title: Text(channel.title, overflow: TextOverflow.ellipsis),
+                trailing: controller.unreadCount(channel.id) > 0
+                    ? Tooltip(
+                        message:
+                            'Непрочитанных сообщений: ${controller.unreadCount(channel.id)}',
+                        child: Badge(
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .primary,
+                          textColor: Theme.of(context).colorScheme.onPrimary,
+                          label: Text(
+                            controller.unreadCount(channel.id) > 99
+                                ? '99+'
+                                : '${controller.unreadCount(channel.id)}',
+                          ),
+                        ),
+                      )
+                    : null,
                 subtitle: channel.archived
                     ? const Text('Архив')
                     : !channel.permissions.read

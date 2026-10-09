@@ -369,6 +369,7 @@ class SpaceSession
       if (!RegExp(r'^[a-z][a-z0-9_-]{0,63}$').hasMatch(c.id) ||
           !seen.add(c.id) ||
           c.title.isEmpty ||
+          c.latestMessageSequence.isNegative ||
           !c.views.any((v) => v.type == 'chat') ||
           !c.hasPermissions()) {
         throw const FormatException('Некорректный список каналов');
@@ -881,6 +882,9 @@ class SpaceSession
         ListContentRequest(channelId: id, after: cursor),
         options: _options,
       );
+      if (response.contents.any((message) => message.sequence.isNegative)) {
+        throw const FormatException('Некорректный порядковый номер сообщения');
+      }
       result.addAll(response.contents);
       if (response.contents.length < 100) return result;
       if (response.nextCursor.isEmpty || response.nextCursor == cursor) {

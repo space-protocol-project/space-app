@@ -1013,6 +1013,13 @@ const Channel$json = {
       '10': 'permissions'
     },
     {'1': 'public_preview', '3': 8, '4': 1, '5': 8, '10': 'publicPreview'},
+    {
+      '1': 'latest_message_sequence',
+      '3': 9,
+      '4': 1,
+      '5': 3,
+      '10': 'latestMessageSequence'
+    },
   ],
 };
 
@@ -1022,7 +1029,8 @@ final $typed_data.Uint8List channelDescriptor = $convert.base64Decode(
     'MYAyADKAsyDi5zcGFjZS52MS5WaWV3UgV2aWV3cxIaCghwb3NpdGlvbhgEIAEoBVIIcG9zaXRp'
     'b24SGgoIYXJjaGl2ZWQYBSABKAhSCGFyY2hpdmVkEhoKCHJldmlzaW9uGAYgASgDUghyZXZpc2'
     'lvbhI+CgtwZXJtaXNzaW9ucxgHIAEoCzIcLnNwYWNlLnYxLkNoYW5uZWxQZXJtaXNzaW9uc1IL'
-    'cGVybWlzc2lvbnMSJQoOcHVibGljX3ByZXZpZXcYCCABKAhSDXB1YmxpY1ByZXZpZXc=');
+    'cGVybWlzc2lvbnMSJQoOcHVibGljX3ByZXZpZXcYCCABKAhSDXB1YmxpY1ByZXZpZXcSNgoXbG'
+    'F0ZXN0X21lc3NhZ2Vfc2VxdWVuY2UYCSABKANSFWxhdGVzdE1lc3NhZ2VTZXF1ZW5jZQ==');
 
 @$core.Deprecated('Use channelPermissionsDescriptor instead')
 const ChannelPermissions$json = {
@@ -1270,13 +1278,15 @@ const Content$json = {
     {'1': 'channel_id', '3': 2, '4': 1, '5': 9, '10': 'channelId'},
     {'1': 'text', '3': 3, '4': 1, '5': 9, '10': 'text'},
     {'1': 'author_id', '3': 4, '4': 1, '5': 9, '10': 'authorId'},
+    {'1': 'sequence', '3': 5, '4': 1, '5': 3, '10': 'sequence'},
   ],
 };
 
 /// Descriptor for `Content`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List contentDescriptor = $convert.base64Decode(
     'CgdDb250ZW50Eg4KAmlkGAEgASgJUgJpZBIdCgpjaGFubmVsX2lkGAIgASgJUgljaGFubmVsSW'
-    'QSEgoEdGV4dBgDIAEoCVIEdGV4dBIbCglhdXRob3JfaWQYBCABKAlSCGF1dGhvcklk');
+    'QSEgoEdGV4dBgDIAEoCVIEdGV4dBIbCglhdXRob3JfaWQYBCABKAlSCGF1dGhvcklkEhoKCHNl'
+    'cXVlbmNlGAUgASgDUghzZXF1ZW5jZQ==');
 
 @$core.Deprecated('Use createContentRequestDescriptor instead')
 const CreateContentRequest$json = {

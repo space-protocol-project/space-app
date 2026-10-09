@@ -16,17 +16,26 @@ class ChatView extends StatefulWidget {
   State<ChatView> createState() => _ChatViewState();
 }
 
-class _ChatViewState extends State<ChatView> {
+class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   final draft = TextEditingController();
   final scroll = ScrollController();
   final Map<String, String> drafts = {};
   final Map<String, double> offsets = {};
   bool restoreScroll = true;
   String scope = '';
+  final viewport = GlobalKey();
+  final messageKeys = <String, GlobalKey>{};
+  String entryReadThrough = '';
+  bool foreground = true, jumping = false;
   @override
   void initState() {
     super.initState();
     scope = widget.controller.draftScope;
+    entryReadThrough = widget.controller.readThrough;
+    foreground =
+        WidgetsBinding.instance.lifecycleState == null ||
+        WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
+    WidgetsBinding.instance.addObserver(this);
     scroll.addListener(markRead);
   }
 
@@ -37,6 +46,8 @@ class _ChatViewState extends State<ChatView> {
     if (next != scope) {
       drafts[scope] = draft.text;
       scope = next;
+      entryReadThrough = widget.controller.readThrough;
+      messageKeys.clear();
       draft.text = drafts[scope] ?? '';
       restoreScroll = true;
     }
@@ -45,17 +56,101 @@ class _ChatViewState extends State<ChatView> {
   void markRead() {
     final c = widget.controller;
     if (scroll.hasClients) offsets[scope] = scroll.offset;
-    if (widget.active &&
-        c.canRead &&
-        scroll.hasClients &&
-        scroll.position.extentAfter < 24 &&
-        c.messages.isNotEmpty) {
+    if (jumping ||
+        ModalRoute.of(context)?.isCurrent == false ||
+        !widget.active ||
+        !foreground ||
+        !c.canRead ||
+        !scroll.hasClients ||
+        c.messages.isEmpty) {
+      return;
+    }
+    if (scroll.position.extentAfter < 24) {
       c.markRead(c.messages.last.id);
+      return;
+    }
+    final box = viewport.currentContext?.findRenderObject();
+    if (box is! RenderBox || !box.hasSize) return;
+    final top = box.localToGlobal(Offset.zero).dy,
+        bottom = box.localToGlobal(Offset(0, box.size.height)).dy;
+    String? lastVisible;
+    for (final message in c.messages) {
+      final row = messageKeys[message.id]?.currentContext?.findRenderObject();
+      if (row is! RenderBox || !row.hasSize) continue;
+      final start = row.localToGlobal(Offset.zero).dy;
+      final end = row.localToGlobal(Offset(0, row.size.height)).dy;
+      if (start >= top && end <= bottom) lastVisible = message.id;
+    }
+    if (lastVisible != null) c.markRead(lastVisible);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (mounted) {
+      setState(() => foreground = state == AppLifecycleState.resumed);
+    }
+  }
+
+  Future<void> jumpToNew() async {
+    if (jumping || !scroll.hasClients) return;
+    final c = widget.controller, startingScope = scope;
+    final list = c.messages;
+    final index = list.indexWhere((m) => m.id == c.readThrough) + 1;
+    if (index >= list.length) return;
+    final id = list[index].id;
+    jumping = true;
+    var low = 0.0, high = scroll.position.maxScrollExtent;
+    try {
+      for (
+        var attempt = 0;
+        attempt < 24 && mounted && scope == startingScope;
+        attempt++
+      ) {
+        final target = messageKeys[id]?.currentContext;
+        if (target != null && target.mounted) {
+          await Scrollable.ensureVisible(
+            target,
+            duration: const Duration(milliseconds: 260),
+            alignment: .1,
+          );
+          break;
+        }
+        final viewportBox = viewport.currentContext?.findRenderObject();
+        if (viewportBox is! RenderBox || !scroll.hasClients) break;
+        final top = viewportBox.localToGlobal(Offset.zero).dy;
+        final bottom = top + viewportBox.size.height;
+        final visible = <int>[];
+        for (var i = 0; i < list.length; i++) {
+          final box = messageKeys[list[i].id]?.currentContext
+              ?.findRenderObject();
+          if (box is! RenderBox || !box.hasSize) continue;
+          final y = box.localToGlobal(Offset.zero).dy;
+          if (y < bottom && y + box.size.height > top) visible.add(i);
+        }
+        if (visible.isEmpty) break;
+        if (index < visible.first) {
+          high = scroll.offset;
+        } else {
+          low = scroll.offset;
+        }
+        final next = (low + high) / 2;
+        if ((next - scroll.offset).abs() < 1) break;
+        scroll.jumpTo(next);
+        await WidgetsBinding.instance.endOfFrame;
+      }
+    } finally {
+      if (mounted) {
+        setState(() => jumping = false);
+        if (scope == startingScope) markRead();
+      } else {
+        jumping = false;
+      }
     }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     draft.dispose();
     scroll.dispose();
     super.dispose();
@@ -145,7 +240,7 @@ class _ChatViewState extends State<ChatView> {
                         DropdownMenuItem(
                           value: channel.id,
                           child: Text(
-                            '${channel.title}${channel.archived ? ' · Архив' : ''}${!channel.permissions.read ? ' · Нет чтения' : ''}',
+                            '${channel.title}${channel.archived ? ' · Архив' : ''}${!channel.permissions.read ? ' · Нет чтения' : ''}${c.unreadCount(channel.id) > 0 ? ' · ${c.unreadCount(channel.id)} новых' : ''}',
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -225,6 +320,7 @@ class _ChatViewState extends State<ChatView> {
                   ),
                 )
               : ListView.builder(
+                  key: viewport,
                   controller: scroll,
                   padding: const EdgeInsets.all(24),
                   itemCount: c.messages.length,
@@ -236,7 +332,11 @@ class _ChatViewState extends State<ChatView> {
                         : message.authorId.length > 16
                         ? '${message.authorId.substring(0, 16)}…'
                         : message.authorId;
+                    final boundary =
+                        c.messages.indexWhere((m) => m.id == entryReadThrough) +
+                        1;
                     return Padding(
+                      key: messageKeys.putIfAbsent(message.id, GlobalKey.new),
                       padding: const EdgeInsets.only(bottom: 24),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,6 +354,17 @@ class _ChatViewState extends State<ChatView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                if (index == boundary)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: Text(
+                                      'Новые сообщения',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: colors.primary,
+                                      ),
+                                    ),
+                                  ),
                                 Text(
                                   author,
                                   style: TextStyle(
@@ -269,18 +380,6 @@ class _ChatViewState extends State<ChatView> {
                                     height: 1.65,
                                   ),
                                 ),
-                                if (message.id == c.readThrough &&
-                                    index < c.messages.length - 1)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 12),
-                                    child: Text(
-                                      'Прочитано до этого места',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: colors.primary,
-                                      ),
-                                    ),
-                                  ),
                               ],
                             ),
                           ),
@@ -290,6 +389,18 @@ class _ChatViewState extends State<ChatView> {
                   },
                 ),
         ),
+        if (c.canRead && c.unreadCount(c.channelId) > 0)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: FilledButton.tonalIcon(
+                onPressed: jumpToNew,
+                icon: const Icon(Icons.arrow_downward, size: 18),
+                label: Text('Новые сообщения: ${c.unreadCount(c.channelId)}'),
+              ),
+            ),
+          ),
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 18),
           child: Row(

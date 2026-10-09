@@ -25,11 +25,46 @@ class ChatController extends ChangeNotifier {
   }
 
   final Map<String, String> _cursors = {}, _readThrough = {};
+  final Map<String, int> _readSequences = {};
   ChannelNavigation? get navigation =>
       _session is ChannelNavigation ? _session as ChannelNavigation : null;
   List<Channel> get channels => navigation?.availableChannels ?? [];
   String get channelId => navigation?.selectedChannelId ?? 'general';
   bool get canRead => navigation?.canRead ?? connected;
+  int readSequence(String id) {
+    final saved = _readSequences[id] ?? 0;
+    if (saved > 0 || id != channelId) return saved;
+    return messages
+            .where((m) => m.id == (_readThrough[id] ?? ''))
+            .firstOrNull
+            ?.sequence
+            .toInt() ??
+        0;
+  }
+
+  int unreadCount(String id) {
+    final entry = channels.where((c) => c.id == id).firstOrNull;
+    if (!connected || entry?.permissions.read != true) return 0;
+    var latest = entry!.latestMessageSequence.toInt();
+    if (id == channelId) {
+      for (final message in messages) {
+        if (message.sequence.toInt() > latest) {
+          latest = message.sequence.toInt();
+        }
+      }
+    }
+    if (id != channelId &&
+        (_readThrough[id] ?? '').isNotEmpty &&
+        readSequence(id) == 0) {
+      return 0;
+    }
+    if (latest > 0) return (latest - readSequence(id)).clamp(0, latest);
+    // Старые серверы: только известные загруженные сообщения, без счётчика других каналов.
+    if (id != channelId) return 0;
+    final index = messages.indexWhere((m) => m.id == (_readThrough[id] ?? ''));
+    return messages.length - index - 1;
+  }
+
   String get readThrough => _readThrough[channelId] ?? '';
   String get draftScope =>
       '${preview?.origin}|${preview?.serverId}|$principalId|$channelId';
@@ -38,6 +73,7 @@ class ChatController extends ChangeNotifier {
     final nav = navigation;
     _cursors.clear();
     _readThrough.clear();
+    _readSequences.clear();
     if (nav == null) return;
     try {
       final data = await positions.load(nav.positionScope);
@@ -48,6 +84,9 @@ class ChatController extends ChangeNotifier {
           if (item['cursor'] is String &&
               (item['cursor'] as String).length <= 128) {
             _cursors[entry.id] = item['cursor'];
+          }
+          if (item['readSequence'] is int && item['readSequence'] >= 0) {
+            _readSequences[entry.id] = item['readSequence'];
           }
           if (item['readThrough'] is String &&
               (item['readThrough'] as String).length <= 128) {
@@ -72,6 +111,7 @@ class ChatController extends ChangeNotifier {
       channelData[c.id] = {
         'cursor': _cursors[c.id] ?? '',
         'readThrough': _readThrough[c.id] ?? '',
+        'readSequence': readSequence(c.id),
       };
     }
     try {
@@ -88,8 +128,17 @@ class ChatController extends ChangeNotifier {
 
   void markRead(String id) {
     if (!canRead || id.isEmpty || _readThrough[channelId] == id) return;
+    final list = messages;
+    final index = list.indexWhere((m) => m.id == id);
+    if (index < 0) return;
+    final previousIndex = list.indexWhere((m) => m.id == readThrough);
+    final sequence = list[index].sequence.toInt();
+    if (sequence > 0 && sequence < readSequence(channelId)) return;
+    if (sequence == 0 && previousIndex > index) return;
     _readThrough[channelId] = id;
+    if (sequence > 0) _readSequences[channelId] = sequence;
     _queuePositions();
+    _update();
   }
 
   final IdentityVault vault;
@@ -227,6 +276,13 @@ class ChatController extends ChangeNotifier {
           throw const FormatException('История другого канала');
         }
         _messages[message.id] = message;
+      }
+      if (readSequence(channelId) == 0 && readThrough.isNotEmpty) {
+        final marked = messages.where((m) => m.id == readThrough).firstOrNull;
+        if (marked != null && marked.sequence.toInt() > 0) {
+          _readSequences[channelId] = marked.sequence.toInt();
+          _queuePositions();
+        }
       }
       cursor = _cursors[channelId] ?? '';
       connected = true;
@@ -477,6 +533,7 @@ class ChatController extends ChangeNotifier {
                 !frame.event.hasContent() ||
                 frame.event.content.channelId != watchedChannel ||
                 frame.event.content.id.isEmpty ||
+                frame.event.content.sequence.isNegative ||
                 frame.cursor.isEmpty ||
                 frame.event.cursor != frame.cursor) {
               throw const FormatException('Неподдерживаемое событие потока');
@@ -627,6 +684,7 @@ class ChatController extends ChangeNotifier {
       _pendingText = '';
       _cursors.clear();
       _readThrough.clear();
+      _readSequences.clear();
       error = '';
     } finally {
       busy = false;

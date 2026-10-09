@@ -124,6 +124,25 @@ Future<void> nativeManagementScenarios(SpaceSession owner) async {
       renamed.title == 'После изменения' && renamed.archived,
       'Название или архив не обновились',
     );
+    final counterMessage = await owner.send(
+      'Проверка счётчика новых сообщений',
+      newRequestKey(),
+    );
+    require(
+      counterMessage.sequence.toInt() > 0,
+      'Нет порядкового номера сообщения',
+    );
+    require(
+      await updates.moveNext().timeout(const Duration(seconds: 5)),
+      'Каталог не обновил счётчик',
+    );
+    require(
+      owner.availableChannels
+              .firstWhere((c) => c.id == owner.selectedChannelId)
+              .latestMessageSequence ==
+          counterMessage.sequence,
+      'Последний номер каталога не совпал с сообщением',
+    );
   } finally {
     await updates.cancel();
   }

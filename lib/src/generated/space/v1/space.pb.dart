@@ -4119,6 +4119,7 @@ class Channel extends $pb.GeneratedMessage {
     $fixnum.Int64? revision,
     ChannelPermissions? permissions,
     $core.bool? publicPreview,
+    $fixnum.Int64? latestMessageSequence,
   }) {
     final result = Channel._();
     if (id != null) result.id = id;
@@ -4129,6 +4130,8 @@ class Channel extends $pb.GeneratedMessage {
     if (revision != null) result.revision = revision;
     if (permissions != null) result.permissions = permissions;
     if (publicPreview != null) result.publicPreview = publicPreview;
+    if (latestMessageSequence != null)
+      result.latestMessageSequence = latestMessageSequence;
     return result;
   }
 
@@ -4155,6 +4158,7 @@ class Channel extends $pb.GeneratedMessage {
     ..aOM<ChannelPermissions>(7, _omitFieldNames ? '' : 'permissions',
         subBuilder: ChannelPermissions.$_createMessage)
     ..aOB(8, _omitFieldNames ? '' : 'publicPreview')
+    ..aInt64(9, _omitFieldNames ? '' : 'latestMessageSequence')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -4244,6 +4248,16 @@ class Channel extends $pb.GeneratedMessage {
   $core.bool hasPublicPreview() => $_has(7);
   @$pb.TagNumber(8)
   void clearPublicPreview() => $_clearField(8);
+
+  /// Только для авторизованного read; иначе 0.
+  @$pb.TagNumber(9)
+  $fixnum.Int64 get latestMessageSequence => $_getI64(8);
+  @$pb.TagNumber(9)
+  set latestMessageSequence($fixnum.Int64 value) => $_setInt64(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasLatestMessageSequence() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearLatestMessageSequence() => $_clearField(9);
 }
 
 /// write требует read, read и manage требуют visible.
@@ -5176,12 +5190,14 @@ class Content extends $pb.GeneratedMessage {
     $core.String? channelId,
     $core.String? text,
     $core.String? authorId,
+    $fixnum.Int64? sequence,
   }) {
     final result = Content._();
     if (id != null) result.id = id;
     if (channelId != null) result.channelId = channelId;
     if (text != null) result.text = text;
     if (authorId != null) result.authorId = authorId;
+    if (sequence != null) result.sequence = sequence;
     return result;
   }
 
@@ -5202,6 +5218,7 @@ class Content extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'channelId')
     ..aOS(3, _omitFieldNames ? '' : 'text')
     ..aOS(4, _omitFieldNames ? '' : 'authorId')
+    ..aInt64(5, _omitFieldNames ? '' : 'sequence')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -5259,6 +5276,15 @@ class Content extends $pb.GeneratedMessage {
   $core.bool hasAuthorId() => $_has(3);
   @$pb.TagNumber(4)
   void clearAuthorId() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get sequence => $_getI64(4);
+  @$pb.TagNumber(5)
+  set sequence($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasSequence() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearSequence() => $_clearField(5);
 }
 
 class CreateContentRequest extends $pb.GeneratedMessage {
