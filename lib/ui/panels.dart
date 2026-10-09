@@ -287,7 +287,13 @@ class IdentityPanel extends StatelessWidget {
       if (controller.administration != null)
         FilledButton.icon(
           onPressed: () async {
-            await openServerAdministration(context, controller.administration!);
+            await openServerAdministration(
+              context,
+              controller.administration!,
+              onDeviceRevoked: () {
+                controller.disconnect();
+              },
+            );
             await controller.refreshChannels();
           },
           icon: const Icon(Icons.settings_outlined),

@@ -6,6 +6,33 @@ import 'package:space_client/src/core.dart';
 import 'package:space_client/src/generated/space/v1/space.pb.dart';
 
 void main() {
+  test('Приглашение открывается в приложении без маршрута веб-панели', () {
+    final code = 'iv_${'a' * 43}';
+    for (final path in ['', '/']) {
+      final input = parseConnectionInput(
+        'http://127.0.0.1:8080$path#invite=$code',
+      );
+      expect(input.origin.toString(), 'http://127.0.0.1:8080');
+      expect(input.invitationToken, code);
+    }
+    expect(
+      () => parseConnectionInput(
+        'http://127.0.0.1:8080#invite=$code',
+        invitationToken: 'other',
+      ),
+      throwsFormatException,
+    );
+    for (final address in [
+      'http://127.0.0.1:8080#invite=bad',
+      'http://127.0.0.1:8080#invite=$code&extra=1',
+      'http://127.0.0.1:8080/api#invite=$code',
+      'http://127.0.0.1:8080/space#invite=$code',
+      'http://user:pass@127.0.0.1:8080#invite=$code',
+    ]) {
+      expect(() => parseConnectionInput(address), throwsFormatException);
+    }
+  });
+
   test('Внешний URL и credentials в адресе отклоняются', () {
     expect(localOrigin('http://127.0.0.1:8080').port, 8080);
     for (final address in [

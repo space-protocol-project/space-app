@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:space_admin_ui/space_admin_ui.dart';
 
 import '../src/chat_controller.dart';
 import '../src/core.dart';
@@ -162,77 +162,16 @@ class _PairingStartPanelState extends State<PairingStartPanel> {
   }
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      const SizedBox(height: 18),
-      const Divider(),
-      const SizedBox(height: 12),
-      Text(
-        'У вас уже есть идентичность?',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      const SizedBox(height: 8),
-      const Text(
-        'Подключите этот компьютер через подтверждение на исходном устройстве. Корневой ключ и карточка не копируются. Для сопряжения приглашение не нужно.',
-      ),
-      const SizedBox(height: 12),
-      if (pending == null)
-        OutlinedButton.icon(
-          onPressed:
-              busy || widget.controller.busy || widget.controller.connected
-              ? null
-              : start,
-          icon: const Icon(Icons.devices),
-          label: const Text('Доверять серверу и начать сопряжение'),
-        ),
-      if (pending != null) ...[
-        const Text(
-          'На исходном устройстве откройте «Идентичность» → «Подтвердить устройство» либо раздел сопряжения в /space. Код действует пять минут.',
-        ),
-        const SizedBox(height: 10),
-        SelectableText(pending!.request.code),
-        TextButton.icon(
-          onPressed: () =>
-              Clipboard.setData(ClipboardData(text: pending!.request.code)),
-          icon: const Icon(Icons.copy),
-          label: const Text('Скопировать код'),
-        ),
-        if (candidate == null && error.isEmpty)
-          const Text('Ожидаем подпись исходного устройства…'),
-        if (candidate == null && verification.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          const Text(
-            'Введите этот код проверки на управляющем устройстве до выдачи подписи:',
-          ),
-          SelectableText(
-            verification,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-        ],
-        if (candidate != null) ...[
-          const SizedBox(height: 12),
-          const Text('Root-подпись проверена. Сверьте код на обоих экранах:'),
-          SelectableText(
-            verification,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          FilledButton(
-            onPressed: busy ? null : accept,
-            child: const Text('Код совпадает — подключиться'),
-          ),
-        ],
-        TextButton(
-          onPressed: busy ? null : cancel,
-          child: const Text('Отменить сопряжение'),
-        ),
-      ],
-      if (busy) const LinearProgressIndicator(),
-      if (error.isNotEmpty)
-        Text(
-          error,
-          style: TextStyle(color: Theme.of(context).colorScheme.error),
-        ),
-    ],
+  Widget build(BuildContext context) => PairingStartView(
+    busy: busy,
+    connectionBusy: widget.controller.busy,
+    connected: widget.controller.connected,
+    code: pending?.request.code ?? '',
+    signatureVerified: candidate != null,
+    verification: verification,
+    error: error,
+    onStart: start,
+    onAccept: accept,
+    onCancel: cancel,
   );
 }

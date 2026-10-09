@@ -118,7 +118,8 @@ class ChatController extends ChangeNotifier {
   String get principalId => _session?.principalId ?? '';
   SpaceAdministration? get administration =>
       _session is SpaceAdministration &&
-          (_session as SpaceAdministration).canManageSpace
+          ((_session as SpaceAdministration).canManageSpace ||
+              (_session as SpaceAdministration).needsOwnerSetup)
       ? _session as SpaceAdministration
       : null;
   DeviceManagement? get deviceManagement =>
@@ -156,11 +157,15 @@ class ChatController extends ChangeNotifier {
     invitationRole = '';
     _update();
     try {
-      final server = await discover(address);
+      final input = parseConnectionInput(
+        address,
+        invitationToken: invitationToken,
+      );
+      final server = await discover(input.origin.toString());
       final saved = await vault.load(server.origin.toString());
       if (saved != null) checkTrust(server, saved);
       fingerprint = await server.fingerprint();
-      final invite = invitationToken.trim();
+      final invite = input.invitationToken;
       if (invite.isNotEmpty) {
         final result = await SpaceSession.previewInvitation(server, invite);
         _invitationToken = invite;

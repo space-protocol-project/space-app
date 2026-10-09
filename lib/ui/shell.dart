@@ -270,6 +270,9 @@ class _SpaceShellState extends State<SpaceShell> {
                       await openServerAdministration(
                         context,
                         controller.administration!,
+                        onDeviceRevoked: () {
+                          controller.disconnect();
+                        },
                       );
                       await controller.refreshChannels();
                     },

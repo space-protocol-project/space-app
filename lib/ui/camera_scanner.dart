@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 
 import '../src/camera_qr.dart';
 
+import 'package:space_admin_ui/space_admin_ui.dart';
+
 Future<String?> scanRecoveryCamera(BuildContext context) => showDialog<String>(
   context: context,
   barrierDismissible: false,
@@ -169,60 +171,26 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Сканировать карточку'),
-    content: SizedBox(
-      width: 560,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Наведите камеру на QR-карточку Space. Кадры обрабатываются на этом устройстве. Микрофон выключен.',
-          ),
-          const SizedBox(height: 12),
-          if (cameras.length > 1)
-            DropdownButton<CameraDescription>(
-              value: selected,
-              isExpanded: true,
-              items: [
-                for (var i = 0; i < cameras.length; i++)
-                  DropdownMenuItem(
-                    value: cameras[i],
-                    child: Text(
-                      'Камера ${i + 1} — ${cameras[i].name}',
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-              ],
-              onChanged: starting ? null : (camera) => unawaited(start(camera)),
-            ),
-          if (error != null)
-            Text(error!)
-          else if (controller?.value.isInitialized == true)
-            AspectRatio(
-              aspectRatio: controller!.value.aspectRatio,
-              child: CameraPreview(controller!),
-            )
-          else
-            const Padding(
-              padding: EdgeInsets.all(24),
-              child: CircularProgressIndicator(),
-            ),
-        ],
-      ),
-    ),
-    actions: [
-      TextButton(
-        onPressed: starting ? null : () => unawaited(start(selected)),
-        child: const Text('Включить снова'),
-      ),
-      TextButton(
-        onPressed: () async {
-          await stop();
-          if (context.mounted) Navigator.of(context).pop();
-        },
-        child: const Text('Отмена'),
-      ),
-    ],
+  Widget build(BuildContext context) => RecoveryCameraView(
+    cameras: [for (final camera in cameras) camera.name],
+    selected: selected?.name,
+    starting: starting,
+    error: error,
+    preview: controller?.value.isInitialized == true
+        ? AspectRatio(
+            aspectRatio: controller!.value.aspectRatio,
+            child: CameraPreview(controller!),
+          )
+        : null,
+    onSelect: (name) {
+      if (name != null) {
+        unawaited(start(cameras.firstWhere((c) => c.name == name)));
+      }
+    },
+    onRestart: () => unawaited(start(selected)),
+    onCancel: () async {
+      await stop();
+      if (context.mounted) Navigator.of(context).pop();
+    },
   );
 }

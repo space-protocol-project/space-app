@@ -1,3 +1,10 @@
+import 'package:file_selector/file_selector.dart';
+import 'package:flutter/foundation.dart';
+
+import '../src/generated/space/v1/space.pb.dart';
+import '../src/recovery_card.dart';
+import '../src/recovery_qr.dart';
+
 import 'package:flutter/material.dart';
 import 'package:grpc/grpc.dart';
 import 'package:space_api/space_api.dart';
@@ -40,8 +47,9 @@ class NativeAdminGateway extends SpaceGateway {
 
 Future<void> openServerAdministration(
   BuildContext context,
-  SpaceAdministration session,
-) async {
+  SpaceAdministration session, {
+  VoidCallback? onDeviceRevoked,
+}) async {
   await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -51,10 +59,70 @@ Future<void> openServerAdministration(
       height: MediaQuery.sizeOf(context).height * .9,
       child: AdminPage(
         autoConnect: true,
-        allowLogout: false,
-        allowIdentityCreation: false,
         login: ({bool create = false}) => session.adminIdentity(),
         gateway: (uri) => NativeAdminGateway(uri, session),
+        authorizeDevice: session is AdministrativeDeviceControl
+            ? (password) async {
+                DeviceRecord? authority;
+                if (!(session as DeviceManagement).hasRootAuthority) {
+                  final file = await openFile(
+                    acceptedTypeGroups: const [
+                      XTypeGroup(
+                        label: 'Корневая карточка Space',
+                        extensions: ['json', 'png'],
+                      ),
+                    ],
+                  );
+                  if (file == null) throw StateError('Выбор карточки отменён');
+                  if (await file.length() > maxRecoveryImageBytes) {
+                    throw const FormatException('Карточка слишком большая');
+                  }
+                  authority = await recordFromRecovery(
+                    await compute(openCardInWorker, [
+                      await compute(artifactInWorker, await file.readAsBytes()),
+                      password,
+                    ]),
+                  );
+                }
+                await (session as AdministrativeDeviceControl)
+                    .authorizeAdministration(authority: authority);
+              }
+            : null,
+        revokeDevice: session is DeviceManagement
+            ? (grant, password) async {
+                final manager = session as DeviceManagement;
+                DeviceRecord? authority;
+                if (!manager.hasRootAuthority &&
+                    grant['id'] != manager.currentGrantId) {
+                  final file = await openFile(
+                    acceptedTypeGroups: const [
+                      XTypeGroup(
+                        label: 'Карточка Space',
+                        extensions: ['json', 'png'],
+                      ),
+                    ],
+                  );
+                  if (file == null) throw StateError('Выбор карточки отменён');
+                  if (await file.length() > maxRecoveryImageBytes) {
+                    throw const FormatException('Карточка слишком большая');
+                  }
+                  authority = await recordFromRecovery(
+                    await compute(openCardInWorker, [
+                      await compute(artifactInWorker, await file.readAsBytes()),
+                      password,
+                    ]),
+                  );
+                }
+                await manager.revokeDevice(
+                  DeviceGrant()..mergeFromProto3Json(grant),
+                  authority: authority,
+                );
+              }
+            : null,
+        onDeviceRevoked: () {
+          onDeviceRevoked?.call();
+          if (context.mounted) Navigator.pop(context);
+        },
         onClose: () => Navigator.pop(context),
       ),
     ),

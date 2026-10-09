@@ -73,7 +73,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
               controller: address,
               enabled: !c.busy && !c.connected,
               decoration: const InputDecoration(
-                labelText: 'Адрес сервера',
+                labelText: 'Адрес сервера или ссылка приглашения',
                 hintText: 'http://127.0.0.1:8080',
               ),
             ),

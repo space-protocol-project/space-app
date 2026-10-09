@@ -13,7 +13,9 @@ import '../src/recovery_qr.dart';
 import '../src/pairing.dart';
 import '../src/root_rotation.dart' as rotation;
 import '../src/generated/space/v1/space.pbgrpc.dart' show AuthServiceClient;
-import 'components.dart';
+
+import 'package:space_admin_ui/space_admin_ui.dart';
+
 import 'camera_scanner.dart';
 
 class RecoveryPanel extends StatefulWidget {
@@ -61,89 +63,9 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     }
   }
 
-  Future<bool> confirm(String text) async =>
-      await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Подтвердите действие'),
-          content: Text(text),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Отмена'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Подтвердить'),
-            ),
-          ],
-        ),
-      ) ??
-      false;
-  Future<String?> password(bool creating) async {
-    final first = TextEditingController(), second = TextEditingController();
-    String? error;
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, update) => AlertDialog(
-          title: Text(creating ? 'Защитите карточку' : 'Открыть карточку'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Пароль шифрует файл только на этом устройстве. Сервер его не получает. Используйте несколько случайных слов и храните пароль отдельно.',
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: first,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Пароль (от 12 символов)',
-                  ),
-                ),
-                if (creating) ...[
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: second,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Повторите пароль',
-                    ),
-                  ),
-                ],
-                if (error != null) Text(error!),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Отмена'),
-            ),
-            FilledButton(
-              onPressed: () {
-                if (first.text.length < 12 ||
-                    (creating && first.text != second.text)) {
-                  update(
-                    () => error =
-                        'Пароль слишком короткий или значения не совпадают.',
-                  );
-                  return;
-                }
-                Navigator.pop(context, first.text);
-              },
-              child: Text(creating ? 'Зашифровать' : 'Открыть'),
-            ),
-          ],
-        ),
-      ),
-    );
-    first.dispose();
-    second.dispose();
-    return result;
-  }
+  Future<bool> confirm(String text) => confirmRecoveryAction(context, text);
+  Future<String?> password(bool creating) =>
+      askRecoveryPassword(context, creating: creating);
 
   Future<void> export() async {
     final manager = widget.controller.deviceManagement;
@@ -406,222 +328,46 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
   }
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      SurfaceCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Смена корневого ключа',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Сохраняет вашу идентичность и закрывает доступ прежним ключам. Начать смену можно на устройстве с корневым ключом. После сбоя завершите сохранённую смену. Если запрос истёк до завершения на сервере, подключитесь прежним ключом и обновите запрос.',
-            ),
-            const SizedBox(height: 12),
-            if (widget.controller.connected &&
-                widget.controller.deviceManagement?.hasRootAuthority == true &&
-                widget.controller.deviceManagement is RootRotationControl) ...[
-              OutlinedButton(
-                onPressed: pending ? null : () => run(rotate),
-                child: const Text('Сменить корневой ключ'),
-              ),
-              TextButton(
-                onPressed: pending
-                    ? null
-                    : () => run(() => rotate(renew: true)),
-                child: const Text('Обновить истёкший запрос'),
-              ),
-            ],
-            OutlinedButton(
-              onPressed: pending || widget.controller.preview == null
-                  ? null
-                  : () => run(finishRotation),
-              child: const Text('Завершить сохранённую смену'),
-            ),
-          ],
+  Widget build(BuildContext context) => RecoveryToolsView(
+    connected: widget.controller.connected,
+    hasServer: widget.controller.preview != null,
+    hasDeviceManagement: widget.controller.deviceManagement != null,
+    hasRootAuthority:
+        widget.controller.deviceManagement?.hasRootAuthority == true,
+    canRotate: widget.controller.deviceManagement is RootRotationControl,
+    pending: pending,
+    message: message,
+    pairingCode: pairingCode,
+    pairingEntered: pairingEntered,
+    pairingCheck: pairingCheck,
+    pairingPrepared: preparedPair != null,
+    currentGrantId: widget.controller.deviceManagement?.currentGrantId ?? '',
+    devices: [
+      for (final g in devices)
+        RecoveryDeviceView(
+          id: g.id,
+          expiresAt: g.expiresAt.toInt(),
+          revoked: g.revoked,
+          recovery: g.recovery,
         ),
-      ),
-      const SizedBox(height: 20),
-      SurfaceCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Подтвердить устройство',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Введите одноразовый код с нового устройства. Подпись требует root или открытую recovery-карточку. Для recovery-карточки новое устройство проверяет цепочку от исходного root.',
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: pairingCode,
-              onChanged: (_) => setState(() {
-                preparedPair = null;
-                preparedAuthority = null;
-                pairingCheck = '';
-              }),
-              decoration: const InputDecoration(
-                labelText: 'Код сопряжения',
-                hintText: 'pc_…',
-              ),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed:
-                  pending ||
-                      !widget.controller.connected ||
-                      widget.controller.deviceManagement == null
-                  ? null
-                  : () => run(approve),
-              icon: const Icon(Icons.verified_user_outlined),
-              label: const Text('Проверить и подтвердить'),
-            ),
-            if (pairingCheck.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              const Text('Код проверки для сравнения с новым устройством'),
-              SelectableText(
-                pairingCheck,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              if (preparedPair != null) ...[
-                const SizedBox(height: 12),
-                TextField(
-                  controller: pairingEntered,
-                  decoration: const InputDecoration(
-                    labelText: 'Код проверки с нового устройства',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                FilledButton(
-                  onPressed: pending ? null : () => run(finishPairing),
-                  child: const Text('Коды совпадают — подписать'),
-                ),
-              ],
-            ],
-          ],
-        ),
-      ),
-      const SizedBox(height: 20),
-      SurfaceCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Восстановление доступа',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Зашифрованная карточка сохраняет доступ к этой идентичности на выбранном сервере. Рабочий ключ устройства в неё не копируется. Владение карточкой и паролем позволяет подключать новые устройства. Устройство из карточки панели не сохраняет управляющий секрет; для отзыва других устройств её нужно открыть заново. Корневая карточка Flutter восстанавливает полный управляющий root. Карточку можно сохранить как QR в PNG или JSON и восстановить из выбранного файла.',
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                FilledButton.icon(
-                  onPressed:
-                      pending ||
-                          !widget.controller.connected ||
-                          widget
-                                  .controller
-                                  .deviceManagement
-                                  ?.hasRootAuthority !=
-                              true
-                      ? null
-                      : () => run(export),
-                  icon: const Icon(Icons.save_alt),
-                  label: const Text('Сохранить карточку'),
-                ),
-                OutlinedButton.icon(
-                  onPressed: pending ? null : () => run(restore),
-                  icon: const Icon(Icons.restore),
-                  label: const Text('Восстановить из файла'),
-                ),
-                OutlinedButton.icon(
-                  onPressed: pending
-                      ? null
-                      : () => run(() async {
-                          final packet = await scanRecoveryCamera(context);
-                          if (packet != null && mounted) {
-                            await restore(cameraPacket: packet);
-                          }
-                        }),
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: const Text('Сканировать камерой'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 20),
-      SurfaceCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Ваши устройства',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-                IconButton(
-                  tooltip: 'Обновить устройства',
-                  onPressed:
-                      pending ||
-                          !widget.controller.connected ||
-                          widget.controller.deviceManagement == null
-                      ? null
-                      : () => run(refresh),
-                  icon: const Icon(Icons.refresh),
-                ),
-              ],
-            ),
-            const Text(
-              'Показаны разрешения только вашей идентичности. Старые и отозванные записи сохраняются.',
-            ),
-            for (final grant in devices) ...[
-              const Divider(),
-              Text(
-                grant.recovery
-                    ? 'Ключ восстановления'
-                    : grant.id ==
-                          widget.controller.deviceManagement?.currentGrantId
-                    ? 'Это устройство'
-                    : 'Другое устройство',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              SelectableText(grant.id, style: const TextStyle(fontSize: 12)),
-              Text(
-                grant.revoked
-                    ? 'Отозвано'
-                    : 'Действует до ${DateTime.fromMillisecondsSinceEpoch(grant.expiresAt.toInt() * 1000).toLocal()}',
-              ),
-              if (!grant.revoked &&
-                  grant.expiresAt.toInt() >
-                      DateTime.now().millisecondsSinceEpoch ~/ 1000)
-                TextButton(
-                  onPressed: pending ? null : () => run(() => revoke(grant)),
-                  child: const Text('Отозвать доступ'),
-                ),
-            ],
-          ],
-        ),
-      ),
-      if (pending) ...[
-        const SizedBox(height: 16),
-        const LinearProgressIndicator(),
-      ],
-      if (message.isNotEmpty) ...[const SizedBox(height: 12), Text(message)],
     ],
+    onRotate: () => run(rotate),
+    onRenewRotation: () => run(() => rotate(renew: true)),
+    onFinishRotation: () => run(finishRotation),
+    onPreparePairing: () => run(approve),
+    onApprovePairing: () => run(finishPairing),
+    onPairingCodeChanged: (_) => setState(() {
+      preparedPair = null;
+      preparedAuthority = null;
+      pairingCheck = '';
+    }),
+    onExport: () => run(export),
+    onRestore: () => run(restore),
+    onScan: () => run(() async {
+      final packet = await scanRecoveryCamera(context);
+      if (packet != null && mounted) await restore(cameraPacket: packet);
+    }),
+    onRefreshDevices: () => run(refresh),
+    onRevoke: (id) => run(() => revoke(devices.firstWhere((g) => g.id == id))),
   );
 }

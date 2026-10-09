@@ -27,6 +27,40 @@ class Discovery {
           .join();
 }
 
+class ConnectionInput {
+  const ConnectionInput(this.origin, this.invitationToken);
+  final Uri origin;
+  final String invitationToken;
+}
+
+ConnectionInput parseConnectionInput(
+  String address, {
+  String invitationToken = '',
+}) {
+  final uri = Uri.parse(address.trim());
+  var token = invitationToken.trim();
+  if (uri.hasFragment) {
+    final fields = Uri.splitQueryString(uri.fragment);
+    if (fields.length != 1 ||
+        !fields.containsKey('invite') ||
+        !RegExp(r'^iv_[A-Za-z0-9_-]{43}$').hasMatch(fields['invite']!)) {
+      throw const FormatException('Некорректная ссылка приглашения');
+    }
+    if (token.isNotEmpty && token != fields['invite']) {
+      throw const FormatException('Код приглашения не совпадает со ссылкой');
+    }
+    token = fields['invite']!;
+    if (uri.path.isNotEmpty && uri.path != '/') {
+      throw const FormatException('Некорректный адрес приглашения');
+    }
+    return ConnectionInput(
+      localOrigin(uri.replace(path: '').removeFragment().toString()),
+      token,
+    );
+  }
+  return ConnectionInput(localOrigin(address), token);
+}
+
 Uri localOrigin(String input) {
   final uri = Uri.parse(input.trim());
   final address = InternetAddress.tryParse(uri.host);
@@ -247,12 +281,17 @@ abstract interface class DeviceManagement {
 
 abstract interface class SpaceAdministration {
   bool get canManageSpace;
+  bool get needsOwnerSetup;
   Future<Map<String, dynamic>> adminIdentity();
   Future<Map<String, dynamic>> adminRequest(
     String path, {
     Map<String, dynamic>? body,
     String? method,
   });
+}
+
+abstract interface class AdministrativeDeviceControl {
+  Future<void> authorizeAdministration({DeviceRecord? authority});
 }
 
 abstract interface class RootRotationControl {
@@ -265,12 +304,13 @@ class SpaceSession
         SpacePresentation,
         SpaceAccess,
         DeviceManagement,
+        AdministrativeDeviceControl,
         RootRotationControl,
         ChannelNavigation,
         SpaceAdministration {
   SpaceSession._(this.server, this.record, this.vault, this.channel);
   final Discovery server;
-  final DeviceRecord record;
+  DeviceRecord record;
   final IdentityVault vault;
   final ClientChannel channel;
   String _token = '';
@@ -354,6 +394,9 @@ class SpaceSession
     metadata: {'authorization': 'Bearer $_token'},
   );
 
+  bool _needsOwnerSetup = false;
+  @override
+  bool get needsOwnerSetup => _needsOwnerSetup;
   @override
   bool get canManageSpace => ['owner', 'admin'].contains(role);
   @override
@@ -365,6 +408,11 @@ class SpaceSession
       'principalId': principalId,
       'role': role,
       'token': '',
+      'grantId': record.grantId,
+      'hasRootAuthority': hasRootAuthority,
+      'administrative': (await listDevices()).any(
+        (g) => g.id == record.grantId && g.scopes.contains('space.manage'),
+      ),
       'expires': DateTime.now().millisecondsSinceEpoch ~/ 1000 + 600,
     };
   }
@@ -379,6 +427,12 @@ class SpaceSession
     Map<String, dynamic> json(GeneratedMessage value) =>
         Map<String, dynamic>.from(value.toProto3Json() as Map);
     final uri = Uri.parse(path);
+    if (uri.path == '/api/v1/auth/devices') {
+      return json(
+        await AuthServiceClient(channel)
+            .listDevices(ListDevicesRequest(), options: _options),
+      );
+    }
     final channelClient = ChannelServiceClient(channel);
     if (uri.path == '/api/v1/channels') {
       if (method == 'POST') {
@@ -489,6 +543,14 @@ class SpaceSession
               )).toProto3Json()
               as Map,
         );
+      case '/api/v1/space/setup/claim':
+        final response = await client.claimOwner(
+          ClaimOwnerRequest()..mergeFromProto3Json(body!),
+          options: _options,
+        );
+        _needsOwnerSetup = false;
+        await refreshMembership();
+        return json(response);
       case '/api/v1/space/settings':
         if (method == 'PATCH') {
           final request = UpdateSettingsRequest()..mergeFromProto3Json(body!);
@@ -616,6 +678,11 @@ class SpaceSession
         );
       }
       await session.refreshMembership();
+      session._needsOwnerSetup =
+          !(await AdminServiceClient(channel).getSetupStatus(
+            GetSetupStatusRequest(),
+            options: session._options,
+          )).initialized;
       await session.refreshChannels();
       return session;
     } catch (_) {
@@ -893,6 +960,60 @@ class SpaceSession
   String get currentGrantId => record.grantId;
   @override
   bool get hasRootAuthority => record.rootSeed.isNotEmpty;
+  @override
+  Future<void> authorizeAdministration({DeviceRecord? authority}) async {
+    await refreshMembership();
+    _needsOwnerSetup = !(await AdminServiceClient(
+      channel,
+    ).getSetupStatus(GetSetupStatusRequest(), options: _options)).initialized;
+    if (!canManageSpace && !needsOwnerSetup) {
+      throw const FormatException('Нужна роль владельца или администратора');
+    }
+    final grants = await listDevices();
+    final current = grants.where((g) => g.id == record.grantId).firstOrNull;
+    if (current == null || current.revoked) {
+      throw const FormatException('Текущее разрешение недействительно');
+    }
+    if (current.scopes.contains('space.manage')) return;
+    final credentials = authority ?? record;
+    checkTrust(server, credentials);
+    if ((await credentials.identity()).principalId != principalId) {
+      throw const FormatException('Карточка относится к другой идентичности');
+    }
+    if (credentials.rootSeed.isEmpty) {
+      throw const FormatException(
+        'Для выдачи разрешения нужна корневая карточка. Recovery-карточка не расширяет свои права',
+      );
+    }
+    final signer = DeviceRecord(
+      origin: record.origin,
+      serverId: record.serverId,
+      serverKey: record.serverKey,
+      rootSeed: credentials.rootSeed,
+      deviceSeed: record.deviceSeed,
+      rootHistory: credentials.rootHistory,
+      administrative: true,
+    );
+    final result = await _authorize('device.register', authority: signer);
+    final next = DeviceRecord.fromJson({
+      ...record.toJson(),
+      'grantId': result.grantId,
+      'administrative': true,
+    });
+    // Старое разрешение сохраняется до проверенной записи нового в vault.
+    await vault.save(next);
+    final saved = await vault.load(next.origin);
+    if (saved?.grantId != next.grantId || saved?.administrative != true) {
+      throw const FormatException(
+        'Не удалось проверить сохранение разрешения. Повторите подключение',
+      );
+    }
+    record = next;
+    _expiresAt = 0;
+    await login();
+    await _authorize('device.revoke', target: current, authority: credentials);
+  }
+
   @override
   Future<void> prepareRotation({bool renew = false}) async {
     await _ensureSession();
