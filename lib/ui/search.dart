@@ -1,23 +1,25 @@
+import '../l10n/strings.dart';
+
 import 'package:flutter/material.dart';
 
 import '../src/generated/space/v1/space.pb.dart';
 
 class SpaceSearch extends SearchDelegate<String> {
-  SpaceSearch(this.sections, this.messages)
-    : super(searchFieldLabel: 'Разделы и загруженные сообщения');
+  SpaceSearch(this.sections, this.messages, String hint)
+    : super(searchFieldLabel: hint);
   final Map<String, String> sections;
   final List<Content> messages;
   @override
   List<Widget> buildActions(BuildContext context) => [
     IconButton(
-      tooltip: 'Очистить поиск',
+      tooltip: context.strings.clearSearch,
       onPressed: () => query = '',
       icon: const Icon(Icons.close),
     ),
   ];
   @override
   Widget buildLeading(BuildContext context) => IconButton(
-    tooltip: 'Вернуться',
+    tooltip: context.strings.back,
     onPressed: () => close(context, ''),
     icon: const Icon(Icons.arrow_back),
   );
@@ -39,15 +41,15 @@ class SpaceSearch extends SearchDelegate<String> {
     return ListView(
       children: [
         if (matching.isEmpty && contents.isEmpty)
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(28),
-            child: Text('Ничего не найдено. Попробуйте другое слово.'),
+            child: Text(context.strings.nothingFound),
           ),
         for (final entry in matching)
           ListTile(
             leading: const Icon(Icons.dashboard_outlined),
             title: Text(entry.value),
-            subtitle: const Text('Раздел приложения'),
+            subtitle: Text(context.strings.appSection),
             onTap: () => close(context, entry.key),
           ),
         for (final message in contents)
@@ -58,7 +60,7 @@ class SpaceSearch extends SearchDelegate<String> {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
-            subtitle: const Text('Общий чат · загруженное сообщение'),
+            subtitle: Text(context.strings.loadedMessage),
             onTap: () => close(context, 'chat'),
           ),
       ],

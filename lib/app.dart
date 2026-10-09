@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'src/chat_controller.dart';
 import 'src/preferences.dart';
+import 'l10n/app_localizations.dart';
 import 'ui/shell.dart';
 
 class SpaceApp extends StatefulWidget {
@@ -34,6 +35,9 @@ class _SpaceAppState extends State<SpaceApp> {
       title: 'Space',
       debugShowCheckedModeBanner: false,
       theme: preferences.theme,
+      locale: preferences.locale,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: SpaceShell(preferences: preferences, controller: widget.controller),
     ),
   );

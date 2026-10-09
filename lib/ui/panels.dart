@@ -1,3 +1,4 @@
+import '../l10n/strings.dart';
 import 'admin_panel.dart';
 
 import 'package:flutter/material.dart';
@@ -19,8 +20,8 @@ class OverviewPanel extends StatelessWidget {
   final VoidCallback openConnection, openChat;
   @override
   Widget build(BuildContext context) => PageBody(
-    title: 'Хорошо, что вы здесь.',
-    description: 'Ваше пространство, ваши разговоры — в удобном темпе.',
+    title: context.strings.welcome,
+    description: context.strings.welcomeDescription,
     children: [
       SurfaceCard(
         child: Column(
@@ -33,13 +34,13 @@ class OverviewPanel extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Место для идей.\nИ людей за ними.',
+              context.strings.ideas,
               style: Theme.of(context).textTheme.headlineMedium
                   ?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Добавьте независимый сервер по адресу, проверьте доверие и продолжите разговор. Центральный аккаунт не нужен.',
+            Text(
+              context.strings.connectDescription,
               style: TextStyle(height: 1.8),
             ),
             const SizedBox(height: 24),
@@ -54,8 +55,8 @@ class OverviewPanel extends StatelessWidget {
               ),
               label: Text(
                 controller.connected
-                    ? 'Вернуться в разговор'
-                    : 'Добавить пространство',
+                    ? context.strings.returnChat
+                    : context.strings.addSpace,
               ),
             ),
           ],
@@ -69,20 +70,20 @@ class OverviewPanel extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Ваш разговор',
+                  context.strings.yourConversation,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 14),
                 Text(
                   controller.connected
-                      ? 'Сообщений в общем чате: ${controller.messages.length}'
-                      : 'Пространство ещё не подключено. Здесь появятся реальные сообщения выбранного сервера.',
+                      ? context.strings.messageCount(controller.messages.length)
+                      : context.strings.noMessages,
                 ),
                 const SizedBox(height: 20),
                 OutlinedButton.icon(
                   onPressed: openChat,
                   icon: const Icon(Icons.chat_bubble_outline),
-                  label: const Text('Открыть чат'),
+                  label: Text(context.strings.openChat),
                 ),
               ],
             ),
@@ -92,12 +93,12 @@ class OverviewPanel extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Ваше внимание',
+                  context.strings.yourAttention,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 14),
-                const Text(
-                  'Оболочка не отправляет системные уведомления и не включает камеру или микрофон. Можно оставаться в своём ритме.',
+                Text(
+                  context.strings.attentionDescription,
                   style: TextStyle(height: 1.7),
                 ),
               ],
@@ -114,35 +115,48 @@ class SettingsPanel extends StatelessWidget {
   final AppPreferences preferences;
   @override
   Widget build(BuildContext context) => PageBody(
-    title: 'Пусть будет удобно вам.',
-    description: 'Личное оформление сохраняется на этом устройстве.',
+    title: context.strings.settingsTitle,
+    description: context.strings.settingsDescription,
     children: [
       SurfaceCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Внешний вид', style: Theme.of(context).textTheme.titleLarge),
+            DropdownButtonFormField<String>(
+              isExpanded: true,
+              initialValue: preferences.language,
+              decoration: InputDecoration(labelText: context.strings.language),
+              items: const [
+                DropdownMenuItem(value: 'ru', child: Text('Русский')),
+                DropdownMenuItem(value: 'zh-Hans', child: Text('简体中文')),
+                DropdownMenuItem(value: 'en', child: Text('English')),
+              ],
+              onChanged: (value) => preferences.change(language: value),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              context.strings.appearance,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 12),
             SwitchListTile.adaptive(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Тёмная тема'),
-              subtitle: const Text(
-                'Gruvbox есть в светлом и тёмном вариантах.',
-              ),
+              title: Text(context.strings.darkTheme),
+              subtitle: Text(context.strings.themeDescription),
               value: preferences.dark,
               onChanged: (value) => preferences.change(dark: value),
             ),
             const Divider(),
             SwitchListTile.adaptive(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Компактный режим'),
-              subtitle: const Text('Более плотные элементы управления.'),
+              title: Text(context.strings.compact),
+              subtitle: Text(context.strings.compactDescription),
               value: preferences.compact,
               onChanged: (value) => preferences.change(compact: value),
             ),
             const Divider(),
             const SizedBox(height: 12),
-            const Text('Мои цвета'),
+            Text(context.strings.myColors),
             const SizedBox(height: 14),
             Wrap(
               spacing: 10,
@@ -150,8 +164,8 @@ class SettingsPanel extends StatelessWidget {
               children: [
                 for (final entry in {
                   'gruvbox': 'Gruvbox',
-                  'ocean': 'Тихий океан',
-                  'iris': 'Мягкий ирис',
+                  'ocean': context.strings.ocean,
+                  'iris': context.strings.iris,
                 }.entries)
                   ChoiceChip(
                     label: Text(entry.value),
@@ -169,12 +183,12 @@ class SettingsPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Оформление пространства',
+              context.strings.spaceAppearance,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Сервер сможет предложить цвета для своего пространства. До вашего согласия будет использоваться личная тема. Текущая версия ещё не получает такие предложения.',
+            Text(
+              context.strings.spaceAppearanceDescription,
               style: TextStyle(height: 1.7),
             ),
           ],

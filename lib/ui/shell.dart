@@ -1,3 +1,4 @@
+import '../l10n/strings.dart';
 import 'admin_panel.dart';
 
 import 'dart:async';
@@ -15,17 +16,25 @@ import 'search.dart';
 import 'components.dart';
 
 enum Section {
-  overview('Обзор', Icons.home_outlined),
-  chat('Общий чат', Icons.tag),
-  forum('Обсуждения', Icons.forum_outlined),
-  feed('Лента', Icons.view_agenda_outlined),
-  rooms('Встречи', Icons.headset_mic_outlined),
-  identity('Идентичность', Icons.shield_outlined),
-  settings('Настройки', Icons.tune);
+  overview(Icons.home_outlined),
+  chat(Icons.tag),
+  forum(Icons.forum_outlined),
+  feed(Icons.view_agenda_outlined),
+  rooms(Icons.headset_mic_outlined),
+  identity(Icons.shield_outlined),
+  settings(Icons.tune);
 
-  const Section(this.label, this.icon);
-  final String label;
+  const Section(this.icon);
   final IconData icon;
+  String localized(BuildContext context) => switch (this) {
+    Section.overview => context.strings.overview,
+    Section.chat => context.strings.chat,
+    Section.forum => context.strings.forum,
+    Section.feed => context.strings.feed,
+    Section.rooms => context.strings.rooms,
+    Section.identity => context.strings.identity,
+    Section.settings => context.strings.settings,
+  };
 }
 
 class SpaceShell extends StatefulWidget {
@@ -44,12 +53,16 @@ class _SpaceShellState extends State<SpaceShell> {
   Future<void> search() async {
     final route = await showSearch<String>(
       context: context,
-      delegate: SpaceSearch({
-        for (final section in Section.values)
-          section.name: section == Section.chat
-              ? controller.chatTitle
-              : section.label,
-      }, controller.messages),
+      delegate: SpaceSearch(
+        {
+          for (final section in Section.values)
+            section.name: section == Section.chat
+                ? controller.chatTitle
+                : section.localized(context),
+        },
+        controller.messages,
+        context.strings.searchHint,
+      ),
     );
     if (!mounted || route == null || route.isEmpty) return;
     select(Section.values.firstWhere((section) => section.name == route));
@@ -122,18 +135,16 @@ class _SpaceShellState extends State<SpaceShell> {
     final accepted = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Отозвать это устройство?'),
-        content: const Text(
-          'Доступ к выбранному серверу прекратится. Ключи останутся на компьютере; новое разрешение автоматически не создаётся.',
-        ),
+        title: Text(context.strings.revokeTitle),
+        content: Text(context.strings.revokeDescription),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Оставить'),
+            child: Text(context.strings.keep),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Отозвать'),
+            child: Text(context.strings.revoke),
           ),
         ],
       ),
@@ -143,7 +154,7 @@ class _SpaceShellState extends State<SpaceShell> {
 
   String get spaceLabel => controller.spaceTitle.isNotEmpty
       ? controller.spaceTitle
-      : controller.preview?.origin.authority ?? 'Ваше пространство';
+      : controller.preview?.origin.authority ?? context.strings.yourSpace;
   Widget sidebar() => SizedBox(
     width: 248,
     child: Material(
@@ -158,7 +169,9 @@ class _SpaceShellState extends State<SpaceShell> {
           ),
           const SizedBox(height: 6),
           Text(
-            controller.connected ? 'Подключено' : 'Пространство не подключено',
+            controller.connected
+                ? context.strings.connected
+                : context.strings.spaceDisconnected,
             style: TextStyle(
               fontSize: 12,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -169,8 +182,8 @@ class _SpaceShellState extends State<SpaceShell> {
             onPressed: controller.busy ? null : () => connection(),
             icon: controller.connected ? Icons.link_outlined : Icons.add,
             label: controller.connected
-                ? 'Подключение'
-                : 'Добавить пространство',
+                ? context.strings.connection
+                : context.strings.addSpace,
           ),
           const SizedBox(height: 20),
           for (final section in Section.values)
@@ -191,15 +204,15 @@ class _SpaceShellState extends State<SpaceShell> {
                   section == Section.chat
                       ? controller.channels.isEmpty
                             ? controller.chatTitle
-                            : 'Чаты'
-                      : section.label,
+                            : context.strings.chats
+                      : section.localized(context),
                 ),
                 onTap: () => select(section),
               ),
             ),
           if (controller.channels.isNotEmpty) ...[
             const Divider(height: 24),
-            const Text('Каналы', style: TextStyle(fontSize: 12)),
+            Text(context.strings.channels, style: TextStyle(fontSize: 12)),
             for (final channel in controller.channels)
               ListTile(
                 dense: true,
@@ -220,8 +233,9 @@ class _SpaceShellState extends State<SpaceShell> {
                 title: Text(channel.title, overflow: TextOverflow.ellipsis),
                 trailing: controller.unreadCount(channel.id) > 0
                     ? Tooltip(
-                        message:
-                            'Непрочитанных сообщений: ${controller.unreadCount(channel.id)}',
+                        message: context.strings.unreadCount(
+                          controller.unreadCount(channel.id),
+                        ),
                         child: Badge(
                           backgroundColor: Theme.of(context)
                               .colorScheme
@@ -236,9 +250,9 @@ class _SpaceShellState extends State<SpaceShell> {
                       )
                     : null,
                 subtitle: channel.archived
-                    ? const Text('Архив')
+                    ? Text(context.strings.archived)
                     : !channel.permissions.read
-                    ? const Text('Без доступа к сообщениям')
+                    ? Text(context.strings.noReadAccess)
                     : null,
                 onTap: controller.busy
                     ? null
@@ -251,7 +265,7 @@ class _SpaceShellState extends State<SpaceShell> {
           if (controller.administration != null)
             ListTile(
               leading: const Icon(Icons.settings_suggest_outlined),
-              title: const Text('Управление пространством'),
+              title: Text(context.strings.manageSpace),
               onTap: controller.busy
                   ? null
                   : () async {
@@ -268,7 +282,7 @@ class _SpaceShellState extends State<SpaceShell> {
             ),
           if (widget.preferences.origins.isNotEmpty) ...[
             const Divider(height: 30),
-            const Text('Недавние пространства', style: TextStyle(fontSize: 12)),
+            Text(context.strings.recentSpaces, style: TextStyle(fontSize: 12)),
             const SizedBox(height: 8),
             for (final origin in widget.preferences.origins)
               ListTile(
@@ -279,10 +293,7 @@ class _SpaceShellState extends State<SpaceShell> {
               ),
           ],
           const SizedBox(height: 20),
-          const Text(
-            'Локальный прототип · Windows',
-            style: TextStyle(fontSize: 11),
-          ),
+          Text(context.strings.prototype, style: TextStyle(fontSize: 11)),
         ],
       ),
     ),
@@ -297,11 +308,11 @@ class _SpaceShellState extends State<SpaceShell> {
           'assets/branding/space-app-icon.png',
           width: 44,
           height: 44,
-          semanticLabel: 'Логотип Space',
+          semanticLabel: context.strings.logo,
         ),
         const SizedBox(height: 24),
         IconButton.filledTonal(
-          tooltip: 'Выбранное пространство',
+          tooltip: context.strings.selectedSpace,
           style: IconButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -315,7 +326,7 @@ class _SpaceShellState extends State<SpaceShell> {
         ),
         const SizedBox(height: 12),
         IconButton(
-          tooltip: 'Добавить пространство',
+          tooltip: context.strings.addSpace,
           style: IconButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.surface,
             foregroundColor: Theme.of(context).colorScheme.onSurface,
@@ -329,7 +340,7 @@ class _SpaceShellState extends State<SpaceShell> {
         ),
         const Spacer(),
         IconButton(
-          tooltip: 'Моя идентичность',
+          tooltip: context.strings.myIdentity,
           style: IconButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.surface,
             foregroundColor: Theme.of(context).colorScheme.onSurface,
@@ -359,21 +370,24 @@ class _SpaceShellState extends State<SpaceShell> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'О пространстве',
+            context.strings.aboutSpace,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 14),
-          const Text(
-            'Независимый сервер. Ваши права и доступные разделы определяются отдельно в каждом пространстве.',
+          Text(
+            context.strings.independentServer,
             style: TextStyle(fontSize: 12, height: 1.8),
           ),
           const Divider(height: 36),
-          Text('Подключение', style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            context.strings.connection,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: 12),
           Text(
             controller.connected
-                ? 'Вход по ключу устройства выполнен'
-                : 'Нет активной сессии',
+                ? context.strings.deviceSignedIn
+                : context.strings.noSession,
             style: const TextStyle(fontSize: 12),
           ),
           if (controller.preview != null) ...[
@@ -387,16 +401,16 @@ class _SpaceShellState extends State<SpaceShell> {
           SpaceActionButton(
             onPressed: () => connection(),
             icon: Icons.link_outlined,
-            label: 'Проверить подключение',
+            label: context.strings.checkConnection,
           ),
           const Divider(height: 36),
           Text(
-            'Можно быть собой.',
+            context.strings.beYourself,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 12),
-          const Text(
-            'Не обязательно отвечать сразу. Камера и микрофон не используются; системные уведомления пока выключены.',
+          Text(
+            context.strings.ownPace,
             style: TextStyle(fontSize: 12, height: 1.8),
           ),
         ],
@@ -417,14 +431,14 @@ class _SpaceShellState extends State<SpaceShell> {
         active: selected == Section.chat,
         openConnection: () => connection(),
       ),
-      const UnavailablePanel(
-        title: 'Хорошие разговоры остаются.',
-        description: 'Место для обсуждений, которым нужно больше времени.',
+      UnavailablePanel(
+        title: context.strings.forumTitle,
+        description: context.strings.forumDescription,
         icon: Icons.forum_outlined,
       ),
-      const UnavailablePanel(
-        title: 'Немного вдохновения.',
-        description: 'Публикации людей, которых вы выбрали.',
+      UnavailablePanel(
+        title: context.strings.feedTitle,
+        description: context.strings.feedDescription,
         icon: Icons.view_agenda_outlined,
       ),
       const RoomsPanel(),
@@ -444,13 +458,15 @@ class _SpaceShellState extends State<SpaceShell> {
       children: [
         if (compact)
           IconButton(
-            tooltip: 'Открыть навигацию',
+            tooltip: context.strings.openNavigation,
             onPressed: () => scaffold.currentState?.openDrawer(),
             icon: const Icon(Icons.menu),
           ),
         Expanded(
           child: Text(
-            selected == Section.chat ? controller.chatTitle : selected.label,
+            selected == Section.chat
+                ? controller.chatTitle
+                : selected.localized(context),
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleMedium,
           ),
@@ -460,10 +476,10 @@ class _SpaceShellState extends State<SpaceShell> {
             padding: const EdgeInsets.only(right: 12),
             child: Text(
               controller.reconnecting
-                  ? 'Восстанавливаем соединение'
+                  ? context.strings.reconnecting
                   : controller.connected
-                  ? 'Вход по ключу'
-                  : 'Не подключено',
+                  ? context.strings.keyLogin
+                  : context.strings.disconnected,
               style: TextStyle(
                 fontSize: 12,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -471,7 +487,7 @@ class _SpaceShellState extends State<SpaceShell> {
             ),
           ),
         IconButton(
-          tooltip: 'Подключение к серверу',
+          tooltip: context.strings.serverConnection,
           onPressed: controller.busy ? null : () => connection(),
           icon: Icon(
             controller.connected
@@ -480,12 +496,12 @@ class _SpaceShellState extends State<SpaceShell> {
           ),
         ),
         IconButton(
-          tooltip: 'Настройки оформления',
+          tooltip: context.strings.appearanceSettings,
           onPressed: () => select(Section.settings),
           icon: const Icon(Icons.tune),
         ),
         IconButton(
-          tooltip: 'Поиск',
+          tooltip: context.strings.search,
           onPressed: search,
           icon: const Icon(Icons.search),
         ),
@@ -517,7 +533,7 @@ class _SpaceShellState extends State<SpaceShell> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Восстанавливаем события. Сообщения и черновик сохранены.',
+                        context.strings.recoveringEvents,
                         style: TextStyle(
                           fontSize: 12,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -565,26 +581,26 @@ class _SpaceShellState extends State<SpaceShell> {
                           Section.identity,
                         ][index],
                       ),
-                      destinations: const [
+                      destinations: [
                         NavigationDestination(
                           icon: Icon(Icons.home_outlined),
-                          label: 'Обзор',
+                          label: context.strings.overview,
                         ),
                         NavigationDestination(
                           icon: Icon(Icons.tag),
-                          label: 'Чат',
+                          label: context.strings.chatTab,
                         ),
                         NavigationDestination(
                           icon: Icon(Icons.forum_outlined),
-                          label: 'Темы',
+                          label: context.strings.topicsTab,
                         ),
                         NavigationDestination(
                           icon: Icon(Icons.headset_mic_outlined),
-                          label: 'Встречи',
+                          label: context.strings.rooms,
                         ),
                         NavigationDestination(
                           icon: Icon(Icons.shield_outlined),
-                          label: 'Профиль',
+                          label: context.strings.profileTab,
                         ),
                       ],
                     )

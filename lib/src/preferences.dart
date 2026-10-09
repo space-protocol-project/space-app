@@ -4,6 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppPreferences extends ChangeNotifier {
   bool dark = true, compact = false;
   String palette = 'gruvbox', error = '';
+  String language = 'ru';
+  static const languages = ['ru', 'zh-Hans', 'en'];
+  Locale get locale => language == 'zh-Hans'
+      ? const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans')
+      : Locale(language);
   final List<String> origins = [];
   bool _disposed = false;
   Future<void> _writes = Future.value();
@@ -14,6 +19,8 @@ class AppPreferences extends ChangeNotifier {
       if (_disposed) return;
       dark = data.getBool('space.ui.dark') ?? true;
       compact = data.getBool('space.ui.compact') ?? false;
+      final savedLanguage = data.getString('space.ui.language');
+      if (languages.contains(savedLanguage)) language = savedLanguage!;
       final saved = data.getString('space.ui.palette');
       if (['gruvbox', 'ocean', 'iris'].contains(saved)) palette = saved!;
       origins.addAll((data.getStringList('space.ui.origins') ?? []).take(12));
@@ -23,7 +30,15 @@ class AppPreferences extends ChangeNotifier {
     if (!_disposed) notifyListeners();
   }
 
-  Future<void> change({bool? dark, bool? compact, String? palette}) {
+  Future<void> change({
+    bool? dark,
+    bool? compact,
+    String? palette,
+    String? language,
+  }) {
+    if (language != null && languages.contains(language)) {
+      this.language = language;
+    }
     if (dark != null) this.dark = dark;
     if (compact != null) this.compact = compact;
     if (palette != null && ['gruvbox', 'ocean', 'iris'].contains(palette)) {
@@ -46,6 +61,7 @@ class AppPreferences extends ChangeNotifier {
       dark: dark,
       compact: compact,
       palette: palette,
+      language: language,
       origins: List<String>.of(origins),
     );
     _writes = _writes.then((_) async {
@@ -55,6 +71,7 @@ class AppPreferences extends ChangeNotifier {
           data.setBool('space.ui.dark', snapshot.dark),
           data.setBool('space.ui.compact', snapshot.compact),
           data.setString('space.ui.palette', snapshot.palette),
+          data.setString('space.ui.language', snapshot.language),
           data.setStringList('space.ui.origins', snapshot.origins),
         ]);
         if (results.contains(false)) throw StateError('Запись не завершена');
