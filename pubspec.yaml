@@ -78,6 +78,36 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  fonts:
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Variable.ttf
+        - asset: assets/fonts/Nunito-Variable.ttf
+          weight: 600
+        - asset: assets/fonts/Nunito-Variable.ttf
+          weight: 700
+        - asset: assets/fonts/Nunito-Variable.ttf
+          weight: 800
+        - asset: assets/fonts/Nunito-Italic-Variable.ttf
+          style: italic
+    - family: Nunito Sans
+      fonts:
+        - asset: assets/fonts/NunitoSans-Variable.ttf
+        - asset: assets/fonts/NunitoSans-Variable.ttf
+          weight: 600
+        - asset: assets/fonts/NunitoSans-Variable.ttf
+          weight: 700
+    - family: JetBrains Mono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Variable.ttf
+        - asset: assets/fonts/JetBrainsMono-Variable.ttf
+          weight: 600
+
+  assets:
+    - assets/branding/space-app-icon.png
+    - assets/fonts/Nunito-OFL.txt
+    - assets/fonts/NunitoSans-OFL.txt
+    - assets/fonts/JetBrainsMono-OFL.txt
 
   # To add assets to your application, add an assets section, like this:
   # assets:

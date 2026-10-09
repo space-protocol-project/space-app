@@ -110,18 +110,84 @@ class AppPreferences extends ChangeNotifier {
       outlineVariant: dark ? const Color(0xFF504945) : const Color(0xFFD5C4A1),
       error: dark ? const Color(0xFFFB4934) : const Color(0xFF9D0006),
     );
-    return ThemeData(
+    final theme = ThemeData(
       useMaterial3: true,
       brightness: brightness,
       colorScheme: scheme,
       scaffoldBackgroundColor: background,
-      fontFamily: 'Segoe UI',
+      fontFamily: 'Nunito Sans',
       visualDensity: compact ? VisualDensity.compact : VisualDensity.standard,
+      filledButtonTheme: const FilledButtonThemeData(
+        style: ButtonStyle(
+          padding: WidgetStatePropertyAll(
+            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          ),
+          minimumSize: WidgetStatePropertyAll(Size(64, 48)),
+          tapTargetSize: MaterialTapTargetSize.padded,
+          visualDensity: VisualDensity.standard,
+        ),
+      ),
+      outlinedButtonTheme: const OutlinedButtonThemeData(
+        style: ButtonStyle(
+          padding: WidgetStatePropertyAll(
+            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          ),
+          minimumSize: WidgetStatePropertyAll(Size(64, 48)),
+          tapTargetSize: MaterialTapTargetSize.padded,
+          visualDensity: VisualDensity.standard,
+        ),
+      ),
+      elevatedButtonTheme: const ElevatedButtonThemeData(
+        style: ButtonStyle(
+          padding: WidgetStatePropertyAll(
+            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          ),
+          minimumSize: WidgetStatePropertyAll(Size(64, 48)),
+          tapTargetSize: MaterialTapTargetSize.padded,
+          visualDensity: VisualDensity.standard,
+        ),
+      ),
+      textButtonTheme: const TextButtonThemeData(
+        style: ButtonStyle(
+          padding: WidgetStatePropertyAll(
+            EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          ),
+          minimumSize: WidgetStatePropertyAll(Size(48, 44)),
+          tapTargetSize: MaterialTapTargetSize.padded,
+          visualDensity: VisualDensity.standard,
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: surface,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
         contentPadding: const EdgeInsets.all(16),
+      ),
+    );
+    return theme.copyWith(
+      textTheme: theme.textTheme.copyWith(
+        displayLarge: theme.textTheme.displayLarge?.copyWith(
+          fontFamily: 'Nunito',
+        ),
+        displayMedium: theme.textTheme.displayMedium?.copyWith(
+          fontFamily: 'Nunito',
+        ),
+        displaySmall: theme.textTheme.displaySmall?.copyWith(
+          fontFamily: 'Nunito',
+        ),
+        headlineLarge: theme.textTheme.headlineLarge?.copyWith(
+          fontFamily: 'Nunito',
+        ),
+        headlineMedium: theme.textTheme.headlineMedium?.copyWith(
+          fontFamily: 'Nunito',
+        ),
+        headlineSmall: theme.textTheme.headlineSmall?.copyWith(
+          fontFamily: 'Nunito',
+        ),
+        titleLarge: theme.textTheme.titleLarge?.copyWith(fontFamily: 'Nunito'),
+        titleMedium: theme.textTheme.titleMedium?.copyWith(
+          fontFamily: 'Nunito',
+        ),
       ),
     );
   }

@@ -293,7 +293,7 @@ class _ChatViewState extends State<ChatView> {
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 18),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: TextField(
@@ -308,6 +308,9 @@ class _ChatViewState extends State<ChatView> {
                         ? 'В этом канале нельзя отправлять сообщения'
                         : 'Что у вас нового?',
                     counterText: '',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                 ),
               ),

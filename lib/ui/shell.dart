@@ -151,34 +151,6 @@ class _SpaceShellState extends State<SpaceShell> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 24, 16, 18),
         children: [
-          Container(
-            height: 78,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.primaryContainer,
-                  Theme.of(context).colorScheme.surfaceContainerHighest,
-                ],
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.auto_awesome,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  'Space',
-                  style: Theme.of(context).textTheme.headlineSmall
-                      ?.copyWith(fontWeight: FontWeight.w800),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 18),
           Text(
             spaceLabel,
             style: Theme.of(context).textTheme.titleMedium
@@ -193,12 +165,12 @@ class _SpaceShellState extends State<SpaceShell> {
             ),
           ),
           const SizedBox(height: 16),
-          OutlinedButton.icon(
+          SpaceActionButton(
             onPressed: controller.busy ? null : () => connection(),
-            icon: const Icon(Icons.add),
-            label: Text(
-              controller.connected ? 'Подключение' : 'Добавить пространство',
-            ),
+            icon: controller.connected ? Icons.link_outlined : Icons.add,
+            label: controller.connected
+                ? 'Подключение'
+                : 'Добавить пространство',
           ),
           const SizedBox(height: 20),
           for (final section in Section.values)
@@ -304,13 +276,11 @@ class _SpaceShellState extends State<SpaceShell> {
     child: Column(
       children: [
         const SizedBox(height: 24),
-        Text(
-          's.',
-          style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w800,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+        Image.asset(
+          'assets/branding/space-app-icon.png',
+          width: 44,
+          height: 44,
+          semanticLabel: 'Логотип Space',
         ),
         const SizedBox(height: 24),
         IconButton.filledTonal(
@@ -397,9 +367,10 @@ class _SpaceShellState extends State<SpaceShell> {
             ),
           ],
           const SizedBox(height: 16),
-          OutlinedButton(
+          SpaceActionButton(
             onPressed: () => connection(),
-            child: const Text('Проверить подключение'),
+            icon: Icons.link_outlined,
+            label: 'Проверить подключение',
           ),
           const Divider(height: 36),
           Text(

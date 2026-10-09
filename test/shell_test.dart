@@ -26,6 +26,45 @@ class TestController extends ChatController {
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
+  testWidgets('Поле сообщения и отправка центрированы при нескольких строках', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final controller = TestController()..connected = true;
+    controller.server(
+      Discovery(
+        localOrigin('http://127.0.0.1:8080'),
+        'srv_test',
+        List.filled(32, 1),
+        9090,
+      ),
+    );
+    await tester.pumpWidget(SpaceApp(controller: controller));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Общий чат'));
+    await tester.pumpAndSettle();
+    final field = find.byKey(const ValueKey('chat-draft'));
+    await tester.enterText(
+      field,
+      'Первая строка\nВторая строка\nТретья строка',
+    );
+    await tester.pumpAndSettle();
+    final send = find.byTooltip('Отправить');
+    expect(
+      tester.getRect(field).center.dy,
+      closeTo(tester.getRect(send).center.dy, .5),
+    );
+    final border =
+        tester.widget<TextField>(field).decoration!.border
+            as OutlineInputBorder;
+    expect(border.borderRadius, BorderRadius.circular(20));
+    expect(find.text('Space'), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+    controller.dispose();
+  });
   testWidgets('Читатель видит чат без возможности отправки', (tester) async {
     tester.view.physicalSize = const Size(1100, 850);
     tester.view.devicePixelRatio = 1;
@@ -50,7 +89,10 @@ void main() {
       find.byKey(const ValueKey('chat-draft')),
     );
     expect(field.enabled, false);
-    expect(field.decoration?.hintText, 'В этом канале нельзя отправлять сообщения');
+    expect(
+      field.decoration?.hintText,
+      'В этом канале нельзя отправлять сообщения',
+    );
     final send = tester.widget<IconButton>(
       find.byWidgetPredicate(
         (widget) => widget is IconButton && widget.tooltip == 'Отправить',
