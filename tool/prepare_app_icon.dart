@@ -18,6 +18,23 @@ void main() {
   );
   File('assets/branding/space-app-icon.png')
       .writeAsBytesSync(image.encodePng(png));
+  for (final size in [16, 32, 64, 128, 256, 512, 1024]) {
+    final directory = Directory(
+      'macos/Runner/Assets.xcassets/AppIcon.appiconset',
+    );
+    if (directory.existsSync()) {
+      File('${directory.path}/app_icon_$size.png').writeAsBytesSync(
+        image.encodePng(
+          image.copyResize(
+            source,
+            width: size,
+            height: size,
+            interpolation: image.Interpolation.cubic,
+          ),
+        ),
+      );
+    }
+  }
   File('windows/runner/resources/app_icon.ico').writeAsBytesSync(
     image.IcoEncoder().encodeImages([
       for (final size in [16, 24, 32, 48, 64, 128, 256])
