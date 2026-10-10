@@ -146,4 +146,178 @@ class AdminLocalizationsRu extends AdminLocalizations {
   String settingsRevision(String revision) {
     return 'Настройки пространства · версия $revision';
   }
+
+  @override
+  String get channelsTitle => 'Каналы и права';
+
+  @override
+  String get channelsReload => 'Обновить список каналов';
+
+  @override
+  String get channelsEmpty => 'Каналов пока нет.';
+
+  @override
+  String get channelCreateSection => 'Создать чат-канал';
+
+  @override
+  String get channelNewId => 'Адрес нового канала';
+
+  @override
+  String get channelNewTitle => 'Название нового канала';
+
+  @override
+  String get channelNewOrder => 'Порядок нового канала';
+
+  @override
+  String get channelDefaults =>
+      'Участники смогут читать и писать, читатели — читать. Публичный предпросмотр выключен.';
+
+  @override
+  String get channelCreate => 'Создать канал';
+
+  @override
+  String get channelName => 'Название канала';
+
+  @override
+  String get channelOrder => 'Порядок канала';
+
+  @override
+  String get channelArchive => 'Архивировать канал';
+
+  @override
+  String get channelPublicPreview =>
+      'Показывать название посетителям без входа';
+
+  @override
+  String get channelPreviewHelp =>
+      'Предпросмотр раскрывает название и адрес, но не сообщения. Архив сохраняет историю и запрещает новую запись.';
+
+  @override
+  String get channelSave => 'Сохранить канал';
+
+  @override
+  String get channelReload => 'Загрузить канал заново';
+
+  @override
+  String get channelAccessHelp =>
+      'Индивидуальное правило заменяет правило роли. Владелец и администраторы сохраняют доступ. Читатель не получает отправку. «Управлять» меняет метаданные, но не права.';
+
+  @override
+  String get channelRulesEmpty => 'Правил нет: доступ только у администрации.';
+
+  @override
+  String get channelRuleSubject => 'Кому добавить правило';
+
+  @override
+  String get channelMembers => 'Участники';
+
+  @override
+  String get channelReaders => 'Читатели';
+
+  @override
+  String get channelIndividual => 'Отдельный участник';
+
+  @override
+  String get channelSelectMember => 'Выберите участника';
+
+  @override
+  String get channelMoreMembers => 'Загрузить ещё участников';
+
+  @override
+  String get channelPrincipalId => 'Или полный идентификатор участника';
+
+  @override
+  String get channelAddRule => 'Добавить правило';
+
+  @override
+  String get channelSaveAccess => 'Сохранить права';
+
+  @override
+  String get channelDeleteRule => 'Удалить правило';
+
+  @override
+  String get channelVisible => 'Видеть канал';
+
+  @override
+  String get channelRead => 'Читать сообщения';
+
+  @override
+  String get channelWrite => 'Отправлять сообщения';
+
+  @override
+  String get channelManage => 'Управлять каналом';
+
+  @override
+  String get channelsLoaded => 'Каналы загружены.';
+
+  @override
+  String get channelLoaded => 'Канал и права загружены.';
+
+  @override
+  String get channelCreated => 'Канал создан.';
+
+  @override
+  String get channelSaved => 'Настройки канала сохранены.';
+
+  @override
+  String get channelAccessSaved => 'Права канала сохранены.';
+
+  @override
+  String get channelRuleAdded =>
+      'Правило добавлено в форму. Сохраните права для применения.';
+
+  @override
+  String get channelConflict =>
+      'Канал или права уже изменены. Загрузите их заново; несохранённые поля остаются в форме.';
+
+  @override
+  String get channelChanged => 'Канал изменился между загрузкой списка и прав';
+
+  @override
+  String get channelOrderInvalid => 'Порядок должен быть от 0 до 100000';
+
+  @override
+  String get channelNameInvalid => 'Укажите название до 320 байт';
+
+  @override
+  String get channelIdInvalid =>
+      'Адрес: латинские буквы, цифры, _ или -, начиная с буквы';
+
+  @override
+  String get channelIdTaken =>
+      'Канал с таким адресом уже существует. Выберите другой адрес.';
+
+  @override
+  String get channelUnavailable => 'Канал больше не доступен';
+
+  @override
+  String get channelRulesLimit => 'Лимит: 100 правил';
+
+  @override
+  String get channelMemberRequired =>
+      'Выберите участника или укажите его полный идентификатор';
+
+  @override
+  String get channelRuleDuplicate =>
+      'Правило для этого участника или роли уже есть';
+
+  @override
+  String get channelAccessTooLarge =>
+      'Список прав слишком большой для одного запроса. Сократите число индивидуальных правил.';
+
+  @override
+  String channelRevision(String id, String revision) {
+    return 'Канал $id · версия $revision';
+  }
+
+  @override
+  String channelAccessRevision(String revision) {
+    return 'Права канала · версия $revision';
+  }
+
+  @override
+  String get channelArchivedSuffix => ' · Архив';
+
+  @override
+  String get channelBlockedSuffix => ' · Заблокирован';
 }

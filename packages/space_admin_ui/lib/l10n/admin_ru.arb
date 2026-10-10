@@ -47,5 +47,75 @@
         "type": "String"
       }
     }
-  }
+  },
+  "channelsTitle": "Каналы и права",
+  "channelsReload": "Обновить список каналов",
+  "channelsEmpty": "Каналов пока нет.",
+  "channelCreateSection": "Создать чат-канал",
+  "channelNewId": "Адрес нового канала",
+  "channelNewTitle": "Название нового канала",
+  "channelNewOrder": "Порядок нового канала",
+  "channelDefaults": "Участники смогут читать и писать, читатели — читать. Публичный предпросмотр выключен.",
+  "channelCreate": "Создать канал",
+  "channelName": "Название канала",
+  "channelOrder": "Порядок канала",
+  "channelArchive": "Архивировать канал",
+  "channelPublicPreview": "Показывать название посетителям без входа",
+  "channelPreviewHelp": "Предпросмотр раскрывает название и адрес, но не сообщения. Архив сохраняет историю и запрещает новую запись.",
+  "channelSave": "Сохранить канал",
+  "channelReload": "Загрузить канал заново",
+  "channelAccessHelp": "Индивидуальное правило заменяет правило роли. Владелец и администраторы сохраняют доступ. Читатель не получает отправку. «Управлять» меняет метаданные, но не права.",
+  "channelRulesEmpty": "Правил нет: доступ только у администрации.",
+  "channelRuleSubject": "Кому добавить правило",
+  "channelMembers": "Участники",
+  "channelReaders": "Читатели",
+  "channelIndividual": "Отдельный участник",
+  "channelSelectMember": "Выберите участника",
+  "channelMoreMembers": "Загрузить ещё участников",
+  "channelPrincipalId": "Или полный идентификатор участника",
+  "channelAddRule": "Добавить правило",
+  "channelSaveAccess": "Сохранить права",
+  "channelDeleteRule": "Удалить правило",
+  "channelVisible": "Видеть канал",
+  "channelRead": "Читать сообщения",
+  "channelWrite": "Отправлять сообщения",
+  "channelManage": "Управлять каналом",
+  "channelsLoaded": "Каналы загружены.",
+  "channelLoaded": "Канал и права загружены.",
+  "channelCreated": "Канал создан.",
+  "channelSaved": "Настройки канала сохранены.",
+  "channelAccessSaved": "Права канала сохранены.",
+  "channelRuleAdded": "Правило добавлено в форму. Сохраните права для применения.",
+  "channelConflict": "Канал или права уже изменены. Загрузите их заново; несохранённые поля остаются в форме.",
+  "channelChanged": "Канал изменился между загрузкой списка и прав",
+  "channelOrderInvalid": "Порядок должен быть от 0 до 100000",
+  "channelNameInvalid": "Укажите название до 320 байт",
+  "channelIdInvalid": "Адрес: латинские буквы, цифры, _ или -, начиная с буквы",
+  "channelIdTaken": "Канал с таким адресом уже существует. Выберите другой адрес.",
+  "channelUnavailable": "Канал больше не доступен",
+  "channelRulesLimit": "Лимит: 100 правил",
+  "channelMemberRequired": "Выберите участника или укажите его полный идентификатор",
+  "channelRuleDuplicate": "Правило для этого участника или роли уже есть",
+  "channelAccessTooLarge": "Список прав слишком большой для одного запроса. Сократите число индивидуальных правил.",
+  "channelRevision": "Канал {id} · версия {revision}",
+  "@channelRevision": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "revision": {
+        "type": "String"
+      }
+    }
+  },
+  "channelAccessRevision": "Права канала · версия {revision}",
+  "@channelAccessRevision": {
+    "placeholders": {
+      "revision": {
+        "type": "String"
+      }
+    }
+  },
+  "channelArchivedSuffix": " · Архив",
+  "channelBlockedSuffix": " · Заблокирован"
 }

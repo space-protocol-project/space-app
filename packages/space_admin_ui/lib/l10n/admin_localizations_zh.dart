@@ -133,4 +133,168 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String settingsRevision(String revision) {
     return '空间设置 · 版本 $revision';
   }
+
+  @override
+  String get channelsTitle => '频道与权限';
+
+  @override
+  String get channelsReload => '刷新频道列表';
+
+  @override
+  String get channelsEmpty => '暂无频道。';
+
+  @override
+  String get channelCreateSection => '创建聊天频道';
+
+  @override
+  String get channelNewId => '新频道地址';
+
+  @override
+  String get channelNewTitle => '新频道名称';
+
+  @override
+  String get channelNewOrder => '新频道顺序';
+
+  @override
+  String get channelDefaults => '成员可读取和发送，阅读者只能读取。公开预览已关闭。';
+
+  @override
+  String get channelCreate => '创建频道';
+
+  @override
+  String get channelName => '频道名称';
+
+  @override
+  String get channelOrder => '频道顺序';
+
+  @override
+  String get channelArchive => '归档频道';
+
+  @override
+  String get channelPublicPreview => '向未登录访客显示名称';
+
+  @override
+  String get channelPreviewHelp => '预览会显示名称和地址，但不显示消息。归档保留历史记录，并禁止发送新消息。';
+
+  @override
+  String get channelSave => '保存频道';
+
+  @override
+  String get channelReload => '重新加载频道';
+
+  @override
+  String get channelAccessHelp =>
+      '个人规则优先于角色规则。所有者和管理员保留访问权限。阅读者不能发送消息。管理权限允许修改元数据，但不允许修改权限。';
+
+  @override
+  String get channelRulesEmpty => '没有规则：仅所有者和管理员可访问。';
+
+  @override
+  String get channelRuleSubject => '添加规则的对象';
+
+  @override
+  String get channelMembers => '成员';
+
+  @override
+  String get channelReaders => '阅读者';
+
+  @override
+  String get channelIndividual => '单个成员';
+
+  @override
+  String get channelSelectMember => '选择成员';
+
+  @override
+  String get channelMoreMembers => '加载更多成员';
+
+  @override
+  String get channelPrincipalId => '或输入完整成员标识符';
+
+  @override
+  String get channelAddRule => '添加规则';
+
+  @override
+  String get channelSaveAccess => '保存权限';
+
+  @override
+  String get channelDeleteRule => '删除规则';
+
+  @override
+  String get channelVisible => '查看频道';
+
+  @override
+  String get channelRead => '读取消息';
+
+  @override
+  String get channelWrite => '发送消息';
+
+  @override
+  String get channelManage => '管理频道';
+
+  @override
+  String get channelsLoaded => '频道已加载。';
+
+  @override
+  String get channelLoaded => '频道和权限已加载。';
+
+  @override
+  String get channelCreated => '频道已创建。';
+
+  @override
+  String get channelSaved => '频道设置已保存。';
+
+  @override
+  String get channelAccessSaved => '频道权限已保存。';
+
+  @override
+  String get channelRuleAdded => '规则已添加到表单。保存权限后才会生效。';
+
+  @override
+  String get channelConflict => '频道或权限已更改。请重新加载，未保存的字段会保留在表单中。';
+
+  @override
+  String get channelChanged => '加载权限期间频道已更改';
+
+  @override
+  String get channelOrderInvalid => '顺序必须在 0 到 100000 之间';
+
+  @override
+  String get channelNameInvalid => '请输入不超过 320 字节的名称';
+
+  @override
+  String get channelIdInvalid => '地址：使用拉丁字母、数字、_ 或 -，并以字母开头';
+
+  @override
+  String get channelIdTaken => '该频道地址已被使用。请选择其他地址。';
+
+  @override
+  String get channelUnavailable => '频道已不可用';
+
+  @override
+  String get channelRulesLimit => '最多 100 条规则';
+
+  @override
+  String get channelMemberRequired => '请选择成员或输入其完整标识符';
+
+  @override
+  String get channelRuleDuplicate => '此成员或角色的规则已存在';
+
+  @override
+  String get channelAccessTooLarge => '权限列表超出请求限制。请减少个人规则的数量。';
+
+  @override
+  String channelRevision(String id, String revision) {
+    return '频道 $id · 版本 $revision';
+  }
+
+  @override
+  String channelAccessRevision(String revision) {
+    return '频道权限 · 版本 $revision';
+  }
+
+  @override
+  String get channelArchivedSuffix => ' · 已归档';
+
+  @override
+  String get channelBlockedSuffix => ' · 已阻止';
 }

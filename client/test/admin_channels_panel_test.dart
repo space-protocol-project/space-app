@@ -111,9 +111,11 @@ Future<void> toggle(WidgetTester tester, String key) async {
 }
 
 void main() {
-  testWidgets(
-    'Каналы: создание, зависимости прав, архив и конфликт без потери формы',
-    (tester) async {
+  for (final language in ['ru', 'zh', 'en']) {
+    final strings = lookupAdminLocalizations(Locale(language));
+    testWidgets('Каналы: создание, права, архив и конфликт: $language', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
@@ -121,6 +123,9 @@ void main() {
       final server = ChannelServer();
       await tester.pumpWidget(
         MaterialApp(
+          locale: Locale(language),
+          supportedLocales: AdminLocalizations.supportedLocales,
+          localizationsDelegates: AdminLocalizations.localizationsDelegates,
           home: Scaffold(
             body: SingleChildScrollView(
               child: ChannelsPanel(call: server.call),
@@ -129,7 +134,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await press(tester, 'Создать чат-канал');
+      await press(tester, strings.channelCreateSection);
       await tester.enterText(
         find.byKey(const ValueKey('new-channel-id')),
         'team',
@@ -138,7 +143,7 @@ void main() {
         find.byKey(const ValueKey('new-channel-title')),
         'Рабочая группа',
       );
-      await press(tester, 'Создать канал');
+      await press(tester, strings.channelCreate);
       expect(server.channels.containsKey('team'), true);
       await toggle(tester, 'rule-0-read');
       expect(
@@ -165,13 +170,13 @@ void main() {
             .value,
         false,
       );
-      await press(tester, 'Сохранить права');
+      await press(tester, strings.channelSaveAccess);
       expect(server.access['team']!.first['permissions']['manage'], true);
-      await tester.ensureVisible(find.text('Архивировать канал'));
+      await tester.ensureVisible(find.text(strings.channelArchive));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Архивировать канал'));
+      await tester.tap(find.text(strings.channelArchive));
       await tester.pumpAndSettle();
-      await press(tester, 'Сохранить канал');
+      await press(tester, strings.channelSave);
       expect(server.channels['team']!['archived'], true);
       server.channels['team']!['revision'] = '99';
       await tester.ensureVisible(find.byKey(const ValueKey('channel-title')));
@@ -180,13 +185,8 @@ void main() {
         find.byKey(const ValueKey('channel-title')),
         'Несохранённое название',
       );
-      await press(tester, 'Сохранить канал');
-      expect(
-        find.text(
-          'Канал или права уже изменены. Загрузите их заново; несохранённые поля остаются в форме.',
-        ),
-        findsOneWidget,
-      );
+      await press(tester, strings.channelSave);
+      expect(find.text(strings.channelConflict), findsOneWidget);
       expect(
         tester
             .widget<TextField>(find.byKey(const ValueKey('channel-title')))
@@ -205,6 +205,6 @@ void main() {
       );
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
-    },
-  );
+    });
+  }
 }

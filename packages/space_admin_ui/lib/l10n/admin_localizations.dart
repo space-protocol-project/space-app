@@ -345,6 +345,324 @@ abstract class AdminLocalizations {
   /// In ru, this message translates to:
   /// **'Настройки пространства · версия {revision}'**
   String settingsRevision(String revision);
+
+  /// No description provided for @channelsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каналы и права'**
+  String get channelsTitle;
+
+  /// No description provided for @channelsReload.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить список каналов'**
+  String get channelsReload;
+
+  /// No description provided for @channelsEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каналов пока нет.'**
+  String get channelsEmpty;
+
+  /// No description provided for @channelCreateSection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать чат-канал'**
+  String get channelCreateSection;
+
+  /// No description provided for @channelNewId.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес нового канала'**
+  String get channelNewId;
+
+  /// No description provided for @channelNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название нового канала'**
+  String get channelNewTitle;
+
+  /// No description provided for @channelNewOrder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порядок нового канала'**
+  String get channelNewOrder;
+
+  /// No description provided for @channelDefaults.
+  ///
+  /// In ru, this message translates to:
+  /// **'Участники смогут читать и писать, читатели — читать. Публичный предпросмотр выключен.'**
+  String get channelDefaults;
+
+  /// No description provided for @channelCreate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать канал'**
+  String get channelCreate;
+
+  /// No description provided for @channelName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название канала'**
+  String get channelName;
+
+  /// No description provided for @channelOrder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порядок канала'**
+  String get channelOrder;
+
+  /// No description provided for @channelArchive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Архивировать канал'**
+  String get channelArchive;
+
+  /// No description provided for @channelPublicPreview.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показывать название посетителям без входа'**
+  String get channelPublicPreview;
+
+  /// No description provided for @channelPreviewHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Предпросмотр раскрывает название и адрес, но не сообщения. Архив сохраняет историю и запрещает новую запись.'**
+  String get channelPreviewHelp;
+
+  /// No description provided for @channelSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить канал'**
+  String get channelSave;
+
+  /// No description provided for @channelReload.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загрузить канал заново'**
+  String get channelReload;
+
+  /// No description provided for @channelAccessHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Индивидуальное правило заменяет правило роли. Владелец и администраторы сохраняют доступ. Читатель не получает отправку. «Управлять» меняет метаданные, но не права.'**
+  String get channelAccessHelp;
+
+  /// No description provided for @channelRulesEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Правил нет: доступ только у администрации.'**
+  String get channelRulesEmpty;
+
+  /// No description provided for @channelRuleSubject.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кому добавить правило'**
+  String get channelRuleSubject;
+
+  /// No description provided for @channelMembers.
+  ///
+  /// In ru, this message translates to:
+  /// **'Участники'**
+  String get channelMembers;
+
+  /// No description provided for @channelReaders.
+  ///
+  /// In ru, this message translates to:
+  /// **'Читатели'**
+  String get channelReaders;
+
+  /// No description provided for @channelIndividual.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отдельный участник'**
+  String get channelIndividual;
+
+  /// No description provided for @channelSelectMember.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите участника'**
+  String get channelSelectMember;
+
+  /// No description provided for @channelMoreMembers.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загрузить ещё участников'**
+  String get channelMoreMembers;
+
+  /// No description provided for @channelPrincipalId.
+  ///
+  /// In ru, this message translates to:
+  /// **'Или полный идентификатор участника'**
+  String get channelPrincipalId;
+
+  /// No description provided for @channelAddRule.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить правило'**
+  String get channelAddRule;
+
+  /// No description provided for @channelSaveAccess.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить права'**
+  String get channelSaveAccess;
+
+  /// No description provided for @channelDeleteRule.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить правило'**
+  String get channelDeleteRule;
+
+  /// No description provided for @channelVisible.
+  ///
+  /// In ru, this message translates to:
+  /// **'Видеть канал'**
+  String get channelVisible;
+
+  /// No description provided for @channelRead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Читать сообщения'**
+  String get channelRead;
+
+  /// No description provided for @channelWrite.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправлять сообщения'**
+  String get channelWrite;
+
+  /// No description provided for @channelManage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Управлять каналом'**
+  String get channelManage;
+
+  /// No description provided for @channelsLoaded.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каналы загружены.'**
+  String get channelsLoaded;
+
+  /// No description provided for @channelLoaded.
+  ///
+  /// In ru, this message translates to:
+  /// **'Канал и права загружены.'**
+  String get channelLoaded;
+
+  /// No description provided for @channelCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Канал создан.'**
+  String get channelCreated;
+
+  /// No description provided for @channelSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настройки канала сохранены.'**
+  String get channelSaved;
+
+  /// No description provided for @channelAccessSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Права канала сохранены.'**
+  String get channelAccessSaved;
+
+  /// No description provided for @channelRuleAdded.
+  ///
+  /// In ru, this message translates to:
+  /// **'Правило добавлено в форму. Сохраните права для применения.'**
+  String get channelRuleAdded;
+
+  /// No description provided for @channelConflict.
+  ///
+  /// In ru, this message translates to:
+  /// **'Канал или права уже изменены. Загрузите их заново; несохранённые поля остаются в форме.'**
+  String get channelConflict;
+
+  /// No description provided for @channelChanged.
+  ///
+  /// In ru, this message translates to:
+  /// **'Канал изменился между загрузкой списка и прав'**
+  String get channelChanged;
+
+  /// No description provided for @channelOrderInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порядок должен быть от 0 до 100000'**
+  String get channelOrderInvalid;
+
+  /// No description provided for @channelNameInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите название до 320 байт'**
+  String get channelNameInvalid;
+
+  /// No description provided for @channelIdInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес: латинские буквы, цифры, _ или -, начиная с буквы'**
+  String get channelIdInvalid;
+
+  /// No description provided for @channelIdTaken.
+  ///
+  /// In ru, this message translates to:
+  /// **'Канал с таким адресом уже существует. Выберите другой адрес.'**
+  String get channelIdTaken;
+
+  /// No description provided for @channelUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Канал больше не доступен'**
+  String get channelUnavailable;
+
+  /// No description provided for @channelRulesLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лимит: 100 правил'**
+  String get channelRulesLimit;
+
+  /// No description provided for @channelMemberRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите участника или укажите его полный идентификатор'**
+  String get channelMemberRequired;
+
+  /// No description provided for @channelRuleDuplicate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Правило для этого участника или роли уже есть'**
+  String get channelRuleDuplicate;
+
+  /// No description provided for @channelAccessTooLarge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Список прав слишком большой для одного запроса. Сократите число индивидуальных правил.'**
+  String get channelAccessTooLarge;
+
+  /// No description provided for @channelRevision.
+  ///
+  /// In ru, this message translates to:
+  /// **'Канал {id} · версия {revision}'**
+  String channelRevision(String id, String revision);
+
+  /// No description provided for @channelAccessRevision.
+  ///
+  /// In ru, this message translates to:
+  /// **'Права канала · версия {revision}'**
+  String channelAccessRevision(String revision);
+
+  /// No description provided for @channelArchivedSuffix.
+  ///
+  /// In ru, this message translates to:
+  /// **' · Архив'**
+  String get channelArchivedSuffix;
+
+  /// No description provided for @channelBlockedSuffix.
+  ///
+  /// In ru, this message translates to:
+  /// **' · Заблокирован'**
+  String get channelBlockedSuffix;
 }
 
 class _AdminLocalizationsDelegate

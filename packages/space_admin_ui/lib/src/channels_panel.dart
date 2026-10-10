@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:space_api/space_api.dart';
 
+import '../l10n/admin_localizations.dart';
+
 typedef AdminCall = Future<Map<String, dynamic>> Function(
   String path, {
   Map<String, dynamic>? body,
@@ -17,10 +19,23 @@ class ChannelsPanel extends StatefulWidget {
 }
 
 class _ChannelsPanelState extends State<ChannelsPanel> {
+  AdminLocalizations get strings =>
+      AdminLocalizations.of(context) ??
+      lookupAdminLocalizations(const Locale('ru'));
   List<Map<String, dynamic>> channels = [], members = [], rules = [];
   Map<String, dynamic>? selected;
   String status = '', subject = 'member', memberCursor = '';
-  String? principal, accessRevision;
+  String? principal, accessRevision, statusKey;
+  String get localizedStatus => switch (statusKey) {
+    'channelsLoaded' => strings.channelsLoaded,
+    'channelLoaded' => strings.channelLoaded,
+    'channelCreated' => strings.channelCreated,
+    'channelSaved' => strings.channelSaved,
+    'channelAccessSaved' => strings.channelAccessSaved,
+    'channelRuleAdded' => strings.channelRuleAdded,
+    'channelConflict' => strings.channelConflict,
+    _ => status,
+  };
   bool busy = false, archived = false, preview = false;
   final newId = TextEditingController(),
       newTitle = TextEditingController(),
@@ -57,9 +72,10 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     try {
       await action();
     } catch (e) {
-      status = e is SpaceApiError && e.status == 409
-          ? 'Канал или права уже изменены. Загрузите их заново; несохранённые поля остаются в форме.'
-          : e.toString().replaceFirst('Bad state: ', '');
+      statusKey = e is SpaceApiError && e.status == 409
+          ? 'channelConflict'
+          : null;
+      status = e.toString().replaceFirst('Bad state: ', '');
     } finally {
       if (mounted) setState(() => busy = false);
     }
@@ -72,7 +88,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     final data = await widget.call('/api/v1/channels?includeArchived=true');
     if (!mounted) return;
     channels = maps(data['channels']);
-    status = 'Каналы загружены.';
+    statusKey = 'channelsLoaded';
   }
 
   Future<void> loadMembers({bool append = false}) async {
@@ -93,7 +109,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     );
     if (!mounted) return;
     if (access['revision'] != channel['revision'])
-      throw SpaceApiError(409, 'Канал изменился между загрузкой списка и прав');
+      throw SpaceApiError(409, strings.channelChanged);
     selected = Map<String, dynamic>.from(channel);
     title.text = channel['title'] as String;
     order.text = '${channel['position'] ?? 0}';
@@ -101,30 +117,28 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     preview = channel['publicPreview'] == true;
     rules = maps(jsonDecode(jsonEncode(access['rules'] ?? [])));
     accessRevision = access['revision'] as String;
-    status = 'Канал и права загружены.';
+    statusKey = 'channelLoaded';
     if (members.isEmpty) await loadMembers();
   }
 
   int position(TextEditingController c) {
     final value = int.tryParse(c.text);
     if (value == null || value < 0 || value > 100000)
-      throw StateError('Порядок должен быть от 0 до 100000');
+      throw StateError(strings.channelOrderInvalid);
     return value;
   }
 
   String name(TextEditingController c) {
     final value = c.text.trim();
     if (value.isEmpty || utf8.encode(value).length > 320)
-      throw StateError('Укажите название до 320 байт');
+      throw StateError(strings.channelNameInvalid);
     return value;
   }
 
   Future<void> create() async {
     final id = newId.text.trim();
     if (!RegExp(r'^[a-z][a-z0-9_-]{0,63}$').hasMatch(id))
-      throw StateError(
-        'Адрес: латинские буквы, цифры, _ или -, начиная с буквы',
-      );
+      throw StateError(strings.channelIdInvalid);
     late Map<String, dynamic> result;
     try {
       result = await widget.call(
@@ -139,10 +153,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
         },
       );
     } on SpaceApiError catch (e) {
-      if (e.status == 409)
-        throw StateError(
-          'Канал с таким адресом уже существует. Выберите другой адрес.',
-        );
+      if (e.status == 409) throw StateError(strings.channelIdTaken);
       rethrow;
     }
     if (!mounted) return;
@@ -150,7 +161,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     newTitle.clear();
     await load();
     await choose(Map<String, dynamic>.from(result['channel'] as Map));
-    status = 'Канал создан.';
+    statusKey = 'channelCreated';
   }
 
   Future<void> saveChannel() async {
@@ -171,31 +182,29 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     // Метаданные и ACL используют одну revision, но несохранённые ACL остаются в форме.
     accessRevision = selected!['revision'] as String;
     await load();
-    status = 'Настройки канала сохранены.';
+    statusKey = 'channelSaved';
   }
 
   Future<void> reloadSelected() async {
     final id = selected!['id'];
     await load();
     final c = channels.where((v) => v['id'] == id).firstOrNull;
-    if (c == null) throw StateError('Канал больше не доступен');
+    if (c == null) throw StateError(strings.channelUnavailable);
     await choose(c);
   }
 
   void addRule() {
-    if (rules.length >= 100) throw StateError('Лимит: 100 правил');
+    if (rules.length >= 100) throw StateError(strings.channelRulesLimit);
     final typed = manualPrincipal.text.trim();
     final id = typed.isNotEmpty ? typed : principal ?? '';
     if (subject == 'principal' && !RegExp(r'^u_[0-9a-f]{64}$').hasMatch(id))
-      throw StateError(
-        'Выберите участника или укажите его полный идентификатор',
-      );
+      throw StateError(strings.channelMemberRequired);
     if (rules.any(
       (r) => subject == 'principal'
           ? r['principalId'] == id
           : r['role'] == subject,
     ))
-      throw StateError('Правило для этого участника или роли уже есть');
+      throw StateError(strings.channelRuleDuplicate);
     rules.add({
       if (subject == 'principal') 'principalId': id else 'role': subject,
       'permissions': {
@@ -207,7 +216,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     });
     principal = null;
     manualPrincipal.clear();
-    status = 'Правило добавлено в форму. Сохраните права для применения.';
+    statusKey = 'channelRuleAdded';
   }
 
   void permission(Map<String, dynamic> rule, String field, bool value) {
@@ -231,9 +240,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
             )
             .length >
         16000)
-      throw StateError(
-        'Список прав слишком большой для одного запроса. Сократите число индивидуальных правил.',
-      );
+      throw StateError(strings.channelAccessTooLarge);
     final result = await widget.call(
       '${channelPath(selected!['id'] as String)}/access',
       method: 'PUT',
@@ -244,7 +251,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     accessRevision = result['revision'] as String;
     rules = maps(result['rules']);
     await load();
-    status = 'Права канала сохранены.';
+    statusKey = 'channelAccessSaved';
   }
 
   Widget action(
@@ -277,9 +284,9 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
   );
   Widget ruleEditor(Map<String, dynamic> rule, int index) {
     final label = rule['role'] == 'member'
-        ? 'Участники'
+        ? strings.channelMembers
         : rule['role'] == 'reader'
-        ? 'Читатели'
+        ? strings.channelReaders
         : rule['principalId'] as String;
     final p = rule['permissions'] as Map? ?? {};
     return Card(
@@ -292,10 +299,10 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
           children: [
             Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
             for (final entry in {
-              'visible': 'Видеть канал',
-              'read': 'Читать сообщения',
-              'write': 'Отправлять сообщения',
-              'manage': 'Управлять каналом',
+              'visible': strings.channelVisible,
+              'read': strings.channelRead,
+              'write': strings.channelWrite,
+              'manage': strings.channelManage,
             }.entries)
               CheckboxListTile(
                 key: ValueKey('rule-$index-${entry.key}'),
@@ -310,7 +317,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
               onPressed: busy
                   ? null
                   : () => setState(() => rules.removeAt(index)),
-              child: const Text('Удалить правило'),
+              child: Text(strings.channelDeleteRule),
             ),
           ],
         ),
@@ -332,8 +339,8 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
             runSpacing: 12,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const Text('Каналы и права', style: TextStyle(fontSize: 20)),
-              action('Обновить список каналов', load),
+              Text(strings.channelsTitle, style: TextStyle(fontSize: 20)),
+              action(strings.channelsReload, load),
             ],
           ),
           const SizedBox(height: 12),
@@ -342,95 +349,98 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
               contentPadding: EdgeInsets.zero,
               title: Text(c['title'] as String),
               subtitle: Text(
-                '${c['id']}${c['archived'] == true ? ' · Архив' : ''}',
+                '${c['id']}${c['archived'] == true ? strings.channelArchivedSuffix : ''}',
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: busy ? null : () => run(() => choose(c)),
             ),
-          if (channels.isEmpty && !busy) const Text('Каналов пока нет.'),
+          if (channels.isEmpty && !busy) Text(strings.channelsEmpty),
           ExpansionTile(
             tilePadding: EdgeInsets.zero,
-            title: const Text('Создать чат-канал'),
+            title: Text(strings.channelCreateSection),
             children: [
               field(
                 newId,
-                'Адрес нового канала',
+                strings.channelNewId,
                 key: const ValueKey('new-channel-id'),
               ),
               field(
                 newTitle,
-                'Название нового канала',
+                strings.channelNewTitle,
                 key: const ValueKey('new-channel-title'),
               ),
-              field(newOrder, 'Порядок нового канала', number: true),
-              const Text(
-                'Участники смогут читать и писать, читатели — читать. Публичный предпросмотр выключен.',
-              ),
+              field(newOrder, strings.channelNewOrder, number: true),
+              Text(strings.channelDefaults),
               const SizedBox(height: 12),
-              action('Создать канал', create, primary: true),
+              action(strings.channelCreate, create, primary: true),
             ],
           ),
           if (selected != null) ...[
             const Divider(height: 32),
             Text(
-              'Канал ${selected!['id']} · версия ${selected!['revision']}',
+              strings.channelRevision(
+                '${selected!['id']}',
+                '${selected!['revision']}',
+              ),
               style: const TextStyle(fontSize: 18),
             ),
             field(
               title,
-              'Название канала',
+              strings.channelName,
               key: const ValueKey('channel-title'),
             ),
-            field(order, 'Порядок канала', number: true),
+            field(order, strings.channelOrder, number: true),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Архивировать канал'),
+              title: Text(strings.channelArchive),
               value: archived,
               onChanged: busy ? null : (v) => setState(() => archived = v),
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Показывать название посетителям без входа'),
+              title: Text(strings.channelPublicPreview),
               value: preview,
               onChanged: busy ? null : (v) => setState(() => preview = v),
             ),
-            const Text(
-              'Предпросмотр раскрывает название и адрес, но не сообщения. Архив сохраняет историю и запрещает новую запись.',
-            ),
+            Text(strings.channelPreviewHelp),
             const SizedBox(height: 12),
             Wrap(
               spacing: 12,
               runSpacing: 12,
               children: [
-                action('Сохранить канал', saveChannel, primary: true),
-                action('Загрузить канал заново', reloadSelected),
+                action(strings.channelSave, saveChannel, primary: true),
+                action(strings.channelReload, reloadSelected),
               ],
             ),
             const Divider(height: 32),
             Text(
-              'Права канала · версия $accessRevision',
+              strings.channelAccessRevision('$accessRevision'),
               style: const TextStyle(fontSize: 18),
             ),
-            const Text(
-              'Индивидуальное правило заменяет правило роли. Владелец и администраторы сохраняют доступ. Читатель не получает отправку. «Управлять» меняет метаданные, но не права.',
-            ),
+            Text(strings.channelAccessHelp),
             if (rules.isEmpty)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(vertical: 12),
-                child: Text('Правил нет: доступ только у администрации.'),
+                child: Text(strings.channelRulesEmpty),
               ),
             for (var i = 0; i < rules.length; i++) ruleEditor(rules[i], i),
             DropdownButtonFormField<String>(
               initialValue: subject,
-              decoration: const InputDecoration(
-                labelText: 'Кому добавить правило',
+              decoration: InputDecoration(
+                labelText: strings.channelRuleSubject,
               ),
-              items: const [
-                DropdownMenuItem(value: 'member', child: Text('Участники')),
-                DropdownMenuItem(value: 'reader', child: Text('Читатели')),
+              items: [
+                DropdownMenuItem(
+                  value: 'member',
+                  child: Text(strings.channelMembers),
+                ),
+                DropdownMenuItem(
+                  value: 'reader',
+                  child: Text(strings.channelReaders),
+                ),
                 DropdownMenuItem(
                   value: 'principal',
-                  child: Text('Отдельный участник'),
+                  child: Text(strings.channelIndividual),
                 ),
               ],
               onChanged: busy ? null : (v) => setState(() => subject = v!),
@@ -443,8 +453,8 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
                     ? principal
                     : null,
                 isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: 'Выберите участника',
+                decoration: InputDecoration(
+                  labelText: strings.channelSelectMember,
                 ),
                 items: [
                   for (final m in members.where(
@@ -453,7 +463,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
                     DropdownMenuItem(
                       value: m['principalId'] as String,
                       child: Text(
-                        '${m['principalId']}${m['blocked'] == true ? ' · Заблокирован' : ''}',
+                        '${m['principalId']}${m['blocked'] == true ? strings.channelBlockedSuffix : ''}',
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -467,29 +477,32 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
               ),
               if (memberCursor.isNotEmpty)
                 action(
-                  'Загрузить ещё участников',
+                  strings.channelMoreMembers,
                   () => loadMembers(append: true),
                 ),
-              field(manualPrincipal, 'Или полный идентификатор участника'),
+              field(manualPrincipal, strings.channelPrincipalId),
             ],
             const SizedBox(height: 12),
             Wrap(
               spacing: 12,
               runSpacing: 12,
               children: [
-                action('Добавить правило', () async => addRule()),
-                action('Сохранить права', saveAccess, primary: true),
+                action(strings.channelAddRule, () async => addRule()),
+                action(strings.channelSaveAccess, saveAccess, primary: true),
               ],
             ),
           ],
           if (busy)
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(12),
               child: LinearProgressIndicator(),
             ),
           Padding(
             padding: const EdgeInsets.only(top: 16),
-            child: Text(status, key: const ValueKey('channels-status')),
+            child: Text(
+              localizedStatus,
+              key: const ValueKey('channels-status'),
+            ),
           ),
         ],
       ),

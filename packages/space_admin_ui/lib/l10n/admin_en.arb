@@ -47,5 +47,75 @@
         "type": "String"
       }
     }
-  }
+  },
+  "channelsTitle": "Channels and permissions",
+  "channelsReload": "Refresh channels",
+  "channelsEmpty": "No channels yet.",
+  "channelCreateSection": "Create a chat channel",
+  "channelNewId": "New channel address",
+  "channelNewTitle": "New channel name",
+  "channelNewOrder": "New channel order",
+  "channelDefaults": "Members can read and send; readers can read. Public preview is disabled.",
+  "channelCreate": "Create channel",
+  "channelName": "Channel name",
+  "channelOrder": "Channel order",
+  "channelArchive": "Archive channel",
+  "channelPublicPreview": "Show the name to visitors without signing in",
+  "channelPreviewHelp": "Preview reveals the name and address, but no messages. Archiving preserves history and blocks new messages.",
+  "channelSave": "Save channel",
+  "channelReload": "Reload channel",
+  "channelAccessHelp": "Individual rules override role rules. Owners and admins retain access. Readers cannot send messages. Manage allows metadata changes, but not permission changes.",
+  "channelRulesEmpty": "No rules: only owners and admins have access.",
+  "channelRuleSubject": "Add a rule for",
+  "channelMembers": "Members",
+  "channelReaders": "Readers",
+  "channelIndividual": "Individual member",
+  "channelSelectMember": "Select a member",
+  "channelMoreMembers": "Load more members",
+  "channelPrincipalId": "Or the full member ID",
+  "channelAddRule": "Add rule",
+  "channelSaveAccess": "Save permissions",
+  "channelDeleteRule": "Remove rule",
+  "channelVisible": "See channel",
+  "channelRead": "Read messages",
+  "channelWrite": "Send messages",
+  "channelManage": "Manage channel",
+  "channelsLoaded": "Channels loaded.",
+  "channelLoaded": "Channel and permissions loaded.",
+  "channelCreated": "Channel created.",
+  "channelSaved": "Channel settings saved.",
+  "channelAccessSaved": "Channel permissions saved.",
+  "channelRuleAdded": "Rule added to the form. Save permissions to apply it.",
+  "channelConflict": "The channel or permissions have changed. Reload them; unsaved fields remain in the form.",
+  "channelChanged": "Channel changed while loading its permissions",
+  "channelOrderInvalid": "Order must be between 0 and 100000",
+  "channelNameInvalid": "Enter a name up to 320 bytes",
+  "channelIdInvalid": "Address: Latin letters, digits, _ or -, starting with a letter",
+  "channelIdTaken": "This channel address is already in use. Choose another.",
+  "channelUnavailable": "Channel is no longer available",
+  "channelRulesLimit": "Limit: 100 rules",
+  "channelMemberRequired": "Select a member or enter their full ID",
+  "channelRuleDuplicate": "A rule for this member or role already exists",
+  "channelAccessTooLarge": "Permissions exceed the request limit. Reduce the number of individual rules.",
+  "channelRevision": "Channel {id} · revision {revision}",
+  "@channelRevision": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "revision": {
+        "type": "String"
+      }
+    }
+  },
+  "channelAccessRevision": "Channel permissions · revision {revision}",
+  "@channelAccessRevision": {
+    "placeholders": {
+      "revision": {
+        "type": "String"
+      }
+    }
+  },
+  "channelArchivedSuffix": " · Archived",
+  "channelBlockedSuffix": " · Blocked"
 }
