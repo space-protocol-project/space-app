@@ -552,4 +552,138 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String deviceParent(String id) {
     return '签发来源：$id';
   }
+
+  @override
+  String get recoveryConfirm => '确认操作';
+
+  @override
+  String get recoveryConfirmButton => '确认';
+
+  @override
+  String get recoveryProtect => '保护身份卡';
+
+  @override
+  String get recoveryOpen => '打开身份卡';
+
+  @override
+  String get recoveryPasswordHelp => '密码仅在此设备上加密文件，不会发送到服务器。请使用多个随机单词，并单独保存密码。';
+
+  @override
+  String get recoveryPassword => '密码（至少 12 个字符）';
+
+  @override
+  String get recoveryPasswordRepeat => '再次输入密码';
+
+  @override
+  String get recoveryPasswordInvalid => '密码太短或两次输入不一致。';
+
+  @override
+  String get recoveryEncrypt => '加密';
+
+  @override
+  String get recoveryOpenButton => '打开';
+
+  @override
+  String get pairingIdentity => '已有身份？';
+
+  @override
+  String get pairingIntro => '在原设备上确认后连接此电脑。根密钥和身份卡不会被复制。设备配对不需要邀请。';
+
+  @override
+  String get pairingStart => '信任服务器并开始配对';
+
+  @override
+  String get pairingInstructions => '在原设备的 Space 中打开“身份”→“确认设备”。代码有效期为五分钟。';
+
+  @override
+  String get pairingCopy => '复制代码';
+
+  @override
+  String get pairingWaiting => '等待原设备签名…';
+
+  @override
+  String get pairingCheckBeforeSign => '签名前，请在授权设备上输入此验证码：';
+
+  @override
+  String get pairingVerified => '根签名已验证。请核对两个屏幕上的代码：';
+
+  @override
+  String get pairingAccept => '代码一致 — 连接';
+
+  @override
+  String get pairingCancel => '取消配对';
+
+  @override
+  String get rotationTitle => '更换根密钥';
+
+  @override
+  String get rotationHelp =>
+      '保留您的身份并撤销旧密钥。请在持有根密钥的设备上开始更换。发生故障后，请完成已保存的更换操作。如果请求在服务器完成操作前过期，请使用旧密钥连接并更新请求。';
+
+  @override
+  String get rotationStart => '更换根密钥';
+
+  @override
+  String get rotationRenew => '更新已过期的请求';
+
+  @override
+  String get rotationFinish => '完成已保存的更换';
+
+  @override
+  String get pairingApproveTitle => '确认设备';
+
+  @override
+  String get pairingApproveHelp =>
+      '请输入新设备的一次性代码。签名需要根密钥或已打开的恢复身份卡。使用恢复身份卡时，新设备会验证从原始根密钥开始的授权链。';
+
+  @override
+  String get pairingCode => '配对代码';
+
+  @override
+  String get pairingPrepare => '检查并确认';
+
+  @override
+  String get pairingComparison => '用于与新设备核对的验证码';
+
+  @override
+  String get pairingEnteredCode => '新设备上的验证码';
+
+  @override
+  String get pairingSign => '代码一致 — 签名';
+
+  @override
+  String get recoveryTitle => '恢复访问';
+
+  @override
+  String get recoveryHelp =>
+      '加密身份卡可保留对所选服务器上此身份的访问，不包含设备的工作密钥。持有身份卡和密码即可连接新设备。通过恢复身份卡连接的设备不会保留管理密钥；撤销其他设备时需要重新打开身份卡。根身份卡可恢复完整的根管理权限。身份卡可保存为包含二维码的 PNG 或 JSON，并从所选文件恢复。';
+
+  @override
+  String get recoveryExport => '保存身份卡';
+
+  @override
+  String get recoveryRestore => '从文件恢复';
+
+  @override
+  String get recoveryScan => '使用摄像头扫描';
+
+  @override
+  String get recoveryDevices => '您的设备';
+
+  @override
+  String get recoveryDevicesHelp => '仅显示您身份的权限。旧记录和已撤销的记录会保留。';
+
+  @override
+  String get cameraTitle => '扫描身份卡';
+
+  @override
+  String get cameraHelp => '请将摄像头对准 Space 身份卡上的二维码。图像仅在此设备上处理。麦克风已关闭。';
+
+  @override
+  String get cameraRestart => '重新启动摄像头';
+
+  @override
+  String cameraLabel(int number, String name) {
+    return '摄像头 $number — $name';
+  }
 }

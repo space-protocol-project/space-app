@@ -258,5 +258,58 @@
         "type": "String"
       }
     }
+  },
+  "recoveryConfirm": "Confirm action",
+  "recoveryConfirmButton": "Confirm",
+  "recoveryProtect": "Protect your card",
+  "recoveryOpen": "Open card",
+  "recoveryPasswordHelp": "The password encrypts the file only on this device. It is not sent to the server. Use several random words and store the password separately.",
+  "recoveryPassword": "Password (at least 12 characters)",
+  "recoveryPasswordRepeat": "Repeat password",
+  "recoveryPasswordInvalid": "The password is too short or the values do not match.",
+  "recoveryEncrypt": "Encrypt",
+  "recoveryOpenButton": "Open",
+  "pairingIdentity": "Already have an identity?",
+  "pairingIntro": "Connect this computer by approving it on your original device. The root key and card are not copied. Pairing does not require an invitation.",
+  "pairingStart": "Trust server and start pairing",
+  "pairingInstructions": "On your original device, open Identity → Approve device in Space. The code expires in five minutes.",
+  "pairingCopy": "Copy code",
+  "pairingWaiting": "Waiting for the original device's signature…",
+  "pairingCheckBeforeSign": "Enter this verification code on the authorizing device before signing:",
+  "pairingVerified": "Root signature verified. Compare the code on both screens:",
+  "pairingAccept": "Code matches — connect",
+  "pairingCancel": "Cancel pairing",
+  "rotationTitle": "Root key rotation",
+  "rotationHelp": "Preserves your identity and revokes old keys. Start on a device holding the root key. After a failure, finish the saved rotation. If the request expires before the server completes it, connect with the old key and renew the request.",
+  "rotationStart": "Rotate root key",
+  "rotationRenew": "Renew expired request",
+  "rotationFinish": "Finish saved rotation",
+  "pairingApproveTitle": "Approve device",
+  "pairingApproveHelp": "Enter the one-time code from the new device. Signing requires the root key or an opened recovery card. For a recovery card, the new device verifies the chain from the original root key.",
+  "pairingCode": "Pairing code",
+  "pairingPrepare": "Check and approve",
+  "pairingComparison": "Verification code to compare with the new device",
+  "pairingEnteredCode": "Verification code from the new device",
+  "pairingSign": "Codes match — sign",
+  "recoveryTitle": "Access recovery",
+  "recoveryHelp": "An encrypted card preserves access to this identity on the selected server. It does not include the device's working key. Anyone holding the card and password can connect new devices. A device restored from a recovery card does not retain the management secret; reopen the card to revoke other devices. A root card restores the full root authority. Save the card as a QR image in PNG or as JSON and restore it from a selected file.",
+  "recoveryExport": "Save card",
+  "recoveryRestore": "Restore from file",
+  "recoveryScan": "Scan with camera",
+  "recoveryDevices": "Your devices",
+  "recoveryDevicesHelp": "Only permissions for your identity are shown. Old and revoked records are retained.",
+  "cameraTitle": "Scan card",
+  "cameraHelp": "Point the camera at a Space QR card. Frames are processed on this device. The microphone is off.",
+  "cameraRestart": "Restart camera",
+  "cameraLabel": "Camera {number} — {name}",
+  "@cameraLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

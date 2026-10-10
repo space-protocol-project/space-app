@@ -1143,6 +1143,264 @@ abstract class AdminLocalizations {
   /// In ru, this message translates to:
   /// **'Выдано через: {id}'**
   String deviceParent(String id);
+
+  /// No description provided for @recoveryConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подтвердите действие'**
+  String get recoveryConfirm;
+
+  /// No description provided for @recoveryConfirmButton.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подтвердить'**
+  String get recoveryConfirmButton;
+
+  /// No description provided for @recoveryProtect.
+  ///
+  /// In ru, this message translates to:
+  /// **'Защитите карточку'**
+  String get recoveryProtect;
+
+  /// No description provided for @recoveryOpen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть карточку'**
+  String get recoveryOpen;
+
+  /// No description provided for @recoveryPasswordHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль шифрует файл только на этом устройстве. Сервер его не получает. Используйте несколько случайных слов и храните пароль отдельно.'**
+  String get recoveryPasswordHelp;
+
+  /// No description provided for @recoveryPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль (от 12 символов)'**
+  String get recoveryPassword;
+
+  /// No description provided for @recoveryPasswordRepeat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторите пароль'**
+  String get recoveryPasswordRepeat;
+
+  /// No description provided for @recoveryPasswordInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль слишком короткий или значения не совпадают.'**
+  String get recoveryPasswordInvalid;
+
+  /// No description provided for @recoveryEncrypt.
+  ///
+  /// In ru, this message translates to:
+  /// **'Зашифровать'**
+  String get recoveryEncrypt;
+
+  /// No description provided for @recoveryOpenButton.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть'**
+  String get recoveryOpenButton;
+
+  /// No description provided for @pairingIdentity.
+  ///
+  /// In ru, this message translates to:
+  /// **'У вас уже есть идентичность?'**
+  String get pairingIdentity;
+
+  /// No description provided for @pairingIntro.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключите этот компьютер через подтверждение на исходном устройстве. Корневой ключ и карточка не копируются. Для сопряжения приглашение не нужно.'**
+  String get pairingIntro;
+
+  /// No description provided for @pairingStart.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доверять серверу и начать сопряжение'**
+  String get pairingStart;
+
+  /// No description provided for @pairingInstructions.
+  ///
+  /// In ru, this message translates to:
+  /// **'На исходном устройстве откройте «Идентичность» → «Подтвердить устройство» в приложении Space. Код действует пять минут.'**
+  String get pairingInstructions;
+
+  /// No description provided for @pairingCopy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировать код'**
+  String get pairingCopy;
+
+  /// No description provided for @pairingWaiting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ожидаем подпись исходного устройства…'**
+  String get pairingWaiting;
+
+  /// No description provided for @pairingCheckBeforeSign.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите этот код проверки на управляющем устройстве до выдачи подписи:'**
+  String get pairingCheckBeforeSign;
+
+  /// No description provided for @pairingVerified.
+  ///
+  /// In ru, this message translates to:
+  /// **'Root-подпись проверена. Сверьте код на обоих экранах:'**
+  String get pairingVerified;
+
+  /// No description provided for @pairingAccept.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код совпадает — подключиться'**
+  String get pairingAccept;
+
+  /// No description provided for @pairingCancel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отменить сопряжение'**
+  String get pairingCancel;
+
+  /// No description provided for @rotationTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Смена корневого ключа'**
+  String get rotationTitle;
+
+  /// No description provided for @rotationHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохраняет вашу идентичность и закрывает доступ прежним ключам. Начать смену можно на устройстве с корневым ключом. После сбоя завершите сохранённую смену. Если запрос истёк до завершения на сервере, подключитесь прежним ключом и обновите запрос.'**
+  String get rotationHelp;
+
+  /// No description provided for @rotationStart.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сменить корневой ключ'**
+  String get rotationStart;
+
+  /// No description provided for @rotationRenew.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить истёкший запрос'**
+  String get rotationRenew;
+
+  /// No description provided for @rotationFinish.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завершить сохранённую смену'**
+  String get rotationFinish;
+
+  /// No description provided for @pairingApproveTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подтвердить устройство'**
+  String get pairingApproveTitle;
+
+  /// No description provided for @pairingApproveHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите одноразовый код с нового устройства. Подпись требует root или открытую recovery-карточку. Для recovery-карточки новое устройство проверяет цепочку от исходного root.'**
+  String get pairingApproveHelp;
+
+  /// No description provided for @pairingCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код сопряжения'**
+  String get pairingCode;
+
+  /// No description provided for @pairingPrepare.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверить и подтвердить'**
+  String get pairingPrepare;
+
+  /// No description provided for @pairingComparison.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код проверки для сравнения с новым устройством'**
+  String get pairingComparison;
+
+  /// No description provided for @pairingEnteredCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код проверки с нового устройства'**
+  String get pairingEnteredCode;
+
+  /// No description provided for @pairingSign.
+  ///
+  /// In ru, this message translates to:
+  /// **'Коды совпадают — подписать'**
+  String get pairingSign;
+
+  /// No description provided for @recoveryTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановление доступа'**
+  String get recoveryTitle;
+
+  /// No description provided for @recoveryHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Зашифрованная карточка сохраняет доступ к этой идентичности на выбранном сервере. Рабочий ключ устройства в неё не копируется. Владение карточкой и паролем позволяет подключать новые устройства. Устройство из карточки восстановления не сохраняет управляющий секрет; для отзыва других устройств её нужно открыть заново. Корневая карточка восстанавливает полный управляющий root. Карточку можно сохранить как QR в PNG или JSON и восстановить из выбранного файла.'**
+  String get recoveryHelp;
+
+  /// No description provided for @recoveryExport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить карточку'**
+  String get recoveryExport;
+
+  /// No description provided for @recoveryRestore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановить из файла'**
+  String get recoveryRestore;
+
+  /// No description provided for @recoveryScan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сканировать камерой'**
+  String get recoveryScan;
+
+  /// No description provided for @recoveryDevices.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ваши устройства'**
+  String get recoveryDevices;
+
+  /// No description provided for @recoveryDevicesHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показаны разрешения только вашей идентичности. Старые и отозванные записи сохраняются.'**
+  String get recoveryDevicesHelp;
+
+  /// No description provided for @cameraTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сканировать карточку'**
+  String get cameraTitle;
+
+  /// No description provided for @cameraHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Наведите камеру на QR-карточку Space. Кадры обрабатываются на этом устройстве. Микрофон выключен.'**
+  String get cameraHelp;
+
+  /// No description provided for @cameraRestart.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включить снова'**
+  String get cameraRestart;
+
+  /// No description provided for @cameraLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Камера {number} — {name}'**
+  String cameraLabel(int number, String name);
 }
 
 class _AdminLocalizationsDelegate

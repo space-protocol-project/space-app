@@ -587,4 +587,147 @@ class AdminLocalizationsEn extends AdminLocalizations {
   String deviceParent(String id) {
     return 'Issued through: $id';
   }
+
+  @override
+  String get recoveryConfirm => 'Confirm action';
+
+  @override
+  String get recoveryConfirmButton => 'Confirm';
+
+  @override
+  String get recoveryProtect => 'Protect your card';
+
+  @override
+  String get recoveryOpen => 'Open card';
+
+  @override
+  String get recoveryPasswordHelp =>
+      'The password encrypts the file only on this device. It is not sent to the server. Use several random words and store the password separately.';
+
+  @override
+  String get recoveryPassword => 'Password (at least 12 characters)';
+
+  @override
+  String get recoveryPasswordRepeat => 'Repeat password';
+
+  @override
+  String get recoveryPasswordInvalid =>
+      'The password is too short or the values do not match.';
+
+  @override
+  String get recoveryEncrypt => 'Encrypt';
+
+  @override
+  String get recoveryOpenButton => 'Open';
+
+  @override
+  String get pairingIdentity => 'Already have an identity?';
+
+  @override
+  String get pairingIntro =>
+      'Connect this computer by approving it on your original device. The root key and card are not copied. Pairing does not require an invitation.';
+
+  @override
+  String get pairingStart => 'Trust server and start pairing';
+
+  @override
+  String get pairingInstructions =>
+      'On your original device, open Identity → Approve device in Space. The code expires in five minutes.';
+
+  @override
+  String get pairingCopy => 'Copy code';
+
+  @override
+  String get pairingWaiting => 'Waiting for the original device\'s signature…';
+
+  @override
+  String get pairingCheckBeforeSign =>
+      'Enter this verification code on the authorizing device before signing:';
+
+  @override
+  String get pairingVerified =>
+      'Root signature verified. Compare the code on both screens:';
+
+  @override
+  String get pairingAccept => 'Code matches — connect';
+
+  @override
+  String get pairingCancel => 'Cancel pairing';
+
+  @override
+  String get rotationTitle => 'Root key rotation';
+
+  @override
+  String get rotationHelp =>
+      'Preserves your identity and revokes old keys. Start on a device holding the root key. After a failure, finish the saved rotation. If the request expires before the server completes it, connect with the old key and renew the request.';
+
+  @override
+  String get rotationStart => 'Rotate root key';
+
+  @override
+  String get rotationRenew => 'Renew expired request';
+
+  @override
+  String get rotationFinish => 'Finish saved rotation';
+
+  @override
+  String get pairingApproveTitle => 'Approve device';
+
+  @override
+  String get pairingApproveHelp =>
+      'Enter the one-time code from the new device. Signing requires the root key or an opened recovery card. For a recovery card, the new device verifies the chain from the original root key.';
+
+  @override
+  String get pairingCode => 'Pairing code';
+
+  @override
+  String get pairingPrepare => 'Check and approve';
+
+  @override
+  String get pairingComparison =>
+      'Verification code to compare with the new device';
+
+  @override
+  String get pairingEnteredCode => 'Verification code from the new device';
+
+  @override
+  String get pairingSign => 'Codes match — sign';
+
+  @override
+  String get recoveryTitle => 'Access recovery';
+
+  @override
+  String get recoveryHelp =>
+      'An encrypted card preserves access to this identity on the selected server. It does not include the device\'s working key. Anyone holding the card and password can connect new devices. A device restored from a recovery card does not retain the management secret; reopen the card to revoke other devices. A root card restores the full root authority. Save the card as a QR image in PNG or as JSON and restore it from a selected file.';
+
+  @override
+  String get recoveryExport => 'Save card';
+
+  @override
+  String get recoveryRestore => 'Restore from file';
+
+  @override
+  String get recoveryScan => 'Scan with camera';
+
+  @override
+  String get recoveryDevices => 'Your devices';
+
+  @override
+  String get recoveryDevicesHelp =>
+      'Only permissions for your identity are shown. Old and revoked records are retained.';
+
+  @override
+  String get cameraTitle => 'Scan card';
+
+  @override
+  String get cameraHelp =>
+      'Point the camera at a Space QR card. Frames are processed on this device. The microphone is off.';
+
+  @override
+  String get cameraRestart => 'Restart camera';
+
+  @override
+  String cameraLabel(int number, String name) {
+    return 'Camera $number — $name';
+  }
 }

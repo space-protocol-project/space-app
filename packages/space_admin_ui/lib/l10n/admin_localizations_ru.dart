@@ -587,4 +587,147 @@ class AdminLocalizationsRu extends AdminLocalizations {
   String deviceParent(String id) {
     return 'Выдано через: $id';
   }
+
+  @override
+  String get recoveryConfirm => 'Подтвердите действие';
+
+  @override
+  String get recoveryConfirmButton => 'Подтвердить';
+
+  @override
+  String get recoveryProtect => 'Защитите карточку';
+
+  @override
+  String get recoveryOpen => 'Открыть карточку';
+
+  @override
+  String get recoveryPasswordHelp =>
+      'Пароль шифрует файл только на этом устройстве. Сервер его не получает. Используйте несколько случайных слов и храните пароль отдельно.';
+
+  @override
+  String get recoveryPassword => 'Пароль (от 12 символов)';
+
+  @override
+  String get recoveryPasswordRepeat => 'Повторите пароль';
+
+  @override
+  String get recoveryPasswordInvalid =>
+      'Пароль слишком короткий или значения не совпадают.';
+
+  @override
+  String get recoveryEncrypt => 'Зашифровать';
+
+  @override
+  String get recoveryOpenButton => 'Открыть';
+
+  @override
+  String get pairingIdentity => 'У вас уже есть идентичность?';
+
+  @override
+  String get pairingIntro =>
+      'Подключите этот компьютер через подтверждение на исходном устройстве. Корневой ключ и карточка не копируются. Для сопряжения приглашение не нужно.';
+
+  @override
+  String get pairingStart => 'Доверять серверу и начать сопряжение';
+
+  @override
+  String get pairingInstructions =>
+      'На исходном устройстве откройте «Идентичность» → «Подтвердить устройство» в приложении Space. Код действует пять минут.';
+
+  @override
+  String get pairingCopy => 'Скопировать код';
+
+  @override
+  String get pairingWaiting => 'Ожидаем подпись исходного устройства…';
+
+  @override
+  String get pairingCheckBeforeSign =>
+      'Введите этот код проверки на управляющем устройстве до выдачи подписи:';
+
+  @override
+  String get pairingVerified =>
+      'Root-подпись проверена. Сверьте код на обоих экранах:';
+
+  @override
+  String get pairingAccept => 'Код совпадает — подключиться';
+
+  @override
+  String get pairingCancel => 'Отменить сопряжение';
+
+  @override
+  String get rotationTitle => 'Смена корневого ключа';
+
+  @override
+  String get rotationHelp =>
+      'Сохраняет вашу идентичность и закрывает доступ прежним ключам. Начать смену можно на устройстве с корневым ключом. После сбоя завершите сохранённую смену. Если запрос истёк до завершения на сервере, подключитесь прежним ключом и обновите запрос.';
+
+  @override
+  String get rotationStart => 'Сменить корневой ключ';
+
+  @override
+  String get rotationRenew => 'Обновить истёкший запрос';
+
+  @override
+  String get rotationFinish => 'Завершить сохранённую смену';
+
+  @override
+  String get pairingApproveTitle => 'Подтвердить устройство';
+
+  @override
+  String get pairingApproveHelp =>
+      'Введите одноразовый код с нового устройства. Подпись требует root или открытую recovery-карточку. Для recovery-карточки новое устройство проверяет цепочку от исходного root.';
+
+  @override
+  String get pairingCode => 'Код сопряжения';
+
+  @override
+  String get pairingPrepare => 'Проверить и подтвердить';
+
+  @override
+  String get pairingComparison =>
+      'Код проверки для сравнения с новым устройством';
+
+  @override
+  String get pairingEnteredCode => 'Код проверки с нового устройства';
+
+  @override
+  String get pairingSign => 'Коды совпадают — подписать';
+
+  @override
+  String get recoveryTitle => 'Восстановление доступа';
+
+  @override
+  String get recoveryHelp =>
+      'Зашифрованная карточка сохраняет доступ к этой идентичности на выбранном сервере. Рабочий ключ устройства в неё не копируется. Владение карточкой и паролем позволяет подключать новые устройства. Устройство из карточки восстановления не сохраняет управляющий секрет; для отзыва других устройств её нужно открыть заново. Корневая карточка восстанавливает полный управляющий root. Карточку можно сохранить как QR в PNG или JSON и восстановить из выбранного файла.';
+
+  @override
+  String get recoveryExport => 'Сохранить карточку';
+
+  @override
+  String get recoveryRestore => 'Восстановить из файла';
+
+  @override
+  String get recoveryScan => 'Сканировать камерой';
+
+  @override
+  String get recoveryDevices => 'Ваши устройства';
+
+  @override
+  String get recoveryDevicesHelp =>
+      'Показаны разрешения только вашей идентичности. Старые и отозванные записи сохраняются.';
+
+  @override
+  String get cameraTitle => 'Сканировать карточку';
+
+  @override
+  String get cameraHelp =>
+      'Наведите камеру на QR-карточку Space. Кадры обрабатываются на этом устройстве. Микрофон выключен.';
+
+  @override
+  String get cameraRestart => 'Включить снова';
+
+  @override
+  String cameraLabel(int number, String name) {
+    return 'Камера $number — $name';
+  }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/admin_localizations.dart';
+
 class RecoveryDeviceView {
   const RecoveryDeviceView({
     required this.id,
@@ -61,199 +63,198 @@ class RecoveryToolsView extends StatelessWidget {
       onRefreshDevices;
   final ValueChanged<String> onPairingCodeChanged, onRevoke;
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      RecoverySurface(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Смена корневого ключа',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Сохраняет вашу идентичность и закрывает доступ прежним ключам. Начать смену можно на устройстве с корневым ключом. После сбоя завершите сохранённую смену. Если запрос истёк до завершения на сервере, подключитесь прежним ключом и обновите запрос.',
-            ),
-            const SizedBox(height: 12),
-            if (connected && hasRootAuthority && canRotate) ...[
-              OutlinedButton(
-                onPressed: pending ? null : onRotate,
-                child: const Text('Сменить корневой ключ'),
-              ),
-              TextButton(
-                onPressed: pending ? null : onRenewRotation,
-                child: const Text('Обновить истёкший запрос'),
-              ),
-            ],
-            OutlinedButton(
-              onPressed: pending || !hasServer ? null : onFinishRotation,
-              child: const Text('Завершить сохранённую смену'),
-            ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 20),
-      RecoverySurface(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Подтвердить устройство',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Введите одноразовый код с нового устройства. Подпись требует root или открытую recovery-карточку. Для recovery-карточки новое устройство проверяет цепочку от исходного root.',
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: pairingCode,
-              onChanged: onPairingCodeChanged,
-              decoration: const InputDecoration(
-                labelText: 'Код сопряжения',
-                hintText: 'pc_…',
-              ),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: pending || !connected || !hasDeviceManagement
-                  ? null
-                  : onPreparePairing,
-              icon: const Icon(Icons.verified_user_outlined),
-              label: const Text('Проверить и подтвердить'),
-            ),
-            if (pairingCheck.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              const Text('Код проверки для сравнения с новым устройством'),
-              SelectableText(
-                pairingCheck,
+  Widget build(BuildContext context) {
+    final strings =
+        AdminLocalizations.of(context) ??
+        lookupAdminLocalizations(const Locale('ru'));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        RecoverySurface(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                strings.rotationTitle,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              if (pairingPrepared) ...[
-                const SizedBox(height: 12),
-                TextField(
-                  controller: pairingEntered,
-                  decoration: const InputDecoration(
-                    labelText: 'Код проверки с нового устройства',
-                  ),
+              const SizedBox(height: 12),
+              Text(strings.rotationHelp),
+              const SizedBox(height: 12),
+              if (connected && hasRootAuthority && canRotate) ...[
+                OutlinedButton(
+                  onPressed: pending ? null : onRotate,
+                  child: Text(strings.rotationStart),
                 ),
-                const SizedBox(height: 12),
-                FilledButton(
-                  onPressed: pending ? null : onApprovePairing,
-                  child: const Text('Коды совпадают — подписать'),
-                ),
-              ],
-            ],
-          ],
-        ),
-      ),
-      const SizedBox(height: 20),
-      RecoverySurface(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Восстановление доступа',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Зашифрованная карточка сохраняет доступ к этой идентичности на выбранном сервере. Рабочий ключ устройства в неё не копируется. Владение карточкой и паролем позволяет подключать новые устройства. Устройство из карточки восстановления не сохраняет управляющий секрет; для отзыва других устройств её нужно открыть заново. Корневая карточка восстанавливает полный управляющий root. Карточку можно сохранить как QR в PNG или JSON и восстановить из выбранного файла.',
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                FilledButton.icon(
-                  onPressed: pending || !connected || !hasRootAuthority
-                      ? null
-                      : onExport,
-                  icon: const Icon(Icons.save_alt),
-                  label: const Text('Сохранить карточку'),
-                ),
-                OutlinedButton.icon(
-                  onPressed: pending ? null : onRestore,
-                  icon: const Icon(Icons.restore),
-                  label: const Text('Восстановить из файла'),
-                ),
-                OutlinedButton.icon(
-                  onPressed: pending ? null : onScan,
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: const Text('Сканировать камерой'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 20),
-      RecoverySurface(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Ваши устройства',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-                IconButton(
-                  tooltip: 'Обновить устройства',
-                  onPressed: pending || !connected || !hasDeviceManagement
-                      ? null
-                      : onRefreshDevices,
-                  icon: const Icon(Icons.refresh),
-                ),
-              ],
-            ),
-            const Text(
-              'Показаны разрешения только вашей идентичности. Старые и отозванные записи сохраняются.',
-            ),
-            for (final grant in devices) ...[
-              const Divider(),
-              Text(
-                grant.recovery
-                    ? 'Ключ восстановления'
-                    : grant.id == currentGrantId
-                    ? 'Это устройство'
-                    : 'Другое устройство',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              SelectableText(
-                grant.id,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontFamily: 'JetBrains Mono',
-                ),
-              ),
-              Text(
-                grant.revoked
-                    ? 'Отозвано'
-                    : 'Действует до ${DateTime.fromMillisecondsSinceEpoch(grant.expiresAt * 1000).toLocal()}',
-              ),
-              if (!grant.revoked &&
-                  grant.expiresAt >
-                      DateTime.now().millisecondsSinceEpoch ~/ 1000)
                 TextButton(
-                  onPressed: pending ? null : () => onRevoke(grant.id),
-                  child: const Text('Отозвать доступ'),
+                  onPressed: pending ? null : onRenewRotation,
+                  child: Text(strings.rotationRenew),
                 ),
+              ],
+              OutlinedButton(
+                onPressed: pending || !hasServer ? null : onFinishRotation,
+                child: Text(strings.rotationFinish),
+              ),
             ],
-          ],
+          ),
         ),
-      ),
-      if (pending) ...[
-        const SizedBox(height: 16),
-        const LinearProgressIndicator(),
+        const SizedBox(height: 20),
+        RecoverySurface(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                strings.pairingApproveTitle,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 12),
+              Text(strings.pairingApproveHelp),
+              const SizedBox(height: 12),
+              TextField(
+                controller: pairingCode,
+                onChanged: onPairingCodeChanged,
+                decoration: InputDecoration(
+                  labelText: strings.pairingCode,
+                  hintText: 'pc_…',
+                ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: pending || !connected || !hasDeviceManagement
+                    ? null
+                    : onPreparePairing,
+                icon: const Icon(Icons.verified_user_outlined),
+                label: Text(strings.pairingPrepare),
+              ),
+              if (pairingCheck.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Text(strings.pairingComparison),
+                SelectableText(
+                  pairingCheck,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                if (pairingPrepared) ...[
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: pairingEntered,
+                    decoration: InputDecoration(
+                      labelText: strings.pairingEnteredCode,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton(
+                    onPressed: pending ? null : onApprovePairing,
+                    child: Text(strings.pairingSign),
+                  ),
+                ],
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        RecoverySurface(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                strings.recoveryTitle,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 12),
+              Text(strings.recoveryHelp),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  FilledButton.icon(
+                    onPressed: pending || !connected || !hasRootAuthority
+                        ? null
+                        : onExport,
+                    icon: const Icon(Icons.save_alt),
+                    label: Text(strings.recoveryExport),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: pending ? null : onRestore,
+                    icon: const Icon(Icons.restore),
+                    label: Text(strings.recoveryRestore),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: pending ? null : onScan,
+                    icon: const Icon(Icons.qr_code_scanner),
+                    label: Text(strings.recoveryScan),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        RecoverySurface(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      strings.recoveryDevices,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: strings.devicesRefresh,
+                    onPressed: pending || !connected || !hasDeviceManagement
+                        ? null
+                        : onRefreshDevices,
+                    icon: const Icon(Icons.refresh),
+                  ),
+                ],
+              ),
+              Text(strings.recoveryDevicesHelp),
+              for (final grant in devices) ...[
+                const Divider(),
+                Text(
+                  grant.recovery
+                      ? strings.deviceRecovery
+                      : grant.id == currentGrantId
+                      ? strings.deviceCurrent
+                      : strings.deviceOther,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                SelectableText(
+                  grant.id,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'JetBrains Mono',
+                  ),
+                ),
+                Text(
+                  grant.revoked
+                      ? strings.inviteRevokedState
+                      : strings.deviceAccessUntil(
+                          '${DateTime.fromMillisecondsSinceEpoch(grant.expiresAt * 1000).toLocal()}',
+                        ),
+                ),
+                if (!grant.revoked &&
+                    grant.expiresAt >
+                        DateTime.now().millisecondsSinceEpoch ~/ 1000)
+                  TextButton(
+                    onPressed: pending ? null : () => onRevoke(grant.id),
+                    child: Text(strings.deviceRevokeAccess),
+                  ),
+              ],
+            ],
+          ),
+        ),
+        if (pending) ...[
+          const SizedBox(height: 16),
+          const LinearProgressIndicator(),
+        ],
+        if (message.isNotEmpty) ...[const SizedBox(height: 12), Text(message)],
       ],
-      if (message.isNotEmpty) ...[const SizedBox(height: 12), Text(message)],
-    ],
-  );
+    );
+  }
 }
 
 class RecoverySurface extends StatelessWidget {
