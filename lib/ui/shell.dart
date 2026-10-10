@@ -92,7 +92,7 @@ class _SpaceShellState extends State<SpaceShell> {
     }
     await home.load();
     if (!mounted) return;
-    if (home.ip.isNotEmpty) await startHome(home.ip);
+    await startHome(home.ip);
     if (!mounted) return;
     await showHomeDetails();
   }

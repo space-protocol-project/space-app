@@ -35,6 +35,11 @@ class Discovery {
       credentials: origin.scheme == 'https' && !localTransport
           ? ChannelCredentials.secure(
               authority: origin.host,
+              onBadCertificate: tlsFingerprint.isEmpty
+                  ? null
+                  : (certificate, authority) =>
+                        authority == origin.host &&
+                        certificateFingerprint(certificate) == tlsFingerprint,
               certificates: tlsCertificate.isEmpty
                   ? null
                   : utf8.encode(tlsCertificate),

@@ -168,16 +168,22 @@ class HomeController extends ChangeNotifier {
                     as Map<String, dynamic>)['ip']
                 as String;
       } else {
-        ip = address.trim();
-        if (!isPublicHomeIPv4(ip)) {
+        var candidate = address.trim();
+        if (candidate.isEmpty) {
+          phase = 'Определяем публичный IP через ipify';
+          _update();
+          candidate = await detectIP();
+        }
+        if (!isPublicHomeIPv4(candidate)) {
           throw const FormatException('Нужен статический публичный IPv4');
         }
         final pending = File('${config.path}.tmp');
         await pending.writeAsString(
-          jsonEncode({'ip': ip, 'port': 8443}),
+          jsonEncode({'ip': candidate, 'port': 8443}),
           flush: true,
         );
         await pending.rename(config.path);
+        ip = candidate;
       }
       final runtime = await _install(root);
       if (_disposed) {
@@ -282,7 +288,8 @@ class HomeController extends ChangeNotifier {
     if (process != null) {
       // EOF запускает штатное завершение Go, затем остановку собственной PostgreSQL.
       await process.stdin.close();
-      await process.exitCode.timeout(const Duration(seconds: 30));
+      final code=await process.exitCode.timeout(const Duration(seconds: 30));
+      if (code != 0) throw StateError('Ошибка остановки домашнего сервера: $_diagnostic');
       _process = null;
     }
     running = false;

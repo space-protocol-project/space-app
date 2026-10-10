@@ -143,7 +143,14 @@ void extractVerifiedHomeArchive(String archivePath, String destination) {
       final parts = entry.name.replaceAll('\\', '/').split('/');
       total += entry.size;
       if (entry.isSymbolicLink ||
-          parts.any((part) => part == '..' || part.contains(':')) ||
+          parts.any(
+            (part) =>
+                part == '..' ||
+                part == '.' ||
+                part.contains(':') ||
+                part.trim() != part ||
+                part.endsWith('.'),
+          ) ||
           entry.name.startsWith('/') ||
           entry.name.startsWith('\\') ||
           total > 2 * 1024 * 1024 * 1024) {
