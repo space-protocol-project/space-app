@@ -16,6 +16,10 @@ class NativeAdminGateway extends SpaceGateway {
   NativeAdminGateway(super.origin, this.session);
   final SpaceAdministration session;
   @override
+  String get tlsFingerprint => session is SpaceSession
+      ? (session as SpaceSession).server.tlsFingerprint
+      : '';
+  @override
   Future<Map<String, dynamic>> call(
     String path, {
     String token = '',

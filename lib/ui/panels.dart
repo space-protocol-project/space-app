@@ -7,6 +7,7 @@ import 'recovery_panel.dart';
 
 import '../src/chat_controller.dart';
 import '../src/preferences.dart';
+import '../src/home_controller.dart';
 import 'components.dart';
 
 class OverviewPanel extends StatelessWidget {
@@ -15,14 +16,69 @@ class OverviewPanel extends StatelessWidget {
     required this.controller,
     required this.openConnection,
     required this.openChat,
+    this.home,
+    this.homeAction,
+    this.homeDetails,
   });
   final ChatController controller;
   final VoidCallback openConnection, openChat;
+  final HomeController? home;
+  final VoidCallback? homeAction, homeDetails;
   @override
   Widget build(BuildContext context) => PageBody(
     title: context.strings.welcome,
     description: context.strings.welcomeDescription,
     children: [
+      if (home != null) ...[
+        SurfaceCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Мой домашний сервер',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                home!.busy
+                    ? home!.phase
+                    : home!.running
+                    ? 'Сервер работает. После отключения все данные сохранятся.'
+                    : 'Запустите своё пространство на этом компьютере.',
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 12,
+                runSpacing: 10,
+                children: [
+                  FilledButton.icon(
+                    onPressed: home!.busy || controller.busy
+                        ? null
+                        : homeAction,
+                    icon: Icon(
+                      home!.running ? Icons.power_settings_new : Icons.sensors,
+                    ),
+                    label: Text(home!.running ? 'Отключиться' : 'Выйти в эфир'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: home!.busy ? null : homeDetails,
+                    icon: const Icon(Icons.tune),
+                    label: const Text('Мой сервер'),
+                  ),
+                ],
+              ),
+              if (home!.error.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Text(
+                  home!.error,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+      ],
       SurfaceCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

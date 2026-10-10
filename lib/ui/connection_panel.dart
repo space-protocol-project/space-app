@@ -124,6 +124,15 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
                 style: const TextStyle(fontSize: 12),
               ),
               const SizedBox(height: 12),
+              if (c.preview!.tlsFingerprint.isNotEmpty) ...[
+                const Text('Отпечаток TLS-сертификата'),
+                const SizedBox(height: 6),
+                SelectableText(
+                  c.preview!.tlsFingerprint,
+                  style: const TextStyle(fontSize: 12),
+                ),
+                const SizedBox(height: 12),
+              ],
               const Text(
                 'При первом визите сравните адрес и отпечаток с известными данными владельца. Первый вход создаёт отдельные ключи для этого сервера.',
               ),

@@ -9,6 +9,8 @@ import 'package:flutter/services.dart';
 import '../src/chat_controller.dart';
 import '../src/preferences.dart';
 import '../src/secure_vault.dart';
+import '../src/home_controller.dart';
+import 'home_panel.dart';
 import 'chat_view.dart';
 import 'connection_panel.dart';
 import 'panels.dart';
@@ -49,6 +51,85 @@ class _SpaceShellState extends State<SpaceShell> {
   late final ChatController controller =
       widget.controller ?? ChatController(SecureIdentityVault());
   final scaffold = GlobalKey<ScaffoldState>();
+  final home = HomeController();
+  @override
+  void initState() {
+    super.initState();
+    unawaited(home.load());
+  }
+
+  Future<void> startHome(String ip) async {
+    final state = await home.start(ip);
+    if (state == null || !mounted) return;
+    await controller.inspect(
+      state.localOrigin,
+      homeOrigin: state.publicOrigin,
+      tlsFingerprint: state.tlsFingerprint,
+    );
+    if (!mounted) return;
+    if (controller.preview == null) {
+      home.reportError(controller.error);
+      return;
+    }
+    await controller.connect(setupCode: state.setupCode);
+    if (!controller.connected) home.reportError(controller.error);
+    if (mounted && controller.connected) {
+      await widget.preferences.remember(state.publicOrigin);
+    }
+  }
+
+  Future<void> stopHome() async {
+    if (controller.preview?.origin.toString() == home.state?.publicOrigin) {
+      await controller.disconnect();
+    }
+    await home.stop();
+  }
+
+  Future<void> showHome() async {
+    if (home.running) {
+      await stopHome();
+      return;
+    }
+    await home.load();
+    if (!mounted) return;
+    if (home.ip.isNotEmpty) await startHome(home.ip);
+    if (!mounted) return;
+    await showHomeDetails();
+  }
+
+  Future<void> showHomeDetails() async {
+    await showDialog<void>(
+      context: context,
+      builder: (context) => Dialog(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: 580,
+            maxHeight: MediaQuery.sizeOf(context).height * .9,
+          ),
+          child: HomePanel(
+            home: home,
+            onStart: startHome,
+            onStop: stopHome,
+            openAdministration: () {
+              final administration = controller.administration;
+              if (administration == null) {
+                home.reportError(
+                  controller.error.isEmpty
+                      ? 'Сначала нужно подключиться к серверу владельцем.'
+                      : controller.error,
+                );
+                return;
+              }
+              Navigator.pop(context);
+              select(Section.identity);
+              unawaited(openServerAdministration(this.context, administration));
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
   Section selected = Section.overview;
   Future<void> search() async {
     final route = await showSearch<String>(
@@ -82,6 +163,7 @@ class _SpaceShellState extends State<SpaceShell> {
 
   @override
   void dispose() {
+    home.dispose();
     if (widget.controller == null) controller.dispose();
     super.dispose();
   }
@@ -186,6 +268,15 @@ class _SpaceShellState extends State<SpaceShell> {
                 : context.strings.addSpace,
           ),
           const SizedBox(height: 20),
+          AnimatedBuilder(
+            animation: home,
+            builder: (context, _) => SpaceActionButton(
+              onPressed: home.busy || controller.busy ? null : showHome,
+              icon: home.running ? Icons.power_settings_new : Icons.sensors,
+              label: home.running ? 'Отключиться' : 'Выйти в эфир',
+            ),
+          ),
+          const SizedBox(height: 16),
           for (final section in Section.values)
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
@@ -422,6 +513,9 @@ class _SpaceShellState extends State<SpaceShell> {
     children: [
       OverviewPanel(
         controller: controller,
+        home: home,
+        homeAction: showHome,
+        homeDetails: showHomeDetails,
         openConnection: () => connection(),
         openChat: () => select(Section.chat),
       ),
@@ -510,7 +604,7 @@ class _SpaceShellState extends State<SpaceShell> {
   );
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-    animation: Listenable.merge([controller, widget.preferences]),
+    animation: Listenable.merge([controller, widget.preferences, home]),
     builder: (context, _) => LayoutBuilder(
       builder: (context, box) {
         final compact = box.maxWidth < 760;

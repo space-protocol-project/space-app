@@ -201,7 +201,12 @@ class ChatController extends ChangeNotifier {
     return 'Не удалось выполнить операцию. Проверьте сервер, соединение и доступ к хранилищу ключей.';
   }
 
-  Future<void> inspect(String address, {String invitationToken = ''}) async {
+  Future<void> inspect(
+    String address, {
+    String invitationToken = '',
+    String? homeOrigin,
+    String tlsFingerprint = '',
+  }) async {
     if (busy) return;
     busy = true;
     error = '';
@@ -214,7 +219,13 @@ class ChatController extends ChangeNotifier {
         address,
         invitationToken: invitationToken,
       );
-      final server = await discover(input.origin.toString());
+      final server = await discover(
+        input.origin.toString(),
+        homeOrigin: homeOrigin,
+        tlsFingerprint: input.tlsFingerprint.isEmpty
+            ? tlsFingerprint
+            : input.tlsFingerprint,
+      );
       final saved = await vault.load(server.origin.toString());
       if (saved != null) checkTrust(server, saved);
       fingerprint = await server.fingerprint();
@@ -236,6 +247,7 @@ class ChatController extends ChangeNotifier {
   Future<void> connect({
     DeviceRecord? restoredRecord,
     String pairingId = '',
+    String setupCode = '',
   }) async {
     final server = preview;
     if (busy || server == null) return;
@@ -253,7 +265,10 @@ class ChatController extends ChangeNotifier {
       _stopCatalog();
       await _session?.close();
       _session = null;
-      final session = _invitationToken.isEmpty && restoredRecord == null
+      final session =
+          _invitationToken.isEmpty &&
+              restoredRecord == null &&
+              setupCode.isEmpty
           ? await openSession(server, vault)
           : await SpaceSession.connect(
               server,
@@ -261,6 +276,7 @@ class ChatController extends ChangeNotifier {
               invitationToken: pairingId.isEmpty ? _invitationToken : '',
               restoredRecord: restoredRecord,
               pairingId: pairingId,
+              setupCode: setupCode,
             );
       if (_disposed) {
         await session.close();

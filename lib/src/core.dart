@@ -4,10 +4,9 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:cryptography/cryptography.dart';
+import 'package:crypto/crypto.dart' as crypto;
 import 'package:grpc/grpc.dart';
 import 'package:protobuf/protobuf.dart' show GeneratedMessage;
-import 'package:http/http.dart' as http;
-import 'package:http/io_client.dart';
 
 import 'generated/space/v1/space.pbgrpc.dart';
 import 'root_history.dart';
@@ -16,7 +15,33 @@ import 'root_rotation.dart' as rotation;
 String url64(List<int> value) => base64Url.encode(value).replaceAll('=', '');
 
 class Discovery {
-  Discovery(this.origin, this.serverId, this.publicKey, this.grpcPort);
+  Discovery(
+    this.origin,
+    this.serverId,
+    this.publicKey,
+    this.grpcPort, {
+    this.grpcHost,
+    this.tlsCertificate = '',
+    this.tlsFingerprint = '',
+    this.localTransport = false,
+  });
+  final String? grpcHost;
+  final String tlsCertificate, tlsFingerprint;
+  final bool localTransport;
+  ClientChannel openChannel() => ClientChannel(
+    grpcHost ?? origin.host,
+    port: grpcPort,
+    options: ChannelOptions(
+      credentials: origin.scheme == 'https' && !localTransport
+          ? ChannelCredentials.secure(
+              authority: origin.host,
+              certificates: tlsCertificate.isEmpty
+                  ? null
+                  : utf8.encode(tlsCertificate),
+            )
+          : const ChannelCredentials.insecure(),
+    ),
+  );
   final Uri origin;
   final String serverId;
   final List<int> publicKey;
@@ -28,7 +53,12 @@ class Discovery {
 }
 
 class ConnectionInput {
-  const ConnectionInput(this.origin, this.invitationToken);
+  const ConnectionInput(
+    this.origin,
+    this.invitationToken, [
+    this.tlsFingerprint = '',
+  ]);
+  final String tlsFingerprint;
   final Uri origin;
   final String invitationToken;
 }
@@ -41,21 +71,27 @@ ConnectionInput parseConnectionInput(
   var token = invitationToken.trim();
   if (uri.hasFragment) {
     final fields = Uri.splitQueryString(uri.fragment);
-    if (fields.length != 1 ||
-        !fields.containsKey('invite') ||
-        !RegExp(r'^iv_[A-Za-z0-9_-]{43}$').hasMatch(fields['invite']!)) {
+    if (fields.keys.any((key) => !['invite', 'tls'].contains(key)) ||
+        (!fields.containsKey('invite') && !fields.containsKey('tls')) ||
+        (fields.containsKey('tls') &&
+            !RegExp(r'^[0-9a-f]{64}$').hasMatch(fields['tls']!)) ||
+        (fields.containsKey('invite') &&
+            !RegExp(r'^iv_[A-Za-z0-9_-]{43}$').hasMatch(fields['invite']!))) {
       throw const FormatException('Некорректная ссылка приглашения');
     }
-    if (token.isNotEmpty && token != fields['invite']) {
+    if (fields.containsKey('invite') &&
+        token.isNotEmpty &&
+        token != fields['invite']) {
       throw const FormatException('Код приглашения не совпадает со ссылкой');
     }
-    token = fields['invite']!;
+    token = fields['invite'] ?? token;
     if (uri.path.isNotEmpty && uri.path != '/') {
       throw const FormatException('Некорректный адрес приглашения');
     }
     return ConnectionInput(
       localOrigin(uri.replace(path: '').removeFragment().toString()),
       token,
+      fields['tls'] ?? '',
     );
   }
   return ConnectionInput(localOrigin(address), token);
@@ -64,43 +100,69 @@ ConnectionInput parseConnectionInput(
 Uri localOrigin(String input) {
   final uri = Uri.parse(input.trim());
   final address = InternetAddress.tryParse(uri.host);
-  if (uri.scheme != 'http' ||
-      address == null ||
-      !address.isLoopback ||
+  if (!((uri.scheme == 'http' && address != null && address.isLoopback) ||
+          (uri.scheme == 'https' && uri.host.isNotEmpty)) ||
       uri.userInfo.isNotEmpty ||
       uri.path.isNotEmpty ||
       uri.hasQuery ||
       uri.hasFragment ||
       uri.port < 1) {
     throw const FormatException(
-      'Сейчас поддерживается локальный адрес: http://127.0.0.1:8080',
+      'Нужен HTTPS адрес сервера или локальный HTTP адрес',
     );
   }
   return uri;
 }
 
-Future<Discovery> discover(String input) async {
-  final origin = localOrigin(input);
-  final client = IOClient(
-    HttpClient()..connectionTimeout = const Duration(seconds: 5),
-  );
+String certificateFingerprint(X509Certificate certificate) =>
+    crypto.sha256.convert(certificate.der).toString();
+
+Future<Discovery> discover(
+  String input, {
+  String tlsFingerprint = '',
+  String? homeOrigin,
+}) async {
+  final networkOrigin = localOrigin(input);
+  final origin = homeOrigin == null ? networkOrigin : localOrigin(homeOrigin);
+  if (homeOrigin != null &&
+      (networkOrigin.scheme != 'http' ||
+          !InternetAddress(networkOrigin.host).isLoopback ||
+          origin.scheme != 'https')) {
+    throw const FormatException(
+      'Недопустимый локальный маршрут домашнего сервера',
+    );
+  }
+  final client = HttpClient()..connectionTimeout = const Duration(seconds: 5);
+  // Первый сертификат проверяется пользователем вместе с ключом сервера до входа.
+  client.badCertificateCallback = (certificate, host, port) =>
+      host == networkOrigin.host &&
+      port == networkOrigin.port &&
+      (tlsFingerprint.isEmpty ||
+          certificateFingerprint(certificate) == tlsFingerprint);
   try {
-    final request = http.Request(
-      'GET',
-      origin.resolve('/.well-known/space-protocol'),
-    )..followRedirects = false;
-    final response = await client
-        .send(request)
+    final request = await client
+        .getUrl(networkOrigin.resolve('/.well-known/space-protocol'))
         .timeout(const Duration(seconds: 10));
+    request.followRedirects = false;
+    final response = await request.close().timeout(const Duration(seconds: 10));
     if (response.statusCode != 200) {
       throw const FormatException(
         'Сервер не предоставил discovery. Перенаправления не принимаются.',
       );
     }
+    final certificate = response.certificate;
+    final actualFingerprint = certificate == null
+        ? ''
+        : certificateFingerprint(certificate);
+    if (tlsFingerprint.isNotEmpty &&
+        homeOrigin == null &&
+        actualFingerprint != tlsFingerprint) {
+      throw const FormatException(
+        'Сертификат не совпадает с отпечатком в ссылке',
+      );
+    }
     final bytes = <int>[];
-    await for (final chunk in response.stream.timeout(
-      const Duration(seconds: 10),
-    )) {
+    await for (final chunk in response.timeout(const Duration(seconds: 10))) {
       bytes.addAll(chunk);
       if (bytes.length > 16384) {
         throw const FormatException('Слишком большой discovery');
@@ -111,26 +173,37 @@ Future<Discovery> discover(String input) async {
     final key = base64Url.decode(
       base64Url.normalize(data['signing_public_key'] as String),
     );
-    final endpoint = Uri.parse('http://${data['grpc_endpoint']}');
+    final endpoint = Uri.parse(
+      '${networkOrigin.scheme}://${data['grpc_endpoint']}',
+    );
     if (data['protocol_version'] != '0.1-experimental' ||
         data['signing_algorithm'] != 'Ed25519' ||
         data['manifest'] != '/api/v1/manifest' ||
         !RegExp(r'^srv_[0-9a-f]{32}$').hasMatch(id) ||
         key.length != 32 ||
-        endpoint.host != origin.host ||
+        endpoint.host != networkOrigin.host ||
         endpoint.userInfo.isNotEmpty ||
         endpoint.path.isNotEmpty ||
         endpoint.hasQuery ||
         endpoint.hasFragment ||
         !endpoint.hasPort ||
-        endpoint.port < 1) {
-      throw const FormatException(
-        'Discovery несовместим с локальным профилем Space',
-      );
+        endpoint.port < 1 ||
+        (networkOrigin.scheme == 'https' &&
+            endpoint.port != networkOrigin.port)) {
+      throw const FormatException('Discovery несовместим с профилем Space');
     }
-    return Discovery(origin, id, key, endpoint.port);
+    return Discovery(
+      origin,
+      id,
+      key,
+      endpoint.port,
+      grpcHost: networkOrigin.host,
+      tlsCertificate: certificate?.pem ?? '',
+      tlsFingerprint: homeOrigin == null ? actualFingerprint : tlsFingerprint,
+      localTransport: homeOrigin != null,
+    );
   } finally {
-    client.close();
+    client.close(force: true);
   }
 }
 
@@ -147,8 +220,10 @@ class DeviceRecord {
     this.recoveryGrantId = '',
     this.administrative = false,
     this.rootHistory = const [],
+    this.tlsFingerprint = '',
   });
   final String origin, serverId, serverKey;
+  final String tlsFingerprint;
   final List<int> rootSeed, deviceSeed;
   final List<int> rootPublicKey;
   List<int> recoverySeed;
@@ -170,6 +245,7 @@ class DeviceRecord {
     'origin': origin,
     'serverId': serverId,
     'serverKey': serverKey,
+    'tlsFingerprint': tlsFingerprint,
     'rootSeed': url64(rootSeed),
     'deviceSeed': url64(deviceSeed),
     'grantId': grantId,
@@ -187,6 +263,7 @@ class DeviceRecord {
       origin: data['origin'] as String,
       serverId: data['serverId'] as String,
       serverKey: data['serverKey'] as String,
+      tlsFingerprint: data['tlsFingerprint'] as String? ?? '',
       rootSeed: base64Url.decode(
         base64Url.normalize(data['rootSeed'] as String),
       ),
@@ -234,7 +311,9 @@ abstract interface class RotationJournalVault implements IdentityVault {
 void checkTrust(Discovery server, DeviceRecord record) {
   if (record.origin != server.origin.toString() ||
       record.serverId != server.serverId ||
-      record.serverKey != url64(server.publicKey)) {
+      record.serverKey != url64(server.publicKey) ||
+      (record.tlsFingerprint.isNotEmpty &&
+          record.tlsFingerprint != server.tlsFingerprint)) {
     throw const FormatException(
       'Идентичность сервера изменилась. Подключение заблокировано.',
     );
@@ -626,6 +705,7 @@ class SpaceSession
     String invitationToken = '',
     DeviceRecord? restoredRecord,
     String pairingId = '',
+    String setupCode = '',
   }) async {
     if (restoredRecord != null &&
         vault is RotationJournalVault &&
@@ -634,11 +714,7 @@ class SpaceSession
         'Сначала завершите сохранённую смену ключа для этого сервера',
       );
     }
-    final setupChannel = ClientChannel(
-      server.origin.host,
-      port: server.grpcPort,
-      options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
-    );
+    final setupChannel = server.openChannel();
     bool automatic = false;
     try {
       automatic = (await AdminServiceClient(setupChannel).getSetupStatus(
@@ -657,6 +733,7 @@ class SpaceSession
           origin: record.origin,
           serverId: record.serverId,
           serverKey: record.serverKey,
+          tlsFingerprint: record.tlsFingerprint,
           rootSeed: record.rootSeed,
           deviceSeed: record.deviceSeed,
           rootPublicKey: record.rootPublicKey,
@@ -672,17 +749,14 @@ class SpaceSession
         origin: server.origin.toString(),
         serverId: server.serverId,
         serverKey: url64(server.publicKey),
+        tlsFingerprint: server.tlsFingerprint,
         rootSeed: await root.extractPrivateKeyBytes(),
         deviceSeed: await device.extractPrivateKeyBytes(),
-        administrative: automatic,
+        administrative: automatic || setupCode.isNotEmpty,
       );
       await vault.save(record);
     }
-    final channel = ClientChannel(
-      server.origin.host,
-      port: server.grpcPort,
-      options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
-    );
+    final channel = server.openChannel();
     final session = SpaceSession._(server, record, vault, channel);
     try {
       final manifest = await ChannelServiceClient(channel).getManifest(
@@ -720,6 +794,12 @@ class SpaceSession
       if (invitationToken.isNotEmpty) {
         await MembershipServiceClient(channel).acceptInvite(
           AcceptInviteRequest(token: invitationToken),
+          options: session._options,
+        );
+      }
+      if (setupCode.isNotEmpty) {
+        await AdminServiceClient(channel).claimOwner(
+          ClaimOwnerRequest(setupCode: setupCode),
           options: session._options,
         );
       }
@@ -966,11 +1046,7 @@ class SpaceSession
     Discovery server,
     String token,
   ) async {
-    final channel = ClientChannel(
-      server.origin.host,
-      port: server.grpcPort,
-      options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
-    );
+    final channel = server.openChannel();
     try {
       final result = await MembershipServiceClient(channel).previewInvite(
         PreviewInviteRequest(token: token),
