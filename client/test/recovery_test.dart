@@ -13,7 +13,8 @@ void main() {
       final payload = <String, dynamic>{
         'v': 1,
         'credential': 'root',
-        'origin': 'http://127.0.0.1:8080',
+        'origin': 'https://203.0.113.10:8443',
+        'tls_fingerprint': 'b' * 64,
         'server_id': 'srv_${'a' * 32}',
         'server_key': url64(List.filled(32, 1)),
         'root_public_key': url64((await root.extractPublicKey()).bytes),
@@ -28,6 +29,7 @@ void main() {
       expect(first.rootSeed, second.rootSeed);
       expect(first.deviceSeed, isNot(second.deviceSeed));
       expect(first.grantId, isEmpty);
+      expect(first.tlsFingerprint, 'b' * 64);
       await expectLater(
         openRecoveryCard(packet, 'Wrong password for the card'),
         throwsFormatException,

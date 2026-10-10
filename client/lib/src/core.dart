@@ -39,6 +39,7 @@ class Discovery {
                   ? null
                   : (certificate, authority) =>
                         authority == origin.host &&
+                        certificateIsCurrent(certificate) &&
                         certificateFingerprint(certificate) == tlsFingerprint,
               certificates: tlsCertificate.isEmpty
                   ? null
@@ -122,6 +123,12 @@ Uri localOrigin(String input) {
 String certificateFingerprint(X509Certificate certificate) =>
     crypto.sha256.convert(certificate.der).toString();
 
+bool certificateIsCurrent(X509Certificate certificate) {
+  final now = DateTime.now();
+  return !certificate.startValidity.isAfter(now) &&
+      certificate.endValidity.isAfter(now);
+}
+
 Future<Discovery> discover(
   String input, {
   String tlsFingerprint = '',
@@ -142,6 +149,7 @@ Future<Discovery> discover(
   client.badCertificateCallback = (certificate, host, port) =>
       host == networkOrigin.host &&
       port == networkOrigin.port &&
+      certificateIsCurrent(certificate) &&
       (tlsFingerprint.isEmpty ||
           certificateFingerprint(certificate) == tlsFingerprint);
   try {
@@ -1196,6 +1204,8 @@ class SpaceSession
       'origin': record.origin,
       'server_id': record.serverId,
       'server_key': record.serverKey,
+      if (record.tlsFingerprint.isNotEmpty)
+        'tls_fingerprint': record.tlsFingerprint,
       'root_public_key': url64(rootPublic),
       'credential': record.rootSeed.isEmpty ? 'recovery' : 'root',
       'secret': url64(
@@ -1331,10 +1341,13 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
   );
   final serverKey = payload['server_key'] as String,
       serverId = payload['server_id'] as String;
+  final tlsFingerprint = payload['tls_fingerprint'] as String? ?? '';
   if (rootPublic.length != 32 ||
       secret.length != 32 ||
       !RegExp(r'^srv_[0-9a-f]{32}$').hasMatch(serverId) ||
-      !RegExp(r'^[A-Za-z0-9_-]{43}$').hasMatch(serverKey)) {
+      !RegExp(r'^[A-Za-z0-9_-]{43}$').hasMatch(serverKey) ||
+      (tlsFingerprint.isNotEmpty &&
+          !RegExp(r'^[0-9a-f]{64}$').hasMatch(tlsFingerprint))) {
     throw const FormatException('Повреждены сведения о сервере или ключах');
   }
   final pair = await Ed25519().newKeyPairFromSeed(secret);
@@ -1368,6 +1381,7 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
     origin: origin,
     serverId: serverId,
     serverKey: serverKey,
+    tlsFingerprint: tlsFingerprint,
     rootSeed: isRoot ? secret : [],
     deviceSeed: await device.extractPrivateKeyBytes(),
     rootPublicKey: rootPublic,

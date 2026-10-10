@@ -89,3 +89,4 @@ jobs:
         run: |
           (cd dist && sha256sum Space-* > SHA256SUMS.txt)
           gh release create "$GITHUB_REF_NAME" dist/Space-* dist/SHA256SUMS.txt --verify-tag --title "Space $GITHUB_REF_NAME" --notes-file dist/release-notes.md --prerelease
+          gh release edit "$GITHUB_REF_NAME" --draft=false

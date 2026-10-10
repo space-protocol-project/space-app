@@ -22,7 +22,8 @@ class HomeRelease {
       data['sha256'] as String,
       data['bytes'] as int,
     );
-    if (!RegExp(r'^home-v[0-9.]+$').hasMatch(release.version) ||
+    if (!RegExp(r'^v[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.-]+)?$')
+            .hasMatch(release.version) ||
         !RegExp(r'^(windows|macos|linux)-(x64|arm64)$')
             .hasMatch(release.platform) ||
         !RegExp(r'^[0-9a-f]{64}$').hasMatch(release.sha256) ||
