@@ -111,6 +111,30 @@ Future<void> main(List<String> args) async {
         );
         if (attempt == 0) {
           await Future<void>.delayed(const Duration(seconds: 1));
+          // Проверяем настоящий TLS handshake, а не только сравнение модели.
+          try {
+            await discover('https://127.0.0.1:18843', tlsFingerprint: '0' * 64);
+            throw StateError('Discovery принял неверный TLS-отпечаток');
+          } on HandshakeException {
+            // Ожидаемый отказ до получения discovery и отправки приглашения.
+          }
+          final wrongCertificate = Discovery(
+            remote.origin,
+            remote.serverId,
+            remote.publicKey,
+            remote.grpcPort,
+            grpcHost: remote.grpcHost,
+            tlsFingerprint: '0' * 64,
+          );
+          try {
+            await SpaceSession.previewInvitation(
+              wrongCertificate,
+              'iv_${'a' * 43}',
+            );
+            throw StateError('gRPC принял неверный TLS-отпечаток');
+          } on GrpcError catch (error) {
+            if (error.code != StatusCode.unavailable) rethrow;
+          }
           final settings =
               (await owner.adminRequest('/api/v1/space/settings'))['settings']
                   as Map;
