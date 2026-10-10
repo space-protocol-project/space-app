@@ -396,4 +396,116 @@ class AdminLocalizationsEn extends AdminLocalizations {
   String membersCount(int count) {
     return 'Loaded: $count. Search covers loaded members.';
   }
+
+  @override
+  String get invitesTitle => 'Invitations';
+
+  @override
+  String get invitesRefresh => 'Refresh invitations';
+
+  @override
+  String get invitesHelp =>
+      'Owners and admins invite members and readers. An invitation does not change an existing member\'s role.';
+
+  @override
+  String get inviteRole => 'Invitee role';
+
+  @override
+  String get inviteMember => 'Member — read and send';
+
+  @override
+  String get inviteReader => 'Reader — read only';
+
+  @override
+  String get inviteTtl => 'Invitation duration';
+
+  @override
+  String get inviteMinute => '1 minute';
+
+  @override
+  String get inviteHour => '1 hour';
+
+  @override
+  String get inviteDay => '1 day';
+
+  @override
+  String get inviteWeek => '7 days';
+
+  @override
+  String get inviteUses => 'Number of uses (1–100)';
+
+  @override
+  String get inviteCreate => 'Create invitation';
+
+  @override
+  String get inviteCode => 'New invitation code';
+
+  @override
+  String get inviteLink => 'Link for Space';
+
+  @override
+  String get inviteLinkHelp =>
+      'The code is shown only now and stays in this form\'s memory. Paste the link into Add space in Space. A public server must be reachable from your friend\'s network.';
+
+  @override
+  String get inviteCopyCode => 'Copy code';
+
+  @override
+  String get inviteCopyLink => 'Copy link';
+
+  @override
+  String get inviteHide => 'Hide code';
+
+  @override
+  String get inviteRevoke => 'Revoke invitation';
+
+  @override
+  String get inviteRevokeConfirm => 'Revoke invitation?';
+
+  @override
+  String get inviteRevokeHelp =>
+      'New members cannot join with this invitation. Members who already joined keep their access.';
+
+  @override
+  String get invitesEmpty => 'No invitations yet.';
+
+  @override
+  String get invitesMore => 'Load more invitations';
+
+  @override
+  String get inviteRevokedState => 'Revoked';
+
+  @override
+  String get inviteExpiredState => 'Expired';
+
+  @override
+  String get inviteUsedState => 'Used up';
+
+  @override
+  String get inviteActiveState => 'Active';
+
+  @override
+  String get invitesLoaded => 'Invitations loaded.';
+
+  @override
+  String get inviteCreated => 'Invitation created. Copy the code or link now.';
+
+  @override
+  String get inviteCopied => 'Copied to clipboard.';
+
+  @override
+  String get inviteCopyFailed =>
+      'Copy is unavailable. Select the code or link and copy it manually.';
+
+  @override
+  String get inviteRevoked =>
+      'Invitation revoked. Existing members keep their access.';
+
+  @override
+  String get inviteUsesInvalid => 'Enter a number of uses from 1 to 100';
+
+  @override
+  String inviteExpiry(String expiry, int uses, int limit) {
+    return 'Until $expiry, device time · uses $uses/$limit';
+  }
 }

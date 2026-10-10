@@ -160,5 +160,53 @@
         "type": "int"
       }
     }
+  },
+  "invitesTitle": "邀请",
+  "invitesRefresh": "刷新邀请",
+  "invitesHelp": "所有者和管理员可邀请成员和阅读者。邀请不会更改已有成员的角色。",
+  "inviteRole": "受邀者角色",
+  "inviteMember": "成员 — 读取和发送",
+  "inviteReader": "阅读者 — 只读",
+  "inviteTtl": "邀请有效期",
+  "inviteMinute": "1 分钟",
+  "inviteHour": "1 小时",
+  "inviteDay": "1 天",
+  "inviteWeek": "7 天",
+  "inviteUses": "使用次数（1–100）",
+  "inviteCreate": "创建邀请",
+  "inviteCode": "新邀请代码",
+  "inviteLink": "Space 邀请链接",
+  "inviteLinkHelp": "代码仅在此时显示，并保存在表单内存中。请将链接粘贴到 Space 的“添加空间”。公共服务器的端口必须能从朋友的网络访问。",
+  "inviteCopyCode": "复制代码",
+  "inviteCopyLink": "复制链接",
+  "inviteHide": "隐藏代码",
+  "inviteRevoke": "撤销邀请",
+  "inviteRevokeConfirm": "撤销邀请？",
+  "inviteRevokeHelp": "此邀请将不再允许新成员加入。已加入的成员保留访问权限。",
+  "invitesEmpty": "暂无邀请。",
+  "invitesMore": "加载更多邀请",
+  "inviteRevokedState": "已撤销",
+  "inviteExpiredState": "已过期",
+  "inviteUsedState": "已用完",
+  "inviteActiveState": "有效",
+  "invitesLoaded": "邀请已加载。",
+  "inviteCreated": "邀请已创建。请立即复制代码或链接。",
+  "inviteCopied": "已复制到剪贴板。",
+  "inviteCopyFailed": "无法复制。请选中代码或链接并手动复制。",
+  "inviteRevoked": "邀请已撤销。已加入成员的访问权限不变。",
+  "inviteUsesInvalid": "请输入 1 到 100 之间的使用次数",
+  "inviteExpiry": "截至 {expiry}（设备时间）· 已使用 {uses}/{limit} 次",
+  "@inviteExpiry": {
+    "placeholders": {
+      "expiry": {
+        "type": "String"
+      },
+      "uses": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
   }
 }

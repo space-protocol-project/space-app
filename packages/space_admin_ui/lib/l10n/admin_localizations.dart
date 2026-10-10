@@ -801,6 +801,216 @@ abstract class AdminLocalizations {
   /// In ru, this message translates to:
   /// **'Загружено: {count}. Поиск работает по загруженным участникам.'**
   String membersCount(int count);
+
+  /// No description provided for @invitesTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приглашения'**
+  String get invitesTitle;
+
+  /// No description provided for @invitesRefresh.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить приглашения'**
+  String get invitesRefresh;
+
+  /// No description provided for @invitesHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Владелец и администраторы выдают приглашения участникам и читателям. Роль существующего участника приглашение не меняет.'**
+  String get invitesHelp;
+
+  /// No description provided for @inviteRole.
+  ///
+  /// In ru, this message translates to:
+  /// **'Роль приглашённого'**
+  String get inviteRole;
+
+  /// No description provided for @inviteMember.
+  ///
+  /// In ru, this message translates to:
+  /// **'Участник — читает и пишет'**
+  String get inviteMember;
+
+  /// No description provided for @inviteReader.
+  ///
+  /// In ru, this message translates to:
+  /// **'Читатель — только чтение'**
+  String get inviteReader;
+
+  /// No description provided for @inviteTtl.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок приглашения'**
+  String get inviteTtl;
+
+  /// No description provided for @inviteMinute.
+  ///
+  /// In ru, this message translates to:
+  /// **'1 минута'**
+  String get inviteMinute;
+
+  /// No description provided for @inviteHour.
+  ///
+  /// In ru, this message translates to:
+  /// **'1 час'**
+  String get inviteHour;
+
+  /// No description provided for @inviteDay.
+  ///
+  /// In ru, this message translates to:
+  /// **'1 день'**
+  String get inviteDay;
+
+  /// No description provided for @inviteWeek.
+  ///
+  /// In ru, this message translates to:
+  /// **'7 дней'**
+  String get inviteWeek;
+
+  /// No description provided for @inviteUses.
+  ///
+  /// In ru, this message translates to:
+  /// **'Число использований (1–100)'**
+  String get inviteUses;
+
+  /// No description provided for @inviteCreate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать приглашение'**
+  String get inviteCreate;
+
+  /// No description provided for @inviteCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код нового приглашения'**
+  String get inviteCode;
+
+  /// No description provided for @inviteLink.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ссылка для Space'**
+  String get inviteLink;
+
+  /// No description provided for @inviteLinkHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код показывается только сейчас и хранится в памяти формы. Вставьте ссылку в «Добавить пространство» приложения Space. Для публичного сервера нужен доступ к его порту из сети друга.'**
+  String get inviteLinkHelp;
+
+  /// No description provided for @inviteCopyCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Копировать код'**
+  String get inviteCopyCode;
+
+  /// No description provided for @inviteCopyLink.
+  ///
+  /// In ru, this message translates to:
+  /// **'Копировать ссылку'**
+  String get inviteCopyLink;
+
+  /// No description provided for @inviteHide.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скрыть код'**
+  String get inviteHide;
+
+  /// No description provided for @inviteRevoke.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отозвать приглашение'**
+  String get inviteRevoke;
+
+  /// No description provided for @inviteRevokeConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отозвать приглашение?'**
+  String get inviteRevokeConfirm;
+
+  /// No description provided for @inviteRevokeHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новые вступления по нему будут запрещены. Уже вступившие участники сохранят доступ.'**
+  String get inviteRevokeHelp;
+
+  /// No description provided for @invitesEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приглашений пока нет.'**
+  String get invitesEmpty;
+
+  /// No description provided for @invitesMore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загрузить ещё приглашения'**
+  String get invitesMore;
+
+  /// No description provided for @inviteRevokedState.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отозвано'**
+  String get inviteRevokedState;
+
+  /// No description provided for @inviteExpiredState.
+  ///
+  /// In ru, this message translates to:
+  /// **'Истекло'**
+  String get inviteExpiredState;
+
+  /// No description provided for @inviteUsedState.
+  ///
+  /// In ru, this message translates to:
+  /// **'Использовано'**
+  String get inviteUsedState;
+
+  /// No description provided for @inviteActiveState.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действует'**
+  String get inviteActiveState;
+
+  /// No description provided for @invitesLoaded.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приглашения загружены.'**
+  String get invitesLoaded;
+
+  /// No description provided for @inviteCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приглашение создано. Скопируйте код или ссылку сейчас.'**
+  String get inviteCreated;
+
+  /// No description provided for @inviteCopied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировано в буфер обмена.'**
+  String get inviteCopied;
+
+  /// No description provided for @inviteCopyFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Копирование недоступно. Выделите код или ссылку и скопируйте вручную.'**
+  String get inviteCopyFailed;
+
+  /// No description provided for @inviteRevoked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приглашение отозвано. Доступ уже вступивших участников не изменён.'**
+  String get inviteRevoked;
+
+  /// No description provided for @inviteUsesInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите число использований от 1 до 100'**
+  String get inviteUsesInvalid;
+
+  /// No description provided for @inviteExpiry.
+  ///
+  /// In ru, this message translates to:
+  /// **'До {expiry} по времени устройства · использований {uses}/{limit}'**
+  String inviteExpiry(String expiry, int uses, int limit);
 }
 
 class _AdminLocalizationsDelegate

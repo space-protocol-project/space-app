@@ -396,4 +396,117 @@ class AdminLocalizationsRu extends AdminLocalizations {
   String membersCount(int count) {
     return 'Загружено: $count. Поиск работает по загруженным участникам.';
   }
+
+  @override
+  String get invitesTitle => 'Приглашения';
+
+  @override
+  String get invitesRefresh => 'Обновить приглашения';
+
+  @override
+  String get invitesHelp =>
+      'Владелец и администраторы выдают приглашения участникам и читателям. Роль существующего участника приглашение не меняет.';
+
+  @override
+  String get inviteRole => 'Роль приглашённого';
+
+  @override
+  String get inviteMember => 'Участник — читает и пишет';
+
+  @override
+  String get inviteReader => 'Читатель — только чтение';
+
+  @override
+  String get inviteTtl => 'Срок приглашения';
+
+  @override
+  String get inviteMinute => '1 минута';
+
+  @override
+  String get inviteHour => '1 час';
+
+  @override
+  String get inviteDay => '1 день';
+
+  @override
+  String get inviteWeek => '7 дней';
+
+  @override
+  String get inviteUses => 'Число использований (1–100)';
+
+  @override
+  String get inviteCreate => 'Создать приглашение';
+
+  @override
+  String get inviteCode => 'Код нового приглашения';
+
+  @override
+  String get inviteLink => 'Ссылка для Space';
+
+  @override
+  String get inviteLinkHelp =>
+      'Код показывается только сейчас и хранится в памяти формы. Вставьте ссылку в «Добавить пространство» приложения Space. Для публичного сервера нужен доступ к его порту из сети друга.';
+
+  @override
+  String get inviteCopyCode => 'Копировать код';
+
+  @override
+  String get inviteCopyLink => 'Копировать ссылку';
+
+  @override
+  String get inviteHide => 'Скрыть код';
+
+  @override
+  String get inviteRevoke => 'Отозвать приглашение';
+
+  @override
+  String get inviteRevokeConfirm => 'Отозвать приглашение?';
+
+  @override
+  String get inviteRevokeHelp =>
+      'Новые вступления по нему будут запрещены. Уже вступившие участники сохранят доступ.';
+
+  @override
+  String get invitesEmpty => 'Приглашений пока нет.';
+
+  @override
+  String get invitesMore => 'Загрузить ещё приглашения';
+
+  @override
+  String get inviteRevokedState => 'Отозвано';
+
+  @override
+  String get inviteExpiredState => 'Истекло';
+
+  @override
+  String get inviteUsedState => 'Использовано';
+
+  @override
+  String get inviteActiveState => 'Действует';
+
+  @override
+  String get invitesLoaded => 'Приглашения загружены.';
+
+  @override
+  String get inviteCreated =>
+      'Приглашение создано. Скопируйте код или ссылку сейчас.';
+
+  @override
+  String get inviteCopied => 'Скопировано в буфер обмена.';
+
+  @override
+  String get inviteCopyFailed =>
+      'Копирование недоступно. Выделите код или ссылку и скопируйте вручную.';
+
+  @override
+  String get inviteRevoked =>
+      'Приглашение отозвано. Доступ уже вступивших участников не изменён.';
+
+  @override
+  String get inviteUsesInvalid => 'Укажите число использований от 1 до 100';
+
+  @override
+  String inviteExpiry(String expiry, int uses, int limit) {
+    return 'До $expiry по времени устройства · использований $uses/$limit';
+  }
 }

@@ -370,4 +370,112 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String membersCount(int count) {
     return '已加载：$count。搜索仅针对已加载的成员。';
   }
+
+  @override
+  String get invitesTitle => '邀请';
+
+  @override
+  String get invitesRefresh => '刷新邀请';
+
+  @override
+  String get invitesHelp => '所有者和管理员可邀请成员和阅读者。邀请不会更改已有成员的角色。';
+
+  @override
+  String get inviteRole => '受邀者角色';
+
+  @override
+  String get inviteMember => '成员 — 读取和发送';
+
+  @override
+  String get inviteReader => '阅读者 — 只读';
+
+  @override
+  String get inviteTtl => '邀请有效期';
+
+  @override
+  String get inviteMinute => '1 分钟';
+
+  @override
+  String get inviteHour => '1 小时';
+
+  @override
+  String get inviteDay => '1 天';
+
+  @override
+  String get inviteWeek => '7 天';
+
+  @override
+  String get inviteUses => '使用次数（1–100）';
+
+  @override
+  String get inviteCreate => '创建邀请';
+
+  @override
+  String get inviteCode => '新邀请代码';
+
+  @override
+  String get inviteLink => 'Space 邀请链接';
+
+  @override
+  String get inviteLinkHelp =>
+      '代码仅在此时显示，并保存在表单内存中。请将链接粘贴到 Space 的“添加空间”。公共服务器的端口必须能从朋友的网络访问。';
+
+  @override
+  String get inviteCopyCode => '复制代码';
+
+  @override
+  String get inviteCopyLink => '复制链接';
+
+  @override
+  String get inviteHide => '隐藏代码';
+
+  @override
+  String get inviteRevoke => '撤销邀请';
+
+  @override
+  String get inviteRevokeConfirm => '撤销邀请？';
+
+  @override
+  String get inviteRevokeHelp => '此邀请将不再允许新成员加入。已加入的成员保留访问权限。';
+
+  @override
+  String get invitesEmpty => '暂无邀请。';
+
+  @override
+  String get invitesMore => '加载更多邀请';
+
+  @override
+  String get inviteRevokedState => '已撤销';
+
+  @override
+  String get inviteExpiredState => '已过期';
+
+  @override
+  String get inviteUsedState => '已用完';
+
+  @override
+  String get inviteActiveState => '有效';
+
+  @override
+  String get invitesLoaded => '邀请已加载。';
+
+  @override
+  String get inviteCreated => '邀请已创建。请立即复制代码或链接。';
+
+  @override
+  String get inviteCopied => '已复制到剪贴板。';
+
+  @override
+  String get inviteCopyFailed => '无法复制。请选中代码或链接并手动复制。';
+
+  @override
+  String get inviteRevoked => '邀请已撤销。已加入成员的访问权限不变。';
+
+  @override
+  String get inviteUsesInvalid => '请输入 1 到 100 之间的使用次数';
+
+  @override
+  String inviteExpiry(String expiry, int uses, int limit) {
+    return '截至 $expiry（设备时间）· 已使用 $uses/$limit 次';
+  }
 }

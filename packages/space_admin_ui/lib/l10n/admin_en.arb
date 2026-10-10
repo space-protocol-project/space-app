@@ -160,5 +160,53 @@
         "type": "int"
       }
     }
+  },
+  "invitesTitle": "Invitations",
+  "invitesRefresh": "Refresh invitations",
+  "invitesHelp": "Owners and admins invite members and readers. An invitation does not change an existing member's role.",
+  "inviteRole": "Invitee role",
+  "inviteMember": "Member — read and send",
+  "inviteReader": "Reader — read only",
+  "inviteTtl": "Invitation duration",
+  "inviteMinute": "1 minute",
+  "inviteHour": "1 hour",
+  "inviteDay": "1 day",
+  "inviteWeek": "7 days",
+  "inviteUses": "Number of uses (1–100)",
+  "inviteCreate": "Create invitation",
+  "inviteCode": "New invitation code",
+  "inviteLink": "Link for Space",
+  "inviteLinkHelp": "The code is shown only now and stays in this form's memory. Paste the link into Add space in Space. A public server must be reachable from your friend's network.",
+  "inviteCopyCode": "Copy code",
+  "inviteCopyLink": "Copy link",
+  "inviteHide": "Hide code",
+  "inviteRevoke": "Revoke invitation",
+  "inviteRevokeConfirm": "Revoke invitation?",
+  "inviteRevokeHelp": "New members cannot join with this invitation. Members who already joined keep their access.",
+  "invitesEmpty": "No invitations yet.",
+  "invitesMore": "Load more invitations",
+  "inviteRevokedState": "Revoked",
+  "inviteExpiredState": "Expired",
+  "inviteUsedState": "Used up",
+  "inviteActiveState": "Active",
+  "invitesLoaded": "Invitations loaded.",
+  "inviteCreated": "Invitation created. Copy the code or link now.",
+  "inviteCopied": "Copied to clipboard.",
+  "inviteCopyFailed": "Copy is unavailable. Select the code or link and copy it manually.",
+  "inviteRevoked": "Invitation revoked. Existing members keep their access.",
+  "inviteUsesInvalid": "Enter a number of uses from 1 to 100",
+  "inviteExpiry": "Until {expiry}, device time · uses {uses}/{limit}",
+  "@inviteExpiry": {
+    "placeholders": {
+      "expiry": {
+        "type": "String"
+      },
+      "uses": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
   }
 }

@@ -4,6 +4,7 @@ import 'package:space_api/space_api.dart';
 
 import 'channels_panel.dart';
 import 'members_panel.dart';
+import '../l10n/admin_localizations.dart';
 
 class InvitesPanel extends StatefulWidget {
   const InvitesPanel({
@@ -20,11 +21,23 @@ class InvitesPanel extends StatefulWidget {
 }
 
 class _InvitesPanelState extends State<InvitesPanel> {
+  AdminLocalizations get strings =>
+      AdminLocalizations.of(context) ??
+      lookupAdminLocalizations(const Locale('ru'));
   final invites = <Map<String, dynamic>>[];
   final uses = TextEditingController(text: '1');
   bool busy = false;
   String role = 'member', cursor = '', status = '', token = '', issuedId = '';
   int ttl = 86400;
+  String? statusKey;
+  String get localizedStatus => switch (statusKey) {
+    'invitesLoaded' => strings.invitesLoaded,
+    'inviteCreated' => strings.inviteCreated,
+    'inviteCopied' => strings.inviteCopied,
+    'inviteCopyFailed' => strings.inviteCopyFailed,
+    'inviteRevoked' => strings.inviteRevoked,
+    _ => status,
+  };
   String get link => Uri.parse(widget.origin)
       .replace(
         fragment: Uri(
@@ -56,6 +69,7 @@ class _InvitesPanelState extends State<InvitesPanel> {
     try {
       await action();
     } catch (e) {
+      statusKey = null;
       status = e.toString().replaceFirst('Bad state: ', '');
       if (e is SpaceApiError && [401, 403].contains(e.status)) {
         token = '';
@@ -92,13 +106,13 @@ class _InvitesPanelState extends State<InvitesPanel> {
       }
     }
     cursor = result['nextCursor'] as String? ?? '';
-    status = 'Приглашения загружены.';
+    statusKey = 'invitesLoaded';
   }
 
   Future<void> create() async {
     final count = int.tryParse(uses.text);
     if (count == null || count < 1 || count > 100)
-      throw StateError('Укажите число использований от 1 до 100');
+      throw StateError(strings.inviteUsesInvalid);
     final result = await widget.call(
       '/api/v1/space/invites',
       method: 'POST',
@@ -108,37 +122,40 @@ class _InvitesPanelState extends State<InvitesPanel> {
     token = result['token'] as String;
     issuedId = (result['invite'] as Map)['id'] as String;
     await load();
-    status = 'Приглашение создано. Скопируйте код или ссылку сейчас.';
+    statusKey = 'inviteCreated';
   }
 
   Future<void> copy(String value) async {
     try {
       await Clipboard.setData(ClipboardData(text: value));
-      status = 'Скопировано в буфер обмена.';
+      statusKey = 'inviteCopied';
     } catch (_) {
-      status = 'Копирование недоступно. Выделите код или ссылку и скопируйте вручную.';
+      statusKey = 'inviteCopyFailed';
     }
   }
 
   Future<void> revoke(Map<String, dynamic> invite) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Отозвать приглашение?'),
-        content: const Text(
-          'Новые вступления по нему будут запрещены. Уже вступившие участники сохранят доступ.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Отмена'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Отозвать приглашение'),
-          ),
-        ],
-      ),
+      builder: (context) {
+        final strings =
+            AdminLocalizations.of(context) ??
+            lookupAdminLocalizations(const Locale('ru'));
+        return AlertDialog(
+          title: Text(strings.inviteRevokeConfirm),
+          content: Text(strings.inviteRevokeHelp),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(strings.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(strings.inviteRevoke),
+            ),
+          ],
+        );
+      },
     );
     if (confirmed != true || !mounted) return;
     await run(() async {
@@ -153,8 +170,7 @@ class _InvitesPanelState extends State<InvitesPanel> {
         token = '';
         issuedId = '';
       }
-      status =
-          'Приглашение отозвано. Доступ уже вступивших участников не изменён.';
+      statusKey = 'inviteRevoked';
     });
   }
 
@@ -162,18 +178,18 @@ class _InvitesPanelState extends State<InvitesPanel> {
     final d = DateTime.fromMillisecondsSinceEpoch(
       int.parse('${invite['expiresAt']}') * 1000,
     ).toLocal();
-    String two(int n) => '$n'.padLeft(2, '0');
-    return '${two(d.day)}.${two(d.month)}.${d.year} ${two(d.hour)}:${two(d.minute)}';
+    final material = MaterialLocalizations.of(context);
+    return '${material.formatShortDate(d)} ${material.formatTimeOfDay(TimeOfDay.fromDateTime(d), alwaysUse24HourFormat: true)}';
   }
 
   String state(Map<String, dynamic> invite) => invite['revoked'] == true
-      ? 'Отозвано'
+      ? strings.inviteRevokedState
       : int.parse('${invite['expiresAt']}') <=
             DateTime.now().millisecondsSinceEpoch ~/ 1000
-      ? 'Истекло'
+      ? strings.inviteExpiredState
       : (invite['uses'] as num? ?? 0) >= (invite['maxUses'] as num)
-      ? 'Использовано'
-      : 'Действует';
+      ? strings.inviteUsedState
+      : strings.inviteActiveState;
   @override
   Widget build(BuildContext context) => Card(
     color: Theme.of(context).colorScheme.surface,
@@ -188,34 +204,33 @@ class _InvitesPanelState extends State<InvitesPanel> {
             runSpacing: 12,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const Text('Приглашения', style: TextStyle(fontSize: 20)),
+              Text(strings.invitesTitle, style: TextStyle(fontSize: 20)),
               OutlinedButton(
                 onPressed: busy ? null : () => run(() => load()),
-                child: const Text('Обновить приглашения'),
+                child: Text(strings.invitesRefresh),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          const Text(
-            'Владелец и администраторы выдают приглашения участникам и читателям. Роль существующего участника приглашение не меняет.',
-          ),
+          Text(strings.invitesHelp),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             isExpanded: true,
+            key: const ValueKey('invite-role'),
             initialValue: role,
-            decoration: const InputDecoration(labelText: 'Роль приглашённого'),
-            items: const [
+            decoration: InputDecoration(labelText: strings.inviteRole),
+            items: [
               DropdownMenuItem(
                 value: 'member',
                 child: Text(
-                  'Участник — читает и пишет',
+                  strings.inviteMember,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               DropdownMenuItem(
                 value: 'reader',
                 child: Text(
-                  'Читатель — только чтение',
+                  strings.inviteReader,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -224,13 +239,14 @@ class _InvitesPanelState extends State<InvitesPanel> {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<int>(
+            key: const ValueKey('invite-ttl'),
             initialValue: ttl,
-            decoration: const InputDecoration(labelText: 'Срок приглашения'),
-            items: const [
-              DropdownMenuItem(value: 60, child: Text('1 минута')),
-              DropdownMenuItem(value: 3600, child: Text('1 час')),
-              DropdownMenuItem(value: 86400, child: Text('1 день')),
-              DropdownMenuItem(value: 604800, child: Text('7 дней')),
+            decoration: InputDecoration(labelText: strings.inviteTtl),
+            items: [
+              DropdownMenuItem(value: 60, child: Text(strings.inviteMinute)),
+              DropdownMenuItem(value: 3600, child: Text(strings.inviteHour)),
+              DropdownMenuItem(value: 86400, child: Text(strings.inviteDay)),
+              DropdownMenuItem(value: 604800, child: Text(strings.inviteWeek)),
             ],
             onChanged: busy ? null : (v) => setState(() => ttl = v!),
           ),
@@ -240,25 +256,21 @@ class _InvitesPanelState extends State<InvitesPanel> {
             controller: uses,
             enabled: !busy,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Число использований (1–100)',
-            ),
+            decoration: InputDecoration(labelText: strings.inviteUses),
           ),
           const SizedBox(height: 12),
           FilledButton(
             onPressed: busy ? null : () => run(create),
-            child: const Text('Создать приглашение'),
+            child: Text(strings.inviteCreate),
           ),
           if (token.isNotEmpty) ...[
             const Divider(height: 28),
-            const Text('Код нового приглашения'),
+            Text(strings.inviteCode),
             SelectableText(token, key: const ValueKey('issued-invite-token')),
             const SizedBox(height: 12),
-            const Text('Ссылка для браузера'),
+            Text(strings.inviteLink),
             SelectableText(link, key: const ValueKey('issued-invite-link')),
-            const Text(
-              'Код показывается только сейчас и хранится в памяти формы. Локальная ссылка работает на этом компьютере или через настроенный SSH-туннель.',
-            ),
+            Text(strings.inviteLinkHelp),
             const SizedBox(height: 12),
             Wrap(
               spacing: 12,
@@ -266,11 +278,11 @@ class _InvitesPanelState extends State<InvitesPanel> {
               children: [
                 OutlinedButton(
                   onPressed: busy ? null : () => run(() => copy(token)),
-                  child: const Text('Копировать код'),
+                  child: Text(strings.inviteCopyCode),
                 ),
                 OutlinedButton(
                   onPressed: busy ? null : () => run(() => copy(link)),
-                  child: const Text('Копировать ссылку'),
+                  child: Text(strings.inviteCopyLink),
                 ),
                 TextButton(
                   onPressed: busy
@@ -279,7 +291,7 @@ class _InvitesPanelState extends State<InvitesPanel> {
                           token = '';
                           issuedId = '';
                         }),
-                  child: const Text('Скрыть код'),
+                  child: Text(strings.inviteHide),
                 ),
               ],
             ),
@@ -292,27 +304,31 @@ class _InvitesPanelState extends State<InvitesPanel> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    '${memberRoleLabel(invite['role'] as String)} · ${state(invite)}',
+                    '${memberRoleLabel(invite['role'] as String, strings)} · ${state(invite)}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    'До ${expiry(invite)} по времени устройства · использований ${invite['uses'] ?? 0}/${invite['maxUses']}',
+                    strings.inviteExpiry(
+                      expiry(invite),
+                      (invite['uses'] as num? ?? 0).toInt(),
+                      (invite['maxUses'] as num).toInt(),
+                    ),
                   ),
                   if (active(invite))
                     OutlinedButton(
                       key: ValueKey('revoke-${invite['id']}'),
                       onPressed: busy ? null : () => revoke(invite),
-                      child: const Text('Отозвать приглашение'),
+                      child: Text(strings.inviteRevoke),
                     ),
                   const Divider(),
                 ],
               ),
             ),
-          if (invites.isEmpty && !busy) const Text('Приглашений пока нет.'),
+          if (invites.isEmpty && !busy) Text(strings.invitesEmpty),
           if (cursor.isNotEmpty)
             OutlinedButton(
               onPressed: busy ? null : () => run(() => load(append: true)),
-              child: const Text('Загрузить ещё приглашения'),
+              child: Text(strings.invitesMore),
             ),
           if (busy) const LinearProgressIndicator(),
           Padding(
@@ -320,7 +336,10 @@ class _InvitesPanelState extends State<InvitesPanel> {
             child: Semantics(
               container: true,
               liveRegion: true,
-              child: Text(status, key: const ValueKey('invites-status')),
+              child: Text(
+                localizedStatus,
+                key: const ValueKey('invites-status'),
+              ),
             ),
           ),
         ],
