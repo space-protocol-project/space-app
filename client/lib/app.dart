@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:space_admin_ui/space_admin_ui.dart';
 
 import 'src/chat_controller.dart';
 import 'src/preferences.dart';
@@ -36,7 +37,10 @@ class _SpaceAppState extends State<SpaceApp> {
       debugShowCheckedModeBanner: false,
       theme: preferences.theme,
       locale: preferences.locale,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: [
+        AdminLocalizations.delegate,
+        ...AppLocalizations.localizationsDelegates,
+      ],
       supportedLocales: AppLocalizations.supportedLocales,
       home: SpaceShell(preferences: preferences, controller: widget.controller),
     ),

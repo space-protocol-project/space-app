@@ -1,0 +1,51 @@
+{
+  "@@locale": "en",
+  "closeManagement": "Close management",
+  "managementTitle": "Space management",
+  "managementIntro": "Your server. Your rules. A home server owner is assigned using its local setup code.",
+  "managementSections": "Settings, channels, members, invitations and devices for the selected server.",
+  "deviceIdentity": "Current device identity",
+  "currentConnection": "Uses the current connection identity. No additional account is needed.",
+  "currentSession": "Uses the current Space session. Open Identity to recover access.",
+  "connectManagement": "Manage the current server",
+  "claimOwner": "Assign the first owner",
+  "setupHelp": "Get the code from the server console: space-server -setup-code. It expires in 15 minutes.",
+  "setupCode": "One-time server code",
+  "confirmOwner": "Confirm ownership",
+  "authorizeFirst": "First authorize this device in the section below",
+  "authorizeTitle": "Allow this device to manage the server",
+  "authorizeHelp": "The space.manage permission is signed with your root key. It also requires the owner or admin role.",
+  "authorizeDevice": "Authorize this device",
+  "authorizeConfirm": "Allow server management?",
+  "authorizeDetails": "You explicitly allow this device to change settings, channels and member access.",
+  "rootPassword": "Root card password (JSON/PNG)",
+  "cancel": "Cancel",
+  "allow": "Allow",
+  "spaceName": "Space name",
+  "chatName": "General chat name",
+  "chatsEnabled": "Chats available to members",
+  "chatsHelp": "Disabling blocks reading and sending. History is preserved.",
+  "registration": "Registration",
+  "registrationOpen": "Open",
+  "registrationClosed": "By invitation",
+  "saveSettings": "Save settings",
+  "reloadSettings": "Reload",
+  "settingsLoaded": "Settings loaded from the server.",
+  "settingsSaved": "Settings saved on the server.",
+  "setupNeeded": "Device signed in. Enter the server setup code to claim ownership.",
+  "roleDenied": "Signed in, but your role cannot manage this server.",
+  "deviceRevoked": "This device was revoked. Recover access or use another device.",
+  "signInFirst": "Sign in first",
+  "identityChanged": "Identity changed. Sign in again",
+  "accessBlocked": "Access to this space is blocked",
+  "bothNames": "Enter both names",
+  "settingsConflict": "Settings have changed. Reload them and try again.",
+  "settingsRevision": "Space settings · revision {revision}",
+  "@settingsRevision": {
+    "placeholders": {
+      "revision": {
+        "type": "String"
+      }
+    }
+  }
+}

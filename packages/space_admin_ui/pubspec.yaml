@@ -5,5 +5,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: 0.20.3
   space_api:
     path: ../space_api
+
+flutter:
+  generate: true

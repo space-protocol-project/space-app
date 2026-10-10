@@ -4,56 +4,62 @@ import 'package:space_api/space_api.dart';
 import 'package:space_admin_ui/space_admin_ui.dart';
 
 void main() {
-  testWidgets('Разрешение своему устройству требует отдельного согласия', (
-    tester,
-  ) async {
-    var authorized = false, signatures = 0;
-    final api = ConsentGateway(() => authorized);
-    await tester.pumpWidget(
-      MaterialApp(
-        home: AdminPage(
-          autoConnect: true,
-          login: ({bool create = false}) async => {
-            'origin': 'http://127.0.0.1:8080',
-            'serverId': 'server',
-            'principalId': 'owner',
-            'role': 'owner',
-            'token': 'session',
-            'expires': 4102444800,
-            'hasRootAuthority': true,
-            'administrative': authorized,
-          },
-          gateway: (_) => api,
-          authorizeDevice: (password) async {
-            signatures++;
-            authorized = true;
-          },
+  for (final language in ['ru', 'zh', 'en']) {
+    final strings = lookupAdminLocalizations(Locale(language));
+    testWidgets('Разрешение устройству требует согласия: $language', (
+      tester,
+    ) async {
+      var authorized = false, signatures = 0;
+      final api = ConsentGateway(() => authorized);
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: Locale(language),
+          supportedLocales: AdminLocalizations.supportedLocales,
+          localizationsDelegates: AdminLocalizations.localizationsDelegates,
+          home: AdminPage(
+            autoConnect: true,
+            login: ({bool create = false}) async => {
+              'origin': 'http://127.0.0.1:8080',
+              'serverId': 'server',
+              'principalId': 'owner',
+              'role': 'owner',
+              'token': 'session',
+              'expires': 4102444800,
+              'hasRootAuthority': true,
+              'administrative': authorized,
+            },
+            gateway: (_) => api,
+            authorizeDevice: (password) async {
+              signatures++;
+              authorized = true;
+            },
+          ),
         ),
-      ),
-    );
-    await tester.runAsync(() async {
-      await Future<void>.delayed(const Duration(milliseconds: 100));
+      );
+      await tester.runAsync(() async {
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      });
+      await tester.pumpAndSettle();
+      expect(signatures, 0);
+      final button = find.text(strings.authorizeDevice);
+      await tester.ensureVisible(button);
+      await tester.tap(button);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(strings.cancel));
+      await tester.pumpAndSettle();
+      expect(signatures, 0);
+      await tester.tap(button);
+      await tester.pumpAndSettle();
+      await tester.runAsync(() async {
+        await tester.tap(find.text(strings.allow));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      });
+      await tester.pumpAndSettle();
+      expect(signatures, 1);
+      expect(find.text(strings.authorizeDevice), findsNothing);
+      expect(find.text(strings.settingsRevision('1')), findsOneWidget);
     });
-    await tester.pumpAndSettle();
-    expect(signatures, 0);
-    final button = find.text('Выдать разрешение этому устройству');
-    await tester.ensureVisible(button);
-    await tester.tap(button);
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Отмена'));
-    await tester.pumpAndSettle();
-    expect(signatures, 0);
-    await tester.tap(button);
-    await tester.pumpAndSettle();
-    await tester.runAsync(() async {
-      await tester.tap(find.text('Разрешить'));
-      await Future<void>.delayed(const Duration(milliseconds: 100));
-    });
-    await tester.pumpAndSettle();
-    expect(signatures, 1);
-    expect(find.text('Выдать разрешение этому устройству'), findsNothing);
-    expect(find.text('Настройки пространства · версия 1'), findsOneWidget);
-  });
+  }
 }
 
 class ConsentGateway extends SpaceGateway {

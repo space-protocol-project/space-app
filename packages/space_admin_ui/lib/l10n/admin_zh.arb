@@ -1,0 +1,51 @@
+{
+  "@@locale": "zh",
+  "closeManagement": "关闭管理",
+  "managementTitle": "空间管理",
+  "managementIntro": "您的服务器，您的规则。使用本地设置代码指定家庭服务器的所有者。",
+  "managementSections": "所选服务器的设置、频道、成员、邀请和设备。",
+  "deviceIdentity": "当前设备身份",
+  "currentConnection": "使用当前连接的身份，无需额外账户。",
+  "currentSession": "使用当前 Space 会话。如需恢复访问，请打开身份页面。",
+  "connectManagement": "管理当前服务器",
+  "claimOwner": "指定首位所有者",
+  "setupHelp": "在服务器控制台获取代码：space-server -setup-code。有效期为 15 分钟。",
+  "setupCode": "服务器一次性代码",
+  "confirmOwner": "确认所有权",
+  "authorizeFirst": "请先在下方明确授权此设备",
+  "authorizeTitle": "允许此设备管理服务器",
+  "authorizeHelp": "space.manage 权限由您的根密钥签署，同时需要所有者或管理员角色。",
+  "authorizeDevice": "授权此设备",
+  "authorizeConfirm": "允许管理服务器？",
+  "authorizeDetails": "您明确允许此设备更改设置、频道及成员访问权限。",
+  "rootPassword": "根身份卡密码（JSON/PNG）",
+  "cancel": "取消",
+  "allow": "允许",
+  "spaceName": "空间名称",
+  "chatName": "公共聊天名称",
+  "chatsEnabled": "成员可以使用聊天",
+  "chatsHelp": "关闭后将禁止读取和发送，历史记录会保留。",
+  "registration": "注册",
+  "registrationOpen": "开放",
+  "registrationClosed": "仅限邀请",
+  "saveSettings": "保存设置",
+  "reloadSettings": "重新加载",
+  "settingsLoaded": "已从服务器加载设置。",
+  "settingsSaved": "设置已保存到服务器。",
+  "setupNeeded": "设备已登录。请输入服务器的一次性代码以指定所有者。",
+  "roleDenied": "已登录，但您的角色无权管理此服务器。",
+  "deviceRevoked": "此设备已被撤销。请恢复访问或使用其他设备。",
+  "signInFirst": "请先登录",
+  "identityChanged": "身份已更改。请重新登录",
+  "accessBlocked": "此空间的访问已被阻止",
+  "bothNames": "请输入两个名称",
+  "settingsConflict": "设置已更改。请重新加载后再修改。",
+  "settingsRevision": "空间设置 · 版本 {revision}",
+  "@settingsRevision": {
+    "placeholders": {
+      "revision": {
+        "type": "String"
+      }
+    }
+  }
+}

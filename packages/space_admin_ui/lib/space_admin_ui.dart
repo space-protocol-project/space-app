@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:space_api/space_api.dart';
 
 import 'src/channels_panel.dart';
+import 'l10n/admin_localizations.dart';
+export 'l10n/admin_localizations.dart';
 import 'src/members_panel.dart';
 import 'src/invites_panel.dart';
 import 'src/devices_panel.dart';
@@ -49,11 +51,24 @@ class _AdminPageState extends State<AdminPage> {
       });
   }
 
+  AdminLocalizations get strings =>
+      AdminLocalizations.of(context) ??
+      lookupAdminLocalizations(const Locale('ru'));
   SpaceGateway? api;
   Map<String, dynamic>? identity, settings;
   bool confirming = false;
   bool busy = false, initialized = true, enabled = true;
   String status = '', policy = 'open';
+  String? statusKey;
+  String get localizedStatus => switch (statusKey) {
+    'settingsConflict' => strings.settingsConflict,
+    'setupNeeded' => strings.setupNeeded,
+    'roleDenied' => strings.roleDenied,
+    'settingsLoaded' => strings.settingsLoaded,
+    'settingsSaved' => strings.settingsSaved,
+    'deviceRevoked' => strings.deviceRevoked,
+    _ => status,
+  };
   final title = TextEditingController(),
       chat = TextEditingController(),
       code = TextEditingController();
@@ -63,9 +78,10 @@ class _AdminPageState extends State<AdminPage> {
     try {
       await action();
     } catch (e) {
-      status = e is SpaceApiError && e.status == 409
-          ? 'Настройки уже изменены. Загрузите их заново и повторите изменения.'
-          : e.toString().replaceFirst('Bad state: ', '');
+      statusKey = e is SpaceApiError && e.status == 409
+          ? 'settingsConflict'
+          : null;
+      status = e.toString().replaceFirst('Bad state: ', '');
     } finally {
       if (mounted) setState(() => busy = false);
     }
@@ -76,13 +92,13 @@ class _AdminPageState extends State<AdminPage> {
     Map<String, dynamic>? body,
     String? method,
   }) async {
-    if (identity == null || api == null) throw StateError('Сначала войдите');
+    if (identity == null || api == null) throw StateError(strings.signInFirst);
     if (DateTime.now().millisecondsSinceEpoch ~/ 1000 >
         (identity!['expires'] as num) - 15) {
       final next = await widget.login(create: false);
       if (next['principalId'] != identity!['principalId'] ||
           next['serverId'] != identity!['serverId']) {
-        throw StateError('Идентичность изменилась. Войдите заново');
+        throw StateError(strings.identityChanged);
       }
       identity = next;
     }
@@ -101,16 +117,16 @@ class _AdminPageState extends State<AdminPage> {
     api = widget.gateway(Uri.parse(next['origin'] as String));
     identity = next;
     if (next['blocked'] == true) {
-      throw StateError('Доступ к пространству заблокирован');
+      throw StateError(strings.accessBlocked);
     }
     final setup = await call('/api/v1/space/setup');
     initialized = setup['initialized'] == true;
     if (!initialized) {
-      status = 'Устройство вошло. Укажите одноразовый код сервера для назначения владельца.';
+      statusKey = 'setupNeeded';
       return;
     }
     if (!['owner', 'admin'].contains(next['role'])) {
-      status = 'Вход выполнен, но ваша роль не разрешает настройку сервера.';
+      statusKey = 'roleDenied';
       return;
     }
     await load();
@@ -124,12 +140,12 @@ class _AdminPageState extends State<AdminPage> {
     chat.text = settings!['chatTitle'] as String;
     enabled = settings!['chatEnabled'] == true;
     policy = settings!['registrationPolicy'] as String;
-    status = 'Настройки загружены с сервера.';
+    statusKey = 'settingsLoaded';
   }
 
   Future<void> save() async {
     if (title.text.trim().isEmpty || chat.text.trim().isEmpty) {
-      throw StateError('Укажите оба названия');
+      throw StateError(strings.bothNames);
     }
     final data = await call(
       '/api/v1/space/settings',
@@ -143,7 +159,7 @@ class _AdminPageState extends State<AdminPage> {
       },
     );
     settings = data['settings'] as Map<String, dynamic>;
-    status = 'Настройки сохранены на сервере.';
+    statusKey = 'settingsSaved';
   }
 
   @override
@@ -172,7 +188,7 @@ class _AdminPageState extends State<AdminPage> {
   );
   @override
   Widget build(BuildContext context) => Scaffold(
-    bottomNavigationBar: status.isEmpty && !busy
+    bottomNavigationBar: localizedStatus.isEmpty && !busy
         ? null
         : SafeArea(
             child: Padding(
@@ -184,7 +200,7 @@ class _AdminPageState extends State<AdminPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (busy && !confirming) const LinearProgressIndicator(),
-                    Text(status, key: const ValueKey('admin-status')),
+                    Text(localizedStatus, key: const ValueKey('admin-status')),
                   ],
                 ),
               ),
@@ -202,66 +218,47 @@ class _AdminPageState extends State<AdminPage> {
                   alignment: Alignment.centerRight,
                   child: IconButton(
                     onPressed: widget.onClose,
-                    tooltip: 'Закрыть управление',
+                    tooltip: strings.closeManagement,
                     icon: const Icon(Icons.close),
                   ),
                 ),
-              const Text(
-                'Управление пространством',
+              Text(
+                strings.managementTitle,
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(vertical: 12),
-                child: Text(
-                  'Ваш сервер. Ваши правила. На новом сервере первый успешный вход назначает владельца.',
-                ),
+                child: Text(strings.managementIntro),
               ),
-              const Text(
-                'Настройки, каналы, участники, приглашения и устройства выбранного сервера.',
-              ),
+              Text(strings.managementSections),
               const SizedBox(height: 20),
               if (identity == null)
                 card([
-                  const Text(
-                    'Текущая идентичность устройства',
-                    style: TextStyle(fontSize: 20),
-                  ),
+                  Text(strings.deviceIdentity, style: TextStyle(fontSize: 20)),
                   const SizedBox(height: 12),
                   Text(
                     widget.autoConnect
-                        ? 'Используется идентичность текущего подключения. Дополнительный аккаунт не нужен.'
-                        : 'Используется текущая сессия приложения Space. Для восстановления откройте раздел идентичности.',
+                        ? strings.currentConnection
+                        : strings.currentSession,
                   ),
                   const SizedBox(height: 16),
-                  button(
-                    'Подключить управление текущим сервером',
-                    () => signIn(false),
-                  ),
+                  button(strings.connectManagement, () => signIn(false)),
                 ]),
               if (identity != null && !initialized)
                 card([
-                  const Text(
-                    'Назначить первого владельца',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  const Text(
-                    'Получите код в консоли сервера: space-server -setup-code. Он действует 15 минут.',
-                  ),
+                  Text(strings.claimOwner, style: TextStyle(fontSize: 20)),
+                  Text(strings.setupHelp),
                   const SizedBox(height: 16),
                   TextField(
                     controller: code,
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Одноразовый код сервера',
-                    ),
+                    decoration: InputDecoration(labelText: strings.setupCode),
                   ),
                   const SizedBox(height: 16),
-                  button('Подтвердить владение', () async {
+                  button(strings.confirmOwner, () async {
                     if (widget.authorizeDevice != null &&
                         identity!['administrative'] != true) {
-                      throw StateError(
-                        'Сначала явно выдайте разрешение этому устройству в блоке ниже',
-                      );
+                      throw StateError(strings.authorizeFirst);
                     }
                     final value = code.text;
                     code.clear();
@@ -280,33 +277,25 @@ class _AdminPageState extends State<AdminPage> {
                       !initialized) &&
                   identity!['administrative'] != true)
                 card([
-                  const Text(
-                    'Разрешить этому устройству управление сервером',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  const Text(
-                    'Разрешение space.manage подписывается вашим корневым ключом. Оно действует вместе с ролью владельца или администратора.',
-                  ),
-                  button('Выдать разрешение этому устройству', () async {
+                  Text(strings.authorizeTitle, style: TextStyle(fontSize: 20)),
+                  Text(strings.authorizeHelp),
+                  button(strings.authorizeDevice, () async {
                     var password = '';
                     setState(() => confirming = true);
                     final accepted = await showDialog<bool>(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text('Разрешить управление сервером?'),
+                        title: Text(strings.authorizeConfirm),
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text(
-                              'Вы явно разрешаете этому устройству менять настройки, каналы и доступ участников.',
-                            ),
+                            Text(strings.authorizeDetails),
                             if (identity!['hasRootAuthority'] != true)
                               TextField(
                                 obscureText: true,
                                 onChanged: (v) => password = v,
-                                decoration: const InputDecoration(
-                                  labelText:
-                                      'Пароль корневой карточки JSON/PNG',
+                                decoration: InputDecoration(
+                                  labelText: strings.rootPassword,
                                 ),
                               ),
                           ],
@@ -314,11 +303,11 @@ class _AdminPageState extends State<AdminPage> {
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context, false),
-                            child: const Text('Отмена'),
+                            child: Text(strings.cancel),
                           ),
                           FilledButton(
                             onPressed: () => Navigator.pop(context, true),
-                            child: const Text('Разрешить'),
+                            child: Text(strings.allow),
                           ),
                         ],
                       ),
@@ -333,43 +322,42 @@ class _AdminPageState extends State<AdminPage> {
               if (settings != null)
                 card([
                   Text(
-                    'Настройки пространства · версия ${settings!['revision']}',
+                    strings.settingsRevision('${settings!['revision']}'),
                     style: const TextStyle(fontSize: 20),
                   ),
                   const SizedBox(height: 20),
                   TextField(
                     controller: title,
                     maxLength: 80,
-                    decoration: const InputDecoration(
-                      labelText: 'Название пространства',
-                    ),
+                    decoration: InputDecoration(labelText: strings.spaceName),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: chat,
                     maxLength: 80,
-                    decoration: const InputDecoration(
-                      labelText: 'Название общего чата',
-                    ),
+                    decoration: InputDecoration(labelText: strings.chatName),
                   ),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
                     value: enabled,
                     onChanged: busy ? null : (v) => setState(() => enabled = v),
-                    title: const Text('Чаты доступны участникам'),
-                    subtitle: const Text(
-                      'Выключение закрывает чтение и отправку. История сохраняется.',
-                    ),
+                    title: Text(strings.chatsEnabled),
+                    subtitle: Text(strings.chatsHelp),
                   ),
                   DropdownButtonFormField<String>(
                     key: ValueKey(policy),
                     initialValue: policy,
-                    decoration: const InputDecoration(labelText: 'Регистрация'),
-                    items: const [
-                      DropdownMenuItem(value: 'open', child: Text('Открыта')),
+                    decoration: InputDecoration(
+                      labelText: strings.registration,
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'open',
+                        child: Text(strings.registrationOpen),
+                      ),
                       DropdownMenuItem(
                         value: 'closed',
-                        child: Text('По приглашению'),
+                        child: Text(strings.registrationClosed),
                       ),
                     ],
                     onChanged: busy ? null : (v) => setState(() => policy = v!),
@@ -379,10 +367,10 @@ class _AdminPageState extends State<AdminPage> {
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      button('Сохранить настройки', save),
+                      button(strings.saveSettings, save),
                       OutlinedButton(
                         onPressed: busy ? null : () => run(load),
-                        child: const Text('Загрузить заново'),
+                        child: Text(strings.reloadSettings),
                       ),
                     ],
                   ),
@@ -429,7 +417,7 @@ class _AdminPageState extends State<AdminPage> {
                     setState(() {
                       identity = null;
                       settings = null;
-                      status = 'Это устройство отозвано. Восстановите доступ или используйте другое устройство.';
+                      statusKey = 'deviceRevoked';
                     });
                     widget.onDeviceRevoked?.call();
                   },
