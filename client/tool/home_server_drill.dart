@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart' as crypto;
+import 'package:grpc/grpc.dart';
 import 'package:space_client/src/core.dart';
 
 class HomeVault implements IdentityVault {
@@ -23,7 +24,7 @@ Future<void> main(List<String> args) async {
   final ownerVault = HomeVault(), friendVault = HomeVault();
   String? originalID, originalCertificate, messageID;
   try {
-    for (var attempt = 0; attempt < 2; attempt++) {
+    for (var attempt = 0; attempt < 3; attempt++) {
       final executable =
           '${root.path}/${Platform.isWindows ? 'space-server.exe' : 'space-server'}';
       final process = await Process.start(executable, [
@@ -109,6 +110,23 @@ Future<void> main(List<String> args) async {
           tlsFingerprint: fingerprint,
         );
         if (attempt == 0) {
+          await Future<void>.delayed(const Duration(seconds: 1));
+          final settings =
+              (await owner.adminRequest('/api/v1/space/settings'))['settings']
+                  as Map;
+          if (settings['registrationPolicy'] != 'closed') {
+            throw StateError('Домашний сервер не закрыт по умолчанию');
+          }
+          try {
+            final stranger = await SpaceSession.connect(remote, HomeVault());
+            await stranger.close();
+            throw StateError('Участник без приглашения получил доступ');
+          } on GrpcError catch (e) {
+            if (e.code != StatusCode.permissionDenied &&
+                e.code != StatusCode.failedPrecondition) {
+              rethrow;
+            }
+          }
           final invite = await owner.adminRequest(
             '/api/v1/space/invites',
             method: 'POST',
@@ -137,6 +155,26 @@ Future<void> main(List<String> args) async {
             (message) => message.id == messageID,
           )) {
             throw StateError('Сообщение потеряно после перезапуска');
+          }
+          final settings =
+              (await owner.adminRequest('/api/v1/space/settings'))['settings']
+                  as Map;
+          if (settings['registrationPolicy'] !=
+              (attempt == 1 ? 'closed' : 'open')) {
+            throw StateError('Выбор владельца изменился при перезапуске');
+          }
+          if (attempt == 1) {
+            await owner.adminRequest(
+              '/api/v1/space/settings',
+              method: 'PATCH',
+              body: {
+                'title': settings['title'],
+                'chatTitle': settings['chatTitle'],
+                'chatEnabled': settings['chatEnabled'],
+                'registrationPolicy': 'open',
+                'expectedRevision': settings['revision'],
+              },
+            );
           }
         }
       } finally {
