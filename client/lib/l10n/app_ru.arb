@@ -92,5 +92,52 @@
         "type": "int"
       }
     }
+  },
+  "findSpace": "Найдите своё пространство",
+  "closeConnection": "Закрыть подключение",
+  "connectionIntro": "Адрес независимого сервера. Сначала проверим его, затем вы решите, доверять ли ему.",
+  "serverAddress": "Адрес сервера или ссылка приглашения",
+  "optionalInvite": "Код приглашения (необязательно)",
+  "checkServer": "Проверить сервер",
+  "verifyTrust": "Проверка доверия",
+  "serverKeyFingerprint": "Отпечаток серверного ключа",
+  "tlsCertificateFingerprint": "Отпечаток TLS-сертификата",
+  "firstTrustHelp": "При первом визите сравните адрес и отпечаток с известными данными владельца. Первый вход создаёт отдельные ключи для этого сервера.",
+  "readerInvitation": "Приглашение: читатель — только чтение чата.",
+  "memberInvitation": "Приглашение: участник — читать и писать в чате.",
+  "trustAndConnect": "Доверять и подключиться",
+  "disconnectServer": "Отключиться от сервера",
+  "supportedConnections": "Поддерживаются публичные HTTPS-серверы и локальный HTTP. Карточку восстановления можно открыть в разделе «Идентичность».",
+  "chatDescription": "Разговоры и маленькие открытия.",
+  "connectionInformation": "Информация о подключении",
+  "channel": "Канал",
+  "noReading": "Нет чтения",
+  "refreshChat": "Обновить каналы и чат",
+  "noMessageAccess": "Нет доступа к сообщениям",
+  "startConversation": "Начните разговор",
+  "conversationStarts": "Здесь начинается разговор",
+  "contactOwner": "Выберите другой канал или обратитесь к владельцу пространства.",
+  "emptyChat": "В этом чате пока нет сообщений.",
+  "connectChatHelp": "Подключите своё пространство. Ваши ключи останутся на этом устройстве.",
+  "you": "Вы",
+  "newMessages": "Новые сообщения",
+  "cannotSend": "В этом канале нельзя отправлять сообщения",
+  "messageHint": "Что у вас нового?",
+  "sendMessage": "Отправить",
+  "newMessagesCount": "Новые сообщения: {count}",
+  "@newMessagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "newChannelMessages": "{count, plural, one{1 новое} few{{count} новых} many{{count} новых} other{{count} новых}}",
+  "@newChannelMessages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

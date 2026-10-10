@@ -1,3 +1,5 @@
+import '../l10n/strings.dart';
+
 import 'package:flutter/material.dart';
 
 import '../src/chat_controller.dart';
@@ -196,13 +198,13 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      c.chatTitle,
+                      c.connected ? c.chatTitle : context.strings.chat,
                       style: Theme.of(context).textTheme.titleLarge
                           ?.copyWith(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      'Разговоры и маленькие открытия.',
+                      context.strings.chatDescription,
                       style: TextStyle(
                         fontSize: 12,
                         color: colors.onSurfaceVariant,
@@ -212,7 +214,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                 ),
               ),
               IconButton(
-                tooltip: 'Информация о подключении',
+                tooltip: context.strings.connectionInformation,
                 onPressed: widget.openConnection,
                 icon: const Icon(Icons.info_outline),
               ),
@@ -234,13 +236,15 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                         ? c.channelId
                         : null,
                     isExpanded: true,
-                    decoration: const InputDecoration(labelText: 'Канал'),
+                    decoration: InputDecoration(
+                      labelText: context.strings.channel,
+                    ),
                     items: [
                       for (final channel in c.channels)
                         DropdownMenuItem(
                           value: channel.id,
                           child: Text(
-                            '${channel.title}${channel.archived ? ' · Архив' : ''}${!channel.permissions.read ? ' · Нет чтения' : ''}${c.unreadCount(channel.id) > 0 ? ' · ${c.unreadCount(channel.id)} новых' : ''}',
+                            '${channel.title}${channel.archived ? ' · ${context.strings.archived}' : ''}${!channel.permissions.read ? ' · ${context.strings.noReading}' : ''}${c.unreadCount(channel.id) > 0 ? ' · ${context.strings.newChannelMessages(c.unreadCount(channel.id))}' : ''}',
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -253,7 +257,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Обновить каналы и чат',
+                  tooltip: context.strings.refreshChat,
                   onPressed: c.busy
                       ? null
                       : () {
@@ -283,20 +287,20 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                             const SizedBox(height: 20),
                             Text(
                               c.connected && !c.canRead
-                                  ? 'Нет доступа к сообщениям'
+                                  ? context.strings.noMessageAccess
                                   : c.connected
-                                  ? 'Начните разговор'
-                                  : 'Здесь начинается разговор',
+                                  ? context.strings.startConversation
+                                  : context.strings.conversationStarts,
                               textAlign: TextAlign.center,
                               style: Theme.of(context).textTheme.headlineSmall,
                             ),
                             const SizedBox(height: 12),
                             Text(
                               c.connected && !c.canRead
-                                  ? 'Выберите другой канал или обратитесь к владельцу пространства.'
+                                  ? context.strings.contactOwner
                                   : c.connected
-                                  ? 'В этом чате пока нет сообщений.'
-                                  : 'Подключите своё пространство. Ваши ключи останутся на этом устройстве.',
+                                  ? context.strings.emptyChat
+                                  : context.strings.connectChatHelp,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: colors.onSurfaceVariant,
@@ -328,7 +332,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                     final message = c.messages[index];
                     final mine = message.authorId == c.principalId;
                     final author = mine
-                        ? 'Вы'
+                        ? context.strings.you
                         : message.authorId.length > 16
                         ? '${message.authorId.substring(0, 16)}…'
                         : message.authorId;
@@ -358,7 +362,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 12),
                                     child: Text(
-                                      'Новые сообщения',
+                                      context.strings.newMessages,
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: colors.primary,
@@ -397,7 +401,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
               child: FilledButton.tonalIcon(
                 onPressed: jumpToNew,
                 icon: const Icon(Icons.arrow_downward, size: 18),
-                label: Text('Новые сообщения: ${c.unreadCount(c.channelId)}'),
+                label: Text(
+                  context.strings.newMessagesCount(c.unreadCount(c.channelId)),
+                ),
               ),
             ),
           ),
@@ -416,8 +422,8 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                   maxLength: 1024,
                   decoration: InputDecoration(
                     hintText: c.connected && !c.canWrite
-                        ? 'В этом канале нельзя отправлять сообщения'
-                        : 'Что у вас нового?',
+                        ? context.strings.cannotSend
+                        : context.strings.messageHint,
                     counterText: '',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
@@ -428,7 +434,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
               const SizedBox(width: 12),
               IconButton.filled(
                 onPressed: c.connected && c.canWrite && !c.busy ? send : null,
-                tooltip: 'Отправить',
+                tooltip: context.strings.sendMessage,
                 icon: const Icon(Icons.arrow_upward),
               ),
             ],

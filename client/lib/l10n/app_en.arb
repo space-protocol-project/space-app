@@ -92,5 +92,52 @@
         "type": "int"
       }
     }
+  },
+  "findSpace": "Find your space",
+  "closeConnection": "Close connection",
+  "connectionIntro": "Enter an independent server address. We will check it first, then you decide whether to trust it.",
+  "serverAddress": "Server address or invitation link",
+  "optionalInvite": "Invitation code (optional)",
+  "checkServer": "Check server",
+  "verifyTrust": "Verify trust",
+  "serverKeyFingerprint": "Server key fingerprint",
+  "tlsCertificateFingerprint": "TLS certificate fingerprint",
+  "firstTrustHelp": "On your first visit, compare the address and fingerprint with the owner’s known details. Signing in creates separate keys for this server.",
+  "readerInvitation": "Reader invitation: read-only chat access.",
+  "memberInvitation": "Member invitation: read and write in chat.",
+  "trustAndConnect": "Trust and connect",
+  "disconnectServer": "Disconnect from server",
+  "supportedConnections": "Public HTTPS servers and local HTTP are supported. Open recovery cards in Identity.",
+  "chatDescription": "Conversations and little discoveries.",
+  "connectionInformation": "Connection information",
+  "channel": "Channel",
+  "noReading": "No read access",
+  "refreshChat": "Refresh channels and chat",
+  "noMessageAccess": "No access to messages",
+  "startConversation": "Start a conversation",
+  "conversationStarts": "The conversation starts here",
+  "contactOwner": "Choose another channel or contact the space owner.",
+  "emptyChat": "There are no messages in this chat yet.",
+  "connectChatHelp": "Connect your space. Your keys stay on this device.",
+  "you": "You",
+  "newMessages": "New messages",
+  "cannotSend": "You cannot send messages in this channel",
+  "messageHint": "What’s new?",
+  "sendMessage": "Send",
+  "newMessagesCount": "New messages: {count}",
+  "@newMessagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "newChannelMessages": "{count, plural, one{1 new} other{{count} new}}",
+  "@newChannelMessages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

@@ -1,3 +1,5 @@
+import '../l10n/strings.dart';
+
 import 'package:flutter/material.dart';
 
 import '../src/chat_controller.dart';
@@ -53,27 +55,25 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Найдите своё пространство',
+                    context.strings.findSpace,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Закрыть подключение',
+                  tooltip: context.strings.closeConnection,
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.close),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Адрес независимого сервера. Сначала проверим его, затем вы решите, доверять ли ему.',
-            ),
+            Text(context.strings.connectionIntro),
             const SizedBox(height: 20),
             TextField(
               controller: address,
               enabled: !c.busy && !c.connected,
-              decoration: const InputDecoration(
-                labelText: 'Адрес сервера или ссылка приглашения',
+              decoration: InputDecoration(
+                labelText: context.strings.serverAddress,
                 hintText: 'http://127.0.0.1:8080',
               ),
             ),
@@ -81,8 +81,8 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
             TextField(
               controller: invitation,
               enabled: !c.busy && !c.connected,
-              decoration: const InputDecoration(
-                labelText: 'Код приглашения (необязательно)',
+              decoration: InputDecoration(
+                labelText: context.strings.optionalInvite,
                 hintText: 'iv_…',
               ),
             ),
@@ -95,7 +95,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
                       invitationToken: invitation.text,
                     ),
               icon: const Icon(Icons.search),
-              label: const Text('Проверить сервер'),
+              label: Text(context.strings.checkServer),
             ),
             if (c.busy) ...[
               const SizedBox(height: 18),
@@ -111,13 +111,13 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
             if (c.preview != null) ...[
               const SizedBox(height: 24),
               Text(
-                'Проверка доверия',
+                context.strings.verifyTrust,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 10),
               SelectableText(c.preview!.origin.toString()),
               const SizedBox(height: 10),
-              const Text('Отпечаток серверного ключа'),
+              Text(context.strings.serverKeyFingerprint),
               const SizedBox(height: 6),
               SelectableText(
                 c.fingerprint,
@@ -125,7 +125,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
               ),
               const SizedBox(height: 12),
               if (c.preview!.tlsFingerprint.isNotEmpty) ...[
-                const Text('Отпечаток TLS-сертификата'),
+                Text(context.strings.tlsCertificateFingerprint),
                 const SizedBox(height: 6),
                 SelectableText(
                   c.preview!.tlsFingerprint,
@@ -133,19 +133,17 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
                 ),
                 const SizedBox(height: 12),
               ],
-              const Text(
-                'При первом визите сравните адрес и отпечаток с известными данными владельца. Первый вход создаёт отдельные ключи для этого сервера.',
-              ),
+              Text(context.strings.firstTrustHelp),
               const SizedBox(height: 20),
               if (c.invitationRole.isNotEmpty)
                 Text(
                   c.invitationRole == 'reader'
-                      ? 'Приглашение: читатель — только чтение чата.'
-                      : 'Приглашение: участник — читать и писать в чате.',
+                      ? context.strings.readerInvitation
+                      : context.strings.memberInvitation,
                 ),
               FilledButton(
                 onPressed: c.busy || c.connected ? null : connect,
-                child: const Text('Доверять и подключиться'),
+                child: Text(context.strings.trustAndConnect),
               ),
               PairingStartPanel(controller: c, onConnected: widget.onConnected),
             ],
@@ -157,12 +155,12 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
                     : () async {
                         await c.disconnect();
                       },
-                child: const Text('Отключиться от сервера'),
+                child: Text(context.strings.disconnectServer),
               ),
             ],
             const SizedBox(height: 20),
             Text(
-              'Сейчас поддерживаются локальные серверы. Карточку восстановления можно открыть в разделе «Идентичность».',
+              context.strings.supportedConnections,
               style: TextStyle(
                 fontSize: 12,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,

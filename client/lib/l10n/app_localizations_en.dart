@@ -259,4 +259,118 @@ class AppLocalizationsEn extends AppLocalizations {
   String unreadCount(int count) {
     return 'Unread messages: $count';
   }
+
+  @override
+  String get findSpace => 'Find your space';
+
+  @override
+  String get closeConnection => 'Close connection';
+
+  @override
+  String get connectionIntro =>
+      'Enter an independent server address. We will check it first, then you decide whether to trust it.';
+
+  @override
+  String get serverAddress => 'Server address or invitation link';
+
+  @override
+  String get optionalInvite => 'Invitation code (optional)';
+
+  @override
+  String get checkServer => 'Check server';
+
+  @override
+  String get verifyTrust => 'Verify trust';
+
+  @override
+  String get serverKeyFingerprint => 'Server key fingerprint';
+
+  @override
+  String get tlsCertificateFingerprint => 'TLS certificate fingerprint';
+
+  @override
+  String get firstTrustHelp =>
+      'On your first visit, compare the address and fingerprint with the owner’s known details. Signing in creates separate keys for this server.';
+
+  @override
+  String get readerInvitation => 'Reader invitation: read-only chat access.';
+
+  @override
+  String get memberInvitation => 'Member invitation: read and write in chat.';
+
+  @override
+  String get trustAndConnect => 'Trust and connect';
+
+  @override
+  String get disconnectServer => 'Disconnect from server';
+
+  @override
+  String get supportedConnections =>
+      'Public HTTPS servers and local HTTP are supported. Open recovery cards in Identity.';
+
+  @override
+  String get chatDescription => 'Conversations and little discoveries.';
+
+  @override
+  String get connectionInformation => 'Connection information';
+
+  @override
+  String get channel => 'Channel';
+
+  @override
+  String get noReading => 'No read access';
+
+  @override
+  String get refreshChat => 'Refresh channels and chat';
+
+  @override
+  String get noMessageAccess => 'No access to messages';
+
+  @override
+  String get startConversation => 'Start a conversation';
+
+  @override
+  String get conversationStarts => 'The conversation starts here';
+
+  @override
+  String get contactOwner =>
+      'Choose another channel or contact the space owner.';
+
+  @override
+  String get emptyChat => 'There are no messages in this chat yet.';
+
+  @override
+  String get connectChatHelp =>
+      'Connect your space. Your keys stay on this device.';
+
+  @override
+  String get you => 'You';
+
+  @override
+  String get newMessages => 'New messages';
+
+  @override
+  String get cannotSend => 'You cannot send messages in this channel';
+
+  @override
+  String get messageHint => 'What’s new?';
+
+  @override
+  String get sendMessage => 'Send';
+
+  @override
+  String newMessagesCount(int count) {
+    return 'New messages: $count';
+  }
+
+  @override
+  String newChannelMessages(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new',
+      one: '1 new',
+    );
+    return '$_temp0';
+  }
 }

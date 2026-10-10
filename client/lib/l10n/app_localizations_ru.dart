@@ -260,4 +260,121 @@ class AppLocalizationsRu extends AppLocalizations {
   String unreadCount(int count) {
     return 'Непрочитанных сообщений: $count';
   }
+
+  @override
+  String get findSpace => 'Найдите своё пространство';
+
+  @override
+  String get closeConnection => 'Закрыть подключение';
+
+  @override
+  String get connectionIntro =>
+      'Адрес независимого сервера. Сначала проверим его, затем вы решите, доверять ли ему.';
+
+  @override
+  String get serverAddress => 'Адрес сервера или ссылка приглашения';
+
+  @override
+  String get optionalInvite => 'Код приглашения (необязательно)';
+
+  @override
+  String get checkServer => 'Проверить сервер';
+
+  @override
+  String get verifyTrust => 'Проверка доверия';
+
+  @override
+  String get serverKeyFingerprint => 'Отпечаток серверного ключа';
+
+  @override
+  String get tlsCertificateFingerprint => 'Отпечаток TLS-сертификата';
+
+  @override
+  String get firstTrustHelp =>
+      'При первом визите сравните адрес и отпечаток с известными данными владельца. Первый вход создаёт отдельные ключи для этого сервера.';
+
+  @override
+  String get readerInvitation => 'Приглашение: читатель — только чтение чата.';
+
+  @override
+  String get memberInvitation =>
+      'Приглашение: участник — читать и писать в чате.';
+
+  @override
+  String get trustAndConnect => 'Доверять и подключиться';
+
+  @override
+  String get disconnectServer => 'Отключиться от сервера';
+
+  @override
+  String get supportedConnections =>
+      'Поддерживаются публичные HTTPS-серверы и локальный HTTP. Карточку восстановления можно открыть в разделе «Идентичность».';
+
+  @override
+  String get chatDescription => 'Разговоры и маленькие открытия.';
+
+  @override
+  String get connectionInformation => 'Информация о подключении';
+
+  @override
+  String get channel => 'Канал';
+
+  @override
+  String get noReading => 'Нет чтения';
+
+  @override
+  String get refreshChat => 'Обновить каналы и чат';
+
+  @override
+  String get noMessageAccess => 'Нет доступа к сообщениям';
+
+  @override
+  String get startConversation => 'Начните разговор';
+
+  @override
+  String get conversationStarts => 'Здесь начинается разговор';
+
+  @override
+  String get contactOwner =>
+      'Выберите другой канал или обратитесь к владельцу пространства.';
+
+  @override
+  String get emptyChat => 'В этом чате пока нет сообщений.';
+
+  @override
+  String get connectChatHelp =>
+      'Подключите своё пространство. Ваши ключи останутся на этом устройстве.';
+
+  @override
+  String get you => 'Вы';
+
+  @override
+  String get newMessages => 'Новые сообщения';
+
+  @override
+  String get cannotSend => 'В этом канале нельзя отправлять сообщения';
+
+  @override
+  String get messageHint => 'Что у вас нового?';
+
+  @override
+  String get sendMessage => 'Отправить';
+
+  @override
+  String newMessagesCount(int count) {
+    return 'Новые сообщения: $count';
+  }
+
+  @override
+  String newChannelMessages(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count новых',
+      many: '$count новых',
+      few: '$count новых',
+      one: '1 новое',
+    );
+    return '$_temp0';
+  }
 }

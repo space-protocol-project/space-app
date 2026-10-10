@@ -574,6 +574,204 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Непрочитанных сообщений: {count}'**
   String unreadCount(int count);
+
+  /// No description provided for @findSpace.
+  ///
+  /// In ru, this message translates to:
+  /// **'Найдите своё пространство'**
+  String get findSpace;
+
+  /// No description provided for @closeConnection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть подключение'**
+  String get closeConnection;
+
+  /// No description provided for @connectionIntro.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес независимого сервера. Сначала проверим его, затем вы решите, доверять ли ему.'**
+  String get connectionIntro;
+
+  /// No description provided for @serverAddress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес сервера или ссылка приглашения'**
+  String get serverAddress;
+
+  /// No description provided for @optionalInvite.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код приглашения (необязательно)'**
+  String get optionalInvite;
+
+  /// No description provided for @checkServer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверить сервер'**
+  String get checkServer;
+
+  /// No description provided for @verifyTrust.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверка доверия'**
+  String get verifyTrust;
+
+  /// No description provided for @serverKeyFingerprint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отпечаток серверного ключа'**
+  String get serverKeyFingerprint;
+
+  /// No description provided for @tlsCertificateFingerprint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отпечаток TLS-сертификата'**
+  String get tlsCertificateFingerprint;
+
+  /// No description provided for @firstTrustHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'При первом визите сравните адрес и отпечаток с известными данными владельца. Первый вход создаёт отдельные ключи для этого сервера.'**
+  String get firstTrustHelp;
+
+  /// No description provided for @readerInvitation.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приглашение: читатель — только чтение чата.'**
+  String get readerInvitation;
+
+  /// No description provided for @memberInvitation.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приглашение: участник — читать и писать в чате.'**
+  String get memberInvitation;
+
+  /// No description provided for @trustAndConnect.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доверять и подключиться'**
+  String get trustAndConnect;
+
+  /// No description provided for @disconnectServer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отключиться от сервера'**
+  String get disconnectServer;
+
+  /// No description provided for @supportedConnections.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поддерживаются публичные HTTPS-серверы и локальный HTTP. Карточку восстановления можно открыть в разделе «Идентичность».'**
+  String get supportedConnections;
+
+  /// No description provided for @chatDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разговоры и маленькие открытия.'**
+  String get chatDescription;
+
+  /// No description provided for @connectionInformation.
+  ///
+  /// In ru, this message translates to:
+  /// **'Информация о подключении'**
+  String get connectionInformation;
+
+  /// No description provided for @channel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Канал'**
+  String get channel;
+
+  /// No description provided for @noReading.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет чтения'**
+  String get noReading;
+
+  /// No description provided for @refreshChat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить каналы и чат'**
+  String get refreshChat;
+
+  /// No description provided for @noMessageAccess.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет доступа к сообщениям'**
+  String get noMessageAccess;
+
+  /// No description provided for @startConversation.
+  ///
+  /// In ru, this message translates to:
+  /// **'Начните разговор'**
+  String get startConversation;
+
+  /// No description provided for @conversationStarts.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здесь начинается разговор'**
+  String get conversationStarts;
+
+  /// No description provided for @contactOwner.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите другой канал или обратитесь к владельцу пространства.'**
+  String get contactOwner;
+
+  /// No description provided for @emptyChat.
+  ///
+  /// In ru, this message translates to:
+  /// **'В этом чате пока нет сообщений.'**
+  String get emptyChat;
+
+  /// No description provided for @connectChatHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключите своё пространство. Ваши ключи останутся на этом устройстве.'**
+  String get connectChatHelp;
+
+  /// No description provided for @you.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вы'**
+  String get you;
+
+  /// No description provided for @newMessages.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новые сообщения'**
+  String get newMessages;
+
+  /// No description provided for @cannotSend.
+  ///
+  /// In ru, this message translates to:
+  /// **'В этом канале нельзя отправлять сообщения'**
+  String get cannotSend;
+
+  /// No description provided for @messageHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что у вас нового?'**
+  String get messageHint;
+
+  /// No description provided for @sendMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправить'**
+  String get sendMessage;
+
+  /// No description provided for @newMessagesCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новые сообщения: {count}'**
+  String newMessagesCount(int count);
+
+  /// No description provided for @newChannelMessages.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{1 новое} few{{count} новых} many{{count} новых} other{{count} новых}}'**
+  String newChannelMessages(int count);
 }
 
 class _AppLocalizationsDelegate

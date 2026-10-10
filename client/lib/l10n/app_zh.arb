@@ -92,5 +92,52 @@
         "type": "int"
       }
     }
+  },
+  "findSpace": "找到你的空间",
+  "closeConnection": "关闭连接",
+  "connectionIntro": "输入独立服务器的地址。我们会先检查，然后由你决定是否信任。",
+  "serverAddress": "服务器地址或邀请链接",
+  "optionalInvite": "邀请码（可选）",
+  "checkServer": "检查服务器",
+  "verifyTrust": "验证信任",
+  "serverKeyFingerprint": "服务器密钥指纹",
+  "tlsCertificateFingerprint": "TLS 证书指纹",
+  "firstTrustHelp": "首次连接时，请与服务器所有者提供的信息核对地址和指纹。登录会为此服务器创建独立的密钥。",
+  "readerInvitation": "读者邀请：只能阅读聊天消息。",
+  "memberInvitation": "成员邀请：可以阅读和发送聊天消息。",
+  "trustAndConnect": "信任并连接",
+  "disconnectServer": "断开服务器连接",
+  "supportedConnections": "支持公共 HTTPS 服务器和本地 HTTP。可在“身份”中打开恢复卡。",
+  "chatDescription": "交流与点滴发现。",
+  "connectionInformation": "连接信息",
+  "channel": "频道",
+  "noReading": "无阅读权限",
+  "refreshChat": "刷新频道和聊天",
+  "noMessageAccess": "无法访问消息",
+  "startConversation": "开始交流",
+  "conversationStarts": "交流从这里开始",
+  "contactOwner": "请选择其他频道或联系空间所有者。",
+  "emptyChat": "此聊天中还没有消息。",
+  "connectChatHelp": "连接你的空间。密钥会保留在此设备上。",
+  "you": "你",
+  "newMessages": "新消息",
+  "cannotSend": "无法在此频道发送消息",
+  "messageHint": "有什么新鲜事？",
+  "sendMessage": "发送",
+  "newMessagesCount": "新消息：{count}",
+  "@newMessagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "newChannelMessages": "{count, plural, other{{count} 条新消息}}",
+  "@newChannelMessages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

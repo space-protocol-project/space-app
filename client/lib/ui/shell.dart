@@ -142,7 +142,7 @@ class _SpaceShellState extends State<SpaceShell> {
         {
           for (final section in Section.values)
             section.name: section == Section.chat
-                ? controller.chatTitle
+                ? chatLabel
                 : section.localized(context),
         },
         controller.messages,
@@ -152,6 +152,9 @@ class _SpaceShellState extends State<SpaceShell> {
     if (!mounted || route == null || route.isEmpty) return;
     select(Section.values.firstWhere((section) => section.name == route));
   }
+
+  String get chatLabel =>
+      controller.connected ? controller.chatTitle : context.strings.chat;
 
   int get bottomIndex => switch (selected) {
     Section.overview => 0,
@@ -298,7 +301,7 @@ class _SpaceShellState extends State<SpaceShell> {
                 title: Text(
                   section == Section.chat
                       ? controller.channels.isEmpty
-                            ? controller.chatTitle
+                            ? chatLabel
                             : context.strings.chats
                       : section.localized(context),
                 ),
@@ -562,9 +565,7 @@ class _SpaceShellState extends State<SpaceShell> {
           ),
         Expanded(
           child: Text(
-            selected == Section.chat
-                ? controller.chatTitle
-                : selected.localized(context),
+            selected == Section.chat ? chatLabel : selected.localized(context),
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleMedium,
           ),
