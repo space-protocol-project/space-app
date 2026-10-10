@@ -18,6 +18,70 @@ class HomeVault implements IdentityVault {
   }
 }
 
+Future<void> expectAccessDenied(
+  Future<void> Function() action,
+  String scenario,
+) async {
+  try {
+    await action();
+  } on GrpcError catch (error) {
+    if ([
+      StatusCode.permissionDenied,
+      StatusCode.failedPrecondition,
+      StatusCode.notFound,
+      StatusCode.unauthenticated,
+    ].contains(error.code)) {
+      return;
+    }
+    rethrow;
+  }
+  throw StateError('Не запрещён доступ: $scenario');
+}
+
+Future<void> checkInvitationRefused(Discovery server, String token) =>
+    expectAccessDenied(() async {
+      final session = await SpaceSession.connect(
+        server,
+        HomeVault(),
+        invitationToken: token,
+      );
+      await session.close();
+    }, 'новый участник по недействующему приглашению');
+
+Future<void> checkMemberBlocking(
+  SpaceSession owner,
+  SpaceSession friend,
+) async {
+  Future<void> setBlocked(bool blocked) async {
+    final response = await owner.adminRequest('/api/v1/space/members');
+    final member = (response['members'] as List).cast<Map>().firstWhere(
+      (member) => member['principalId'] == friend.principalId,
+    );
+    await owner.adminRequest(
+      '/api/v1/space/members/${friend.principalId}',
+      method: 'PATCH',
+      body: {
+        'role': member['role'],
+        'blocked': blocked,
+        'expectedRevision': member['revision'],
+      },
+    );
+  }
+
+  await setBlocked(true);
+  try {
+    await expectAccessDenied(() async {
+      await friend.messages();
+    }, 'чтение заблокированным участником');
+    await expectAccessDenied(() async {
+      await friend.send('Запрещённая запись', 'blocked-home-drill');
+    }, 'запись заблокированным участником');
+  } finally {
+    await setBlocked(false);
+  }
+  await friend.messages();
+}
+
 Future<void> main(List<String> args) async {
   final root = Directory(args.single).absolute;
   final directory = await Directory.systemTemp.createTemp('space-home-drill-');
@@ -173,6 +237,20 @@ Future<void> main(List<String> args) async {
             'Сохранённое сообщение домашнего сервера',
             'home-drill-message',
           )).id;
+          await checkInvitationRefused(remote, invite['token'] as String);
+          final revoked = await owner.adminRequest(
+            '/api/v1/space/invites',
+            method: 'POST',
+            body: {'role': 'member', 'ttlSeconds': 3600, 'maxUses': 1},
+          );
+          final revokedInvite = revoked['invite'] as Map;
+          await owner.adminRequest(
+            '/api/v1/space/invites/${revokedInvite['id']}/revoke',
+            method: 'POST',
+            body: {},
+          );
+          await checkInvitationRefused(remote, revoked['token'] as String);
+          await checkMemberBlocking(owner, friend);
         } else {
           friend = await SpaceSession.connect(remote, friendVault);
           if (!(await friend.messages()).any(
@@ -209,6 +287,7 @@ Future<void> main(List<String> args) async {
           const Duration(seconds: 30),
         );
         if (code != 0) throw StateError('Сервер завершился с кодом $code');
+        await expectAccessDeniedAfterStop();
       }
     }
     stdout.writeln(
@@ -217,4 +296,13 @@ Future<void> main(List<String> args) async {
   } finally {
     await directory.delete(recursive: true);
   }
+}
+
+Future<void> expectAccessDeniedAfterStop() async {
+  try {
+    await discover('https://127.0.0.1:18843');
+  } on SocketException {
+    return;
+  }
+  throw StateError('HTTPS остался доступен после остановки сервера');
 }
