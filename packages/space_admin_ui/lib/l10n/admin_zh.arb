@@ -117,5 +117,48 @@
     }
   },
   "channelArchivedSuffix": " · 已归档",
-  "channelBlockedSuffix": " · 已阻止"
+  "channelBlockedSuffix": " · 已阻止",
+  "roleOwner": "所有者",
+  "roleAdmin": "管理员",
+  "roleMember": "成员",
+  "roleReader": "阅读者",
+  "membersConflict": "权限已更改。未保存的值会保留在表单中。请刷新成员后重试。",
+  "membersLoaded": "成员已加载。",
+  "memberConfirm": "更改成员权限？",
+  "memberApply": "应用权限",
+  "memberSaved": "成员权限已保存。服务器会将其应用于操作和订阅。",
+  "memberCollapse": "收起权限",
+  "memberEdit": "编辑权限",
+  "memberRole": "成员角色",
+  "memberBlock": "阻止成员",
+  "memberSave": "保存成员权限",
+  "membersRefresh": "刷新成员",
+  "membersHelp": "只有所有者可以更改角色和阻止成员。管理员可以查看列表。",
+  "membersSearch": "按标识符或角色搜索",
+  "membersEmpty": "未找到成员。",
+  "memberBlocked": "已阻止",
+  "memberAllowed": "允许",
+  "memberBlockedSuffix": " · 访问已被阻止",
+  "memberProposal": "{id}\n角色：{role}\n访问：{access}",
+  "@memberProposal": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "role": {
+        "type": "String"
+      },
+      "access": {
+        "type": "String"
+      }
+    }
+  },
+  "membersCount": "已加载：{count}。搜索仅针对已加载的成员。",
+  "@membersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

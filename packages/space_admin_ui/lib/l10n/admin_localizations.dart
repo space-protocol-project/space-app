@@ -663,6 +663,144 @@ abstract class AdminLocalizations {
   /// In ru, this message translates to:
   /// **' · Заблокирован'**
   String get channelBlockedSuffix;
+
+  /// No description provided for @roleOwner.
+  ///
+  /// In ru, this message translates to:
+  /// **'Владелец'**
+  String get roleOwner;
+
+  /// No description provided for @roleAdmin.
+  ///
+  /// In ru, this message translates to:
+  /// **'Администратор'**
+  String get roleAdmin;
+
+  /// No description provided for @roleMember.
+  ///
+  /// In ru, this message translates to:
+  /// **'Участник'**
+  String get roleMember;
+
+  /// No description provided for @roleReader.
+  ///
+  /// In ru, this message translates to:
+  /// **'Читатель'**
+  String get roleReader;
+
+  /// No description provided for @membersConflict.
+  ///
+  /// In ru, this message translates to:
+  /// **'Права уже изменились. Несохранённые значения остаются в форме. Обновите участников перед повтором.'**
+  String get membersConflict;
+
+  /// No description provided for @membersLoaded.
+  ///
+  /// In ru, this message translates to:
+  /// **'Участники загружены.'**
+  String get membersLoaded;
+
+  /// No description provided for @memberConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить права участника?'**
+  String get memberConfirm;
+
+  /// No description provided for @memberApply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Применить права'**
+  String get memberApply;
+
+  /// No description provided for @memberSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Права участника сохранены. Сервер применяет их к действиям и подпискам.'**
+  String get memberSaved;
+
+  /// No description provided for @memberCollapse.
+  ///
+  /// In ru, this message translates to:
+  /// **'Свернуть права'**
+  String get memberCollapse;
+
+  /// No description provided for @memberEdit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить права'**
+  String get memberEdit;
+
+  /// No description provided for @memberRole.
+  ///
+  /// In ru, this message translates to:
+  /// **'Роль участника'**
+  String get memberRole;
+
+  /// No description provided for @memberBlock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заблокировать участника'**
+  String get memberBlock;
+
+  /// No description provided for @memberSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить права участника'**
+  String get memberSave;
+
+  /// No description provided for @membersRefresh.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить участников'**
+  String get membersRefresh;
+
+  /// No description provided for @membersHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Роли и блокировку меняет только владелец. Администраторы могут просматривать список.'**
+  String get membersHelp;
+
+  /// No description provided for @membersSearch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поиск по идентификатору или роли'**
+  String get membersSearch;
+
+  /// No description provided for @membersEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Участники не найдены.'**
+  String get membersEmpty;
+
+  /// No description provided for @memberBlocked.
+  ///
+  /// In ru, this message translates to:
+  /// **'заблокирован'**
+  String get memberBlocked;
+
+  /// No description provided for @memberAllowed.
+  ///
+  /// In ru, this message translates to:
+  /// **'разрешён'**
+  String get memberAllowed;
+
+  /// No description provided for @memberBlockedSuffix.
+  ///
+  /// In ru, this message translates to:
+  /// **' · Доступ заблокирован'**
+  String get memberBlockedSuffix;
+
+  /// No description provided for @memberProposal.
+  ///
+  /// In ru, this message translates to:
+  /// **'{id}\nРоль: {role}\nДоступ: {access}'**
+  String memberProposal(String id, String role, String access);
+
+  /// No description provided for @membersCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загружено: {count}. Поиск работает по загруженным участникам.'**
+  String membersCount(int count);
 }
 
 class _AdminLocalizationsDelegate

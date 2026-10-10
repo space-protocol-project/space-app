@@ -320,4 +320,80 @@ class AdminLocalizationsEn extends AdminLocalizations {
 
   @override
   String get channelBlockedSuffix => ' · Blocked';
+
+  @override
+  String get roleOwner => 'Owner';
+
+  @override
+  String get roleAdmin => 'Administrator';
+
+  @override
+  String get roleMember => 'Member';
+
+  @override
+  String get roleReader => 'Reader';
+
+  @override
+  String get membersConflict =>
+      'Permissions have changed. Unsaved values remain in the form. Refresh members before trying again.';
+
+  @override
+  String get membersLoaded => 'Members loaded.';
+
+  @override
+  String get memberConfirm => 'Change member permissions?';
+
+  @override
+  String get memberApply => 'Apply permissions';
+
+  @override
+  String get memberSaved =>
+      'Member permissions saved. The server applies them to actions and subscriptions.';
+
+  @override
+  String get memberCollapse => 'Collapse permissions';
+
+  @override
+  String get memberEdit => 'Edit permissions';
+
+  @override
+  String get memberRole => 'Member role';
+
+  @override
+  String get memberBlock => 'Block member';
+
+  @override
+  String get memberSave => 'Save member permissions';
+
+  @override
+  String get membersRefresh => 'Refresh members';
+
+  @override
+  String get membersHelp =>
+      'Only the owner can change roles and block members. Administrators can view the list.';
+
+  @override
+  String get membersSearch => 'Search by ID or role';
+
+  @override
+  String get membersEmpty => 'No members found.';
+
+  @override
+  String get memberBlocked => 'blocked';
+
+  @override
+  String get memberAllowed => 'allowed';
+
+  @override
+  String get memberBlockedSuffix => ' · Access blocked';
+
+  @override
+  String memberProposal(String id, String role, String access) {
+    return '$id\nRole: $role\nAccess: $access';
+  }
+
+  @override
+  String membersCount(int count) {
+    return 'Loaded: $count. Search covers loaded members.';
+  }
 }

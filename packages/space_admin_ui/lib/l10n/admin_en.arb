@@ -117,5 +117,48 @@
     }
   },
   "channelArchivedSuffix": " · Archived",
-  "channelBlockedSuffix": " · Blocked"
+  "channelBlockedSuffix": " · Blocked",
+  "roleOwner": "Owner",
+  "roleAdmin": "Administrator",
+  "roleMember": "Member",
+  "roleReader": "Reader",
+  "membersConflict": "Permissions have changed. Unsaved values remain in the form. Refresh members before trying again.",
+  "membersLoaded": "Members loaded.",
+  "memberConfirm": "Change member permissions?",
+  "memberApply": "Apply permissions",
+  "memberSaved": "Member permissions saved. The server applies them to actions and subscriptions.",
+  "memberCollapse": "Collapse permissions",
+  "memberEdit": "Edit permissions",
+  "memberRole": "Member role",
+  "memberBlock": "Block member",
+  "memberSave": "Save member permissions",
+  "membersRefresh": "Refresh members",
+  "membersHelp": "Only the owner can change roles and block members. Administrators can view the list.",
+  "membersSearch": "Search by ID or role",
+  "membersEmpty": "No members found.",
+  "memberBlocked": "blocked",
+  "memberAllowed": "allowed",
+  "memberBlockedSuffix": " · Access blocked",
+  "memberProposal": "{id}\nRole: {role}\nAccess: {access}",
+  "@memberProposal": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "role": {
+        "type": "String"
+      },
+      "access": {
+        "type": "String"
+      }
+    }
+  },
+  "membersCount": "Loaded: {count}. Search covers loaded members.",
+  "@membersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

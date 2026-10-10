@@ -117,5 +117,48 @@
     }
   },
   "channelArchivedSuffix": " · Архив",
-  "channelBlockedSuffix": " · Заблокирован"
+  "channelBlockedSuffix": " · Заблокирован",
+  "roleOwner": "Владелец",
+  "roleAdmin": "Администратор",
+  "roleMember": "Участник",
+  "roleReader": "Читатель",
+  "membersConflict": "Права уже изменились. Несохранённые значения остаются в форме. Обновите участников перед повтором.",
+  "membersLoaded": "Участники загружены.",
+  "memberConfirm": "Изменить права участника?",
+  "memberApply": "Применить права",
+  "memberSaved": "Права участника сохранены. Сервер применяет их к действиям и подпискам.",
+  "memberCollapse": "Свернуть права",
+  "memberEdit": "Изменить права",
+  "memberRole": "Роль участника",
+  "memberBlock": "Заблокировать участника",
+  "memberSave": "Сохранить права участника",
+  "membersRefresh": "Обновить участников",
+  "membersHelp": "Роли и блокировку меняет только владелец. Администраторы могут просматривать список.",
+  "membersSearch": "Поиск по идентификатору или роли",
+  "membersEmpty": "Участники не найдены.",
+  "memberBlocked": "заблокирован",
+  "memberAllowed": "разрешён",
+  "memberBlockedSuffix": " · Доступ заблокирован",
+  "memberProposal": "{id}\nРоль: {role}\nДоступ: {access}",
+  "@memberProposal": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "role": {
+        "type": "String"
+      },
+      "access": {
+        "type": "String"
+      }
+    }
+  },
+  "membersCount": "Загружено: {count}. Поиск работает по загруженным участникам.",
+  "@membersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

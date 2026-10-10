@@ -320,4 +320,80 @@ class AdminLocalizationsRu extends AdminLocalizations {
 
   @override
   String get channelBlockedSuffix => ' · Заблокирован';
+
+  @override
+  String get roleOwner => 'Владелец';
+
+  @override
+  String get roleAdmin => 'Администратор';
+
+  @override
+  String get roleMember => 'Участник';
+
+  @override
+  String get roleReader => 'Читатель';
+
+  @override
+  String get membersConflict =>
+      'Права уже изменились. Несохранённые значения остаются в форме. Обновите участников перед повтором.';
+
+  @override
+  String get membersLoaded => 'Участники загружены.';
+
+  @override
+  String get memberConfirm => 'Изменить права участника?';
+
+  @override
+  String get memberApply => 'Применить права';
+
+  @override
+  String get memberSaved =>
+      'Права участника сохранены. Сервер применяет их к действиям и подпискам.';
+
+  @override
+  String get memberCollapse => 'Свернуть права';
+
+  @override
+  String get memberEdit => 'Изменить права';
+
+  @override
+  String get memberRole => 'Роль участника';
+
+  @override
+  String get memberBlock => 'Заблокировать участника';
+
+  @override
+  String get memberSave => 'Сохранить права участника';
+
+  @override
+  String get membersRefresh => 'Обновить участников';
+
+  @override
+  String get membersHelp =>
+      'Роли и блокировку меняет только владелец. Администраторы могут просматривать список.';
+
+  @override
+  String get membersSearch => 'Поиск по идентификатору или роли';
+
+  @override
+  String get membersEmpty => 'Участники не найдены.';
+
+  @override
+  String get memberBlocked => 'заблокирован';
+
+  @override
+  String get memberAllowed => 'разрешён';
+
+  @override
+  String get memberBlockedSuffix => ' · Доступ заблокирован';
+
+  @override
+  String memberProposal(String id, String role, String access) {
+    return '$id\nРоль: $role\nДоступ: $access';
+  }
+
+  @override
+  String membersCount(int count) {
+    return 'Загружено: $count. Поиск работает по загруженным участникам.';
+  }
 }

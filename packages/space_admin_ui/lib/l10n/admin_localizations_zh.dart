@@ -297,4 +297,77 @@ class AdminLocalizationsZh extends AdminLocalizations {
 
   @override
   String get channelBlockedSuffix => ' · 已阻止';
+
+  @override
+  String get roleOwner => '所有者';
+
+  @override
+  String get roleAdmin => '管理员';
+
+  @override
+  String get roleMember => '成员';
+
+  @override
+  String get roleReader => '阅读者';
+
+  @override
+  String get membersConflict => '权限已更改。未保存的值会保留在表单中。请刷新成员后重试。';
+
+  @override
+  String get membersLoaded => '成员已加载。';
+
+  @override
+  String get memberConfirm => '更改成员权限？';
+
+  @override
+  String get memberApply => '应用权限';
+
+  @override
+  String get memberSaved => '成员权限已保存。服务器会将其应用于操作和订阅。';
+
+  @override
+  String get memberCollapse => '收起权限';
+
+  @override
+  String get memberEdit => '编辑权限';
+
+  @override
+  String get memberRole => '成员角色';
+
+  @override
+  String get memberBlock => '阻止成员';
+
+  @override
+  String get memberSave => '保存成员权限';
+
+  @override
+  String get membersRefresh => '刷新成员';
+
+  @override
+  String get membersHelp => '只有所有者可以更改角色和阻止成员。管理员可以查看列表。';
+
+  @override
+  String get membersSearch => '按标识符或角色搜索';
+
+  @override
+  String get membersEmpty => '未找到成员。';
+
+  @override
+  String get memberBlocked => '已阻止';
+
+  @override
+  String get memberAllowed => '允许';
+
+  @override
+  String get memberBlockedSuffix => ' · 访问已被阻止';
+
+  @override
+  String memberProposal(String id, String role, String access) {
+    return '$id\n角色：$role\n访问：$access';
+  }
+
+  @override
+  String membersCount(int count) {
+    return '已加载：$count。搜索仅针对已加载的成员。';
+  }
 }
