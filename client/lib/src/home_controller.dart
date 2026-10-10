@@ -288,8 +288,9 @@ class HomeController extends ChangeNotifier {
     if (process != null) {
       // EOF запускает штатное завершение Go, затем остановку собственной PostgreSQL.
       await process.stdin.close();
-      final code=await process.exitCode.timeout(const Duration(seconds: 30));
-      if (code != 0) throw StateError('Ошибка остановки домашнего сервера: $_diagnostic');
+      final code = await process.exitCode.timeout(const Duration(seconds: 30));
+      if (code != 0)
+        throw StateError('Ошибка остановки домашнего сервера: $_diagnostic');
       _process = null;
     }
     running = false;
@@ -306,8 +307,7 @@ class HomeController extends ChangeNotifier {
     try {
       await _stop();
     } catch (_) {
-      error =
-          'Сервер не подтвердил остановку. Повторный запуск пока заблокирован.';
+      error = 'Сервер не подтвердил завершение всех процессов. Проверьте состояние перед повторным запуском.';
     } finally {
       busy = false;
       _update();

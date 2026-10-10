@@ -61,6 +61,10 @@ class _SpaceShellState extends State<SpaceShell> {
   Future<void> startHome(String ip) async {
     final state = await home.start(ip);
     if (state == null || !mounted) return;
+    if (controller.connected &&
+        controller.preview?.origin.toString() != state.publicOrigin) {
+      await controller.disconnect();
+    }
     await controller.inspect(
       state.localOrigin,
       homeOrigin: state.publicOrigin,
