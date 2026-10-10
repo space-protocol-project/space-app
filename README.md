@@ -30,6 +30,10 @@ flutter test --no-pub
 
 ## Публикация
 
+Первый публичный экспериментальный выпуск: [v0.1.0](https://github.com/space-protocol-project/space-app/releases/tag/v0.1.0). В приложение включены закреплённые SHA-256 архивов [сервера v0.1.0](https://github.com/space-protocol-project/space-server/releases/tag/v0.1.0).
+
+Проверки: 55 Flutter-тестов, анализ без замечаний, локальная Windows release-сборка и запуск с hot reload без ошибок. CI [38066040895](https://github.com/space-protocol-project/space-app/actions/runs/38066040895) собрал и опубликовал три установщика. CI [38067026461](https://github.com/space-protocol-project/space-app/actions/runs/38067026461) проверил реальную загрузку публичного архива, установку и два запуска с прежними владельцем, server ID, сертификатом и ссылкой на трёх платформах. Повторная загрузка при втором запуске запрещалась тестом; сценарий прошёл.
+
 Тег `vX.Y.Z` запускает проверки и сборку Windows Setup, macOS DMG и Linux RUN. CI публикует выпуск только после успешных сборок и проверок; описание берётся из одноимённого раздела [Changelog.md](Changelog.md), вместе с установщиками публикуется SHA-256. [Подробности](packaging/README.md).
 
 Windows — первая проверенная платформа. macOS/Linux требуют ручной проверки установки, защищённого хранилища и восстановления; DMG пока без подписи Apple и notarization. Реальное подключение друзей из интернета проверяется отдельно от runner.
