@@ -289,8 +289,9 @@ class HomeController extends ChangeNotifier {
       // EOF запускает штатное завершение Go, затем остановку собственной PostgreSQL.
       await process.stdin.close();
       final code = await process.exitCode.timeout(const Duration(seconds: 30));
-      if (code != 0)
+      if (code != 0) {
         throw StateError('Ошибка остановки домашнего сервера: $_diagnostic');
+      }
       _process = null;
     }
     running = false;

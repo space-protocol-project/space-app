@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/home_controller.dart';
@@ -10,6 +12,19 @@ import 'package:space_client/src/home_runtime.dart';
 import 'package:space_client/ui/home_panel.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  test('В приложение включены проверяемые выпуски для трёх платформ', () async {
+    final manifest = jsonDecode(
+      await rootBundle.loadString('assets/home/runtime-manifest.json'),
+    ) as Map<String, dynamic>;
+    expect(manifest.keys.toSet(), {'windows-x64', 'macos-arm64', 'linux-x64'});
+    for (final entry in manifest.entries) {
+      final release = HomeRelease.fromJson(
+        Map<String, dynamic>.from(entry.value as Map),
+      );
+      expect(release.platform, entry.key);
+    }
+  });
   test(
     'Публичный HTTPS и TLS-отпечаток приглашения; внешний HTTP запрещён',
     () {
