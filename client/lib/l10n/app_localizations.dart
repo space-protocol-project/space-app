@@ -772,6 +772,168 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'{count, plural, one{1 новое} few{{count} новых} many{{count} новых} other{{count} новых}}'**
   String newChannelMessages(int count);
+
+  /// No description provided for @homeTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Домашний сервер'**
+  String get homeTitle;
+
+  /// No description provided for @close.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть'**
+  String get close;
+
+  /// No description provided for @homeFirstSetup.
+  ///
+  /// In ru, this message translates to:
+  /// **'Space скачает сервер и PostgreSQL, создаст базу и сертификат. Данные останутся на этом компьютере.'**
+  String get homeFirstSetup;
+
+  /// No description provided for @homeReuse.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторный запуск использует ваш прежний сервер, базу, ключи, сертификат и участников.'**
+  String get homeReuse;
+
+  /// No description provided for @homeIP.
+  ///
+  /// In ru, this message translates to:
+  /// **'Статический публичный IPv4'**
+  String get homeIP;
+
+  /// No description provided for @homeIPHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес, выданный провайдером'**
+  String get homeIPHint;
+
+  /// No description provided for @detectingIP.
+  ///
+  /// In ru, this message translates to:
+  /// **'Определяем IP…'**
+  String get detectingIP;
+
+  /// No description provided for @detectIP.
+  ///
+  /// In ru, this message translates to:
+  /// **'Определить IP автоматически'**
+  String get detectIP;
+
+  /// No description provided for @homeIPPrivacy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Определение адреса обращается к ipify. При VPN будет показан адрес VPN.'**
+  String get homeIPPrivacy;
+
+  /// No description provided for @homeIPFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось определить адрес. Введите свой статический IP.'**
+  String get homeIPFailed;
+
+  /// No description provided for @homePortHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для доступа друзей направьте TCP-порт 8443 роутера на порт 8443 этого компьютера и разрешите его в брандмауэре. PostgreSQL и локальные порты наружу открывать не нужно.'**
+  String get homePortHelp;
+
+  /// No description provided for @goLive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти в эфир'**
+  String get goLive;
+
+  /// No description provided for @stopHome.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отключиться'**
+  String get stopHome;
+
+  /// No description provided for @homeLink.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ссылка на ваш сервер (открывается через подключение в Space)'**
+  String get homeLink;
+
+  /// No description provided for @copyLink.
+  ///
+  /// In ru, this message translates to:
+  /// **'Копировать ссылку'**
+  String get copyLink;
+
+  /// No description provided for @manageServer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Управлять сервером'**
+  String get manageServer;
+
+  /// No description provided for @homeInviteHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сама ссылка не выдаёт права администратора. Друзей приглашайте через «Управление пространством → Приглашения». Остановка сервера завершит их подключения.'**
+  String get homeInviteHelp;
+
+  /// No description provided for @myHomeServer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мой домашний сервер'**
+  String get myHomeServer;
+
+  /// No description provided for @homeRunningHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер работает. После отключения все данные сохранятся.'**
+  String get homeRunningHelp;
+
+  /// No description provided for @homeStartHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запустите своё пространство на этом компьютере.'**
+  String get homeStartHelp;
+
+  /// No description provided for @myServer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мой сервер'**
+  String get myServer;
+
+  /// No description provided for @homeDetectingIP.
+  ///
+  /// In ru, this message translates to:
+  /// **'Определяем публичный IP через ipify'**
+  String get homeDetectingIP;
+
+  /// No description provided for @homeDownloading.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скачиваем сервер и PostgreSQL'**
+  String get homeDownloading;
+
+  /// No description provided for @homeInstalling.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверяем и устанавливаем выпуск'**
+  String get homeInstalling;
+
+  /// No description provided for @homeStarting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запускаем сохранённый сервер'**
+  String get homeStarting;
+
+  /// No description provided for @homeRunning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер работает на этом компьютере'**
+  String get homeRunning;
+
+  /// No description provided for @homeStopped.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер отключён, данные сохранены'**
+  String get homeStopped;
 }
 
 class _AppLocalizationsDelegate

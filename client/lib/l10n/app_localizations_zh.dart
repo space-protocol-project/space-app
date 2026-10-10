@@ -358,6 +358,88 @@ class AppLocalizationsZh extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get homeTitle => '家庭服务器';
+
+  @override
+  String get close => '关闭';
+
+  @override
+  String get homeFirstSetup => 'Space 将下载服务器和 PostgreSQL，并创建数据库和证书。数据会保留在此电脑上。';
+
+  @override
+  String get homeReuse => '再次启动会使用原有的服务器、数据库、密钥、证书和成员。';
+
+  @override
+  String get homeIP => '静态公网 IPv4';
+
+  @override
+  String get homeIPHint => '互联网服务提供商分配的地址';
+
+  @override
+  String get detectingIP => '正在获取 IP…';
+
+  @override
+  String get detectIP => '自动获取 IP';
+
+  @override
+  String get homeIPPrivacy => '获取地址会访问 ipify。使用 VPN 时将显示 VPN 的地址。';
+
+  @override
+  String get homeIPFailed => '无法获取地址。请输入你的静态 IP。';
+
+  @override
+  String get homePortHelp =>
+      '为让朋友连接，请将路由器的 TCP 8443 端口转发到此电脑的 8443 端口，并在防火墙中放行。无需对外开放 PostgreSQL 或本地端口。';
+
+  @override
+  String get goLive => '上线';
+
+  @override
+  String get stopHome => '断开';
+
+  @override
+  String get homeLink => '你的服务器链接（粘贴到 Space 的连接界面中）';
+
+  @override
+  String get copyLink => '复制链接';
+
+  @override
+  String get manageServer => '管理服务器';
+
+  @override
+  String get homeInviteHelp => '链接本身不授予管理员权限。请通过“管理空间 → 邀请”邀请朋友。停止服务器会断开他们的连接。';
+
+  @override
+  String get myHomeServer => '我的家庭服务器';
+
+  @override
+  String get homeRunningHelp => '服务器正在运行。断开后所有数据都会保留。';
+
+  @override
+  String get homeStartHelp => '在此电脑上运行自己的空间。';
+
+  @override
+  String get myServer => '我的服务器';
+
+  @override
+  String get homeDetectingIP => '正在通过 ipify 获取公网 IP';
+
+  @override
+  String get homeDownloading => '正在下载服务器和 PostgreSQL';
+
+  @override
+  String get homeInstalling => '正在验证并安装版本';
+
+  @override
+  String get homeStarting => '正在启动已有的服务器';
+
+  @override
+  String get homeRunning => '服务器正在此电脑上运行';
+
+  @override
+  String get homeStopped => '服务器已停止，数据已保留';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

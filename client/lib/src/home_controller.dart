@@ -8,6 +8,16 @@ import 'package:path_provider/path_provider.dart';
 
 import 'home_runtime.dart';
 
+enum HomePhase {
+  idle,
+  detectingIP,
+  downloading,
+  installing,
+  starting,
+  running,
+  stopped,
+}
+
 class HomeServerState {
   HomeServerState(
     this.localOrigin,
@@ -39,7 +49,8 @@ class HomeController extends ChangeNotifier {
   Process? _process;
   RandomAccessFile? _lock;
   bool busy = false, running = false, _disposed = false;
-  String ip = '', error = '', phase = '';
+  String ip = '', error = '';
+  HomePhase phase = HomePhase.idle;
   double progress = 0;
   HomeServerState? state;
   void reportError(String message) {
@@ -117,7 +128,7 @@ class HomeController extends ChangeNotifier {
       }
       return target;
     }
-    phase = 'Скачиваем сервер и PostgreSQL';
+    phase = HomePhase.downloading;
     _update();
     final staging = await Directory('${root.path}/runtimes')
         .create(recursive: true);
@@ -128,7 +139,7 @@ class HomeController extends ChangeNotifier {
         progress = value;
         _update();
       });
-      phase = 'Проверяем и устанавливаем выпуск';
+      phase = HomePhase.installing;
       _update();
       final unpacked = await Directory('${temporary.path}/unpacked').create();
       await extractHomeRelease(archive, unpacked, descriptor.sha256);
@@ -170,7 +181,7 @@ class HomeController extends ChangeNotifier {
       } else {
         var candidate = address.trim();
         if (candidate.isEmpty) {
-          phase = 'Определяем публичный IP через ipify';
+          phase = HomePhase.detectingIP;
           _update();
           candidate = await detectIP();
         }
@@ -189,7 +200,7 @@ class HomeController extends ChangeNotifier {
       if (_disposed) {
         throw const FormatException('Запуск отменён при закрытии приложения');
       }
-      phase = 'Запускаем сохранённый сервер';
+      phase = HomePhase.starting;
       _update();
       final data = await Directory('${root.path}/data').create(recursive: true);
       final ready = File('${data.path}/state.json');
@@ -259,7 +270,7 @@ class HomeController extends ChangeNotifier {
         crypto.sha256.convert(der).toString(),
       );
       running = true;
-      phase = 'Сервер работает на этом компьютере';
+      phase = HomePhase.running;
       return state;
     } catch (e) {
       error = e.toString().replaceFirst('FormatException: ', '');
@@ -296,7 +307,7 @@ class HomeController extends ChangeNotifier {
     }
     running = false;
     state = null;
-    phase = 'Сервер отключён, данные сохранены';
+    phase = HomePhase.stopped;
     await _unlock();
   }
 

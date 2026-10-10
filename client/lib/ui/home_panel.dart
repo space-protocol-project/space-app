@@ -1,3 +1,6 @@
+import '../l10n/strings.dart';
+import '../l10n/home_strings.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -23,7 +26,7 @@ class HomePanel extends StatefulWidget {
 class _HomePanelState extends State<HomePanel> {
   late final address = TextEditingController(text: widget.home.ip);
   bool detecting = false;
-  String detectionError = '';
+  bool detectionFailed = false;
   @override
   void dispose() {
     address.dispose();
@@ -33,15 +36,14 @@ class _HomePanelState extends State<HomePanel> {
   Future<void> detect() async {
     setState(() {
       detecting = true;
-      detectionError = '';
+      detectionFailed = false;
     });
     try {
       final ip = await widget.home.detectIP();
       if (mounted) address.text = ip;
     } catch (_) {
       if (mounted) {
-        detectionError =
-            'Не удалось определить адрес. Введите свой статический IP.';
+        detectionFailed = true;
       }
     } finally {
       if (mounted) setState(() => detecting = false);
@@ -65,12 +67,12 @@ class _HomePanelState extends State<HomePanel> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Домашний сервер',
+                    context.strings.homeTitle,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Закрыть',
+                  tooltip: context.strings.close,
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.close),
                 ),
@@ -79,16 +81,16 @@ class _HomePanelState extends State<HomePanel> {
             const SizedBox(height: 16),
             Text(
               home.ip.isEmpty
-                  ? 'Space скачает сервер и PostgreSQL, создаст базу и сертификат. Данные останутся на этом компьютере.'
-                  : 'Повторный запуск использует ваш прежний сервер, базу, ключи, сертификат и участников.',
+                  ? context.strings.homeFirstSetup
+                  : context.strings.homeReuse,
             ),
             const SizedBox(height: 20),
             TextField(
               controller: address,
               enabled: home.ip.isEmpty && !home.busy && !detecting,
-              decoration: const InputDecoration(
-                labelText: 'Статический публичный IPv4',
-                hintText: 'Адрес, выданный провайдером',
+              decoration: InputDecoration(
+                labelText: context.strings.homeIP,
+                hintText: context.strings.homeIPHint,
               ),
             ),
             if (home.ip.isEmpty) ...[
@@ -97,19 +99,19 @@ class _HomePanelState extends State<HomePanel> {
                 onPressed: home.busy || detecting ? null : detect,
                 icon: const Icon(Icons.public),
                 label: Text(
-                  detecting ? 'Определяем IP…' : 'Определить IP автоматически',
+                  detecting
+                      ? context.strings.detectingIP
+                      : context.strings.detectIP,
                 ),
               ),
-              const Text(
-                'Определение адреса обращается к ipify. При VPN будет показан адрес VPN.',
+              Text(
+                context.strings.homeIPPrivacy,
                 style: TextStyle(fontSize: 12),
               ),
             ],
-            if (detectionError.isNotEmpty) Text(detectionError),
+            if (detectionFailed) Text(context.strings.homeIPFailed),
             const SizedBox(height: 20),
-            const Text(
-              'Для доступа друзей направьте TCP-порт 8443 роутера на порт 8443 этого компьютера и разрешите его в брандмауэре. PostgreSQL и локальные порты наружу открывать не нужно.',
-            ),
+            Text(context.strings.homePortHelp),
             const SizedBox(height: 20),
             if (home.busy) ...[
               LinearProgressIndicator(
@@ -118,7 +120,11 @@ class _HomePanelState extends State<HomePanel> {
                     : null,
               ),
               const SizedBox(height: 10),
-              Text(home.phase),
+              Text(home.phase.label(context)),
+              const SizedBox(height: 16),
+            ],
+            if (!home.busy && home.phase != HomePhase.idle) ...[
+              Text(home.phase.label(context)),
               const SizedBox(height: 16),
             ],
             if (home.error.isNotEmpty) ...[
@@ -139,13 +145,13 @@ class _HomePanelState extends State<HomePanel> {
                       }
                     },
               icon: home.running ? Icons.power_settings_new : Icons.sensors,
-              label: home.running ? 'Отключиться' : 'Выйти в эфир',
+              label: home.running
+                  ? context.strings.stopHome
+                  : context.strings.goLive,
             ),
             if (home.state != null) ...[
               const SizedBox(height: 20),
-              const Text(
-                'Ссылка на ваш сервер (открывается через подключение в Space)',
-              ),
+              Text(context.strings.homeLink),
               const SizedBox(height: 8),
               SelectableText(home.state!.link),
               const SizedBox(height: 10),
@@ -158,18 +164,18 @@ class _HomePanelState extends State<HomePanel> {
                       ClipboardData(text: home.state!.link),
                     ),
                     icon: const Icon(Icons.copy),
-                    label: const Text('Копировать ссылку'),
+                    label: Text(context.strings.copyLink),
                   ),
                   FilledButton.icon(
                     onPressed: widget.openAdministration,
                     icon: const Icon(Icons.tune),
-                    label: const Text('Управлять сервером'),
+                    label: Text(context.strings.manageServer),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Сама ссылка не выдаёт права администратора. Друзей приглашайте через «Управление пространством → Приглашения». Остановка сервера завершит их подключения.',
+              Text(
+                context.strings.homeInviteHelp,
                 style: TextStyle(fontSize: 12),
               ),
             ],

@@ -377,4 +377,93 @@ class AppLocalizationsRu extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get homeTitle => 'Домашний сервер';
+
+  @override
+  String get close => 'Закрыть';
+
+  @override
+  String get homeFirstSetup =>
+      'Space скачает сервер и PostgreSQL, создаст базу и сертификат. Данные останутся на этом компьютере.';
+
+  @override
+  String get homeReuse =>
+      'Повторный запуск использует ваш прежний сервер, базу, ключи, сертификат и участников.';
+
+  @override
+  String get homeIP => 'Статический публичный IPv4';
+
+  @override
+  String get homeIPHint => 'Адрес, выданный провайдером';
+
+  @override
+  String get detectingIP => 'Определяем IP…';
+
+  @override
+  String get detectIP => 'Определить IP автоматически';
+
+  @override
+  String get homeIPPrivacy =>
+      'Определение адреса обращается к ipify. При VPN будет показан адрес VPN.';
+
+  @override
+  String get homeIPFailed =>
+      'Не удалось определить адрес. Введите свой статический IP.';
+
+  @override
+  String get homePortHelp =>
+      'Для доступа друзей направьте TCP-порт 8443 роутера на порт 8443 этого компьютера и разрешите его в брандмауэре. PostgreSQL и локальные порты наружу открывать не нужно.';
+
+  @override
+  String get goLive => 'Выйти в эфир';
+
+  @override
+  String get stopHome => 'Отключиться';
+
+  @override
+  String get homeLink =>
+      'Ссылка на ваш сервер (открывается через подключение в Space)';
+
+  @override
+  String get copyLink => 'Копировать ссылку';
+
+  @override
+  String get manageServer => 'Управлять сервером';
+
+  @override
+  String get homeInviteHelp =>
+      'Сама ссылка не выдаёт права администратора. Друзей приглашайте через «Управление пространством → Приглашения». Остановка сервера завершит их подключения.';
+
+  @override
+  String get myHomeServer => 'Мой домашний сервер';
+
+  @override
+  String get homeRunningHelp =>
+      'Сервер работает. После отключения все данные сохранятся.';
+
+  @override
+  String get homeStartHelp => 'Запустите своё пространство на этом компьютере.';
+
+  @override
+  String get myServer => 'Мой сервер';
+
+  @override
+  String get homeDetectingIP => 'Определяем публичный IP через ipify';
+
+  @override
+  String get homeDownloading => 'Скачиваем сервер и PostgreSQL';
+
+  @override
+  String get homeInstalling => 'Проверяем и устанавливаем выпуск';
+
+  @override
+  String get homeStarting => 'Запускаем сохранённый сервер';
+
+  @override
+  String get homeRunning => 'Сервер работает на этом компьютере';
+
+  @override
+  String get homeStopped => 'Сервер отключён, данные сохранены';
 }

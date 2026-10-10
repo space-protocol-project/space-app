@@ -280,7 +280,9 @@ class _SpaceShellState extends State<SpaceShell> {
             builder: (context, _) => SpaceActionButton(
               onPressed: home.busy || controller.busy ? null : showHome,
               icon: home.running ? Icons.power_settings_new : Icons.sensors,
-              label: home.running ? 'Отключиться' : 'Выйти в эфир',
+              label: home.running
+                  ? context.strings.stopHome
+                  : context.strings.goLive,
             ),
           ),
           const SizedBox(height: 16),

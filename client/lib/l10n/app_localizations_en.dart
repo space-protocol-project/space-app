@@ -373,4 +373,93 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get homeTitle => 'Home server';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get homeFirstSetup =>
+      'Space will download the server and PostgreSQL, then create a database and certificate. Your data stays on this computer.';
+
+  @override
+  String get homeReuse =>
+      'Starting again uses your existing server, database, keys, certificate and members.';
+
+  @override
+  String get homeIP => 'Static public IPv4';
+
+  @override
+  String get homeIPHint => 'Address assigned by your internet provider';
+
+  @override
+  String get detectingIP => 'Detecting IP…';
+
+  @override
+  String get detectIP => 'Detect IP automatically';
+
+  @override
+  String get homeIPPrivacy =>
+      'IP detection uses ipify. If you use a VPN, it will show the VPN address.';
+
+  @override
+  String get homeIPFailed =>
+      'Could not detect your address. Enter your static IP.';
+
+  @override
+  String get homePortHelp =>
+      'To let friends connect, forward TCP port 8443 on your router to port 8443 on this computer and allow it through the firewall. Keep PostgreSQL and local ports private.';
+
+  @override
+  String get goLive => 'Go live';
+
+  @override
+  String get stopHome => 'Disconnect';
+
+  @override
+  String get homeLink =>
+      'Your server link (paste it into the connection screen in Space)';
+
+  @override
+  String get copyLink => 'Copy link';
+
+  @override
+  String get manageServer => 'Manage server';
+
+  @override
+  String get homeInviteHelp =>
+      'The link does not grant administrator rights. Invite friends through Manage space → Invitations. Stopping the server disconnects them.';
+
+  @override
+  String get myHomeServer => 'My home server';
+
+  @override
+  String get homeRunningHelp =>
+      'The server is running. Disconnecting preserves all data.';
+
+  @override
+  String get homeStartHelp => 'Run your own space on this computer.';
+
+  @override
+  String get myServer => 'My server';
+
+  @override
+  String get homeDetectingIP => 'Detecting public IP with ipify';
+
+  @override
+  String get homeDownloading => 'Downloading the server and PostgreSQL';
+
+  @override
+  String get homeInstalling => 'Verifying and installing the release';
+
+  @override
+  String get homeStarting => 'Starting your existing server';
+
+  @override
+  String get homeRunning => 'The server is running on this computer';
+
+  @override
+  String get homeStopped => 'Server stopped; data preserved';
 }

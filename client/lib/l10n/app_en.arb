@@ -139,5 +139,32 @@
         "type": "int"
       }
     }
-  }
+  },
+  "homeTitle": "Home server",
+  "close": "Close",
+  "homeFirstSetup": "Space will download the server and PostgreSQL, then create a database and certificate. Your data stays on this computer.",
+  "homeReuse": "Starting again uses your existing server, database, keys, certificate and members.",
+  "homeIP": "Static public IPv4",
+  "homeIPHint": "Address assigned by your internet provider",
+  "detectingIP": "Detecting IP…",
+  "detectIP": "Detect IP automatically",
+  "homeIPPrivacy": "IP detection uses ipify. If you use a VPN, it will show the VPN address.",
+  "homeIPFailed": "Could not detect your address. Enter your static IP.",
+  "homePortHelp": "To let friends connect, forward TCP port 8443 on your router to port 8443 on this computer and allow it through the firewall. Keep PostgreSQL and local ports private.",
+  "goLive": "Go live",
+  "stopHome": "Disconnect",
+  "homeLink": "Your server link (paste it into the connection screen in Space)",
+  "copyLink": "Copy link",
+  "manageServer": "Manage server",
+  "homeInviteHelp": "The link does not grant administrator rights. Invite friends through Manage space → Invitations. Stopping the server disconnects them.",
+  "myHomeServer": "My home server",
+  "homeRunningHelp": "The server is running. Disconnecting preserves all data.",
+  "homeStartHelp": "Run your own space on this computer.",
+  "myServer": "My server",
+  "homeDetectingIP": "Detecting public IP with ipify",
+  "homeDownloading": "Downloading the server and PostgreSQL",
+  "homeInstalling": "Verifying and installing the release",
+  "homeStarting": "Starting your existing server",
+  "homeRunning": "The server is running on this computer",
+  "homeStopped": "Server stopped; data preserved"
 }

@@ -1,3 +1,4 @@
+import '../l10n/home_strings.dart';
 import '../l10n/strings.dart';
 import 'admin_panel.dart';
 
@@ -35,16 +36,16 @@ class OverviewPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Мой домашний сервер',
+                context.strings.myHomeServer,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 10),
               Text(
                 home!.busy
-                    ? home!.phase
+                    ? home!.phase.label(context)
                     : home!.running
-                    ? 'Сервер работает. После отключения все данные сохранятся.'
-                    : 'Запустите своё пространство на этом компьютере.',
+                    ? context.strings.homeRunningHelp
+                    : context.strings.homeStartHelp,
               ),
               const SizedBox(height: 16),
               Wrap(
@@ -58,12 +59,16 @@ class OverviewPanel extends StatelessWidget {
                     icon: Icon(
                       home!.running ? Icons.power_settings_new : Icons.sensors,
                     ),
-                    label: Text(home!.running ? 'Отключиться' : 'Выйти в эфир'),
+                    label: Text(
+                      home!.running
+                          ? context.strings.stopHome
+                          : context.strings.goLive,
+                    ),
                   ),
                   OutlinedButton.icon(
                     onPressed: home!.busy ? null : homeDetails,
                     icon: const Icon(Icons.tune),
-                    label: const Text('Мой сервер'),
+                    label: Text(context.strings.myServer),
                   ),
                 ],
               ),
