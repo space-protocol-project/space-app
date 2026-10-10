@@ -1,0 +1,9 @@
+name: space_admin_ui
+publish_to: none
+environment:
+  sdk: ^3.13.5
+dependencies:
+  flutter:
+    sdk: flutter
+  space_api:
+    path: ../space_api

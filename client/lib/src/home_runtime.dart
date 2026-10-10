@@ -29,7 +29,7 @@ class HomeRelease {
         release.bytes < 1 ||
         release.bytes > 512 * 1024 * 1024 ||
         release.url.toString() !=
-            'https://github.com/space-protocol-project/space-protocol/releases/download/${release.version}/Space-home-${release.platform}.zip') {
+            'https://github.com/space-protocol-project/space-server/releases/download/${release.version}/Space-home-${release.platform}.zip') {
       throw const FormatException('Недопустимый выпуск домашнего сервера');
     }
     return release;

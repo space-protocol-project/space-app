@@ -1,0 +1,91 @@
+name: Установщики приложения
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths: ['client/**', 'packages/**', 'packaging/**', '.github/workflows/desktop.yml']
+  pull_request:
+    paths: ['client/**', 'packages/**', 'packaging/**', '.github/workflows/desktop.yml']
+permissions:
+  contents: read
+jobs:
+  verify-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    uses: space-protocol-project/space-server/.github/workflows/server.yml@main
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            target: windows
+          - os: macos-14
+            target: macos
+          - os: ubuntu-22.04
+            target: linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.6'
+          channel: stable
+          cache: true
+      - name: Зависимости Linux (только CI)
+        if: matrix.target == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev
+      - name: Зависимости приложения
+        working-directory: client
+        run: flutter pub get
+      - name: Сборка
+        working-directory: client
+        shell: bash
+        run: |
+          version=$(sed -n 's/^version: \([^+]*\).*/\1/p' pubspec.yaml)
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then version=${GITHUB_REF_NAME#v}; fi
+          flutter build ${{ matrix.target }} --release --build-name "$version"
+      - name: Windows Setup
+        if: matrix.target == 'windows'
+        shell: pwsh
+        run: |
+          $appVersion = (Select-String -Path client/pubspec.yaml -Pattern '^version: (.+?)(\+.*)?$').Matches.Groups[1].Value
+          if ($env:GITHUB_REF -like 'refs/tags/v*') { $appVersion = $env:GITHUB_REF_NAME.Substring(1) }
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=$appVersion" packaging/windows.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-FileHash dist/Space-Setup-windows-x64.exe -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  Space-Setup-windows-x64.exe" } | Set-Content dist/SHA256SUMS-windows-x64.txt
+      - name: macOS DMG
+        if: matrix.target == 'macos'
+        run: bash packaging/build-macos.sh
+      - name: Linux RUN
+        if: matrix.target == 'linux'
+        run: |
+          bash packaging/build-linux.sh
+          (cd dist && sha256sum *.run > SHA256SUMS-linux-x64.txt)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Space-${{ matrix.target }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [desktop, verify-release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: Space-*
+          path: dist
+          merge-multiple: true
+      - name: Описание из Changelog.md
+        run: python3 packaging/release-notes.py "$GITHUB_REF_NAME" Changelog.md dist/release-notes.md
+      - name: Публикация проверенного выпуска
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          (cd dist && sha256sum Space-* > SHA256SUMS.txt)
+          gh release create "$GITHUB_REF_NAME" dist/Space-* dist/SHA256SUMS.txt --verify-tag --title "Space $GITHUB_REF_NAME" --notes-file dist/release-notes.md --prerelease
