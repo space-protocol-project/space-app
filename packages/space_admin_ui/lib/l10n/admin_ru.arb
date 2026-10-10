@@ -208,5 +208,55 @@
         "type": "int"
       }
     }
+  },
+  "devicesTitle": "Устройства и разрешения",
+  "devicesHelp": "Только устройства вашей идентичности. Роль на сервере и разрешения устройства проверяются отдельно.",
+  "devicesRefresh": "Обновить устройства",
+  "devicesEmpty": "Нет доступных устройств.",
+  "deviceRecovery": "Ключ восстановления",
+  "deviceCurrent": "Это устройство",
+  "deviceOther": "Другое устройство",
+  "deviceRevokeAccess": "Отозвать доступ",
+  "deviceRevokeConfirm": "Отозвать доступ?",
+  "deviceRevoke": "Отозвать",
+  "deviceRecoveryWarning": "Карточка и все подключённые через неё устройства потеряют доступ. Проверьте другой путь восстановления.",
+  "deviceCurrentWarning": "Это устройство потеряет доступ. Его сессия и подписки завершатся.",
+  "deviceOtherWarning": "Сессии и подписки устройства завершатся.",
+  "deviceCardHelp": "После подтверждения выберите исходную карточку JSON или PNG. Секрет используется только для подписи.",
+  "deviceCardPassword": "Пароль карточки",
+  "devicesLoaded": "Устройства загружены.",
+  "deviceRevokedStatus": "Доступ отозван на сервере.",
+  "deviceExpiryUnknown": "Срок неизвестен",
+  "deviceAccessUntil": "Доступ до {expiry}",
+  "@deviceAccessUntil": {
+    "placeholders": {
+      "expiry": {
+        "type": "String"
+      }
+    }
+  },
+  "deviceExpired": "Срок истёк: {expiry}",
+  "@deviceExpired": {
+    "placeholders": {
+      "expiry": {
+        "type": "String"
+      }
+    }
+  },
+  "deviceScopes": "Разрешения: {scopes}",
+  "@deviceScopes": {
+    "placeholders": {
+      "scopes": {
+        "type": "String"
+      }
+    }
+  },
+  "deviceParent": "Выдано через: {id}",
+  "@deviceParent": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
   }
 }

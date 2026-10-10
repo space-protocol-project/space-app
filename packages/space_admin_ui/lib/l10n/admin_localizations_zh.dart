@@ -478,4 +478,78 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String inviteExpiry(String expiry, int uses, int limit) {
     return '截至 $expiry（设备时间）· 已使用 $uses/$limit 次';
   }
+
+  @override
+  String get devicesTitle => '设备与权限';
+
+  @override
+  String get devicesHelp => '仅显示属于您身份的设备。服务器角色和设备权限分别验证。';
+
+  @override
+  String get devicesRefresh => '刷新设备';
+
+  @override
+  String get devicesEmpty => '没有可用设备。';
+
+  @override
+  String get deviceRecovery => '恢复密钥';
+
+  @override
+  String get deviceCurrent => '此设备';
+
+  @override
+  String get deviceOther => '其他设备';
+
+  @override
+  String get deviceRevokeAccess => '撤销访问';
+
+  @override
+  String get deviceRevokeConfirm => '撤销访问？';
+
+  @override
+  String get deviceRevoke => '撤销';
+
+  @override
+  String get deviceRecoveryWarning => '身份卡及所有通过它连接的设备将失去访问权限。请确保您有其他恢复方式。';
+
+  @override
+  String get deviceCurrentWarning => '此设备将失去访问权限。其会话和订阅将结束。';
+
+  @override
+  String get deviceOtherWarning => '该设备的会话和订阅将结束。';
+
+  @override
+  String get deviceCardHelp => '确认后请选择原始 JSON 或 PNG 身份卡。密钥仅用于签署请求。';
+
+  @override
+  String get deviceCardPassword => '身份卡密码';
+
+  @override
+  String get devicesLoaded => '设备已加载。';
+
+  @override
+  String get deviceRevokedStatus => '已在服务器上撤销访问。';
+
+  @override
+  String get deviceExpiryUnknown => '有效期未知';
+
+  @override
+  String deviceAccessUntil(String expiry) {
+    return '访问有效至 $expiry';
+  }
+
+  @override
+  String deviceExpired(String expiry) {
+    return '已过期：$expiry';
+  }
+
+  @override
+  String deviceScopes(String scopes) {
+    return '权限：$scopes';
+  }
+
+  @override
+  String deviceParent(String id) {
+    return '签发来源：$id';
+  }
 }

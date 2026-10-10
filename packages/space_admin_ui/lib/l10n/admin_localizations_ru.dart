@@ -509,4 +509,82 @@ class AdminLocalizationsRu extends AdminLocalizations {
   String inviteExpiry(String expiry, int uses, int limit) {
     return 'До $expiry по времени устройства · использований $uses/$limit';
   }
+
+  @override
+  String get devicesTitle => 'Устройства и разрешения';
+
+  @override
+  String get devicesHelp =>
+      'Только устройства вашей идентичности. Роль на сервере и разрешения устройства проверяются отдельно.';
+
+  @override
+  String get devicesRefresh => 'Обновить устройства';
+
+  @override
+  String get devicesEmpty => 'Нет доступных устройств.';
+
+  @override
+  String get deviceRecovery => 'Ключ восстановления';
+
+  @override
+  String get deviceCurrent => 'Это устройство';
+
+  @override
+  String get deviceOther => 'Другое устройство';
+
+  @override
+  String get deviceRevokeAccess => 'Отозвать доступ';
+
+  @override
+  String get deviceRevokeConfirm => 'Отозвать доступ?';
+
+  @override
+  String get deviceRevoke => 'Отозвать';
+
+  @override
+  String get deviceRecoveryWarning =>
+      'Карточка и все подключённые через неё устройства потеряют доступ. Проверьте другой путь восстановления.';
+
+  @override
+  String get deviceCurrentWarning =>
+      'Это устройство потеряет доступ. Его сессия и подписки завершатся.';
+
+  @override
+  String get deviceOtherWarning => 'Сессии и подписки устройства завершатся.';
+
+  @override
+  String get deviceCardHelp =>
+      'После подтверждения выберите исходную карточку JSON или PNG. Секрет используется только для подписи.';
+
+  @override
+  String get deviceCardPassword => 'Пароль карточки';
+
+  @override
+  String get devicesLoaded => 'Устройства загружены.';
+
+  @override
+  String get deviceRevokedStatus => 'Доступ отозван на сервере.';
+
+  @override
+  String get deviceExpiryUnknown => 'Срок неизвестен';
+
+  @override
+  String deviceAccessUntil(String expiry) {
+    return 'Доступ до $expiry';
+  }
+
+  @override
+  String deviceExpired(String expiry) {
+    return 'Срок истёк: $expiry';
+  }
+
+  @override
+  String deviceScopes(String scopes) {
+    return 'Разрешения: $scopes';
+  }
+
+  @override
+  String deviceParent(String id) {
+    return 'Выдано через: $id';
+  }
 }

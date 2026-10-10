@@ -1011,6 +1011,138 @@ abstract class AdminLocalizations {
   /// In ru, this message translates to:
   /// **'До {expiry} по времени устройства · использований {uses}/{limit}'**
   String inviteExpiry(String expiry, int uses, int limit);
+
+  /// No description provided for @devicesTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Устройства и разрешения'**
+  String get devicesTitle;
+
+  /// No description provided for @devicesHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только устройства вашей идентичности. Роль на сервере и разрешения устройства проверяются отдельно.'**
+  String get devicesHelp;
+
+  /// No description provided for @devicesRefresh.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить устройства'**
+  String get devicesRefresh;
+
+  /// No description provided for @devicesEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет доступных устройств.'**
+  String get devicesEmpty;
+
+  /// No description provided for @deviceRecovery.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ключ восстановления'**
+  String get deviceRecovery;
+
+  /// No description provided for @deviceCurrent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это устройство'**
+  String get deviceCurrent;
+
+  /// No description provided for @deviceOther.
+  ///
+  /// In ru, this message translates to:
+  /// **'Другое устройство'**
+  String get deviceOther;
+
+  /// No description provided for @deviceRevokeAccess.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отозвать доступ'**
+  String get deviceRevokeAccess;
+
+  /// No description provided for @deviceRevokeConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отозвать доступ?'**
+  String get deviceRevokeConfirm;
+
+  /// No description provided for @deviceRevoke.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отозвать'**
+  String get deviceRevoke;
+
+  /// No description provided for @deviceRecoveryWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карточка и все подключённые через неё устройства потеряют доступ. Проверьте другой путь восстановления.'**
+  String get deviceRecoveryWarning;
+
+  /// No description provided for @deviceCurrentWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это устройство потеряет доступ. Его сессия и подписки завершатся.'**
+  String get deviceCurrentWarning;
+
+  /// No description provided for @deviceOtherWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сессии и подписки устройства завершатся.'**
+  String get deviceOtherWarning;
+
+  /// No description provided for @deviceCardHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'После подтверждения выберите исходную карточку JSON или PNG. Секрет используется только для подписи.'**
+  String get deviceCardHelp;
+
+  /// No description provided for @deviceCardPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль карточки'**
+  String get deviceCardPassword;
+
+  /// No description provided for @devicesLoaded.
+  ///
+  /// In ru, this message translates to:
+  /// **'Устройства загружены.'**
+  String get devicesLoaded;
+
+  /// No description provided for @deviceRevokedStatus.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ отозван на сервере.'**
+  String get deviceRevokedStatus;
+
+  /// No description provided for @deviceExpiryUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок неизвестен'**
+  String get deviceExpiryUnknown;
+
+  /// No description provided for @deviceAccessUntil.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ до {expiry}'**
+  String deviceAccessUntil(String expiry);
+
+  /// No description provided for @deviceExpired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок истёк: {expiry}'**
+  String deviceExpired(String expiry);
+
+  /// No description provided for @deviceScopes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разрешения: {scopes}'**
+  String deviceScopes(String scopes);
+
+  /// No description provided for @deviceParent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выдано через: {id}'**
+  String deviceParent(String id);
 }
 
 class _AdminLocalizationsDelegate

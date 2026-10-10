@@ -208,5 +208,55 @@
         "type": "int"
       }
     }
+  },
+  "devicesTitle": "设备与权限",
+  "devicesHelp": "仅显示属于您身份的设备。服务器角色和设备权限分别验证。",
+  "devicesRefresh": "刷新设备",
+  "devicesEmpty": "没有可用设备。",
+  "deviceRecovery": "恢复密钥",
+  "deviceCurrent": "此设备",
+  "deviceOther": "其他设备",
+  "deviceRevokeAccess": "撤销访问",
+  "deviceRevokeConfirm": "撤销访问？",
+  "deviceRevoke": "撤销",
+  "deviceRecoveryWarning": "身份卡及所有通过它连接的设备将失去访问权限。请确保您有其他恢复方式。",
+  "deviceCurrentWarning": "此设备将失去访问权限。其会话和订阅将结束。",
+  "deviceOtherWarning": "该设备的会话和订阅将结束。",
+  "deviceCardHelp": "确认后请选择原始 JSON 或 PNG 身份卡。密钥仅用于签署请求。",
+  "deviceCardPassword": "身份卡密码",
+  "devicesLoaded": "设备已加载。",
+  "deviceRevokedStatus": "已在服务器上撤销访问。",
+  "deviceExpiryUnknown": "有效期未知",
+  "deviceAccessUntil": "访问有效至 {expiry}",
+  "@deviceAccessUntil": {
+    "placeholders": {
+      "expiry": {
+        "type": "String"
+      }
+    }
+  },
+  "deviceExpired": "已过期：{expiry}",
+  "@deviceExpired": {
+    "placeholders": {
+      "expiry": {
+        "type": "String"
+      }
+    }
+  },
+  "deviceScopes": "权限：{scopes}",
+  "@deviceScopes": {
+    "placeholders": {
+      "scopes": {
+        "type": "String"
+      }
+    }
+  },
+  "deviceParent": "签发来源：{id}",
+  "@deviceParent": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -208,5 +208,55 @@
         "type": "int"
       }
     }
+  },
+  "devicesTitle": "Devices and permissions",
+  "devicesHelp": "Only devices belonging to your identity. Server roles and device permissions are checked separately.",
+  "devicesRefresh": "Refresh devices",
+  "devicesEmpty": "No available devices.",
+  "deviceRecovery": "Recovery key",
+  "deviceCurrent": "This device",
+  "deviceOther": "Other device",
+  "deviceRevokeAccess": "Revoke access",
+  "deviceRevokeConfirm": "Revoke access?",
+  "deviceRevoke": "Revoke",
+  "deviceRecoveryWarning": "The card and all devices connected through it will lose access. Make sure you have another recovery method.",
+  "deviceCurrentWarning": "This device will lose access. Its session and subscriptions will end.",
+  "deviceOtherWarning": "The device's sessions and subscriptions will end.",
+  "deviceCardHelp": "After confirming, select the original JSON or PNG card. Its secret is used only to sign the request.",
+  "deviceCardPassword": "Card password",
+  "devicesLoaded": "Devices loaded.",
+  "deviceRevokedStatus": "Access revoked on the server.",
+  "deviceExpiryUnknown": "Expiry unknown",
+  "deviceAccessUntil": "Access until {expiry}",
+  "@deviceAccessUntil": {
+    "placeholders": {
+      "expiry": {
+        "type": "String"
+      }
+    }
+  },
+  "deviceExpired": "Expired: {expiry}",
+  "@deviceExpired": {
+    "placeholders": {
+      "expiry": {
+        "type": "String"
+      }
+    }
+  },
+  "deviceScopes": "Permissions: {scopes}",
+  "@deviceScopes": {
+    "placeholders": {
+      "scopes": {
+        "type": "String"
+      }
+    }
+  },
+  "deviceParent": "Issued through: {id}",
+  "@deviceParent": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
   }
 }

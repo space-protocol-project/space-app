@@ -508,4 +508,83 @@ class AdminLocalizationsEn extends AdminLocalizations {
   String inviteExpiry(String expiry, int uses, int limit) {
     return 'Until $expiry, device time · uses $uses/$limit';
   }
+
+  @override
+  String get devicesTitle => 'Devices and permissions';
+
+  @override
+  String get devicesHelp =>
+      'Only devices belonging to your identity. Server roles and device permissions are checked separately.';
+
+  @override
+  String get devicesRefresh => 'Refresh devices';
+
+  @override
+  String get devicesEmpty => 'No available devices.';
+
+  @override
+  String get deviceRecovery => 'Recovery key';
+
+  @override
+  String get deviceCurrent => 'This device';
+
+  @override
+  String get deviceOther => 'Other device';
+
+  @override
+  String get deviceRevokeAccess => 'Revoke access';
+
+  @override
+  String get deviceRevokeConfirm => 'Revoke access?';
+
+  @override
+  String get deviceRevoke => 'Revoke';
+
+  @override
+  String get deviceRecoveryWarning =>
+      'The card and all devices connected through it will lose access. Make sure you have another recovery method.';
+
+  @override
+  String get deviceCurrentWarning =>
+      'This device will lose access. Its session and subscriptions will end.';
+
+  @override
+  String get deviceOtherWarning =>
+      'The device\'s sessions and subscriptions will end.';
+
+  @override
+  String get deviceCardHelp =>
+      'After confirming, select the original JSON or PNG card. Its secret is used only to sign the request.';
+
+  @override
+  String get deviceCardPassword => 'Card password';
+
+  @override
+  String get devicesLoaded => 'Devices loaded.';
+
+  @override
+  String get deviceRevokedStatus => 'Access revoked on the server.';
+
+  @override
+  String get deviceExpiryUnknown => 'Expiry unknown';
+
+  @override
+  String deviceAccessUntil(String expiry) {
+    return 'Access until $expiry';
+  }
+
+  @override
+  String deviceExpired(String expiry) {
+    return 'Expired: $expiry';
+  }
+
+  @override
+  String deviceScopes(String scopes) {
+    return 'Permissions: $scopes';
+  }
+
+  @override
+  String deviceParent(String id) {
+    return 'Issued through: $id';
+  }
 }

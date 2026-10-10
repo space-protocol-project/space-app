@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'channels_panel.dart';
+import '../l10n/admin_localizations.dart';
 
 typedef DeviceRevoke = Future<void> Function(
   Map<String, dynamic> grant,
@@ -26,9 +27,18 @@ class DevicesPanel extends StatefulWidget {
 }
 
 class _DevicesPanelState extends State<DevicesPanel> {
+  AdminLocalizations get strings =>
+      AdminLocalizations.of(context) ??
+      lookupAdminLocalizations(const Locale('ru'));
   List<Map<String, dynamic>> devices = [];
   bool busy = false, revoked = false, confirming = false;
   String status = '';
+  String? statusKey;
+  String get localizedStatus => switch (statusKey) {
+    'devicesLoaded' => strings.devicesLoaded,
+    'deviceRevokedStatus' => strings.deviceRevokedStatus,
+    _ => status,
+  };
   @override
   void initState() {
     super.initState();
@@ -43,7 +53,10 @@ class _DevicesPanelState extends State<DevicesPanel> {
     try {
       await action();
     } catch (e) {
-      if (mounted) status = e.toString().replaceFirst('Bad state: ', '');
+      if (mounted) {
+        statusKey = null;
+        status = e.toString().replaceFirst('Bad state: ', '');
+      }
     } finally {
       if (mounted) setState(() => busy = false);
     }
@@ -56,7 +69,7 @@ class _DevicesPanelState extends State<DevicesPanel> {
       for (final value in result['devices'] as List? ?? [])
         Map<String, dynamic>.from(value as Map),
     ];
-    status = 'Устройства загружены.';
+    statusKey = 'devicesLoaded';
   }
 
   bool active(Map<String, dynamic> grant) =>
@@ -72,48 +85,51 @@ class _DevicesPanelState extends State<DevicesPanel> {
     try {
       secret = await showDialog<String>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Отозвать доступ?'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  grant['recovery'] == true
-                      ? 'Карточка и все подключённые через неё устройства потеряют доступ. Проверьте другой путь восстановления.'
-                      : current
-                      ? 'Это устройство потеряет доступ. Его сессия и подписки завершатся.'
-                      : 'Сессии и подписки устройства завершатся.',
-                ),
-                if (needsCard) ...[
-                  const SizedBox(height: 16),
-                  const Text(
-                    'После подтверждения выберите исходную карточку JSON или PNG. Секрет используется только для подписи.',
+        builder: (context) {
+          final strings =
+              AdminLocalizations.of(context) ??
+              lookupAdminLocalizations(const Locale('ru'));
+          return AlertDialog(
+            title: Text(strings.deviceRevokeConfirm),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    grant['recovery'] == true
+                        ? strings.deviceRecoveryWarning
+                        : current
+                        ? strings.deviceCurrentWarning
+                        : strings.deviceOtherWarning,
                   ),
-                  TextField(
-                    onChanged: (value) => password = value,
-                    obscureText: true,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    decoration: const InputDecoration(
-                      labelText: 'Пароль карточки',
+                  if (needsCard) ...[
+                    const SizedBox(height: 16),
+                    Text(strings.deviceCardHelp),
+                    TextField(
+                      onChanged: (value) => password = value,
+                      obscureText: true,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      decoration: InputDecoration(
+                        labelText: strings.deviceCardPassword,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Отмена'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, password),
-              child: const Text('Отозвать'),
-            ),
-          ],
-        ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(strings.cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, password),
+                child: Text(strings.deviceRevoke),
+              ),
+            ],
+          );
+        },
       );
     } finally {
       password = '';
@@ -129,15 +145,15 @@ class _DevicesPanelState extends State<DevicesPanel> {
     } else {
       await load();
     }
-    status = 'Доступ отозван на сервере.';
+    statusKey = 'deviceRevokedStatus';
   }
 
   String expiry(Map<String, dynamic> grant) {
     final seconds = int.tryParse('${grant['expiresAt']}');
-    if (seconds == null) return 'Срок неизвестен';
-    return DateTime.fromMillisecondsSinceEpoch(seconds * 1000)
-        .toLocal()
-        .toString();
+    if (seconds == null) return strings.deviceExpiryUnknown;
+    final date = DateTime.fromMillisecondsSinceEpoch(seconds * 1000).toLocal();
+    final material = MaterialLocalizations.of(context);
+    return '${material.formatShortDate(date)} ${material.formatTimeOfDay(TimeOfDay.fromDateTime(date), alwaysUse24HourFormat: true)}';
   }
 
   @override
@@ -147,17 +163,15 @@ class _DevicesPanelState extends State<DevicesPanel> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text('Устройства и разрешения', style: TextStyle(fontSize: 20)),
-          const Text(
-            'Только устройства вашей идентичности. Роль на сервере и разрешения устройства проверяются отдельно.',
-          ),
+          Text(strings.devicesTitle, style: TextStyle(fontSize: 20)),
+          Text(strings.devicesHelp),
           const SizedBox(height: 12),
           OutlinedButton(
             onPressed: busy || revoked ? null : () => run(load),
-            child: const Text('Обновить устройства'),
+            child: Text(strings.devicesRefresh),
           ),
           if (busy && !confirming) const LinearProgressIndicator(),
-          if (!busy && devices.isEmpty) const Text('Нет доступных устройств.'),
+          if (!busy && devices.isEmpty) Text(strings.devicesEmpty),
           for (final grant in devices)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
@@ -166,10 +180,10 @@ class _DevicesPanelState extends State<DevicesPanel> {
                 children: [
                   Text(
                     grant['recovery'] == true
-                        ? 'Ключ восстановления'
+                        ? strings.deviceRecovery
                         : grant['id'] == widget.currentGrantId
-                        ? 'Это устройство'
-                        : 'Другое устройство',
+                        ? strings.deviceCurrent
+                        : strings.deviceOther,
                   ),
                   SelectableText(
                     '${grant['id']}',
@@ -180,26 +194,29 @@ class _DevicesPanelState extends State<DevicesPanel> {
                   ),
                   Text(
                     grant['revoked'] == true
-                        ? 'Отозвано'
+                        ? strings.inviteRevokedState
                         : active(grant)
-                        ? 'Доступ до ${expiry(grant)}'
-                        : 'Срок истёк: ${expiry(grant)}',
+                        ? strings.deviceAccessUntil(expiry(grant))
+                        : strings.deviceExpired(expiry(grant)),
                   ),
                   Text(
-                    'Разрешения: ${(grant['scopes'] as List? ?? []).join(', ')}',
+                    strings.deviceScopes(
+                      (grant['scopes'] as List? ?? []).join(', '),
+                    ),
                   ),
                   if ((grant['parentGrantId'] as String? ?? '').isNotEmpty)
-                    Text('Выдано через: ${grant['parentGrantId']}'),
+                    Text(strings.deviceParent('${grant['parentGrantId']}')),
                   if (active(grant))
                     TextButton(
+                      key: ValueKey('revoke-device-${grant['id']}'),
                       onPressed: busy ? null : () => run(() => revoke(grant)),
-                      child: const Text('Отозвать доступ'),
+                      child: Text(strings.deviceRevokeAccess),
                     ),
                 ],
               ),
             ),
-          if (status.isNotEmpty)
-            Text(status, key: const ValueKey('devices-status')),
+          if (localizedStatus.isNotEmpty)
+            Text(localizedStatus, key: const ValueKey('devices-status')),
         ],
       ),
     ),
