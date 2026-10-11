@@ -11,6 +11,7 @@ extension HomePhaseStrings on HomePhase {
     HomePhase.installing => context.strings.homeInstalling,
     HomePhase.starting => context.strings.homeStarting,
     HomePhase.running => context.strings.homeRunning,
+    HomePhase.stopping => context.strings.homeStopping,
     HomePhase.stopped => context.strings.homeStopped,
   };
 }

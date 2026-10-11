@@ -147,7 +147,7 @@ void main() {
       find.byKey(const ValueKey('chat-draft')),
       'Мысль, к которой хочется вернуться',
     );
-    await tester.tap(find.byTooltip('Настройки приложения').first);
+    await tester.tap(find.byTooltip('Настройки приложения'));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(ChoiceChip, 'Мягкий ирис'));
     await tester.pumpAndSettle();
@@ -211,7 +211,7 @@ void main() {
       await tester.tap(destinations.at(2));
       await tester.pumpAndSettle();
       expect(find.text('Пока недоступно'), findsOneWidget);
-      await tester.tap(find.byTooltip('Настройки приложения').first);
+      await tester.tap(find.byTooltip('Настройки приложения'));
       await tester.pumpAndSettle();
       expect(find.text('Оформление пространства'), findsOneWidget);
       expect(tester.takeException(), isNull);

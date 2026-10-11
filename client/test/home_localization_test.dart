@@ -60,11 +60,11 @@ void main() {
         expect(find.text(strings.homeDownloading), findsOneWidget);
         expect(
           tester
-              .widget<LinearProgressIndicator>(
-                find.byType(LinearProgressIndicator),
+              .widget<CircularProgressIndicator>(
+                find.byType(CircularProgressIndicator),
               )
               .value,
-          .37,
+          closeTo(.05 + .55 * .37, .00001),
         );
         expect(
           tester.widget<TextField>(find.byType(TextField)).controller!.text,
@@ -82,7 +82,7 @@ void main() {
         await tester.tap(find.text(strings.stopHome));
         await tester.pumpAndSettle();
         expect(find.text(strings.goLive), findsOneWidget);
-      expect(find.text(strings.homeStopped), findsOneWidget);
+        expect(find.text(strings.homeStopped), findsOneWidget);
         expect(home.ip, ip);
         expect(tester.takeException(), isNull);
       }

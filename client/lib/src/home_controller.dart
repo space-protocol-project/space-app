@@ -16,6 +16,7 @@ enum HomePhase {
   installing,
   starting,
   running,
+  stopping,
   stopped,
 }
 
@@ -54,6 +55,51 @@ class HomeController extends ChangeNotifier {
   LocalFailureCode? failureCode;
   HomePhase phase = HomePhase.idle;
   double progress = 0;
+  double stopProgress = 0;
+  final _operationClock = Stopwatch();
+  final _downloadClock = Stopwatch();
+  Timer? _progressTimer;
+  Duration get elapsed => _operationClock.elapsed;
+  int? get downloadSecondsRemaining {
+    if (phase != HomePhase.downloading ||
+        progress <= 0 ||
+        progress >= 1 ||
+        _downloadClock.elapsedMilliseconds < 1000) {
+      return null;
+    }
+    return (_downloadClock.elapsedMilliseconds /
+            1000 *
+            (1 - progress) /
+            progress)
+        .ceil();
+  }
+
+  double get operationProgress => switch (phase) {
+    HomePhase.idle => 0.01,
+    HomePhase.detectingIP => 0.02,
+    HomePhase.downloading => 0.05 + 0.55 * progress.clamp(0, 1),
+    HomePhase.installing => 0.65,
+    HomePhase.starting => 0.80,
+    HomePhase.stopping => stopProgress,
+    HomePhase.running || HomePhase.stopped => 1,
+  };
+  void _beginProgress() {
+    _operationClock.reset();
+    _operationClock.start();
+    _downloadClock.reset();
+    _progressTimer?.cancel();
+    _progressTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => _update(),
+    );
+  }
+
+  void _endProgress() {
+    _downloadClock.stop();
+    _operationClock.stop();
+    _progressTimer?.cancel();
+  }
+
   HomeServerState? state;
   void reportError(String message) {
     error = message;
@@ -132,6 +178,7 @@ class HomeController extends ChangeNotifier {
       return target;
     }
     phase = HomePhase.downloading;
+    _downloadClock.start();
     _update();
     final staging = await Directory('${root.path}/runtimes')
         .create(recursive: true);
@@ -142,6 +189,7 @@ class HomeController extends ChangeNotifier {
         progress = value;
         _update();
       });
+      _downloadClock.stop();
       phase = HomePhase.installing;
       _update();
       final unpacked = await Directory('${temporary.path}/unpacked').create();
@@ -164,9 +212,11 @@ class HomeController extends ChangeNotifier {
   Future<HomeServerState?> start(String address) async {
     if (busy || running || _disposed) return state;
     busy = true;
+    _beginProgress();
     error = '';
     failureCode = null;
     progress = 0;
+    phase = HomePhase.idle;
     state = null;
     _diagnostic = '';
     _update();
@@ -291,6 +341,7 @@ class HomeController extends ChangeNotifier {
       return null;
     } finally {
       busy = false;
+      _endProgress();
       _update();
     }
   }
@@ -304,15 +355,22 @@ class HomeController extends ChangeNotifier {
   }
 
   Future<void> _stop() async {
+    phase = HomePhase.stopping;
+    stopProgress = .1;
+    _update();
     final process = _process;
     if (process != null) {
       // EOF запускает штатное завершение Go, затем остановку собственной PostgreSQL.
       await process.stdin.close();
+      stopProgress = .35;
+      _update();
       final code = await process.exitCode.timeout(const Duration(seconds: 30));
       if (code != 0) {
         throw StateError('Ошибка остановки домашнего сервера: $_diagnostic');
       }
       _process = null;
+      stopProgress = .95;
+      _update();
     }
     running = false;
     state = null;
@@ -323,6 +381,9 @@ class HomeController extends ChangeNotifier {
   Future<void> stop() async {
     if (busy) return;
     busy = true;
+    phase = HomePhase.stopping;
+    stopProgress = 0;
+    _beginProgress();
     error = '';
     failureCode = null;
     _update();
@@ -333,6 +394,7 @@ class HomeController extends ChangeNotifier {
       error = 'Сервер не подтвердил завершение всех процессов. Проверьте состояние перед повторным запуском.';
     } finally {
       busy = false;
+      _endProgress();
       _update();
     }
   }
@@ -340,6 +402,7 @@ class HomeController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _endProgress();
     unawaited(_process?.stdin.close());
     super.dispose();
   }

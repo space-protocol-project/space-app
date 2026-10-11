@@ -313,5 +313,23 @@
   "messageUnconfirmed": "No server confirmation. Retry with the same text.",
   "messageAccepted": "Accepted by server",
   "appSettings": "App settings",
-  "serverSettings": "Server settings"
+  "serverSettings": "Server settings",
+  "homeStopping": "Stopping server and database…",
+  "homeProgressHint": "Progress by completed stages. Process waiting time is not known in advance.",
+  "homeProgressElapsed": "Elapsed: {seconds} s",
+  "homeDownloadEstimate": "Download: about {seconds} s remaining",
+  "@homeProgressElapsed": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "@homeDownloadEstimate": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  }
 }

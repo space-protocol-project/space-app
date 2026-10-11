@@ -6,9 +6,13 @@ import 'package:space_client/src/preferences.dart';
 
 void main() {
   for (final entry in {
-    'ru': ['Все ваши пространства — рядом.', 'Настройки', 'Язык приложения'],
-    'zh-Hans': ['您的所有空间，尽在一处。', '设置', '应用语言'],
-    'en': ['All your spaces, together.', 'Settings', 'App language'],
+    'ru': [
+      'Все ваши пространства — рядом.',
+      'Настройки приложения',
+      'Язык приложения',
+    ],
+    'zh-Hans': ['您的所有空间，尽在一处。', '应用设置', '应用语言'],
+    'en': ['All your spaces, together.', 'App settings', 'App language'],
   }.entries) {
     testWidgets('Оболочка и настройки: ${entry.key}, широкое и узкое окно', (
       tester,
@@ -21,12 +25,14 @@ void main() {
       await tester.pumpWidget(const SpaceApp());
       await tester.pumpAndSettle();
       expect(find.text(entry.value[0]), findsOneWidget);
+      expect(find.byTooltip(entry.value[1]), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('app-settings-tab')));
       await tester.pumpAndSettle();
       expect(find.text(entry.value[2]), findsOneWidget);
       expect(tester.takeException(), isNull);
       tester.view.physicalSize = const Size(430, 900);
       await tester.pumpAndSettle();
+      expect(find.byTooltip(entry.value[1]), findsOneWidget);
       expect(find.text(entry.value[2]), findsOneWidget);
       expect(tester.takeException(), isNull);
       if (entry.key == 'ru') {

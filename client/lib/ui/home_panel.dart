@@ -1,3 +1,4 @@
+import 'home_operation_progress.dart';
 import '../l10n/strings.dart';
 import '../l10n/home_strings.dart';
 import '../l10n/failure_strings.dart';
@@ -114,14 +115,8 @@ class _HomePanelState extends State<HomePanel> {
             const SizedBox(height: 20),
             Text(context.strings.homePortHelp),
             const SizedBox(height: 20),
-            if (home.busy) ...[
-              LinearProgressIndicator(
-                value: home.progress > 0 && home.progress < 1
-                    ? home.progress
-                    : null,
-              ),
-              const SizedBox(height: 10),
-              Text(home.phase.label(context)),
+            if (home.busy && home.error.isEmpty) ...[
+              HomeOperationProgress(home: home),
               const SizedBox(height: 16),
             ],
             if (!home.busy && home.phase != HomePhase.idle) ...[

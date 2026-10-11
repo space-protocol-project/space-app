@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -70,8 +69,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutSpace => 'About this space';
 
   @override
-  String get independentServer =>
-      'An independent server. Each space defines your permissions and available sections.';
+  String get independentServer => 'An independent server. Each space defines your permissions and available sections.';
 
   @override
   String get deviceSignedIn => 'Signed in with a device key';
@@ -86,8 +84,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get beYourself => 'Be yourself.';
 
   @override
-  String get ownPace =>
-      'Reply at your own pace. Camera and microphone are inactive; system notifications are currently disabled.';
+  String get ownPace => 'Reply at your own pace. Camera and microphone are inactive; system notifications are currently disabled.';
 
   @override
   String get openNavigation => 'Open navigation';
@@ -111,15 +108,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcome => 'Good to have you here.';
 
   @override
-  String get welcomeDescription =>
-      'Your space, your conversations, at your own pace.';
+  String get welcomeDescription => 'Your space, your conversations, at your own pace.';
 
   @override
   String get ideas => 'A place for ideas.\nAnd the people behind them.';
 
   @override
-  String get connectDescription =>
-      'Add an independent server by its address, verify trust and join the conversation. No central account is needed.';
+  String get connectDescription => 'Add an independent server by its address, verify trust and join the conversation. No central account is needed.';
 
   @override
   String get returnChat => 'Back to the conversation';
@@ -128,8 +123,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yourConversation => 'Your conversation';
 
   @override
-  String get noMessages =>
-      'Connect a space to see messages from the selected server.';
+  String get noMessages => 'Connect a space to see messages from the selected server.';
 
   @override
   String get openChat => 'Open chat';
@@ -138,15 +132,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yourAttention => 'Your attention';
 
   @override
-  String get attentionDescription =>
-      'The app does not send system notifications or activate your camera or microphone. Keep your own pace.';
+  String get attentionDescription => 'The app does not send system notifications or activate your camera or microphone. Keep your own pace.';
 
   @override
   String get settingsTitle => 'Make yourself comfortable.';
 
   @override
-  String get settingsDescription =>
-      'Your preferences are saved on this device.';
+  String get settingsDescription => 'Your preferences are saved on this device.';
 
   @override
   String get appearance => 'Appearance';
@@ -176,8 +168,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get spaceAppearance => 'Space appearance';
 
   @override
-  String get spaceAppearanceDescription =>
-      'A server will be able to suggest colors. Your personal theme stays until you accept. This version does not receive these suggestions yet.';
+  String get spaceAppearanceDescription => 'A server will be able to suggest colors. Your personal theme stays until you accept. This version does not receive these suggestions yet.';
 
   @override
   String get language => 'App language';
@@ -209,8 +200,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get revokeTitle => 'Revoke this device?';
 
   @override
-  String get revokeDescription =>
-      'Access to this server will end. Keys stay on this computer; a new permission will not be created automatically.';
+  String get revokeDescription => 'Access to this server will end. Keys stay on this computer; a new permission will not be created automatically.';
 
   @override
   String get keep => 'Keep';
@@ -243,8 +233,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get search => 'Search';
 
   @override
-  String get recoveringEvents =>
-      'Recovering events. Messages and your draft are preserved.';
+  String get recoveringEvents => 'Recovering events. Messages and your draft are preserved.';
 
   @override
   String get chatTab => 'Chat';
@@ -267,8 +256,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get closeConnection => 'Close connection';
 
   @override
-  String get connectionIntro =>
-      'Enter an independent server address. We will check it first, then you decide whether to trust it.';
+  String get connectionIntro => 'Enter an independent server address. We will check it first, then you decide whether to trust it.';
 
   @override
   String get serverAddress => 'Server address or invitation link';
@@ -289,8 +277,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tlsCertificateFingerprint => 'TLS certificate fingerprint';
 
   @override
-  String get firstTrustHelp =>
-      'On your first visit, compare the address and fingerprint with the owner’s known details. Signing in creates separate keys for this server.';
+  String get firstTrustHelp => 'On your first visit, compare the address and fingerprint with the owner’s known details. Signing in creates separate keys for this server.';
 
   @override
   String get readerInvitation => 'Reader invitation: read-only chat access.';
@@ -305,8 +292,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get disconnectServer => 'Disconnect from server';
 
   @override
-  String get supportedConnections =>
-      'Public HTTPS servers and local HTTP are supported. Open recovery cards in Identity.';
+  String get supportedConnections => 'Public HTTPS servers and local HTTP are supported. Open recovery cards in Identity.';
 
   @override
   String get chatDescription => 'Conversations and little discoveries.';
@@ -333,15 +319,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get conversationStarts => 'The conversation starts here';
 
   @override
-  String get contactOwner =>
-      'Choose another channel or contact the space owner.';
+  String get contactOwner => 'Choose another channel or contact the space owner.';
 
   @override
   String get emptyChat => 'There are no messages in this chat yet.';
 
   @override
-  String get connectChatHelp =>
-      'Connect your space. Your keys stay on this device.';
+  String get connectChatHelp => 'Connect your space. Your keys stay on this device.';
 
   @override
   String get you => 'You';
@@ -381,12 +365,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get close => 'Close';
 
   @override
-  String get homeFirstSetup =>
-      'Space will download the server and PostgreSQL, then create a database and certificate. Your data stays on this computer.';
+  String get homeFirstSetup => 'Space will download the server and PostgreSQL, then create a database and certificate. Your data stays on this computer.';
 
   @override
-  String get homeReuse =>
-      'Starting again uses your existing server, database, keys, certificate and members.';
+  String get homeReuse => 'Starting again uses your existing server, database, keys, certificate and members.';
 
   @override
   String get homeIP => 'Static public IPv4';
@@ -401,16 +383,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get detectIP => 'Detect IP automatically';
 
   @override
-  String get homeIPPrivacy =>
-      'IP detection uses ipify. If you use a VPN, it will show the VPN address.';
+  String get homeIPPrivacy => 'IP detection uses ipify. If you use a VPN, it will show the VPN address.';
 
   @override
-  String get homeIPFailed =>
-      'Could not detect your address. Enter your static IP.';
+  String get homeIPFailed => 'Could not detect your address. Enter your static IP.';
 
   @override
-  String get homePortHelp =>
-      'To let friends connect, forward TCP port 8443 on your router to port 8443 on this computer and allow it through the firewall. Keep PostgreSQL and local ports private.';
+  String get homePortHelp => 'To let friends connect, forward TCP port 8443 on your router to port 8443 on this computer and allow it through the firewall. Keep PostgreSQL and local ports private.';
 
   @override
   String get goLive => 'Go live';
@@ -419,8 +398,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stopHome => 'Disconnect';
 
   @override
-  String get homeLink =>
-      'Your server link (paste it into the connection screen in Space)';
+  String get homeLink => 'Your server link (paste it into the connection screen in Space)';
 
   @override
   String get copyLink => 'Copy link';
@@ -429,15 +407,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get manageServer => 'Manage server';
 
   @override
-  String get homeInviteHelp =>
-      'The link does not grant administrator rights. Invite friends through Manage space → Invitations. Stopping the server disconnects them.';
+  String get homeInviteHelp => 'The link does not grant administrator rights. Invite friends through Manage space → Invitations. Stopping the server disconnects them.';
 
   @override
   String get myHomeServer => 'My home server';
 
   @override
-  String get homeRunningHelp =>
-      'The server is running. Disconnecting preserves all data.';
+  String get homeRunningHelp => 'The server is running. Disconnecting preserves all data.';
 
   @override
   String get homeStartHelp => 'Run your own space on this computer.';
@@ -477,8 +453,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverAvailabilityUnknown => 'Availability is not yet known';
 
   @override
-  String get recoveryOperationFailed =>
-      'The operation did not finish. Check access, the card and the connection.';
+  String get recoveryOperationFailed => 'The operation did not finish. Check access, the card and the connection.';
 
   @override
   String get recoveryFileLabel => 'Space card';
@@ -487,61 +462,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recoveryFormat => 'Card format';
 
   @override
-  String get recoveryFormatHelp =>
-      'PNG contains an encrypted QR code suitable for printing. JSON is a compact backup file. Keep the password separately.';
+  String get recoveryFormatHelp => 'PNG contains an encrypted QR code suitable for printing. JSON is a compact backup file. Keep the password separately.';
 
   @override
   String get recoveryPng => 'QR in PNG';
 
   @override
-  String get recoveryCardSaved =>
-      'Card saved. Test recovery on another device; store the file and password separately.';
+  String get recoveryCardSaved => 'Card saved. Test recovery on another device; store the file and password separately.';
 
   @override
   String get recoveryTooLarge => 'Card is too large';
 
   @override
-  String get recoveryReplaceWarning =>
-      'Saved keys for this address will be replaced. Back them up as a card first if they belong to another identity.';
+  String get recoveryReplaceWarning => 'Saved keys for this address will be replaced. Back them up as a card first if they belong to another identity.';
 
   @override
-  String get recoveryConnectionDenied =>
-      'Keys saved, but the server denied the connection. Check whether the card was revoked, access blocked or chat unavailable.';
+  String get recoveryConnectionDenied => 'Keys saved, but the server denied the connection. Check whether the card was revoked, access blocked or chat unavailable.';
 
   @override
-  String get recoveryRestored =>
-      'Identity restored with a new device. Check the device list and revoke lost devices.';
+  String get recoveryRestored => 'Identity restored with a new device. Check the device list and revoke lost devices.';
 
   @override
-  String get rotationRenewConfirm =>
-      'Renew the expired request using the same saved new keys? If the server already completed rotation, finish the saved rotation instead.';
+  String get rotationRenewConfirm => 'Renew the expired request using the same saved new keys? If the server already completed rotation, finish the saved rotation instead.';
 
   @override
-  String get rotationConfirm =>
-      'Rotate the root key? Your ID, permissions and history stay unchanged. Old devices and cards lose access. The new secret is first saved in a protected journal. Save a new card after rotation.';
+  String get rotationConfirm => 'Rotate the root key? Your ID, permissions and history stay unchanged. Old devices and cards lose access. The new secret is first saved in a protected journal. Save a new card after rotation.';
 
   @override
-  String get rotationServerRequired =>
-      'First check the original server address';
+  String get rotationServerRequired => 'First check the original server address';
 
   @override
   String get rotationNotPending => 'No saved key rotation for this server.';
 
   @override
-  String get rotationReconnect =>
-      'New key saved. Check server availability and reconnect.';
+  String get rotationReconnect => 'New key saved. Check server availability and reconnect.';
 
   @override
-  String get rotationCompleted =>
-      'Root key rotated; your ID is preserved. Save a new card. Old cards and devices no longer work.';
+  String get rotationCompleted => 'Root key rotated; your ID is preserved. Save a new card. Old cards and devices no longer work.';
 
   @override
-  String get recoveryRevokeCard =>
-      'Revoke the recovery key? The card and all devices connected through it will stop working. Make sure you have another access method.';
+  String get recoveryRevokeCard => 'Revoke the recovery key? The card and all devices connected through it will stop working. Make sure you have another access method.';
 
   @override
-  String get recoveryRevokeDevice =>
-      'Revoke this device? Its sessions and subscriptions will end.';
+  String get recoveryRevokeDevice => 'Revoke this device? Its sessions and subscriptions will end.';
 
   @override
   String get recoveryRevoked => 'Permission revoked on the server.';
@@ -550,39 +513,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pairingAlreadyUsed => 'Code already used or cancelled';
 
   @override
-  String get pairingManageRequest =>
-      'Space management is also requested if the role allows it.';
+  String get pairingManageRequest => 'Space management is also requested if the role allows it.';
 
   @override
-  String get pairingChatRequest =>
-      'Chat access with your permissions is requested.';
+  String get pairingChatRequest => 'Chat access with your permissions is requested.';
 
   @override
-  String get pairingReady =>
-      'The code also appears on the new device. Enter its verification code before signing.';
+  String get pairingReady => 'The code also appears on the new device. Enter its verification code before signing.';
 
   @override
-  String get pairingMismatch =>
-      'Verification codes do not match. Do not approve the connection.';
+  String get pairingMismatch => 'Verification codes do not match. Do not approve the connection.';
 
   @override
-  String get pairingSignConfirm =>
-      'Do the codes on both devices match? Sign for the new device with the specified permissions using the root authority?';
+  String get pairingSignConfirm => 'Do the codes on both devices match? Sign for the new device with the specified permissions using the root authority?';
 
   @override
-  String get pairingSigned =>
-      'Signature issued. Finish signing in on the new device.';
+  String get pairingSigned => 'Signature issued. Finish signing in on the new device.';
 
   @override
-  String get pairingStartFailed =>
-      'Could not start pairing. Check the server and PostgreSQL availability.';
+  String get pairingStartFailed => 'Could not start pairing. Check the server and PostgreSQL availability.';
 
   @override
   String get pairingCancelled => 'Pairing cancelled';
 
   @override
-  String get pairingExpired =>
-      'The code expired, was cancelled or the approval failed verification. Start again.';
+  String get pairingExpired => 'The code expired, was cancelled or the approval failed verification. Start again.';
 
   @override
   String get pairingCompareTitle => 'Compare the code on both devices';
@@ -615,8 +570,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardTitle => 'All your spaces, together.';
 
   @override
-  String get dashboardDescription =>
-      'An overview of saved servers and channels you can access. Catalogs update according to your permissions.';
+  String get dashboardDescription => 'An overview of saved servers and channels you can access. Catalogs update according to your permissions.';
 
   @override
   String get dashboardServers => 'Servers';
@@ -637,8 +591,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardEmpty => 'Add your first space';
 
   @override
-  String get dashboardEmptyHelp =>
-      'Connect to a server or create your own. Each server gets its own icon on the left.';
+  String get dashboardEmptyHelp => 'Connect to a server or create your own. Each server gets its own icon on the left.';
 
   @override
   String get dashboardCatalogUnknown => 'Catalog not yet loaded';
@@ -653,193 +606,148 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardOpen => 'Open space';
 
   @override
-  String get dashboardResourcesHelp =>
-      'The overview includes accessible channels and unread messages. Data from unavailable servers appears after reconnection.';
+  String get dashboardResourcesHelp => 'The overview includes accessible channels and unread messages. Data from unavailable servers appears after reconnection.';
 
   @override
   String get dashboardSpaces => 'Your spaces';
 
   @override
-  String get failureCardCorrupt =>
-      'The card is damaged or has an invalid format.';
+  String get failureCardCorrupt => 'The card is damaged or has an invalid format.';
 
   @override
-  String get failurePasswordInvalid =>
-      'The password must contain at least 12 characters and no more than 512 bytes.';
+  String get failurePasswordInvalid => 'The password must contain at least 12 characters and no more than 512 bytes.';
 
   @override
   String get failureCardTooLarge => 'The card exceeds the allowed size.';
 
   @override
-  String get failureCardUnsupported =>
-      'The card format or encryption parameters are unsupported.';
+  String get failureCardUnsupported => 'The card format or encryption parameters are unsupported.';
 
   @override
-  String get failureCardAuthentication =>
-      'Wrong password or damaged card. Check the file and password.';
+  String get failureCardAuthentication => 'Wrong password or damaged card. Check the file and password.';
 
   @override
-  String get failureReleaseInvalid =>
-      'The server release descriptor failed validation. Installation stopped.';
+  String get failureReleaseInvalid => 'The server release descriptor failed validation. Installation stopped.';
 
   @override
-  String get failurePlatformUnsupported =>
-      'No verified home server release is available for this platform.';
+  String get failurePlatformUnsupported => 'No verified home server release is available for this platform.';
 
   @override
-  String get failureDownloadAddress =>
-      'The server download address is not allowed. Installation stopped.';
+  String get failureDownloadAddress => 'The server download address is not allowed. Installation stopped.';
 
   @override
-  String get failureDownloadFailed =>
-      'Could not download the server. Check the connection and try again.';
+  String get failureDownloadFailed => 'Could not download the server. Check the connection and try again.';
 
   @override
-  String get failureRedirectLimit =>
-      'The download has too many redirects. Installation stopped.';
+  String get failureRedirectLimit => 'The download has too many redirects. Installation stopped.';
 
   @override
-  String get failureReleaseSize =>
-      'The server download is incomplete or its size is incorrect. Download it again.';
+  String get failureReleaseSize => 'The server download is incomplete or its size is incorrect. Download it again.';
 
   @override
-  String get failureHashMismatch =>
-      'The release checksum does not match. This archive must not be executed.';
+  String get failureHashMismatch => 'The release checksum does not match. This archive must not be executed.';
 
   @override
-  String get failureArchiveInvalid =>
-      'The server archive contains invalid paths, files or sizes. Installation stopped.';
+  String get failureArchiveInvalid => 'The server archive contains invalid paths, files or sizes. Installation stopped.';
 
   @override
-  String get failureExecutePermission =>
-      'Could not grant permission to run the server. Check access to the application directory.';
+  String get failureExecutePermission => 'Could not grant permission to run the server. Check access to the application directory.';
 
   @override
-  String get failureHomeStartFailed =>
-      'Could not start the home server. Check data access, available ports and connection settings.';
+  String get failureHomeStartFailed => 'Could not start the home server. Check data access, available ports and connection settings.';
 
   @override
-  String get failureHomeStopFailed =>
-      'The server did not confirm that all processes stopped. Check its state before restarting.';
+  String get failureHomeStopFailed => 'The server did not confirm that all processes stopped. Check its state before restarting.';
 
   @override
-  String get failurePermissionDenied =>
-      'The server denied access. Check your role, block status and invitation.';
+  String get failurePermissionDenied => 'The server denied access. Check your role, block status and invitation.';
 
   @override
-  String get failureUnauthenticated =>
-      'The session or device authorization is invalid. Sign in again; no new authorization is created automatically.';
+  String get failureUnauthenticated => 'The session or device authorization is invalid. Sign in again; no new authorization is created automatically.';
 
   @override
-  String get failureServerLimit =>
-      'A server limit was reached. Try again later.';
+  String get failureServerLimit => 'A server limit was reached. Try again later.';
 
   @override
-  String get failureConnectionFailed =>
-      'Could not reach the server. Check the address and network.';
+  String get failureConnectionFailed => 'Could not reach the server. Check the address and network.';
 
   @override
-  String get failureTlsRejected =>
-      'The secure connection could not be verified. Check the certificate and trusted fingerprint.';
+  String get failureTlsRejected => 'The secure connection could not be verified. Check the certificate and trusted fingerprint.';
 
   @override
-  String get failureProtocolInvalid =>
-      'The server returned incompatible or invalid data. The operation was stopped.';
+  String get failureProtocolInvalid => 'The server returned incompatible or invalid data. The operation was stopped.';
 
   @override
-  String get failureIdentityInvalid =>
-      'Key, signature or identity verification failed. The operation was stopped.';
+  String get failureIdentityInvalid => 'Key, signature or identity verification failed. The operation was stopped.';
 
   @override
-  String get failureAddressInvalid =>
-      'Enter an HTTPS server address or a local HTTP address. Check the link and invitation code.';
+  String get failureAddressInvalid => 'Enter an HTTPS server address or a local HTTP address. Check the link and invitation code.';
 
   @override
-  String get failureOperationFailed =>
-      'The operation failed. Check the connection and access to secure storage.';
+  String get failureOperationFailed => 'The operation failed. Check the connection and access to secure storage.';
 
   @override
-  String get failureRetrySameRequest =>
-      'Retrying the same text reuses the original request key.';
+  String get failureRetrySameRequest => 'Retrying the same text reuses the original request key.';
 
   @override
-  String get failurePositionsLoad =>
-      'Could not load reading positions. History will be loaded again.';
+  String get failurePositionsLoad => 'Could not load reading positions. History will be loaded again.';
 
   @override
-  String get failurePositionsSave =>
-      'The reading position was updated but could not be saved on this device.';
+  String get failurePositionsSave => 'The reading position was updated but could not be saved on this device.';
 
   @override
-  String get failureChannelChanged =>
-      'Channel permissions changed. Refresh the chat before retrying.';
+  String get failureChannelChanged => 'Channel permissions changed. Refresh the chat before retrying.';
 
   @override
-  String get failureChannelUnavailable =>
-      'Access to this channel changed. Select an accessible chat.';
+  String get failureChannelUnavailable => 'Access to this channel changed. Select an accessible chat.';
 
   @override
-  String get failureEventsUnsupported =>
-      'This server does not support event subscriptions yet. Update the server.';
+  String get failureEventsUnsupported => 'This server does not support event subscriptions yet. Update the server.';
 
   @override
-  String get failureCursorRejected =>
-      'The server rejected the history cursor. Reconnect to load messages.';
+  String get failureCursorRejected => 'The server rejected the history cursor. Reconnect to load messages.';
 
   @override
-  String get failureDeviceRevoked =>
-      'Access for this device was revoked. Keys were preserved; no new authorization is created automatically.';
+  String get failureDeviceRevoked => 'Access for this device was revoked. Keys were preserved; no new authorization is created automatically.';
 
   @override
-  String get failureQrTooLarge =>
-      'The card is too large for QR. Save it as JSON.';
+  String get failureQrTooLarge => 'The card is too large for QR. Save it as JSON.';
 
   @override
-  String get failureQrFileTooLarge =>
-      'The file exceeds the size limit: PNG 8 MiB, JSON 16 KiB.';
+  String get failureQrFileTooLarge => 'The file exceeds the size limit: PNG 8 MiB, JSON 16 KiB.';
 
   @override
-  String get failureQrImageInvalid =>
-      'The PNG is damaged or has invalid dimensions. Use the original file, 64–2048 pixels on each side.';
+  String get failureQrImageInvalid => 'The PNG is damaged or has invalid dimensions. Use the original file, 64–2048 pixels on each side.';
 
   @override
-  String get failureQrUnreadable =>
-      'The QR could not be read or is not a Space card. Select the original PNG with white margins.';
+  String get failureQrUnreadable => 'The QR could not be read or is not a Space card. Select the original PNG with white margins.';
 
   @override
-  String get failureKeyStorageMismatch =>
-      'The key record belongs to another address. The operation was stopped.';
+  String get failureKeyStorageMismatch => 'The key record belongs to another address. The operation was stopped.';
 
   @override
-  String get failureKeyStorageSave =>
-      'Secure storage did not confirm that keys were saved. Rotation is not submitted without a saved key.';
+  String get failureKeyStorageSave => 'Secure storage did not confirm that keys were saved. Rotation is not submitted without a saved key.';
 
   @override
-  String get failureKeyJournalInvalid =>
-      'The key rotation journal is damaged or exceeds 64 KiB. Check secure storage.';
+  String get failureKeyJournalInvalid => 'The key rotation journal is damaged or exceeds 64 KiB. Check secure storage.';
 
   @override
-  String get failureCameraDenied =>
-      'Camera access was denied. Allow it in system settings.';
+  String get failureCameraDenied => 'Camera access was denied. Allow it in system settings.';
 
   @override
-  String get failureCameraUnavailable =>
-      'The camera is unavailable or busy. Restore from PNG or JSON instead.';
+  String get failureCameraUnavailable => 'The camera is unavailable or busy. Restore from PNG or JSON instead.';
 
   @override
-  String get failureCameraFrame =>
-      'Could not read the frame. Check the camera or select a file.';
+  String get failureCameraFrame => 'Could not read the frame. Check the camera or select a file.';
 
   @override
-  String get failureCameraStopped =>
-      'The camera was stopped. Select Restart camera.';
+  String get failureCameraStopped => 'The camera was stopped. Select Restart camera.';
 
   @override
   String get sendingMessage => 'Sending…';
 
   @override
-  String get messageUnconfirmed =>
-      'No server confirmation. Retry with the same text.';
+  String get messageUnconfirmed => 'No server confirmation. Retry with the same text.';
 
   @override
   String get messageAccepted => 'Accepted by server';
@@ -849,4 +757,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverSettings => 'Server settings';
+
+  @override
+  String get homeStopping => 'Stopping server and database…';
+
+  @override
+  String get homeProgressHint => 'Progress by completed stages. Process waiting time is not known in advance.';
+
+  @override
+  String homeProgressElapsed(int seconds) {
+    return 'Elapsed: $seconds s';
+  }
+
+  @override
+  String homeDownloadEstimate(int seconds) {
+    return 'Download: about $seconds s remaining';
+  }
 }

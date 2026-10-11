@@ -1,3 +1,4 @@
+import 'home_operation_progress.dart';
 import '../l10n/failure_strings.dart';
 import '../l10n/strings.dart';
 import 'admin_panel.dart';
@@ -156,6 +157,7 @@ class _SpaceShellState extends State<SpaceShell> {
   @override
   void initState() {
     super.initState();
+    dashboard = widget.controller == null;
     unawaited(home.load());
     final initialOrigin = initialController.preview?.origin.toString();
     if (initialOrigin != null && initialController.connected) {
@@ -439,14 +441,6 @@ class _SpaceShellState extends State<SpaceShell> {
             ),
           ),
           const SizedBox(height: 16),
-          SpaceActionButton(
-            onPressed: controller.busy ? null : () => connection(),
-            icon: controller.connected ? Icons.link_outlined : Icons.add,
-            label: controller.connected
-                ? context.strings.connection
-                : context.strings.addSpace,
-          ),
-          const SizedBox(height: 20),
           if (controller.channels.isNotEmpty) ...[
             const Divider(height: 24),
             Text(context.strings.channels, style: TextStyle(fontSize: 12)),
@@ -546,46 +540,11 @@ class _SpaceShellState extends State<SpaceShell> {
                       await target.refreshChannels();
                     },
             ),
-          if (widget.preferences.origins.isNotEmpty) ...[
-            const Divider(height: 30),
-            Text(context.strings.recentSpaces, style: TextStyle(fontSize: 12)),
-            const SizedBox(height: 8),
-            for (final origin in widget.preferences.origins)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Tooltip(
-                  message: presence.online(origin) == null
-                      ? context.strings.serverAvailabilityUnknown
-                      : presence.online(origin) == true
-                      ? context.strings.serverNowOnline(
-                          Uri.parse(origin).authority,
-                        )
-                      : context.strings.serverNowOffline(
-                          Uri.parse(origin).authority,
-                        ),
-                  child: Icon(
-                    presence.online(origin) == null
-                        ? Icons.public
-                        : presence.online(origin) == true
-                        ? Icons.cloud_done_outlined
-                        : Icons.cloud_off_outlined,
-                    size: 18,
-                    color: presence.online(origin) == true
-                        ? Theme.of(context).colorScheme.secondary
-                        : Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                title: Text(origin, style: const TextStyle(fontSize: 11)),
-                onTap: () => openSpace(origin),
-              ),
-          ],
-          const SizedBox(height: 20),
-          Text(context.strings.prototype, style: TextStyle(fontSize: 11)),
         ],
       ),
     ),
   );
-  Widget navigationSidebar() => dashboard && widget.controller == null
+  Widget navigationSidebar() => dashboard
       ? SizedBox(
           width: 280,
           child: Material(
@@ -594,7 +553,7 @@ class _SpaceShellState extends State<SpaceShell> {
               padding: const EdgeInsets.all(20),
               children: [
                 Text(
-                  context.strings.dashboardSpaces,
+                  context.strings.recentSpaces,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 16),
@@ -628,12 +587,6 @@ class _SpaceShellState extends State<SpaceShell> {
                     ),
                     onTap: () => openSpace(origin),
                   ),
-                const Divider(height: 28),
-                ListTile(
-                  leading: const Icon(Icons.tune),
-                  title: Text(context.strings.appSettings),
-                  onTap: showApplicationSettings,
-                ),
               ],
             ),
           ),
@@ -711,17 +664,34 @@ class _SpaceShellState extends State<SpaceShell> {
                       !dashboard &&
                       identical(controller, workspaces[origin]),
                   onPressed: () => openSpace(origin),
-                  icon: Text(
-                    (workspaces[origin]?.spaceTitle.isNotEmpty == true
-                            ? workspaces[origin]!.spaceTitle
-                            : Uri.parse(origin).host)
-                        .characters
-                        .take(1)
-                        .toString()
-                        .toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                  icon: Tooltip(
+                    message: presence.online(origin) == null
+                        ? origin
+                        : presence.online(origin) == true
+                        ? context.strings.serverNowOnline(
+                            Uri.parse(origin).host,
+                          )
+                        : context.strings.serverNowOffline(
+                            Uri.parse(origin).host,
+                          ),
+                    child: Badge(
+                      isLabelVisible: presence.online(origin) != null,
+                      backgroundColor: presence.online(origin) == true
+                          ? Colors.green
+                          : Theme.of(context).colorScheme.outlineVariant,
+                      child: Text(
+                        (workspaces[origin]?.spaceTitle.isNotEmpty == true
+                                ? workspaces[origin]!.spaceTitle
+                                : Uri.parse(origin).host)
+                            .characters
+                            .take(1)
+                            .toString()
+                            .toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -741,10 +711,7 @@ class _SpaceShellState extends State<SpaceShell> {
           selected: home.running,
           onPressed: home.busy || controller.busy ? null : showHome,
           icon: home.busy
-              ? const SizedBox.square(
-                  dimension: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
+              ? HomeOperationProgress(home: home, compact: true)
               : Icon(home.running ? Icons.power_settings_new : Icons.sensors),
         ),
         railButton(
@@ -938,11 +905,12 @@ class _SpaceShellState extends State<SpaceShell> {
                 : Icons.cloud_off_outlined,
           ),
         ),
-        IconButton(
-          tooltip: context.strings.appSettings,
-          onPressed: showApplicationSettings,
-          icon: const Icon(Icons.tune),
-        ),
+        if (compact)
+          IconButton(
+            tooltip: context.strings.appSettings,
+            onPressed: showApplicationSettings,
+            icon: const Icon(Icons.tune),
+          ),
         IconButton(
           tooltip: context.strings.search,
           onPressed: search,

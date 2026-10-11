@@ -313,5 +313,23 @@
   "messageUnconfirmed": "未收到服务器确认。请重试相同文本。",
   "messageAccepted": "服务器已接收",
   "appSettings": "应用设置",
-  "serverSettings": "服务器设置"
+  "serverSettings": "服务器设置",
+  "homeStopping": "正在停止服务器和数据库…",
+  "homeProgressHint": "按已完成阶段显示进度。无法提前确定进程等待时间。",
+  "homeProgressElapsed": "已用时：{seconds} 秒",
+  "homeDownloadEstimate": "下载：预计还需 {seconds} 秒",
+  "@homeProgressElapsed": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "@homeDownloadEstimate": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  }
 }

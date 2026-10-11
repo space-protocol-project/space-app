@@ -313,5 +313,23 @@
   "messageUnconfirmed": "Нет подтверждения сервера. Повторите отправку с тем же текстом.",
   "messageAccepted": "Принято сервером",
   "appSettings": "Настройки приложения",
-  "serverSettings": "Настройки сервера"
+  "serverSettings": "Настройки сервера",
+  "homeStopping": "Отключаем сервер и базу данных…",
+  "homeProgressHint": "Готовность по этапам. Точное время ожидания процесса заранее неизвестно.",
+  "homeProgressElapsed": "Прошло: {seconds} с",
+  "homeDownloadEstimate": "Загрузка: примерно {seconds} с осталось",
+  "@homeProgressElapsed": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "@homeDownloadEstimate": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  }
 }
