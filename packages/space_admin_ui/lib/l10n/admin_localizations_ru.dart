@@ -730,4 +730,40 @@ class AdminLocalizationsRu extends AdminLocalizations {
   String cameraLabel(int number, String name) {
     return 'Камера $number — $name';
   }
+
+  @override
+  String get serverIconTitle => 'Иконка пространства';
+
+  @override
+  String get serverIconUpload => 'Выбрать PNG или SVG';
+
+  @override
+  String get serverIconHelp =>
+      'PNG уменьшается до значка. SVG: базовые фигуры без скриптов и внешних ссылок, до 8 КиБ.';
+
+  @override
+  String get serverIconInvalid =>
+      'Не удалось прочитать иконку. Выберите PNG до 2048×2048 или простой SVG до 8 КиБ.';
+
+  @override
+  String get serverIconUpgrade =>
+      'Для изменения иконки требуется обновление сервера.';
+
+  @override
+  String get iconOrbit => 'Орбита';
+
+  @override
+  String get iconPlanet => 'Планета';
+
+  @override
+  String get iconLeaf => 'Лист';
+
+  @override
+  String get iconStar => 'Звезда';
+
+  @override
+  String get iconBolt => 'Молния';
+
+  @override
+  String get iconRocket => 'Ракета';
 }

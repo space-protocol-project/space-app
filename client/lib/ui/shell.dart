@@ -1,3 +1,5 @@
+import 'package:space_admin_ui/space_admin_ui.dart' show ServerIconView;
+
 import 'home_operation_progress.dart';
 import '../l10n/failure_strings.dart';
 import '../l10n/strings.dart';
@@ -29,7 +31,7 @@ enum Section {
   feed(Icons.view_agenda_outlined),
   rooms(Icons.headset_mic_outlined),
   identity(Icons.shield_outlined),
-  settings(Icons.tune);
+  settings(Icons.settings_suggest_outlined);
 
   const Section(this.icon);
   final IconData icon;
@@ -40,7 +42,7 @@ enum Section {
     Section.feed => context.strings.feed,
     Section.rooms => context.strings.rooms,
     Section.identity => context.strings.identity,
-    Section.settings => context.strings.serverSettings,
+    Section.settings => context.strings.manageSpace,
   };
 }
 
@@ -76,6 +78,7 @@ class _SpaceShellState extends State<SpaceShell> {
       widget.workspaces ?? ServerWorkspaces(vault: initialController.vault);
   bool dashboard = true;
   bool applicationSettings = false;
+  bool managementOpen = false;
   void showDashboard() {
     setState(() {
       applicationSettings = false;
@@ -123,6 +126,17 @@ class _SpaceShellState extends State<SpaceShell> {
         probe: (origin) => probeSavedServer(origin, SecureIdentityVault()),
       );
   StreamSubscription<ServerPresenceChange>? presenceChanges;
+  void cacheServerIcons() {
+    for (final entry in workspaces.controllers.entries) {
+      final icon = entry.value.serverIcon;
+      if (icon != null) {
+        unawaited(
+          widget.preferences.cacheServerIcon(entry.key, icon.toProto3Json()),
+        );
+      }
+    }
+  }
+
   void watchSavedServers() {
     presence.watch(widget.preferences.origins);
     workspaces.synchronize(widget.preferences.origins);
@@ -168,6 +182,7 @@ class _SpaceShellState extends State<SpaceShell> {
       );
     }
     widget.preferences.addListener(watchSavedServers);
+    workspaces.addListener(cacheServerIcons);
     presenceChanges = presence.changes.listen(announcePresence);
     watchSavedServers();
   }
@@ -306,11 +321,16 @@ class _SpaceShellState extends State<SpaceShell> {
     final administration = target.administration;
     if (target.busy || administration == null) return;
     scaffold.currentState?.closeDrawer();
-    await openServerAdministration(
-      context,
-      administration,
-      onDeviceRevoked: () => target.disconnect(),
-    );
+    setState(() => managementOpen = true);
+    try {
+      await openServerAdministration(
+        context,
+        administration,
+        onDeviceRevoked: () => target.disconnect(),
+      );
+    } finally {
+      if (mounted) setState(() => managementOpen = false);
+    }
     await target.refreshChannels();
   }
 
@@ -330,6 +350,7 @@ class _SpaceShellState extends State<SpaceShell> {
   @override
   void dispose() {
     widget.preferences.removeListener(watchSavedServers);
+    workspaces.removeListener(cacheServerIcons);
     unawaited(presenceChanges?.cancel());
     if (widget.presence == null) presence.dispose();
     home.dispose();
@@ -521,25 +542,6 @@ class _SpaceShellState extends State<SpaceShell> {
                     : () => select(section),
               ),
             ),
-          if (controller.administration != null)
-            ListTile(
-              leading: const Icon(Icons.settings_suggest_outlined),
-              title: Text(context.strings.manageSpace),
-              onTap: controller.busy
-                  ? null
-                  : () async {
-                      final target = controller;
-                      scaffold.currentState?.closeDrawer();
-                      await openServerAdministration(
-                        context,
-                        target.administration!,
-                        onDeviceRevoked: () {
-                          target.disconnect();
-                        },
-                      );
-                      await target.refreshChannels();
-                    },
-            ),
         ],
       ),
     ),
@@ -679,18 +681,10 @@ class _SpaceShellState extends State<SpaceShell> {
                       backgroundColor: presence.online(origin) == true
                           ? Colors.green
                           : Theme.of(context).colorScheme.outlineVariant,
-                      child: Text(
-                        (workspaces[origin]?.spaceTitle.isNotEmpty == true
-                                ? workspaces[origin]!.spaceTitle
-                                : Uri.parse(origin).host)
-                            .characters
-                            .take(1)
-                            .toString()
-                            .toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      child: ServerIconView(
+                        value:
+                            workspaces[origin]?.serverIcon?.toProto3Json() ??
+                            widget.preferences.serverIcons[origin],
                       ),
                     ),
                   ),
@@ -809,8 +803,13 @@ class _SpaceShellState extends State<SpaceShell> {
       ChatView(
         key: const ValueKey('live-chat'),
         controller: controller,
-        active: !applicationSettings && !dashboard && selected == Section.chat,
+        active:
+            !managementOpen &&
+            !applicationSettings &&
+            !dashboard &&
+            selected == Section.chat,
         showHeader: false,
+        sendWithShift: widget.preferences.sendShortcut == 'shiftEnter',
         openConnection: () => connection(),
       ),
       UnavailablePanel(

@@ -62,6 +62,8 @@ dependencies:
   camera_windows:
     path: vendor/camera_windows
   connectrpc: 2.0.0
+  flutter_markdown_plus: 1.0.12
+  url_launcher: 6.3.3
 
 dev_dependencies:
   flutter_test:

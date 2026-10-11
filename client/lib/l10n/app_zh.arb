@@ -5,7 +5,7 @@
   "forum": "讨论",
   "feed": "动态",
   "rooms": "会议",
-  "identity": "身份",
+  "identity": "我的访问权限与设备",
   "settings": "设置",
   "yourSpace": "你的空间",
   "connected": "已连接",
@@ -18,7 +18,7 @@
   "prototype": "实验性桌面应用",
   "logo": "Space 标志",
   "selectedSpace": "当前空间",
-  "myIdentity": "我的身份",
+  "myIdentity": "我的访问权限与设备",
   "aboutSpace": "关于此空间",
   "independentServer": "独立服务器。每个空间分别决定你的权限和可用功能。",
   "deviceSignedIn": "已使用设备密钥登录",
@@ -331,5 +331,8 @@
         "type": "int"
       }
     }
-  }
+  },
+  "identityDescription": "所选空间的密钥、权限和访问恢复。",
+  "sendShortcutTitle": "发送快捷键",
+  "sendShortcutHelp": "选择 Enter 或 Shift+Enter 发送。另一组合键用于换行。"
 }

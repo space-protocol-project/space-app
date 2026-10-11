@@ -59,7 +59,7 @@ void main() {
           image.dispose();
         });
         for (final screen in {
-          'Идентичность': 'client-identity',
+          'Мой доступ и устройства': 'client-identity',
           'Настройки': 'client-settings',
         }.entries) {
           await tester.tap(find.widgetWithText(ListTile, screen.key));

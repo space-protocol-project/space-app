@@ -2991,6 +2991,86 @@ class UpdateSettingsResponse extends $pb.GeneratedMessage {
   SpaceSettings ensureSettings() => $_ensure(0);
 }
 
+class ServerIcon extends $pb.GeneratedMessage {
+  factory ServerIcon({
+    $core.String? preset,
+    $core.String? mediaType,
+    $core.List<$core.int>? data,
+  }) {
+    final result = ServerIcon._();
+    if (preset != null) result.preset = preset;
+    if (mediaType != null) result.mediaType = mediaType;
+    if (data != null) result.data = data;
+    return result;
+  }
+
+  ServerIcon._();
+
+  factory ServerIcon.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ServerIcon()..mergeFromBuffer(data, registry);
+  factory ServerIcon.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ServerIcon()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ServerIcon',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ServerIcon.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'preset')
+    ..aOS(2, _omitFieldNames ? '' : 'mediaType')
+    ..a<$core.List<$core.int>>(
+        3, _omitFieldNames ? '' : 'data', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ServerIcon clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ServerIcon copyWith(void Function(ServerIcon) updates) =>
+      super.copyWith((message) => updates(message as ServerIcon)) as ServerIcon;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ServerIcon() / ServerIcon.new instead')
+  static ServerIcon create() => ServerIcon._();
+  static $pb.GeneratedMessage $_createMessage() => ServerIcon._();
+  @$core.override
+  ServerIcon createEmptyInstance() => ServerIcon._();
+  @$core.pragma('dart2js:noInline')
+  static ServerIcon getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ServerIcon>(ServerIcon.$_createMessage);
+  static ServerIcon? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get preset => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set preset($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPreset() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPreset() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get mediaType => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set mediaType($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasMediaType() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearMediaType() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get data => $_getN(2);
+  @$pb.TagNumber(3)
+  set data($core.List<$core.int> value) => $_setBytes(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasData() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearData() => $_clearField(3);
+}
+
 class SpaceSettings extends $pb.GeneratedMessage {
   factory SpaceSettings({
     $core.String? title,
@@ -2998,6 +3078,7 @@ class SpaceSettings extends $pb.GeneratedMessage {
     $core.bool? chatEnabled,
     $core.String? registrationPolicy,
     $fixnum.Int64? revision,
+    ServerIcon? icon,
   }) {
     final result = SpaceSettings._();
     if (title != null) result.title = title;
@@ -3006,6 +3087,7 @@ class SpaceSettings extends $pb.GeneratedMessage {
     if (registrationPolicy != null)
       result.registrationPolicy = registrationPolicy;
     if (revision != null) result.revision = revision;
+    if (icon != null) result.icon = icon;
     return result;
   }
 
@@ -3027,6 +3109,8 @@ class SpaceSettings extends $pb.GeneratedMessage {
     ..aOB(3, _omitFieldNames ? '' : 'chatEnabled')
     ..aOS(4, _omitFieldNames ? '' : 'registrationPolicy')
     ..aInt64(5, _omitFieldNames ? '' : 'revision')
+    ..aOM<ServerIcon>(6, _omitFieldNames ? '' : 'icon',
+        subBuilder: ServerIcon.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -3095,6 +3179,17 @@ class SpaceSettings extends $pb.GeneratedMessage {
   $core.bool hasRevision() => $_has(4);
   @$pb.TagNumber(5)
   void clearRevision() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  ServerIcon get icon => $_getN(5);
+  @$pb.TagNumber(6)
+  set icon(ServerIcon value) => $_setField(6, value);
+  @$pb.TagNumber(6)
+  $core.bool hasIcon() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearIcon() => $_clearField(6);
+  @$pb.TagNumber(6)
+  ServerIcon ensureIcon() => $_ensure(5);
 }
 
 class UpdateSettingsRequest extends $pb.GeneratedMessage {
@@ -3104,6 +3199,7 @@ class UpdateSettingsRequest extends $pb.GeneratedMessage {
     $core.bool? chatEnabled,
     $core.String? registrationPolicy,
     $fixnum.Int64? expectedRevision,
+    ServerIcon? icon,
   }) {
     final result = UpdateSettingsRequest._();
     if (title != null) result.title = title;
@@ -3112,6 +3208,7 @@ class UpdateSettingsRequest extends $pb.GeneratedMessage {
     if (registrationPolicy != null)
       result.registrationPolicy = registrationPolicy;
     if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    if (icon != null) result.icon = icon;
     return result;
   }
 
@@ -3133,6 +3230,8 @@ class UpdateSettingsRequest extends $pb.GeneratedMessage {
     ..aOB(3, _omitFieldNames ? '' : 'chatEnabled')
     ..aOS(4, _omitFieldNames ? '' : 'registrationPolicy')
     ..aInt64(5, _omitFieldNames ? '' : 'expectedRevision')
+    ..aOM<ServerIcon>(6, _omitFieldNames ? '' : 'icon',
+        subBuilder: ServerIcon.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -3203,6 +3302,17 @@ class UpdateSettingsRequest extends $pb.GeneratedMessage {
   $core.bool hasExpectedRevision() => $_has(4);
   @$pb.TagNumber(5)
   void clearExpectedRevision() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  ServerIcon get icon => $_getN(5);
+  @$pb.TagNumber(6)
+  set icon(ServerIcon value) => $_setField(6, value);
+  @$pb.TagNumber(6)
+  $core.bool hasIcon() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearIcon() => $_clearField(6);
+  @$pb.TagNumber(6)
+  ServerIcon ensureIcon() => $_ensure(5);
 }
 
 class SubscribeRequest extends $pb.GeneratedMessage {
@@ -4026,12 +4136,14 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     $core.String? serverId,
     $core.Iterable<Channel>? channels,
     $core.String? title,
+    ServerIcon? icon,
   }) {
     final result = GetManifestResponse._();
     if (protocolVersion != null) result.protocolVersion = protocolVersion;
     if (serverId != null) result.serverId = serverId;
     if (channels != null) result.channels.addAll(channels);
     if (title != null) result.title = title;
+    if (icon != null) result.icon = icon;
     return result;
   }
 
@@ -4053,6 +4165,8 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     ..pPM<Channel>(3, _omitFieldNames ? '' : 'channels',
         subBuilder: Channel.$_createMessage)
     ..aOS(4, _omitFieldNames ? '' : 'title')
+    ..aOM<ServerIcon>(5, _omitFieldNames ? '' : 'icon',
+        subBuilder: ServerIcon.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -4107,6 +4221,17 @@ class GetManifestResponse extends $pb.GeneratedMessage {
   $core.bool hasTitle() => $_has(3);
   @$pb.TagNumber(4)
   void clearTitle() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  ServerIcon get icon => $_getN(4);
+  @$pb.TagNumber(5)
+  set icon(ServerIcon value) => $_setField(5, value);
+  @$pb.TagNumber(5)
+  $core.bool hasIcon() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearIcon() => $_clearField(5);
+  @$pb.TagNumber(5)
+  ServerIcon ensureIcon() => $_ensure(4);
 }
 
 class Channel extends $pb.GeneratedMessage {
@@ -6213,6 +6338,7 @@ class WatchChannelsResponse extends $pb.GeneratedMessage {
     $core.String? role,
     $core.bool? heartbeat,
     $core.String? serverId,
+    ServerIcon? icon,
   }) {
     final result = WatchChannelsResponse._();
     if (channels != null) result.channels.addAll(channels);
@@ -6220,6 +6346,7 @@ class WatchChannelsResponse extends $pb.GeneratedMessage {
     if (role != null) result.role = role;
     if (heartbeat != null) result.heartbeat = heartbeat;
     if (serverId != null) result.serverId = serverId;
+    if (icon != null) result.icon = icon;
     return result;
   }
 
@@ -6242,6 +6369,8 @@ class WatchChannelsResponse extends $pb.GeneratedMessage {
     ..aOS(3, _omitFieldNames ? '' : 'role')
     ..aOB(4, _omitFieldNames ? '' : 'heartbeat')
     ..aOS(5, _omitFieldNames ? '' : 'serverId')
+    ..aOM<ServerIcon>(6, _omitFieldNames ? '' : 'icon',
+        subBuilder: ServerIcon.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6306,6 +6435,17 @@ class WatchChannelsResponse extends $pb.GeneratedMessage {
   $core.bool hasServerId() => $_has(4);
   @$pb.TagNumber(5)
   void clearServerId() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  ServerIcon get icon => $_getN(5);
+  @$pb.TagNumber(6)
+  set icon(ServerIcon value) => $_setField(6, value);
+  @$pb.TagNumber(6)
+  $core.bool hasIcon() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearIcon() => $_clearField(6);
+  @$pb.TagNumber(6)
+  ServerIcon ensureIcon() => $_ensure(5);
 }
 
 const $core.bool _omitFieldNames =

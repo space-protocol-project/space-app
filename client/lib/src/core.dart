@@ -422,10 +422,15 @@ abstract interface class RootRotationControl {
   Future<void> prepareRotation({bool renew = false});
 }
 
+abstract interface class ServerIconPresentation {
+  ServerIcon? get serverIcon;
+}
+
 class SpaceSession
     implements
         LiveSession,
         SpacePresentation,
+        ServerIconPresentation,
         SpaceAccess,
         DeviceManagement,
         AdministrativeDeviceControl,
@@ -441,6 +446,8 @@ class SpaceSession
   String _token = '';
   @override
   String spaceTitle = '';
+  @override
+  ServerIcon? serverIcon;
   @override
   String chatTitle = 'Общий чат';
   String role = '';
@@ -488,10 +495,15 @@ class SpaceSession
       ListChannelsRequest(includeArchived: true),
       options: _options,
     );
-    _applyCatalog(result.channels, manifest.title);
+    _applyCatalog(
+      result.channels,
+      manifest.title,
+      manifest.hasIcon() ? manifest.icon : null,
+    );
   }
 
-  void _applyCatalog(List<Channel> channels, String title) {
+  void _applyCatalog(List<Channel> channels, String title, [ServerIcon? icon]) {
+    if (icon != null) serverIcon = icon;
     final seen = <String>{};
     for (final c in channels) {
       if (!RegExp(r'^[a-z][a-z0-9_-]{0,63}$').hasMatch(c.id) ||
@@ -547,6 +559,7 @@ class SpaceSession
         if (frame.heartbeat) {
           if (frame.channels.isNotEmpty ||
               frame.spaceTitle.isNotEmpty ||
+              frame.hasIcon() ||
               frame.role.isNotEmpty) {
             throw const LocalFailure(
               LocalFailureCode.protocolInvalid,
@@ -562,7 +575,11 @@ class SpaceSession
             'Некорректный снимок каталога',
           );
         }
-        _applyCatalog(frame.channels, frame.spaceTitle);
+        _applyCatalog(
+          frame.channels,
+          frame.spaceTitle,
+          frame.hasIcon() ? frame.icon : null,
+        );
         role = frame.role;
         yield null;
       }
@@ -826,6 +843,7 @@ class SpaceSession
         options: CallOptions(timeout: const Duration(seconds: 10)),
       );
       session.spaceTitle = manifest.title;
+      session.serverIcon = manifest.hasIcon() ? manifest.icon : null;
       session.chatTitle =
           manifest.channels
               .where((channel) => channel.id == 'general')

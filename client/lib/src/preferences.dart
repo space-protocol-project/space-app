@@ -1,3 +1,8 @@
+import 'package:flutter/foundation.dart' show mapEquals;
+
+import 'dart:convert';
+
+import 'package:space_admin_ui/space_admin_ui.dart' show validatedServerIcon;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -5,11 +10,25 @@ class AppPreferences extends ChangeNotifier {
   bool dark = true, compact = false;
   String palette = 'gruvbox', error = '';
   String language = 'ru';
+  String sendShortcut = 'enter';
   static const languages = ['ru', 'zh-Hans', 'en'];
   Locale get locale => language == 'zh-Hans'
       ? const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans')
       : Locale(language);
   final List<String> origins = [];
+  final Map<String, Map<String, dynamic>> serverIcons = {};
+  Future<void> cacheServerIcon(String origin, Object? value) {
+    final icon = validatedServerIcon(value);
+    if (icon == null ||
+        !origins.contains(origin) ||
+        mapEquals(serverIcons[origin], icon)) {
+      return Future.value();
+    }
+    serverIcons[origin] = icon;
+    notifyListeners();
+    return _save();
+  }
+
   bool _disposed = false;
   Future<void> _writes = Future.value();
 
@@ -19,11 +38,27 @@ class AppPreferences extends ChangeNotifier {
       if (_disposed) return;
       dark = data.getBool('space.ui.dark') ?? true;
       compact = data.getBool('space.ui.compact') ?? false;
+      final savedSend = data.getString('space.ui.sendShortcut');
+      if (['enter', 'shiftEnter'].contains(savedSend)) {
+        sendShortcut = savedSend!;
+      }
       final savedLanguage = data.getString('space.ui.language');
       if (languages.contains(savedLanguage)) language = savedLanguage!;
       final saved = data.getString('space.ui.palette');
       if (['gruvbox', 'ocean', 'iris'].contains(saved)) palette = saved!;
       origins.addAll(data.getStringList('space.ui.origins') ?? []);
+      final icons = data.getString('space.server.icons');
+      if (icons != null && icons.length < 2 * 1024 * 1024) {
+        try {
+          final decoded = jsonDecode(icons);
+          if (decoded is Map) {
+            for (final origin in origins) {
+              final icon = validatedServerIcon(decoded[origin]);
+              if (icon != null) serverIcons[origin] = icon;
+            }
+          }
+        } catch (_) {}
+      }
     } catch (_) {
       error = 'Не удалось загрузить настройки оформления.';
     }
@@ -35,7 +70,12 @@ class AppPreferences extends ChangeNotifier {
     bool? compact,
     String? palette,
     String? language,
+    String? sendShortcut,
   }) {
+    if (sendShortcut != null &&
+        ['enter', 'shiftEnter'].contains(sendShortcut)) {
+      this.sendShortcut = sendShortcut;
+    }
     if (language != null && languages.contains(language)) {
       this.language = language;
     }
@@ -61,7 +101,9 @@ class AppPreferences extends ChangeNotifier {
       compact: compact,
       palette: palette,
       language: language,
+      sendShortcut: sendShortcut,
       origins: List<String>.of(origins),
+      icons: jsonEncode(serverIcons),
     );
     _writes = _writes.then((_) async {
       try {
@@ -71,7 +113,9 @@ class AppPreferences extends ChangeNotifier {
           data.setBool('space.ui.compact', snapshot.compact),
           data.setString('space.ui.palette', snapshot.palette),
           data.setString('space.ui.language', snapshot.language),
+          data.setString('space.ui.sendShortcut', snapshot.sendShortcut),
           data.setStringList('space.ui.origins', snapshot.origins),
+          data.setString('space.server.icons', snapshot.icons),
         ]);
         if (results.contains(false)) throw StateError('Запись не завершена');
         error = '';

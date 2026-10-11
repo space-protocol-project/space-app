@@ -47,7 +47,7 @@ void main() {
     for (final entry in {
       'chat': 'Общий чат',
       'settings': 'Настройки',
-      'identity': 'Идентичность',
+      'identity': 'Мой доступ и устройства',
     }.entries) {
       await tester.tap(find.widgetWithText(ListTile, entry.value));
       await tester.pumpAndSettle();

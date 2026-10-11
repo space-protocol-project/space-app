@@ -726,6 +726,21 @@ final $typed_data.Uint8List updateSettingsResponseDescriptor =
         'ChZVcGRhdGVTZXR0aW5nc1Jlc3BvbnNlEjMKCHNldHRpbmdzGAEgASgLMhcuc3BhY2UudjEuU3'
         'BhY2VTZXR0aW5nc1IIc2V0dGluZ3M=');
 
+@$core.Deprecated('Use serverIconDescriptor instead')
+const ServerIcon$json = {
+  '1': 'ServerIcon',
+  '2': [
+    {'1': 'preset', '3': 1, '4': 1, '5': 9, '10': 'preset'},
+    {'1': 'media_type', '3': 2, '4': 1, '5': 9, '10': 'mediaType'},
+    {'1': 'data', '3': 3, '4': 1, '5': 12, '10': 'data'},
+  ],
+};
+
+/// Descriptor for `ServerIcon`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List serverIconDescriptor = $convert.base64Decode(
+    'CgpTZXJ2ZXJJY29uEhYKBnByZXNldBgBIAEoCVIGcHJlc2V0Eh0KCm1lZGlhX3R5cGUYAiABKA'
+    'lSCW1lZGlhVHlwZRISCgRkYXRhGAMgASgMUgRkYXRh');
+
 @$core.Deprecated('Use spaceSettingsDescriptor instead')
 const SpaceSettings$json = {
   '1': 'SpaceSettings',
@@ -741,6 +756,14 @@ const SpaceSettings$json = {
       '10': 'registrationPolicy'
     },
     {'1': 'revision', '3': 5, '4': 1, '5': 3, '10': 'revision'},
+    {
+      '1': 'icon',
+      '3': 6,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.ServerIcon',
+      '10': 'icon'
+    },
   ],
 };
 
@@ -749,7 +772,7 @@ final $typed_data.Uint8List spaceSettingsDescriptor = $convert.base64Decode(
     'Cg1TcGFjZVNldHRpbmdzEhQKBXRpdGxlGAEgASgJUgV0aXRsZRIdCgpjaGF0X3RpdGxlGAIgAS'
     'gJUgljaGF0VGl0bGUSIQoMY2hhdF9lbmFibGVkGAMgASgIUgtjaGF0RW5hYmxlZBIvChNyZWdp'
     'c3RyYXRpb25fcG9saWN5GAQgASgJUhJyZWdpc3RyYXRpb25Qb2xpY3kSGgoIcmV2aXNpb24YBS'
-    'ABKANSCHJldmlzaW9u');
+    'ABKANSCHJldmlzaW9uEigKBGljb24YBiABKAsyFC5zcGFjZS52MS5TZXJ2ZXJJY29uUgRpY29u');
 
 @$core.Deprecated('Use updateSettingsRequestDescriptor instead')
 const UpdateSettingsRequest$json = {
@@ -772,6 +795,14 @@ const UpdateSettingsRequest$json = {
       '5': 3,
       '10': 'expectedRevision'
     },
+    {
+      '1': 'icon',
+      '3': 6,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.ServerIcon',
+      '10': 'icon'
+    },
   ],
 };
 
@@ -780,7 +811,8 @@ final $typed_data.Uint8List updateSettingsRequestDescriptor = $convert.base64Dec
     'ChVVcGRhdGVTZXR0aW5nc1JlcXVlc3QSFAoFdGl0bGUYASABKAlSBXRpdGxlEh0KCmNoYXRfdG'
     'l0bGUYAiABKAlSCWNoYXRUaXRsZRIhCgxjaGF0X2VuYWJsZWQYAyABKAhSC2NoYXRFbmFibGVk'
     'Ei8KE3JlZ2lzdHJhdGlvbl9wb2xpY3kYBCABKAlSEnJlZ2lzdHJhdGlvblBvbGljeRIrChFleH'
-    'BlY3RlZF9yZXZpc2lvbhgFIAEoA1IQZXhwZWN0ZWRSZXZpc2lvbg==');
+    'BlY3RlZF9yZXZpc2lvbhgFIAEoA1IQZXhwZWN0ZWRSZXZpc2lvbhIoCgRpY29uGAYgASgLMhQu'
+    'c3BhY2UudjEuU2VydmVySWNvblIEaWNvbg==');
 
 @$core.Deprecated('Use subscribeRequestDescriptor instead')
 const SubscribeRequest$json = {
@@ -978,6 +1010,14 @@ const GetManifestResponse$json = {
       '10': 'channels'
     },
     {'1': 'title', '3': 4, '4': 1, '5': 9, '10': 'title'},
+    {
+      '1': 'icon',
+      '3': 5,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.ServerIcon',
+      '10': 'icon'
+    },
   ],
 };
 
@@ -985,7 +1025,8 @@ const GetManifestResponse$json = {
 final $typed_data.Uint8List getManifestResponseDescriptor = $convert.base64Decode(
     'ChNHZXRNYW5pZmVzdFJlc3BvbnNlEikKEHByb3RvY29sX3ZlcnNpb24YASABKAlSD3Byb3RvY2'
     '9sVmVyc2lvbhIbCglzZXJ2ZXJfaWQYAiABKAlSCHNlcnZlcklkEi0KCGNoYW5uZWxzGAMgAygL'
-    'MhEuc3BhY2UudjEuQ2hhbm5lbFIIY2hhbm5lbHMSFAoFdGl0bGUYBCABKAlSBXRpdGxl');
+    'MhEuc3BhY2UudjEuQ2hhbm5lbFIIY2hhbm5lbHMSFAoFdGl0bGUYBCABKAlSBXRpdGxlEigKBG'
+    'ljb24YBSABKAsyFC5zcGFjZS52MS5TZXJ2ZXJJY29uUgRpY29u');
 
 @$core.Deprecated('Use channelDescriptor instead')
 const Channel$json = {
@@ -1527,6 +1568,14 @@ const WatchChannelsResponse$json = {
     {'1': 'role', '3': 3, '4': 1, '5': 9, '10': 'role'},
     {'1': 'heartbeat', '3': 4, '4': 1, '5': 8, '10': 'heartbeat'},
     {'1': 'server_id', '3': 5, '4': 1, '5': 9, '10': 'serverId'},
+    {
+      '1': 'icon',
+      '3': 6,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.ServerIcon',
+      '10': 'icon'
+    },
   ],
 };
 
@@ -1535,4 +1584,5 @@ final $typed_data.Uint8List watchChannelsResponseDescriptor = $convert.base64Dec
     'ChVXYXRjaENoYW5uZWxzUmVzcG9uc2USLQoIY2hhbm5lbHMYASADKAsyES5zcGFjZS52MS5DaG'
     'FubmVsUghjaGFubmVscxIfCgtzcGFjZV90aXRsZRgCIAEoCVIKc3BhY2VUaXRsZRISCgRyb2xl'
     'GAMgASgJUgRyb2xlEhwKCWhlYXJ0YmVhdBgEIAEoCFIJaGVhcnRiZWF0EhsKCXNlcnZlcl9pZB'
-    'gFIAEoCVIIc2VydmVySWQ=');
+    'gFIAEoCVIIc2VydmVySWQSKAoEaWNvbhgGIAEoCzIULnNwYWNlLnYxLlNlcnZlckljb25SBGlj'
+    'b24=');

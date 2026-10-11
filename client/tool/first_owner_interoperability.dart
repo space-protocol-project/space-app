@@ -36,13 +36,20 @@ Future<void> main(List<String> args) async {
         'chatEnabled': true,
         'registrationPolicy': 'open',
         'expectedRevision': settings['revision'],
+        'icon': {'preset': 'star'},
       },
     );
+    if (session.serverIcon?.preset != 'star') {
+      throw StateError('Иконка не обновилась из manifest');
+    }
   } finally {
     await session.close();
   }
   session = await SpaceSession.connect(server, vault);
   try {
+    if (session.serverIcon?.preset != 'star') {
+      throw StateError('Иконка потерялась при новом входе');
+    }
     if (session.role != 'owner' ||
         session.principalId != principal ||
         session.currentGrantId != grant) {

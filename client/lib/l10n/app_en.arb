@@ -5,7 +5,7 @@
   "forum": "Discussions",
   "feed": "Feed",
   "rooms": "Meetings",
-  "identity": "Identity",
+  "identity": "My access and devices",
   "settings": "Settings",
   "yourSpace": "Your space",
   "connected": "Connected",
@@ -18,7 +18,7 @@
   "prototype": "Experimental desktop app",
   "logo": "Space logo",
   "selectedSpace": "Selected space",
-  "myIdentity": "My identity",
+  "myIdentity": "My access and devices",
   "aboutSpace": "About this space",
   "independentServer": "An independent server. Each space defines your permissions and available sections.",
   "deviceSignedIn": "Signed in with a device key",
@@ -331,5 +331,8 @@
         "type": "int"
       }
     }
-  }
+  },
+  "identityDescription": "Keys, permissions and recovery for the selected space.",
+  "sendShortcutTitle": "Send shortcut",
+  "sendShortcutHelp": "Choose Enter or Shift+Enter to send. The other combination inserts a new line."
 }

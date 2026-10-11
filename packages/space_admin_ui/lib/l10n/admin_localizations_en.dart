@@ -730,4 +730,39 @@ class AdminLocalizationsEn extends AdminLocalizations {
   String cameraLabel(int number, String name) {
     return 'Camera $number — $name';
   }
+
+  @override
+  String get serverIconTitle => 'Space icon';
+
+  @override
+  String get serverIconUpload => 'Choose PNG or SVG';
+
+  @override
+  String get serverIconHelp =>
+      'PNG is resized to an icon. SVG: basic shapes without scripts or external links, up to 8 KiB.';
+
+  @override
+  String get serverIconInvalid =>
+      'Could not read the icon. Choose PNG up to 2048×2048 or a simple SVG up to 8 KiB.';
+
+  @override
+  String get serverIconUpgrade => 'Update the server to change its icon.';
+
+  @override
+  String get iconOrbit => 'Orbit';
+
+  @override
+  String get iconPlanet => 'Planet';
+
+  @override
+  String get iconLeaf => 'Leaf';
+
+  @override
+  String get iconStar => 'Star';
+
+  @override
+  String get iconBolt => 'Bolt';
+
+  @override
+  String get iconRocket => 'Rocket';
 }

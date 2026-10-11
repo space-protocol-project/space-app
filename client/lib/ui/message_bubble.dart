@@ -1,3 +1,4 @@
+import 'message_markdown.dart';
 import '../l10n/strings.dart';
 
 import 'package:flutter/material.dart';
@@ -72,15 +73,7 @@ class MessageBubble extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                       ],
-                      SelectableText(
-                        text,
-                        textWidthBasis: TextWidthBasis.longestLine,
-                        style: TextStyle(
-                          fontSize: 15,
-                          height: 1.45,
-                          color: colors.onSurface,
-                        ),
-                      ),
+                      MessageMarkdown(text: text),
                       if (sentAt != null || accepted)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),

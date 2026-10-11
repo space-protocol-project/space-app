@@ -195,7 +195,13 @@ class ChatController extends ChangeNotifier {
   String get chatTitle => _session is SpacePresentation
       ? (_session as SpacePresentation).chatTitle
       : 'Общий чат';
+  ServerIcon? _lastServerIcon;
+  ServerIcon? get serverIcon => _lastServerIcon;
   void _update() {
+    if (_session is ServerIconPresentation) {
+      _lastServerIcon =
+          (_session as ServerIconPresentation).serverIcon ?? _lastServerIcon;
+    }
     if (!_disposed) notifyListeners();
   }
 

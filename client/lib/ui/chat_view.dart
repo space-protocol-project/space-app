@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:flutter/services.dart';
+
 import '../l10n/strings.dart';
 
 import 'package:flutter/material.dart';
@@ -12,16 +16,18 @@ class ChatView extends StatefulWidget {
     required this.openConnection,
     this.active = true,
     this.showHeader = true,
+    this.sendWithShift = false,
   });
   final ChatController controller;
   final VoidCallback openConnection;
-  final bool active, showHeader;
+  final bool active, showHeader, sendWithShift;
   @override
   State<ChatView> createState() => _ChatViewState();
 }
 
 class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   final draft = TextEditingController();
+  final draftFocus = FocusNode();
   final scroll = ScrollController();
   final Map<String, String> drafts = {};
   final Map<String, double> offsets = {};
@@ -156,18 +162,38 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     draft.dispose();
+    draftFocus.dispose();
     scroll.dispose();
     super.dispose();
   }
 
   Future<void> send() async {
     final text = draft.text;
+    final restoreFocus = draftFocus.hasFocus;
     final target = widget.controller, startingScope = scope;
-    if (!await target.send(text) || !mounted) return;
-    if (scope == startingScope && identical(widget.controller, target)) {
-      if (draft.text == text) draft.clear();
-    } else if (drafts[startingScope] == text) {
-      drafts[startingScope] = '';
+    final sent = await target.send(text);
+    if (!mounted) return;
+    if (sent) {
+      if (scope == startingScope && identical(widget.controller, target)) {
+        if (draft.text == text) draft.clear();
+      } else if (drafts[startingScope] == text) {
+        drafts[startingScope] = '';
+      }
+    }
+    if (restoreFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted &&
+            widget.active &&
+            foreground &&
+            scope == startingScope &&
+            identical(widget.controller, target) &&
+            target.connected &&
+            target.canWrite &&
+            !target.busy &&
+            ModalRoute.of(context)?.isCurrent != false) {
+          draftFocus.requestFocus();
+        }
+      });
     }
   }
 
@@ -436,27 +462,74 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: TextField(
-                      key: const ValueKey('chat-draft'),
-                      controller: draft,
-                      enabled: c.connected && c.canWrite && !c.busy,
-                      minLines: 1,
-                      maxLines: 4,
-                      maxLength: 1024,
-                      decoration: InputDecoration(
-                        hintText: c.connected && !c.canWrite
-                            ? context.strings.cannotSend
-                            : context.strings.messageHint,
-                        counterText: '',
-                        filled: false,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 14,
+                    child: Focus(
+                      canRequestFocus: false,
+                      onKeyEvent: (_, event) {
+                        final keyboard = HardwareKeyboard.instance;
+                        if (event is KeyUpEvent ||
+                            ![
+                              LogicalKeyboardKey.enter,
+                              LogicalKeyboardKey.numpadEnter,
+                            ].contains(event.logicalKey) ||
+                            keyboard.isControlPressed ||
+                            keyboard.isAltPressed ||
+                            keyboard.isMetaPressed ||
+                            (draft.value.composing.isValid &&
+                                !draft.value.composing.isCollapsed)) {
+                          return KeyEventResult.ignored;
+                        }
+                        if (event is KeyDownEvent) {
+                          if (keyboard.isShiftPressed == widget.sendWithShift) {
+                            unawaited(send());
+                          } else {
+                            final value = draft.value;
+                            final selection = value.selection;
+                            final start = selection.isValid
+                                ? selection.start
+                                : value.text.length;
+                            final end = selection.isValid
+                                ? selection.end
+                                : value.text.length;
+                            final updated = value.text.replaceRange(
+                              start,
+                              end,
+                              '\n',
+                            );
+                            if (updated.characters.length <= 1024) {
+                              draft.value = TextEditingValue(
+                                text: updated,
+                                selection: TextSelection.collapsed(
+                                  offset: start + 1,
+                                ),
+                              );
+                            }
+                          }
+                        }
+                        return KeyEventResult.handled;
+                      },
+                      child: TextField(
+                        key: const ValueKey('chat-draft'),
+                        focusNode: draftFocus,
+                        controller: draft,
+                        enabled: c.connected && c.canWrite && !c.busy,
+                        minLines: 1,
+                        maxLines: 4,
+                        maxLength: 1024,
+                        decoration: InputDecoration(
+                          hintText: c.connected && !c.canWrite
+                              ? context.strings.cannotSend
+                              : context.strings.messageHint,
+                          counterText: '',
+                          filled: false,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 14,
+                          ),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
                         ),
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
                       ),
                     ),
                   ),

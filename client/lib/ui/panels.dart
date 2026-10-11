@@ -184,6 +184,7 @@ class SettingsPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DropdownButtonFormField<String>(
+              key: const ValueKey('app-language'),
               isExpanded: true,
               initialValue: preferences.language,
               decoration: InputDecoration(labelText: context.strings.language),
@@ -207,6 +208,25 @@ class SettingsPanel extends StatelessWidget {
               value: preferences.dark,
               onChanged: (value) => preferences.change(dark: value),
             ),
+            const Divider(),
+            DropdownButtonFormField<String>(
+              key: ValueKey('send-shortcut-${preferences.sendShortcut}'),
+              isExpanded: true,
+              initialValue: preferences.sendShortcut,
+              decoration: InputDecoration(
+                labelText: context.strings.sendShortcutTitle,
+              ),
+              items: const [
+                DropdownMenuItem(value: 'enter', child: Text('Enter')),
+                DropdownMenuItem(
+                  value: 'shiftEnter',
+                  child: Text('Shift + Enter'),
+                ),
+              ],
+              onChanged: (value) => preferences.change(sendShortcut: value),
+            ),
+            const SizedBox(height: 8),
+            Text(context.strings.sendShortcutHelp),
             const Divider(),
             SwitchListTile.adaptive(
               contentPadding: EdgeInsets.zero,

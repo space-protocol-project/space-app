@@ -311,5 +311,16 @@
         "type": "String"
       }
     }
-  }
+  },
+  "serverIconTitle": "空间图标",
+  "serverIconUpload": "选择 PNG 或 SVG",
+  "serverIconHelp": "PNG 将缩小为图标。SVG 仅允许基本图形，不含脚本或外部链接，最大 8 KiB。",
+  "serverIconInvalid": "无法读取图标。请选择不超过 2048×2048 的 PNG 或不超过 8 KiB 的简单 SVG。",
+  "serverIconUpgrade": "请更新服务器以更改图标。",
+  "iconOrbit": "轨道",
+  "iconPlanet": "星球",
+  "iconLeaf": "叶子",
+  "iconStar": "星星",
+  "iconBolt": "闪电",
+  "iconRocket": "火箭"
 }

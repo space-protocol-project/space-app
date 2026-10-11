@@ -311,5 +311,16 @@
         "type": "String"
       }
     }
-  }
+  },
+  "serverIconTitle": "Иконка пространства",
+  "serverIconUpload": "Выбрать PNG или SVG",
+  "serverIconHelp": "PNG уменьшается до значка. SVG: базовые фигуры без скриптов и внешних ссылок, до 8 КиБ.",
+  "serverIconInvalid": "Не удалось прочитать иконку. Выберите PNG до 2048×2048 или простой SVG до 8 КиБ.",
+  "serverIconUpgrade": "Для изменения иконки требуется обновление сервера.",
+  "iconOrbit": "Орбита",
+  "iconPlanet": "Планета",
+  "iconLeaf": "Лист",
+  "iconStar": "Звезда",
+  "iconBolt": "Молния",
+  "iconRocket": "Ракета"
 }

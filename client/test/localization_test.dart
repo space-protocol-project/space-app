@@ -36,7 +36,7 @@ void main() {
       expect(find.text(entry.value[2]), findsOneWidget);
       expect(tester.takeException(), isNull);
       if (entry.key == 'ru') {
-        await tester.tap(find.byType(DropdownButtonFormField<String>));
+        await tester.tap(find.byKey(const ValueKey('app-language')));
         await tester.pumpAndSettle();
         await tester.tap(find.text('English').last);
         await tester.pumpAndSettle();

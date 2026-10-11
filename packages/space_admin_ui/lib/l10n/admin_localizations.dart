@@ -1401,6 +1401,72 @@ abstract class AdminLocalizations {
   /// In ru, this message translates to:
   /// **'Камера {number} — {name}'**
   String cameraLabel(int number, String name);
+
+  /// No description provided for @serverIconTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Иконка пространства'**
+  String get serverIconTitle;
+
+  /// No description provided for @serverIconUpload.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбрать PNG или SVG'**
+  String get serverIconUpload;
+
+  /// No description provided for @serverIconHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'PNG уменьшается до значка. SVG: базовые фигуры без скриптов и внешних ссылок, до 8 КиБ.'**
+  String get serverIconHelp;
+
+  /// No description provided for @serverIconInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось прочитать иконку. Выберите PNG до 2048×2048 или простой SVG до 8 КиБ.'**
+  String get serverIconInvalid;
+
+  /// No description provided for @serverIconUpgrade.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для изменения иконки требуется обновление сервера.'**
+  String get serverIconUpgrade;
+
+  /// No description provided for @iconOrbit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Орбита'**
+  String get iconOrbit;
+
+  /// No description provided for @iconPlanet.
+  ///
+  /// In ru, this message translates to:
+  /// **'Планета'**
+  String get iconPlanet;
+
+  /// No description provided for @iconLeaf.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лист'**
+  String get iconLeaf;
+
+  /// No description provided for @iconStar.
+  ///
+  /// In ru, this message translates to:
+  /// **'Звезда'**
+  String get iconStar;
+
+  /// No description provided for @iconBolt.
+  ///
+  /// In ru, this message translates to:
+  /// **'Молния'**
+  String get iconBolt;
+
+  /// No description provided for @iconRocket.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ракета'**
+  String get iconRocket;
 }
 
 class _AdminLocalizationsDelegate

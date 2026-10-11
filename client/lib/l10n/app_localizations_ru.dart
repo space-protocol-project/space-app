@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -24,7 +25,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get rooms => 'Встречи';
 
   @override
-  String get identity => 'Идентичность';
+  String get identity => 'Мой доступ и устройства';
 
   @override
   String get settings => 'Настройки';
@@ -63,13 +64,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get selectedSpace => 'Выбранное пространство';
 
   @override
-  String get myIdentity => 'Моя идентичность';
+  String get myIdentity => 'Мой доступ и устройства';
 
   @override
   String get aboutSpace => 'О пространстве';
 
   @override
-  String get independentServer => 'Независимый сервер. Ваши права и доступные разделы определяются отдельно в каждом пространстве.';
+  String get independentServer =>
+      'Независимый сервер. Ваши права и доступные разделы определяются отдельно в каждом пространстве.';
 
   @override
   String get deviceSignedIn => 'Вход по ключу устройства выполнен';
@@ -84,7 +86,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get beYourself => 'Можно быть собой.';
 
   @override
-  String get ownPace => 'Не обязательно отвечать сразу. Камера и микрофон не используются; системные уведомления пока выключены.';
+  String get ownPace =>
+      'Не обязательно отвечать сразу. Камера и микрофон не используются; системные уведомления пока выключены.';
 
   @override
   String get openNavigation => 'Открыть навигацию';
@@ -108,13 +111,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get welcome => 'Хорошо, что вы здесь.';
 
   @override
-  String get welcomeDescription => 'Ваше пространство, ваши разговоры — в удобном темпе.';
+  String get welcomeDescription =>
+      'Ваше пространство, ваши разговоры — в удобном темпе.';
 
   @override
   String get ideas => 'Место для идей.\nИ людей за ними.';
 
   @override
-  String get connectDescription => 'Добавьте независимый сервер по адресу, проверьте доверие и продолжите разговор. Центральный аккаунт не нужен.';
+  String get connectDescription =>
+      'Добавьте независимый сервер по адресу, проверьте доверие и продолжите разговор. Центральный аккаунт не нужен.';
 
   @override
   String get returnChat => 'Вернуться в разговор';
@@ -123,7 +128,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get yourConversation => 'Ваш разговор';
 
   @override
-  String get noMessages => 'Пространство ещё не подключено. Здесь появятся реальные сообщения выбранного сервера.';
+  String get noMessages =>
+      'Пространство ещё не подключено. Здесь появятся реальные сообщения выбранного сервера.';
 
   @override
   String get openChat => 'Открыть чат';
@@ -132,13 +138,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get yourAttention => 'Ваше внимание';
 
   @override
-  String get attentionDescription => 'Оболочка не отправляет системные уведомления и не включает камеру или микрофон. Можно оставаться в своём ритме.';
+  String get attentionDescription =>
+      'Оболочка не отправляет системные уведомления и не включает камеру или микрофон. Можно оставаться в своём ритме.';
 
   @override
   String get settingsTitle => 'Пусть будет удобно вам.';
 
   @override
-  String get settingsDescription => 'Личное оформление сохраняется на этом устройстве.';
+  String get settingsDescription =>
+      'Личное оформление сохраняется на этом устройстве.';
 
   @override
   String get appearance => 'Внешний вид';
@@ -168,7 +176,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get spaceAppearance => 'Оформление пространства';
 
   @override
-  String get spaceAppearanceDescription => 'Сервер сможет предложить цвета для своего пространства. До вашего согласия будет использоваться личная тема. Текущая версия ещё не получает такие предложения.';
+  String get spaceAppearanceDescription =>
+      'Сервер сможет предложить цвета для своего пространства. До вашего согласия будет использоваться личная тема. Текущая версия ещё не получает такие предложения.';
 
   @override
   String get language => 'Язык приложения';
@@ -200,7 +209,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get revokeTitle => 'Отозвать это устройство?';
 
   @override
-  String get revokeDescription => 'Доступ к выбранному серверу прекратится. Ключи останутся на компьютере; новое разрешение автоматически не создаётся.';
+  String get revokeDescription =>
+      'Доступ к выбранному серверу прекратится. Ключи останутся на компьютере; новое разрешение автоматически не создаётся.';
 
   @override
   String get keep => 'Оставить';
@@ -221,7 +231,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get forumTitle => 'Хорошие разговоры остаются.';
 
   @override
-  String get forumDescription => 'Место для обсуждений, которым нужно больше времени.';
+  String get forumDescription =>
+      'Место для обсуждений, которым нужно больше времени.';
 
   @override
   String get feedTitle => 'Немного вдохновения.';
@@ -233,7 +244,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get search => 'Поиск';
 
   @override
-  String get recoveringEvents => 'Восстанавливаем события. Сообщения и черновик сохранены.';
+  String get recoveringEvents =>
+      'Восстанавливаем события. Сообщения и черновик сохранены.';
 
   @override
   String get chatTab => 'Чат';
@@ -256,7 +268,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get closeConnection => 'Закрыть подключение';
 
   @override
-  String get connectionIntro => 'Адрес независимого сервера. Сначала проверим его, затем вы решите, доверять ли ему.';
+  String get connectionIntro =>
+      'Адрес независимого сервера. Сначала проверим его, затем вы решите, доверять ли ему.';
 
   @override
   String get serverAddress => 'Адрес сервера или ссылка приглашения';
@@ -277,13 +290,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tlsCertificateFingerprint => 'Отпечаток TLS-сертификата';
 
   @override
-  String get firstTrustHelp => 'При первом визите сравните адрес и отпечаток с известными данными владельца. Первый вход создаёт отдельные ключи для этого сервера.';
+  String get firstTrustHelp =>
+      'При первом визите сравните адрес и отпечаток с известными данными владельца. Первый вход создаёт отдельные ключи для этого сервера.';
 
   @override
   String get readerInvitation => 'Приглашение: читатель — только чтение чата.';
 
   @override
-  String get memberInvitation => 'Приглашение: участник — читать и писать в чате.';
+  String get memberInvitation =>
+      'Приглашение: участник — читать и писать в чате.';
 
   @override
   String get trustAndConnect => 'Доверять и подключиться';
@@ -292,7 +307,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get disconnectServer => 'Отключиться от сервера';
 
   @override
-  String get supportedConnections => 'Поддерживаются публичные HTTPS-серверы и локальный HTTP. Карточку восстановления можно открыть в разделе «Идентичность».';
+  String get supportedConnections =>
+      'Поддерживаются публичные HTTPS-серверы и локальный HTTP. Карточку восстановления можно открыть в разделе «Идентичность».';
 
   @override
   String get chatDescription => 'Разговоры и маленькие открытия.';
@@ -319,13 +335,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get conversationStarts => 'Здесь начинается разговор';
 
   @override
-  String get contactOwner => 'Выберите другой канал или обратитесь к владельцу пространства.';
+  String get contactOwner =>
+      'Выберите другой канал или обратитесь к владельцу пространства.';
 
   @override
   String get emptyChat => 'В этом чате пока нет сообщений.';
 
   @override
-  String get connectChatHelp => 'Подключите своё пространство. Ваши ключи останутся на этом устройстве.';
+  String get connectChatHelp =>
+      'Подключите своё пространство. Ваши ключи останутся на этом устройстве.';
 
   @override
   String get you => 'Вы';
@@ -367,10 +385,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get close => 'Закрыть';
 
   @override
-  String get homeFirstSetup => 'Space скачает сервер и PostgreSQL, создаст базу и сертификат. Данные останутся на этом компьютере.';
+  String get homeFirstSetup =>
+      'Space скачает сервер и PostgreSQL, создаст базу и сертификат. Данные останутся на этом компьютере.';
 
   @override
-  String get homeReuse => 'Повторный запуск использует ваш прежний сервер, базу, ключи, сертификат и участников.';
+  String get homeReuse =>
+      'Повторный запуск использует ваш прежний сервер, базу, ключи, сертификат и участников.';
 
   @override
   String get homeIP => 'Статический публичный IPv4';
@@ -385,13 +405,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get detectIP => 'Определить IP автоматически';
 
   @override
-  String get homeIPPrivacy => 'Определение адреса обращается к ipify. При VPN будет показан адрес VPN.';
+  String get homeIPPrivacy =>
+      'Определение адреса обращается к ipify. При VPN будет показан адрес VPN.';
 
   @override
-  String get homeIPFailed => 'Не удалось определить адрес. Введите свой статический IP.';
+  String get homeIPFailed =>
+      'Не удалось определить адрес. Введите свой статический IP.';
 
   @override
-  String get homePortHelp => 'Для доступа друзей направьте TCP-порт 8443 роутера на порт 8443 этого компьютера и разрешите его в брандмауэре. PostgreSQL и локальные порты наружу открывать не нужно.';
+  String get homePortHelp =>
+      'Для доступа друзей направьте TCP-порт 8443 роутера на порт 8443 этого компьютера и разрешите его в брандмауэре. PostgreSQL и локальные порты наружу открывать не нужно.';
 
   @override
   String get goLive => 'Выйти в эфир';
@@ -400,7 +423,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get stopHome => 'Отключиться';
 
   @override
-  String get homeLink => 'Ссылка на ваш сервер (открывается через подключение в Space)';
+  String get homeLink =>
+      'Ссылка на ваш сервер (открывается через подключение в Space)';
 
   @override
   String get copyLink => 'Копировать ссылку';
@@ -409,13 +433,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get manageServer => 'Управлять сервером';
 
   @override
-  String get homeInviteHelp => 'Сама ссылка не выдаёт права администратора. Друзей приглашайте через «Управление пространством → Приглашения». Остановка сервера завершит их подключения.';
+  String get homeInviteHelp =>
+      'Сама ссылка не выдаёт права администратора. Друзей приглашайте через «Управление пространством → Приглашения». Остановка сервера завершит их подключения.';
 
   @override
   String get myHomeServer => 'Мой домашний сервер';
 
   @override
-  String get homeRunningHelp => 'Сервер работает. После отключения все данные сохранятся.';
+  String get homeRunningHelp =>
+      'Сервер работает. После отключения все данные сохранятся.';
 
   @override
   String get homeStartHelp => 'Запустите своё пространство на этом компьютере.';
@@ -455,7 +481,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get serverAvailabilityUnknown => 'Доступность пока неизвестна';
 
   @override
-  String get recoveryOperationFailed => 'Операция не завершена. Проверьте доступ, карточку и соединение.';
+  String get recoveryOperationFailed =>
+      'Операция не завершена. Проверьте доступ, карточку и соединение.';
 
   @override
   String get recoveryFileLabel => 'Карточка Space';
@@ -464,49 +491,62 @@ class AppLocalizationsRu extends AppLocalizations {
   String get recoveryFormat => 'Формат карточки';
 
   @override
-  String get recoveryFormatHelp => 'PNG содержит зашифрованный QR и подходит для печати. JSON — компактный резервный файл. Пароль храните отдельно.';
+  String get recoveryFormatHelp =>
+      'PNG содержит зашифрованный QR и подходит для печати. JSON — компактный резервный файл. Пароль храните отдельно.';
 
   @override
   String get recoveryPng => 'QR в PNG';
 
   @override
-  String get recoveryCardSaved => 'Карточка сохранена. Проверьте её восстановлением на отдельном устройстве; файл и пароль храните раздельно.';
+  String get recoveryCardSaved =>
+      'Карточка сохранена. Проверьте её восстановлением на отдельном устройстве; файл и пароль храните раздельно.';
 
   @override
   String get recoveryTooLarge => 'Карточка слишком большая';
 
   @override
-  String get recoveryReplaceWarning => 'Сохранённые здесь ключи для этого адреса будут заменены. Сначала сохраните их карточку, если это другая идентичность.';
+  String get recoveryReplaceWarning =>
+      'Сохранённые здесь ключи для этого адреса будут заменены. Сначала сохраните их карточку, если это другая идентичность.';
 
   @override
-  String get recoveryConnectionDenied => 'Ключи сохранены, но сервер не разрешил подключение. Проверьте отзыв карточки, блокировку и доступность чата.';
+  String get recoveryConnectionDenied =>
+      'Ключи сохранены, но сервер не разрешил подключение. Проверьте отзыв карточки, блокировку и доступность чата.';
 
   @override
-  String get recoveryRestored => 'Идентичность восстановлена с новым устройством. Проверьте список и отзовите потерянные устройства.';
+  String get recoveryRestored =>
+      'Идентичность восстановлена с новым устройством. Проверьте список и отзовите потерянные устройства.';
 
   @override
-  String get rotationRenewConfirm => 'Обновить истёкший запрос с теми же сохранёнными новыми ключами? Если сервер уже завершил переход, используйте завершение сохранённой смены.';
+  String get rotationRenewConfirm =>
+      'Обновить истёкший запрос с теми же сохранёнными новыми ключами? Если сервер уже завершил переход, используйте завершение сохранённой смены.';
 
   @override
-  String get rotationConfirm => 'Сменить корневой ключ? Ваш ID, права и история сохранятся. Прежние устройства и карточки потеряют доступ. Новый секрет сначала сохраняется в защищённый журнал. После перехода обязательно сохраните новую карточку.';
+  String get rotationConfirm =>
+      'Сменить корневой ключ? Ваш ID, права и история сохранятся. Прежние устройства и карточки потеряют доступ. Новый секрет сначала сохраняется в защищённый журнал. После перехода обязательно сохраните новую карточку.';
 
   @override
-  String get rotationServerRequired => 'Сначала проверьте адрес прежнего сервера';
+  String get rotationServerRequired =>
+      'Сначала проверьте адрес прежнего сервера';
 
   @override
-  String get rotationNotPending => 'Для этого сервера нет сохранённой смены ключа.';
+  String get rotationNotPending =>
+      'Для этого сервера нет сохранённой смены ключа.';
 
   @override
-  String get rotationReconnect => 'Новый ключ сохранён. Проверьте доступность сервера и подключитесь повторно.';
+  String get rotationReconnect =>
+      'Новый ключ сохранён. Проверьте доступность сервера и подключитесь повторно.';
 
   @override
-  String get rotationCompleted => 'Корневой ключ сменён, прежний ID сохранён. Сохраните новую карточку; старые карточки и устройства больше не работают.';
+  String get rotationCompleted =>
+      'Корневой ключ сменён, прежний ID сохранён. Сохраните новую карточку; старые карточки и устройства больше не работают.';
 
   @override
-  String get recoveryRevokeCard => 'Отозвать ключ восстановления? Карточка и все устройства, подключённые через неё, перестанут работать. Перед этим сохраните другой путь доступа.';
+  String get recoveryRevokeCard =>
+      'Отозвать ключ восстановления? Карточка и все устройства, подключённые через неё, перестанут работать. Перед этим сохраните другой путь доступа.';
 
   @override
-  String get recoveryRevokeDevice => 'Отозвать это устройство? Его сессии и подписки завершатся.';
+  String get recoveryRevokeDevice =>
+      'Отозвать это устройство? Его сессии и подписки завершатся.';
 
   @override
   String get recoveryRevoked => 'Разрешение отозвано на сервере.';
@@ -515,31 +555,38 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pairingAlreadyUsed => 'Код уже использован или отменён';
 
   @override
-  String get pairingManageRequest => 'Запрошено также управление пространством, если роль это разрешает.';
+  String get pairingManageRequest =>
+      'Запрошено также управление пространством, если роль это разрешает.';
 
   @override
   String get pairingChatRequest => 'Запрошен доступ к чату с вашими правами.';
 
   @override
-  String get pairingReady => 'Код появится также на новом устройстве. Введите показанный там код проверки перед выдачей подписи.';
+  String get pairingReady =>
+      'Код появится также на новом устройстве. Введите показанный там код проверки перед выдачей подписи.';
 
   @override
-  String get pairingMismatch => 'Коды проверки не совпадают. Не подтверждайте подключение.';
+  String get pairingMismatch =>
+      'Коды проверки не совпадают. Не подтверждайте подключение.';
 
   @override
-  String get pairingSignConfirm => 'Коды на двух устройствах совпадают? Выдать root-подпись для нового устройства с указанными правами?';
+  String get pairingSignConfirm =>
+      'Коды на двух устройствах совпадают? Выдать root-подпись для нового устройства с указанными правами?';
 
   @override
-  String get pairingSigned => 'Подпись выдана. Завершите вход на новом устройстве.';
+  String get pairingSigned =>
+      'Подпись выдана. Завершите вход на новом устройстве.';
 
   @override
-  String get pairingStartFailed => 'Не удалось начать сопряжение. Проверьте сервер и доступность PostgreSQL.';
+  String get pairingStartFailed =>
+      'Не удалось начать сопряжение. Проверьте сервер и доступность PostgreSQL.';
 
   @override
   String get pairingCancelled => 'Сопряжение отменено';
 
   @override
-  String get pairingExpired => 'Код истёк, отменён или подтверждение не прошло проверку. Начните заново.';
+  String get pairingExpired =>
+      'Код истёк, отменён или подтверждение не прошло проверку. Начните заново.';
 
   @override
   String get pairingCompareTitle => 'Сверьте код на двух устройствах';
@@ -572,7 +619,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dashboardTitle => 'Все ваши пространства — рядом.';
 
   @override
-  String get dashboardDescription => 'Сводка по сохранённым серверам и доступным вам каналам. Каталоги обновляются с учётом ваших прав.';
+  String get dashboardDescription =>
+      'Сводка по сохранённым серверам и доступным вам каналам. Каталоги обновляются с учётом ваших прав.';
 
   @override
   String get dashboardServers => 'Серверы';
@@ -593,7 +641,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dashboardEmpty => 'Добавьте первое пространство';
 
   @override
-  String get dashboardEmptyHelp => 'Подключитесь к серверу или создайте свой. Каждый сервер появится отдельной иконкой слева.';
+  String get dashboardEmptyHelp =>
+      'Подключитесь к серверу или создайте свой. Каждый сервер появится отдельной иконкой слева.';
 
   @override
   String get dashboardCatalogUnknown => 'Каталог ещё не получен';
@@ -608,148 +657,192 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dashboardOpen => 'Открыть пространство';
 
   @override
-  String get dashboardResourcesHelp => 'Сводка учитывает доступные вам каналы и непрочитанные сообщения. Данные недоступных серверов появятся после подключения.';
+  String get dashboardResourcesHelp =>
+      'Сводка учитывает доступные вам каналы и непрочитанные сообщения. Данные недоступных серверов появятся после подключения.';
 
   @override
   String get dashboardSpaces => 'Ваши пространства';
 
   @override
-  String get failureCardCorrupt => 'Карточка повреждена или имеет неверный формат.';
+  String get failureCardCorrupt =>
+      'Карточка повреждена или имеет неверный формат.';
 
   @override
-  String get failurePasswordInvalid => 'Пароль должен содержать не менее 12 символов и занимать не более 512 байт.';
+  String get failurePasswordInvalid =>
+      'Пароль должен содержать не менее 12 символов и занимать не более 512 байт.';
 
   @override
   String get failureCardTooLarge => 'Карточка превышает допустимый размер.';
 
   @override
-  String get failureCardUnsupported => 'Формат или параметры шифрования карточки не поддерживаются.';
+  String get failureCardUnsupported =>
+      'Формат или параметры шифрования карточки не поддерживаются.';
 
   @override
-  String get failureCardAuthentication => 'Неверный пароль или повреждённая карточка. Проверьте файл и пароль.';
+  String get failureCardAuthentication =>
+      'Неверный пароль или повреждённая карточка. Проверьте файл и пароль.';
 
   @override
-  String get failureReleaseInvalid => 'Описание выпуска сервера не прошло проверку. Установка остановлена.';
+  String get failureReleaseInvalid =>
+      'Описание выпуска сервера не прошло проверку. Установка остановлена.';
 
   @override
-  String get failurePlatformUnsupported => 'Для этой платформы ещё нет проверенного выпуска домашнего сервера.';
+  String get failurePlatformUnsupported =>
+      'Для этой платформы ещё нет проверенного выпуска домашнего сервера.';
 
   @override
-  String get failureDownloadAddress => 'Адрес загрузки сервера не разрешён. Установка остановлена.';
+  String get failureDownloadAddress =>
+      'Адрес загрузки сервера не разрешён. Установка остановлена.';
 
   @override
-  String get failureDownloadFailed => 'Не удалось скачать сервер. Проверьте соединение и повторите загрузку.';
+  String get failureDownloadFailed =>
+      'Не удалось скачать сервер. Проверьте соединение и повторите загрузку.';
 
   @override
-  String get failureRedirectLimit => 'Загрузка содержит слишком много перенаправлений. Установка остановлена.';
+  String get failureRedirectLimit =>
+      'Загрузка содержит слишком много перенаправлений. Установка остановлена.';
 
   @override
-  String get failureReleaseSize => 'Сервер загрузился не полностью или размер выпуска не совпадает. Повторите загрузку.';
+  String get failureReleaseSize =>
+      'Сервер загрузился не полностью или размер выпуска не совпадает. Повторите загрузку.';
 
   @override
-  String get failureHashMismatch => 'Контрольная сумма выпуска не совпадает. Этот архив нельзя запускать.';
+  String get failureHashMismatch =>
+      'Контрольная сумма выпуска не совпадает. Этот архив нельзя запускать.';
 
   @override
-  String get failureArchiveInvalid => 'Архив сервера содержит недопустимые пути, файлы или размеры. Установка остановлена.';
+  String get failureArchiveInvalid =>
+      'Архив сервера содержит недопустимые пути, файлы или размеры. Установка остановлена.';
 
   @override
-  String get failureExecutePermission => 'Не удалось разрешить запуск сервера. Проверьте доступ к каталогу приложения.';
+  String get failureExecutePermission =>
+      'Не удалось разрешить запуск сервера. Проверьте доступ к каталогу приложения.';
 
   @override
-  String get failureHomeStartFailed => 'Не удалось запустить домашний сервер. Проверьте доступ к данным, свободные порты и параметры подключения.';
+  String get failureHomeStartFailed =>
+      'Не удалось запустить домашний сервер. Проверьте доступ к данным, свободные порты и параметры подключения.';
 
   @override
-  String get failureHomeStopFailed => 'Сервер не подтвердил остановку всех процессов. Проверьте его состояние перед повторным запуском.';
+  String get failureHomeStopFailed =>
+      'Сервер не подтвердил остановку всех процессов. Проверьте его состояние перед повторным запуском.';
 
   @override
-  String get failurePermissionDenied => 'Сервер отказал в доступе. Проверьте роль, блокировку и приглашение.';
+  String get failurePermissionDenied =>
+      'Сервер отказал в доступе. Проверьте роль, блокировку и приглашение.';
 
   @override
-  String get failureUnauthenticated => 'Сессия или разрешение устройства недействительны. Войдите заново; новое разрешение автоматически не создаётся.';
+  String get failureUnauthenticated =>
+      'Сессия или разрешение устройства недействительны. Войдите заново; новое разрешение автоматически не создаётся.';
 
   @override
   String get failureServerLimit => 'Достигнут лимит сервера. Попробуйте позже.';
 
   @override
-  String get failureConnectionFailed => 'Не удалось связаться с сервером. Проверьте адрес и сеть.';
+  String get failureConnectionFailed =>
+      'Не удалось связаться с сервером. Проверьте адрес и сеть.';
 
   @override
-  String get failureTlsRejected => 'Защищённое соединение не прошло проверку. Проверьте сертификат и доверенный отпечаток.';
+  String get failureTlsRejected =>
+      'Защищённое соединение не прошло проверку. Проверьте сертификат и доверенный отпечаток.';
 
   @override
-  String get failureProtocolInvalid => 'Сервер вернул несовместимые или некорректные данные. Операция остановлена.';
+  String get failureProtocolInvalid =>
+      'Сервер вернул несовместимые или некорректные данные. Операция остановлена.';
 
   @override
-  String get failureIdentityInvalid => 'Проверка ключей, подписей или идентичности не пройдена. Операция остановлена.';
+  String get failureIdentityInvalid =>
+      'Проверка ключей, подписей или идентичности не пройдена. Операция остановлена.';
 
   @override
-  String get failureAddressInvalid => 'Укажите HTTPS-адрес сервера или локальный HTTP-адрес. Проверьте ссылку и код приглашения.';
+  String get failureAddressInvalid =>
+      'Укажите HTTPS-адрес сервера или локальный HTTP-адрес. Проверьте ссылку и код приглашения.';
 
   @override
-  String get failureOperationFailed => 'Не удалось выполнить операцию. Проверьте соединение и доступ к защищённому хранилищу.';
+  String get failureOperationFailed =>
+      'Не удалось выполнить операцию. Проверьте соединение и доступ к защищённому хранилищу.';
 
   @override
-  String get failureRetrySameRequest => 'Повтор с тем же текстом использует прежний ключ запроса.';
+  String get failureRetrySameRequest =>
+      'Повтор с тем же текстом использует прежний ключ запроса.';
 
   @override
-  String get failurePositionsLoad => 'Не удалось загрузить позиции чтения. История будет загружена заново.';
+  String get failurePositionsLoad =>
+      'Не удалось загрузить позиции чтения. История будет загружена заново.';
 
   @override
-  String get failurePositionsSave => 'Позиция чтения обновлена, но сохранить её на устройстве не удалось.';
+  String get failurePositionsSave =>
+      'Позиция чтения обновлена, но сохранить её на устройстве не удалось.';
 
   @override
-  String get failureChannelChanged => 'Права канала изменились. Обновите чат перед повтором.';
+  String get failureChannelChanged =>
+      'Права канала изменились. Обновите чат перед повтором.';
 
   @override
-  String get failureChannelUnavailable => 'Доступ к этому каналу изменён. Выберите доступный чат.';
+  String get failureChannelUnavailable =>
+      'Доступ к этому каналу изменён. Выберите доступный чат.';
 
   @override
-  String get failureEventsUnsupported => 'Сервер пока не поддерживает подписку событий. Обновите сервер.';
+  String get failureEventsUnsupported =>
+      'Сервер пока не поддерживает подписку событий. Обновите сервер.';
 
   @override
-  String get failureCursorRejected => 'Сервер не принял курсор истории. Подключитесь заново для загрузки сообщений.';
+  String get failureCursorRejected =>
+      'Сервер не принял курсор истории. Подключитесь заново для загрузки сообщений.';
 
   @override
-  String get failureDeviceRevoked => 'Доступ этого устройства отозван. Ключи сохранены; новое разрешение автоматически не создаётся.';
+  String get failureDeviceRevoked =>
+      'Доступ этого устройства отозван. Ключи сохранены; новое разрешение автоматически не создаётся.';
 
   @override
-  String get failureQrTooLarge => 'Карточка слишком большая для QR; сохраните JSON.';
+  String get failureQrTooLarge =>
+      'Карточка слишком большая для QR; сохраните JSON.';
 
   @override
-  String get failureQrFileTooLarge => 'Файл превышает допустимый размер: PNG — 8 МиБ, JSON — 16 КиБ.';
+  String get failureQrFileTooLarge =>
+      'Файл превышает допустимый размер: PNG — 8 МиБ, JSON — 16 КиБ.';
 
   @override
-  String get failureQrImageInvalid => 'PNG повреждён или имеет недопустимый размер. Нужен исходный файл от 64 до 2048 пикселей по каждой стороне.';
+  String get failureQrImageInvalid =>
+      'PNG повреждён или имеет недопустимый размер. Нужен исходный файл от 64 до 2048 пикселей по каждой стороне.';
 
   @override
-  String get failureQrUnreadable => 'QR не прочитан или не является карточкой Space. Выберите исходный PNG с белыми полями.';
+  String get failureQrUnreadable =>
+      'QR не прочитан или не является карточкой Space. Выберите исходный PNG с белыми полями.';
 
   @override
-  String get failureKeyStorageMismatch => 'Запись ключей принадлежит другому адресу. Операция остановлена.';
+  String get failureKeyStorageMismatch =>
+      'Запись ключей принадлежит другому адресу. Операция остановлена.';
 
   @override
-  String get failureKeyStorageSave => 'Защищённое хранилище не подтвердило сохранение ключей. Ротация не отправляется без сохранённого ключа.';
+  String get failureKeyStorageSave =>
+      'Защищённое хранилище не подтвердило сохранение ключей. Ротация не отправляется без сохранённого ключа.';
 
   @override
-  String get failureKeyJournalInvalid => 'Журнал смены ключа повреждён или превышает 64 КиБ. Проверьте защищённое хранилище.';
+  String get failureKeyJournalInvalid =>
+      'Журнал смены ключа повреждён или превышает 64 КиБ. Проверьте защищённое хранилище.';
 
   @override
-  String get failureCameraDenied => 'Доступ к камере запрещён. Разрешите его в настройках системы.';
+  String get failureCameraDenied =>
+      'Доступ к камере запрещён. Разрешите его в настройках системы.';
 
   @override
-  String get failureCameraUnavailable => 'Камера недоступна или занята. Можно восстановиться из PNG или JSON.';
+  String get failureCameraUnavailable =>
+      'Камера недоступна или занята. Можно восстановиться из PNG или JSON.';
 
   @override
-  String get failureCameraFrame => 'Не удалось прочитать кадр. Проверьте камеру или выберите файл.';
+  String get failureCameraFrame =>
+      'Не удалось прочитать кадр. Проверьте камеру или выберите файл.';
 
   @override
-  String get failureCameraStopped => 'Камера остановлена. Нажмите «Включить снова».';
+  String get failureCameraStopped =>
+      'Камера остановлена. Нажмите «Включить снова».';
 
   @override
   String get sendingMessage => 'Отправляется…';
 
   @override
-  String get messageUnconfirmed => 'Нет подтверждения сервера. Повторите отправку с тем же текстом.';
+  String get messageUnconfirmed =>
+      'Нет подтверждения сервера. Повторите отправку с тем же текстом.';
 
   @override
   String get messageAccepted => 'Принято сервером';
@@ -764,7 +857,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeStopping => 'Отключаем сервер и базу данных…';
 
   @override
-  String get homeProgressHint => 'Готовность по этапам. Точное время ожидания процесса заранее неизвестно.';
+  String get homeProgressHint =>
+      'Готовность по этапам. Точное время ожидания процесса заранее неизвестно.';
 
   @override
   String homeProgressElapsed(int seconds) {
@@ -775,4 +869,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String homeDownloadEstimate(int seconds) {
     return 'Загрузка: примерно $seconds с осталось';
   }
+
+  @override
+  String get identityDescription =>
+      'Ключи, разрешения и восстановление доступа в выбранном пространстве.';
+
+  @override
+  String get sendShortcutTitle => 'Клавиша отправки';
+
+  @override
+  String get sendShortcutHelp =>
+      'Выберите Enter или Shift+Enter для отправки. Другая комбинация добавляет новую строку.';
 }

@@ -1,3 +1,5 @@
+export 'src/server_icon.dart';
+import 'src/server_icon_picker.dart';
 export 'src/recovery_dialogs.dart';
 export 'src/recovery_camera_view.dart';
 export 'src/pairing_start_view.dart';
@@ -55,7 +57,8 @@ class _AdminPageState extends State<AdminPage> {
       AdminLocalizations.of(context) ??
       lookupAdminLocalizations(const Locale('ru'));
   SpaceGateway? api;
-  Map<String, dynamic>? identity, settings;
+  Map<String, dynamic>? identity, settings, serverIcon;
+  bool iconDirty = false, iconLoading = false;
   bool confirming = false;
   bool busy = false, initialized = true, enabled = true;
   String status = '', policy = 'open';
@@ -136,6 +139,10 @@ class _AdminPageState extends State<AdminPage> {
     final data = await call('/api/v1/space/settings');
     if (!mounted) return;
     settings = data['settings'] as Map<String, dynamic>;
+    serverIcon = settings!['icon'] is Map
+        ? Map<String, dynamic>.from(settings!['icon'] as Map)
+        : null;
+    iconDirty = false;
     title.text = settings!['title'] as String;
     chat.text = settings!['chatTitle'] as String;
     enabled = settings!['chatEnabled'] == true;
@@ -156,9 +163,14 @@ class _AdminPageState extends State<AdminPage> {
         'chatEnabled': enabled,
         'registrationPolicy': policy,
         'expectedRevision': settings!['revision'],
+        if (iconDirty) 'icon': serverIcon,
       },
     );
     settings = data['settings'] as Map<String, dynamic>;
+    serverIcon = settings!['icon'] is Map
+        ? Map<String, dynamic>.from(settings!['icon'] as Map)
+        : null;
+    iconDirty = false;
     statusKey = 'settingsSaved';
   }
 
@@ -183,7 +195,7 @@ class _AdminPageState extends State<AdminPage> {
     ),
   );
   Widget button(String label, Future<void> Function() action) => FilledButton(
-    onPressed: busy ? null : () => run(action),
+    onPressed: busy || iconLoading ? null : () => run(action),
     child: Text(label),
   );
   @override
@@ -326,6 +338,21 @@ class _AdminPageState extends State<AdminPage> {
                     style: const TextStyle(fontSize: 20),
                   ),
                   const SizedBox(height: 20),
+                  if (settings!.containsKey('icon')) ...[
+                    ServerIconPicker(
+                      value: serverIcon,
+                      disabled: busy,
+                      onChanged: (value) => setState(() {
+                        serverIcon = value;
+                        iconDirty = true;
+                      }),
+                      onPending: (value) => setState(() => iconLoading = value),
+                    ),
+                    const SizedBox(height: 20),
+                  ] else ...[
+                    Text(strings.serverIconUpgrade),
+                    const SizedBox(height: 20),
+                  ],
                   TextField(
                     controller: title,
                     maxLength: 80,

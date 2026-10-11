@@ -686,4 +686,38 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String cameraLabel(int number, String name) {
     return '摄像头 $number — $name';
   }
+
+  @override
+  String get serverIconTitle => '空间图标';
+
+  @override
+  String get serverIconUpload => '选择 PNG 或 SVG';
+
+  @override
+  String get serverIconHelp => 'PNG 将缩小为图标。SVG 仅允许基本图形，不含脚本或外部链接，最大 8 KiB。';
+
+  @override
+  String get serverIconInvalid =>
+      '无法读取图标。请选择不超过 2048×2048 的 PNG 或不超过 8 KiB 的简单 SVG。';
+
+  @override
+  String get serverIconUpgrade => '请更新服务器以更改图标。';
+
+  @override
+  String get iconOrbit => '轨道';
+
+  @override
+  String get iconPlanet => '星球';
+
+  @override
+  String get iconLeaf => '叶子';
+
+  @override
+  String get iconStar => '星星';
+
+  @override
+  String get iconBolt => '闪电';
+
+  @override
+  String get iconRocket => '火箭';
 }

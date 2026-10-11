@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -24,7 +25,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get rooms => '会议';
 
   @override
-  String get identity => '身份';
+  String get identity => '我的访问权限与设备';
 
   @override
   String get settings => '设置';
@@ -63,7 +64,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get selectedSpace => '当前空间';
 
   @override
-  String get myIdentity => '我的身份';
+  String get myIdentity => '我的访问权限与设备';
 
   @override
   String get aboutSpace => '关于此空间';
@@ -168,7 +169,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get spaceAppearance => '空间外观';
 
   @override
-  String get spaceAppearanceDescription => '服务器将能够推荐空间配色。在你同意之前，应用会保留个人主题。当前版本尚不接收此类建议。';
+  String get spaceAppearanceDescription =>
+      '服务器将能够推荐空间配色。在你同意之前，应用会保留个人主题。当前版本尚不接收此类建议。';
 
   @override
   String get language => '应用语言';
@@ -388,7 +390,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeIPFailed => '无法获取地址。请输入你的静态 IP。';
 
   @override
-  String get homePortHelp => '为让朋友连接，请将路由器的 TCP 8443 端口转发到此电脑的 8443 端口，并在防火墙中放行。无需对外开放 PostgreSQL 或本地端口。';
+  String get homePortHelp =>
+      '为让朋友连接，请将路由器的 TCP 8443 端口转发到此电脑的 8443 端口，并在防火墙中放行。无需对外开放 PostgreSQL 或本地端口。';
 
   @override
   String get goLive => '上线';
@@ -476,16 +479,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get recoveryReplaceWarning => '此地址在本设备上保存的密钥将被替换。如果它们属于其他身份，请先保存其身份卡。';
 
   @override
-  String get recoveryConnectionDenied => '密钥已保存，但服务器拒绝连接。请检查身份卡是否被撤销、访问是否被阻止以及聊天是否可用。';
+  String get recoveryConnectionDenied =>
+      '密钥已保存，但服务器拒绝连接。请检查身份卡是否被撤销、访问是否被阻止以及聊天是否可用。';
 
   @override
   String get recoveryRestored => '身份已通过新设备恢复。请检查设备列表并撤销丢失的设备。';
 
   @override
-  String get rotationRenewConfirm => '使用相同的已保存新密钥更新过期请求？如果服务器已完成更换，请完成已保存的更换操作。';
+  String get rotationRenewConfirm =>
+      '使用相同的已保存新密钥更新过期请求？如果服务器已完成更换，请完成已保存的更换操作。';
 
   @override
-  String get rotationConfirm => '更换根密钥？您的标识符、权限和历史记录会保留。旧设备和身份卡将失去访问权限。新密钥会先保存到受保护的日志。更换后务必保存新身份卡。';
+  String get rotationConfirm =>
+      '更换根密钥？您的标识符、权限和历史记录会保留。旧设备和身份卡将失去访问权限。新密钥会先保存到受保护的日志。更换后务必保存新身份卡。';
 
   @override
   String get rotationServerRequired => '请先检查原服务器地址';
@@ -772,11 +778,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String homeDownloadEstimate(int seconds) {
     return '下载：预计还需 $seconds 秒';
   }
+
+  @override
+  String get identityDescription => '所选空间的密钥、权限和访问恢复。';
+
+  @override
+  String get sendShortcutTitle => '发送快捷键';
+
+  @override
+  String get sendShortcutHelp => '选择 Enter 或 Shift+Enter 发送。另一组合键用于换行。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
 class AppLocalizationsZhHans extends AppLocalizationsZh {
-  AppLocalizationsZhHans(): super('zh_Hans');
-
-
+  AppLocalizationsZhHans() : super('zh_Hans');
 }
