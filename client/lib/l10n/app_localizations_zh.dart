@@ -440,6 +440,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeStopped => '服务器已停止，数据已保留';
+
+  @override
+  String serverNowOnline(String server) {
+    return '服务器 $server 现已在线。';
+  }
+
+  @override
+  String serverNowOffline(String server) {
+    return '与服务器 $server 的连接已断开。';
+  }
+
+  @override
+  String get serverAvailabilityUnknown => '尚不确定是否可用';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

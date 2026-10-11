@@ -166,5 +166,22 @@
   "homeInstalling": "正在验证并安装版本",
   "homeStarting": "正在启动已有的服务器",
   "homeRunning": "服务器正在此电脑上运行",
-  "homeStopped": "服务器已停止，数据已保留"
+  "homeStopped": "服务器已停止，数据已保留",
+  "serverNowOnline": "服务器 {server} 现已在线。",
+  "serverNowOffline": "与服务器 {server} 的连接已断开。",
+  "serverAvailabilityUnknown": "尚不确定是否可用",
+  "@serverNowOnline": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "@serverNowOffline": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      }
+    }
+  }
 }

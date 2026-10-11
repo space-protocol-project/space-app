@@ -466,4 +466,17 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get homeStopped => 'Сервер отключён, данные сохранены';
+
+  @override
+  String serverNowOnline(String server) {
+    return 'Сервер $server сейчас онлайн.';
+  }
+
+  @override
+  String serverNowOffline(String server) {
+    return 'Соединение с сервером $server потеряно.';
+  }
+
+  @override
+  String get serverAvailabilityUnknown => 'Доступность пока неизвестна';
 }

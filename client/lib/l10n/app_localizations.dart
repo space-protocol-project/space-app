@@ -934,6 +934,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Сервер отключён, данные сохранены'**
   String get homeStopped;
+
+  /// No description provided for @serverNowOnline.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер {server} сейчас онлайн.'**
+  String serverNowOnline(String server);
+
+  /// No description provided for @serverNowOffline.
+  ///
+  /// In ru, this message translates to:
+  /// **'Соединение с сервером {server} потеряно.'**
+  String serverNowOffline(String server);
+
+  /// No description provided for @serverAvailabilityUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступность пока неизвестна'**
+  String get serverAvailabilityUnknown;
 }
 
 class _AppLocalizationsDelegate

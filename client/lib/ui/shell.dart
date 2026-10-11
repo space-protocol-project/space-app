@@ -10,6 +10,7 @@ import '../src/chat_controller.dart';
 import '../src/preferences.dart';
 import '../src/secure_vault.dart';
 import '../src/home_controller.dart';
+import '../src/server_presence.dart';
 import 'home_panel.dart';
 import 'chat_view.dart';
 import 'connection_panel.dart';
@@ -40,9 +41,15 @@ enum Section {
 }
 
 class SpaceShell extends StatefulWidget {
-  const SpaceShell({super.key, required this.preferences, this.controller});
+  const SpaceShell({
+    super.key,
+    required this.preferences,
+    this.controller,
+    this.presence,
+  });
   final AppPreferences preferences;
   final ChatController? controller;
+  final ServerPresence? presence;
   @override
   State<SpaceShell> createState() => _SpaceShellState();
 }
@@ -52,10 +59,45 @@ class _SpaceShellState extends State<SpaceShell> {
       widget.controller ?? ChatController(SecureIdentityVault());
   final scaffold = GlobalKey<ScaffoldState>();
   final home = HomeController();
+  late final presence =
+      widget.presence ??
+      ServerPresence(
+        probe: (origin) => probeSavedServer(origin, SecureIdentityVault()),
+      );
+  StreamSubscription<ServerPresenceChange>? presenceChanges;
+  void watchSavedServers() => presence.watch(widget.preferences.origins);
+  void announcePresence(ServerPresenceChange change) {
+    if (!mounted) return;
+    final name = Uri.parse(change.origin).authority;
+    final label = change.online
+        ? context.strings.serverNowOnline(name)
+        : context.strings.serverNowOffline(name);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              change.online
+                  ? Icons.cloud_done_outlined
+                  : Icons.cloud_off_outlined,
+              color: Theme.of(context).colorScheme.onInverseSurface,
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: Text(label)),
+          ],
+        ),
+        duration: const Duration(seconds: 6),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     unawaited(home.load());
+    widget.preferences.addListener(watchSavedServers);
+    presenceChanges = presence.changes.listen(announcePresence);
+    watchSavedServers();
   }
 
   Future<void> startHome(String ip) async {
@@ -170,6 +212,9 @@ class _SpaceShellState extends State<SpaceShell> {
 
   @override
   void dispose() {
+    widget.preferences.removeListener(watchSavedServers);
+    unawaited(presenceChanges?.cancel());
+    if (widget.presence == null) presence.dispose();
     home.dispose();
     if (widget.controller == null) controller.dispose();
     super.dispose();
@@ -376,7 +421,28 @@ class _SpaceShellState extends State<SpaceShell> {
             for (final origin in widget.preferences.origins)
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.public, size: 18),
+                leading: Tooltip(
+                  message: presence.online(origin) == null
+                      ? context.strings.serverAvailabilityUnknown
+                      : presence.online(origin) == true
+                      ? context.strings.serverNowOnline(
+                          Uri.parse(origin).authority,
+                        )
+                      : context.strings.serverNowOffline(
+                          Uri.parse(origin).authority,
+                        ),
+                  child: Icon(
+                    presence.online(origin) == null
+                        ? Icons.public
+                        : presence.online(origin) == true
+                        ? Icons.cloud_done_outlined
+                        : Icons.cloud_off_outlined,
+                    size: 18,
+                    color: presence.online(origin) == true
+                        ? Theme.of(context).colorScheme.secondary
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
                 title: Text(origin, style: const TextStyle(fontSize: 11)),
                 onTap: controller.busy ? null : () => connection(origin),
               ),
@@ -637,7 +703,12 @@ class _SpaceShellState extends State<SpaceShell> {
   );
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-    animation: Listenable.merge([controller, widget.preferences, home]),
+    animation: Listenable.merge([
+      controller,
+      widget.preferences,
+      home,
+      presence,
+    ]),
     builder: (context, _) => LayoutBuilder(
       builder: (context, box) {
         final compact = box.maxWidth < 760;

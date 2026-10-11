@@ -166,5 +166,22 @@
   "homeInstalling": "Проверяем и устанавливаем выпуск",
   "homeStarting": "Запускаем сохранённый сервер",
   "homeRunning": "Сервер работает на этом компьютере",
-  "homeStopped": "Сервер отключён, данные сохранены"
+  "homeStopped": "Сервер отключён, данные сохранены",
+  "serverNowOnline": "Сервер {server} сейчас онлайн.",
+  "serverNowOffline": "Соединение с сервером {server} потеряно.",
+  "serverAvailabilityUnknown": "Доступность пока неизвестна",
+  "@serverNowOnline": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "@serverNowOffline": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -166,5 +166,22 @@
   "homeInstalling": "Verifying and installing the release",
   "homeStarting": "Starting your existing server",
   "homeRunning": "The server is running on this computer",
-  "homeStopped": "Server stopped; data preserved"
+  "homeStopped": "Server stopped; data preserved",
+  "serverNowOnline": "Server {server} is now online.",
+  "serverNowOffline": "Connection to server {server} was lost.",
+  "serverAvailabilityUnknown": "Availability is not yet known",
+  "@serverNowOnline": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "@serverNowOffline": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      }
+    }
+  }
 }

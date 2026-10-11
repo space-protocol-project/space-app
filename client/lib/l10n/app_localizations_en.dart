@@ -462,4 +462,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeStopped => 'Server stopped; data preserved';
+
+  @override
+  String serverNowOnline(String server) {
+    return 'Server $server is now online.';
+  }
+
+  @override
+  String serverNowOffline(String server) {
+    return 'Connection to server $server was lost.';
+  }
+
+  @override
+  String get serverAvailabilityUnknown => 'Availability is not yet known';
 }
