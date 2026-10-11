@@ -761,4 +761,76 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get failureRetrySameRequest =>
       'Retrying the same text reuses the original request key.';
+
+  @override
+  String get failurePositionsLoad =>
+      'Could not load reading positions. History will be loaded again.';
+
+  @override
+  String get failurePositionsSave =>
+      'The reading position was updated but could not be saved on this device.';
+
+  @override
+  String get failureChannelChanged =>
+      'Channel permissions changed. Refresh the chat before retrying.';
+
+  @override
+  String get failureChannelUnavailable =>
+      'Access to this channel changed. Select an accessible chat.';
+
+  @override
+  String get failureEventsUnsupported =>
+      'This server does not support event subscriptions yet. Update the server.';
+
+  @override
+  String get failureCursorRejected =>
+      'The server rejected the history cursor. Reconnect to load messages.';
+
+  @override
+  String get failureDeviceRevoked =>
+      'Access for this device was revoked. Keys were preserved; no new authorization is created automatically.';
+
+  @override
+  String get failureQrTooLarge =>
+      'The card is too large for QR. Save it as JSON.';
+
+  @override
+  String get failureQrFileTooLarge =>
+      'The file exceeds the size limit: PNG 8 MiB, JSON 16 KiB.';
+
+  @override
+  String get failureQrImageInvalid =>
+      'The PNG is damaged or has invalid dimensions. Use the original file, 64–2048 pixels on each side.';
+
+  @override
+  String get failureQrUnreadable =>
+      'The QR could not be read or is not a Space card. Select the original PNG with white margins.';
+
+  @override
+  String get failureKeyStorageMismatch =>
+      'The key record belongs to another address. The operation was stopped.';
+
+  @override
+  String get failureKeyStorageSave =>
+      'Secure storage did not confirm that keys were saved. Rotation is not submitted without a saved key.';
+
+  @override
+  String get failureKeyJournalInvalid =>
+      'The key rotation journal is damaged or exceeds 64 KiB. Check secure storage.';
+
+  @override
+  String get failureCameraDenied =>
+      'Camera access was denied. Allow it in system settings.';
+
+  @override
+  String get failureCameraUnavailable =>
+      'The camera is unavailable or busy. Restore from PNG or JSON instead.';
+
+  @override
+  String get failureCameraFrame =>
+      'Could not read the frame. Check the camera or select a file.';
+
+  @override
+  String get failureCameraStopped =>
+      'The camera was stopped. Select Restart camera.';
 }

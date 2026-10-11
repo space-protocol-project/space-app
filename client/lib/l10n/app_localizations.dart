@@ -1414,6 +1414,114 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Повтор с тем же текстом использует прежний ключ запроса.'**
   String get failureRetrySameRequest;
+
+  /// No description provided for @failurePositionsLoad.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить позиции чтения. История будет загружена заново.'**
+  String get failurePositionsLoad;
+
+  /// No description provided for @failurePositionsSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Позиция чтения обновлена, но сохранить её на устройстве не удалось.'**
+  String get failurePositionsSave;
+
+  /// No description provided for @failureChannelChanged.
+  ///
+  /// In ru, this message translates to:
+  /// **'Права канала изменились. Обновите чат перед повтором.'**
+  String get failureChannelChanged;
+
+  /// No description provided for @failureChannelUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ к этому каналу изменён. Выберите доступный чат.'**
+  String get failureChannelUnavailable;
+
+  /// No description provided for @failureEventsUnsupported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер пока не поддерживает подписку событий. Обновите сервер.'**
+  String get failureEventsUnsupported;
+
+  /// No description provided for @failureCursorRejected.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер не принял курсор истории. Подключитесь заново для загрузки сообщений.'**
+  String get failureCursorRejected;
+
+  /// No description provided for @failureDeviceRevoked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ этого устройства отозван. Ключи сохранены; новое разрешение автоматически не создаётся.'**
+  String get failureDeviceRevoked;
+
+  /// No description provided for @failureQrTooLarge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карточка слишком большая для QR; сохраните JSON.'**
+  String get failureQrTooLarge;
+
+  /// No description provided for @failureQrFileTooLarge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Файл превышает допустимый размер: PNG — 8 МиБ, JSON — 16 КиБ.'**
+  String get failureQrFileTooLarge;
+
+  /// No description provided for @failureQrImageInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'PNG повреждён или имеет недопустимый размер. Нужен исходный файл от 64 до 2048 пикселей по каждой стороне.'**
+  String get failureQrImageInvalid;
+
+  /// No description provided for @failureQrUnreadable.
+  ///
+  /// In ru, this message translates to:
+  /// **'QR не прочитан или не является карточкой Space. Выберите исходный PNG с белыми полями.'**
+  String get failureQrUnreadable;
+
+  /// No description provided for @failureKeyStorageMismatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запись ключей принадлежит другому адресу. Операция остановлена.'**
+  String get failureKeyStorageMismatch;
+
+  /// No description provided for @failureKeyStorageSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Защищённое хранилище не подтвердило сохранение ключей. Ротация не отправляется без сохранённого ключа.'**
+  String get failureKeyStorageSave;
+
+  /// No description provided for @failureKeyJournalInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Журнал смены ключа повреждён или превышает 64 КиБ. Проверьте защищённое хранилище.'**
+  String get failureKeyJournalInvalid;
+
+  /// No description provided for @failureCameraDenied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ к камере запрещён. Разрешите его в настройках системы.'**
+  String get failureCameraDenied;
+
+  /// No description provided for @failureCameraUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Камера недоступна или занята. Можно восстановиться из PNG или JSON.'**
+  String get failureCameraUnavailable;
+
+  /// No description provided for @failureCameraFrame.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось прочитать кадр. Проверьте камеру или выберите файл.'**
+  String get failureCameraFrame;
+
+  /// No description provided for @failureCameraStopped.
+  ///
+  /// In ru, this message translates to:
+  /// **'Камера остановлена. Нажмите «Включить снова».'**
+  String get failureCameraStopped;
 }
 
 class _AppLocalizationsDelegate

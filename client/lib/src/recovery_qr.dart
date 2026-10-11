@@ -1,3 +1,5 @@
+import 'local_failure.dart';
+
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -11,7 +13,8 @@ const _pngSignature = [137, 80, 78, 71, 13, 10, 26, 10];
 Uint8List recoveryPng(String packet) {
   final text = recoveryQrPrefix + packet;
   if (utf8.encode(text).length > 2800) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.qrTooLarge,
       'Карточка слишком большая для QR; сохраните JSON',
     );
   }
@@ -45,18 +48,36 @@ Uint8List recoveryPng(String packet) {
 
 String cardFromArtifact(Uint8List bytes) {
   if (bytes.length > maxRecoveryImageBytes) {
-    throw const FormatException('Файл слишком большой');
+    throw const LocalFailure(
+      LocalFailureCode.qrFileTooLarge,
+      'Файл слишком большой',
+    );
   }
   final png =
       bytes.length >= 8 &&
       List.generate(8, (i) => bytes[i]).join(',') == _pngSignature.join(',');
   if (!png) {
     if (bytes.length > 16384) {
-      throw const FormatException('JSON-карточка слишком большая');
+      throw const LocalFailure(
+        LocalFailureCode.qrFileTooLarge,
+        'JSON-карточка слишком большая',
+      );
     }
-    return utf8.decode(bytes);
+    try {
+      return utf8.decode(bytes);
+    } on FormatException {
+      throw const LocalFailure(
+        LocalFailureCode.cardCorrupt,
+        'Некорректный UTF-8 карточки',
+      );
+    }
   }
-  if (bytes.length < 24) throw const FormatException('Повреждённый PNG');
+  if (bytes.length < 24) {
+    throw const LocalFailure(
+      LocalFailureCode.qrImageInvalid,
+      'Повреждённый PNG',
+    );
+  }
   final header = ByteData.sublistView(bytes);
   final width = header.getUint32(16), height = header.getUint32(20);
   if (width < 64 ||
@@ -64,12 +85,18 @@ String cardFromArtifact(Uint8List bytes) {
       width > 2048 ||
       height > 2048 ||
       width * height > 4194304) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.qrImageInvalid,
       'PNG должен быть от 64 до 2048 пикселей по каждой стороне',
     );
   }
   final image = img.decodePng(bytes);
-  if (image == null) throw const FormatException('Повреждённый PNG');
+  if (image == null) {
+    throw const LocalFailure(
+      LocalFailureCode.qrImageInvalid,
+      'Повреждённый PNG',
+    );
+  }
   final pixels = Int32List(width * height);
   for (var y = 0; y < height; y++) {
     for (var x = 0; x < width; x++) {
@@ -97,13 +124,17 @@ String cardFromArtifact(Uint8List bytes) {
           .text;
     }
     if (!text.startsWith(recoveryQrPrefix) || utf8.encode(text).length > 2800) {
-      throw const FormatException('QR не является карточкой Space');
+      throw const LocalFailure(
+        LocalFailureCode.qrUnreadable,
+        'QR не является карточкой Space',
+      );
     }
     return text.substring(recoveryQrPrefix.length);
   } on FormatException {
     rethrow;
   } catch (_) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.qrUnreadable,
       'QR не прочитан. Выберите исходный PNG с белыми полями.',
     );
   }

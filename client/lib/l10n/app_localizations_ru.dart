@@ -764,4 +764,76 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get failureRetrySameRequest =>
       'Повтор с тем же текстом использует прежний ключ запроса.';
+
+  @override
+  String get failurePositionsLoad =>
+      'Не удалось загрузить позиции чтения. История будет загружена заново.';
+
+  @override
+  String get failurePositionsSave =>
+      'Позиция чтения обновлена, но сохранить её на устройстве не удалось.';
+
+  @override
+  String get failureChannelChanged =>
+      'Права канала изменились. Обновите чат перед повтором.';
+
+  @override
+  String get failureChannelUnavailable =>
+      'Доступ к этому каналу изменён. Выберите доступный чат.';
+
+  @override
+  String get failureEventsUnsupported =>
+      'Сервер пока не поддерживает подписку событий. Обновите сервер.';
+
+  @override
+  String get failureCursorRejected =>
+      'Сервер не принял курсор истории. Подключитесь заново для загрузки сообщений.';
+
+  @override
+  String get failureDeviceRevoked =>
+      'Доступ этого устройства отозван. Ключи сохранены; новое разрешение автоматически не создаётся.';
+
+  @override
+  String get failureQrTooLarge =>
+      'Карточка слишком большая для QR; сохраните JSON.';
+
+  @override
+  String get failureQrFileTooLarge =>
+      'Файл превышает допустимый размер: PNG — 8 МиБ, JSON — 16 КиБ.';
+
+  @override
+  String get failureQrImageInvalid =>
+      'PNG повреждён или имеет недопустимый размер. Нужен исходный файл от 64 до 2048 пикселей по каждой стороне.';
+
+  @override
+  String get failureQrUnreadable =>
+      'QR не прочитан или не является карточкой Space. Выберите исходный PNG с белыми полями.';
+
+  @override
+  String get failureKeyStorageMismatch =>
+      'Запись ключей принадлежит другому адресу. Операция остановлена.';
+
+  @override
+  String get failureKeyStorageSave =>
+      'Защищённое хранилище не подтвердило сохранение ключей. Ротация не отправляется без сохранённого ключа.';
+
+  @override
+  String get failureKeyJournalInvalid =>
+      'Журнал смены ключа повреждён или превышает 64 КиБ. Проверьте защищённое хранилище.';
+
+  @override
+  String get failureCameraDenied =>
+      'Доступ к камере запрещён. Разрешите его в настройках системы.';
+
+  @override
+  String get failureCameraUnavailable =>
+      'Камера недоступна или занята. Можно восстановиться из PNG или JSON.';
+
+  @override
+  String get failureCameraFrame =>
+      'Не удалось прочитать кадр. Проверьте камеру или выберите файл.';
+
+  @override
+  String get failureCameraStopped =>
+      'Камера остановлена. Нажмите «Включить снова».';
 }

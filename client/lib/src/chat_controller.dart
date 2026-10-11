@@ -100,7 +100,12 @@ class ChatController extends ChangeNotifier {
         nav.selectChannel(selected);
       }
     } catch (_) {
-      error = 'Не удалось загрузить позиции чтения. История будет загружена заново.';
+      error = _explain(
+        const LocalFailure(
+          LocalFailureCode.positionsLoad,
+          'Не удалось загрузить позиции чтения. История будет загружена заново.',
+        ),
+      );
     }
   }
 
@@ -121,8 +126,12 @@ class ChatController extends ChangeNotifier {
         'channels': channelData,
       });
     } catch (_) {
-      error =
-          'Позиция чтения обновлена, но сохранить её на устройстве не удалось.';
+      error = _explain(
+        const LocalFailure(
+          LocalFailureCode.positionsSave,
+          'Позиция чтения обновлена, но сохранить её на устройстве не удалось.',
+        ),
+      );
       _update();
     }
   }
@@ -305,7 +314,10 @@ class ChatController extends ChangeNotifier {
       _messages.clear();
       for (final message in initial) {
         if (navigation != null && message.channelId != channelId) {
-          throw const FormatException('История другого канала');
+          throw const LocalFailure(
+            LocalFailureCode.protocolInvalid,
+            'История другого канала',
+          );
         }
         _messages[message.id] = message;
       }
@@ -355,7 +367,10 @@ class ChatController extends ChangeNotifier {
       if (_disposed) return;
       for (final m in initial) {
         if (m.channelId != nextId) {
-          throw const FormatException('История другого канала');
+          throw const LocalFailure(
+            LocalFailureCode.protocolInvalid,
+            'История другого канала',
+          );
         }
         _messages[m.id] = m;
       }
@@ -415,8 +430,18 @@ class ChatController extends ChangeNotifier {
         cursor = '';
       }
       error = canRead
-          ? 'Права канала изменились. Обновите чат перед повтором.'
-          : 'Доступ к этому каналу изменён. Выберите доступный чат.';
+          ? _explain(
+              const LocalFailure(
+                LocalFailureCode.channelChanged,
+                'Права канала изменились. Обновите чат перед повтором.',
+              ),
+            )
+          : _explain(
+              const LocalFailure(
+                LocalFailureCode.channelUnavailable,
+                'Доступ к этому каналу изменён. Выберите доступный чат.',
+              ),
+            );
     } catch (e) {
       if (_disposed || generation != _generation) return true;
       _messages.clear();
@@ -460,7 +485,12 @@ class ChatController extends ChangeNotifier {
             cursor = '';
             _pendingKey = '';
             _pendingText = '';
-            error = 'Доступ к этому каналу изменён. Выберите доступный чат.';
+            error = _explain(
+              const LocalFailure(
+                LocalFailureCode.channelUnavailable,
+                'Доступ к этому каналу изменён. Выберите доступный чат.',
+              ),
+            );
           } else if (_activeIterator == null && !busy && channelId.isNotEmpty) {
             await selectChannel(channelId);
           }
@@ -545,17 +575,30 @@ class ChatController extends ChangeNotifier {
           if (!_current(session, generation)) return;
           if (navigation != null && (!canRead || channelId != watchedChannel)) {
             _messages.clear();
-            error = 'Канал больше не доступен для чтения.';
+            error = _explain(
+              const LocalFailure(
+                LocalFailureCode.channelUnavailable,
+                'Канал больше не доступен для чтения.',
+              ),
+            );
             _update();
             return;
           }
           if (frame.heartbeat) {
             if (frame.hasEvent() || frame.cursor != cursor) {
-              throw const FormatException('Heartbeat содержит неверный курсор');
+              throw const LocalFailure(
+                LocalFailureCode.protocolInvalid,
+                'Heartbeat содержит неверный курсор',
+              );
             }
             if (!canRead || channelId != watchedChannel) {
               _messages.clear();
-              error = 'Канал больше не доступен для чтения.';
+              error = _explain(
+                const LocalFailure(
+                  LocalFailureCode.channelUnavailable,
+                  'Канал больше не доступен для чтения.',
+                ),
+              );
               _update();
               return;
             }
@@ -568,7 +611,10 @@ class ChatController extends ChangeNotifier {
                 frame.event.content.sequence.isNegative ||
                 frame.cursor.isEmpty ||
                 frame.event.cursor != frame.cursor) {
-              throw const FormatException('Неподдерживаемое событие потока');
+              throw const LocalFailure(
+                LocalFailureCode.protocolInvalid,
+                'Неподдерживаемое событие потока',
+              );
             }
             _messages[frame.event.content.id] = frame.event.content;
             cursor = frame.cursor;
@@ -608,10 +654,20 @@ class ChatController extends ChangeNotifier {
           connected = false;
           error =
               problem is GrpcError && problem.code == StatusCode.unimplemented
-              ? 'Сервер пока не поддерживает подписку событий. Обновите сервер.'
+              ? _explain(
+                  const LocalFailure(
+                    LocalFailureCode.eventsUnsupported,
+                    'Сервер пока не поддерживает подписку событий. Обновите сервер.',
+                  ),
+                )
               : problem is GrpcError &&
                     problem.code == StatusCode.invalidArgument
-              ? 'Сервер не принял курсор истории. Подключитесь заново для загрузки сообщений.'
+              ? _explain(
+                  const LocalFailure(
+                    LocalFailureCode.cursorRejected,
+                    'Сервер не принял курсор истории. Подключитесь заново для загрузки сообщений.',
+                  ),
+                )
               : _explain(problem);
           _update();
           return;
@@ -657,7 +713,10 @@ class ChatController extends ChangeNotifier {
     try {
       final content = await session.send(text, _pendingKey);
       if (navigation != null && content.channelId != channelId) {
-        throw const FormatException('Ответ другого канала');
+        throw const LocalFailure(
+          LocalFailureCode.protocolInvalid,
+          'Ответ другого канала',
+        );
       }
       _messages[content.id] = content;
       _pendingKey = '';
@@ -683,7 +742,12 @@ class ChatController extends ChangeNotifier {
       await _session!.revoke();
       _stopCatalog();
       connected = false;
-      error = 'Доступ этого устройства отозван. Ключи сохранены; новый grant автоматически не создаётся.';
+      error = _explain(
+        const LocalFailure(
+          LocalFailureCode.deviceRevoked,
+          'Доступ этого устройства отозван. Ключи сохранены; новый grant автоматически не создаётся.',
+        ),
+      );
     } catch (e) {
       error = _explain(e);
       if (_session != null && connected) {

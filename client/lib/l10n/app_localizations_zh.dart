@@ -693,6 +693,60 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get failureRetrySameRequest => '重试相同文本会重复使用原请求密钥。';
+
+  @override
+  String get failurePositionsLoad => '无法加载阅读位置。将重新加载历史记录。';
+
+  @override
+  String get failurePositionsSave => '阅读位置已更新，但无法保存到此设备。';
+
+  @override
+  String get failureChannelChanged => '频道权限已更改。请刷新聊天后重试。';
+
+  @override
+  String get failureChannelUnavailable => '此频道的访问权限已更改。请选择可访问的聊天。';
+
+  @override
+  String get failureEventsUnsupported => '此服务器尚不支持事件订阅。请更新服务器。';
+
+  @override
+  String get failureCursorRejected => '服务器拒绝了历史游标。请重新连接以加载消息。';
+
+  @override
+  String get failureDeviceRevoked => '此设备的访问权限已撤销。密钥已保留；不会自动创建新授权。';
+
+  @override
+  String get failureQrTooLarge => '卡片太大，无法生成二维码。请保存为 JSON。';
+
+  @override
+  String get failureQrFileTooLarge => '文件超过大小限制：PNG 为 8 MiB，JSON 为 16 KiB。';
+
+  @override
+  String get failureQrImageInvalid => 'PNG 已损坏或尺寸无效。请使用原始文件，每边为 64–2048 像素。';
+
+  @override
+  String get failureQrUnreadable => '无法读取二维码，或它不是 Space 卡片。请选择带白色边距的原始 PNG。';
+
+  @override
+  String get failureKeyStorageMismatch => '密钥记录属于其他地址。操作已停止。';
+
+  @override
+  String get failureKeyStorageSave => '安全存储未确认密钥已保存。没有已保存的密钥时不会提交轮换。';
+
+  @override
+  String get failureKeyJournalInvalid => '密钥轮换日志已损坏或超过 64 KiB。请检查安全存储。';
+
+  @override
+  String get failureCameraDenied => '摄像头访问被拒绝。请在系统设置中允许访问。';
+
+  @override
+  String get failureCameraUnavailable => '摄像头不可用或被占用。可使用 PNG 或 JSON 恢复。';
+
+  @override
+  String get failureCameraFrame => '无法读取画面。请检查摄像头或选择文件。';
+
+  @override
+  String get failureCameraStopped => '摄像头已停止。请选择重新启动摄像头。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

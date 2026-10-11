@@ -4,6 +4,26 @@ import 'dart:io';
 import 'package:grpc/grpc.dart';
 
 enum LocalFailureCode {
+  cameraDenied,
+  cameraUnavailable,
+  cameraFrame,
+  cameraStopped,
+
+  positionsLoad,
+  positionsSave,
+  channelChanged,
+  channelUnavailable,
+  eventsUnsupported,
+  cursorRejected,
+  deviceRevoked,
+  qrTooLarge,
+  qrFileTooLarge,
+  qrImageInvalid,
+  qrUnreadable,
+  keyStorageMismatch,
+  keyStorageSave,
+  keyJournalInvalid,
+
   permissionDenied,
   unauthenticated,
   serverLimit,

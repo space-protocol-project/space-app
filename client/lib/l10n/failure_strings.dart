@@ -8,6 +8,29 @@ String localFailureText(
   BuildContext context,
   LocalFailureCode code,
 ) => switch (code) {
+  LocalFailureCode.cameraDenied => context.strings.failureCameraDenied,
+  LocalFailureCode.cameraUnavailable =>
+    context.strings.failureCameraUnavailable,
+  LocalFailureCode.cameraFrame => context.strings.failureCameraFrame,
+  LocalFailureCode.cameraStopped => context.strings.failureCameraStopped,
+  LocalFailureCode.positionsLoad => context.strings.failurePositionsLoad,
+  LocalFailureCode.positionsSave => context.strings.failurePositionsSave,
+  LocalFailureCode.channelChanged => context.strings.failureChannelChanged,
+  LocalFailureCode.channelUnavailable =>
+    context.strings.failureChannelUnavailable,
+  LocalFailureCode.eventsUnsupported =>
+    context.strings.failureEventsUnsupported,
+  LocalFailureCode.cursorRejected => context.strings.failureCursorRejected,
+  LocalFailureCode.deviceRevoked => context.strings.failureDeviceRevoked,
+  LocalFailureCode.qrTooLarge => context.strings.failureQrTooLarge,
+  LocalFailureCode.qrFileTooLarge => context.strings.failureQrFileTooLarge,
+  LocalFailureCode.qrImageInvalid => context.strings.failureQrImageInvalid,
+  LocalFailureCode.qrUnreadable => context.strings.failureQrUnreadable,
+  LocalFailureCode.keyStorageMismatch =>
+    context.strings.failureKeyStorageMismatch,
+  LocalFailureCode.keyStorageSave => context.strings.failureKeyStorageSave,
+  LocalFailureCode.keyJournalInvalid =>
+    context.strings.failureKeyJournalInvalid,
   LocalFailureCode.permissionDenied => context.strings.failurePermissionDenied,
   LocalFailureCode.unauthenticated => context.strings.failureUnauthenticated,
   LocalFailureCode.serverLimit => context.strings.failureServerLimit,

@@ -1,3 +1,6 @@
+import '../l10n/failure_strings.dart';
+import '../src/local_failure.dart';
+
 import 'dart:async';
 import 'dart:io';
 
@@ -29,7 +32,7 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
   Timer? timer;
   Future<void>? frameJob;
   int generation = 0;
-  String? error;
+  LocalFailureCode? error;
   bool starting = false;
   @override
   void initState() {
@@ -95,16 +98,14 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
       if (mounted) {
         setState(
           () => error = e.code.contains('AccessDenied')
-              ? 'Доступ к камере запрещён. Разрешите его в настройках Windows.'
-              : 'Камера недоступна или занята другим приложением. Можно восстановиться из файла.',
+              ? LocalFailureCode.cameraDenied
+              : LocalFailureCode.cameraUnavailable,
         );
       }
     } catch (_) {
       await stop();
       if (mounted) {
-        setState(
-          () => error = 'Не удалось открыть камеру. Используйте PNG или JSON.',
-        );
+        setState(() => error = LocalFailureCode.cameraUnavailable);
       }
     } finally {
       starting = false;
@@ -129,10 +130,7 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
       }
     } catch (_) {
       if (mounted && token == generation) {
-        setState(
-          () => error =
-              'Не удалось прочитать кадр. Проверьте камеру или выберите файл.',
-        );
+        setState(() => error = LocalFailureCode.cameraFrame);
       }
     } finally {
       if (photo != null) {
@@ -158,7 +156,7 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
     if (state != AppLifecycleState.resumed) {
       unawaited(stop());
       if (mounted) {
-        setState(() => error = 'Камера остановлена. Нажмите «Включить снова».');
+        setState(() => error = LocalFailureCode.cameraStopped);
       }
     }
   }
@@ -175,7 +173,7 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
     cameras: [for (final camera in cameras) camera.name],
     selected: selected?.name,
     starting: starting,
-    error: error,
+    error: error == null ? null : localFailureText(context, error!),
     preview: controller?.value.isInitialized == true
         ? AspectRatio(
             aspectRatio: controller!.value.aspectRatio,
