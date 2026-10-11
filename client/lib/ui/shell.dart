@@ -625,14 +625,8 @@ class _SpaceShellState extends State<SpaceShell> {
       SettingsPanel(preferences: widget.preferences),
     ],
   );
-  Widget header(bool compact) => Container(
+  Widget header(bool compact) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-    decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
-      border: Border(
-        bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-      ),
-    ),
     child: Row(
       children: [
         if (compact)
@@ -750,7 +744,15 @@ class _SpaceShellState extends State<SpaceShell> {
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ),
-            Expanded(child: pages()),
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(child: pages()),
+                  if (box.maxWidth >= 1320) contextPanel(),
+                ],
+              ),
+            ),
           ],
         );
         return CallbackShortcuts(
@@ -834,10 +836,6 @@ class _SpaceShellState extends State<SpaceShell> {
                           ),
                         ),
                       ),
-                      if (box.maxWidth >= 1320) ...[
-                        const SizedBox(width: 8),
-                        contextPanel(),
-                      ],
                     ],
                   ),
                 ),
