@@ -728,6 +728,8 @@ class _SpaceShellState extends State<SpaceShell> {
       padding: const EdgeInsets.fromLTRB(16, 20, 8, 20),
       child: SurfaceCard(
         padding: const EdgeInsets.all(20),
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        hoverBorder: true,
         child: contextDetails(),
       ),
     ),

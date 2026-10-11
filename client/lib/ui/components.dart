@@ -21,23 +21,63 @@ class RegionFrame extends StatelessWidget {
   );
 }
 
-class SurfaceCard extends StatelessWidget {
+class SurfaceCard extends StatefulWidget {
   const SurfaceCard({
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(24),
+    this.color,
+    this.hoverBorder = false,
   });
   final Widget child;
   final EdgeInsets padding;
+  final Color? color;
+  final bool hoverBorder;
   @override
-  Widget build(BuildContext context) => Material(
-    color: Theme.of(context).colorScheme.surface,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(areaRadius),
-      side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-    ),
-    child: Padding(padding: padding, child: child),
-  );
+  State<SurfaceCard> createState() => _SurfaceCardState();
+}
+
+class _SurfaceCardState extends State<SurfaceCard> {
+  bool hovered = false;
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    if (!widget.hoverBorder) {
+      return Material(
+        color: widget.color ?? colors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(areaRadius),
+          side: BorderSide(color: colors.outlineVariant),
+        ),
+        child: Padding(padding: widget.padding, child: widget.child),
+      );
+    }
+    final card = AnimatedContainer(
+      duration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+      decoration: BoxDecoration(
+        color: widget.color ?? colors.surface,
+        borderRadius: BorderRadius.circular(areaRadius),
+        border: Border.all(
+          color: hovered
+              ? colors.outlineVariant
+              : colors.outlineVariant.withValues(alpha: 0),
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(areaRadius),
+        child: Padding(padding: widget.padding, child: widget.child),
+      ),
+    );
+    return MouseRegion(
+      onEnter: (_) => setState(() => hovered = true),
+      onExit: (_) => setState(() => hovered = false),
+      child: card,
+    );
+  }
 }
 
 class PageBody extends StatelessWidget {
