@@ -1522,6 +1522,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Камера остановлена. Нажмите «Включить снова».'**
   String get failureCameraStopped;
+
+  /// No description provided for @sendingMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправляется…'**
+  String get sendingMessage;
+
+  /// No description provided for @messageUnconfirmed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет подтверждения сервера. Повторите отправку с тем же текстом.'**
+  String get messageUnconfirmed;
+
+  /// No description provided for @messageAccepted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Принято сервером'**
+  String get messageAccepted;
 }
 
 class _AppLocalizationsDelegate

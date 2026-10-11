@@ -1,3 +1,5 @@
+import '../l10n/strings.dart';
+
 import 'package:flutter/material.dart';
 
 class MessageBubble extends StatelessWidget {
@@ -7,9 +9,12 @@ class MessageBubble extends StatelessWidget {
     required this.author,
     required this.mine,
     this.grouped = false,
+    this.sentAt,
+    this.accepted = false,
   });
   final String text, author;
-  final bool mine, grouped;
+  final bool mine, grouped, accepted;
+  final DateTime? sentAt;
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +81,41 @@ class MessageBubble extends StatelessWidget {
                           color: colors.onSurface,
                         ),
                       ),
+                      if (sentAt != null || accepted)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (sentAt != null)
+                                Tooltip(
+                                  message:
+                                      '${MaterialLocalizations.of(context).formatFullDate(sentAt!)} ${MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(sentAt!))}',
+                                  child: Text(
+                                    MaterialLocalizations.of(context)
+                                        .formatTimeOfDay(
+                                          TimeOfDay.fromDateTime(sentAt!),
+                                        ),
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: colors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                              if (accepted) ...[
+                                const SizedBox(width: 6),
+                                Tooltip(
+                                  message: context.strings.messageAccepted,
+                                  child: Icon(
+                                    Icons.check,
+                                    size: 14,
+                                    color: colors.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 ),

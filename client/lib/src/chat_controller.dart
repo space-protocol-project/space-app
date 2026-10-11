@@ -8,6 +8,8 @@ import 'local_failure.dart';
 import 'channel_positions.dart';
 import 'generated/space/v1/space.pb.dart';
 
+enum MessageSendStatus { idle, sending, unconfirmed, accepted }
+
 class ChatController extends ChangeNotifier {
   ChatController(
     this.vault, {
@@ -283,6 +285,7 @@ class ChatController extends ChangeNotifier {
     _messages.clear();
     _pendingKey = '';
     _pendingText = '';
+    sendStatus = MessageSendStatus.idle;
     _update();
     try {
       _positionTimer?.cancel();
@@ -352,6 +355,7 @@ class ChatController extends ChangeNotifier {
     _messages.clear();
     cursor = '';
     _pendingText = '';
+    sendStatus = MessageSendStatus.idle;
     _pendingKey = '';
     _update();
     try {
@@ -426,6 +430,7 @@ class ChatController extends ChangeNotifier {
       if (!canRead) {
         _messages.clear();
         _pendingText = '';
+        sendStatus = MessageSendStatus.idle;
         _pendingKey = '';
         cursor = '';
       }
@@ -485,6 +490,7 @@ class ChatController extends ChangeNotifier {
             cursor = '';
             _pendingKey = '';
             _pendingText = '';
+            sendStatus = MessageSendStatus.idle;
             error = _explain(
               const LocalFailure(
                 LocalFailureCode.channelUnavailable,
@@ -694,6 +700,8 @@ class ChatController extends ChangeNotifier {
             StatusCode.unimplemented,
             StatusCode.notFound,
           ].contains(problem.code);
+  MessageSendStatus sendStatus = MessageSendStatus.idle;
+
   Future<bool> send(String text) async {
     final session = _session;
     if (busy ||
@@ -707,11 +715,17 @@ class ChatController extends ChangeNotifier {
       _pendingText = text;
       _pendingKey = newRequestKey();
     }
+    final startingChannel = channelId;
+    sendStatus = MessageSendStatus.sending;
     busy = true;
     error = '';
     _update();
     try {
       final content = await session.send(text, _pendingKey);
+      if (!identical(_session, session) || channelId != startingChannel) {
+        sendStatus = MessageSendStatus.idle;
+        return false;
+      }
       if (navigation != null && content.channelId != channelId) {
         throw const LocalFailure(
           LocalFailureCode.protocolInvalid,
@@ -721,8 +735,14 @@ class ChatController extends ChangeNotifier {
       _messages[content.id] = content;
       _pendingKey = '';
       _pendingText = '';
+      sendStatus = MessageSendStatus.accepted;
       return true;
     } catch (e) {
+      if (!identical(_session, session) || channelId != startingChannel) {
+        sendStatus = MessageSendStatus.idle;
+        return false;
+      }
+      sendStatus = MessageSendStatus.unconfirmed;
       if (await _channelDenied(e)) return false;
       error =
           '${_explain(e, retry: true)} Повтор с тем же текстом использует прежний ключ запроса.';
@@ -778,6 +798,7 @@ class ChatController extends ChangeNotifier {
       _messages.clear();
       _pendingKey = '';
       _pendingText = '';
+      sendStatus = MessageSendStatus.idle;
       _cursors.clear();
       _readThrough.clear();
       _readSequences.clear();

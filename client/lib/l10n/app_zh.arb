@@ -308,5 +308,8 @@
   "failureCameraDenied": "摄像头访问被拒绝。请在系统设置中允许访问。",
   "failureCameraUnavailable": "摄像头不可用或被占用。可使用 PNG 或 JSON 恢复。",
   "failureCameraFrame": "无法读取画面。请检查摄像头或选择文件。",
-  "failureCameraStopped": "摄像头已停止。请选择重新启动摄像头。"
+  "failureCameraStopped": "摄像头已停止。请选择重新启动摄像头。",
+  "sendingMessage": "正在发送…",
+  "messageUnconfirmed": "未收到服务器确认。请重试相同文本。",
+  "messageAccepted": "服务器已接收"
 }

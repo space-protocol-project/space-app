@@ -747,6 +747,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get failureCameraStopped => '摄像头已停止。请选择重新启动摄像头。';
+
+  @override
+  String get sendingMessage => '正在发送…';
+
+  @override
+  String get messageUnconfirmed => '未收到服务器确认。请重试相同文本。';
+
+  @override
+  String get messageAccepted => '服务器已接收';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

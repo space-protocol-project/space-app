@@ -1279,6 +1279,13 @@ const Content$json = {
     {'1': 'text', '3': 3, '4': 1, '5': 9, '10': 'text'},
     {'1': 'author_id', '3': 4, '4': 1, '5': 9, '10': 'authorId'},
     {'1': 'sequence', '3': 5, '4': 1, '5': 3, '10': 'sequence'},
+    {
+      '1': 'created_at_unix_ms',
+      '3': 6,
+      '4': 1,
+      '5': 3,
+      '10': 'createdAtUnixMs'
+    },
   ],
 };
 
@@ -1286,7 +1293,8 @@ const Content$json = {
 final $typed_data.Uint8List contentDescriptor = $convert.base64Decode(
     'CgdDb250ZW50Eg4KAmlkGAEgASgJUgJpZBIdCgpjaGFubmVsX2lkGAIgASgJUgljaGFubmVsSW'
     'QSEgoEdGV4dBgDIAEoCVIEdGV4dBIbCglhdXRob3JfaWQYBCABKAlSCGF1dGhvcklkEhoKCHNl'
-    'cXVlbmNlGAUgASgDUghzZXF1ZW5jZQ==');
+    'cXVlbmNlGAUgASgDUghzZXF1ZW5jZRIrChJjcmVhdGVkX2F0X3VuaXhfbXMYBiABKANSD2NyZW'
+    'F0ZWRBdFVuaXhNcw==');
 
 @$core.Deprecated('Use createContentRequestDescriptor instead')
 const CreateContentRequest$json = {

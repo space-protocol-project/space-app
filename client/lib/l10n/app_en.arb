@@ -308,5 +308,8 @@
   "failureCameraDenied": "Camera access was denied. Allow it in system settings.",
   "failureCameraUnavailable": "The camera is unavailable or busy. Restore from PNG or JSON instead.",
   "failureCameraFrame": "Could not read the frame. Check the camera or select a file.",
-  "failureCameraStopped": "The camera was stopped. Select Restart camera."
+  "failureCameraStopped": "The camera was stopped. Select Restart camera.",
+  "sendingMessage": "Sending…",
+  "messageUnconfirmed": "No server confirmation. Retry with the same text.",
+  "messageAccepted": "Accepted by server"
 }

@@ -5191,6 +5191,7 @@ class Content extends $pb.GeneratedMessage {
     $core.String? text,
     $core.String? authorId,
     $fixnum.Int64? sequence,
+    $fixnum.Int64? createdAtUnixMs,
   }) {
     final result = Content._();
     if (id != null) result.id = id;
@@ -5198,6 +5199,7 @@ class Content extends $pb.GeneratedMessage {
     if (text != null) result.text = text;
     if (authorId != null) result.authorId = authorId;
     if (sequence != null) result.sequence = sequence;
+    if (createdAtUnixMs != null) result.createdAtUnixMs = createdAtUnixMs;
     return result;
   }
 
@@ -5219,6 +5221,7 @@ class Content extends $pb.GeneratedMessage {
     ..aOS(3, _omitFieldNames ? '' : 'text')
     ..aOS(4, _omitFieldNames ? '' : 'authorId')
     ..aInt64(5, _omitFieldNames ? '' : 'sequence')
+    ..aInt64(6, _omitFieldNames ? '' : 'createdAtUnixMs')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -5285,6 +5288,16 @@ class Content extends $pb.GeneratedMessage {
   $core.bool hasSequence() => $_has(4);
   @$pb.TagNumber(5)
   void clearSequence() => $_clearField(5);
+
+  /// Серверное время создания в миллисекундах Unix; 0 означает неизвестное время.
+  @$pb.TagNumber(6)
+  $fixnum.Int64 get createdAtUnixMs => $_getI64(5);
+  @$pb.TagNumber(6)
+  set createdAtUnixMs($fixnum.Int64 value) => $_setInt64(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasCreatedAtUnixMs() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearCreatedAtUnixMs() => $_clearField(6);
 }
 
 class CreateContentRequest extends $pb.GeneratedMessage {

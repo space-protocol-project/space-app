@@ -833,4 +833,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get failureCameraStopped =>
       'The camera was stopped. Select Restart camera.';
+
+  @override
+  String get sendingMessage => 'Sending…';
+
+  @override
+  String get messageUnconfirmed =>
+      'No server confirmation. Retry with the same text.';
+
+  @override
+  String get messageAccepted => 'Accepted by server';
 }

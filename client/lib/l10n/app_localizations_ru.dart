@@ -836,4 +836,14 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get failureCameraStopped =>
       'Камера остановлена. Нажмите «Включить снова».';
+
+  @override
+  String get sendingMessage => 'Отправляется…';
+
+  @override
+  String get messageUnconfirmed =>
+      'Нет подтверждения сервера. Повторите отправку с тем же текстом.';
+
+  @override
+  String get messageAccepted => 'Принято сервером';
 }

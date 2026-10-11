@@ -381,6 +381,16 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                             author: author,
                             mine: mine,
                             grouped: grouped,
+                            sentAt:
+                                message.createdAtUnixMs > 0 &&
+                                    message.createdAtUnixMs.toInt() <=
+                                        8640000000000000
+                                ? DateTime.fromMillisecondsSinceEpoch(
+                                    message.createdAtUnixMs.toInt(),
+                                    isUtc: true,
+                                  ).toLocal()
+                                : null,
+                            accepted: mine,
                           ),
                         ],
                       ),
@@ -401,6 +411,17 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                 ),
               ),
             ),
+          ),
+        if (c.sendStatus != MessageSendStatus.idle)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 6, 24, 0),
+            child: Text(switch (c.sendStatus) {
+              MessageSendStatus.sending => context.strings.sendingMessage,
+              MessageSendStatus.unconfirmed =>
+                context.strings.messageUnconfirmed,
+              MessageSendStatus.accepted => context.strings.messageAccepted,
+              MessageSendStatus.idle => '',
+            }, style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant)),
           ),
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 18),
