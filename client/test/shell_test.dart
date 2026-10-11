@@ -57,10 +57,21 @@ void main() {
       tester.getRect(field).center.dy,
       closeTo(tester.getRect(send).center.dy, .5),
     );
-    final border =
-        tester.widget<TextField>(field).decoration!.border
-            as OutlineInputBorder;
-    expect(border.borderRadius, BorderRadius.circular(20));
+    expect(
+      tester.widget<TextField>(field).decoration!.border,
+      InputBorder.none,
+    );
+    final composer = tester
+        .widgetList<DecoratedBox>(
+          find.ancestor(of: field, matching: find.byType(DecoratedBox)),
+        )
+        .firstWhere(
+          (box) =>
+              box.decoration is BoxDecoration &&
+              (box.decoration as BoxDecoration).borderRadius ==
+                  BorderRadius.circular(22),
+        );
+    expect((composer.decoration as BoxDecoration).color, isNotNull);
     expect(find.text('Space'), findsNothing);
     await tester.pumpWidget(const SizedBox());
     controller.dispose();

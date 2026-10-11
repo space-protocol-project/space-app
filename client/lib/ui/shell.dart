@@ -245,7 +245,7 @@ class _SpaceShellState extends State<SpaceShell> {
       ? controller.spaceTitle
       : controller.preview?.origin.authority ?? context.strings.yourSpace;
   Widget sidebar() => SizedBox(
-    width: 248,
+    width: 280,
     child: Material(
       color: Theme.of(context).colorScheme.surfaceContainerLowest,
       child: ListView(
@@ -286,30 +286,6 @@ class _SpaceShellState extends State<SpaceShell> {
             ),
           ),
           const SizedBox(height: 16),
-          for (final section in Section.values)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: ListTile(
-                dense: true,
-                minTileHeight: 48,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                selected: selected == section,
-                selectedTileColor: Theme.of(context)
-                    .colorScheme
-                    .primaryContainer,
-                leading: Icon(section.icon, size: 20),
-                title: Text(
-                  section == Section.chat
-                      ? controller.channels.isEmpty
-                            ? chatLabel
-                            : context.strings.chats
-                      : section.localized(context),
-                ),
-                onTap: () => select(section),
-              ),
-            ),
           if (controller.channels.isNotEmpty) ...[
             const Divider(height: 24),
             Text(context.strings.channels, style: TextStyle(fontSize: 12)),
@@ -362,6 +338,30 @@ class _SpaceShellState extends State<SpaceShell> {
                       },
               ),
           ],
+          for (final section in Section.values)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: ListTile(
+                dense: true,
+                minTileHeight: 48,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                selected: selected == section,
+                selectedTileColor: Theme.of(context)
+                    .colorScheme
+                    .primaryContainer,
+                leading: Icon(section.icon, size: 20),
+                title: Text(
+                  section == Section.chat
+                      ? controller.channels.isEmpty
+                            ? chatLabel
+                            : context.strings.chats
+                      : section.localized(context),
+                ),
+                onTap: () => select(section),
+              ),
+            ),
           if (controller.administration != null)
             ListTile(
               leading: const Icon(Icons.settings_suggest_outlined),
@@ -398,9 +398,8 @@ class _SpaceShellState extends State<SpaceShell> {
       ),
     ),
   );
-  Widget rail() => Container(
-    width: 72,
-    color: Theme.of(context).colorScheme.surfaceContainerLowest,
+  Widget rail() => SizedBox(
+    width: 64,
     child: Column(
       children: [
         const SizedBox(height: 24),
@@ -414,8 +413,8 @@ class _SpaceShellState extends State<SpaceShell> {
         IconButton.filledTonal(
           tooltip: context.strings.selectedSpace,
           style: IconButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            foregroundColor: Theme.of(context).colorScheme.onSurface,
             minimumSize: const Size(48, 48),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(17),
@@ -428,7 +427,7 @@ class _SpaceShellState extends State<SpaceShell> {
         IconButton(
           tooltip: context.strings.addSpace,
           style: IconButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.surface,
+            backgroundColor: Colors.transparent,
             foregroundColor: Theme.of(context).colorScheme.onSurface,
             minimumSize: const Size(48, 48),
             shape: RoundedRectangleBorder(
@@ -442,7 +441,7 @@ class _SpaceShellState extends State<SpaceShell> {
         IconButton(
           tooltip: context.strings.myIdentity,
           style: IconButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.surface,
+            backgroundColor: Colors.transparent,
             foregroundColor: Theme.of(context).colorScheme.onSurface,
             minimumSize: const Size(48, 48),
             shape: RoundedRectangleBorder(
@@ -456,65 +455,65 @@ class _SpaceShellState extends State<SpaceShell> {
       ],
     ),
   );
-  Widget contextPanel() => Container(
-    width: 240,
-    padding: const EdgeInsets.all(22),
-    decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surface,
-      border: Border(
-        left: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+  Widget contextPanel() => SizedBox(
+    width: 280,
+    child: SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(16, 20, 8, 20),
+      child: SurfaceCard(
+        padding: const EdgeInsets.all(20),
+        child: contextDetails(),
       ),
     ),
-    child: SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            context.strings.aboutSpace,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 14),
-          Text(
-            context.strings.independentServer,
-            style: TextStyle(fontSize: 12, height: 1.8),
-          ),
-          const Divider(height: 36),
-          Text(
-            context.strings.connection,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            controller.connected
-                ? context.strings.deviceSignedIn
-                : context.strings.noSession,
-            style: const TextStyle(fontSize: 12),
-          ),
-          if (controller.preview != null) ...[
-            const SizedBox(height: 10),
-            SelectableText(
-              controller.preview!.origin.toString(),
-              style: const TextStyle(fontSize: 11),
-            ),
-          ],
-          const SizedBox(height: 16),
-          SpaceActionButton(
-            onPressed: () => connection(),
-            icon: Icons.link_outlined,
-            label: context.strings.checkConnection,
-          ),
-          const Divider(height: 36),
-          Text(
-            context.strings.beYourself,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            context.strings.ownPace,
-            style: TextStyle(fontSize: 12, height: 1.8),
+  );
+  Widget contextDetails() => SingleChildScrollView(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.strings.aboutSpace,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 14),
+        Text(
+          context.strings.independentServer,
+          style: TextStyle(fontSize: 12, height: 1.8),
+        ),
+        const Divider(height: 36),
+        Text(
+          context.strings.connection,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 12),
+        Text(
+          controller.connected
+              ? context.strings.deviceSignedIn
+              : context.strings.noSession,
+          style: const TextStyle(fontSize: 12),
+        ),
+        if (controller.preview != null) ...[
+          const SizedBox(height: 10),
+          SelectableText(
+            controller.preview!.origin.toString(),
+            style: const TextStyle(fontSize: 11),
           ),
         ],
-      ),
+        const SizedBox(height: 16),
+        SpaceActionButton(
+          onPressed: () => connection(),
+          icon: Icons.link_outlined,
+          label: context.strings.checkConnection,
+        ),
+        const Divider(height: 36),
+        Text(
+          context.strings.beYourself,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 12),
+        Text(
+          context.strings.ownPace,
+          style: TextStyle(fontSize: 12, height: 1.8),
+        ),
+      ],
     ),
   );
   Widget pages() => IndexedStack(
@@ -532,6 +531,7 @@ class _SpaceShellState extends State<SpaceShell> {
         key: const ValueKey('live-chat'),
         controller: controller,
         active: selected == Section.chat,
+        showHeader: false,
         openConnection: () => connection(),
       ),
       UnavailablePanel(
@@ -550,7 +550,7 @@ class _SpaceShellState extends State<SpaceShell> {
     ],
   );
   Widget header(bool compact) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       border: Border(
@@ -565,11 +565,27 @@ class _SpaceShellState extends State<SpaceShell> {
             onPressed: () => scaffold.currentState?.openDrawer(),
             icon: const Icon(Icons.menu),
           ),
+        if (!compact) ...[
+          Icon(selected.icon, size: 26),
+          const SizedBox(width: 12),
+        ],
         Expanded(
-          child: Text(
-            selected == Section.chat ? chatLabel : selected.localized(context),
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.titleMedium,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                selected == Section.chat
+                    ? chatLabel
+                    : selected.localized(context),
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              if (selected == Section.chat && !compact)
+                Text(
+                  context.strings.chatDescription,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+            ],
           ),
         ),
         if (!compact)
@@ -713,18 +729,33 @@ class _SpaceShellState extends State<SpaceShell> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       if (!compact) ...[
+                        rail(),
+                        const SizedBox(width: 8),
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(areaRadius),
-                          child: rail(),
+                          borderRadius: const BorderRadius.horizontal(
+                            left: Radius.circular(20),
+                          ),
+                          child: sidebar(),
                         ),
-                        const SizedBox(width: 8),
-                        RegionFrame(child: sidebar()),
-                        const SizedBox(width: 8),
                       ],
-                      Expanded(child: RegionFrame(child: workspace)),
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: compact
+                              ? BorderRadius.circular(20)
+                              : const BorderRadius.horizontal(
+                                  right: Radius.circular(20),
+                                ),
+                          child: ColoredBox(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerLow,
+                            child: workspace,
+                          ),
+                        ),
+                      ),
                       if (box.maxWidth >= 1320) ...[
                         const SizedBox(width: 8),
-                        RegionFrame(child: contextPanel()),
+                        contextPanel(),
                       ],
                     ],
                   ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const areaRadius = 12.0;
+const areaRadius = 20.0;
 
 class RegionFrame extends StatelessWidget {
   const RegionFrame({super.key, required this.child});

@@ -3,6 +3,7 @@ import '../l10n/strings.dart';
 import 'package:flutter/material.dart';
 
 import '../src/chat_controller.dart';
+import 'message_bubble.dart';
 
 class ChatView extends StatefulWidget {
   const ChatView({
@@ -10,10 +11,11 @@ class ChatView extends StatefulWidget {
     required this.controller,
     required this.openConnection,
     this.active = true,
+    this.showHeader = true,
   });
   final ChatController controller;
   final VoidCallback openConnection;
-  final bool active;
+  final bool active, showHeader;
   @override
   State<ChatView> createState() => _ChatViewState();
 }
@@ -187,42 +189,44 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     });
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 18),
-          child: Row(
-            children: [
-              const Icon(Icons.tag),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      c.connected ? c.chatTitle : context.strings.chat,
-                      style: Theme.of(context).textTheme.titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      context.strings.chatDescription,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: colors.onSurfaceVariant,
+        if (widget.showHeader)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 18),
+            child: Row(
+              children: [
+                const Icon(Icons.tag),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        c.connected ? c.chatTitle : context.strings.chat,
+                        style: Theme.of(context).textTheme.titleLarge
+                            ?.copyWith(fontWeight: FontWeight.w700),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 5),
+                      Text(
+                        context.strings.chatDescription,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              IconButton(
-                tooltip: context.strings.connectionInformation,
-                onPressed: widget.openConnection,
-                icon: const Icon(Icons.info_outline),
-              ),
-            ],
+                IconButton(
+                  tooltip: context.strings.connectionInformation,
+                  onPressed: widget.openConnection,
+                  icon: const Icon(Icons.info_outline),
+                ),
+              ],
+            ),
           ),
-        ),
-        const Divider(height: 1),
-        if (c.channels.isNotEmpty)
+        if (widget.showHeader) const Divider(height: 1),
+        if (c.channels.isNotEmpty &&
+            (widget.showHeader || MediaQuery.sizeOf(context).width < 760))
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
@@ -314,7 +318,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                                     ? null
                                     : widget.openConnection,
                                 icon: const Icon(Icons.add),
-                                label: const Text('Добавить пространство'),
+                                label: Text(context.strings.addSpace),
                               ),
                             ],
                           ],
@@ -339,53 +343,40 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                     final boundary =
                         c.messages.indexWhere((m) => m.id == entryReadThrough) +
                         1;
+                    final grouped =
+                        index > 0 &&
+                        c.messages[index - 1].authorId == message.authorId &&
+                        index != boundary;
                     return Padding(
                       key: messageKeys.putIfAbsent(message.id, GlobalKey.new),
-                      padding: const EdgeInsets.only(bottom: 24),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      padding: EdgeInsets.only(
+                        bottom:
+                            index + 1 < c.messages.length &&
+                                c.messages[index + 1].authorId ==
+                                    message.authorId
+                            ? 6
+                            : 18,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          CircleAvatar(
-                            backgroundColor: colors.surfaceContainerHighest,
-                            child: Icon(
-                              mine ? Icons.person_outline : Icons.person,
-                              size: 20,
-                              color: colors.primary,
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (index == boundary)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 12),
-                                    child: Text(
-                                      context.strings.newMessages,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: colors.primary,
-                                      ),
-                                    ),
-                                  ),
-                                Text(
-                                  author,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: colors.secondary,
-                                  ),
+                          if (index == boundary)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: Text(
+                                context.strings.newMessages,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: colors.primary,
                                 ),
-                                const SizedBox(height: 7),
-                                SelectableText(
-                                  message.text,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    height: 1.65,
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
+                          MessageBubble(
+                            text: message.text,
+                            author: author,
+                            mine: mine,
+                            grouped: grouped,
                           ),
                         ],
                       ),
@@ -409,35 +400,52 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
           ),
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 18),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: TextField(
-                  key: const ValueKey('chat-draft'),
-                  controller: draft,
-                  enabled: c.connected && c.canWrite && !c.busy,
-                  minLines: 1,
-                  maxLines: 4,
-                  maxLength: 1024,
-                  decoration: InputDecoration(
-                    hintText: c.connected && !c.canWrite
-                        ? context.strings.cannotSend
-                        : context.strings.messageHint,
-                    counterText: '',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: colors.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      key: const ValueKey('chat-draft'),
+                      controller: draft,
+                      enabled: c.connected && c.canWrite && !c.busy,
+                      minLines: 1,
+                      maxLines: 4,
+                      maxLength: 1024,
+                      decoration: InputDecoration(
+                        hintText: c.connected && !c.canWrite
+                            ? context.strings.cannotSend
+                            : context.strings.messageHint,
+                        counterText: '',
+                        filled: false,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 14,
+                        ),
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  IconButton.filled(
+                    onPressed: c.connected && c.canWrite && !c.busy
+                        ? send
+                        : null,
+                    tooltip: context.strings.sendMessage,
+                    icon: const Icon(Icons.arrow_upward),
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              IconButton.filled(
-                onPressed: c.connected && c.canWrite && !c.busy ? send : null,
-                tooltip: context.strings.sendMessage,
-                icon: const Icon(Icons.arrow_upward),
-              ),
-            ],
+            ),
           ),
         ),
       ],
