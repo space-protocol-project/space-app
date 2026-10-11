@@ -1,3 +1,5 @@
+import 'local_failure.dart';
+
 import 'dart:convert';
 import 'dart:math';
 
@@ -23,19 +25,29 @@ Future<Map<String, dynamic>> prepareRootRotation(
   bool renew = false,
 }) async {
   if (current.rootSeed.length != 32) {
-    throw const FormatException('Для смены root нужен исходный корневой ключ');
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Для смены root нужен исходный корневой ключ',
+    );
   }
   checkTrust(server, current);
   final existing = await vault.loadRotation(current.origin);
   if (existing != null && !renew) {
-    throw const FormatException('Сначала завершите предыдущую ротацию');
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Сначала завершите предыдущую ротацию',
+    );
   }
   if (renew && existing == null) {
-    throw const FormatException('Нет сохранённого запроса ротации');
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Нет сохранённого запроса ротации',
+    );
   }
   final identity = await current.identity();
   if (current.rootHistory.length >= 16) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
       'Достигнут предел экспериментальной истории ключей',
     );
   }
@@ -54,7 +66,8 @@ Future<Map<String, dynamic>> prepareRootRotation(
               saved.rootHistory.take(saved.rootHistory.length - 1).toList(),
             ) !=
             jsonEncode(current.rootHistory)) {
-      throw const FormatException(
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
         'Сохранённая ротация относится к другой записи',
       );
     }
@@ -105,7 +118,8 @@ Future<Map<String, dynamic>> prepareRootRotation(
       t['expires_at'] is! int ||
       t['expires_at'] <= now ||
       jsonEncode(t['scopes']) != jsonEncode(expectedScopes)) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
       'Запрос ротации не соответствует выбранной операции',
     );
   }
@@ -148,13 +162,17 @@ Future<Map<String, dynamic>> prepareRootRotation(
       )
       .length;
   if (recoverySize > 8176) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
       'История не помещается в recovery-карточку; смена не отправлена',
     );
   }
   if (nextIdentity.principalId != identity.principalId ||
       nextIdentity.epoch != identity.epoch + 1) {
-    throw const FormatException('Ротация меняет идентичность');
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Ротация меняет идентичность',
+    );
   }
   final pending = <String, dynamic>{
     'v': 1,
@@ -173,13 +191,19 @@ Future<DeviceRecord?> finishRootRotation(
   final pending = await vault.loadRotation(server.origin.toString());
   if (pending == null) return null;
   if (pending['v'] != 1) {
-    throw const FormatException('Неизвестный журнал ротации');
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Неизвестный журнал ротации',
+    );
   }
   final next = DeviceRecord.fromJson(pending['next'] as Map<String, dynamic>);
   checkTrust(server, next);
   final identity = await next.identity();
   if (next.rootHistory.isEmpty || next.rootSeed.length != 32) {
-    throw const FormatException('В журнале нет нового корневого ключа');
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'В журнале нет нового корневого ключа',
+    );
   }
   final proof = next.rootHistory.last;
   final raw = _decode(proof['transcript'] as String);
@@ -187,7 +211,10 @@ Future<DeviceRecord?> finishRootRotation(
   final device = await Ed25519().newKeyPairFromSeed(next.deviceSeed);
   if (url64((await device.extractPublicKey()).bytes) !=
       t['new_device_public_key']) {
-    throw const FormatException('Журнал содержит другое устройство');
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Журнал содержит другое устройство',
+    );
   }
   DeviceRecord? current;
   try {
@@ -209,7 +236,8 @@ Future<DeviceRecord?> finishRootRotation(
       url64(current.rootSeed) == url64(next.rootSeed) &&
       url64(current.deviceSeed) == url64(next.deviceSeed);
   if (!oldState && !alreadyActivated) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
       'Хранилище изменилось; автоматическая ротация остановлена',
     );
   }
@@ -228,7 +256,8 @@ Future<DeviceRecord?> finishRootRotation(
       receipt.authEpoch.toInt() != identity.epoch ||
       !RegExp(r'^dg_[A-Za-z0-9_-]{43}$').hasMatch(receipt.grantId) ||
       (alreadyActivated && receipt.grantId != current.grantId)) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
       'Ответ ротации не соответствует сохранённому доказательству',
     );
   }

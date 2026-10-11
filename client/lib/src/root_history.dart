@@ -1,3 +1,5 @@
+import 'local_failure.dart';
+
 import 'dart:convert';
 
 import 'package:cryptography/cryptography.dart';
@@ -5,11 +7,17 @@ import 'package:cryptography/cryptography.dart';
 String _url(List<int> bytes) => base64Url.encode(bytes).replaceAll('=', '');
 List<int> _bytes(dynamic value, int? length) {
   if (value is! String || !RegExp(r'^[A-Za-z0-9_-]+$').hasMatch(value)) {
-    throw const FormatException('Повреждено доказательство смены ключа');
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Повреждено доказательство смены ключа',
+    );
   }
   final bytes = base64Url.decode(base64Url.normalize(value));
   if (_url(bytes) != value || (length != null && bytes.length != length)) {
-    throw const FormatException('Повреждено доказательство смены ключа');
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Повреждено доказательство смены ключа',
+    );
   }
   return bytes;
 }
@@ -34,7 +42,8 @@ Future<RootIdentity> verifyRootHistory(
   String serverId,
 ) async {
   if (currentRoot.length != 32 || history.length > 16) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
       'История корневых ключей слишком большая или повреждена',
     );
   }
@@ -49,7 +58,10 @@ Future<RootIdentity> verifyRootHistory(
     final proof = history[index];
     final raw = _bytes(proof['transcript'], null);
     if (raw.length > 2048) {
-      throw const FormatException('Доказательство слишком большое');
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Доказательство слишком большое',
+      );
     }
     final text = utf8.decode(raw);
     final t = jsonDecode(text) as Map<String, dynamic>;
@@ -61,7 +73,10 @@ Future<RootIdentity> verifyRootHistory(
     principal ??= await rootPrincipal(oldRoot);
     if (index == 0) seenRoots.add(_url(oldRoot));
     if (!seenRoots.add(_url(newRoot))) {
-      throw const FormatException('История повторно использует прежний root');
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'История повторно использует прежний root',
+      );
     }
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final integers = ['auth_epoch', 'expires_at', 'issued_at', 'v'];
@@ -94,7 +109,8 @@ Future<RootIdentity> verifyRootHistory(
         _bytes(t['nonce'], 32).length != 32 ||
         (scopes != '["chat.read","chat.write"]' &&
             scopes != '["chat.read","chat.write","space.manage"]')) {
-      throw const FormatException(
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
         'Цепочка смены root не соответствует идентичности',
       );
     }
@@ -111,14 +127,18 @@ Future<RootIdentity> verifyRootHistory(
         ),
       );
       if (!await Ed25519().verify(signed, signature: signature)) {
-        throw const FormatException('Подпись смены root недействительна');
+        throw const LocalFailure(
+          LocalFailureCode.identityInvalid,
+          'Подпись смены root недействительна',
+        );
       }
     }
     previous = newRoot;
     issuedBefore = t['issued_at'] as int;
   }
   if (_url(previous!) != _url(currentRoot)) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
       'Текущий root не завершает проверенную цепочку',
     );
   }

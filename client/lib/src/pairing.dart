@@ -1,3 +1,5 @@
+import 'local_failure.dart';
+
 import 'dart:convert';
 
 import 'package:cryptography/cryptography.dart';
@@ -59,7 +61,8 @@ class PendingPairing {
               result.pairing.createdAt.toInt() + 300 ||
           result.pairing.createdAt.toInt() > now + 5 ||
           result.pairing.createdAt.toInt() < now - 15) {
-        throw const FormatException(
+        throw const LocalFailure(
+          LocalFailureCode.identityInvalid,
           'Запрос сопряжения не соответствует устройству',
         );
       }
@@ -90,7 +93,10 @@ class PendingPairing {
               url64(response.pairing.proposedRootPublicKey) ||
           (proposedRoot != null &&
               url64(proposedRoot!) != url64(response.rootPublicKey))) {
-        throw const FormatException('Подтверждающая идентичность изменилась');
+        throw const LocalFailure(
+          LocalFailureCode.identityInvalid,
+          'Подтверждающая идентичность изменилась',
+        );
       }
       proposedRoot = List<int>.of(response.rootPublicKey);
     }
@@ -125,14 +131,20 @@ class PendingPairing {
         proposedRoot == null ||
         url64(proposedRoot!) != url64(response.rootPublicKey) ||
         response.signature.length != 64) {
-      throw const FormatException('Сопряжение изменено или истекло');
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Сопряжение изменено или истекло',
+      );
     }
     final transcript =
         jsonDecode(utf8.decode(response.transcript)) as Map<String, dynamic>;
     if (transcript['grant_id'] != response.grantId ||
         (transcript['issued_at'] as int) < p.createdAt.toInt() - 5 ||
         (transcript['issued_at'] as int) >= p.expiresAt.toInt()) {
-      throw const FormatException('Подтверждение не относится к запросу');
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Подтверждение не относится к запросу',
+      );
     }
     final delegated = transcript['purpose'] == 'device.delegate';
     List<int> signer = response.rootPublicKey;
@@ -140,7 +152,10 @@ class PendingPairing {
       if (response.parentTranscript.isEmpty ||
           response.parentSignature.length != 64 ||
           response.parentGrantId != transcript['authorizer_grant_id']) {
-        throw const FormatException('Нет доказательства recovery authority');
+        throw const LocalFailure(
+          LocalFailureCode.identityInvalid,
+          'Нет доказательства recovery authority',
+        );
       }
       final parent = jsonDecode(
         utf8.decode(response.parentTranscript),
@@ -156,7 +171,10 @@ class PendingPairing {
           (parent['issued_at'] as int) > (transcript['issued_at'] as int) + 5 ||
           (parent['grant_expires_at'] as int) <
               (transcript['grant_expires_at'] as int)) {
-        throw const FormatException('Неподходящая цепочка recovery');
+        throw const LocalFailure(
+          LocalFailureCode.identityInvalid,
+          'Неподходящая цепочка recovery',
+        );
       }
       final parentSigning = await checkedSigningBytes(
         CreateChallengeResponse(
@@ -189,12 +207,18 @@ class PendingPairing {
           ),
         ),
       )) {
-        throw const FormatException('Root-подпись recovery не прошла проверку');
+        throw const LocalFailure(
+          LocalFailureCode.identityInvalid,
+          'Root-подпись recovery не прошла проверку',
+        );
       }
     } else if (response.parentGrantId.isNotEmpty ||
         response.parentTranscript.isNotEmpty ||
         response.parentSignature.isNotEmpty) {
-      throw const FormatException('Неожиданная цепочка подписи');
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Неожиданная цепочка подписи',
+      );
     }
     final signing = await checkedSigningBytes(
       CreateChallengeResponse(
@@ -225,7 +249,10 @@ class PendingPairing {
       ),
     );
     if (!valid) {
-      throw const FormatException('Root-подпись сопряжения не прошла проверку');
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Root-подпись сопряжения не прошла проверку',
+      );
     }
     return DeviceRecord(
       origin: server.origin.toString(),

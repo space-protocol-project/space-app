@@ -68,7 +68,9 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     } catch (error) {
       if (mounted) {
         setState(() {
-          failureCode = error is LocalFailure ? error.code : null;
+          failureCode = error is RecoveryOperationError
+              ? null
+              : classifyFailure(error);
           messageKey = error is RecoveryOperationError
               ? error.key
               : error is FormatException

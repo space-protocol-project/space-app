@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:grpc/grpc.dart';
 
 import 'core.dart';
+import 'local_failure.dart';
 import 'channel_positions.dart';
 import 'generated/space/v1/space.pb.dart';
 
@@ -187,7 +188,22 @@ class ChatController extends ChangeNotifier {
     if (!_disposed) notifyListeners();
   }
 
-  String _explain(Object problem) {
+  bool _failureRetry = false;
+  bool get failureRetry => failureCode != null && _failureRetry;
+  String _failureMessage = '';
+  LocalFailureCode? _failureCode;
+  LocalFailureCode? get failureCode =>
+      error.isNotEmpty && error.startsWith(_failureMessage)
+      ? _failureCode
+      : null;
+
+  String _explain(Object problem, {bool retry = false}) {
+    _failureRetry = retry;
+    _failureCode = classifyFailure(problem);
+    return _failureMessage = _diagnostic(problem);
+  }
+
+  String _diagnostic(Object problem) {
     if (problem is GrpcError && problem.code == StatusCode.permissionDenied) {
       return 'Недостаточно прав: доступ заблокирован, приглашение недействительно или роль разрешает только чтение.';
     }
@@ -650,7 +666,7 @@ class ChatController extends ChangeNotifier {
     } catch (e) {
       if (await _channelDenied(e)) return false;
       error =
-          '${_explain(e)} Повтор с тем же текстом использует прежний ключ запроса.';
+          '${_explain(e, retry: true)} Повтор с тем же текстом использует прежний ключ запроса.';
       return false;
     } finally {
       busy = false;

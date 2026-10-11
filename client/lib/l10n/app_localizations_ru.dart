@@ -725,4 +725,43 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get failureHomeStopFailed =>
       'Сервер не подтвердил остановку всех процессов. Проверьте его состояние перед повторным запуском.';
+
+  @override
+  String get failurePermissionDenied =>
+      'Сервер отказал в доступе. Проверьте роль, блокировку и приглашение.';
+
+  @override
+  String get failureUnauthenticated =>
+      'Сессия или разрешение устройства недействительны. Войдите заново; новое разрешение автоматически не создаётся.';
+
+  @override
+  String get failureServerLimit => 'Достигнут лимит сервера. Попробуйте позже.';
+
+  @override
+  String get failureConnectionFailed =>
+      'Не удалось связаться с сервером. Проверьте адрес и сеть.';
+
+  @override
+  String get failureTlsRejected =>
+      'Защищённое соединение не прошло проверку. Проверьте сертификат и доверенный отпечаток.';
+
+  @override
+  String get failureProtocolInvalid =>
+      'Сервер вернул несовместимые или некорректные данные. Операция остановлена.';
+
+  @override
+  String get failureIdentityInvalid =>
+      'Проверка ключей, подписей или идентичности не пройдена. Операция остановлена.';
+
+  @override
+  String get failureAddressInvalid =>
+      'Укажите HTTPS-адрес сервера или локальный HTTP-адрес. Проверьте ссылку и код приглашения.';
+
+  @override
+  String get failureOperationFailed =>
+      'Не удалось выполнить операцию. Проверьте соединение и доступ к защищённому хранилищу.';
+
+  @override
+  String get failureRetrySameRequest =>
+      'Повтор с тем же текстом использует прежний ключ запроса.';
 }

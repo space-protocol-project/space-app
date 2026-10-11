@@ -721,4 +721,44 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get failureHomeStopFailed =>
       'The server did not confirm that all processes stopped. Check its state before restarting.';
+
+  @override
+  String get failurePermissionDenied =>
+      'The server denied access. Check your role, block status and invitation.';
+
+  @override
+  String get failureUnauthenticated =>
+      'The session or device authorization is invalid. Sign in again; no new authorization is created automatically.';
+
+  @override
+  String get failureServerLimit =>
+      'A server limit was reached. Try again later.';
+
+  @override
+  String get failureConnectionFailed =>
+      'Could not reach the server. Check the address and network.';
+
+  @override
+  String get failureTlsRejected =>
+      'The secure connection could not be verified. Check the certificate and trusted fingerprint.';
+
+  @override
+  String get failureProtocolInvalid =>
+      'The server returned incompatible or invalid data. The operation was stopped.';
+
+  @override
+  String get failureIdentityInvalid =>
+      'Key, signature or identity verification failed. The operation was stopped.';
+
+  @override
+  String get failureAddressInvalid =>
+      'Enter an HTTPS server address or a local HTTP address. Check the link and invitation code.';
+
+  @override
+  String get failureOperationFailed =>
+      'The operation failed. Check the connection and access to secure storage.';
+
+  @override
+  String get failureRetrySameRequest =>
+      'Retrying the same text reuses the original request key.';
 }

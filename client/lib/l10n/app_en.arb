@@ -280,5 +280,15 @@
   "failureArchiveInvalid": "The server archive contains invalid paths, files or sizes. Installation stopped.",
   "failureExecutePermission": "Could not grant permission to run the server. Check access to the application directory.",
   "failureHomeStartFailed": "Could not start the home server. Check data access, available ports and connection settings.",
-  "failureHomeStopFailed": "The server did not confirm that all processes stopped. Check its state before restarting."
+  "failureHomeStopFailed": "The server did not confirm that all processes stopped. Check its state before restarting.",
+  "failurePermissionDenied": "The server denied access. Check your role, block status and invitation.",
+  "failureUnauthenticated": "The session or device authorization is invalid. Sign in again; no new authorization is created automatically.",
+  "failureServerLimit": "A server limit was reached. Try again later.",
+  "failureConnectionFailed": "Could not reach the server. Check the address and network.",
+  "failureTlsRejected": "The secure connection could not be verified. Check the certificate and trusted fingerprint.",
+  "failureProtocolInvalid": "The server returned incompatible or invalid data. The operation was stopped.",
+  "failureIdentityInvalid": "Key, signature or identity verification failed. The operation was stopped.",
+  "failureAddressInvalid": "Enter an HTTPS server address or a local HTTP address. Check the link and invitation code.",
+  "failureOperationFailed": "The operation failed. Check the connection and access to secure storage.",
+  "failureRetrySameRequest": "Retrying the same text reuses the original request key."
 }

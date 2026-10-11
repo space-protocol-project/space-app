@@ -1,3 +1,5 @@
+import 'local_failure.dart';
+
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
@@ -83,16 +85,25 @@ ConnectionInput parseConnectionInput(
             !RegExp(r'^[0-9a-f]{64}$').hasMatch(fields['tls']!)) ||
         (fields.containsKey('invite') &&
             !RegExp(r'^iv_[A-Za-z0-9_-]{43}$').hasMatch(fields['invite']!))) {
-      throw const FormatException('Некорректная ссылка приглашения');
+      throw const LocalFailure(
+        LocalFailureCode.addressInvalid,
+        'Некорректная ссылка приглашения',
+      );
     }
     if (fields.containsKey('invite') &&
         token.isNotEmpty &&
         token != fields['invite']) {
-      throw const FormatException('Код приглашения не совпадает со ссылкой');
+      throw const LocalFailure(
+        LocalFailureCode.addressInvalid,
+        'Код приглашения не совпадает со ссылкой',
+      );
     }
     token = fields['invite'] ?? token;
     if (uri.path.isNotEmpty && uri.path != '/') {
-      throw const FormatException('Некорректный адрес приглашения');
+      throw const LocalFailure(
+        LocalFailureCode.addressInvalid,
+        'Некорректный адрес приглашения',
+      );
     }
     return ConnectionInput(
       localOrigin(uri.replace(path: '').removeFragment().toString()),
@@ -113,7 +124,8 @@ Uri localOrigin(String input) {
       uri.hasQuery ||
       uri.hasFragment ||
       uri.port < 1) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.addressInvalid,
       'Нужен HTTPS адрес сервера или локальный HTTP адрес',
     );
   }
@@ -140,7 +152,8 @@ Future<Discovery> discover(
       (networkOrigin.scheme != 'http' ||
           !InternetAddress(networkOrigin.host).isLoopback ||
           origin.scheme != 'https')) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.protocolInvalid,
       'Недопустимый локальный маршрут домашнего сервера',
     );
   }
@@ -159,7 +172,8 @@ Future<Discovery> discover(
     request.followRedirects = false;
     final response = await request.close().timeout(const Duration(seconds: 10));
     if (response.statusCode != 200) {
-      throw const FormatException(
+      throw const LocalFailure(
+        LocalFailureCode.protocolInvalid,
         'Сервер не предоставил discovery. Перенаправления не принимаются.',
       );
     }
@@ -170,7 +184,8 @@ Future<Discovery> discover(
     if (tlsFingerprint.isNotEmpty &&
         homeOrigin == null &&
         actualFingerprint != tlsFingerprint) {
-      throw const FormatException(
+      throw const LocalFailure(
+        LocalFailureCode.tlsRejected,
         'Сертификат не совпадает с отпечатком в ссылке',
       );
     }
@@ -178,7 +193,10 @@ Future<Discovery> discover(
     await for (final chunk in response.timeout(const Duration(seconds: 10))) {
       bytes.addAll(chunk);
       if (bytes.length > 16384) {
-        throw const FormatException('Слишком большой discovery');
+        throw const LocalFailure(
+          LocalFailureCode.protocolInvalid,
+          'Слишком большой discovery',
+        );
       }
     }
     final data = jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
@@ -203,7 +221,10 @@ Future<Discovery> discover(
         endpoint.port < 1 ||
         (networkOrigin.scheme == 'https' &&
             endpoint.port != networkOrigin.port)) {
-      throw const FormatException('Discovery несовместим с профилем Space');
+      throw const LocalFailure(
+        LocalFailureCode.protocolInvalid,
+        'Discovery несовместим с профилем Space',
+      );
     }
     return Discovery(
       origin,
@@ -270,7 +291,10 @@ class DeviceRecord {
   };
   static DeviceRecord fromJson(Map<String, dynamic> data) {
     if (data['v'] != 1 && data['v'] != 2 && data['v'] != 3) {
-      throw const FormatException('Неизвестная версия хранилища ключей');
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Неизвестная версия хранилища ключей',
+      );
     }
     final record = DeviceRecord(
       origin: data['origin'] as String,
@@ -304,7 +328,10 @@ class DeviceRecord {
                         RegExp(r'^dg_[A-Za-z0-9_-]{43}$')
                             .hasMatch(record.recoveryGrantId))))) ||
         record.deviceSeed.length != 32) {
-      throw const FormatException('Повреждено хранилище ключей');
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Повреждено хранилище ключей',
+      );
     }
     return record;
   }
@@ -327,7 +354,8 @@ void checkTrust(Discovery server, DeviceRecord record) {
       record.serverKey != url64(server.publicKey) ||
       (record.tlsFingerprint.isNotEmpty &&
           record.tlsFingerprint != server.tlsFingerprint)) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
       'Идентичность сервера изменилась. Подключение заблокировано.',
     );
   }
@@ -434,7 +462,12 @@ class SpaceSession
   @override
   void selectChannel(String id) {
     final chosen = availableChannels.where((c) => c.id == id).firstOrNull;
-    if (chosen == null) throw const FormatException('Канал больше не доступен');
+    if (chosen == null) {
+      throw const LocalFailure(
+        LocalFailureCode.protocolInvalid,
+        'Канал больше не доступен',
+      );
+    }
     selectedChannelId = id;
     chatTitle = chosen.title;
   }
@@ -446,7 +479,10 @@ class SpaceSession
         .getManifest(GetManifestRequest(), options: _options);
     if (manifest.serverId != server.serverId ||
         manifest.protocolVersion != '0.1-experimental') {
-      throw const FormatException('Manifest не соответствует серверу');
+      throw const LocalFailure(
+        LocalFailureCode.protocolInvalid,
+        'Manifest не соответствует серверу',
+      );
     }
     final result = await ChannelServiceClient(channel).listChannels(
       ListChannelsRequest(includeArchived: true),
@@ -464,7 +500,10 @@ class SpaceSession
           c.latestMessageSequence.isNegative ||
           !c.views.any((v) => v.type == 'chat') ||
           !c.hasPermissions()) {
-        throw const FormatException('Некорректный список каналов');
+        throw const LocalFailure(
+          LocalFailureCode.protocolInvalid,
+          'Некорректный список каналов',
+        );
       }
     }
     spaceTitle = title;
@@ -500,19 +539,28 @@ class SpaceSession
     try {
       await for (final frame in stream.timeout(const Duration(seconds: 35))) {
         if (frame.serverId != server.serverId) {
-          throw const FormatException('Каталог относится к другому серверу');
+          throw const LocalFailure(
+            LocalFailureCode.protocolInvalid,
+            'Каталог относится к другому серверу',
+          );
         }
         if (frame.heartbeat) {
           if (frame.channels.isNotEmpty ||
               frame.spaceTitle.isNotEmpty ||
               frame.role.isNotEmpty) {
-            throw const FormatException('Heartbeat каталога содержит данные');
+            throw const LocalFailure(
+              LocalFailureCode.protocolInvalid,
+              'Heartbeat каталога содержит данные',
+            );
           }
           continue;
         }
         if (!['owner', 'admin', 'member', 'reader'].contains(frame.role) ||
             frame.spaceTitle.isEmpty) {
-          throw const FormatException('Некорректный снимок каталога');
+          throw const LocalFailure(
+            LocalFailureCode.protocolInvalid,
+            'Некорректный снимок каталога',
+          );
         }
         _applyCatalog(frame.channels, frame.spaceTitle);
         role = frame.role;
@@ -723,7 +771,8 @@ class SpaceSession
     if (restoredRecord != null &&
         vault is RotationJournalVault &&
         await vault.loadRotation(server.origin.toString()) != null) {
-      throw const FormatException(
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
         'Сначала завершите сохранённую смену ключа для этого сервера',
       );
     }
@@ -785,7 +834,10 @@ class SpaceSession
           'Общий чат';
       if (manifest.serverId != server.serverId ||
           manifest.protocolVersion != '0.1-experimental') {
-        throw const FormatException('gRPC manifest не соответствует discovery');
+        throw const LocalFailure(
+          LocalFailureCode.protocolInvalid,
+          'gRPC manifest не соответствует discovery',
+        );
       }
       if (record.grantId.isEmpty) {
         final result = await session._authorize(
@@ -839,7 +891,10 @@ class SpaceSession
     if (!RegExp(r'^st_[A-Za-z0-9_-]{43}$').hasMatch(result.accessToken) ||
         result.expiresAt.toInt() <= now ||
         result.expiresAt.toInt() > now + 605) {
-      throw const FormatException('Сервер не выдал сессию');
+      throw const LocalFailure(
+        LocalFailureCode.protocolInvalid,
+        'Сервер не выдал сессию',
+      );
     }
     _token = result.accessToken;
     _expiresAt = result.expiresAt.toInt();
@@ -881,7 +936,8 @@ class SpaceSession
     if (root == null &&
         credentials.recoverySeed.isEmpty &&
         purpose != "auth.login") {
-      throw const FormatException(
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
         "Откройте карточку для управления устройствами",
       );
     }
@@ -958,7 +1014,10 @@ class SpaceSession
         (purpose != 'device.register' &&
             purpose != 'device.delegate' &&
             result.grantId != grantId)) {
-      throw const FormatException('Ответ входа не соответствует ключам');
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Ответ входа не соответствует ключам',
+      );
     }
     return result;
   }
@@ -976,16 +1035,25 @@ class SpaceSession
         options: _options,
       );
       if (response.contents.any((message) => message.sequence.isNegative)) {
-        throw const FormatException('Некорректный порядковый номер сообщения');
+        throw const LocalFailure(
+          LocalFailureCode.protocolInvalid,
+          'Некорректный порядковый номер сообщения',
+        );
       }
       result.addAll(response.contents);
       if (response.contents.length < 100) return result;
       if (response.nextCursor.isEmpty || response.nextCursor == cursor) {
-        throw const FormatException('Сервер повторил курсор');
+        throw const LocalFailure(
+          LocalFailureCode.protocolInvalid,
+          'Сервер повторил курсор',
+        );
       }
       cursor = response.nextCursor;
     }
-    throw const FormatException('Слишком много страниц');
+    throw const LocalFailure(
+      LocalFailureCode.protocolInvalid,
+      'Слишком много страниц',
+    );
   }
 
   @override
@@ -1051,7 +1119,10 @@ class SpaceSession
     }
     role = result.member.role;
     if (!['owner', 'admin', 'member', 'reader'].contains(role)) {
-      throw const FormatException('Неизвестная роль');
+      throw const LocalFailure(
+        LocalFailureCode.permissionDenied,
+        'Неизвестная роль',
+      );
     }
   }
 
@@ -1067,7 +1138,10 @@ class SpaceSession
       );
       if (result.serverId != server.serverId ||
           !['reader', 'member'].contains(result.role)) {
-        throw const FormatException('Приглашение не соответствует серверу');
+        throw const LocalFailure(
+          LocalFailureCode.protocolInvalid,
+          'Приглашение не соответствует серверу',
+        );
       }
       return result;
     } finally {
@@ -1105,21 +1179,31 @@ class SpaceSession
       channel,
     ).getSetupStatus(GetSetupStatusRequest(), options: _options)).initialized;
     if (!canManageSpace && !needsOwnerSetup) {
-      throw const FormatException('Нужна роль владельца или администратора');
+      throw const LocalFailure(
+        LocalFailureCode.permissionDenied,
+        'Нужна роль владельца или администратора',
+      );
     }
     final grants = await listDevices();
     final current = grants.where((g) => g.id == record.grantId).firstOrNull;
     if (current == null || current.revoked) {
-      throw const FormatException('Текущее разрешение недействительно');
+      throw const LocalFailure(
+        LocalFailureCode.protocolInvalid,
+        'Текущее разрешение недействительно',
+      );
     }
     if (current.scopes.contains('space.manage')) return;
     final credentials = authority ?? record;
     checkTrust(server, credentials);
     if ((await credentials.identity()).principalId != principalId) {
-      throw const FormatException('Карточка относится к другой идентичности');
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Карточка относится к другой идентичности',
+      );
     }
     if (credentials.rootSeed.isEmpty) {
-      throw const FormatException(
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
         'Для выдачи разрешения нужна корневая карточка. Recovery-карточка не расширяет свои права',
       );
     }
@@ -1142,7 +1226,8 @@ class SpaceSession
     await vault.save(next);
     final saved = await vault.load(next.origin);
     if (saved?.grantId != next.grantId || saved?.administrative != true) {
-      throw const FormatException(
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
         'Не удалось проверить сохранение разрешения. Повторите подключение',
       );
     }
@@ -1156,7 +1241,10 @@ class SpaceSession
   Future<void> prepareRotation({bool renew = false}) async {
     await _ensureSession();
     if (vault is! RotationJournalVault) {
-      throw const FormatException('Нет защищённого журнала ротации');
+      throw const LocalFailure(
+        LocalFailureCode.protocolInvalid,
+        'Нет защищённого журнала ротации',
+      );
     }
     await rotation.prepareRootRotation(
       server,
@@ -1181,7 +1269,10 @@ class SpaceSession
       checkTrust(server, authority);
       final id = (await authority.identity()).principalId;
       if (id != principalId) {
-        throw const FormatException('Карточка относится к другой идентичности');
+        throw const LocalFailure(
+          LocalFailureCode.identityInvalid,
+          'Карточка относится к другой идентичности',
+        );
       }
     }
     await _authorize('device.revoke', target: grant, authority: authority);
@@ -1190,7 +1281,8 @@ class SpaceSession
   @override
   Future<Map<String, dynamic>> recoveryPayload() async {
     if (!hasRootAuthority && record.recoverySeed.isEmpty) {
-      throw const FormatException(
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
         'Для этой операции нужна исходная карточка. Ключ восстановления не сохраняется в рабочем устройстве.',
       );
     }
@@ -1221,7 +1313,10 @@ class SpaceSession
           parent.revoked ||
           parent.expiresAt.toInt() <=
               DateTime.now().millisecondsSinceEpoch ~/ 1000) {
-        throw const FormatException('Ключ восстановления недействителен');
+        throw const LocalFailure(
+          LocalFailureCode.identityInvalid,
+          'Ключ восстановления недействителен',
+        );
       }
       payload.addAll({
         'recovery_grant_id': parent.id,
@@ -1240,7 +1335,8 @@ class SpaceSession
     final credentials = authority ?? record;
 
     if (credentials.rootSeed.isEmpty && credentials.recoverySeed.length != 32) {
-      throw const FormatException(
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
         'Откройте корневую или recovery-карточку для подтверждения',
       );
     }
@@ -1252,7 +1348,8 @@ class SpaceSession
           )).extractPublicKey()).bytes;
     final id = (await credentials.identity()).principalId;
     if (id != principalId) {
-      throw const FormatException(
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
         'Корневая карточка относится к другой идентичности',
       );
     }
@@ -1278,7 +1375,10 @@ class SpaceSession
     final credentials = authority ?? record;
 
     if (credentials.rootSeed.isEmpty && credentials.recoverySeed.length != 32) {
-      throw const FormatException('Нужен root или recovery-карточка');
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Нужен root или recovery-карточка',
+      );
     }
     checkTrust(server, credentials);
     final root = credentials.rootSeed.isEmpty
@@ -1288,7 +1388,10 @@ class SpaceSession
           )).extractPublicKey()).bytes;
     final id = (await credentials.identity()).principalId;
     if (id != principalId) {
-      throw const FormatException('Карточка относится к другой идентичности');
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Карточка относится к другой идентичности',
+      );
     }
     await _ensureSession();
     await AuthServiceClient(channel).proposePairing(
@@ -1330,7 +1433,10 @@ Future<String> pairVerificationCode(
 Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
   if ((payload['v'] != 1 && payload['v'] != 2) ||
       !['root', 'recovery'].contains(payload['credential'])) {
-    throw const FormatException('Неподдерживаемая карточка');
+    throw const LocalFailure(
+      LocalFailureCode.protocolInvalid,
+      'Неподдерживаемая карточка',
+    );
   }
   final origin = localOrigin(payload['origin'] as String).toString();
   final rootPublic = base64Url.decode(
@@ -1348,14 +1454,18 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
       !RegExp(r'^[A-Za-z0-9_-]{43}$').hasMatch(serverKey) ||
       (tlsFingerprint.isNotEmpty &&
           !RegExp(r'^[0-9a-f]{64}$').hasMatch(tlsFingerprint))) {
-    throw const FormatException('Повреждены сведения о сервере или ключах');
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Повреждены сведения о сервере или ключах',
+    );
   }
   final pair = await Ed25519().newKeyPairFromSeed(secret);
   final actual = url64((await pair.extractPublicKey()).bytes);
   final isRoot = payload['credential'] == 'root';
   if (actual !=
       (isRoot ? url64(rootPublic) : payload['credential_public_key'])) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
       'Ключ карточки не соответствует публичному ключу',
     );
   }
@@ -1365,7 +1475,10 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
               DateTime.now().millisecondsSinceEpoch ~/ 1000 ||
           !RegExp(r'^dg_[A-Za-z0-9_-]{43}$')
               .hasMatch(payload['recovery_grant_id'] as String))) {
-    throw const FormatException('Разрешение восстановления недействительно');
+    throw const LocalFailure(
+      LocalFailureCode.protocolInvalid,
+      'Разрешение восстановления недействительно',
+    );
   }
   final device = await Ed25519().newKeyPair();
   final history = (payload['root_history'] as List? ?? [])
@@ -1373,7 +1486,8 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
       .toList();
   if (payload['v'] == 1 && history.isNotEmpty ||
       payload['v'] == 2 && history.isEmpty) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
       'Версия карточки не соответствует истории ключей',
     );
   }
@@ -1481,7 +1595,8 @@ Future<List<int>> checkedSigningBytes(
                 : grantExpiry <= issued + 30 * 86400)
           : transcript['grant_id'] == grantId);
   if (!valid) {
-    throw const FormatException(
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
       'Подпись отклонена: challenge не соответствует серверу, ключам или операции',
     );
   }
@@ -1493,7 +1608,10 @@ Future<List<int>> checkedSigningBytes(
     'recovery.device.revoke': 'space/recovery-device-revoke/v1',
   }[purpose];
   if (prefix == null) {
-    throw const FormatException('Неизвестное назначение подписи');
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Неизвестное назначение подписи',
+    );
   }
   return utf8.encode('$prefix\u0000$canonical');
 }

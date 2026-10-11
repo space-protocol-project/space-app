@@ -1,3 +1,4 @@
+import '../l10n/failure_strings.dart';
 import '../l10n/strings.dart';
 
 import 'package:flutter/material.dart';
@@ -104,7 +105,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
             if (c.error.isNotEmpty) ...[
               const SizedBox(height: 18),
               Text(
-                c.error,
+                chatFailureText(context, c),
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             ],

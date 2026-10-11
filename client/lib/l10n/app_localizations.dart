@@ -1354,6 +1354,66 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Сервер не подтвердил остановку всех процессов. Проверьте его состояние перед повторным запуском.'**
   String get failureHomeStopFailed;
+
+  /// No description provided for @failurePermissionDenied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер отказал в доступе. Проверьте роль, блокировку и приглашение.'**
+  String get failurePermissionDenied;
+
+  /// No description provided for @failureUnauthenticated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сессия или разрешение устройства недействительны. Войдите заново; новое разрешение автоматически не создаётся.'**
+  String get failureUnauthenticated;
+
+  /// No description provided for @failureServerLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Достигнут лимит сервера. Попробуйте позже.'**
+  String get failureServerLimit;
+
+  /// No description provided for @failureConnectionFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось связаться с сервером. Проверьте адрес и сеть.'**
+  String get failureConnectionFailed;
+
+  /// No description provided for @failureTlsRejected.
+  ///
+  /// In ru, this message translates to:
+  /// **'Защищённое соединение не прошло проверку. Проверьте сертификат и доверенный отпечаток.'**
+  String get failureTlsRejected;
+
+  /// No description provided for @failureProtocolInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер вернул несовместимые или некорректные данные. Операция остановлена.'**
+  String get failureProtocolInvalid;
+
+  /// No description provided for @failureIdentityInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверка ключей, подписей или идентичности не пройдена. Операция остановлена.'**
+  String get failureIdentityInvalid;
+
+  /// No description provided for @failureAddressInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите HTTPS-адрес сервера или локальный HTTP-адрес. Проверьте ссылку и код приглашения.'**
+  String get failureAddressInvalid;
+
+  /// No description provided for @failureOperationFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось выполнить операцию. Проверьте соединение и доступ к защищённому хранилищу.'**
+  String get failureOperationFailed;
+
+  /// No description provided for @failureRetrySameRequest.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повтор с тем же текстом использует прежний ключ запроса.'**
+  String get failureRetrySameRequest;
 }
 
 class _AppLocalizationsDelegate

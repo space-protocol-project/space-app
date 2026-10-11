@@ -1,12 +1,22 @@
 import 'package:flutter/widgets.dart';
 
 import '../src/local_failure.dart';
+import '../src/chat_controller.dart';
 import 'strings.dart';
 
 String localFailureText(
   BuildContext context,
   LocalFailureCode code,
 ) => switch (code) {
+  LocalFailureCode.permissionDenied => context.strings.failurePermissionDenied,
+  LocalFailureCode.unauthenticated => context.strings.failureUnauthenticated,
+  LocalFailureCode.serverLimit => context.strings.failureServerLimit,
+  LocalFailureCode.connectionFailed => context.strings.failureConnectionFailed,
+  LocalFailureCode.tlsRejected => context.strings.failureTlsRejected,
+  LocalFailureCode.protocolInvalid => context.strings.failureProtocolInvalid,
+  LocalFailureCode.identityInvalid => context.strings.failureIdentityInvalid,
+  LocalFailureCode.addressInvalid => context.strings.failureAddressInvalid,
+  LocalFailureCode.operationFailed => context.strings.failureOperationFailed,
   LocalFailureCode.cardCorrupt => context.strings.failureCardCorrupt,
   LocalFailureCode.passwordInvalid => context.strings.failurePasswordInvalid,
   LocalFailureCode.cardTooLarge => context.strings.failureCardTooLarge,
@@ -27,3 +37,12 @@ String localFailureText(
   LocalFailureCode.homeStartFailed => context.strings.failureHomeStartFailed,
   LocalFailureCode.homeStopFailed => context.strings.failureHomeStopFailed,
 };
+
+String chatFailureText(BuildContext context, ChatController controller) {
+  final code = controller.failureCode;
+  if (code == null) return controller.error;
+  final text = localFailureText(context, code);
+  return controller.failureRetry
+      ? '$text ${context.strings.failureRetrySameRequest}'
+      : text;
+}

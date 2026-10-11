@@ -1,3 +1,5 @@
+import '../l10n/failure_strings.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -30,7 +32,10 @@ class _PairingStartPanelState extends State<PairingStartPanel> {
   String get localizedError => switch (errorKey) {
     'pairingStartFailed' => context.strings.pairingStartFailed,
     'pairingExpired' => context.strings.pairingExpired,
-    _ => error,
+    _ =>
+      error.isNotEmpty && error == widget.controller.error
+          ? chatFailureText(context, widget.controller)
+          : error,
   };
   @override
   void dispose() {

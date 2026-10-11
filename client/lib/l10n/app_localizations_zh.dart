@@ -663,6 +663,36 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get failureHomeStopFailed => '服务器未确认所有进程已停止。重新启动前请检查其状态。';
+
+  @override
+  String get failurePermissionDenied => '服务器拒绝访问。请检查角色、封禁状态和邀请。';
+
+  @override
+  String get failureUnauthenticated => '会话或设备授权无效。请重新登录；不会自动创建新授权。';
+
+  @override
+  String get failureServerLimit => '已达到服务器限制。请稍后重试。';
+
+  @override
+  String get failureConnectionFailed => '无法连接服务器。请检查地址和网络。';
+
+  @override
+  String get failureTlsRejected => '无法验证安全连接。请检查证书和可信指纹。';
+
+  @override
+  String get failureProtocolInvalid => '服务器返回了不兼容或无效的数据。操作已停止。';
+
+  @override
+  String get failureIdentityInvalid => '密钥、签名或身份验证失败。操作已停止。';
+
+  @override
+  String get failureAddressInvalid => '请输入 HTTPS 服务器地址或本地 HTTP 地址。请检查链接和邀请码。';
+
+  @override
+  String get failureOperationFailed => '操作失败。请检查连接及安全存储访问权限。';
+
+  @override
+  String get failureRetrySameRequest => '重试相同文本会重复使用原请求密钥。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

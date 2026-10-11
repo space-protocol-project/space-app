@@ -1,3 +1,4 @@
+import '../l10n/failure_strings.dart';
 import '../l10n/strings.dart';
 import 'admin_panel.dart';
 
@@ -946,7 +947,7 @@ class _SpaceShellState extends State<SpaceShell> {
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Text(
-                  controller.error,
+                  chatFailureText(context, controller),
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ),
