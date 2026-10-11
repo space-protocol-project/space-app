@@ -11,6 +11,8 @@ import '../src/preferences.dart';
 import '../src/secure_vault.dart';
 import '../src/home_controller.dart';
 import '../src/server_presence.dart';
+import '../src/server_workspaces.dart';
+import 'dashboard.dart';
 import 'home_panel.dart';
 import 'chat_view.dart';
 import 'connection_panel.dart';
@@ -46,17 +48,68 @@ class SpaceShell extends StatefulWidget {
     required this.preferences,
     this.controller,
     this.presence,
+    this.workspaces,
   });
   final AppPreferences preferences;
   final ChatController? controller;
   final ServerPresence? presence;
+  final ServerWorkspaces? workspaces;
   @override
   State<SpaceShell> createState() => _SpaceShellState();
 }
 
 class _SpaceShellState extends State<SpaceShell> {
-  late final ChatController controller =
+  late final ChatController initialController =
       widget.controller ?? ChatController(SecureIdentityVault());
+  ChatController? activeController;
+  final transientControllers = <ChatController>{};
+  ChatController createTransient() {
+    final target = ChatController(initialController.vault);
+    transientControllers.add(target);
+    return target;
+  }
+
+  ChatController get controller => activeController ?? initialController;
+  late final workspaces =
+      widget.workspaces ?? ServerWorkspaces(vault: initialController.vault);
+  bool dashboard = true;
+  void showDashboard() {
+    setState(() {
+      dashboard = true;
+      selected = Section.overview;
+    });
+    scaffold.currentState?.closeDrawer();
+  }
+
+  Future<void> openSpace(String origin, {String? channel}) async {
+    workspaces.synchronize([origin]);
+    final target = workspaces[origin];
+    if (target == null || !mounted) return;
+    setState(() {
+      activeController = target;
+      dashboard = false;
+      selected = Section.chat;
+    });
+    scaffold.currentState?.closeDrawer();
+    await workspaces.reconnect(origin);
+    if (channel != null && mounted && identical(controller, target)) {
+      await target.selectChannel(channel);
+    }
+  }
+
+  Future<void> addSpace() async {
+    final previous = activeController;
+    final pending = createTransient();
+    setState(() => activeController = pending);
+    await connection();
+    if (!mounted) return;
+    if (!workspaces.controllers.values.contains(pending)) {
+      setState(() => activeController = previous);
+      transientControllers.remove(pending);
+      pending.dispose();
+    }
+  }
+
   final scaffold = GlobalKey<ScaffoldState>();
   final home = HomeController();
   late final presence =
@@ -65,9 +118,14 @@ class _SpaceShellState extends State<SpaceShell> {
         probe: (origin) => probeSavedServer(origin, SecureIdentityVault()),
       );
   StreamSubscription<ServerPresenceChange>? presenceChanges;
-  void watchSavedServers() => presence.watch(widget.preferences.origins);
+  void watchSavedServers() {
+    presence.watch(widget.preferences.origins);
+    workspaces.synchronize(widget.preferences.origins);
+  }
+
   void announcePresence(ServerPresenceChange change) {
     if (!mounted) return;
+    if (change.online) unawaited(workspaces.reconnect(change.origin));
     final name = Uri.parse(change.origin).authority;
     final label = change.online
         ? context.strings.serverNowOnline(name)
@@ -95,6 +153,14 @@ class _SpaceShellState extends State<SpaceShell> {
   void initState() {
     super.initState();
     unawaited(home.load());
+    final initialOrigin = initialController.preview?.origin.toString();
+    if (initialOrigin != null && initialController.connected) {
+      workspaces.adopt(
+        initialOrigin,
+        initialController,
+        owned: widget.controller == null,
+      );
+    }
     widget.preferences.addListener(watchSavedServers);
     presenceChanges = presence.changes.listen(announcePresence);
     watchSavedServers();
@@ -103,31 +169,41 @@ class _SpaceShellState extends State<SpaceShell> {
   Future<void> startHome(String ip) async {
     final state = await home.start(ip);
     if (state == null || !mounted) return;
-    if (controller.connected &&
-        controller.preview?.origin.toString() != state.publicOrigin) {
-      await controller.disconnect();
-    }
-    await controller.inspect(
+    final existing = workspaces[state.publicOrigin];
+    final target = existing != null && !existing.busy
+        ? existing
+        : createTransient();
+    setState(() {
+      activeController = target;
+      dashboard = false;
+      selected = Section.overview;
+    });
+    await target.inspect(
       state.localOrigin,
       homeOrigin: state.publicOrigin,
       tlsFingerprint: state.tlsFingerprint,
     );
     if (!mounted) return;
-    if (controller.preview == null) {
-      home.reportError(controller.error);
+    if (target.preview == null) {
+      home.reportError(target.error);
       return;
     }
-    await controller.connect(setupCode: state.setupCode);
-    if (!controller.connected) home.reportError(controller.error);
-    if (mounted && controller.connected) {
+    await target.connect(setupCode: state.setupCode);
+    if (!target.connected) home.reportError(target.error);
+    if (mounted && target.connected) {
+      workspaces.adopt(
+        state.publicOrigin,
+        target,
+        owned: target != widget.controller,
+      );
+      transientControllers.remove(target);
       await widget.preferences.remember(state.publicOrigin);
     }
   }
 
   Future<void> stopHome() async {
-    if (controller.preview?.origin.toString() == home.state?.publicOrigin) {
-      await controller.disconnect();
-    }
+    final owner = workspaces[home.state?.publicOrigin ?? ''];
+    if (owner != null) await owner.disconnect();
     await home.stop();
   }
 
@@ -157,6 +233,13 @@ class _SpaceShellState extends State<SpaceShell> {
             onStart: startHome,
             onStop: stopHome,
             openAdministration: () {
+              final owner = workspaces[home.state?.publicOrigin ?? ''];
+              if (owner != null) {
+                setState(() {
+                  activeController = owner;
+                  dashboard = false;
+                });
+              }
               final administration = controller.administration;
               if (administration == null) {
                 home.reportError(
@@ -206,7 +289,10 @@ class _SpaceShellState extends State<SpaceShell> {
     Section.identity || Section.settings => 4,
   };
   void select(Section section) {
-    setState(() => selected = section);
+    setState(() {
+      selected = section;
+      dashboard = false;
+    });
     scaffold.currentState?.closeDrawer();
   }
 
@@ -216,24 +302,35 @@ class _SpaceShellState extends State<SpaceShell> {
     unawaited(presenceChanges?.cancel());
     if (widget.presence == null) presence.dispose();
     home.dispose();
-    if (widget.controller == null) controller.dispose();
+    for (final pending in transientControllers) {
+      pending.dispose();
+    }
+    transientControllers.clear();
+    final ownsInitial = workspaces.controllers.values.contains(
+      initialController,
+    );
+    if (widget.workspaces == null) workspaces.dispose();
+    if (widget.controller == null && !ownsInitial) initialController.dispose();
     super.dispose();
   }
 
   Future<void> connection([String? origin]) async {
-    if (origin != null &&
-        controller.connected &&
-        controller.preview?.origin.toString() != origin) {
-      await controller.disconnect();
+    if (origin != null) {
+      workspaces.synchronize([origin]);
+      activeController = workspaces[origin];
     }
     if (!mounted) return;
+    final target = controller;
     final panel = ConnectionPanel(
-      controller: controller,
+      controller: target,
       origin:
           origin ??
           controller.preview?.origin.toString() ??
           'http://127.0.0.1:8080',
       onConnected: (address) async {
+        workspaces.adopt(address, target, owned: target != widget.controller);
+        transientControllers.remove(target);
+        activeController = target;
         await widget.preferences.remember(address);
         if (!mounted) return;
         Navigator.pop(context);
@@ -266,6 +363,7 @@ class _SpaceShellState extends State<SpaceShell> {
   }
 
   Future<void> revoke() async {
+    final target = controller;
     final accepted = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -283,7 +381,7 @@ class _SpaceShellState extends State<SpaceShell> {
         ],
       ),
     );
-    if (accepted == true && mounted) await controller.revoke();
+    if (accepted == true && mounted) await target.revoke();
   }
 
   String get spaceLabel => controller.spaceTitle.isNotEmpty
@@ -403,15 +501,16 @@ class _SpaceShellState extends State<SpaceShell> {
               onTap: controller.busy
                   ? null
                   : () async {
+                      final target = controller;
                       scaffold.currentState?.closeDrawer();
                       await openServerAdministration(
                         context,
-                        controller.administration!,
+                        target.administration!,
                         onDeviceRevoked: () {
-                          controller.disconnect();
+                          target.disconnect();
                         },
                       );
-                      await controller.refreshChannels();
+                      await target.refreshChannels();
                     },
             ),
           if (widget.preferences.origins.isNotEmpty) ...[
@@ -444,7 +543,7 @@ class _SpaceShellState extends State<SpaceShell> {
                   ),
                 ),
                 title: Text(origin, style: const TextStyle(fontSize: 11)),
-                onTap: controller.busy ? null : () => connection(origin),
+                onTap: () => openSpace(origin),
               ),
           ],
           const SizedBox(height: 20),
@@ -453,6 +552,98 @@ class _SpaceShellState extends State<SpaceShell> {
       ),
     ),
   );
+  Widget navigationSidebar() => dashboard && widget.controller == null
+      ? SizedBox(
+          width: 280,
+          child: Material(
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            child: ListView(
+              padding: const EdgeInsets.all(20),
+              children: [
+                Text(
+                  context.strings.dashboardSpaces,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 16),
+                SpaceActionButton(
+                  onPressed: addSpace,
+                  icon: Icons.add,
+                  label: context.strings.addSpace,
+                ),
+                const SizedBox(height: 20),
+                ListTile(
+                  leading: const Icon(Icons.home_outlined),
+                  title: Text(context.strings.dashboard),
+                  onTap: showDashboard,
+                ),
+                for (final origin in widget.preferences.origins)
+                  ListTile(
+                    leading: Icon(
+                      presence.online(origin) == true
+                          ? Icons.cloud_done_outlined
+                          : Icons.dns_outlined,
+                    ),
+                    title: Text(
+                      workspaces[origin]?.spaceTitle.isNotEmpty == true
+                          ? workspaces[origin]!.spaceTitle
+                          : Uri.parse(origin).authority,
+                    ),
+                    subtitle: Text(
+                      origin,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    onTap: () => openSpace(origin),
+                  ),
+                const Divider(height: 28),
+                ListTile(
+                  leading: const Icon(Icons.tune),
+                  title: Text(context.strings.settings),
+                  onTap: () => select(Section.settings),
+                ),
+              ],
+            ),
+          ),
+        )
+      : sidebar();
+  Widget railButton({
+    Key? key,
+    required String tooltip,
+    required Widget icon,
+    required VoidCallback? onPressed,
+    bool selected = false,
+  }) {
+    final colors = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Center(
+        child: SizedBox.square(
+          dimension: 48,
+          child: IconButton(
+            key: key,
+            tooltip: tooltip,
+            onPressed: onPressed,
+            icon: icon,
+            style: IconButton.styleFrom(
+              padding: EdgeInsets.zero,
+              fixedSize: const Size.square(48),
+              backgroundColor: colors.surfaceContainerHigh,
+              foregroundColor: selected ? colors.primary : colors.onSurface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+                side: BorderSide(
+                  color: selected
+                      ? colors.primary.withValues(alpha: .5)
+                      : Colors.transparent,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget rail() => SizedBox(
     width: 64,
     child: Column(
@@ -465,69 +656,68 @@ class _SpaceShellState extends State<SpaceShell> {
           semanticLabel: context.strings.logo,
         ),
         const SizedBox(height: 24),
-        IconButton.filledTonal(
-          tooltip: context.strings.selectedSpace,
-          style: IconButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-            foregroundColor: Theme.of(context).colorScheme.onSurface,
-            minimumSize: const Size(48, 48),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(17),
-            ),
-          ),
-          onPressed: () => select(Section.overview),
-          icon: const Icon(Icons.public),
+        railButton(
+          key: const ValueKey('dashboard-tab'),
+          tooltip: context.strings.dashboard,
+          selected: dashboard,
+          onPressed: showDashboard,
+          icon: const Icon(Icons.home_outlined),
         ),
-        const SizedBox(height: 12),
-        IconButton(
-          tooltip: context.strings.addSpace,
-          style: IconButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            foregroundColor: Theme.of(context).colorScheme.onSurface,
-            minimumSize: const Size(48, 48),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(17),
-            ),
+        Expanded(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              for (final origin in widget.preferences.origins)
+                railButton(
+                  key: ValueKey('server-tab-$origin'),
+                  tooltip: workspaces[origin]?.spaceTitle.isNotEmpty == true
+                      ? '${workspaces[origin]!.spaceTitle} · $origin'
+                      : origin,
+                  selected:
+                      !dashboard && identical(controller, workspaces[origin]),
+                  onPressed: () => openSpace(origin),
+                  icon: Text(
+                    (workspaces[origin]?.spaceTitle.isNotEmpty == true
+                            ? workspaces[origin]!.spaceTitle
+                            : Uri.parse(origin).host)
+                        .characters
+                        .take(1)
+                        .toString()
+                        .toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              railButton(
+                tooltip: context.strings.addSpace,
+                onPressed: addSpace,
+                icon: const Icon(Icons.add),
+              ),
+            ],
           ),
-          onPressed: controller.busy ? null : () => connection(),
-          icon: const Icon(Icons.add),
         ),
-        const Spacer(),
-        IconButton(
+        railButton(
           key: const ValueKey('home-server-toggle'),
           tooltip: home.running
               ? context.strings.stopHome
               : context.strings.goLive,
+          selected: home.running,
           onPressed: home.busy || controller.busy ? null : showHome,
-          style: IconButton.styleFrom(
-            foregroundColor: home.running
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.onSurface,
-            minimumSize: const Size(48, 48),
-          ),
           icon: home.busy
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
+              ? const SizedBox.square(
+                  dimension: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : Icon(home.running ? Icons.power_settings_new : Icons.sensors),
         ),
-        const SizedBox(height: 8),
-        IconButton(
+        railButton(
           tooltip: context.strings.myIdentity,
-          style: IconButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            foregroundColor: Theme.of(context).colorScheme.onSurface,
-            minimumSize: const Size(48, 48),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(17),
-            ),
-          ),
           onPressed: () => select(Section.identity),
           icon: const Icon(Icons.shield_outlined),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
       ],
     ),
   );
@@ -606,7 +796,7 @@ class _SpaceShellState extends State<SpaceShell> {
       ChatView(
         key: const ValueKey('live-chat'),
         controller: controller,
-        active: selected == Section.chat,
+        active: !dashboard && selected == Section.chat,
         showHeader: false,
         openConnection: () => connection(),
       ),
@@ -621,7 +811,11 @@ class _SpaceShellState extends State<SpaceShell> {
         icon: Icons.view_agenda_outlined,
       ),
       const RoomsPanel(),
-      IdentityPanel(controller: controller, revoke: revoke),
+      IdentityPanel(
+        key: ValueKey(controller),
+        controller: controller,
+        revoke: revoke,
+      ),
       SettingsPanel(preferences: widget.preferences),
     ],
   );
@@ -644,13 +838,15 @@ class _SpaceShellState extends State<SpaceShell> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                selected == Section.chat
+                dashboard
+                    ? context.strings.dashboard
+                    : selected == Section.chat
                     ? chatLabel
                     : selected.localized(context),
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              if (selected == Section.chat && !compact)
+              if (!dashboard && selected == Section.chat && !compact)
                 Text(
                   context.strings.chatDescription,
                   style: Theme.of(context).textTheme.bodySmall,
@@ -658,7 +854,7 @@ class _SpaceShellState extends State<SpaceShell> {
             ],
           ),
         ),
-        if (!compact)
+        if (!compact && !dashboard)
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: Text(
@@ -674,10 +870,18 @@ class _SpaceShellState extends State<SpaceShell> {
             ),
           ),
         IconButton(
-          tooltip: context.strings.serverConnection,
-          onPressed: controller.busy ? null : () => connection(),
+          tooltip: dashboard
+              ? context.strings.addSpace
+              : context.strings.serverConnection,
+          onPressed: controller.busy
+              ? null
+              : dashboard
+              ? addSpace
+              : () => connection(),
           icon: Icon(
-            controller.connected
+            dashboard
+                ? Icons.add
+                : controller.connected
                 ? Icons.cloud_done_outlined
                 : Icons.cloud_off_outlined,
           ),
@@ -699,6 +903,7 @@ class _SpaceShellState extends State<SpaceShell> {
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: Listenable.merge([
       controller,
+      workspaces,
       widget.preferences,
       home,
       presence,
@@ -709,7 +914,7 @@ class _SpaceShellState extends State<SpaceShell> {
         final workspace = Column(
           children: [
             header(compact),
-            if (controller.reconnecting)
+            if (!dashboard && controller.reconnecting)
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -735,8 +940,9 @@ class _SpaceShellState extends State<SpaceShell> {
                   ],
                 ),
               ),
-            if (controller.busy) const LinearProgressIndicator(minHeight: 2),
-            if (controller.error.isNotEmpty)
+            if (!dashboard && controller.busy)
+              const LinearProgressIndicator(minHeight: 2),
+            if (!dashboard && controller.error.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Text(
@@ -748,8 +954,26 @@ class _SpaceShellState extends State<SpaceShell> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(child: pages()),
-                  if (box.maxWidth >= 1320) contextPanel(),
+                  Expanded(
+                    child: IndexedStack(
+                      index: dashboard ? 0 : 1,
+                      children: [
+                        Dashboard(
+                          workspaces: workspaces,
+                          presence: presence,
+                          homeAction: showHome,
+                          homeRunning: home.running,
+                          homeBusy: home.busy,
+                          addSpace: addSpace,
+                          openSpace: (origin) => openSpace(origin),
+                          openChannel: (origin, channel) =>
+                              openSpace(origin, channel: channel),
+                        ),
+                        pages(),
+                      ],
+                    ),
+                  ),
+                  if (box.maxWidth >= 1320 && !dashboard) contextPanel(),
                 ],
               ),
             ),
@@ -767,20 +991,22 @@ class _SpaceShellState extends State<SpaceShell> {
             child: Scaffold(
               key: scaffold,
               drawer: compact
-                  ? Drawer(child: SafeArea(child: sidebar()))
+                  ? Drawer(child: SafeArea(child: navigationSidebar()))
                   : null,
               bottomNavigationBar: compact
                   ? NavigationBar(
                       selectedIndex: bottomIndex,
-                      onDestinationSelected: (index) => select(
-                        [
-                          Section.overview,
-                          Section.chat,
-                          Section.forum,
-                          Section.rooms,
-                          Section.identity,
-                        ][index],
-                      ),
+                      onDestinationSelected: (index) => index == 0
+                          ? showDashboard()
+                          : select(
+                              [
+                                Section.overview,
+                                Section.chat,
+                                Section.forum,
+                                Section.rooms,
+                                Section.identity,
+                              ][index],
+                            ),
                       destinations: [
                         NavigationDestination(
                           icon: Icon(Icons.home_outlined),
@@ -818,7 +1044,7 @@ class _SpaceShellState extends State<SpaceShell> {
                           borderRadius: const BorderRadius.horizontal(
                             left: Radius.circular(20),
                           ),
-                          child: sidebar(),
+                          child: navigationSidebar(),
                         ),
                       ],
                       Expanded(

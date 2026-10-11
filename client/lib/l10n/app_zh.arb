@@ -248,5 +248,21 @@
       }
     }
   },
-  "recoveryCancel": "取消"
+  "recoveryCancel": "取消",
+  "dashboard": "总览",
+  "dashboardTitle": "您的所有空间，尽在一处。",
+  "dashboardDescription": "查看已保存的服务器及您可访问的频道。目录会根据您的权限更新。",
+  "dashboardServers": "服务器",
+  "dashboardOnline": "在线",
+  "dashboardChannels": "可访问频道",
+  "dashboardUnread": "未读消息",
+  "dashboardRefresh": "刷新总览",
+  "dashboardEmpty": "添加您的首个空间",
+  "dashboardEmptyHelp": "连接服务器或创建自己的服务器。每个服务器都会在左侧拥有独立图标。",
+  "dashboardCatalogUnknown": "尚未加载目录",
+  "dashboardAvailable": "可用",
+  "dashboardUnavailable": "不可用",
+  "dashboardOpen": "打开空间",
+  "dashboardResourcesHelp": "总览包含您可访问的频道和未读消息。无法访问的服务器重新连接后，其数据将显示。",
+  "dashboardSpaces": "您的空间"
 }

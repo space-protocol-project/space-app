@@ -1162,6 +1162,102 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Отмена'**
   String get recoveryCancel;
+
+  /// No description provided for @dashboard.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сводка'**
+  String get dashboard;
+
+  /// No description provided for @dashboardTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все ваши пространства — рядом.'**
+  String get dashboardTitle;
+
+  /// No description provided for @dashboardDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сводка по сохранённым серверам и доступным вам каналам. Каталоги обновляются с учётом ваших прав.'**
+  String get dashboardDescription;
+
+  /// No description provided for @dashboardServers.
+  ///
+  /// In ru, this message translates to:
+  /// **'Серверы'**
+  String get dashboardServers;
+
+  /// No description provided for @dashboardOnline.
+  ///
+  /// In ru, this message translates to:
+  /// **'Онлайн'**
+  String get dashboardOnline;
+
+  /// No description provided for @dashboardChannels.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступные каналы'**
+  String get dashboardChannels;
+
+  /// No description provided for @dashboardUnread.
+  ///
+  /// In ru, this message translates to:
+  /// **'Непрочитанные'**
+  String get dashboardUnread;
+
+  /// No description provided for @dashboardRefresh.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить сводку'**
+  String get dashboardRefresh;
+
+  /// No description provided for @dashboardEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавьте первое пространство'**
+  String get dashboardEmpty;
+
+  /// No description provided for @dashboardEmptyHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключитесь к серверу или создайте свой. Каждый сервер появится отдельной иконкой слева.'**
+  String get dashboardEmptyHelp;
+
+  /// No description provided for @dashboardCatalogUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каталог ещё не получен'**
+  String get dashboardCatalogUnknown;
+
+  /// No description provided for @dashboardAvailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступен'**
+  String get dashboardAvailable;
+
+  /// No description provided for @dashboardUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Недоступен'**
+  String get dashboardUnavailable;
+
+  /// No description provided for @dashboardOpen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть пространство'**
+  String get dashboardOpen;
+
+  /// No description provided for @dashboardResourcesHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сводка учитывает доступные вам каналы и непрочитанные сообщения. Данные недоступных серверов появятся после подключения.'**
+  String get dashboardResourcesHelp;
+
+  /// No description provided for @dashboardSpaces.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ваши пространства'**
+  String get dashboardSpaces;
 }
 
 class _AppLocalizationsDelegate

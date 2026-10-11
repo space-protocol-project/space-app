@@ -6,9 +6,9 @@ import 'package:space_client/src/preferences.dart';
 
 void main() {
   for (final entry in {
-    'ru': ['Хорошо, что вы здесь.', 'Настройки', 'Язык приложения'],
-    'zh-Hans': ['欢迎你来到这里。', '设置', '应用语言'],
-    'en': ['Good to have you here.', 'Settings', 'App language'],
+    'ru': ['Все ваши пространства — рядом.', 'Настройки', 'Язык приложения'],
+    'zh-Hans': ['您的所有空间，尽在一处。', '设置', '应用语言'],
+    'en': ['All your spaces, together.', 'Settings', 'App language'],
   }.entries) {
     testWidgets('Оболочка и настройки: ${entry.key}, широкое и узкое окно', (
       tester,

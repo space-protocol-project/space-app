@@ -37,20 +37,13 @@ void main() {
         RepaintBoundary(key: boundary, child: const SpaceApp()),
       );
       await tester.pumpAndSettle();
-      expect(find.text('Хорошо, что вы здесь.'), findsOneWidget);
-      expect(find.text('О пространстве'), findsOneWidget);
-      await tester.tap(find.widgetWithText(ListTile, 'Общий чат'));
+      expect(find.text('Все ваши пространства — рядом.'), findsOneWidget);
+      expect(find.text('О пространстве'), findsNothing);
+      await tester.tap(find.byTooltip('Добавить пространство').first);
       await tester.pumpAndSettle();
-      expect(
-        tester
-            .widget<IconButton>(
-              find.byWidgetPredicate(
-                (w) => w is IconButton && w.tooltip == 'Отправить',
-              ),
-            )
-            .onPressed,
-        isNull,
-      );
+      expect(find.text('Проверить сервер'), findsOneWidget);
+      await tester.tap(find.byTooltip('Закрыть подключение'));
+      await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       final output = Platform.environment['SPACE_PREVIEW_DIR'];
       if (output != null) {
@@ -84,6 +77,19 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(NavigationBar), findsOneWidget);
       expect(tester.takeException(), isNull);
+      await tester.tap(find.byType(NavigationDestination).at(1));
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<IconButton>(
+              find.byWidgetPredicate(
+                (widget) =>
+                    widget is IconButton && widget.tooltip == 'Отправить',
+              ),
+            )
+            .onPressed,
+        isNull,
+      );
       await tester.tap(find.byTooltip('Подключение к серверу'));
       await tester.pumpAndSettle();
       expect(find.text('Проверить сервер'), findsOneWidget);

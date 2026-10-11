@@ -611,4 +611,55 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get recoveryCancel => 'Отмена';
+
+  @override
+  String get dashboard => 'Сводка';
+
+  @override
+  String get dashboardTitle => 'Все ваши пространства — рядом.';
+
+  @override
+  String get dashboardDescription =>
+      'Сводка по сохранённым серверам и доступным вам каналам. Каталоги обновляются с учётом ваших прав.';
+
+  @override
+  String get dashboardServers => 'Серверы';
+
+  @override
+  String get dashboardOnline => 'Онлайн';
+
+  @override
+  String get dashboardChannels => 'Доступные каналы';
+
+  @override
+  String get dashboardUnread => 'Непрочитанные';
+
+  @override
+  String get dashboardRefresh => 'Обновить сводку';
+
+  @override
+  String get dashboardEmpty => 'Добавьте первое пространство';
+
+  @override
+  String get dashboardEmptyHelp =>
+      'Подключитесь к серверу или создайте свой. Каждый сервер появится отдельной иконкой слева.';
+
+  @override
+  String get dashboardCatalogUnknown => 'Каталог ещё не получен';
+
+  @override
+  String get dashboardAvailable => 'Доступен';
+
+  @override
+  String get dashboardUnavailable => 'Недоступен';
+
+  @override
+  String get dashboardOpen => 'Открыть пространство';
+
+  @override
+  String get dashboardResourcesHelp =>
+      'Сводка учитывает доступные вам каналы и непрочитанные сообщения. Данные недоступных серверов появятся после подключения.';
+
+  @override
+  String get dashboardSpaces => 'Ваши пространства';
 }

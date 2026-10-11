@@ -248,5 +248,21 @@
       }
     }
   },
-  "recoveryCancel": "Cancel"
+  "recoveryCancel": "Cancel",
+  "dashboard": "Dashboard",
+  "dashboardTitle": "All your spaces, together.",
+  "dashboardDescription": "An overview of saved servers and channels you can access. Catalogs update according to your permissions.",
+  "dashboardServers": "Servers",
+  "dashboardOnline": "Online",
+  "dashboardChannels": "Accessible channels",
+  "dashboardUnread": "Unread messages",
+  "dashboardRefresh": "Refresh overview",
+  "dashboardEmpty": "Add your first space",
+  "dashboardEmptyHelp": "Connect to a server or create your own. Each server gets its own icon on the left.",
+  "dashboardCatalogUnknown": "Catalog not yet loaded",
+  "dashboardAvailable": "Available",
+  "dashboardUnavailable": "Unavailable",
+  "dashboardOpen": "Open space",
+  "dashboardResourcesHelp": "The overview includes accessible channels and unread messages. Data from unavailable servers appears after reconnection.",
+  "dashboardSpaces": "Your spaces"
 }

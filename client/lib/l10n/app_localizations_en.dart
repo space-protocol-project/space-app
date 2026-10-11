@@ -607,4 +607,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recoveryCancel => 'Cancel';
+
+  @override
+  String get dashboard => 'Dashboard';
+
+  @override
+  String get dashboardTitle => 'All your spaces, together.';
+
+  @override
+  String get dashboardDescription =>
+      'An overview of saved servers and channels you can access. Catalogs update according to your permissions.';
+
+  @override
+  String get dashboardServers => 'Servers';
+
+  @override
+  String get dashboardOnline => 'Online';
+
+  @override
+  String get dashboardChannels => 'Accessible channels';
+
+  @override
+  String get dashboardUnread => 'Unread messages';
+
+  @override
+  String get dashboardRefresh => 'Refresh overview';
+
+  @override
+  String get dashboardEmpty => 'Add your first space';
+
+  @override
+  String get dashboardEmptyHelp =>
+      'Connect to a server or create your own. Each server gets its own icon on the left.';
+
+  @override
+  String get dashboardCatalogUnknown => 'Catalog not yet loaded';
+
+  @override
+  String get dashboardAvailable => 'Available';
+
+  @override
+  String get dashboardUnavailable => 'Unavailable';
+
+  @override
+  String get dashboardOpen => 'Open space';
+
+  @override
+  String get dashboardResourcesHelp =>
+      'The overview includes accessible channels and unread messages. Data from unavailable servers appears after reconnection.';
+
+  @override
+  String get dashboardSpaces => 'Your spaces';
 }

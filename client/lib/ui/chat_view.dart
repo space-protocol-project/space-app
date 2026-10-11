@@ -162,8 +162,12 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
 
   Future<void> send() async {
     final text = draft.text;
-    if (await widget.controller.send(text) && mounted && draft.text == text) {
-      draft.clear();
+    final target = widget.controller, startingScope = scope;
+    if (!await target.send(text) || !mounted) return;
+    if (scope == startingScope && identical(widget.controller, target)) {
+      if (draft.text == text) draft.clear();
+    } else if (drafts[startingScope] == text) {
+      drafts[startingScope] = '';
     }
   }
 

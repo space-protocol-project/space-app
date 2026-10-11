@@ -248,5 +248,21 @@
       }
     }
   },
-  "recoveryCancel": "Отмена"
+  "recoveryCancel": "Отмена",
+  "dashboard": "Сводка",
+  "dashboardTitle": "Все ваши пространства — рядом.",
+  "dashboardDescription": "Сводка по сохранённым серверам и доступным вам каналам. Каталоги обновляются с учётом ваших прав.",
+  "dashboardServers": "Серверы",
+  "dashboardOnline": "Онлайн",
+  "dashboardChannels": "Доступные каналы",
+  "dashboardUnread": "Непрочитанные",
+  "dashboardRefresh": "Обновить сводку",
+  "dashboardEmpty": "Добавьте первое пространство",
+  "dashboardEmptyHelp": "Подключитесь к серверу или создайте свой. Каждый сервер появится отдельной иконкой слева.",
+  "dashboardCatalogUnknown": "Каталог ещё не получен",
+  "dashboardAvailable": "Доступен",
+  "dashboardUnavailable": "Недоступен",
+  "dashboardOpen": "Открыть пространство",
+  "dashboardResourcesHelp": "Сводка учитывает доступные вам каналы и непрочитанные сообщения. Данные недоступных серверов появятся после подключения.",
+  "dashboardSpaces": "Ваши пространства"
 }

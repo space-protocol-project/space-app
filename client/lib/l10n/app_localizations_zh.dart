@@ -567,6 +567,54 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get recoveryCancel => '取消';
+
+  @override
+  String get dashboard => '总览';
+
+  @override
+  String get dashboardTitle => '您的所有空间，尽在一处。';
+
+  @override
+  String get dashboardDescription => '查看已保存的服务器及您可访问的频道。目录会根据您的权限更新。';
+
+  @override
+  String get dashboardServers => '服务器';
+
+  @override
+  String get dashboardOnline => '在线';
+
+  @override
+  String get dashboardChannels => '可访问频道';
+
+  @override
+  String get dashboardUnread => '未读消息';
+
+  @override
+  String get dashboardRefresh => '刷新总览';
+
+  @override
+  String get dashboardEmpty => '添加您的首个空间';
+
+  @override
+  String get dashboardEmptyHelp => '连接服务器或创建自己的服务器。每个服务器都会在左侧拥有独立图标。';
+
+  @override
+  String get dashboardCatalogUnknown => '尚未加载目录';
+
+  @override
+  String get dashboardAvailable => '可用';
+
+  @override
+  String get dashboardUnavailable => '不可用';
+
+  @override
+  String get dashboardOpen => '打开空间';
+
+  @override
+  String get dashboardResourcesHelp => '总览包含您可访问的频道和未读消息。无法访问的服务器重新连接后，其数据将显示。';
+
+  @override
+  String get dashboardSpaces => '您的空间';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
