@@ -208,11 +208,14 @@ Win32Window::MessageHandler(HWND hwnd,
     }
 
     case WM_ACTIVATE:
+      UpdateTheme(hwnd);
       if (child_content_ != nullptr) {
         SetFocus(child_content_);
       }
       return 0;
 
+    case WM_THEMECHANGED:
+    case WM_SETTINGCHANGE:
     case WM_DWMCOLORIZATIONCOLORCHANGED:
       UpdateTheme(hwnd);
       return 0;
@@ -284,5 +287,13 @@ void Win32Window::UpdateTheme(HWND const window) {
     BOOL enable_dark_mode = light_mode == 0;
     DwmSetWindowAttribute(window, DWMWA_USE_IMMERSIVE_DARK_MODE,
                           &enable_dark_mode, sizeof(enable_dark_mode));
+    // Единый нейтральный цвет рамки при получении и потере фокуса.
+    // DWMWA_BORDER_COLOR поддерживается Windows 11; старые системы
+    // сохраняют стандартную рамку при неподдерживаемом атрибуте.
+    constexpr DWORD kBorderColorAttribute = 34;
+    const COLORREF border_color = enable_dark_mode
+        ? RGB(32, 32, 32) : RGB(204, 204, 204);
+    DwmSetWindowAttribute(window, kBorderColorAttribute,
+                         &border_color, sizeof(border_color));
   }
 }
