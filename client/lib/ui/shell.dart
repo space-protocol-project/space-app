@@ -275,17 +275,6 @@ class _SpaceShellState extends State<SpaceShell> {
                 : context.strings.addSpace,
           ),
           const SizedBox(height: 20),
-          AnimatedBuilder(
-            animation: home,
-            builder: (context, _) => SpaceActionButton(
-              onPressed: home.busy || controller.busy ? null : showHome,
-              icon: home.running ? Icons.power_settings_new : Icons.sensors,
-              label: home.running
-                  ? context.strings.stopHome
-                  : context.strings.goLive,
-            ),
-          ),
-          const SizedBox(height: 16),
           if (controller.channels.isNotEmpty) ...[
             const Divider(height: 24),
             Text(context.strings.channels, style: TextStyle(fontSize: 12)),
@@ -438,6 +427,27 @@ class _SpaceShellState extends State<SpaceShell> {
           icon: const Icon(Icons.add),
         ),
         const Spacer(),
+        IconButton(
+          key: const ValueKey('home-server-toggle'),
+          tooltip: home.running
+              ? context.strings.stopHome
+              : context.strings.goLive,
+          onPressed: home.busy || controller.busy ? null : showHome,
+          style: IconButton.styleFrom(
+            foregroundColor: home.running
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.onSurface,
+            minimumSize: const Size(48, 48),
+          ),
+          icon: home.busy
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Icon(home.running ? Icons.power_settings_new : Icons.sensors),
+        ),
+        const SizedBox(height: 8),
         IconButton(
           tooltip: context.strings.myIdentity,
           style: IconButton.styleFrom(
