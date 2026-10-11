@@ -843,4 +843,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get messageAccepted => 'Accepted by server';
+
+  @override
+  String get appSettings => 'App settings';
+
+  @override
+  String get serverSettings => 'Server settings';
 }

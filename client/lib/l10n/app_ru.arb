@@ -311,5 +311,7 @@
   "failureCameraStopped": "Камера остановлена. Нажмите «Включить снова».",
   "sendingMessage": "Отправляется…",
   "messageUnconfirmed": "Нет подтверждения сервера. Повторите отправку с тем же текстом.",
-  "messageAccepted": "Принято сервером"
+  "messageAccepted": "Принято сервером",
+  "appSettings": "Настройки приложения",
+  "serverSettings": "Настройки сервера"
 }

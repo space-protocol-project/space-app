@@ -311,5 +311,7 @@
   "failureCameraStopped": "The camera was stopped. Select Restart camera.",
   "sendingMessage": "Sending…",
   "messageUnconfirmed": "No server confirmation. Retry with the same text.",
-  "messageAccepted": "Accepted by server"
+  "messageAccepted": "Accepted by server",
+  "appSettings": "App settings",
+  "serverSettings": "Server settings"
 }

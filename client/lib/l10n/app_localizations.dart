@@ -1540,6 +1540,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Принято сервером'**
   String get messageAccepted;
+
+  /// No description provided for @appSettings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настройки приложения'**
+  String get appSettings;
+
+  /// No description provided for @serverSettings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настройки сервера'**
+  String get serverSettings;
 }
 
 class _AppLocalizationsDelegate

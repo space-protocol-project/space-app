@@ -21,7 +21,7 @@ void main() {
       await tester.pumpWidget(const SpaceApp());
       await tester.pumpAndSettle();
       expect(find.text(entry.value[0]), findsOneWidget);
-      await tester.tap(find.widgetWithText(ListTile, entry.value[1]));
+      await tester.tap(find.byKey(const ValueKey('app-settings-tab')));
       await tester.pumpAndSettle();
       expect(find.text(entry.value[2]), findsOneWidget);
       expect(tester.takeException(), isNull);

@@ -756,6 +756,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get messageAccepted => '服务器已接收';
+
+  @override
+  String get appSettings => '应用设置';
+
+  @override
+  String get serverSettings => '服务器设置';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

@@ -846,4 +846,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get messageAccepted => 'Принято сервером';
+
+  @override
+  String get appSettings => 'Настройки приложения';
+
+  @override
+  String get serverSettings => 'Настройки сервера';
 }

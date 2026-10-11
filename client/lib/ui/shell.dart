@@ -39,7 +39,7 @@ enum Section {
     Section.feed => context.strings.feed,
     Section.rooms => context.strings.rooms,
     Section.identity => context.strings.identity,
-    Section.settings => context.strings.settings,
+    Section.settings => context.strings.serverSettings,
   };
 }
 
@@ -74,8 +74,10 @@ class _SpaceShellState extends State<SpaceShell> {
   late final workspaces =
       widget.workspaces ?? ServerWorkspaces(vault: initialController.vault);
   bool dashboard = true;
+  bool applicationSettings = false;
   void showDashboard() {
     setState(() {
+      applicationSettings = false;
       dashboard = true;
       selected = Section.overview;
     });
@@ -89,6 +91,7 @@ class _SpaceShellState extends State<SpaceShell> {
     setState(() {
       activeController = target;
       dashboard = false;
+      applicationSettings = false;
       selected = Section.chat;
     });
     scaffold.currentState?.closeDrawer();
@@ -177,6 +180,7 @@ class _SpaceShellState extends State<SpaceShell> {
     setState(() {
       activeController = target;
       dashboard = false;
+      applicationSettings = false;
       selected = Section.overview;
     });
     await target.inspect(
@@ -239,14 +243,15 @@ class _SpaceShellState extends State<SpaceShell> {
                 setState(() {
                   activeController = owner;
                   dashboard = false;
+                  applicationSettings = false;
                 });
               }
-              final administration = controller.administration;
+              final administration = owner?.administration;
               if (administration == null) {
                 home.reportError(
-                  controller.error.isEmpty
+                  owner == null || owner.error.isEmpty
                       ? 'Сначала нужно подключиться к серверу владельцем.'
-                      : controller.error,
+                      : owner.error,
                 );
                 return;
               }
@@ -289,10 +294,33 @@ class _SpaceShellState extends State<SpaceShell> {
     Section.rooms => 3,
     Section.identity || Section.settings => 4,
   };
+  void showApplicationSettings() {
+    setState(() => applicationSettings = true);
+    scaffold.currentState?.closeDrawer();
+  }
+
+  Future<void> showServerSettings() async {
+    final target = controller;
+    final administration = target.administration;
+    if (target.busy || administration == null) return;
+    scaffold.currentState?.closeDrawer();
+    await openServerAdministration(
+      context,
+      administration,
+      onDeviceRevoked: () => target.disconnect(),
+    );
+    await target.refreshChannels();
+  }
+
   void select(Section section) {
+    if (section == Section.settings) {
+      unawaited(showServerSettings());
+      return;
+    }
     setState(() {
       selected = section;
       dashboard = false;
+      applicationSettings = false;
     });
     scaffold.currentState?.closeDrawer();
   }
@@ -480,7 +508,7 @@ class _SpaceShellState extends State<SpaceShell> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                selected: selected == section,
+                selected: !applicationSettings && selected == section,
                 selectedTileColor: Theme.of(context)
                     .colorScheme
                     .primaryContainer,
@@ -492,7 +520,11 @@ class _SpaceShellState extends State<SpaceShell> {
                             : context.strings.chats
                       : section.localized(context),
                 ),
-                onTap: () => select(section),
+                onTap:
+                    section == Section.settings &&
+                        (controller.busy || controller.administration == null)
+                    ? null
+                    : () => select(section),
               ),
             ),
           if (controller.administration != null)
@@ -599,8 +631,8 @@ class _SpaceShellState extends State<SpaceShell> {
                 const Divider(height: 28),
                 ListTile(
                   leading: const Icon(Icons.tune),
-                  title: Text(context.strings.settings),
-                  onTap: () => select(Section.settings),
+                  title: Text(context.strings.appSettings),
+                  onTap: showApplicationSettings,
                 ),
               ],
             ),
@@ -660,7 +692,7 @@ class _SpaceShellState extends State<SpaceShell> {
         railButton(
           key: const ValueKey('dashboard-tab'),
           tooltip: context.strings.dashboard,
-          selected: dashboard,
+          selected: dashboard && !applicationSettings,
           onPressed: showDashboard,
           icon: const Icon(Icons.home_outlined),
         ),
@@ -675,7 +707,9 @@ class _SpaceShellState extends State<SpaceShell> {
                       ? '${workspaces[origin]!.spaceTitle} · $origin'
                       : origin,
                   selected:
-                      !dashboard && identical(controller, workspaces[origin]),
+                      !applicationSettings &&
+                      !dashboard &&
+                      identical(controller, workspaces[origin]),
                   onPressed: () => openSpace(origin),
                   icon: Text(
                     (workspaces[origin]?.spaceTitle.isNotEmpty == true
@@ -712,6 +746,13 @@ class _SpaceShellState extends State<SpaceShell> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : Icon(home.running ? Icons.power_settings_new : Icons.sensors),
+        ),
+        railButton(
+          key: const ValueKey('app-settings-tab'),
+          tooltip: context.strings.appSettings,
+          selected: applicationSettings,
+          onPressed: showApplicationSettings,
+          icon: const Icon(Icons.settings_outlined),
         ),
         railButton(
           tooltip: context.strings.myIdentity,
@@ -799,7 +840,7 @@ class _SpaceShellState extends State<SpaceShell> {
       ChatView(
         key: const ValueKey('live-chat'),
         controller: controller,
-        active: !dashboard && selected == Section.chat,
+        active: !applicationSettings && !dashboard && selected == Section.chat,
         showHeader: false,
         openConnection: () => connection(),
       ),
@@ -819,7 +860,7 @@ class _SpaceShellState extends State<SpaceShell> {
         controller: controller,
         revoke: revoke,
       ),
-      SettingsPanel(preferences: widget.preferences),
+      const SizedBox.shrink(),
     ],
   );
   Widget header(bool compact) => Padding(
@@ -833,7 +874,10 @@ class _SpaceShellState extends State<SpaceShell> {
             icon: const Icon(Icons.menu),
           ),
         if (!compact) ...[
-          Icon(selected.icon, size: 26),
+          Icon(
+            applicationSettings ? Icons.settings_outlined : selected.icon,
+            size: 26,
+          ),
           const SizedBox(width: 12),
         ],
         Expanded(
@@ -841,7 +885,9 @@ class _SpaceShellState extends State<SpaceShell> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                dashboard
+                applicationSettings
+                    ? context.strings.appSettings
+                    : dashboard
                     ? context.strings.dashboard
                     : selected == Section.chat
                     ? chatLabel
@@ -849,7 +895,10 @@ class _SpaceShellState extends State<SpaceShell> {
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              if (!dashboard && selected == Section.chat && !compact)
+              if (!applicationSettings &&
+                  !dashboard &&
+                  selected == Section.chat &&
+                  !compact)
                 Text(
                   context.strings.chatDescription,
                   style: Theme.of(context).textTheme.bodySmall,
@@ -857,7 +906,7 @@ class _SpaceShellState extends State<SpaceShell> {
             ],
           ),
         ),
-        if (!compact && !dashboard)
+        if (!compact && !dashboard && !applicationSettings)
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: Text(
@@ -890,8 +939,8 @@ class _SpaceShellState extends State<SpaceShell> {
           ),
         ),
         IconButton(
-          tooltip: context.strings.appearanceSettings,
-          onPressed: () => select(Section.settings),
+          tooltip: context.strings.appSettings,
+          onPressed: showApplicationSettings,
           icon: const Icon(Icons.tune),
         ),
         IconButton(
@@ -945,7 +994,9 @@ class _SpaceShellState extends State<SpaceShell> {
               ),
             if (!dashboard && controller.busy)
               const LinearProgressIndicator(minHeight: 2),
-            if (!dashboard && controller.error.isNotEmpty)
+            if (!applicationSettings &&
+                !dashboard &&
+                controller.error.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Text(
@@ -959,7 +1010,11 @@ class _SpaceShellState extends State<SpaceShell> {
                 children: [
                   Expanded(
                     child: IndexedStack(
-                      index: dashboard ? 0 : 1,
+                      index: applicationSettings
+                          ? 2
+                          : dashboard
+                          ? 0
+                          : 1,
                       children: [
                         Dashboard(
                           workspaces: workspaces,
@@ -973,10 +1028,14 @@ class _SpaceShellState extends State<SpaceShell> {
                               openSpace(origin, channel: channel),
                         ),
                         pages(),
+                        SettingsPanel(preferences: widget.preferences),
                       ],
                     ),
                   ),
-                  if (box.maxWidth >= 1320 && !dashboard) contextPanel(),
+                  if (box.maxWidth >= 1320 &&
+                      !dashboard &&
+                      !applicationSettings)
+                    contextPanel(),
                 ],
               ),
             ),

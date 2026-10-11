@@ -311,5 +311,7 @@
   "failureCameraStopped": "摄像头已停止。请选择重新启动摄像头。",
   "sendingMessage": "正在发送…",
   "messageUnconfirmed": "未收到服务器确认。请重试相同文本。",
-  "messageAccepted": "服务器已接收"
+  "messageAccepted": "服务器已接收",
+  "appSettings": "应用设置",
+  "serverSettings": "服务器设置"
 }
