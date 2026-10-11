@@ -1,0 +1,4 @@
+version: v2
+plugins:
+  - local: [dart, pub, global, run, connectrpc:protoc-gen-connect-dart]
+    out: client/lib/src/generated
