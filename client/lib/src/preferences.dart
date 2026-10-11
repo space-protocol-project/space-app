@@ -90,10 +90,10 @@ class AppPreferences extends ChangeNotifier {
       'iris' => dark ? const Color(0xFFD3869B) : const Color(0xFF8F3F71),
       _ => dark ? const Color(0xFFFABD2F) : const Color(0xFF076678),
     };
-    final background = dark ? const Color(0xFF282828) : const Color(0xFFFBF1C7);
+    final background = dark ? const Color(0xFF1D2021) : const Color(0xFFFBF1C7);
     final surface = dark ? const Color(0xFF32302F) : const Color(0xFFF9F5D7);
     final text = dark ? const Color(0xFFEBDBB2) : const Color(0xFF3C3836);
-    final sidebar = dark ? const Color(0xFF1D2021) : const Color(0xFFF2E5BC);
+    final sidebar = dark ? const Color(0xFF282828) : const Color(0xFFF2E5BC);
     final soft = dark ? const Color(0xFF3C3836) : const Color(0xFFEBDBB2);
     final raised = dark ? const Color(0xFF504945) : const Color(0xFFD5C4A1);
     final scheme = ColorScheme.fromSeed(
@@ -108,7 +108,7 @@ class AppPreferences extends ChangeNotifier {
       surfaceContainerHigh: soft,
       surfaceContainerHighest: raised,
       surfaceBright: raised,
-      surfaceDim: sidebar,
+      surfaceDim: dark ? background : sidebar,
       surfaceTint: Colors.transparent,
       primaryContainer: soft,
       onPrimaryContainer: primary,
