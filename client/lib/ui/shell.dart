@@ -798,7 +798,9 @@ class _SpaceShellState extends State<SpaceShell> {
     children: [
       OverviewPanel(
         controller: controller,
-        home: home,
+        home: controller.preview?.origin.toString() == 'https://${home.ip}:8443'
+            ? home
+            : null,
         homeAction: showHome,
         homeDetails: showHomeDetails,
         openConnection: () => connection(),
