@@ -479,4 +479,136 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get serverAvailabilityUnknown => 'Доступность пока неизвестна';
+
+  @override
+  String get recoveryOperationFailed =>
+      'Операция не завершена. Проверьте доступ, карточку и соединение.';
+
+  @override
+  String get recoveryFileLabel => 'Карточка Space';
+
+  @override
+  String get recoveryFormat => 'Формат карточки';
+
+  @override
+  String get recoveryFormatHelp =>
+      'PNG содержит зашифрованный QR и подходит для печати. JSON — компактный резервный файл. Пароль храните отдельно.';
+
+  @override
+  String get recoveryPng => 'QR в PNG';
+
+  @override
+  String get recoveryCardSaved =>
+      'Карточка сохранена. Проверьте её восстановлением на отдельном устройстве; файл и пароль храните раздельно.';
+
+  @override
+  String get recoveryTooLarge => 'Карточка слишком большая';
+
+  @override
+  String get recoveryReplaceWarning =>
+      'Сохранённые здесь ключи для этого адреса будут заменены. Сначала сохраните их карточку, если это другая идентичность.';
+
+  @override
+  String get recoveryConnectionDenied =>
+      'Ключи сохранены, но сервер не разрешил подключение. Проверьте отзыв карточки, блокировку и доступность чата.';
+
+  @override
+  String get recoveryRestored =>
+      'Идентичность восстановлена с новым устройством. Проверьте список и отзовите потерянные устройства.';
+
+  @override
+  String get rotationRenewConfirm =>
+      'Обновить истёкший запрос с теми же сохранёнными новыми ключами? Если сервер уже завершил переход, используйте завершение сохранённой смены.';
+
+  @override
+  String get rotationConfirm =>
+      'Сменить корневой ключ? Ваш ID, права и история сохранятся. Прежние устройства и карточки потеряют доступ. Новый секрет сначала сохраняется в защищённый журнал. После перехода обязательно сохраните новую карточку.';
+
+  @override
+  String get rotationServerRequired =>
+      'Сначала проверьте адрес прежнего сервера';
+
+  @override
+  String get rotationNotPending =>
+      'Для этого сервера нет сохранённой смены ключа.';
+
+  @override
+  String get rotationReconnect =>
+      'Новый ключ сохранён. Проверьте доступность сервера и подключитесь повторно.';
+
+  @override
+  String get rotationCompleted =>
+      'Корневой ключ сменён, прежний ID сохранён. Сохраните новую карточку; старые карточки и устройства больше не работают.';
+
+  @override
+  String get recoveryRevokeCard =>
+      'Отозвать ключ восстановления? Карточка и все устройства, подключённые через неё, перестанут работать. Перед этим сохраните другой путь доступа.';
+
+  @override
+  String get recoveryRevokeDevice =>
+      'Отозвать это устройство? Его сессии и подписки завершатся.';
+
+  @override
+  String get recoveryRevoked => 'Разрешение отозвано на сервере.';
+
+  @override
+  String get pairingAlreadyUsed => 'Код уже использован или отменён';
+
+  @override
+  String get pairingManageRequest =>
+      'Запрошено также управление пространством, если роль это разрешает.';
+
+  @override
+  String get pairingChatRequest => 'Запрошен доступ к чату с вашими правами.';
+
+  @override
+  String get pairingReady =>
+      'Код появится также на новом устройстве. Введите показанный там код проверки перед выдачей подписи.';
+
+  @override
+  String get pairingMismatch =>
+      'Коды проверки не совпадают. Не подтверждайте подключение.';
+
+  @override
+  String get pairingSignConfirm =>
+      'Коды на двух устройствах совпадают? Выдать root-подпись для нового устройства с указанными правами?';
+
+  @override
+  String get pairingSigned =>
+      'Подпись выдана. Завершите вход на новом устройстве.';
+
+  @override
+  String get pairingStartFailed =>
+      'Не удалось начать сопряжение. Проверьте сервер и доступность PostgreSQL.';
+
+  @override
+  String get pairingCancelled => 'Сопряжение отменено';
+
+  @override
+  String get pairingExpired =>
+      'Код истёк, отменён или подтверждение не прошло проверку. Начните заново.';
+
+  @override
+  String get pairingCompareTitle => 'Сверьте код на двух устройствах';
+
+  @override
+  String get pairingMatches => 'Код совпадает';
+
+  @override
+  String recoveryRestoreConfirm(String origin, String warning) {
+    return 'Восстановить идентичность на $origin? Будет создан новый ключ этого устройства. $warning';
+  }
+
+  @override
+  String pairingPrepareConfirm(String device, String request) {
+    return 'Подготовить подключение «$device» к вашей идентичности? $request Подпись ещё не выдаётся. Сначала сравните код на обоих экранах.';
+  }
+
+  @override
+  String pairingAcceptConfirm(String code, String origin) {
+    return 'На подтверждающем устройстве должен отображаться код $code. Совпадает? Сохранённая здесь идентичность для $origin будет заменена; сначала сохраните её карточку, если это другой аккаунт.';
+  }
+
+  @override
+  String get recoveryCancel => 'Отмена';
 }

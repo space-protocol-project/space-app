@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../l10n/admin_localizations.dart';
 
-Future<bool> confirmRecoveryAction(BuildContext context, String text) async =>
+Future<bool> confirmRecoveryAction(
+  BuildContext context,
+  String text, {
+  String Function(BuildContext)? textBuilder,
+}) async =>
     await showDialog<bool>(
       context: context,
       builder: (context) {
@@ -11,7 +15,7 @@ Future<bool> confirmRecoveryAction(BuildContext context, String text) async =>
             lookupAdminLocalizations(const Locale('ru'));
         return AlertDialog(
           title: Text(strings.recoveryConfirm),
-          content: Text(text),
+          content: Text(textBuilder?.call(context) ?? text),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),

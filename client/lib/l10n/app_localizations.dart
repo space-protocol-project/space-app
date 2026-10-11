@@ -952,6 +952,216 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Доступность пока неизвестна'**
   String get serverAvailabilityUnknown;
+
+  /// No description provided for @recoveryOperationFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Операция не завершена. Проверьте доступ, карточку и соединение.'**
+  String get recoveryOperationFailed;
+
+  /// No description provided for @recoveryFileLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карточка Space'**
+  String get recoveryFileLabel;
+
+  /// No description provided for @recoveryFormat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Формат карточки'**
+  String get recoveryFormat;
+
+  /// No description provided for @recoveryFormatHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'PNG содержит зашифрованный QR и подходит для печати. JSON — компактный резервный файл. Пароль храните отдельно.'**
+  String get recoveryFormatHelp;
+
+  /// No description provided for @recoveryPng.
+  ///
+  /// In ru, this message translates to:
+  /// **'QR в PNG'**
+  String get recoveryPng;
+
+  /// No description provided for @recoveryCardSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карточка сохранена. Проверьте её восстановлением на отдельном устройстве; файл и пароль храните раздельно.'**
+  String get recoveryCardSaved;
+
+  /// No description provided for @recoveryTooLarge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карточка слишком большая'**
+  String get recoveryTooLarge;
+
+  /// No description provided for @recoveryReplaceWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранённые здесь ключи для этого адреса будут заменены. Сначала сохраните их карточку, если это другая идентичность.'**
+  String get recoveryReplaceWarning;
+
+  /// No description provided for @recoveryConnectionDenied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ключи сохранены, но сервер не разрешил подключение. Проверьте отзыв карточки, блокировку и доступность чата.'**
+  String get recoveryConnectionDenied;
+
+  /// No description provided for @recoveryRestored.
+  ///
+  /// In ru, this message translates to:
+  /// **'Идентичность восстановлена с новым устройством. Проверьте список и отзовите потерянные устройства.'**
+  String get recoveryRestored;
+
+  /// No description provided for @rotationRenewConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить истёкший запрос с теми же сохранёнными новыми ключами? Если сервер уже завершил переход, используйте завершение сохранённой смены.'**
+  String get rotationRenewConfirm;
+
+  /// No description provided for @rotationConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сменить корневой ключ? Ваш ID, права и история сохранятся. Прежние устройства и карточки потеряют доступ. Новый секрет сначала сохраняется в защищённый журнал. После перехода обязательно сохраните новую карточку.'**
+  String get rotationConfirm;
+
+  /// No description provided for @rotationServerRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сначала проверьте адрес прежнего сервера'**
+  String get rotationServerRequired;
+
+  /// No description provided for @rotationNotPending.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для этого сервера нет сохранённой смены ключа.'**
+  String get rotationNotPending;
+
+  /// No description provided for @rotationReconnect.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новый ключ сохранён. Проверьте доступность сервера и подключитесь повторно.'**
+  String get rotationReconnect;
+
+  /// No description provided for @rotationCompleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корневой ключ сменён, прежний ID сохранён. Сохраните новую карточку; старые карточки и устройства больше не работают.'**
+  String get rotationCompleted;
+
+  /// No description provided for @recoveryRevokeCard.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отозвать ключ восстановления? Карточка и все устройства, подключённые через неё, перестанут работать. Перед этим сохраните другой путь доступа.'**
+  String get recoveryRevokeCard;
+
+  /// No description provided for @recoveryRevokeDevice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отозвать это устройство? Его сессии и подписки завершатся.'**
+  String get recoveryRevokeDevice;
+
+  /// No description provided for @recoveryRevoked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разрешение отозвано на сервере.'**
+  String get recoveryRevoked;
+
+  /// No description provided for @pairingAlreadyUsed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код уже использован или отменён'**
+  String get pairingAlreadyUsed;
+
+  /// No description provided for @pairingManageRequest.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запрошено также управление пространством, если роль это разрешает.'**
+  String get pairingManageRequest;
+
+  /// No description provided for @pairingChatRequest.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запрошен доступ к чату с вашими правами.'**
+  String get pairingChatRequest;
+
+  /// No description provided for @pairingReady.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код появится также на новом устройстве. Введите показанный там код проверки перед выдачей подписи.'**
+  String get pairingReady;
+
+  /// No description provided for @pairingMismatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Коды проверки не совпадают. Не подтверждайте подключение.'**
+  String get pairingMismatch;
+
+  /// No description provided for @pairingSignConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Коды на двух устройствах совпадают? Выдать root-подпись для нового устройства с указанными правами?'**
+  String get pairingSignConfirm;
+
+  /// No description provided for @pairingSigned.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подпись выдана. Завершите вход на новом устройстве.'**
+  String get pairingSigned;
+
+  /// No description provided for @pairingStartFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось начать сопряжение. Проверьте сервер и доступность PostgreSQL.'**
+  String get pairingStartFailed;
+
+  /// No description provided for @pairingCancelled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сопряжение отменено'**
+  String get pairingCancelled;
+
+  /// No description provided for @pairingExpired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код истёк, отменён или подтверждение не прошло проверку. Начните заново.'**
+  String get pairingExpired;
+
+  /// No description provided for @pairingCompareTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сверьте код на двух устройствах'**
+  String get pairingCompareTitle;
+
+  /// No description provided for @pairingMatches.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код совпадает'**
+  String get pairingMatches;
+
+  /// No description provided for @recoveryRestoreConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановить идентичность на {origin}? Будет создан новый ключ этого устройства. {warning}'**
+  String recoveryRestoreConfirm(String origin, String warning);
+
+  /// No description provided for @pairingPrepareConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подготовить подключение «{device}» к вашей идентичности? {request} Подпись ещё не выдаётся. Сначала сравните код на обоих экранах.'**
+  String pairingPrepareConfirm(String device, String request);
+
+  /// No description provided for @pairingAcceptConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'На подтверждающем устройстве должен отображаться код {code}. Совпадает? Сохранённая здесь идентичность для {origin} будет заменена; сначала сохраните её карточку, если это другой аккаунт.'**
+  String pairingAcceptConfirm(String code, String origin);
+
+  /// No description provided for @recoveryCancel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отмена'**
+  String get recoveryCancel;
 }
 
 class _AppLocalizationsDelegate

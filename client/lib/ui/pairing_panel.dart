@@ -6,6 +6,7 @@ import 'package:space_admin_ui/space_admin_ui.dart';
 import '../src/chat_controller.dart';
 import '../src/core.dart';
 import '../src/pairing.dart';
+import '../l10n/strings.dart';
 
 class PairingStartPanel extends StatefulWidget {
   const PairingStartPanel({
@@ -25,6 +26,12 @@ class _PairingStartPanelState extends State<PairingStartPanel> {
   Timer? timer;
   bool busy = false, polling = false;
   String error = '', verification = '';
+  String? errorKey;
+  String get localizedError => switch (errorKey) {
+    'pairingStartFailed' => context.strings.pairingStartFailed,
+    'pairingExpired' => context.strings.pairingExpired,
+    _ => error,
+  };
   @override
   void dispose() {
     timer?.cancel();
@@ -38,6 +45,7 @@ class _PairingStartPanelState extends State<PairingStartPanel> {
     setState(() {
       busy = true;
       error = '';
+      errorKey = null;
     });
     try {
       final result = await PendingPairing.start(server);
@@ -49,9 +57,7 @@ class _PairingStartPanelState extends State<PairingStartPanel> {
       timer = Timer.periodic(const Duration(seconds: 2), (_) => poll());
     } catch (_) {
       if (mounted) {
-        setState(
-          () => error = 'Не удалось начать сопряжение. Проверьте сервер и доступность PostgreSQL.',
-        );
+        setState(() => errorKey = 'pairingStartFailed');
       }
     } finally {
       if (mounted) setState(() => busy = false);
@@ -66,7 +72,7 @@ class _PairingStartPanelState extends State<PairingStartPanel> {
       final response = await current.poll();
       if (!mounted || pending != current) return;
       if (response.pairing.state == 'cancelled') {
-        throw const FormatException('Сопряжение отменено');
+        throw FormatException(context.strings.pairingCancelled);
       }
       if (response.pairing.state == 'approved') {
         final record = await current.verifiedRecord(response);
@@ -97,9 +103,7 @@ class _PairingStartPanelState extends State<PairingStartPanel> {
     } catch (_) {
       if (mounted && pending == current) {
         timer?.cancel();
-        setState(
-          () => error = 'Код истёк, отменён или подтверждение не прошло проверку. Начните заново.',
-        );
+        setState(() => errorKey = 'pairingExpired');
       }
     } finally {
       polling = false;
@@ -114,6 +118,7 @@ class _PairingStartPanelState extends State<PairingStartPanel> {
       candidate = null;
       verification = '';
       error = '';
+      errorKey = null;
     });
     await current?.close();
   }
@@ -124,18 +129,18 @@ class _PairingStartPanelState extends State<PairingStartPanel> {
     final approved = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Сверьте код на двух устройствах'),
+        title: Text(context.strings.pairingCompareTitle),
         content: Text(
-          'На подтверждающем устройстве должен отображаться код $verification. Совпадает? Сохранённая здесь идентичность для ${record.origin} будет заменена; сначала сохраните её карточку, если это другой аккаунт.',
+          context.strings.pairingAcceptConfirm(verification, record.origin),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Отмена'),
+            child: Text(context.strings.recoveryCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Код совпадает'),
+            child: Text(context.strings.pairingMatches),
           ),
         ],
       ),
@@ -149,7 +154,10 @@ class _PairingStartPanelState extends State<PairingStartPanel> {
       );
       if (!mounted) return;
       if (!widget.controller.connected) {
-        setState(() => error = widget.controller.error);
+        setState(() {
+          errorKey = null;
+          error = widget.controller.error;
+        });
         return;
       }
       current.claimed = true;
@@ -169,7 +177,7 @@ class _PairingStartPanelState extends State<PairingStartPanel> {
     code: pending?.request.code ?? '',
     signatureVerified: candidate != null,
     verification: verification,
-    error: error,
+    error: localizedError,
     onStart: start,
     onAccept: accept,
     onCancel: cancel,

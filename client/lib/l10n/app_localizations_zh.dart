@@ -453,6 +453,120 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get serverAvailabilityUnknown => '尚不确定是否可用';
+
+  @override
+  String get recoveryOperationFailed => '操作未完成。请检查访问权限、身份卡和连接。';
+
+  @override
+  String get recoveryFileLabel => 'Space 身份卡';
+
+  @override
+  String get recoveryFormat => '身份卡格式';
+
+  @override
+  String get recoveryFormatHelp => 'PNG 包含加密二维码，适合打印。JSON 是紧凑的备份文件。请单独保存密码。';
+
+  @override
+  String get recoveryPng => 'PNG 二维码';
+
+  @override
+  String get recoveryCardSaved => '身份卡已保存。请在另一台设备上测试恢复，并分开保存文件和密码。';
+
+  @override
+  String get recoveryTooLarge => '身份卡文件过大';
+
+  @override
+  String get recoveryReplaceWarning => '此地址在本设备上保存的密钥将被替换。如果它们属于其他身份，请先保存其身份卡。';
+
+  @override
+  String get recoveryConnectionDenied =>
+      '密钥已保存，但服务器拒绝连接。请检查身份卡是否被撤销、访问是否被阻止以及聊天是否可用。';
+
+  @override
+  String get recoveryRestored => '身份已通过新设备恢复。请检查设备列表并撤销丢失的设备。';
+
+  @override
+  String get rotationRenewConfirm =>
+      '使用相同的已保存新密钥更新过期请求？如果服务器已完成更换，请完成已保存的更换操作。';
+
+  @override
+  String get rotationConfirm =>
+      '更换根密钥？您的标识符、权限和历史记录会保留。旧设备和身份卡将失去访问权限。新密钥会先保存到受保护的日志。更换后务必保存新身份卡。';
+
+  @override
+  String get rotationServerRequired => '请先检查原服务器地址';
+
+  @override
+  String get rotationNotPending => '此服务器没有已保存的密钥更换操作。';
+
+  @override
+  String get rotationReconnect => '新密钥已保存。请检查服务器是否可用并重新连接。';
+
+  @override
+  String get rotationCompleted => '根密钥已更换，原标识符已保留。请保存新身份卡；旧身份卡和设备已无法使用。';
+
+  @override
+  String get recoveryRevokeCard => '撤销恢复密钥？身份卡及所有通过它连接的设备将无法使用。请先确保有其他访问方式。';
+
+  @override
+  String get recoveryRevokeDevice => '撤销此设备？其会话和订阅将结束。';
+
+  @override
+  String get recoveryRevoked => '已在服务器上撤销权限。';
+
+  @override
+  String get pairingAlreadyUsed => '代码已被使用或取消';
+
+  @override
+  String get pairingManageRequest => '如果角色允许，还请求了空间管理权限。';
+
+  @override
+  String get pairingChatRequest => '请求使用您的权限访问聊天。';
+
+  @override
+  String get pairingReady => '代码也会显示在新设备上。签名前请输入新设备显示的验证码。';
+
+  @override
+  String get pairingMismatch => '验证码不一致。请勿确认连接。';
+
+  @override
+  String get pairingSignConfirm => '两个设备上的代码是否一致？使用根权限为新设备签署所列权限？';
+
+  @override
+  String get pairingSigned => '签名已签发。请在新设备上完成登录。';
+
+  @override
+  String get pairingStartFailed => '无法开始配对。请检查服务器和 PostgreSQL 是否可用。';
+
+  @override
+  String get pairingCancelled => '配对已取消';
+
+  @override
+  String get pairingExpired => '代码已过期、已取消或确认未通过验证。请重新开始。';
+
+  @override
+  String get pairingCompareTitle => '核对两个设备上的代码';
+
+  @override
+  String get pairingMatches => '代码一致';
+
+  @override
+  String recoveryRestoreConfirm(String origin, String warning) {
+    return '在 $origin 上恢复身份？将为此设备创建新密钥。$warning';
+  }
+
+  @override
+  String pairingPrepareConfirm(String device, String request) {
+    return '准备将“$device”连接到您的身份？$request 尚未签发签名。请先核对两个屏幕上的代码。';
+  }
+
+  @override
+  String pairingAcceptConfirm(String code, String origin) {
+    return '确认设备应显示代码 $code。是否一致？本设备为 $origin 保存的身份将被替换；如果属于其他账户，请先保存其身份卡。';
+  }
+
+  @override
+  String get recoveryCancel => '取消';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

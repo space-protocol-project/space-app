@@ -475,4 +475,136 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverAvailabilityUnknown => 'Availability is not yet known';
+
+  @override
+  String get recoveryOperationFailed =>
+      'The operation did not finish. Check access, the card and the connection.';
+
+  @override
+  String get recoveryFileLabel => 'Space card';
+
+  @override
+  String get recoveryFormat => 'Card format';
+
+  @override
+  String get recoveryFormatHelp =>
+      'PNG contains an encrypted QR code suitable for printing. JSON is a compact backup file. Keep the password separately.';
+
+  @override
+  String get recoveryPng => 'QR in PNG';
+
+  @override
+  String get recoveryCardSaved =>
+      'Card saved. Test recovery on another device; store the file and password separately.';
+
+  @override
+  String get recoveryTooLarge => 'Card is too large';
+
+  @override
+  String get recoveryReplaceWarning =>
+      'Saved keys for this address will be replaced. Back them up as a card first if they belong to another identity.';
+
+  @override
+  String get recoveryConnectionDenied =>
+      'Keys saved, but the server denied the connection. Check whether the card was revoked, access blocked or chat unavailable.';
+
+  @override
+  String get recoveryRestored =>
+      'Identity restored with a new device. Check the device list and revoke lost devices.';
+
+  @override
+  String get rotationRenewConfirm =>
+      'Renew the expired request using the same saved new keys? If the server already completed rotation, finish the saved rotation instead.';
+
+  @override
+  String get rotationConfirm =>
+      'Rotate the root key? Your ID, permissions and history stay unchanged. Old devices and cards lose access. The new secret is first saved in a protected journal. Save a new card after rotation.';
+
+  @override
+  String get rotationServerRequired =>
+      'First check the original server address';
+
+  @override
+  String get rotationNotPending => 'No saved key rotation for this server.';
+
+  @override
+  String get rotationReconnect =>
+      'New key saved. Check server availability and reconnect.';
+
+  @override
+  String get rotationCompleted =>
+      'Root key rotated; your ID is preserved. Save a new card. Old cards and devices no longer work.';
+
+  @override
+  String get recoveryRevokeCard =>
+      'Revoke the recovery key? The card and all devices connected through it will stop working. Make sure you have another access method.';
+
+  @override
+  String get recoveryRevokeDevice =>
+      'Revoke this device? Its sessions and subscriptions will end.';
+
+  @override
+  String get recoveryRevoked => 'Permission revoked on the server.';
+
+  @override
+  String get pairingAlreadyUsed => 'Code already used or cancelled';
+
+  @override
+  String get pairingManageRequest =>
+      'Space management is also requested if the role allows it.';
+
+  @override
+  String get pairingChatRequest =>
+      'Chat access with your permissions is requested.';
+
+  @override
+  String get pairingReady =>
+      'The code also appears on the new device. Enter its verification code before signing.';
+
+  @override
+  String get pairingMismatch =>
+      'Verification codes do not match. Do not approve the connection.';
+
+  @override
+  String get pairingSignConfirm =>
+      'Do the codes on both devices match? Sign for the new device with the specified permissions using the root authority?';
+
+  @override
+  String get pairingSigned =>
+      'Signature issued. Finish signing in on the new device.';
+
+  @override
+  String get pairingStartFailed =>
+      'Could not start pairing. Check the server and PostgreSQL availability.';
+
+  @override
+  String get pairingCancelled => 'Pairing cancelled';
+
+  @override
+  String get pairingExpired =>
+      'The code expired, was cancelled or the approval failed verification. Start again.';
+
+  @override
+  String get pairingCompareTitle => 'Compare the code on both devices';
+
+  @override
+  String get pairingMatches => 'Code matches';
+
+  @override
+  String recoveryRestoreConfirm(String origin, String warning) {
+    return 'Restore identity on $origin? A new key will be created for this device. $warning';
+  }
+
+  @override
+  String pairingPrepareConfirm(String device, String request) {
+    return 'Prepare to connect “$device” to your identity? $request No signature is issued yet. Compare the code on both screens first.';
+  }
+
+  @override
+  String pairingAcceptConfirm(String code, String origin) {
+    return 'The approving device must display code $code. Does it match? The identity saved here for $origin will be replaced. Save its card first if it belongs to another account.';
+  }
+
+  @override
+  String get recoveryCancel => 'Cancel';
 }

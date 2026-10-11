@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:grpc/grpc.dart';
 
 import '../src/chat_controller.dart';
 import '../src/core.dart';
@@ -17,6 +16,8 @@ import '../src/generated/space/v1/space.pbgrpc.dart' show AuthServiceClient;
 import 'package:space_admin_ui/space_admin_ui.dart';
 
 import 'camera_scanner.dart';
+import '../l10n/strings.dart';
+import '../l10n/app_localizations.dart';
 
 class RecoveryPanel extends StatefulWidget {
   const RecoveryPanel({super.key, required this.controller});
@@ -28,6 +29,9 @@ class RecoveryPanel extends StatefulWidget {
 class _RecoveryPanelState extends State<RecoveryPanel> {
   bool pending = false;
   String message = '';
+  String? messageKey;
+  String get localizedMessage =>
+      recoveryMessage(context.strings, messageKey) ?? message;
   List<DeviceGrant> devices = [];
   final pairingCode = TextEditingController();
   final pairingEntered = TextEditingController();
@@ -41,29 +45,43 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     super.dispose();
   }
 
-  static const files = [
-    XTypeGroup(label: 'Карточка Space', extensions: ['json', 'png']),
+  List<XTypeGroup> get files => [
+    XTypeGroup(
+      label: context.strings.recoveryFileLabel,
+      extensions: ['json', 'png'],
+    ),
   ];
   Future<void> run(Future<void> Function() action) async {
     if (pending || widget.controller.busy) return;
     setState(() {
       pending = true;
       message = '';
+      messageKey = null;
     });
     try {
       await action();
     } catch (error) {
       if (mounted) {
-        setState(
-          () => message = error is FormatException ? error.message.toString() : 'Операция не завершена. Проверьте доступ, карточку и соединение.',
-        );
+        setState(() {
+          messageKey = error is RecoveryOperationError
+              ? error.key
+              : error is FormatException
+              ? null
+              : 'recoveryOperationFailed';
+          message = error is FormatException ? error.message.toString() : '';
+        });
       }
     } finally {
       if (mounted) setState(() => pending = false);
     }
   }
 
-  Future<bool> confirm(String text) => confirmRecoveryAction(context, text);
+  Future<bool> confirm(String Function(AppLocalizations) text) =>
+      confirmRecoveryAction(
+        context,
+        '',
+        textBuilder: (context) => text(context.strings),
+      );
   Future<String?> password(bool creating) =>
       askRecoveryPassword(context, creating: creating);
 
@@ -80,18 +98,16 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     final png = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Формат карточки'),
-        content: const Text(
-          'PNG содержит зашифрованный QR и подходит для печати. JSON — компактный резервный файл. Пароль храните отдельно.',
-        ),
+        title: Text(context.strings.recoveryFormat),
+        content: Text(context.strings.recoveryFormatHelp),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('JSON'),
+            child: Text('JSON'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('QR в PNG'),
+            child: Text(context.strings.recoveryPng),
           ),
         ],
       ),
@@ -101,10 +117,14 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     final content = png
         ? await compute(pngInWorker, packet)
         : Uint8List.fromList(utf8.encode(packet));
+    if (!mounted) return;
     final destination = await getSaveLocation(
       suggestedName: 'space-recovery.$extension',
       acceptedTypeGroups: [
-        XTypeGroup(label: 'Карточка Space', extensions: [extension]),
+        XTypeGroup(
+          label: context.strings.recoveryFileLabel,
+          extensions: [extension],
+        ),
       ],
     );
     if (destination == null) return;
@@ -114,9 +134,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       name: 'space-recovery.$extension',
     ).saveTo(destination.path);
     if (mounted) {
-      setState(
-        () => message = 'Карточка сохранена. Проверьте её восстановлением на отдельном устройстве; файл и пароль храните раздельно.',
-      );
+      setState(() => messageKey = 'recoveryCardSaved');
     }
   }
 
@@ -128,7 +146,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       final file = await openFile(acceptedTypeGroups: files);
       if (file == null) return;
       if (await file.length() > maxRecoveryImageBytes) {
-        throw const FormatException('Карточка слишком большая');
+        throw RecoveryOperationError('recoveryTooLarge');
       }
       packet = await compute(artifactInWorker, await file.readAsBytes());
     }
@@ -136,29 +154,34 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     if (pass == null) return;
     final payload = await compute(openCardInWorker, [packet, pass]);
     final record = await recordFromRecovery(payload);
-    final server = await discover(record.origin);
+    final server = await discover(
+      record.origin,
+      tlsFingerprint: record.tlsFingerprint,
+    );
     checkTrust(server, record);
     final existing = await widget.controller.vault.load(record.origin);
     if (existing != null) checkTrust(server, existing);
     if (!mounted ||
         !await confirm(
-          'Восстановить идентичность на ${record.origin}? Будет создан новый ключ этого устройства. ${existing == null ? '' : 'Сохранённые здесь ключи для этого адреса будут заменены. Сначала сохраните их карточку, если это другая идентичность.'}',
+          (strings) => strings.recoveryRestoreConfirm(
+            record.origin,
+            existing == null ? '' : strings.recoveryReplaceWarning,
+          ),
         )) {
       return;
     }
     await widget.controller.disconnect();
-    await widget.controller.inspect(record.origin);
+    await widget.controller.inspect(
+      record.origin,
+      tlsFingerprint: record.tlsFingerprint,
+    );
     await widget.controller.connect(restoredRecord: record);
     if (!widget.controller.connected) {
-      throw const FormatException(
-        'Ключи сохранены, но сервер не разрешил подключение. Проверьте отзыв карточки, блокировку и доступность чата.',
-      );
+      throw RecoveryOperationError('recoveryConnectionDenied');
     }
     await refresh();
     if (mounted) {
-      setState(
-        () => message = 'Идентичность восстановлена с новым устройством. Проверьте список и отзовите потерянные устройства.',
-      );
+      setState(() => messageKey = 'recoveryRestored');
     }
   }
 
@@ -171,9 +194,8 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     final manager = widget.controller.deviceManagement;
     if (manager is! RootRotationControl) return;
     if (!await confirm(
-      renew
-          ? 'Обновить истёкший запрос с теми же сохранёнными новыми ключами? Если сервер уже завершил переход, используйте завершение сохранённой смены.'
-          : 'Сменить корневой ключ? Ваш ID, права и история сохранятся. Прежние устройства и карточки потеряют доступ. Новый секрет сначала сохраняется в защищённый журнал. После перехода обязательно сохраните новую карточку.',
+      (strings) =>
+          renew ? strings.rotationRenewConfirm : strings.rotationConfirm,
     )) {
       return;
     }
@@ -184,13 +206,9 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
   Future<void> finishRotation() async {
     final server = widget.controller.preview, vault = widget.controller.vault;
     if (server == null || vault is! RotationJournalVault) {
-      throw const FormatException('Сначала проверьте адрес прежнего сервера');
+      throw RecoveryOperationError('rotationServerRequired');
     }
-    final channel = ClientChannel(
-      server.origin.host,
-      port: server.grpcPort,
-      options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
-    );
+    final channel = server.openChannel();
     try {
       final record = await rotation.finishRootRotation(
         server,
@@ -199,9 +217,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       );
       if (record == null) {
         if (mounted) {
-          setState(
-            () => message = 'Для этого сервера нет сохранённой смены ключа.',
-          );
+          setState(() => messageKey = 'rotationNotPending');
         }
         return;
       }
@@ -209,15 +225,11 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       await widget.controller.inspect(record.origin);
       await widget.controller.connect();
       if (!widget.controller.connected) {
-        throw const FormatException(
-          'Новый ключ сохранён. Проверьте доступность сервера и подключитесь повторно.',
-        );
+        throw RecoveryOperationError('rotationReconnect');
       }
       await refresh();
       if (mounted) {
-        setState(
-          () => message = 'Корневой ключ сменён, прежний ID сохранён. Сохраните новую карточку; старые карточки и устройства больше не работают.',
-        );
+        setState(() => messageKey = 'rotationCompleted');
       }
     } finally {
       await channel.shutdown();
@@ -228,9 +240,9 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     final manager = widget.controller.deviceManagement;
     if (manager == null) return;
     if (!await confirm(
-      grant.recovery
-          ? 'Отозвать ключ восстановления? Карточка и все устройства, подключённые через неё, перестанут работать. Перед этим сохраните другой путь доступа.'
-          : 'Отозвать это устройство? Его сессии и подписки завершатся.',
+      (strings) => grant.recovery
+          ? strings.recoveryRevokeCard
+          : strings.recoveryRevokeDevice,
     )) {
       return;
     }
@@ -239,7 +251,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       final file = await openFile(acceptedTypeGroups: files);
       if (file == null) return;
       if (await file.length() > maxRecoveryImageBytes) {
-        throw const FormatException('Карточка слишком большая');
+        throw RecoveryOperationError('recoveryTooLarge');
       }
       final pass = await password(false);
       if (pass == null) return;
@@ -257,7 +269,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     } else {
       await refresh();
     }
-    if (mounted) setState(() => message = 'Разрешение отозвано на сервере.');
+    if (mounted) setState(() => messageKey = 'recoveryRevoked');
   }
 
   Future<void> approve() async {
@@ -266,10 +278,15 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     if (server == null || manager == null) return;
     final pair = await inspectPairing(server, pairingCode.text);
     if (pair.state != 'pending') {
-      throw const FormatException('Код уже использован или отменён');
+      throw RecoveryOperationError('pairingAlreadyUsed');
     }
     if (!await confirm(
-      'Подготовить подключение «${pair.deviceName}» к вашей идентичности? ${pair.administrative ? 'Запрошено также управление пространством, если роль это разрешает.' : 'Запрошен доступ к чату с вашими правами.'} Подпись ещё не выдаётся. Сначала сравните код на обоих экранах.',
+      (strings) => strings.pairingPrepareConfirm(
+        pair.deviceName,
+        pair.administrative
+            ? strings.pairingManageRequest
+            : strings.pairingChatRequest,
+      ),
     )) {
       return;
     }
@@ -278,7 +295,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       final file = await openFile(acceptedTypeGroups: files);
       if (file == null) return;
       if (await file.length() > maxRecoveryImageBytes) {
-        throw const FormatException('Карточка слишком большая');
+        throw RecoveryOperationError('recoveryTooLarge');
       }
       final pass = await password(false);
       if (pass == null) return;
@@ -296,7 +313,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
         preparedPair = pair;
         preparedAuthority = authority;
         pairingEntered.clear();
-        message = 'Код появится также на новом устройстве. Введите показанный там код проверки перед выдачей подписи.';
+        messageKey = 'pairingReady';
       });
     }
   }
@@ -306,13 +323,9 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     if (manager == null || pair == null) return;
     if (pairingEntered.text.replaceAll(RegExp(r'[\s-]'), '').toUpperCase() !=
         pairingCheck.replaceAll('-', '')) {
-      throw const FormatException(
-        'Коды проверки не совпадают. Не подтверждайте подключение.',
-      );
+      throw RecoveryOperationError('pairingMismatch');
     }
-    if (!await confirm(
-      'Коды на двух устройствах совпадают? Выдать root-подпись для нового устройства с указанными правами?',
-    )) {
+    if (!await confirm((strings) => strings.pairingSignConfirm)) {
       return;
     }
     await manager.approvePairing(pair, authority: preparedAuthority);
@@ -322,7 +335,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
         preparedAuthority = null;
         pairingEntered.clear();
         pairingCode.clear();
-        message = 'Подпись выдана. Завершите вход на новом устройстве.';
+        messageKey = 'pairingSigned';
       });
     }
   }
@@ -336,7 +349,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
         widget.controller.deviceManagement?.hasRootAuthority == true,
     canRotate: widget.controller.deviceManagement is RootRotationControl,
     pending: pending,
-    message: message,
+    message: localizedMessage,
     pairingCode: pairingCode,
     pairingEntered: pairingEntered,
     pairingCheck: pairingCheck,
@@ -371,3 +384,26 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     onRevoke: (id) => run(() => revoke(devices.firstWhere((g) => g.id == id))),
   );
 }
+
+class RecoveryOperationError implements Exception {
+  const RecoveryOperationError(this.key);
+  final String key;
+}
+
+String? recoveryMessage(AppLocalizations strings, String? key) => switch (key) {
+  'recoveryCardSaved' => strings.recoveryCardSaved,
+  'recoveryRestored' => strings.recoveryRestored,
+  'rotationNotPending' => strings.rotationNotPending,
+  'rotationCompleted' => strings.rotationCompleted,
+  'recoveryRevoked' => strings.recoveryRevoked,
+  'pairingReady' => strings.pairingReady,
+  'pairingSigned' => strings.pairingSigned,
+  'recoveryTooLarge' => strings.recoveryTooLarge,
+  'recoveryConnectionDenied' => strings.recoveryConnectionDenied,
+  'rotationServerRequired' => strings.rotationServerRequired,
+  'rotationReconnect' => strings.rotationReconnect,
+  'pairingAlreadyUsed' => strings.pairingAlreadyUsed,
+  'pairingMismatch' => strings.pairingMismatch,
+  'recoveryOperationFailed' => strings.recoveryOperationFailed,
+  _ => null,
+};

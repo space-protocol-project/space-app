@@ -183,5 +183,70 @@
         "type": "String"
       }
     }
-  }
+  },
+  "recoveryOperationFailed": "The operation did not finish. Check access, the card and the connection.",
+  "recoveryFileLabel": "Space card",
+  "recoveryFormat": "Card format",
+  "recoveryFormatHelp": "PNG contains an encrypted QR code suitable for printing. JSON is a compact backup file. Keep the password separately.",
+  "recoveryPng": "QR in PNG",
+  "recoveryCardSaved": "Card saved. Test recovery on another device; store the file and password separately.",
+  "recoveryTooLarge": "Card is too large",
+  "recoveryReplaceWarning": "Saved keys for this address will be replaced. Back them up as a card first if they belong to another identity.",
+  "recoveryConnectionDenied": "Keys saved, but the server denied the connection. Check whether the card was revoked, access blocked or chat unavailable.",
+  "recoveryRestored": "Identity restored with a new device. Check the device list and revoke lost devices.",
+  "rotationRenewConfirm": "Renew the expired request using the same saved new keys? If the server already completed rotation, finish the saved rotation instead.",
+  "rotationConfirm": "Rotate the root key? Your ID, permissions and history stay unchanged. Old devices and cards lose access. The new secret is first saved in a protected journal. Save a new card after rotation.",
+  "rotationServerRequired": "First check the original server address",
+  "rotationNotPending": "No saved key rotation for this server.",
+  "rotationReconnect": "New key saved. Check server availability and reconnect.",
+  "rotationCompleted": "Root key rotated; your ID is preserved. Save a new card. Old cards and devices no longer work.",
+  "recoveryRevokeCard": "Revoke the recovery key? The card and all devices connected through it will stop working. Make sure you have another access method.",
+  "recoveryRevokeDevice": "Revoke this device? Its sessions and subscriptions will end.",
+  "recoveryRevoked": "Permission revoked on the server.",
+  "pairingAlreadyUsed": "Code already used or cancelled",
+  "pairingManageRequest": "Space management is also requested if the role allows it.",
+  "pairingChatRequest": "Chat access with your permissions is requested.",
+  "pairingReady": "The code also appears on the new device. Enter its verification code before signing.",
+  "pairingMismatch": "Verification codes do not match. Do not approve the connection.",
+  "pairingSignConfirm": "Do the codes on both devices match? Sign for the new device with the specified permissions using the root authority?",
+  "pairingSigned": "Signature issued. Finish signing in on the new device.",
+  "pairingStartFailed": "Could not start pairing. Check the server and PostgreSQL availability.",
+  "pairingCancelled": "Pairing cancelled",
+  "pairingExpired": "The code expired, was cancelled or the approval failed verification. Start again.",
+  "pairingCompareTitle": "Compare the code on both devices",
+  "pairingMatches": "Code matches",
+  "recoveryRestoreConfirm": "Restore identity on {origin}? A new key will be created for this device. {warning}",
+  "@recoveryRestoreConfirm": {
+    "placeholders": {
+      "origin": {
+        "type": "String"
+      },
+      "warning": {
+        "type": "String"
+      }
+    }
+  },
+  "pairingPrepareConfirm": "Prepare to connect “{device}” to your identity? {request} No signature is issued yet. Compare the code on both screens first.",
+  "@pairingPrepareConfirm": {
+    "placeholders": {
+      "device": {
+        "type": "String"
+      },
+      "request": {
+        "type": "String"
+      }
+    }
+  },
+  "pairingAcceptConfirm": "The approving device must display code {code}. Does it match? The identity saved here for {origin} will be replaced. Save its card first if it belongs to another account.",
+  "@pairingAcceptConfirm": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "origin": {
+        "type": "String"
+      }
+    }
+  },
+  "recoveryCancel": "Cancel"
 }
