@@ -291,9 +291,18 @@ void Win32Window::UpdateTheme(HWND const window) {
     // DWMWA_BORDER_COLOR поддерживается Windows 11; старые системы
     // сохраняют стандартную рамку при неподдерживаемом атрибуте.
     constexpr DWORD kBorderColorAttribute = 34;
-    const COLORREF border_color = enable_dark_mode
-        ? RGB(32, 32, 32) : RGB(204, 204, 204);
+    const COLORREF border_color = RGB(32, 32, 32);
     DwmSetWindowAttribute(window, kBorderColorAttribute,
                          &border_color, sizeof(border_color));
+    // Цвет строки заголовка задаётся отдельно от внешней рамки.
+    // Оба состояния окна используют палитру Space, а не акцент Windows.
+    constexpr DWORD kCaptionColorAttribute = 35;
+    constexpr DWORD kCaptionTextColorAttribute = 36;
+    const COLORREF caption_color = RGB(32, 32, 32);
+    const COLORREF caption_text_color = RGB(235, 219, 178);
+    DwmSetWindowAttribute(window, kCaptionColorAttribute,
+                         &caption_color, sizeof(caption_color));
+    DwmSetWindowAttribute(window, kCaptionTextColorAttribute,
+                         &caption_text_color, sizeof(caption_text_color));
   }
 }
