@@ -60,7 +60,7 @@ class ServerPresence extends ChangeNotifier {
 
   void watch(Iterable<String> origins) {
     if (_disposed) return;
-    final next = origins.take(12).toSet();
+    final next = origins.toSet();
     if (setEquals(next, _origins)) return;
     _generation++;
     _origins = next;
@@ -79,39 +79,48 @@ class ServerPresence extends ChangeNotifier {
     _checking = true;
     final generation = _generation;
     try {
-      await Future.wait(
-        _origins.map((origin) async {
-          bool? result;
-          try {
-            result = await probe(origin).timeout(const Duration(seconds: 30));
-          } on TimeoutException {
-            result = false;
-          } catch (_) {
-            result = null;
-          }
-          if (_disposed || generation != _generation) return;
-          if (result == null) {
-            _states.remove(origin);
-            _failures.remove(origin);
-            return;
-          }
-          if (!result) {
-            final count = (_failures[origin] ?? 0) + 1;
-            _failures[origin] = count;
-            if (count < 2) return;
-          } else {
-            _failures[origin] = 0;
-          }
-          final previous = _states[origin];
-          _states[origin] = result;
-          if (previous != null && previous != result) {
-            _changes.add(ServerPresenceChange(origin, result));
-          }
-        }),
-      );
+      final origins = _origins.toList();
+      for (var start = 0; start < origins.length; start += 4) {
+        await Future.wait(
+          origins
+              .skip(start)
+              .take(4)
+              .map((origin) => _probe(origin, generation)),
+        );
+        if (_disposed || generation != _generation) break;
+      }
       if (!_disposed) notifyListeners();
     } finally {
       _checking = false;
+    }
+  }
+
+  Future<void> _probe(String origin, int generation) async {
+    bool? result;
+    try {
+      result = await probe(origin).timeout(const Duration(seconds: 30));
+    } on TimeoutException {
+      result = false;
+    } catch (_) {
+      result = null;
+    }
+    if (_disposed || generation != _generation) return;
+    if (result == null) {
+      _states.remove(origin);
+      _failures.remove(origin);
+      return;
+    }
+    if (!result) {
+      final count = (_failures[origin] ?? 0) + 1;
+      _failures[origin] = count;
+      if (count < 2) return;
+    } else {
+      _failures[origin] = 0;
+    }
+    final previous = _states[origin];
+    _states[origin] = result;
+    if (previous != null && previous != result) {
+      _changes.add(ServerPresenceChange(origin, result));
     }
   }
 

@@ -8,6 +8,36 @@ import 'package:space_client/src/core.dart';
 
 void main() {
   test(
+    'Проверяются все сохранённые серверы, не больше четырёх одновременно',
+    () async {
+      final visited = <String>{};
+      var active = 0, maximum = 0;
+      final finished = Completer<void>();
+      final monitor = ServerPresence(
+        probe: (origin) async {
+          active++;
+          if (active > maximum) maximum = active;
+          await Future<void>.delayed(Duration.zero);
+          active--;
+          visited.add(origin);
+          if (visited.length == 18) finished.complete();
+          return true;
+        },
+      );
+      addTearDown(monitor.dispose);
+      final origins = List.generate(
+        18,
+        (index) => 'https://server$index.example',
+      );
+      monitor.watch(origins);
+      await finished.future;
+      await Future<void>.delayed(Duration.zero);
+      expect(visited, origins.toSet());
+      expect(maximum, lessThanOrEqualTo(4));
+      expect(monitor.online(origins.last), true);
+    },
+  );
+  test(
     'Проверка доступности сверяет сохранённый ключ и не выполняет вход',
     () async {
       final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);

@@ -23,7 +23,7 @@ class AppPreferences extends ChangeNotifier {
       if (languages.contains(savedLanguage)) language = savedLanguage!;
       final saved = data.getString('space.ui.palette');
       if (['gruvbox', 'ocean', 'iris'].contains(saved)) palette = saved!;
-      origins.addAll((data.getStringList('space.ui.origins') ?? []).take(12));
+      origins.addAll(data.getStringList('space.ui.origins') ?? []);
     } catch (_) {
       error = 'Не удалось загрузить настройки оформления.';
     }
@@ -51,7 +51,6 @@ class AppPreferences extends ChangeNotifier {
   Future<void> remember(String origin) {
     origins.remove(origin);
     origins.insert(0, origin);
-    if (origins.length > 12) origins.removeLast();
     notifyListeners();
     return _save();
   }
