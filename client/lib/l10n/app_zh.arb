@@ -264,5 +264,21 @@
   "dashboardUnavailable": "不可用",
   "dashboardOpen": "打开空间",
   "dashboardResourcesHelp": "总览包含您可访问的频道和未读消息。无法访问的服务器重新连接后，其数据将显示。",
-  "dashboardSpaces": "您的空间"
+  "dashboardSpaces": "您的空间",
+  "failureCardCorrupt": "身份卡已损坏或格式无效。",
+  "failurePasswordInvalid": "密码必须至少包含 12 个字符，且不超过 512 字节。",
+  "failureCardTooLarge": "身份卡超出允许的大小。",
+  "failureCardUnsupported": "不支持此身份卡格式或加密参数。",
+  "failureCardAuthentication": "密码错误或身份卡损坏。请检查文件和密码。",
+  "failureReleaseInvalid": "服务器版本描述未通过验证。安装已停止。",
+  "failurePlatformUnsupported": "此平台尚无经过验证的家庭服务器版本。",
+  "failureDownloadAddress": "不允许使用此服务器下载地址。安装已停止。",
+  "failureDownloadFailed": "无法下载服务器。请检查连接并重试。",
+  "failureRedirectLimit": "下载重定向次数过多。安装已停止。",
+  "failureReleaseSize": "服务器下载不完整或大小不正确。请重新下载。",
+  "failureHashMismatch": "版本校验和不一致。禁止运行此压缩包。",
+  "failureArchiveInvalid": "服务器压缩包包含无效的路径、文件或大小。安装已停止。",
+  "failureExecutePermission": "无法授予服务器运行权限。请检查应用目录的访问权限。",
+  "failureHomeStartFailed": "无法启动家庭服务器。请检查数据访问权限、可用端口和连接设置。",
+  "failureHomeStopFailed": "服务器未确认所有进程已停止。重新启动前请检查其状态。"
 }

@@ -662,4 +662,67 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get dashboardSpaces => 'Ваши пространства';
+
+  @override
+  String get failureCardCorrupt =>
+      'Карточка повреждена или имеет неверный формат.';
+
+  @override
+  String get failurePasswordInvalid =>
+      'Пароль должен содержать не менее 12 символов и занимать не более 512 байт.';
+
+  @override
+  String get failureCardTooLarge => 'Карточка превышает допустимый размер.';
+
+  @override
+  String get failureCardUnsupported =>
+      'Формат или параметры шифрования карточки не поддерживаются.';
+
+  @override
+  String get failureCardAuthentication =>
+      'Неверный пароль или повреждённая карточка. Проверьте файл и пароль.';
+
+  @override
+  String get failureReleaseInvalid =>
+      'Описание выпуска сервера не прошло проверку. Установка остановлена.';
+
+  @override
+  String get failurePlatformUnsupported =>
+      'Для этой платформы ещё нет проверенного выпуска домашнего сервера.';
+
+  @override
+  String get failureDownloadAddress =>
+      'Адрес загрузки сервера не разрешён. Установка остановлена.';
+
+  @override
+  String get failureDownloadFailed =>
+      'Не удалось скачать сервер. Проверьте соединение и повторите загрузку.';
+
+  @override
+  String get failureRedirectLimit =>
+      'Загрузка содержит слишком много перенаправлений. Установка остановлена.';
+
+  @override
+  String get failureReleaseSize =>
+      'Сервер загрузился не полностью или размер выпуска не совпадает. Повторите загрузку.';
+
+  @override
+  String get failureHashMismatch =>
+      'Контрольная сумма выпуска не совпадает. Этот архив нельзя запускать.';
+
+  @override
+  String get failureArchiveInvalid =>
+      'Архив сервера содержит недопустимые пути, файлы или размеры. Установка остановлена.';
+
+  @override
+  String get failureExecutePermission =>
+      'Не удалось разрешить запуск сервера. Проверьте доступ к каталогу приложения.';
+
+  @override
+  String get failureHomeStartFailed =>
+      'Не удалось запустить домашний сервер. Проверьте доступ к данным, свободные порты и параметры подключения.';
+
+  @override
+  String get failureHomeStopFailed =>
+      'Сервер не подтвердил остановку всех процессов. Проверьте его состояние перед повторным запуском.';
 }

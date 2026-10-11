@@ -658,4 +658,67 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardSpaces => 'Your spaces';
+
+  @override
+  String get failureCardCorrupt =>
+      'The card is damaged or has an invalid format.';
+
+  @override
+  String get failurePasswordInvalid =>
+      'The password must contain at least 12 characters and no more than 512 bytes.';
+
+  @override
+  String get failureCardTooLarge => 'The card exceeds the allowed size.';
+
+  @override
+  String get failureCardUnsupported =>
+      'The card format or encryption parameters are unsupported.';
+
+  @override
+  String get failureCardAuthentication =>
+      'Wrong password or damaged card. Check the file and password.';
+
+  @override
+  String get failureReleaseInvalid =>
+      'The server release descriptor failed validation. Installation stopped.';
+
+  @override
+  String get failurePlatformUnsupported =>
+      'No verified home server release is available for this platform.';
+
+  @override
+  String get failureDownloadAddress =>
+      'The server download address is not allowed. Installation stopped.';
+
+  @override
+  String get failureDownloadFailed =>
+      'Could not download the server. Check the connection and try again.';
+
+  @override
+  String get failureRedirectLimit =>
+      'The download has too many redirects. Installation stopped.';
+
+  @override
+  String get failureReleaseSize =>
+      'The server download is incomplete or its size is incorrect. Download it again.';
+
+  @override
+  String get failureHashMismatch =>
+      'The release checksum does not match. This archive must not be executed.';
+
+  @override
+  String get failureArchiveInvalid =>
+      'The server archive contains invalid paths, files or sizes. Installation stopped.';
+
+  @override
+  String get failureExecutePermission =>
+      'Could not grant permission to run the server. Check access to the application directory.';
+
+  @override
+  String get failureHomeStartFailed =>
+      'Could not start the home server. Check data access, available ports and connection settings.';
+
+  @override
+  String get failureHomeStopFailed =>
+      'The server did not confirm that all processes stopped. Check its state before restarting.';
 }

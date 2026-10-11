@@ -1258,6 +1258,102 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Ваши пространства'**
   String get dashboardSpaces;
+
+  /// No description provided for @failureCardCorrupt.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карточка повреждена или имеет неверный формат.'**
+  String get failureCardCorrupt;
+
+  /// No description provided for @failurePasswordInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль должен содержать не менее 12 символов и занимать не более 512 байт.'**
+  String get failurePasswordInvalid;
+
+  /// No description provided for @failureCardTooLarge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карточка превышает допустимый размер.'**
+  String get failureCardTooLarge;
+
+  /// No description provided for @failureCardUnsupported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Формат или параметры шифрования карточки не поддерживаются.'**
+  String get failureCardUnsupported;
+
+  /// No description provided for @failureCardAuthentication.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неверный пароль или повреждённая карточка. Проверьте файл и пароль.'**
+  String get failureCardAuthentication;
+
+  /// No description provided for @failureReleaseInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Описание выпуска сервера не прошло проверку. Установка остановлена.'**
+  String get failureReleaseInvalid;
+
+  /// No description provided for @failurePlatformUnsupported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для этой платформы ещё нет проверенного выпуска домашнего сервера.'**
+  String get failurePlatformUnsupported;
+
+  /// No description provided for @failureDownloadAddress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес загрузки сервера не разрешён. Установка остановлена.'**
+  String get failureDownloadAddress;
+
+  /// No description provided for @failureDownloadFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось скачать сервер. Проверьте соединение и повторите загрузку.'**
+  String get failureDownloadFailed;
+
+  /// No description provided for @failureRedirectLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загрузка содержит слишком много перенаправлений. Установка остановлена.'**
+  String get failureRedirectLimit;
+
+  /// No description provided for @failureReleaseSize.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер загрузился не полностью или размер выпуска не совпадает. Повторите загрузку.'**
+  String get failureReleaseSize;
+
+  /// No description provided for @failureHashMismatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Контрольная сумма выпуска не совпадает. Этот архив нельзя запускать.'**
+  String get failureHashMismatch;
+
+  /// No description provided for @failureArchiveInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Архив сервера содержит недопустимые пути, файлы или размеры. Установка остановлена.'**
+  String get failureArchiveInvalid;
+
+  /// No description provided for @failureExecutePermission.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось разрешить запуск сервера. Проверьте доступ к каталогу приложения.'**
+  String get failureExecutePermission;
+
+  /// No description provided for @failureHomeStartFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось запустить домашний сервер. Проверьте доступ к данным, свободные порты и параметры подключения.'**
+  String get failureHomeStartFailed;
+
+  /// No description provided for @failureHomeStopFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер не подтвердил остановку всех процессов. Проверьте его состояние перед повторным запуском.'**
+  String get failureHomeStopFailed;
 }
 
 class _AppLocalizationsDelegate

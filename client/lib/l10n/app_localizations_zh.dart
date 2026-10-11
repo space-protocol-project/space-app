@@ -615,6 +615,54 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dashboardSpaces => '您的空间';
+
+  @override
+  String get failureCardCorrupt => '身份卡已损坏或格式无效。';
+
+  @override
+  String get failurePasswordInvalid => '密码必须至少包含 12 个字符，且不超过 512 字节。';
+
+  @override
+  String get failureCardTooLarge => '身份卡超出允许的大小。';
+
+  @override
+  String get failureCardUnsupported => '不支持此身份卡格式或加密参数。';
+
+  @override
+  String get failureCardAuthentication => '密码错误或身份卡损坏。请检查文件和密码。';
+
+  @override
+  String get failureReleaseInvalid => '服务器版本描述未通过验证。安装已停止。';
+
+  @override
+  String get failurePlatformUnsupported => '此平台尚无经过验证的家庭服务器版本。';
+
+  @override
+  String get failureDownloadAddress => '不允许使用此服务器下载地址。安装已停止。';
+
+  @override
+  String get failureDownloadFailed => '无法下载服务器。请检查连接并重试。';
+
+  @override
+  String get failureRedirectLimit => '下载重定向次数过多。安装已停止。';
+
+  @override
+  String get failureReleaseSize => '服务器下载不完整或大小不正确。请重新下载。';
+
+  @override
+  String get failureHashMismatch => '版本校验和不一致。禁止运行此压缩包。';
+
+  @override
+  String get failureArchiveInvalid => '服务器压缩包包含无效的路径、文件或大小。安装已停止。';
+
+  @override
+  String get failureExecutePermission => '无法授予服务器运行权限。请检查应用目录的访问权限。';
+
+  @override
+  String get failureHomeStartFailed => '无法启动家庭服务器。请检查数据访问权限、可用端口和连接设置。';
+
+  @override
+  String get failureHomeStopFailed => '服务器未确认所有进程已停止。重新启动前请检查其状态。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

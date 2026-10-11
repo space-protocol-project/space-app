@@ -1,3 +1,5 @@
+import 'local_failure.dart';
+
 import 'dart:convert';
 import 'dart:math';
 
@@ -8,18 +10,35 @@ const cardDomain = 'space/recovery-card/v1';
 String _encode(List<int> value) => base64Url.encode(value).replaceAll('=', '');
 List<int> _decode(dynamic value, int? size) {
   if (value is! String || !RegExp(r'^[A-Za-z0-9_-]+$').hasMatch(value)) {
-    throw const FormatException('Повреждена карточка');
+    throw const LocalFailure(
+      LocalFailureCode.cardCorrupt,
+      'Повреждена карточка',
+    );
   }
-  final bytes = base64Url.decode(base64Url.normalize(value));
+  late List<int> bytes;
+  try {
+    bytes = base64Url.decode(base64Url.normalize(value));
+  } on FormatException {
+    throw const LocalFailure(
+      LocalFailureCode.cardCorrupt,
+      'Повреждена карточка',
+    );
+  }
   if (_encode(bytes) != value || (size != null && bytes.length != size)) {
-    throw const FormatException('Повреждена карточка');
+    throw const LocalFailure(
+      LocalFailureCode.cardCorrupt,
+      'Повреждена карточка',
+    );
   }
   return bytes;
 }
 
 Future<SecretKey> _key(String password, List<int> salt) {
   if (password.length < 12 || utf8.encode(password).length > 512) {
-    throw const FormatException('Пароль должен содержать от 12 символов');
+    throw const LocalFailure(
+      LocalFailureCode.passwordInvalid,
+      'Пароль должен содержать от 12 символов',
+    );
   }
   return Pbkdf2(
     macAlgorithm: Hmac.sha256(),
@@ -34,7 +53,10 @@ Future<String> sealRecoveryCard(
 ) async {
   final plain = utf8.encode(jsonEncode(payload));
   if (plain.length > 8176) {
-    throw const FormatException('Карточка превышает безопасный размер формата');
+    throw const LocalFailure(
+      LocalFailureCode.cardTooLarge,
+      'Карточка превышает безопасный размер формата',
+    );
   }
   final random = Random.secure();
   final salt = List<int>.generate(16, (_) => random.nextInt(256));
@@ -61,22 +83,46 @@ Future<Map<String, dynamic>> openRecoveryCard(
   String password,
 ) async {
   if (utf8.encode(text).length > 16384) {
-    throw const FormatException('Карточка слишком большая');
+    throw const LocalFailure(
+      LocalFailureCode.cardTooLarge,
+      'Карточка слишком большая',
+    );
   }
-  final packet = jsonDecode(text) as Map<String, dynamic>;
+  dynamic decoded;
+  try {
+    decoded = jsonDecode(text);
+  } on FormatException {
+    throw const LocalFailure(
+      LocalFailureCode.cardCorrupt,
+      'Повреждена карточка',
+    );
+  }
+  if (decoded is! Map<String, dynamic>) {
+    throw const LocalFailure(
+      LocalFailureCode.cardCorrupt,
+      'Повреждена карточка',
+    );
+  }
+  final packet = decoded;
   final keys = packet.keys.toList()..sort();
   if (packet['v'] != 1 ||
       packet['kind'] != 'space-recovery-card' ||
       packet['kdf'] != 'PBKDF2-SHA256' ||
       packet['iterations'] != cardIterations ||
       keys.join(',') != 'ciphertext,iterations,kdf,kind,nonce,salt,v') {
-    throw const FormatException('Неподдерживаемая карточка');
+    throw const LocalFailure(
+      LocalFailureCode.cardUnsupported,
+      'Неподдерживаемая карточка',
+    );
   }
   final salt = _decode(packet['salt'], 16),
       nonce = _decode(packet['nonce'], 12),
       ciphertext = _decode(packet['ciphertext'], null);
   if (ciphertext.length < 16 || ciphertext.length > 8192) {
-    throw const FormatException('Повреждена карточка');
+    throw const LocalFailure(
+      LocalFailureCode.cardCorrupt,
+      'Повреждена карточка',
+    );
   }
   try {
     final box = SecretBox(
@@ -91,7 +137,10 @@ Future<Map<String, dynamic>> openRecoveryCard(
     );
     return jsonDecode(utf8.decode(plain)) as Map<String, dynamic>;
   } on SecretBoxAuthenticationError {
-    throw const FormatException('Неверный пароль или повреждённая карточка');
+    throw const LocalFailure(
+      LocalFailureCode.cardAuthentication,
+      'Неверный пароль или повреждённая карточка',
+    );
   }
 }
 

@@ -1,5 +1,6 @@
 import '../l10n/strings.dart';
 import '../l10n/home_strings.dart';
+import '../l10n/failure_strings.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -129,7 +130,9 @@ class _HomePanelState extends State<HomePanel> {
             ],
             if (home.error.isNotEmpty) ...[
               Text(
-                home.error,
+                home.failureCode == null
+                    ? home.error
+                    : localFailureText(context, home.failureCode!),
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
               const SizedBox(height: 16),

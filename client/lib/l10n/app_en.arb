@@ -264,5 +264,21 @@
   "dashboardUnavailable": "Unavailable",
   "dashboardOpen": "Open space",
   "dashboardResourcesHelp": "The overview includes accessible channels and unread messages. Data from unavailable servers appears after reconnection.",
-  "dashboardSpaces": "Your spaces"
+  "dashboardSpaces": "Your spaces",
+  "failureCardCorrupt": "The card is damaged or has an invalid format.",
+  "failurePasswordInvalid": "The password must contain at least 12 characters and no more than 512 bytes.",
+  "failureCardTooLarge": "The card exceeds the allowed size.",
+  "failureCardUnsupported": "The card format or encryption parameters are unsupported.",
+  "failureCardAuthentication": "Wrong password or damaged card. Check the file and password.",
+  "failureReleaseInvalid": "The server release descriptor failed validation. Installation stopped.",
+  "failurePlatformUnsupported": "No verified home server release is available for this platform.",
+  "failureDownloadAddress": "The server download address is not allowed. Installation stopped.",
+  "failureDownloadFailed": "Could not download the server. Check the connection and try again.",
+  "failureRedirectLimit": "The download has too many redirects. Installation stopped.",
+  "failureReleaseSize": "The server download is incomplete or its size is incorrect. Download it again.",
+  "failureHashMismatch": "The release checksum does not match. This archive must not be executed.",
+  "failureArchiveInvalid": "The server archive contains invalid paths, files or sizes. Installation stopped.",
+  "failureExecutePermission": "Could not grant permission to run the server. Check access to the application directory.",
+  "failureHomeStartFailed": "Could not start the home server. Check data access, available ports and connection settings.",
+  "failureHomeStopFailed": "The server did not confirm that all processes stopped. Check its state before restarting."
 }

@@ -17,6 +17,8 @@ import 'package:space_admin_ui/space_admin_ui.dart';
 
 import 'camera_scanner.dart';
 import '../l10n/strings.dart';
+import '../l10n/failure_strings.dart';
+import '../src/local_failure.dart';
 import '../l10n/app_localizations.dart';
 
 class RecoveryPanel extends StatefulWidget {
@@ -30,8 +32,10 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
   bool pending = false;
   String message = '';
   String? messageKey;
-  String get localizedMessage =>
-      recoveryMessage(context.strings, messageKey) ?? message;
+  LocalFailureCode? failureCode;
+  String get localizedMessage => failureCode == null
+      ? recoveryMessage(context.strings, messageKey) ?? message
+      : localFailureText(context, failureCode!);
   List<DeviceGrant> devices = [];
   final pairingCode = TextEditingController();
   final pairingEntered = TextEditingController();
@@ -57,12 +61,14 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       pending = true;
       message = '';
       messageKey = null;
+      failureCode = null;
     });
     try {
       await action();
     } catch (error) {
       if (mounted) {
         setState(() {
+          failureCode = error is LocalFailure ? error.code : null;
           messageKey = error is RecoveryOperationError
               ? error.key
               : error is FormatException

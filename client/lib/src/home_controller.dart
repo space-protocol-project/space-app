@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'home_runtime.dart';
+import 'local_failure.dart';
 
 enum HomePhase {
   idle,
@@ -50,11 +51,13 @@ class HomeController extends ChangeNotifier {
   RandomAccessFile? _lock;
   bool busy = false, running = false, _disposed = false;
   String ip = '', error = '';
+  LocalFailureCode? failureCode;
   HomePhase phase = HomePhase.idle;
   double progress = 0;
   HomeServerState? state;
   void reportError(String message) {
     error = message;
+    failureCode = LocalFailureCode.homeStartFailed;
     _update();
   }
 
@@ -162,6 +165,7 @@ class HomeController extends ChangeNotifier {
     if (busy || running || _disposed) return state;
     busy = true;
     error = '';
+    failureCode = null;
     progress = 0;
     state = null;
     _diagnostic = '';
@@ -241,6 +245,7 @@ class HomeController extends ChangeNotifier {
           running = false;
           state = null;
           if (!busy && code != 0) {
+            failureCode = LocalFailureCode.homeStartFailed;
             error = 'Сервер завершился с ошибкой. $_diagnostic';
           }
           await _unlock();
@@ -273,10 +278,14 @@ class HomeController extends ChangeNotifier {
       phase = HomePhase.running;
       return state;
     } catch (e) {
+      failureCode = e is LocalFailure
+          ? e.code
+          : LocalFailureCode.homeStartFailed;
       error = e.toString().replaceFirst('FormatException: ', '');
       try {
         await _stop();
       } catch (_) {
+        failureCode = LocalFailureCode.homeStopFailed;
         error += ' Сервер не подтвердил остановку.';
       }
       return null;
@@ -315,10 +324,12 @@ class HomeController extends ChangeNotifier {
     if (busy) return;
     busy = true;
     error = '';
+    failureCode = null;
     _update();
     try {
       await _stop();
     } catch (_) {
+      failureCode = LocalFailureCode.homeStopFailed;
       error = 'Сервер не подтвердил завершение всех процессов. Проверьте состояние перед повторным запуском.';
     } finally {
       busy = false;
