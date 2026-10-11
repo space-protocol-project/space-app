@@ -140,6 +140,7 @@ class _SpaceShellState extends State<SpaceShell> {
   void watchSavedServers() {
     presence.watch(widget.preferences.origins);
     workspaces.synchronize(widget.preferences.origins);
+    cacheServerIcons();
   }
 
   void announcePresence(ServerPresenceChange change) {

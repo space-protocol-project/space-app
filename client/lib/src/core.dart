@@ -757,13 +757,12 @@ class SpaceSession
       case '/api/v1/space/settings':
         if (method == 'PATCH') {
           final request = UpdateSettingsRequest()..mergeFromProto3Json(body!);
-          return Map<String, dynamic>.from(
-            (await client.updateSettings(
-                  request,
-                  options: _options,
-                )).toProto3Json()
-                as Map,
+          final response = await client.updateSettings(
+            request,
+            options: _options,
           );
+          await refreshChannels();
+          return json(response);
         }
         return Map<String, dynamic>.from(
           (await client.getSettings(
