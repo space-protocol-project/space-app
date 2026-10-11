@@ -94,17 +94,20 @@ class _BubblePaint extends CustomPainter {
   final Color color;
   @override
   void paint(Canvas canvas, Size size) {
-    final path = Path()
+    final body = Path()
       ..addRRect(
         RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(18)),
       );
     final edge = mine ? size.width : 0.0;
-    path
+    final tail = Path()
       ..moveTo(edge, size.height - 16)
       ..lineTo(edge + (mine ? 6 : -6), size.height)
       ..lineTo(edge + (mine ? -16 : 16), size.height)
       ..close();
-    canvas.drawPath(path, Paint()..color = color);
+    canvas.drawPath(
+      Path.combine(PathOperation.union, body, tail),
+      Paint()..color = color,
+    );
   }
 
   @override
