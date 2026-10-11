@@ -103,7 +103,7 @@ class AppPreferences extends ChangeNotifier {
       onPrimary: background,
       surface: surface,
       surfaceContainerLowest: sidebar,
-      surfaceContainerLow: background,
+      surfaceContainerLow: dark ? const Color(0xFF2C2C2C) : background,
       surfaceContainer: surface,
       surfaceContainerHigh: soft,
       surfaceContainerHighest: raised,
