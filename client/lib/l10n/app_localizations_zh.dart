@@ -665,6 +665,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get failureHomeStopFailed => '服务器未确认所有进程已停止。重新启动前请检查其状态。';
 
   @override
+  String get failureHomeUpdatePending => '家庭服务器更新尚未完成。请先完成更新或恢复；正常启动已被阻止。';
+
+  @override
   String get failurePermissionDenied => '服务器拒绝访问。请检查角色、封禁状态和邀请。';
 
   @override

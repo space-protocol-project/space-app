@@ -281,6 +281,7 @@
   "failureExecutePermission": "Could not grant permission to run the server. Check access to the application directory.",
   "failureHomeStartFailed": "Could not start the home server. Check data access, available ports and connection settings.",
   "failureHomeStopFailed": "The server did not confirm that all processes stopped. Check its state before restarting.",
+  "failureHomeUpdatePending": "The home server update is unfinished. Complete the update or recovery first; normal startup is blocked.",
   "failurePermissionDenied": "The server denied access. Check your role, block status and invitation.",
   "failureUnauthenticated": "The session or device authorization is invalid. Sign in again; no new authorization is created automatically.",
   "failureServerLimit": "A server limit was reached. Try again later.",

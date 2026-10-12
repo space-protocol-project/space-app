@@ -59,6 +59,7 @@ String localFailureText(
     context.strings.failureExecutePermission,
   LocalFailureCode.homeStartFailed => context.strings.failureHomeStartFailed,
   LocalFailureCode.homeStopFailed => context.strings.failureHomeStopFailed,
+  LocalFailureCode.homeUpdatePending => context.strings.failureHomeUpdatePending,
 };
 
 String chatFailureText(BuildContext context, ChatController controller) {

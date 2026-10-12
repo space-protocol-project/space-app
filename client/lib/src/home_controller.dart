@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'home_runtime.dart';
 import 'home_installation.dart';
+import 'home_update_journal.dart';
 import 'local_failure.dart';
 
 enum HomePhase {
@@ -223,6 +224,7 @@ class HomeController extends ChangeNotifier {
       _lock = await File('${root.path}/process.lock')
           .open(mode: FileMode.append);
       await _lock!.lock(FileLock.exclusive);
+      await HomeUpdateJournal(root).requireSettled();
       final config = File('${root.path}/config.json');
       // Повторный запуск читает прежнюю конфигурацию, а не создаёт новый сервер.
       if (await config.exists()) {

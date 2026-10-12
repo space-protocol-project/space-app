@@ -1355,6 +1355,12 @@ abstract class AppLocalizations {
   /// **'Сервер не подтвердил остановку всех процессов. Проверьте его состояние перед повторным запуском.'**
   String get failureHomeStopFailed;
 
+  /// No description provided for @failureHomeUpdatePending.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновление домашнего сервера не завершено. Сначала завершите обновление или восстановление; обычный запуск заблокирован.'**
+  String get failureHomeUpdatePending;
+
   /// No description provided for @failurePermissionDenied.
   ///
   /// In ru, this message translates to:

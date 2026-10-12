@@ -723,6 +723,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The server did not confirm that all processes stopped. Check its state before restarting.';
 
   @override
+  String get failureHomeUpdatePending =>
+      'The home server update is unfinished. Complete the update or recovery first; normal startup is blocked.';
+
+  @override
   String get failurePermissionDenied =>
       'The server denied access. Check your role, block status and invitation.';
 

@@ -727,6 +727,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Сервер не подтвердил остановку всех процессов. Проверьте его состояние перед повторным запуском.';
 
   @override
+  String get failureHomeUpdatePending =>
+      'Обновление домашнего сервера не завершено. Сначала завершите обновление или восстановление; обычный запуск заблокирован.';
+
+  @override
   String get failurePermissionDenied =>
       'Сервер отказал в доступе. Проверьте роль, блокировку и приглашение.';
 
