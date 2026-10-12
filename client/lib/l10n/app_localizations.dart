@@ -1738,6 +1738,30 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Для настройки иконки сначала обновите домашний сервер.'**
   String get setupUpdateRequired;
+
+  /// No description provided for @myDevice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Моё устройство'**
+  String get myDevice;
+
+  /// No description provided for @myDeviceDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настройки и сведения этого компьютера, общие для всех пространств.'**
+  String get myDeviceDescription;
+
+  /// No description provided for @myDeviceStorage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ключи Space хранятся в системном защищённом хранилище этого устройства.'**
+  String get myDeviceStorage;
+
+  /// No description provided for @myDeviceAccessHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ, сопряжение и отзыв устройств относятся к конкретному серверу. Откройте его раздел «Мой доступ и устройства».'**
+  String get myDeviceAccessHelp;
 }
 
 class _AppLocalizationsDelegate

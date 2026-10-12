@@ -123,6 +123,23 @@ void main() {
         await tester.pumpAndSettle();
         final initialPushes = observer.pushes;
         if (width < 760) {
+          await tester.tap(find.byTooltip('Моё устройство'));
+        } else {
+          await tester.tap(find.byKey(const ValueKey('my-device-tab')));
+        }
+        await tester.pumpAndSettle();
+        expect(
+          find.text(
+            'Настройки и сведения этого компьютера, общие для всех пространств.',
+          ),
+          findsOneWidget,
+        );
+        expect(find.byType(AdminPage), findsNothing);
+        if (width >= 760) {
+          await tester.tap(find.byKey(const ValueKey('server-tab-$first')));
+          await tester.pumpAndSettle();
+        }
+        if (width < 760) {
           await tester.tap(find.byType(NavigationDestination).at(4));
         } else {
           await tester.tap(

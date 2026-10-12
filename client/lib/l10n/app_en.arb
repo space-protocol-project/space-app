@@ -368,5 +368,9 @@
   "setupBack": "Back",
   "setupNext": "Next",
   "setupOwnerRequired": "Could not connect as owner. Open Go live and check the server status.",
-  "setupUpdateRequired": "Update the home server before configuring its icon."
+  "setupUpdateRequired": "Update the home server before configuring its icon.",
+  "myDevice": "My device",
+  "myDeviceDescription": "This computer, shared across all spaces.",
+  "myDeviceStorage": "Space keys are kept in this device’s protected system storage.",
+  "myDeviceAccessHelp": "Access, pairing and device revocation are specific to each server. Open its My access and devices section."
 }

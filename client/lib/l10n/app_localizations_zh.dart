@@ -863,6 +863,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get setupUpdateRequired => '请先更新家庭服务器，然后设置图标。';
+
+  @override
+  String get myDevice => '我的设备';
+
+  @override
+  String get myDeviceDescription => '此计算机的信息，适用于所有空间。';
+
+  @override
+  String get myDeviceStorage => 'Space 密钥保存在此设备的系统安全存储中。';
+
+  @override
+  String get myDeviceAccessHelp => '访问、配对和设备撤销属于特定服务器。请打开该服务器的我的访问与设备。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

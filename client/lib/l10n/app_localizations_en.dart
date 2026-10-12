@@ -961,4 +961,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get setupUpdateRequired =>
       'Update the home server before configuring its icon.';
+
+  @override
+  String get myDevice => 'My device';
+
+  @override
+  String get myDeviceDescription => 'This computer, shared across all spaces.';
+
+  @override
+  String get myDeviceStorage =>
+      'Space keys are kept in this device’s protected system storage.';
+
+  @override
+  String get myDeviceAccessHelp =>
+      'Access, pairing and device revocation are specific to each server. Open its My access and devices section.';
 }

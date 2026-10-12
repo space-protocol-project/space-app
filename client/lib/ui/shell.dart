@@ -17,6 +17,7 @@ import '../src/home_controller.dart';
 import '../src/server_presence.dart';
 import '../src/server_workspaces.dart';
 import 'dashboard.dart';
+import 'device_panel.dart';
 import 'home_panel.dart';
 import 'space_setup_wizard.dart';
 import 'chat_view.dart';
@@ -79,9 +80,20 @@ class _SpaceShellState extends State<SpaceShell> {
       widget.workspaces ?? ServerWorkspaces(vault: initialController.vault);
   bool dashboard = true;
   bool applicationSettings = false;
+  bool devicePage = false;
+  void showDevice() {
+    setState(() {
+      devicePage = true;
+      dashboard = true;
+      applicationSettings = false;
+    });
+    scaffold.currentState?.closeDrawer();
+  }
+
   void showDashboard() {
     setState(() {
       applicationSettings = false;
+      devicePage = false;
       dashboard = true;
       selected = Section.overview;
     });
@@ -96,6 +108,7 @@ class _SpaceShellState extends State<SpaceShell> {
       activeController = target;
       dashboard = false;
       applicationSettings = false;
+      devicePage = false;
       selected = Section.chat;
     });
     scaffold.currentState?.closeDrawer();
@@ -204,6 +217,7 @@ class _SpaceShellState extends State<SpaceShell> {
       activeController = target;
       dashboard = false;
       applicationSettings = false;
+      devicePage = false;
       selected = Section.overview;
     });
     await target.inspect(
@@ -268,6 +282,7 @@ class _SpaceShellState extends State<SpaceShell> {
                   activeController = owner;
                   dashboard = false;
                   applicationSettings = false;
+                  devicePage = false;
                 });
               }
               final administration = owner?.administration;
@@ -353,6 +368,7 @@ class _SpaceShellState extends State<SpaceShell> {
             activeController = owner;
             dashboard = false;
             applicationSettings = false;
+            devicePage = false;
           });
           select(Section.settings);
         },
@@ -391,7 +407,10 @@ class _SpaceShellState extends State<SpaceShell> {
     Section.settings => 5,
   };
   void showApplicationSettings() {
-    setState(() => applicationSettings = true);
+    setState(() {
+      devicePage = false;
+      applicationSettings = true;
+    });
     scaffold.currentState?.closeDrawer();
   }
 
@@ -407,6 +426,7 @@ class _SpaceShellState extends State<SpaceShell> {
       selected = section;
       dashboard = false;
       applicationSettings = false;
+      devicePage = false;
     });
     scaffold.currentState?.closeDrawer();
   }
@@ -715,7 +735,7 @@ class _SpaceShellState extends State<SpaceShell> {
         railButton(
           key: const ValueKey('dashboard-tab'),
           tooltip: context.strings.dashboard,
-          selected: dashboard && !applicationSettings,
+          selected: dashboard && !applicationSettings && !devicePage,
           onPressed: showDashboard,
           icon: const Icon(Icons.home_outlined),
         ),
@@ -782,9 +802,11 @@ class _SpaceShellState extends State<SpaceShell> {
           icon: const Icon(Icons.settings_outlined),
         ),
         railButton(
-          tooltip: context.strings.myIdentity,
-          onPressed: () => select(Section.identity),
-          icon: const Icon(Icons.shield_outlined),
+          key: const ValueKey('my-device-tab'),
+          tooltip: context.strings.myDevice,
+          selected: devicePage,
+          onPressed: showDevice,
+          icon: const Icon(Icons.computer_outlined),
         ),
         const SizedBox(height: 12),
       ],
@@ -922,13 +944,23 @@ class _SpaceShellState extends State<SpaceShell> {
       children: [
         if (compact)
           IconButton(
+            tooltip: context.strings.myDevice,
+            onPressed: showDevice,
+            icon: const Icon(Icons.computer_outlined),
+          ),
+        if (compact)
+          IconButton(
             tooltip: context.strings.openNavigation,
             onPressed: () => scaffold.currentState?.openDrawer(),
             icon: const Icon(Icons.menu),
           ),
         if (!compact) ...[
           Icon(
-            applicationSettings ? Icons.settings_outlined : selected.icon,
+            devicePage
+                ? Icons.computer_outlined
+                : applicationSettings
+                ? Icons.settings_outlined
+                : selected.icon,
             size: 26,
           ),
           const SizedBox(width: 12),
@@ -938,7 +970,9 @@ class _SpaceShellState extends State<SpaceShell> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                applicationSettings
+                devicePage
+                    ? context.strings.myDevice
+                    : applicationSettings
                     ? context.strings.appSettings
                     : dashboard
                     ? context.strings.dashboard
@@ -1064,7 +1098,9 @@ class _SpaceShellState extends State<SpaceShell> {
                 children: [
                   Expanded(
                     child: IndexedStack(
-                      index: applicationSettings
+                      index: devicePage
+                          ? 3
+                          : applicationSettings
                           ? 2
                           : dashboard
                           ? 0
@@ -1085,6 +1121,7 @@ class _SpaceShellState extends State<SpaceShell> {
                         ),
                         pages(),
                         SettingsPanel(preferences: widget.preferences),
+                        const DevicePanel(),
                       ],
                     ),
                   ),

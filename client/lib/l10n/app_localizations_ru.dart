@@ -964,4 +964,19 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get setupUpdateRequired =>
       'Для настройки иконки сначала обновите домашний сервер.';
+
+  @override
+  String get myDevice => 'Моё устройство';
+
+  @override
+  String get myDeviceDescription =>
+      'Настройки и сведения этого компьютера, общие для всех пространств.';
+
+  @override
+  String get myDeviceStorage =>
+      'Ключи Space хранятся в системном защищённом хранилище этого устройства.';
+
+  @override
+  String get myDeviceAccessHelp =>
+      'Доступ, сопряжение и отзыв устройств относятся к конкретному серверу. Откройте его раздел «Мой доступ и устройства».';
 }
