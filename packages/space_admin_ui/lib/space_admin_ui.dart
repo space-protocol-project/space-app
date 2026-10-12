@@ -350,6 +350,11 @@ class _AdminPageState extends State<AdminPage> {
                     ),
                     const SizedBox(height: 20),
                   ] else ...[
+                    Text(
+                      strings.serverIconTitle,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
                     Text(strings.serverIconUpgrade),
                     const SizedBox(height: 20),
                   ],

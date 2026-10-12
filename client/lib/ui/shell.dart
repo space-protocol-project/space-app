@@ -246,6 +246,8 @@ class _SpaceShellState extends State<SpaceShell> {
   }
 
   Future<void> showHomeDetails() async {
+    await home.load();
+    if (!mounted) return;
     await showDialog<void>(
       context: context,
       builder: (context) => Dialog(
