@@ -75,6 +75,8 @@ class _SpaceShellState extends State<SpaceShell> {
     return target;
   }
 
+  late final deviceController = createTransient();
+
   ChatController get controller => activeController ?? initialController;
   late final workspaces =
       widget.workspaces ?? ServerWorkspaces(vault: initialController.vault);
@@ -415,6 +417,10 @@ class _SpaceShellState extends State<SpaceShell> {
   }
 
   void select(Section section) {
+    if (section == Section.identity) {
+      showDevice();
+      return;
+    }
     if (section == Section.settings &&
         (controller.busy || controller.administration == null)) {
       return;
@@ -598,7 +604,9 @@ class _SpaceShellState extends State<SpaceShell> {
                       },
               ),
           ],
-          for (final section in Section.values)
+          for (final section in Section.values.where(
+            (section) => section != Section.identity,
+          ))
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
               child: ListTile(
@@ -912,11 +920,7 @@ class _SpaceShellState extends State<SpaceShell> {
             icon: Icons.view_agenda_outlined,
           ),
           Section.rooms => const RoomsPanel(),
-          Section.identity => IdentityPanel(
-            key: ValueKey(controller),
-            controller: controller,
-            revoke: revoke,
-          ),
+          Section.identity => const SizedBox.shrink(),
           Section.settings => administrationPage(),
         },
     ],
@@ -1121,7 +1125,21 @@ class _SpaceShellState extends State<SpaceShell> {
                         ),
                         pages(),
                         SettingsPanel(preferences: widget.preferences),
-                        const DevicePanel(),
+                        DevicePanel(
+                          workspaces: workspaces,
+                          fallback: deviceController,
+                          restoreController: (origin) =>
+                              workspaces[origin] ?? createTransient(),
+                          onRestored: (origin, target) async {
+                            workspaces.adopt(
+                              origin,
+                              target,
+                              owned: target != widget.controller,
+                            );
+                            transientControllers.remove(target);
+                            await widget.preferences.remember(origin);
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -1181,8 +1199,8 @@ class _SpaceShellState extends State<SpaceShell> {
                           label: context.strings.rooms,
                         ),
                         NavigationDestination(
-                          icon: Icon(Icons.shield_outlined),
-                          label: context.strings.profileTab,
+                          icon: Icon(Icons.computer_outlined),
+                          label: context.strings.myDevice,
                         ),
                         NavigationDestination(
                           icon: const Icon(Icons.settings_suggest_outlined),

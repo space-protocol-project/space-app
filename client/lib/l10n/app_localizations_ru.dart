@@ -978,5 +978,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get myDeviceAccessHelp =>
-      'Доступ, сопряжение и отзыв устройств относятся к конкретному серверу. Откройте его раздел «Мой доступ и устройства».';
+      'Управляйте сохранёнными на этом устройстве ключами: создавайте QR-карточку, восстанавливайте её из файла или сканируйте камерой. Доступ к пространствам проверяется их серверами.';
+
+  @override
+  String get deviceIdentityChoice => 'Идентичность на этом устройстве';
+
+  @override
+  String get deviceConnectIdentity => 'Подключить идентичность';
 }

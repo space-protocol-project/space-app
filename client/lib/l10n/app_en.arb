@@ -372,5 +372,7 @@
   "myDevice": "My device",
   "myDeviceDescription": "This computer, shared across all spaces.",
   "myDeviceStorage": "Space keys are kept in this device’s protected system storage.",
-  "myDeviceAccessHelp": "Access, pairing and device revocation are specific to each server. Open its My access and devices section."
+  "myDeviceAccessHelp": "Manage keys stored on this device: create a QR recovery card, restore a file or scan with the camera. Each space verifies access on its server.",
+  "deviceIdentityChoice": "Identity on this device",
+  "deviceConnectIdentity": "Connect identity"
 }

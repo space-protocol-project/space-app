@@ -123,7 +123,12 @@ void main() {
         await tester.pumpAndSettle();
         final initialPushes = observer.pushes;
         if (width < 760) {
-          await tester.tap(find.byTooltip('Моё устройство'));
+          await tester.tap(
+            find.byWidgetPredicate(
+              (widget) =>
+                  widget is IconButton && widget.tooltip == 'Моё устройство',
+            ),
+          );
         } else {
           await tester.tap(find.byKey(const ValueKey('my-device-tab')));
         }
@@ -135,23 +140,14 @@ void main() {
           findsOneWidget,
         );
         expect(find.byType(AdminPage), findsNothing);
+        expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
+        expect(find.text('Сохранить карточку'), findsOneWidget);
+        expect(find.text('Восстановить из файла'), findsOneWidget);
+        expect(find.text('Сканировать камерой'), findsOneWidget);
         if (width >= 760) {
           await tester.tap(find.byKey(const ValueKey('server-tab-$first')));
           await tester.pumpAndSettle();
         }
-        if (width < 760) {
-          await tester.tap(find.byType(NavigationDestination).at(4));
-        } else {
-          await tester.tap(
-            find.widgetWithText(ListTile, 'Мой доступ и устройства'),
-          );
-        }
-        await tester.pumpAndSettle();
-        expect(
-          find.text('Ключи устройства и доверие к выбранному пространству.'),
-          findsOneWidget,
-        );
-        expect(find.byType(AdminPage), findsNothing);
         if (width < 760) {
           await tester.tap(find.byType(NavigationDestination).last);
         } else {

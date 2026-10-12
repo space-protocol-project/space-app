@@ -22,8 +22,16 @@ import '../src/local_failure.dart';
 import '../l10n/app_localizations.dart';
 
 class RecoveryPanel extends StatefulWidget {
-  const RecoveryPanel({super.key, required this.controller});
+  const RecoveryPanel({
+    super.key,
+    required this.controller,
+    this.restoreController,
+    this.onRestored,
+  });
   final ChatController controller;
+  final ChatController Function(String origin)? restoreController;
+  final Future<void> Function(String origin, ChatController controller)?
+  onRestored;
   @override
   State<RecoveryPanel> createState() => _RecoveryPanelState();
 }
@@ -178,15 +186,15 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
         )) {
       return;
     }
-    await widget.controller.disconnect();
-    await widget.controller.inspect(
-      record.origin,
-      tlsFingerprint: record.tlsFingerprint,
-    );
-    await widget.controller.connect(restoredRecord: record);
-    if (!widget.controller.connected) {
+    final target =
+        widget.restoreController?.call(record.origin) ?? widget.controller;
+    await target.disconnect();
+    await target.inspect(record.origin, tlsFingerprint: record.tlsFingerprint);
+    await target.connect(restoredRecord: record);
+    if (!target.connected) {
       throw RecoveryOperationError('recoveryConnectionDenied');
     }
+    await widget.onRestored?.call(record.origin, target);
     await refresh();
     if (mounted) {
       setState(() => messageKey = 'recoveryRestored');

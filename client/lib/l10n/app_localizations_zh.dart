@@ -874,7 +874,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get myDeviceStorage => 'Space 密钥保存在此设备的系统安全存储中。';
 
   @override
-  String get myDeviceAccessHelp => '访问、配对和设备撤销属于特定服务器。请打开该服务器的我的访问与设备。';
+  String get myDeviceAccessHelp =>
+      '管理此设备保存的密钥：创建二维码恢复卡、从文件恢复或使用摄像头扫描。每个空间的访问由其服务器验证。';
+
+  @override
+  String get deviceIdentityChoice => '此设备上的身份';
+
+  @override
+  String get deviceConnectIdentity => '连接身份';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

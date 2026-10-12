@@ -1760,8 +1760,20 @@ abstract class AppLocalizations {
   /// No description provided for @myDeviceAccessHelp.
   ///
   /// In ru, this message translates to:
-  /// **'Доступ, сопряжение и отзыв устройств относятся к конкретному серверу. Откройте его раздел «Мой доступ и устройства».'**
+  /// **'Управляйте сохранёнными на этом устройстве ключами: создавайте QR-карточку, восстанавливайте её из файла или сканируйте камерой. Доступ к пространствам проверяется их серверами.'**
   String get myDeviceAccessHelp;
+
+  /// No description provided for @deviceIdentityChoice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Идентичность на этом устройстве'**
+  String get deviceIdentityChoice;
+
+  /// No description provided for @deviceConnectIdentity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключить идентичность'**
+  String get deviceConnectIdentity;
 }
 
 class _AppLocalizationsDelegate

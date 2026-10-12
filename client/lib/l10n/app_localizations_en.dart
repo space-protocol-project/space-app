@@ -974,5 +974,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get myDeviceAccessHelp =>
-      'Access, pairing and device revocation are specific to each server. Open its My access and devices section.';
+      'Manage keys stored on this device: create a QR recovery card, restore a file or scan with the camera. Each space verifies access on its server.';
+
+  @override
+  String get deviceIdentityChoice => 'Identity on this device';
+
+  @override
+  String get deviceConnectIdentity => 'Connect identity';
 }
