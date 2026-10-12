@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'home_runtime.dart';
+import 'home_installation.dart';
 import 'local_failure.dart';
 
 enum HomePhase {
@@ -162,21 +163,12 @@ class HomeController extends ChangeNotifier {
   }
 
   Future<Directory> _install(Directory root) async {
-    final descriptor = await release();
-    final target = Directory(
-      '${root.path}/runtimes/${descriptor.version}-${descriptor.platform}',
-    );
-    final marker = File('${target.path}/installed.json');
-    if (await marker.exists()) {
-      final saved =
-          jsonDecode(await marker.readAsString()) as Map<String, dynamic>;
-      if (saved['sha256'] != descriptor.sha256) {
-        throw const FormatException(
-          'Сохранённый выпуск не совпадает с приложением',
-        );
-      }
-      return target;
-    }
+    final offered = await release();
+    final installation = HomeInstallation(root);
+    final active = await installation.active(offered);
+    if (active != null) return installation.runtime(active);
+    final descriptor = offered;
+    final target = installation.runtime(descriptor);
     phase = HomePhase.downloading;
     _downloadClock.start();
     _update();
@@ -200,9 +192,15 @@ class HomeController extends ChangeNotifier {
       if (!await File('${unpacked.path}/$executable').exists()) {
         throw const FormatException('В выпуске нет сервера');
       }
-      await File('${unpacked.path}/installed.json')
-          .writeAsString(jsonEncode({'sha256': descriptor.sha256}));
+      await File('${unpacked.path}/installed.json').writeAsString(
+        jsonEncode({
+          'sha256': descriptor.sha256,
+          'release': descriptor.toJson(),
+        }),
+        flush: true,
+      );
       await unpacked.rename(target.path);
+      await installation.selectInitial(descriptor);
       return target;
     } finally {
       await temporary.delete(recursive: true);

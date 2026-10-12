@@ -16,6 +16,14 @@ class HomeRelease {
   final Uri url;
   final int bytes;
 
+  Map<String, dynamic> toJson() => {
+    'version': version,
+    'platform': platform,
+    'url': url.toString(),
+    'sha256': sha256,
+    'bytes': bytes,
+  };
+
   factory HomeRelease.fromJson(Map<String, dynamic> data) {
     final release = HomeRelease(
       data['version'] as String,
