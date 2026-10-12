@@ -243,7 +243,6 @@ class _AdminPageState extends State<AdminPage> {
                 padding: EdgeInsets.symmetric(vertical: 12),
                 child: Text(strings.managementIntro),
               ),
-              Text(strings.managementSections),
               const SizedBox(height: 20),
               if (identity == null)
                 card([

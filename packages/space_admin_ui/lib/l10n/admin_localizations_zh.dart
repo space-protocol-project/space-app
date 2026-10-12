@@ -16,10 +16,10 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String get managementTitle => '空间管理';
 
   @override
-  String get managementIntro => '您的服务器，您的规则。使用本地设置代码指定家庭服务器的所有者。';
+  String get managementIntro => '空间设置和成员。';
 
   @override
-  String get managementSections => '所选服务器的设置、频道、成员、邀请和设备。';
+  String get managementSections => '';
 
   @override
   String get deviceIdentity => '当前设备身份';
@@ -694,7 +694,7 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String get serverIconUpload => '选择 PNG 或 SVG';
 
   @override
-  String get serverIconHelp => 'PNG 将缩小为图标。SVG 仅允许基本图形，不含脚本或外部链接，最大 8 KiB。';
+  String get serverIconHelp => 'PNG 自动缩小。SVG 最大8 KiB，不含脚本或外部链接。';
 
   @override
   String get serverIconInvalid =>

@@ -70,8 +70,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutSpace => 'About this space';
 
   @override
-  String get independentServer =>
-      'An independent server. Each space defines your permissions and available sections.';
+  String get independentServer => 'This server controls channels and access.';
 
   @override
   String get deviceSignedIn => 'Signed in with a device key';
@@ -86,8 +85,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get beYourself => 'Be yourself.';
 
   @override
-  String get ownPace =>
-      'Reply at your own pace. Camera and microphone are inactive; system notifications are currently disabled.';
+  String get ownPace => 'Camera and microphone are off.';
 
   @override
   String get openNavigation => 'Open navigation';
@@ -108,18 +106,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearanceSettings => 'Appearance settings';
 
   @override
-  String get welcome => 'Good to have you here.';
+  String get welcome => 'Your space';
 
   @override
-  String get welcomeDescription =>
-      'Your space, your conversations, at your own pace.';
+  String get welcomeDescription => 'Server channels and resources.';
 
   @override
   String get ideas => 'A place for ideas.\nAnd the people behind them.';
 
   @override
-  String get connectDescription =>
-      'Add an independent server by its address, verify trust and join the conversation. No central account is needed.';
+  String get connectDescription => 'Add a server by address or invitation.';
 
   @override
   String get returnChat => 'Back to the conversation';
@@ -128,8 +124,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yourConversation => 'Your conversation';
 
   @override
-  String get noMessages =>
-      'Connect a space to see messages from the selected server.';
+  String get noMessages => 'Connect to open messages.';
 
   @override
   String get openChat => 'Open chat';
@@ -142,11 +137,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The app does not send system notifications or activate your camera or microphone. Keep your own pace.';
 
   @override
-  String get settingsTitle => 'Make yourself comfortable.';
+  String get settingsTitle => 'App settings';
 
   @override
-  String get settingsDescription =>
-      'Your preferences are saved on this device.';
+  String get settingsDescription => 'Saved on this device.';
 
   @override
   String get appearance => 'Appearance';
@@ -267,8 +261,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get closeConnection => 'Close connection';
 
   @override
-  String get connectionIntro =>
-      'Enter an independent server address. We will check it first, then you decide whether to trust it.';
+  String get connectionIntro => 'Enter a server address or invitation.';
 
   @override
   String get serverAddress => 'Server address or invitation link';
@@ -382,11 +375,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeFirstSetup =>
-      'Space will download the server and PostgreSQL, then create a database and certificate. Your data stays on this computer.';
+      'The server and data will be created on this computer.';
 
   @override
-  String get homeReuse =>
-      'Starting again uses your existing server, database, keys, certificate and members.';
+  String get homeReuse => 'Your server and data are saved.';
 
   @override
   String get homeIP => 'Static public IPv4';
@@ -430,7 +422,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeInviteHelp =>
-      'The link does not grant administrator rights. Invite friends through Manage space → Invitations. Stopping the server disconnects them.';
+      'Invitations: Space management. Stopping disconnects participants.';
 
   @override
   String get myHomeServer => 'My home server';
@@ -651,8 +643,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardTitle => 'All your spaces, together.';
 
   @override
-  String get dashboardDescription =>
-      'An overview of saved servers and channels you can access. Catalogs update according to your permissions.';
+  String get dashboardDescription => 'Servers, channels and unread messages.';
 
   @override
   String get dashboardServers => 'Servers';
@@ -673,11 +664,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardEmpty => 'Add your first space';
 
   @override
-  String get dashboardEmptyHelp =>
-      'Connect to a server or create your own. Each server gets its own icon on the left.';
+  String get dashboardEmptyHelp => 'Add a server or create your own.';
 
   @override
-  String get dashboardCatalogUnknown => 'Catalog not yet loaded';
+  String get dashboardCatalogUnknown => 'Connect to load channels.';
 
   @override
   String get dashboardAvailable => 'Available';
@@ -926,27 +916,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createOwnSpace => 'Create your own space';
 
   @override
-  String get setupSpaceName => 'Space name';
+  String get setupSpaceName => 'Name';
 
   @override
-  String get setupResources => 'Included in the space';
+  String get setupResources => 'Sections';
 
   @override
-  String get setupComingSoon => 'Coming soon — unavailable';
+  String get setupComingSoon => 'Coming soon';
 
   @override
   String get setupInternetHelp =>
-      'Friends need a public IPv4 address and router forwarding for TCP 8443. The server and certificate will be created automatically.';
+      'For friends: public IPv4 and TCP 8443 forwarding.';
 
   @override
   String get setupReady => 'Your space is ready';
 
   @override
   String get setupInviteHelp =>
-      'This single-use invitation expires in 24 hours. Create more invitations in space management.';
+      'Single-use invitation · 24 hours. Create more in management.';
 
   @override
-  String get setupWorking => 'Creating and configuring the server…';
+  String get setupWorking => 'Creating space…';
 
   @override
   String get setupBack => 'Back';
@@ -966,15 +956,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get myDevice => 'My device';
 
   @override
-  String get myDeviceDescription => 'This computer, shared across all spaces.';
+  String get myDeviceDescription => 'Identities and keys on this device.';
 
   @override
-  String get myDeviceStorage =>
-      'Space keys are kept in this device’s protected system storage.';
+  String get myDeviceStorage => 'Keys are in protected device storage.';
 
   @override
   String get myDeviceAccessHelp =>
-      'Manage keys stored on this device: create a QR recovery card, restore a file or scan with the camera. Each space verifies access on its server.';
+      'Select an identity for QR, recovery and pairing.';
 
   @override
   String get deviceIdentityChoice => 'Identity on this device';
@@ -1009,4 +998,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get recoveryFolderUnavailable =>
       'Could not read this folder. Enter the full file path.';
+
+  @override
+  String get setupExisting => 'Configure your saved space.';
 }

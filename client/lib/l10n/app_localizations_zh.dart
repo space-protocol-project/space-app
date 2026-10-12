@@ -70,7 +70,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutSpace => '关于此空间';
 
   @override
-  String get independentServer => '独立服务器。每个空间分别决定你的权限和可用功能。';
+  String get independentServer => '频道和访问权限由此服务器管理。';
 
   @override
   String get deviceSignedIn => '已使用设备密钥登录';
@@ -85,7 +85,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get beYourself => '做你自己。';
 
   @override
-  String get ownPace => '无需立即回复。摄像头和麦克风未启用；系统通知目前已关闭。';
+  String get ownPace => '摄像头和麦克风已关闭。';
 
   @override
   String get openNavigation => '打开导航';
@@ -106,16 +106,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appearanceSettings => '外观设置';
 
   @override
-  String get welcome => '欢迎你来到这里。';
+  String get welcome => '您的空间';
 
   @override
-  String get welcomeDescription => '你的空间，你的交流，按自己的节奏。';
+  String get welcomeDescription => '服务器频道和资源。';
 
   @override
   String get ideas => '让想法相聚。\n让人们相连。';
 
   @override
-  String get connectDescription => '通过地址添加独立服务器，验证信任后开始交流。无需中心账号。';
+  String get connectDescription => '通过地址或邀请添加服务器。';
 
   @override
   String get returnChat => '返回聊天';
@@ -124,7 +124,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get yourConversation => '你的交流';
 
   @override
-  String get noMessages => '连接空间后，这里将显示所选服务器的消息。';
+  String get noMessages => '连接后查看消息。';
 
   @override
   String get openChat => '打开聊天';
@@ -136,10 +136,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get attentionDescription => '应用不会发送系统通知，也不会开启摄像头或麦克风。保持自己的节奏。';
 
   @override
-  String get settingsTitle => '让使用更舒适。';
+  String get settingsTitle => '应用设置';
 
   @override
-  String get settingsDescription => '个人设置保存在此设备上。';
+  String get settingsDescription => '保存在此设备上。';
 
   @override
   String get appearance => '外观';
@@ -258,7 +258,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get closeConnection => '关闭连接';
 
   @override
-  String get connectionIntro => '输入独立服务器的地址。我们会先检查，然后由你决定是否信任。';
+  String get connectionIntro => '输入服务器地址或邀请。';
 
   @override
   String get serverAddress => '服务器地址或邀请链接';
@@ -366,10 +366,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get close => '关闭';
 
   @override
-  String get homeFirstSetup => 'Space 将下载服务器和 PostgreSQL，并创建数据库和证书。数据会保留在此电脑上。';
+  String get homeFirstSetup => '服务器和数据将在此计算机上创建。';
 
   @override
-  String get homeReuse => '再次启动会使用原有的服务器、数据库、密钥、证书和成员。';
+  String get homeReuse => '您的服务器和数据已保存。';
 
   @override
   String get homeIP => '静态公网 IPv4';
@@ -409,7 +409,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get manageServer => '管理服务器';
 
   @override
-  String get homeInviteHelp => '链接本身不授予管理员权限。请通过“管理空间 → 邀请”邀请朋友。停止服务器会断开他们的连接。';
+  String get homeInviteHelp => '邀请：空间管理。关闭服务器将断开参与者连接。';
 
   @override
   String get myHomeServer => '我的家庭服务器';
@@ -608,7 +608,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboardTitle => '您的所有空间，尽在一处。';
 
   @override
-  String get dashboardDescription => '查看已保存的服务器及您可访问的频道。目录会根据您的权限更新。';
+  String get dashboardDescription => '服务器、频道和未读消息。';
 
   @override
   String get dashboardServers => '服务器';
@@ -629,10 +629,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboardEmpty => '添加您的首个空间';
 
   @override
-  String get dashboardEmptyHelp => '连接服务器或创建自己的服务器。每个服务器都会在左侧拥有独立图标。';
+  String get dashboardEmptyHelp => '添加服务器或创建自己的服务器。';
 
   @override
-  String get dashboardCatalogUnknown => '尚未加载目录';
+  String get dashboardCatalogUnknown => '连接后加载频道。';
 
   @override
   String get dashboardAvailable => '可用';
@@ -831,26 +831,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get createOwnSpace => '创建自己的空间';
 
   @override
-  String get setupSpaceName => '空间名称';
+  String get setupSpaceName => '名称';
 
   @override
-  String get setupResources => '空间包含的功能';
+  String get setupResources => '功能';
 
   @override
-  String get setupComingSoon => '即将推出，暂不可用';
+  String get setupComingSoon => '即将推出';
 
   @override
-  String get setupInternetHelp =>
-      '邀请朋友需要公网 IPv4 和路由器 TCP 8443 端口转发。服务器和证书将自动创建。';
+  String get setupInternetHelp => '邀请朋友：公网 IPv4 和 TCP 8443 端口转发。';
 
   @override
   String get setupReady => '空间已准备好';
 
   @override
-  String get setupInviteHelp => '邀请仅可使用一次，有效期为24小时。可在空间管理中创建更多邀请。';
+  String get setupInviteHelp => '一次性邀请 · 24小时。可在管理中创建更多邀请。';
 
   @override
-  String get setupWorking => '正在创建和配置服务器…';
+  String get setupWorking => '正在创建空间…';
 
   @override
   String get setupBack => '返回';
@@ -868,14 +867,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get myDevice => '我的设备';
 
   @override
-  String get myDeviceDescription => '此计算机的信息，适用于所有空间。';
+  String get myDeviceDescription => '此设备上的身份和密钥。';
 
   @override
-  String get myDeviceStorage => 'Space 密钥保存在此设备的系统安全存储中。';
+  String get myDeviceStorage => '密钥保存在设备安全存储中。';
 
   @override
-  String get myDeviceAccessHelp =>
-      '管理此设备保存的密钥：创建二维码恢复卡、从文件恢复或使用摄像头扫描。每个空间的访问由其服务器验证。';
+  String get myDeviceAccessHelp => '选择身份以使用二维码、恢复和配对。';
 
   @override
   String get deviceIdentityChoice => '此设备上的身份';
@@ -909,6 +907,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get recoveryFolderUnavailable => '无法读取文件夹。请输入完整文件路径。';
+
+  @override
+  String get setupExisting => '配置已保存的空间。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

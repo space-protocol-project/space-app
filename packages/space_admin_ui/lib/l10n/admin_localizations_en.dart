@@ -16,12 +16,10 @@ class AdminLocalizationsEn extends AdminLocalizations {
   String get managementTitle => 'Space management';
 
   @override
-  String get managementIntro =>
-      'Your server. Your rules. A home server owner is assigned using its local setup code.';
+  String get managementIntro => 'Space settings and members.';
 
   @override
-  String get managementSections =>
-      'Settings, channels, members, invitations and devices for the selected server.';
+  String get managementSections => '';
 
   @override
   String get deviceIdentity => 'Current device identity';
@@ -738,7 +736,7 @@ class AdminLocalizationsEn extends AdminLocalizations {
 
   @override
   String get serverIconHelp =>
-      'PNG is resized to an icon. SVG: basic shapes without scripts or external links, up to 8 KiB.';
+      'PNG is resized. SVG: up to 8 KiB, without scripts or external links.';
 
   @override
   String get serverIconInvalid =>

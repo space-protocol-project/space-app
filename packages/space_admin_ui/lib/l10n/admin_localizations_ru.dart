@@ -16,12 +16,10 @@ class AdminLocalizationsRu extends AdminLocalizations {
   String get managementTitle => 'Управление пространством';
 
   @override
-  String get managementIntro =>
-      'Ваш сервер. Ваши правила. Владелец домашнего сервера назначается локальным кодом настройки.';
+  String get managementIntro => 'Настройки и участники пространства.';
 
   @override
-  String get managementSections =>
-      'Настройки, каналы, участники, приглашения и устройства выбранного сервера.';
+  String get managementSections => '';
 
   @override
   String get deviceIdentity => 'Текущая идентичность устройства';
@@ -738,7 +736,7 @@ class AdminLocalizationsRu extends AdminLocalizations {
 
   @override
   String get serverIconHelp =>
-      'PNG уменьшается до значка. SVG: базовые фигуры без скриптов и внешних ссылок, до 8 КиБ.';
+      'PNG уменьшается автоматически. SVG — до 8 КиБ, без скриптов и внешних ссылок.';
 
   @override
   String get serverIconInvalid =>

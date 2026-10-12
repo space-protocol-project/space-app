@@ -115,13 +115,13 @@ abstract class AdminLocalizations {
   /// No description provided for @managementIntro.
   ///
   /// In ru, this message translates to:
-  /// **'Ваш сервер. Ваши правила. Владелец домашнего сервера назначается локальным кодом настройки.'**
+  /// **'Настройки и участники пространства.'**
   String get managementIntro;
 
   /// No description provided for @managementSections.
   ///
   /// In ru, this message translates to:
-  /// **'Настройки, каналы, участники, приглашения и устройства выбранного сервера.'**
+  /// **''**
   String get managementSections;
 
   /// No description provided for @deviceIdentity.
@@ -1417,7 +1417,7 @@ abstract class AdminLocalizations {
   /// No description provided for @serverIconHelp.
   ///
   /// In ru, this message translates to:
-  /// **'PNG уменьшается до значка. SVG: базовые фигуры без скриптов и внешних ссылок, до 8 КиБ.'**
+  /// **'PNG уменьшается автоматически. SVG — до 8 КиБ, без скриптов и внешних ссылок.'**
   String get serverIconHelp;
 
   /// No description provided for @serverIconInvalid.

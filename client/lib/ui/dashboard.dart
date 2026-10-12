@@ -63,35 +63,6 @@ class Dashboard extends StatelessWidget {
           spacing: 12,
           runSpacing: 12,
           children: [
-            _Metric(
-              label: context.strings.dashboardServers,
-              value: entries.length,
-              icon: Icons.dns_outlined,
-            ),
-            _Metric(
-              label: context.strings.dashboardOnline,
-              value: entries
-                  .where((entry) => presence.online(entry.key) == true)
-                  .length,
-              icon: Icons.cloud_done_outlined,
-            ),
-            _Metric(
-              label: context.strings.dashboardChannels,
-              value: channels,
-              icon: Icons.tag,
-            ),
-            _Metric(
-              label: context.strings.dashboardUnread,
-              value: unread,
-              icon: Icons.mark_chat_unread_outlined,
-            ),
-          ],
-        ),
-        const SizedBox(height: 24),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
             IntrinsicWidth(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -128,6 +99,35 @@ class Dashboard extends StatelessWidget {
                 icon: const Icon(Icons.sensors),
                 label: Text(context.strings.goLive),
               ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            _Metric(
+              label: context.strings.dashboardServers,
+              value: entries.length,
+              icon: Icons.dns_outlined,
+            ),
+            _Metric(
+              label: context.strings.dashboardOnline,
+              value: entries
+                  .where((entry) => presence.online(entry.key) == true)
+                  .length,
+              icon: Icons.cloud_done_outlined,
+            ),
+            _Metric(
+              label: context.strings.dashboardChannels,
+              value: channels,
+              icon: Icons.tag,
+            ),
+            _Metric(
+              label: context.strings.dashboardUnread,
+              value: unread,
+              icon: Icons.mark_chat_unread_outlined,
+            ),
           ],
         ),
         const SizedBox(height: 24),
@@ -217,11 +217,6 @@ class Dashboard extends StatelessWidget {
               ),
             ),
           ),
-        const SizedBox(height: 8),
-        Text(
-          context.strings.dashboardResourcesHelp,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
       ],
     );
   }

@@ -224,7 +224,7 @@ abstract class AppLocalizations {
   /// No description provided for @independentServer.
   ///
   /// In ru, this message translates to:
-  /// **'Независимый сервер. Ваши права и доступные разделы определяются отдельно в каждом пространстве.'**
+  /// **'Каналы и доступ задаёт этот сервер.'**
   String get independentServer;
 
   /// No description provided for @deviceSignedIn.
@@ -254,7 +254,7 @@ abstract class AppLocalizations {
   /// No description provided for @ownPace.
   ///
   /// In ru, this message translates to:
-  /// **'Не обязательно отвечать сразу. Камера и микрофон не используются; системные уведомления пока выключены.'**
+  /// **'Камера и микрофон выключены.'**
   String get ownPace;
 
   /// No description provided for @openNavigation.
@@ -296,13 +296,13 @@ abstract class AppLocalizations {
   /// No description provided for @welcome.
   ///
   /// In ru, this message translates to:
-  /// **'Хорошо, что вы здесь.'**
+  /// **'Ваше пространство'**
   String get welcome;
 
   /// No description provided for @welcomeDescription.
   ///
   /// In ru, this message translates to:
-  /// **'Ваше пространство, ваши разговоры — в удобном темпе.'**
+  /// **'Каналы и ресурсы сервера.'**
   String get welcomeDescription;
 
   /// No description provided for @ideas.
@@ -314,7 +314,7 @@ abstract class AppLocalizations {
   /// No description provided for @connectDescription.
   ///
   /// In ru, this message translates to:
-  /// **'Добавьте независимый сервер по адресу, проверьте доверие и продолжите разговор. Центральный аккаунт не нужен.'**
+  /// **'Добавьте сервер по адресу или приглашению.'**
   String get connectDescription;
 
   /// No description provided for @returnChat.
@@ -332,7 +332,7 @@ abstract class AppLocalizations {
   /// No description provided for @noMessages.
   ///
   /// In ru, this message translates to:
-  /// **'Пространство ещё не подключено. Здесь появятся реальные сообщения выбранного сервера.'**
+  /// **'Подключитесь, чтобы открыть сообщения.'**
   String get noMessages;
 
   /// No description provided for @openChat.
@@ -356,13 +356,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Пусть будет удобно вам.'**
+  /// **'Настройки приложения'**
   String get settingsTitle;
 
   /// No description provided for @settingsDescription.
   ///
   /// In ru, this message translates to:
-  /// **'Личное оформление сохраняется на этом устройстве.'**
+  /// **'Сохраняются на этом устройстве.'**
   String get settingsDescription;
 
   /// No description provided for @appearance.
@@ -590,7 +590,7 @@ abstract class AppLocalizations {
   /// No description provided for @connectionIntro.
   ///
   /// In ru, this message translates to:
-  /// **'Адрес независимого сервера. Сначала проверим его, затем вы решите, доверять ли ему.'**
+  /// **'Введите адрес сервера или приглашение.'**
   String get connectionIntro;
 
   /// No description provided for @serverAddress.
@@ -788,13 +788,13 @@ abstract class AppLocalizations {
   /// No description provided for @homeFirstSetup.
   ///
   /// In ru, this message translates to:
-  /// **'Space скачает сервер и PostgreSQL, создаст базу и сертификат. Данные останутся на этом компьютере.'**
+  /// **'Сервер и данные будут созданы на этом компьютере.'**
   String get homeFirstSetup;
 
   /// No description provided for @homeReuse.
   ///
   /// In ru, this message translates to:
-  /// **'Повторный запуск использует ваш прежний сервер, базу, ключи, сертификат и участников.'**
+  /// **'Ваш сервер и данные сохранены.'**
   String get homeReuse;
 
   /// No description provided for @homeIP.
@@ -872,7 +872,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeInviteHelp.
   ///
   /// In ru, this message translates to:
-  /// **'Сама ссылка не выдаёт права администратора. Друзей приглашайте через «Управление пространством → Приглашения». Остановка сервера завершит их подключения.'**
+  /// **'Приглашения: «Управление пространством». При отключении участники потеряют соединение.'**
   String get homeInviteHelp;
 
   /// No description provided for @myHomeServer.
@@ -1238,7 +1238,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardDescription.
   ///
   /// In ru, this message translates to:
-  /// **'Сводка по сохранённым серверам и доступным вам каналам. Каталоги обновляются с учётом ваших прав.'**
+  /// **'Серверы, каналы и непрочитанные сообщения.'**
   String get dashboardDescription;
 
   /// No description provided for @dashboardServers.
@@ -1280,13 +1280,13 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardEmptyHelp.
   ///
   /// In ru, this message translates to:
-  /// **'Подключитесь к серверу или создайте свой. Каждый сервер появится отдельной иконкой слева.'**
+  /// **'Добавьте сервер или создайте свой.'**
   String get dashboardEmptyHelp;
 
   /// No description provided for @dashboardCatalogUnknown.
   ///
   /// In ru, this message translates to:
-  /// **'Каталог ещё не получен'**
+  /// **'Подключитесь, чтобы загрузить каналы.'**
   String get dashboardCatalogUnknown;
 
   /// No description provided for @dashboardAvailable.
@@ -1676,25 +1676,25 @@ abstract class AppLocalizations {
   /// No description provided for @setupSpaceName.
   ///
   /// In ru, this message translates to:
-  /// **'Название пространства'**
+  /// **'Название'**
   String get setupSpaceName;
 
   /// No description provided for @setupResources.
   ///
   /// In ru, this message translates to:
-  /// **'Что включено в пространство'**
+  /// **'Разделы'**
   String get setupResources;
 
   /// No description provided for @setupComingSoon.
   ///
   /// In ru, this message translates to:
-  /// **'Скоро — пока недоступно'**
+  /// **'Скоро'**
   String get setupComingSoon;
 
   /// No description provided for @setupInternetHelp.
   ///
   /// In ru, this message translates to:
-  /// **'Для друзей нужен публичный IPv4 и проброс TCP 8443 на роутере. Сервер и сертификат будут созданы автоматически.'**
+  /// **'Для друзей: публичный IPv4 и проброс TCP 8443.'**
   String get setupInternetHelp;
 
   /// No description provided for @setupReady.
@@ -1706,13 +1706,13 @@ abstract class AppLocalizations {
   /// No description provided for @setupInviteHelp.
   ///
   /// In ru, this message translates to:
-  /// **'Приглашение на один вход действует 24 часа. Для следующих участников создайте новые приглашения в управлении пространством.'**
+  /// **'Одноразовое приглашение · 24 часа. Новые — в управлении.'**
   String get setupInviteHelp;
 
   /// No description provided for @setupWorking.
   ///
   /// In ru, this message translates to:
-  /// **'Создание сервера и настройка…'**
+  /// **'Создаём пространство…'**
   String get setupWorking;
 
   /// No description provided for @setupBack.
@@ -1748,19 +1748,19 @@ abstract class AppLocalizations {
   /// No description provided for @myDeviceDescription.
   ///
   /// In ru, this message translates to:
-  /// **'Настройки и сведения этого компьютера, общие для всех пространств.'**
+  /// **'Идентичности и ключи этого устройства.'**
   String get myDeviceDescription;
 
   /// No description provided for @myDeviceStorage.
   ///
   /// In ru, this message translates to:
-  /// **'Ключи Space хранятся в системном защищённом хранилище этого устройства.'**
+  /// **'Ключи — в защищённом хранилище устройства.'**
   String get myDeviceStorage;
 
   /// No description provided for @myDeviceAccessHelp.
   ///
   /// In ru, this message translates to:
-  /// **'Управляйте сохранёнными на этом устройстве ключами: создавайте QR-карточку, восстанавливайте её из файла или сканируйте камерой. Доступ к пространствам проверяется их серверами.'**
+  /// **'Выберите идентичность для QR, восстановления и сопряжения.'**
   String get myDeviceAccessHelp;
 
   /// No description provided for @deviceIdentityChoice.
@@ -1828,6 +1828,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не удалось прочитать папку. Укажите полный путь к файлу.'**
   String get recoveryFolderUnavailable;
+
+  /// No description provided for @setupExisting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настройка вашего сохранённого пространства.'**
+  String get setupExisting;
 }
 
 class _AppLocalizationsDelegate

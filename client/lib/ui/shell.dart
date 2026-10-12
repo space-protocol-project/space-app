@@ -309,14 +309,34 @@ class _SpaceShellState extends State<SpaceShell> {
     await home.load();
     if (!mounted) return;
     final strings = context.strings;
-    if (home.ip.isNotEmpty || home.running || home.pendingUpdate) {
+    if (home.pendingUpdate || home.updateAvailable) {
       await showHomeDetails();
       return;
     }
+    final existing = home.ip.isNotEmpty;
+    final owner = workspaces[home.state?.publicOrigin ?? ''];
+    Map<String, dynamic>? settings;
+    if (owner?.administration != null) {
+      try {
+        final response = await owner!.administration!.adminRequest(
+          '/api/v1/space/settings',
+        );
+        settings = Map<String, dynamic>.from(response['settings'] as Map);
+      } catch (_) {
+        // Мастер повторит проверку перед сохранением.
+      }
+    }
+    if (!mounted) return;
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (context) => SpaceSetupWizard(
+        existing: existing,
+        initialTitle: settings?['title'] as String? ?? owner?.spaceTitle ?? '',
+        initialIcon: settings?['icon'] is Map
+            ? Map<String, dynamic>.from(settings!['icon'] as Map)
+            : null,
+        initialChat: settings?['chatEnabled'] as bool? ?? true,
         create: (title, icon, chatEnabled) async {
           if (!home.running) {
             final ip = home.ip.isEmpty ? await home.detectIP() : home.ip;

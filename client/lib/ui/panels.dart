@@ -236,23 +236,6 @@ class SettingsPanel extends StatelessWidget {
           ],
         ),
       ),
-      const SizedBox(height: 20),
-      SurfaceCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.strings.spaceAppearance,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              context.strings.spaceAppearanceDescription,
-              style: TextStyle(height: 1.7),
-            ),
-          ],
-        ),
-      ),
       if (preferences.error.isNotEmpty) ...[
         const SizedBox(height: 16),
         Text(

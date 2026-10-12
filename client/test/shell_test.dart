@@ -213,7 +213,7 @@ void main() {
       expect(find.text('Пока недоступно'), findsOneWidget);
       await tester.tap(find.byTooltip('Настройки приложения'));
       await tester.pumpAndSettle();
-      expect(find.text('Оформление пространства'), findsOneWidget);
+      expect(find.text('Оформление пространства'), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );

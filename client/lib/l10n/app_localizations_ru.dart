@@ -70,8 +70,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get aboutSpace => 'О пространстве';
 
   @override
-  String get independentServer =>
-      'Независимый сервер. Ваши права и доступные разделы определяются отдельно в каждом пространстве.';
+  String get independentServer => 'Каналы и доступ задаёт этот сервер.';
 
   @override
   String get deviceSignedIn => 'Вход по ключу устройства выполнен';
@@ -86,8 +85,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get beYourself => 'Можно быть собой.';
 
   @override
-  String get ownPace =>
-      'Не обязательно отвечать сразу. Камера и микрофон не используются; системные уведомления пока выключены.';
+  String get ownPace => 'Камера и микрофон выключены.';
 
   @override
   String get openNavigation => 'Открыть навигацию';
@@ -108,18 +106,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get appearanceSettings => 'Настройки оформления';
 
   @override
-  String get welcome => 'Хорошо, что вы здесь.';
+  String get welcome => 'Ваше пространство';
 
   @override
-  String get welcomeDescription =>
-      'Ваше пространство, ваши разговоры — в удобном темпе.';
+  String get welcomeDescription => 'Каналы и ресурсы сервера.';
 
   @override
   String get ideas => 'Место для идей.\nИ людей за ними.';
 
   @override
-  String get connectDescription =>
-      'Добавьте независимый сервер по адресу, проверьте доверие и продолжите разговор. Центральный аккаунт не нужен.';
+  String get connectDescription => 'Добавьте сервер по адресу или приглашению.';
 
   @override
   String get returnChat => 'Вернуться в разговор';
@@ -128,8 +124,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get yourConversation => 'Ваш разговор';
 
   @override
-  String get noMessages =>
-      'Пространство ещё не подключено. Здесь появятся реальные сообщения выбранного сервера.';
+  String get noMessages => 'Подключитесь, чтобы открыть сообщения.';
 
   @override
   String get openChat => 'Открыть чат';
@@ -142,11 +137,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Оболочка не отправляет системные уведомления и не включает камеру или микрофон. Можно оставаться в своём ритме.';
 
   @override
-  String get settingsTitle => 'Пусть будет удобно вам.';
+  String get settingsTitle => 'Настройки приложения';
 
   @override
-  String get settingsDescription =>
-      'Личное оформление сохраняется на этом устройстве.';
+  String get settingsDescription => 'Сохраняются на этом устройстве.';
 
   @override
   String get appearance => 'Внешний вид';
@@ -268,8 +262,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get closeConnection => 'Закрыть подключение';
 
   @override
-  String get connectionIntro =>
-      'Адрес независимого сервера. Сначала проверим его, затем вы решите, доверять ли ему.';
+  String get connectionIntro => 'Введите адрес сервера или приглашение.';
 
   @override
   String get serverAddress => 'Адрес сервера или ссылка приглашения';
@@ -386,11 +379,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get homeFirstSetup =>
-      'Space скачает сервер и PostgreSQL, создаст базу и сертификат. Данные останутся на этом компьютере.';
+      'Сервер и данные будут созданы на этом компьютере.';
 
   @override
-  String get homeReuse =>
-      'Повторный запуск использует ваш прежний сервер, базу, ключи, сертификат и участников.';
+  String get homeReuse => 'Ваш сервер и данные сохранены.';
 
   @override
   String get homeIP => 'Статический публичный IPv4';
@@ -434,7 +426,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get homeInviteHelp =>
-      'Сама ссылка не выдаёт права администратора. Друзей приглашайте через «Управление пространством → Приглашения». Остановка сервера завершит их подключения.';
+      'Приглашения: «Управление пространством». При отключении участники потеряют соединение.';
 
   @override
   String get myHomeServer => 'Мой домашний сервер';
@@ -656,7 +648,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get dashboardDescription =>
-      'Сводка по сохранённым серверам и доступным вам каналам. Каталоги обновляются с учётом ваших прав.';
+      'Серверы, каналы и непрочитанные сообщения.';
 
   @override
   String get dashboardServers => 'Серверы';
@@ -677,11 +669,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dashboardEmpty => 'Добавьте первое пространство';
 
   @override
-  String get dashboardEmptyHelp =>
-      'Подключитесь к серверу или создайте свой. Каждый сервер появится отдельной иконкой слева.';
+  String get dashboardEmptyHelp => 'Добавьте сервер или создайте свой.';
 
   @override
-  String get dashboardCatalogUnknown => 'Каталог ещё не получен';
+  String get dashboardCatalogUnknown => 'Подключитесь, чтобы загрузить каналы.';
 
   @override
   String get dashboardAvailable => 'Доступен';
@@ -929,27 +920,27 @@ class AppLocalizationsRu extends AppLocalizations {
   String get createOwnSpace => 'Создать своё пространство';
 
   @override
-  String get setupSpaceName => 'Название пространства';
+  String get setupSpaceName => 'Название';
 
   @override
-  String get setupResources => 'Что включено в пространство';
+  String get setupResources => 'Разделы';
 
   @override
-  String get setupComingSoon => 'Скоро — пока недоступно';
+  String get setupComingSoon => 'Скоро';
 
   @override
   String get setupInternetHelp =>
-      'Для друзей нужен публичный IPv4 и проброс TCP 8443 на роутере. Сервер и сертификат будут созданы автоматически.';
+      'Для друзей: публичный IPv4 и проброс TCP 8443.';
 
   @override
   String get setupReady => 'Пространство готово';
 
   @override
   String get setupInviteHelp =>
-      'Приглашение на один вход действует 24 часа. Для следующих участников создайте новые приглашения в управлении пространством.';
+      'Одноразовое приглашение · 24 часа. Новые — в управлении.';
 
   @override
-  String get setupWorking => 'Создание сервера и настройка…';
+  String get setupWorking => 'Создаём пространство…';
 
   @override
   String get setupBack => 'Назад';
@@ -969,16 +960,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get myDevice => 'Моё устройство';
 
   @override
-  String get myDeviceDescription =>
-      'Настройки и сведения этого компьютера, общие для всех пространств.';
+  String get myDeviceDescription => 'Идентичности и ключи этого устройства.';
 
   @override
-  String get myDeviceStorage =>
-      'Ключи Space хранятся в системном защищённом хранилище этого устройства.';
+  String get myDeviceStorage => 'Ключи — в защищённом хранилище устройства.';
 
   @override
   String get myDeviceAccessHelp =>
-      'Управляйте сохранёнными на этом устройстве ключами: создавайте QR-карточку, восстанавливайте её из файла или сканируйте камерой. Доступ к пространствам проверяется их серверами.';
+      'Выберите идентичность для QR, восстановления и сопряжения.';
 
   @override
   String get deviceIdentityChoice => 'Идентичность на этом устройстве';
@@ -1013,4 +1002,7 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get recoveryFolderUnavailable =>
       'Не удалось прочитать папку. Укажите полный путь к файлу.';
+
+  @override
+  String get setupExisting => 'Настройка вашего сохранённого пространства.';
 }

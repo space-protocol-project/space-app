@@ -18,19 +18,29 @@ class SpaceSetupWizard extends StatefulWidget {
     super.key,
     required this.create,
     required this.manage,
+    this.initialTitle = '',
+    this.initialIcon,
+    this.initialChat = true,
+    this.existing = false,
   });
   final CreateHomeSpace create;
   final VoidCallback manage;
+  final String initialTitle;
+  final Map<String, dynamic>? initialIcon;
+  final bool initialChat, existing;
 
   @override
   State<SpaceSetupWizard> createState() => _SpaceSetupWizardState();
 }
 
 class _SpaceSetupWizardState extends State<SpaceSetupWizard> {
-  final title = TextEditingController();
-  Map<String, dynamic> icon = {'preset': 'orbit'};
+  late final title = TextEditingController(text: widget.initialTitle);
+  late Map<String, dynamic> icon = Map.from(
+    widget.initialIcon ?? {'preset': 'orbit'},
+  );
   int step = 0;
-  bool chat = true, busy = false, iconLoading = false;
+  late bool chat = widget.initialChat;
+  bool busy = false, iconLoading = false;
   String link = '', error = '';
 
   @override
@@ -98,6 +108,7 @@ class _SpaceSetupWizardState extends State<SpaceSetupWizard> {
                   ],
                 ),
                 Text('${step + 1} / 3'),
+                if (widget.existing) Text(s.setupExisting),
                 const SizedBox(height: 20),
                 if (step == 0) ...[
                   TextField(

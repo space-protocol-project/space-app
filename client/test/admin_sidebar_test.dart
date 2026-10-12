@@ -135,7 +135,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(
           find.text(
-            'Настройки и сведения этого компьютера, общие для всех пространств.',
+            'Идентичности и ключи этого устройства.',
           ),
           findsOneWidget,
         );
