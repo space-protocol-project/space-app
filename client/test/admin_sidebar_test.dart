@@ -123,6 +123,19 @@ void main() {
         await tester.pumpAndSettle();
         final initialPushes = observer.pushes;
         if (width < 760) {
+          await tester.tap(find.byType(NavigationDestination).at(4));
+        } else {
+          await tester.tap(
+            find.widgetWithText(ListTile, 'Мой доступ и устройства'),
+          );
+        }
+        await tester.pumpAndSettle();
+        expect(
+          find.text('Ключи устройства и доверие к выбранному пространству.'),
+          findsOneWidget,
+        );
+        expect(find.byType(AdminPage), findsNothing);
+        if (width < 760) {
           await tester.tap(find.byType(NavigationDestination).last);
         } else {
           await tester.tap(

@@ -856,41 +856,47 @@ class _SpaceShellState extends State<SpaceShell> {
   Widget pages() => IndexedStack(
     index: selected.index,
     children: [
-      OverviewPanel(
-        controller: controller,
-        home: controller.preview?.origin.toString() == 'https://${home.ip}:8443'
-            ? home
-            : null,
-        homeAction: showHome,
-        homeDetails: showHomeDetails,
-        openConnection: () => connection(),
-        openChat: () => select(Section.chat),
-      ),
-      ChatView(
-        key: const ValueKey('live-chat'),
-        controller: controller,
-        active: !applicationSettings && !dashboard && selected == Section.chat,
-        showHeader: false,
-        sendWithShift: widget.preferences.sendShortcut == 'shiftEnter',
-        openConnection: () => connection(),
-      ),
-      UnavailablePanel(
-        title: context.strings.forumTitle,
-        description: context.strings.forumDescription,
-        icon: Icons.forum_outlined,
-      ),
-      UnavailablePanel(
-        title: context.strings.feedTitle,
-        description: context.strings.feedDescription,
-        icon: Icons.view_agenda_outlined,
-      ),
-      const RoomsPanel(),
-      IdentityPanel(
-        key: ValueKey(controller),
-        controller: controller,
-        revoke: revoke,
-      ),
-      administrationPage(),
+      for (final section in Section.values)
+        switch (section) {
+          Section.overview => OverviewPanel(
+            controller: controller,
+            home:
+                controller.preview?.origin.toString() ==
+                    'https://${home.ip}:8443'
+                ? home
+                : null,
+            homeAction: showHome,
+            homeDetails: showHomeDetails,
+            openConnection: () => connection(),
+            openChat: () => select(Section.chat),
+          ),
+          Section.chat => ChatView(
+            key: const ValueKey('live-chat'),
+            controller: controller,
+            active:
+                !applicationSettings && !dashboard && selected == Section.chat,
+            showHeader: false,
+            sendWithShift: widget.preferences.sendShortcut == 'shiftEnter',
+            openConnection: () => connection(),
+          ),
+          Section.forum => UnavailablePanel(
+            title: context.strings.forumTitle,
+            description: context.strings.forumDescription,
+            icon: Icons.forum_outlined,
+          ),
+          Section.feed => UnavailablePanel(
+            title: context.strings.feedTitle,
+            description: context.strings.feedDescription,
+            icon: Icons.view_agenda_outlined,
+          ),
+          Section.rooms => const RoomsPanel(),
+          Section.identity => IdentityPanel(
+            key: ValueKey(controller),
+            controller: controller,
+            revoke: revoke,
+          ),
+          Section.settings => administrationPage(),
+        },
     ],
   );
   Widget administrationPage() {
