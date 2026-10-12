@@ -90,6 +90,16 @@ void main() {
   });
   tearDown(() => root.delete(recursive: true));
 
+  test('Продолжение прерванной подготовки повторяет обновление, не создавая цикл ошибок', () async {
+    await HomeUpdateJournal(root).begin(release('v0.1.0'), release('v0.2.0'));
+    await executor.recover();
+    expect(
+      (await HomeUpdateJournal(root).read())!.step,
+      HomeUpdateStep.completeUpdated,
+    );
+    expect((await installation.active(release('v0.2.0')))!.version, 'v0.2.0');
+  });
+
   test('Успех: копия до миграций, прежний runtime сохранён, новая версия закреплена', () async {
     await executor.update(release('v0.1.0'), release('v0.2.0'));
     expect(

@@ -157,7 +157,7 @@ class HomeUpdateExecutor {
       await installation.activate(source, target);
       await journal.advance(record.id, HomeUpdateStep.completeUpdated);
     } catch (_) {
-      await recover();
+      await recover(retryPreparation: false);
       if ((await journal.read())?.step == HomeUpdateStep.completeUpdated) {
         return;
       }
@@ -168,11 +168,12 @@ class HomeUpdateExecutor {
     }
   }
 
-  Future<void> recover() async {
+  Future<void> recover({bool retryPreparation = true}) async {
     var record = await journal.read();
     if (record == null || record.settled) return;
     if (record.recovery == HomeRecoveryAction.resumePreparation) {
       await journal.advance(record.id, HomeUpdateStep.cancelled);
+      if (retryPreparation) await update(record.source, record.target);
       return;
     }
     final runtime = installation.runtime(record.target);
