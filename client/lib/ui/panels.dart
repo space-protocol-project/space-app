@@ -59,7 +59,7 @@ class OverviewPanel extends StatelessWidget {
                 ],
               ),
               if (home!.error.isNotEmpty) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Text(
                   home!.error,
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
@@ -186,7 +186,7 @@ class SettingsPanel extends StatelessWidget {
               context.strings.appearance,
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             SwitchListTile.adaptive(
               contentPadding: EdgeInsets.zero,
               title: Text(context.strings.darkTheme),
@@ -211,10 +211,10 @@ class SettingsPanel extends StatelessWidget {
               ],
               onChanged: (value) => preferences.change(sendShortcut: value),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             Text(context.strings.sendShortcutHelp),
             const Divider(),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Text(context.strings.myColors),
             const SizedBox(height: 14),
             Wrap(
@@ -282,7 +282,7 @@ class IdentityPanel extends StatelessWidget {
                         'Этот компьютер',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 16),
                       Text(
                         controller.connected
                             ? 'Вход выполнен по ключу устройства'
@@ -331,7 +331,7 @@ class IdentityPanel extends StatelessWidget {
               'Восстановление ключей',
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             const Text(
               'Карточка относится к выбранному серверу. Она не содержит историю сообщений; права и сохранённая история загружаются с сервера после восстановления.',
               style: TextStyle(height: 1.7),
@@ -370,7 +370,7 @@ class UnavailablePanel extends StatelessWidget {
               'Пока недоступно',
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             const Text(
               'В этой версии клиента работает текстовый чат. Раздел появится, когда его поддержат клиент и выбранное пространство.',
               style: TextStyle(height: 1.8),
@@ -436,7 +436,7 @@ class RoomsPanel extends StatelessWidget {
         Icon(icon, size: 32, color: Theme.of(context).colorScheme.primary),
         const SizedBox(height: 18),
         Text(title, style: Theme.of(context).textTheme.titleLarge),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         Text(description, style: const TextStyle(height: 1.7)),
         const SizedBox(height: 20),
         const Text('Пока недоступно', style: TextStyle(fontSize: 12)),

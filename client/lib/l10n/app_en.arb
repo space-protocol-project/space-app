@@ -357,7 +357,7 @@
   "identityDescription": "Keys, permissions and recovery for the selected space.",
   "sendShortcutTitle": "Send shortcut",
   "sendShortcutHelp": "Choose Enter or Shift+Enter to send. The other combination inserts a new line.",
-  "createOwnSpace": "Create your own space",
+  "createOwnSpace": "Create space",
   "setupSpaceName": "Name",
   "setupResources": "Sections",
   "setupComingSoon": "Coming soon",
@@ -387,5 +387,13 @@
   "setupExisting": "Configure your saved space.",
   "recoveryGeneratingQr": "Creating QR…",
   "recoverySaveQr": "Save QR",
-  "recoveryOverwriteQr": "Replace the existing QR card file?"
+  "recoveryOverwriteQr": "Replace the existing QR card file?",
+  "serverSearch": "Find a server",
+  "serverFilterAll": "All",
+  "serverNoEvents": "No loaded messages",
+  "serverOffline": "Offline",
+  "removeServer": "Remove from app",
+  "removeServerConfirm": "History on this device will be deleted. You can add the server again.",
+  "serverAccessRemoved": "Access revoked. Server removed.",
+  "serverRemoveFailed": "Could not remove the server. Try again."
 }

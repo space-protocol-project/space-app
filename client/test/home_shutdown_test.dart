@@ -7,7 +7,8 @@ import 'package:space_client/src/chat_controller.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/ui/home_operation_progress.dart';
 
-import 'channels_test.dart' show CatalogSession, ChannelVault, MemoryPositions;
+import 'channels_test.dart'
+    show CatalogSession, ChannelVault, MemoryPositions, MemoryHistory;
 
 class _HangingSession extends CatalogSession {
   final closed = Completer<void>();
@@ -67,6 +68,7 @@ void main() {
       final controller = ChatController(
         ChannelVault(),
         positions: MemoryPositions(),
+        historyStore: MemoryHistory(),
         openSession: (_, _) async => opens++ == 0 ? hanging : next,
       );
       final discovery = Discovery(

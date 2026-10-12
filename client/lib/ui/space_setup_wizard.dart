@@ -164,7 +164,7 @@ class _SpaceSetupWizardState extends State<SpaceSetupWizard> {
                   const SizedBox(height: 16),
                   SelectableText(link),
                   Text(s.setupInviteHelp),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   Wrap(
                     spacing: 12,
                     runSpacing: 12,

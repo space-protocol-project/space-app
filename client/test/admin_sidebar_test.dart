@@ -10,7 +10,8 @@ import 'package:space_client/src/server_presence.dart';
 import 'package:space_client/src/server_workspaces.dart';
 import 'package:space_client/ui/shell.dart';
 
-import 'channels_test.dart' show CatalogSession, ChannelVault, MemoryPositions;
+import 'channels_test.dart'
+    show CatalogSession, ChannelVault, MemoryPositions, MemoryHistory;
 
 class _AdminSession extends CatalogSession implements SpaceAdministration {
   _AdminSession(this.origin, this.name);
@@ -82,6 +83,7 @@ void main() {
           create: (origin) => ChatController(
             vault,
             positions: MemoryPositions(),
+            historyStore: MemoryHistory(),
             openSession: (_, _) async => sessions[origin]!,
           ),
           resume: (origin, controller) async {
@@ -134,9 +136,7 @@ void main() {
         }
         await tester.pumpAndSettle();
         expect(
-          find.text(
-            'Идентичности и ключи этого устройства.',
-          ),
+          find.text('Идентичности и ключи этого устройства.'),
           findsOneWidget,
         );
         expect(find.byType(AdminPage), findsNothing);

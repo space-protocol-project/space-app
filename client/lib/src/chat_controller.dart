@@ -6,6 +6,7 @@ import 'package:grpc/grpc.dart';
 import 'core.dart';
 import 'local_failure.dart';
 import 'channel_positions.dart';
+import 'chat_history.dart';
 import 'generated/space/v1/space.pb.dart';
 
 enum MessageSendStatus { idle, sending, unconfirmed, accepted }
@@ -16,7 +17,159 @@ class ChatController extends ChangeNotifier {
     this.openSession = SpaceSession.connect,
     this.retryDelay = defaultRetryDelay,
     ChannelPositionStore? positions,
-  }) : positions = positions ?? LocalChannelPositions();
+    ChatHistoryStore? historyStore,
+    DateTime Function()? now,
+  }) : positions = positions ?? LocalChannelPositions(),
+       historyStore = historyStore ?? LocalChatHistory(),
+       now = now ?? DateTime.now;
+  final ChatHistoryStore historyStore;
+  final DateTime Function() now;
+  ChatHistory? _history;
+  String? _historyOrigin;
+  String? _sessionOrigin;
+  String _sessionServerId = '';
+  Timer? _historyTimer;
+  bool accessRemoved = false;
+  String cacheError = '';
+  String get knownOrigin => preview?.origin.toString() ?? _historyOrigin ?? '';
+  bool get hasOfflineHistory {
+    _history?.prune(now());
+    return !accessRemoved && _history?.entries.isNotEmpty == true;
+  }
+
+  Content? get latestKnownMessage {
+    _history?.prune(now());
+    return _history?.latest;
+  }
+
+  Future<void> restoreHistory(String origin) async {
+    if (accessRemoved || _historyOrigin == origin && _history != null) return;
+    try {
+      final saved = await historyStore.read(origin);
+      if (saved == null || _disposed) return;
+      final record = await vault.load(origin);
+      if (record == null ||
+          record.serverId != saved.serverId ||
+          record.grantId != saved.grantId ||
+          (await record.identity()).principalId != saved.principalId) {
+        await historyStore.delete(origin);
+        return;
+      }
+      if (_disposed) return;
+      _history = saved;
+      _historyOrigin = origin;
+      _readSequences.addAll(saved.readSequences);
+      await historyStore.write(origin, saved);
+      _update();
+    } catch (_) {
+      cacheError = 'История недоступна';
+    }
+  }
+
+  void _captureHistory() {
+    final session = _session;
+    final origin = _sessionOrigin;
+    final nav = navigation;
+    if (_history != null &&
+        nav != null &&
+        origin == _historyOrigin &&
+        !accessRemoved) {
+      _history!.channels = nav.availableChannels
+          .map((c) => Channel()..mergeFromProto3Json(c.toProto3Json()))
+          .toList();
+      _history!.merge(const [], now());
+      if (!connected) {
+        _historyTimer?.cancel();
+        _historyTimer = Timer(
+          const Duration(milliseconds: 500),
+          () => unawaited(flushHistory()),
+        );
+      }
+    }
+    if (!connected || session == null || origin == null || accessRemoved) {
+      return;
+    }
+    final grant = deviceManagement?.currentGrantId ?? '';
+    if (_history?.serverId != _sessionServerId ||
+        _history?.principalId != session.principalId ||
+        _history?.grantId != grant) {
+      _history = ChatHistory(
+        serverId: _sessionServerId,
+        principalId: session.principalId,
+        grantId: grant,
+      );
+    }
+    _historyOrigin = origin;
+    final saved = _history!;
+    saved.title = spaceTitle;
+    saved.channels = channels
+        .map((c) => Channel()..mergeFromProto3Json(c.toProto3Json()))
+        .toList();
+    if (nav == null && saved.channels.isEmpty && _messages.isNotEmpty) {
+      saved.channels = [
+        Channel(
+          id: channelId,
+          title: chatTitle,
+          permissions: ChannelPermissions(read: true, write: canWrite),
+        ),
+      ];
+    }
+    saved.selected = channelId;
+    saved.readSequences = Map.of(_readSequences);
+    saved.merge(_messages.values, now());
+    _historyTimer?.cancel();
+    _historyTimer = Timer(
+      const Duration(milliseconds: 500),
+      () => unawaited(flushHistory()),
+    );
+  }
+
+  Future<void> flushHistory() async {
+    _historyTimer?.cancel();
+    final saved = _history;
+    final origin = _historyOrigin;
+    if (accessRemoved || saved == null || origin == null) return;
+    try {
+      await historyStore.write(origin, saved);
+      cacheError = '';
+    } catch (_) {
+      cacheError = 'История не сохранена';
+    }
+  }
+
+  Future<void> clearOfflineData() async {
+    final origin = knownOrigin;
+    accessRemoved = true;
+    _historyTimer?.cancel();
+    _history = null;
+    _messages.clear();
+    _cursors.clear();
+    _readThrough.clear();
+    _readSequences.clear();
+    _pendingText = '';
+    _pendingKey = '';
+    _stopCatalog();
+    _stopSubscription();
+    connected = false;
+    _update();
+    if (origin.isNotEmpty) await historyStore.delete(origin);
+  }
+
+  bool _accessDenied(Object problem) =>
+      problem is GrpcError &&
+      [
+        StatusCode.unauthenticated,
+        StatusCode.permissionDenied,
+      ].contains(problem.code);
+  Future<void> _rejectAccess(Object problem) async {
+    if (!_accessDenied(problem)) return;
+    try {
+      await clearOfflineData();
+    } catch (_) {
+      cacheError = 'История не удалена';
+    }
+  }
+
   final ChannelPositionStore positions;
   Timer? _positionTimer;
   void _queuePositions() {
@@ -31,11 +184,21 @@ class ChatController extends ChangeNotifier {
   final Map<String, int> _readSequences = {};
   ChannelNavigation? get navigation =>
       _session is ChannelNavigation ? _session as ChannelNavigation : null;
-  List<Channel> get channels => navigation?.availableChannels ?? [];
-  String get channelId => navigation?.selectedChannelId ?? 'general';
-  bool get canRead => navigation?.canRead ?? connected;
+  List<Channel> get channels => accessRemoved
+      ? []
+      : navigation?.availableChannels ?? _history?.channels ?? [];
+  String get channelId =>
+      navigation?.selectedChannelId ?? _history?.selected ?? 'general';
+  bool get canRead =>
+      !accessRemoved &&
+      (navigation?.canRead ??
+          (_history?.channels.any(
+                    (c) => c.id == channelId && c.permissions.read,
+                  ) ==
+                  true ||
+              connected));
   int readSequence(String id) {
-    final saved = _readSequences[id] ?? 0;
+    final saved = _readSequences[id] ?? _history?.readSequences[id] ?? 0;
     if (saved > 0 || id != channelId) return saved;
     return messages
             .where((m) => m.id == (_readThrough[id] ?? ''))
@@ -47,7 +210,14 @@ class ChatController extends ChangeNotifier {
 
   int unreadCount(String id) {
     final entry = channels.where((c) => c.id == id).firstOrNull;
-    if (!connected || entry?.permissions.read != true) return 0;
+    if (entry?.permissions.read != true) return 0;
+    if (!connected) {
+      return _history
+              ?.messages(id, now())
+              .where((m) => m.sequence.toInt() > readSequence(id))
+              .length ??
+          0;
+    }
     var latest = entry!.latestMessageSequence.toInt();
     if (id == channelId) {
       for (final message in messages) {
@@ -70,7 +240,7 @@ class ChatController extends ChangeNotifier {
 
   String get readThrough => _readThrough[channelId] ?? '';
   String get draftScope =>
-      '${preview?.origin}|${preview?.serverId}|$principalId|$channelId';
+      '$knownOrigin|${preview?.serverId ?? _history?.serverId}|$principalId|$channelId';
 
   Future<void> _loadPositions() async {
     final nav = navigation;
@@ -149,6 +319,10 @@ class ChatController extends ChangeNotifier {
     if (sequence == 0 && previousIndex > index) return;
     _readThrough[channelId] = id;
     if (sequence > 0) _readSequences[channelId] = sequence;
+    if (_history != null) {
+      _history!.readSequences = {..._history!.readSequences, ..._readSequences};
+      unawaited(flushHistory());
+    }
     _queuePositions();
     _update();
   }
@@ -176,28 +350,51 @@ class ChatController extends ChangeNotifier {
       _pendingText = '',
       _pendingKey = '';
   final Map<String, Content> _messages = {};
-  List<Content> get messages => _messages.values.toList();
+  List<Content> get messages {
+    if (accessRemoved || !canRead) return [];
+    if (_sessionOrigin != null && _sessionOrigin != knownOrigin) return [];
+    final saved = _historyOrigin == knownOrigin
+        ? _history?.messages(channelId, now()) ?? []
+        : <Content>[];
+    final live = connected && !reconnecting
+        ? _messages
+        : const <String, Content>{};
+    return {
+      ...{for (final m in saved) m.id: m},
+      ...live,
+    }.values.toList()..sort((a, b) => a.sequence.compareTo(b.sequence));
+  }
+
   String _invitationToken = '', invitationRole = '';
   bool get canWrite =>
-      _session is SpaceAccess ? (_session as SpaceAccess).canWrite : connected;
-  String get principalId => _session?.principalId ?? '';
+      connected &&
+      !reconnecting &&
+      !accessRemoved &&
+      (_session is SpaceAccess ? (_session as SpaceAccess).canWrite : true);
+  String get principalId =>
+      _session?.principalId ?? _history?.principalId ?? '';
   SpaceAdministration? get administration =>
-      _session is SpaceAdministration &&
+      !accessRemoved &&
+          _session is SpaceAdministration &&
           ((_session as SpaceAdministration).canManageSpace ||
               (_session as SpaceAdministration).needsOwnerSetup)
       ? _session as SpaceAdministration
       : null;
   DeviceManagement? get deviceManagement =>
-      _session is DeviceManagement ? _session as DeviceManagement : null;
+      !accessRemoved && _session is DeviceManagement
+      ? _session as DeviceManagement
+      : null;
   String get spaceTitle => _session is SpacePresentation
       ? (_session as SpacePresentation).spaceTitle
-      : '';
+      : _history?.title ?? '';
   String get chatTitle => _session is SpacePresentation
       ? (_session as SpacePresentation).chatTitle
-      : 'Общий чат';
+      : channels.where((c) => c.id == channelId).firstOrNull?.title ??
+            'Общий чат';
   ServerIcon? _lastServerIcon;
   ServerIcon? get serverIcon => _lastServerIcon;
   void _update() {
+    _captureHistory();
     if (_session is ServerIconPresentation) {
       _lastServerIcon =
           (_session as ServerIconPresentation).serverIcon ?? _lastServerIcon;
@@ -284,6 +481,7 @@ class ChatController extends ChangeNotifier {
   }) async {
     final server = preview;
     if (busy || server == null) return;
+    accessRemoved = false;
     busy = true;
     error = '';
     _stopSubscription();
@@ -312,14 +510,20 @@ class ChatController extends ChangeNotifier {
               pairingId: pairingId,
               setupCode: setupCode,
             );
-      if (_disposed) {
+      if (_disposed || accessRemoved) {
         await session.close();
         return;
       }
       _session = session;
+      _sessionOrigin = server.origin.toString();
+      _sessionServerId = server.serverId;
       _invitationToken = '';
       await _loadPositions();
       final initial = await session.messages();
+      if (_disposed || accessRemoved) {
+        await session.close();
+        return;
+      }
       _messages.clear();
       for (final message in initial) {
         if (navigation != null && message.channelId != channelId) {
@@ -344,6 +548,7 @@ class ChatController extends ChangeNotifier {
       }
       if (canRead) unawaited(_watch(session, ++_generation));
     } catch (e) {
+      await _rejectAccess(e);
       error = _explain(e);
     } finally {
       busy = false;
@@ -352,6 +557,19 @@ class ChatController extends ChangeNotifier {
   }
 
   Future<void> selectChannel(String id) async {
+    if ((!connected || reconnecting) && _history != null && !accessRemoved) {
+      if (!_history!.channels.any((c) => c.id == id && c.permissions.read)) {
+        return;
+      }
+      _stopSubscription();
+      navigation?.selectChannel(id);
+      _history!.selected = id;
+      _messages.clear();
+      connected = false;
+      await flushHistory();
+      _update();
+      return;
+    }
     final nav = navigation;
     final session = _session;
     if (busy || nav == null || session == null) return;
@@ -455,6 +673,7 @@ class ChatController extends ChangeNotifier {
             );
     } catch (e) {
       if (_disposed || generation != _generation) return true;
+      await _rejectAccess(e);
       _messages.clear();
       connected = false;
       error = _explain(e);
@@ -520,6 +739,7 @@ class ChatController extends ChangeNotifier {
           } catch (error) {
             if (!active()) return;
             if (_terminal(error)) {
+              await _rejectAccess(error);
               connected = false;
               this.error = _explain(error);
               _stopSubscription();
@@ -529,6 +749,7 @@ class ChatController extends ChangeNotifier {
             }
           }
         } else if (_terminal(problem)) {
+          await _rejectAccess(problem);
           connected = false;
           error = _explain(problem);
           _stopSubscription();
@@ -650,6 +871,7 @@ class ChatController extends ChangeNotifier {
           } catch (loginError) {
             if (!_current(session, generation)) return;
             if (_terminal(loginError)) {
+              await _rejectAccess(loginError);
               connected = false;
               error = _explain(loginError);
               _update();
@@ -766,6 +988,7 @@ class ChatController extends ChangeNotifier {
     _update();
     try {
       await _session!.revoke();
+      await clearOfflineData();
       _stopCatalog();
       connected = false;
       error = _explain(
@@ -787,6 +1010,9 @@ class ChatController extends ChangeNotifier {
 
   Future<void> disconnect() async {
     if (busy) return;
+    try {
+      await flushHistory().timeout(const Duration(seconds: 3));
+    } catch (_) {}
     busy = true;
     connected = false;
     _stopCatalog();
@@ -822,6 +1048,7 @@ class ChatController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _historyTimer?.cancel();
     _disposed = true;
     _stopCatalog();
     _positionTimer?.cancel();

@@ -124,7 +124,7 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String get accessBlocked => '此空间的访问已被阻止';
 
   @override
-  String get bothNames => '请输入两个名称';
+  String get bothNames => '请输入空间名称';
 
   @override
   String get settingsConflict => '设置已更改。请重新加载后再修改。';

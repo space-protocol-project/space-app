@@ -7,10 +7,26 @@ import 'package:grpc/grpc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/chat_controller.dart';
+import 'package:space_client/src/chat_history.dart';
 import 'package:space_client/src/channel_positions.dart';
 import 'package:space_client/src/preferences.dart';
 import 'package:space_client/src/generated/space/v1/space.pb.dart';
 import 'package:space_client/ui/chat_view.dart';
+
+class MemoryHistory implements ChatHistoryStore {
+  final data = <String, ChatHistory>{};
+  @override
+  Future<ChatHistory?> read(String origin) async => data[origin];
+  @override
+  Future<void> write(String origin, ChatHistory history) async {
+    data[origin] = history;
+  }
+
+  @override
+  Future<void> delete(String origin) async {
+    data.remove(origin);
+  }
+}
 
 class ChannelVault implements IdentityVault {
   @override
@@ -169,6 +185,7 @@ Future<ChatController> connected(
     ChannelVault(),
     openSession: (_, _) async => session,
     positions: positions,
+    historyStore: MemoryHistory(),
   );
   c.preview = Discovery(
     localOrigin('http://127.0.0.1:8080'),
@@ -190,6 +207,7 @@ void main() {
         ChannelVault(),
         openSession: (_, _) async => session,
         positions: MemoryPositions(),
+        historyStore: MemoryHistory(),
         retryDelay: (_) => const Duration(milliseconds: 5),
       );
       controller.preview = Discovery(

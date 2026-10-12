@@ -1,4 +1,6 @@
 export 'src/server_icon.dart';
+export 'src/control_spacing.dart';
+import 'src/control_spacing.dart';
 export 'src/server_icon_picker.dart';
 import 'src/server_icon_picker.dart';
 export 'src/recovery_dialogs.dart';
@@ -152,7 +154,7 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   Future<void> save() async {
-    if (title.text.trim().isEmpty || chat.text.trim().isEmpty) {
+    if (title.text.trim().isEmpty) {
       throw StateError(strings.bothNames);
     }
     final data = await call(
@@ -189,9 +191,11 @@ class _AdminPageState extends State<AdminPage> {
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     child: Padding(
       padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: children,
+      child: spaceControls(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: children,
+        ),
       ),
     ),
   );
@@ -364,11 +368,6 @@ class _AdminPageState extends State<AdminPage> {
                     decoration: InputDecoration(labelText: strings.spaceName),
                   ),
                   const SizedBox(height: 12),
-                  TextField(
-                    controller: chat,
-                    maxLength: 80,
-                    decoration: InputDecoration(labelText: strings.chatName),
-                  ),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
                     value: enabled,

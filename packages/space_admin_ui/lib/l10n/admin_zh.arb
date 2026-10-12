@@ -38,7 +38,7 @@
   "signInFirst": "请先登录",
   "identityChanged": "身份已更改。请重新登录",
   "accessBlocked": "此空间的访问已被阻止",
-  "bothNames": "请输入两个名称",
+  "bothNames": "请输入空间名称",
   "settingsConflict": "设置已更改。请重新加载后再修改。",
   "settingsRevision": "空间设置 · 版本 {revision}",
   "@settingsRevision": {

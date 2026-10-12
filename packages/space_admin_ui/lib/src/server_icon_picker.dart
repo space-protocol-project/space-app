@@ -105,6 +105,7 @@ class _ServerIconPickerState extends State<ServerIconPicker> {
           label: Text(s.serverIconUpload),
         ),
         if (loading) const LinearProgressIndicator(),
+        const SizedBox(height: 16),
         Text(s.serverIconHelp, style: Theme.of(context).textTheme.bodySmall),
         if (invalid)
           Text(

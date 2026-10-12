@@ -51,11 +51,11 @@ class _HomePanelState extends State<HomePanel> {
                 Text(
                   '${widget.home.installedVersion} → ${widget.home.availableVersion}',
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Text(context.strings.homeUpdateConfirm),
                 const Divider(height: 24),
                 Text(context.strings.homeReleaseChanges),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
                 SelectableText(
                   widget.home.availableReleaseNotes.isEmpty
                       ? context.strings.homeNoReleaseNotes
@@ -162,7 +162,7 @@ class _HomePanelState extends State<HomePanel> {
               ),
             ),
             if (home.ip.isEmpty) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               TextButton.icon(
                 onPressed: home.busy || detecting ? null : detect,
                 icon: const Icon(Icons.public),
@@ -226,7 +226,7 @@ class _HomePanelState extends State<HomePanel> {
                   : context.strings.goLive,
             ),
             if (home.updateAvailable || home.pendingUpdate) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               if (home.installedVersion.isNotEmpty &&
                   home.availableVersion.isNotEmpty)
                 Text('${home.installedVersion} → ${home.availableVersion}'),
@@ -245,7 +245,7 @@ class _HomePanelState extends State<HomePanel> {
             if (home.state != null) ...[
               const SizedBox(height: 20),
               Text(context.strings.homeLink),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               SelectableText(home.state!.link),
               const SizedBox(height: 10),
               Wrap(
@@ -266,7 +266,7 @@ class _HomePanelState extends State<HomePanel> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Text(
                 context.strings.homeInviteHelp,
                 style: TextStyle(fontSize: 12),

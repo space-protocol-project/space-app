@@ -51,7 +51,7 @@ class _DevicePanelState extends State<DevicePanel> {
                   Platform.operatingSystem,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
                 SelectableText(Platform.operatingSystemVersion),
                 const Divider(height: 32),
                 Text(context.strings.myDeviceStorage),

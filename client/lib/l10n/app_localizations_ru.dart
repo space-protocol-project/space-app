@@ -917,7 +917,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Выберите Enter или Shift+Enter для отправки. Другая комбинация добавляет новую строку.';
 
   @override
-  String get createOwnSpace => 'Создать своё пространство';
+  String get createOwnSpace => 'Создать пространство';
 
   @override
   String get setupSpaceName => 'Название';
@@ -1014,4 +1014,29 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get recoveryOverwriteQr => 'Заменить существующий файл QR-карточки?';
+
+  @override
+  String get serverSearch => 'Найти сервер';
+
+  @override
+  String get serverFilterAll => 'Все';
+
+  @override
+  String get serverNoEvents => 'Нет загруженных сообщений';
+
+  @override
+  String get serverOffline => 'Офлайн';
+
+  @override
+  String get removeServer => 'Убрать из приложения';
+
+  @override
+  String get removeServerConfirm =>
+      'История на этом устройстве будет удалена. Сервер можно добавить снова.';
+
+  @override
+  String get serverAccessRemoved => 'Доступ отозван. Сервер убран.';
+
+  @override
+  String get serverRemoveFailed => 'Не удалось убрать сервер. Повторите.';
 }

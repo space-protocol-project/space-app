@@ -134,7 +134,7 @@ class AdminLocalizationsEn extends AdminLocalizations {
   String get accessBlocked => 'Access to this space is blocked';
 
   @override
-  String get bothNames => 'Enter both names';
+  String get bothNames => 'Enter the space name';
 
   @override
   String get settingsConflict =>

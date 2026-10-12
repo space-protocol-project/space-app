@@ -913,7 +913,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Choose Enter or Shift+Enter to send. The other combination inserts a new line.';
 
   @override
-  String get createOwnSpace => 'Create your own space';
+  String get createOwnSpace => 'Create space';
 
   @override
   String get setupSpaceName => 'Name';
@@ -1010,4 +1010,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recoveryOverwriteQr => 'Replace the existing QR card file?';
+
+  @override
+  String get serverSearch => 'Find a server';
+
+  @override
+  String get serverFilterAll => 'All';
+
+  @override
+  String get serverNoEvents => 'No loaded messages';
+
+  @override
+  String get serverOffline => 'Offline';
+
+  @override
+  String get removeServer => 'Remove from app';
+
+  @override
+  String get removeServerConfirm =>
+      'History on this device will be deleted. You can add the server again.';
+
+  @override
+  String get serverAccessRemoved => 'Access revoked. Server removed.';
+
+  @override
+  String get serverRemoveFailed => 'Could not remove the server. Try again.';
 }

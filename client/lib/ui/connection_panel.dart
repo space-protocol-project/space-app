@@ -124,7 +124,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
                 c.fingerprint,
                 style: const TextStyle(fontSize: 12),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               if (c.preview!.tlsFingerprint.isNotEmpty) ...[
                 Text(context.strings.tlsCertificateFingerprint),
                 const SizedBox(height: 6),
@@ -132,7 +132,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
                   c.preview!.tlsFingerprint,
                   style: const TextStyle(fontSize: 12),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
               ],
               Text(context.strings.firstTrustHelp),
               const SizedBox(height: 20),

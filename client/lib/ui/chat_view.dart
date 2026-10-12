@@ -328,7 +328,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                               textAlign: TextAlign.center,
                               style: Theme.of(context).textTheme.headlineSmall,
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 16),
                             Text(
                               c.connected && !c.canRead
                                   ? context.strings.contactOwner

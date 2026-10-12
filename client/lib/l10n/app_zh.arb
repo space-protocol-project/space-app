@@ -357,7 +357,7 @@
   "identityDescription": "所选空间的密钥、权限和访问恢复。",
   "sendShortcutTitle": "发送快捷键",
   "sendShortcutHelp": "选择 Enter 或 Shift+Enter 发送。另一组合键用于换行。",
-  "createOwnSpace": "创建自己的空间",
+  "createOwnSpace": "创建空间",
   "setupSpaceName": "名称",
   "setupResources": "功能",
   "setupComingSoon": "即将推出",
@@ -387,5 +387,13 @@
   "setupExisting": "配置已保存的空间。",
   "recoveryGeneratingQr": "正在创建二维码…",
   "recoverySaveQr": "保存二维码",
-  "recoveryOverwriteQr": "替换现有二维码恢复卡文件？"
+  "recoveryOverwriteQr": "替换现有二维码恢复卡文件？",
+  "serverSearch": "查找服务器",
+  "serverFilterAll": "全部",
+  "serverNoEvents": "暂无已加载消息",
+  "serverOffline": "离线",
+  "removeServer": "从应用移除",
+  "removeServerConfirm": "此设备上的历史将被删除。以后可以重新添加服务器。",
+  "serverAccessRemoved": "访问已撤销，服务器已移除。",
+  "serverRemoveFailed": "无法移除服务器。请重试。"
 }

@@ -18,7 +18,7 @@ import 'package:space_client/src/server_workspaces.dart';
 import 'package:space_client/ui/shell.dart';
 
 import 'channels_test.dart'
-    show CatalogSession, ChannelVault, MemoryPositions, chat;
+    show MemoryHistory, CatalogSession, ChannelVault, MemoryPositions, chat;
 
 class DashboardSession extends CatalogSession {
   DashboardSession(this.name) {
@@ -63,6 +63,7 @@ void main() {
         create: (origin) => ChatController(
           vault,
           positions: MemoryPositions(),
+          historyStore: MemoryHistory(),
           openSession: (_, _) async => sessions[origin]!,
         ),
         resume: (origin, controller) async {

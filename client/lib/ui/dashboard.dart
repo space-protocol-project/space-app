@@ -13,6 +13,7 @@ class Dashboard extends StatelessWidget {
     required this.addSpace,
     required this.openSpace,
     required this.openChannel,
+    this.removeSpace,
     this.homeAction,
     this.homeDetails,
     this.createOwnSpace,
@@ -23,6 +24,7 @@ class Dashboard extends StatelessWidget {
   final ServerPresence presence;
   final VoidCallback addSpace;
   final ValueChanged<String> openSpace;
+  final ValueChanged<String>? removeSpace;
   final void Function(String, String) openChannel;
   final VoidCallback? homeAction;
   final VoidCallback? homeDetails;
@@ -75,7 +77,7 @@ class Dashboard extends StatelessWidget {
                       label: Text(context.strings.addSpace),
                     ),
                     if (createOwnSpace != null) ...[
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
                       FilledButton.icon(
                         onPressed: homeBusy ? null : createOwnSpace,
                         icon: const Icon(Icons.add_home_outlined),
@@ -147,7 +149,7 @@ class Dashboard extends StatelessWidget {
                   context.strings.dashboardEmpty,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
                 Text(context.strings.dashboardEmptyHelp),
               ],
             ),
@@ -160,6 +162,17 @@ class Dashboard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   ListTile(
+                    trailing: removeSpace == null
+                        ? null
+                        : PopupMenuButton<String>(
+                            onSelected: (_) => removeSpace!(entry.key),
+                            itemBuilder: (_) => [
+                              PopupMenuItem(
+                                value: 'remove',
+                                child: Text(context.strings.removeServer),
+                              ),
+                            ],
+                          ),
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(
                       presence.online(entry.key) == true
@@ -205,7 +218,7 @@ class Dashboard extends StatelessWidget {
                           ),
                       ],
                     ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: TextButton.icon(
@@ -237,7 +250,7 @@ class _Metric extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: Theme.of(context).colorScheme.primary),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Text('$value', style: Theme.of(context).textTheme.headlineMedium),
           Text(label),
         ],

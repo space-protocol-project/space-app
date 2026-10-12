@@ -331,7 +331,7 @@ abstract class AdminLocalizations {
   /// No description provided for @bothNames.
   ///
   /// In ru, this message translates to:
-  /// **'Укажите оба названия'**
+  /// **'Укажите название пространства'**
   String get bothNames;
 
   /// No description provided for @settingsConflict.

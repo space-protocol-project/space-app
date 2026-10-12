@@ -381,6 +381,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     }
     await manager.revokeDevice(grant, authority: authority);
     if (grant.id == manager.currentGrantId) {
+      await widget.controller.clearOfflineData();
       await widget.controller.disconnect();
       if (mounted) setState(() => devices = []);
     } else {

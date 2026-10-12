@@ -79,18 +79,9 @@ void main() {
       expect(tester.takeException(), isNull);
       await tester.tap(find.byType(NavigationDestination).at(1));
       await tester.pumpAndSettle();
-      expect(
-        tester
-            .widget<IconButton>(
-              find.byWidgetPredicate(
-                (widget) =>
-                    widget is IconButton && widget.tooltip == 'Отправить',
-              ),
-            )
-            .onPressed,
-        isNull,
-      );
-      await tester.tap(find.byTooltip('Подключение к серверу'));
+      expect(find.byKey(const ValueKey('chat-draft')), findsNothing);
+      expect(find.byTooltip('Отправить'), findsNothing);
+      await tester.tap(find.byTooltip('Добавить пространство'));
       await tester.pumpAndSettle();
       expect(find.text('Проверить сервер'), findsOneWidget);
       expect(tester.takeException(), isNull);

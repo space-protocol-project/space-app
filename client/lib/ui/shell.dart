@@ -18,6 +18,7 @@ import '../src/server_presence.dart';
 import '../src/server_workspaces.dart';
 import 'dashboard.dart';
 import 'device_panel.dart';
+import 'server_inbox.dart';
 import 'home_panel.dart';
 import 'space_setup_wizard.dart';
 import 'chat_view.dart';
@@ -83,9 +84,92 @@ class _SpaceShellState extends State<SpaceShell> {
   bool dashboard = true;
   bool applicationSettings = false;
   bool devicePage = false;
+  bool serverList = false;
+  final Set<String> removing = {}, deniedHandled = {};
+  void showServers() {
+    setState(() {
+      applicationSettings = false;
+      devicePage = false;
+      dashboard = true;
+      serverList = true;
+    });
+    scaffold.currentState?.closeDrawer();
+  }
+
+  void handleDeniedServers() {
+    for (final target in workspaces.controllers.values) {
+      final origin = target.knownOrigin;
+      if (target.accessRemoved &&
+          !target.busy &&
+          widget.preferences.origins.contains(origin) &&
+          !removing.contains(origin) &&
+          deniedHandled.add(origin)) {
+        unawaited(removeSpace(origin, denied: true));
+      }
+    }
+  }
+
+  Future<void> removeSpace(String origin, {bool denied = false}) async {
+    if (!removing.add(origin)) return;
+    try {
+      final target = workspaces[origin];
+      if (!denied) {
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(context.strings.removeServer),
+            content: Text(context.strings.removeServerConfirm),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(context.strings.close),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(context.strings.removeServer),
+              ),
+            ],
+          ),
+        );
+        if (confirmed != true || !mounted) return;
+      }
+      if (target != null) {
+        await target.clearOfflineData();
+        await target.disconnect();
+      }
+      if (!mounted) return;
+      if (identical(controller, target)) {
+        setState(() {
+          activeController = null;
+          dashboard = true;
+          applicationSettings = false;
+          devicePage = false;
+          serverList = false;
+          selected = Section.overview;
+        });
+      }
+      workspaces.remove(origin);
+      await widget.preferences.forget(origin);
+      if (denied && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.strings.serverAccessRemoved)),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.strings.serverRemoveFailed)),
+        );
+      }
+    } finally {
+      removing.remove(origin);
+    }
+  }
+
   void showDevice() {
     setState(() {
       devicePage = true;
+      serverList = false;
       dashboard = true;
       applicationSettings = false;
     });
@@ -96,6 +180,7 @@ class _SpaceShellState extends State<SpaceShell> {
     setState(() {
       applicationSettings = false;
       devicePage = false;
+      serverList = false;
       dashboard = true;
       selected = Section.overview;
     });
@@ -111,6 +196,7 @@ class _SpaceShellState extends State<SpaceShell> {
       dashboard = false;
       applicationSettings = false;
       devicePage = false;
+      serverList = false;
       selected = Section.chat;
     });
     scaffold.currentState?.closeDrawer();
@@ -153,6 +239,9 @@ class _SpaceShellState extends State<SpaceShell> {
   }
 
   void watchSavedServers() {
+    deniedHandled.removeWhere(
+      (origin) => workspaces[origin]?.accessRemoved != true,
+    );
     presence.watch(widget.preferences.origins);
     workspaces.synchronize(widget.preferences.origins);
     cacheServerIcons();
@@ -204,6 +293,7 @@ class _SpaceShellState extends State<SpaceShell> {
     }
     widget.preferences.addListener(watchSavedServers);
     workspaces.addListener(cacheServerIcons);
+    workspaces.addListener(handleDeniedServers);
     presenceChanges = presence.changes.listen(announcePresence);
     watchSavedServers();
   }
@@ -220,6 +310,7 @@ class _SpaceShellState extends State<SpaceShell> {
       dashboard = false;
       applicationSettings = false;
       devicePage = false;
+      serverList = false;
       selected = Section.overview;
     });
     await target.inspect(
@@ -285,6 +376,7 @@ class _SpaceShellState extends State<SpaceShell> {
                   dashboard = false;
                   applicationSettings = false;
                   devicePage = false;
+                  serverList = false;
                 });
               }
               final administration = owner?.administration;
@@ -391,6 +483,7 @@ class _SpaceShellState extends State<SpaceShell> {
             dashboard = false;
             applicationSettings = false;
             devicePage = false;
+            serverList = false;
           });
           select(Section.settings);
         },
@@ -422,10 +515,13 @@ class _SpaceShellState extends State<SpaceShell> {
     select(Section.values.firstWhere((section) => section.name == route));
   }
 
-  String get chatLabel =>
-      controller.connected ? controller.chatTitle : context.strings.chat;
+  String get chatLabel => controller.channels.isNotEmpty
+      ? controller.chatTitle
+      : context.strings.chat;
 
-  int get bottomIndex => devicePage
+  int get bottomIndex => serverList
+      ? 1
+      : devicePage
       ? 2
       : dashboard || applicationSettings
       ? 0
@@ -437,6 +533,7 @@ class _SpaceShellState extends State<SpaceShell> {
   void showApplicationSettings() {
     setState(() {
       devicePage = false;
+      serverList = false;
       applicationSettings = true;
     });
     scaffold.currentState?.closeDrawer();
@@ -459,6 +556,7 @@ class _SpaceShellState extends State<SpaceShell> {
       dashboard = false;
       applicationSettings = false;
       devicePage = false;
+      serverList = false;
     });
     scaffold.currentState?.closeDrawer();
   }
@@ -467,6 +565,7 @@ class _SpaceShellState extends State<SpaceShell> {
   void dispose() {
     widget.preferences.removeListener(watchSavedServers);
     workspaces.removeListener(cacheServerIcons);
+    workspaces.removeListener(handleDeniedServers);
     unawaited(presenceChanges?.cancel());
     if (widget.presence == null) presence.dispose();
     home.dispose();
@@ -695,7 +794,7 @@ class _SpaceShellState extends State<SpaceShell> {
                   icon: Icons.add,
                   label: context.strings.addSpace,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 SpaceActionButton(
                   onPressed: home.busy ? null : createOwnSpace,
                   icon: Icons.add_home_outlined,
@@ -712,10 +811,12 @@ class _SpaceShellState extends State<SpaceShell> {
                   context.strings.recentSpaces,
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
                 for (final origin in widget.preferences.origins)
                   ListTile(
-                    enabled: presence.online(origin) == true,
+                    enabled:
+                        presence.online(origin) == true ||
+                        workspaces[origin]?.hasOfflineHistory == true,
                     leading: Icon(
                       presence.online(origin) == true
                           ? Icons.cloud_done_outlined
@@ -731,7 +832,9 @@ class _SpaceShellState extends State<SpaceShell> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    onTap: presence.online(origin) == true
+                    onTap:
+                        (presence.online(origin) == true ||
+                            workspaces[origin]?.hasOfflineHistory == true)
                         ? () => openSpace(origin)
                         : null,
                   ),
@@ -793,7 +896,8 @@ class _SpaceShellState extends State<SpaceShell> {
         railButton(
           key: const ValueKey('dashboard-tab'),
           tooltip: context.strings.dashboard,
-          selected: dashboard && !applicationSettings && !devicePage,
+          selected:
+              dashboard && !applicationSettings && !devicePage && !serverList,
           onPressed: showDashboard,
           icon: const Icon(Icons.home_outlined),
         ),
@@ -866,7 +970,7 @@ class _SpaceShellState extends State<SpaceShell> {
           onPressed: showDevice,
           icon: const Icon(Icons.computer_outlined),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
       ],
     ),
   );
@@ -900,7 +1004,7 @@ class _SpaceShellState extends State<SpaceShell> {
           context.strings.connection,
           style: Theme.of(context).textTheme.titleMedium,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         Text(
           controller.connected
               ? context.strings.deviceSignedIn
@@ -925,7 +1029,7 @@ class _SpaceShellState extends State<SpaceShell> {
           context.strings.beYourself,
           style: Theme.of(context).textTheme.titleMedium,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         Text(
           context.strings.ownPace,
           style: TextStyle(fontSize: 12, height: 1.8),
@@ -988,7 +1092,7 @@ class _SpaceShellState extends State<SpaceShell> {
       context,
       session,
       key: ObjectKey(session),
-      onDeviceRevoked: () => target.disconnect(),
+      onDeviceRevoked: () => target.clearOfflineData(),
     );
   }
 
@@ -1012,6 +1116,8 @@ class _SpaceShellState extends State<SpaceShell> {
           Icon(
             devicePage
                 ? Icons.computer_outlined
+                : serverList
+                ? Icons.dns_outlined
                 : applicationSettings
                 ? Icons.settings_outlined
                 : selected.icon,
@@ -1024,7 +1130,9 @@ class _SpaceShellState extends State<SpaceShell> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                devicePage
+                serverList
+                    ? context.strings.dashboardServers
+                    : devicePage
                     ? context.strings.myDevice
                     : applicationSettings
                     ? context.strings.appSettings
@@ -1152,7 +1260,9 @@ class _SpaceShellState extends State<SpaceShell> {
                 children: [
                   Expanded(
                     child: IndexedStack(
-                      index: devicePage
+                      index: serverList
+                          ? 4
+                          : devicePage
                           ? 3
                           : applicationSettings
                           ? 2
@@ -1170,6 +1280,7 @@ class _SpaceShellState extends State<SpaceShell> {
                           homeBusy: home.busy,
                           addSpace: addSpace,
                           openSpace: (origin) => openSpace(origin),
+                          removeSpace: (origin) => removeSpace(origin),
                           openChannel: (origin, channel) =>
                               openSpace(origin, channel: channel),
                         ),
@@ -1189,6 +1300,13 @@ class _SpaceShellState extends State<SpaceShell> {
                             transientControllers.remove(target);
                             await widget.preferences.remember(origin);
                           },
+                        ),
+                        ServerInbox(
+                          controllers: workspaces.controllers,
+                          presence: presence,
+                          icons: widget.preferences.serverIcons,
+                          open: (origin) => openSpace(origin),
+                          remove: (origin) => removeSpace(origin),
                         ),
                       ],
                     ),
@@ -1221,6 +1339,8 @@ class _SpaceShellState extends State<SpaceShell> {
                       selectedIndex: bottomIndex,
                       onDestinationSelected: (index) => index == 0
                           ? showDashboard()
+                          : index == 1
+                          ? showServers()
                           : select(
                               [
                                 Section.overview,
@@ -1235,8 +1355,8 @@ class _SpaceShellState extends State<SpaceShell> {
                           label: context.strings.overview,
                         ),
                         NavigationDestination(
-                          icon: Icon(Icons.tag),
-                          label: context.strings.chatTab,
+                          icon: Icon(Icons.dns_outlined),
+                          label: context.strings.dashboardServers,
                         ),
                         NavigationDestination(
                           icon: Icon(Icons.computer_outlined),

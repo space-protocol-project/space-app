@@ -136,15 +136,12 @@ void main() {
       await tester.pumpAndSettle();
       await press(tester, strings.channelCreateSection);
       await tester.enterText(
-        find.byKey(const ValueKey('new-channel-id')),
-        'team',
-      );
-      await tester.enterText(
         find.byKey(const ValueKey('new-channel-title')),
         'Рабочая группа',
       );
       await press(tester, strings.channelCreate);
-      expect(server.channels.containsKey('team'), true);
+      final id = server.channels.keys.singleWhere((id) => id != 'general');
+      expect(RegExp(r'^[a-z][a-z0-9_-]{0,63}$').hasMatch(id), true);
       await toggle(tester, 'rule-0-read');
       expect(
         tester
@@ -171,14 +168,14 @@ void main() {
         false,
       );
       await press(tester, strings.channelSaveAccess);
-      expect(server.access['team']!.first['permissions']['manage'], true);
+      expect(server.access[id]!.first['permissions']['manage'], true);
       await tester.ensureVisible(find.text(strings.channelArchive));
       await tester.pumpAndSettle();
       await tester.tap(find.text(strings.channelArchive));
       await tester.pumpAndSettle();
       await press(tester, strings.channelSave);
-      expect(server.channels['team']!['archived'], true);
-      server.channels['team']!['revision'] = '99';
+      expect(server.channels[id]!['archived'], true);
+      server.channels[id]!['revision'] = '99';
       await tester.ensureVisible(find.byKey(const ValueKey('channel-title')));
       await tester.pumpAndSettle();
       await tester.enterText(
@@ -194,14 +191,17 @@ void main() {
             .text,
         'Несохранённое название',
       );
-      expect(server.channels['team']!['title'], 'Рабочая группа');
+      expect(server.channels[id]!['title'], 'Рабочая группа');
+      await press(tester, 'Рабочая группа');
+      expect(find.byKey(const ValueKey('channel-title')), findsNothing);
+      await press(tester, strings.channelsReload);
       await press(tester, 'Рабочая группа');
       expect(
         tester
             .widget<TextField>(find.byKey(const ValueKey('channel-title')))
             .controller!
             .text,
-        'Несохранённое название',
+        'Рабочая группа',
       );
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());

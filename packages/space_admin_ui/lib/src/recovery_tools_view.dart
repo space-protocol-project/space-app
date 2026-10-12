@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'control_spacing.dart';
 
 import '../l10n/admin_localizations.dart';
 
@@ -300,6 +301,6 @@ class RecoverySurface extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
     ),
-    child: Padding(padding: const EdgeInsets.all(24), child: child),
+    child: Padding(padding: const EdgeInsets.all(24), child: spaceControls(child)),
   );
 }

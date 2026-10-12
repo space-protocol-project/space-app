@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:space_api/space_api.dart';
 
 import '../l10n/admin_localizations.dart';
+import 'control_spacing.dart';
 
 typedef AdminCall = Future<Map<String, dynamic>> Function(
   String path, {
@@ -136,9 +137,13 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
   }
 
   Future<void> create() async {
-    final id = newId.text.trim();
-    if (!RegExp(r'^[a-z][a-z0-9_-]{0,63}$').hasMatch(id))
-      throw StateError(strings.channelIdInvalid);
+    final channelName = name(newTitle);
+    final channelPosition = position(newOrder);
+    if (newId.text.isEmpty) {
+      newId.text =
+          'chat_${DateTime.now().microsecondsSinceEpoch.toRadixString(36)}';
+    }
+    final id = newId.text;
     late Map<String, dynamic> result;
     try {
       result = await widget.call(
@@ -146,8 +151,8 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
         method: 'POST',
         body: {
           'channelId': id,
-          'title': name(newTitle),
-          'position': position(newOrder),
+          'title': channelName,
+          'position': channelPosition,
           'viewType': 'chat',
           'publicPreview': false,
         },
@@ -325,6 +330,130 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     );
   }
 
+  Widget channelEditor() => _ChannelEditorSurface(
+    child: spaceControls(
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Divider(height: 32),
+          Text(
+            strings.channelRevision(
+              '${selected!['id']}',
+              '${selected!['revision']}',
+            ),
+            style: const TextStyle(fontSize: 18),
+          ),
+          field(
+            title,
+            strings.channelName,
+            key: const ValueKey('channel-title'),
+          ),
+          field(order, strings.channelOrder, number: true),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(strings.channelArchive),
+            value: archived,
+            onChanged: busy ? null : (v) => setState(() => archived = v),
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(strings.channelPublicPreview),
+            value: preview,
+            onChanged: busy ? null : (v) => setState(() => preview = v),
+          ),
+          Text(strings.channelPreviewHelp),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              action(strings.channelSave, saveChannel, primary: true),
+              action(strings.channelReload, reloadSelected),
+            ],
+          ),
+          const Divider(height: 32),
+          Text(
+            strings.channelAccessRevision('$accessRevision'),
+            style: const TextStyle(fontSize: 18),
+          ),
+          Text(strings.channelAccessHelp),
+          if (rules.isEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Text(strings.channelRulesEmpty),
+            ),
+          for (var i = 0; i < rules.length; i++) ruleEditor(rules[i], i),
+          DropdownButtonFormField<String>(
+            isExpanded: true,
+            initialValue: subject,
+            decoration: InputDecoration(labelText: strings.channelRuleSubject),
+            items: [
+              DropdownMenuItem(
+                value: 'member',
+                child: Text(strings.channelMembers),
+              ),
+              DropdownMenuItem(
+                value: 'reader',
+                child: Text(strings.channelReaders),
+              ),
+              DropdownMenuItem(
+                value: 'principal',
+                child: Text(strings.channelIndividual),
+              ),
+            ],
+            onChanged: busy ? null : (v) => setState(() => subject = v!),
+          ),
+          if (subject == 'principal') ...[
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              key: ValueKey('member-$principal-${members.length}'),
+              initialValue: members.any((m) => m['principalId'] == principal)
+                  ? principal
+                  : null,
+              isExpanded: true,
+              decoration: InputDecoration(
+                labelText: strings.channelSelectMember,
+              ),
+              items: [
+                for (final m in members.where(
+                  (v) => ['member', 'reader'].contains(v['role']),
+                ))
+                  DropdownMenuItem(
+                    value: m['principalId'] as String,
+                    child: Text(
+                      '${m['principalId']}${m['blocked'] == true ? strings.channelBlockedSuffix : ''}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+              ],
+              onChanged: busy
+                  ? null
+                  : (v) => setState(() {
+                      principal = v;
+                      manualPrincipal.clear();
+                    }),
+            ),
+            if (memberCursor.isNotEmpty)
+              action(
+                strings.channelMoreMembers,
+                () => loadMembers(append: true),
+              ),
+            field(manualPrincipal, strings.channelPrincipalId),
+          ],
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              action(strings.channelAddRule, () async => addRule()),
+              action(strings.channelSaveAccess, saveAccess, primary: true),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) => Card(
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -343,27 +472,36 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
               action(strings.channelsReload, load),
             ],
           ),
-          const SizedBox(height: 12),
-          for (final c in channels)
+          const SizedBox(height: 16),
+          for (final c in channels) ...[
             ListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(c['title'] as String),
               subtitle: Text(
                 '${c['id']}${c['archived'] == true ? strings.channelArchivedSuffix : ''}',
               ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: busy ? null : () => run(() => choose(c)),
+              trailing: Icon(
+                selected?['id'] == c['id']
+                    ? Icons.expand_less
+                    : Icons.expand_more,
+              ),
+              onTap: busy
+                  ? null
+                  : () {
+                      if (selected?['id'] == c['id']) {
+                        setState(() => selected = null);
+                      } else {
+                        run(() => choose(c));
+                      }
+                    },
             ),
+            if (selected?['id'] == c['id']) channelEditor(),
+          ],
           if (channels.isEmpty && !busy) Text(strings.channelsEmpty),
           ExpansionTile(
             tilePadding: EdgeInsets.zero,
             title: Text(strings.channelCreateSection),
             children: [
-              field(
-                newId,
-                strings.channelNewId,
-                key: const ValueKey('new-channel-id'),
-              ),
               field(
                 newTitle,
                 strings.channelNewTitle,
@@ -371,127 +509,11 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
               ),
               field(newOrder, strings.channelNewOrder, number: true),
               Text(strings.channelDefaults),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               action(strings.channelCreate, create, primary: true),
+              const SizedBox(height: 24),
             ],
           ),
-          if (selected != null) ...[
-            const Divider(height: 32),
-            Text(
-              strings.channelRevision(
-                '${selected!['id']}',
-                '${selected!['revision']}',
-              ),
-              style: const TextStyle(fontSize: 18),
-            ),
-            field(
-              title,
-              strings.channelName,
-              key: const ValueKey('channel-title'),
-            ),
-            field(order, strings.channelOrder, number: true),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(strings.channelArchive),
-              value: archived,
-              onChanged: busy ? null : (v) => setState(() => archived = v),
-            ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(strings.channelPublicPreview),
-              value: preview,
-              onChanged: busy ? null : (v) => setState(() => preview = v),
-            ),
-            Text(strings.channelPreviewHelp),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                action(strings.channelSave, saveChannel, primary: true),
-                action(strings.channelReload, reloadSelected),
-              ],
-            ),
-            const Divider(height: 32),
-            Text(
-              strings.channelAccessRevision('$accessRevision'),
-              style: const TextStyle(fontSize: 18),
-            ),
-            Text(strings.channelAccessHelp),
-            if (rules.isEmpty)
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: Text(strings.channelRulesEmpty),
-              ),
-            for (var i = 0; i < rules.length; i++) ruleEditor(rules[i], i),
-            DropdownButtonFormField<String>(
-              initialValue: subject,
-              decoration: InputDecoration(
-                labelText: strings.channelRuleSubject,
-              ),
-              items: [
-                DropdownMenuItem(
-                  value: 'member',
-                  child: Text(strings.channelMembers),
-                ),
-                DropdownMenuItem(
-                  value: 'reader',
-                  child: Text(strings.channelReaders),
-                ),
-                DropdownMenuItem(
-                  value: 'principal',
-                  child: Text(strings.channelIndividual),
-                ),
-              ],
-              onChanged: busy ? null : (v) => setState(() => subject = v!),
-            ),
-            if (subject == 'principal') ...[
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                key: ValueKey('member-$principal-${members.length}'),
-                initialValue: members.any((m) => m['principalId'] == principal)
-                    ? principal
-                    : null,
-                isExpanded: true,
-                decoration: InputDecoration(
-                  labelText: strings.channelSelectMember,
-                ),
-                items: [
-                  for (final m in members.where(
-                    (v) => ['member', 'reader'].contains(v['role']),
-                  ))
-                    DropdownMenuItem(
-                      value: m['principalId'] as String,
-                      child: Text(
-                        '${m['principalId']}${m['blocked'] == true ? strings.channelBlockedSuffix : ''}',
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                ],
-                onChanged: busy
-                    ? null
-                    : (v) => setState(() {
-                        principal = v;
-                        manualPrincipal.clear();
-                      }),
-              ),
-              if (memberCursor.isNotEmpty)
-                action(
-                  strings.channelMoreMembers,
-                  () => loadMembers(append: true),
-                ),
-              field(manualPrincipal, strings.channelPrincipalId),
-            ],
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                action(strings.channelAddRule, () async => addRule()),
-                action(strings.channelSaveAccess, saveAccess, primary: true),
-              ],
-            ),
-          ],
           if (busy)
             Padding(
               padding: EdgeInsets.all(12),
@@ -508,4 +530,39 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
       ),
     ),
   );
+}
+
+class _ChannelEditorSurface extends StatefulWidget {
+  const _ChannelEditorSurface({required this.child});
+  final Widget child;
+  @override
+  State<_ChannelEditorSurface> createState() => _ChannelEditorSurfaceState();
+}
+
+class _ChannelEditorSurfaceState extends State<_ChannelEditorSurface> {
+  bool hovered = false;
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return MouseRegion(
+      onEnter: (_) => setState(() => hovered = true),
+      onExit: (_) => setState(() => hovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Color.alphaBlend(
+            scheme.primary.withValues(alpha: .12),
+            scheme.surface,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: hovered ? scheme.primary : Colors.transparent,
+          ),
+        ),
+        child: Material(type: MaterialType.transparency, child: widget.child),
+      ),
+    );
+  }
 }

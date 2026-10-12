@@ -1,3 +1,5 @@
+import 'channels_test.dart' show MemoryHistory;
+
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -68,6 +70,7 @@ SubscribeResponse event(String cursor, String id) => SubscribeResponse(
 Future<ChatController> connect(Session session) async {
   final controller = ChatController(
     Vault(),
+    historyStore: MemoryHistory(),
     openSession: (_, _) async => session,
     retryDelay: (_) => const Duration(milliseconds: 5),
   );

@@ -357,7 +357,7 @@
   "identityDescription": "Ключи, разрешения и восстановление доступа в выбранном пространстве.",
   "sendShortcutTitle": "Клавиша отправки",
   "sendShortcutHelp": "Выберите Enter или Shift+Enter для отправки. Другая комбинация добавляет новую строку.",
-  "createOwnSpace": "Создать своё пространство",
+  "createOwnSpace": "Создать пространство",
   "setupSpaceName": "Название",
   "setupResources": "Разделы",
   "setupComingSoon": "Скоро",
@@ -387,5 +387,13 @@
   "setupExisting": "Настройка вашего сохранённого пространства.",
   "recoveryGeneratingQr": "Создаём QR…",
   "recoverySaveQr": "Сохранить QR",
-  "recoveryOverwriteQr": "Заменить существующий файл QR-карточки?"
+  "recoveryOverwriteQr": "Заменить существующий файл QR-карточки?",
+  "serverSearch": "Найти сервер",
+  "serverFilterAll": "Все",
+  "serverNoEvents": "Нет загруженных сообщений",
+  "serverOffline": "Офлайн",
+  "removeServer": "Убрать из приложения",
+  "removeServerConfirm": "История на этом устройстве будет удалена. Сервер можно добавить снова.",
+  "serverAccessRemoved": "Доступ отозван. Сервер убран.",
+  "serverRemoveFailed": "Не удалось убрать сервер. Повторите."
 }

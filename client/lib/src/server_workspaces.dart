@@ -78,11 +78,13 @@ class ServerWorkspaces extends ChangeNotifier {
     if (_disposed ||
         controller == null ||
         controller.connected ||
+        controller.accessRemoved ||
         controller.busy ||
         !_loading.add(origin)) {
       return;
     }
     try {
+      await controller.restoreHistory(origin);
       if (resume != null) {
         await resume!(origin, controller);
         return;
@@ -107,6 +109,14 @@ class ServerWorkspaces extends ChangeNotifier {
 
   void _changed() {
     if (!_disposed) notifyListeners();
+  }
+
+  void remove(String origin) {
+    final controller = _controllers.remove(origin);
+    if (controller == null) return;
+    controller.removeListener(_changed);
+    if (_owned.remove(controller)) controller.dispose();
+    _changed();
   }
 
   @override

@@ -828,7 +828,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sendShortcutHelp => '选择 Enter 或 Shift+Enter 发送。另一组合键用于换行。';
 
   @override
-  String get createOwnSpace => '创建自己的空间';
+  String get createOwnSpace => '创建空间';
 
   @override
   String get setupSpaceName => '名称';
@@ -919,6 +919,30 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get recoveryOverwriteQr => '替换现有二维码恢复卡文件？';
+
+  @override
+  String get serverSearch => '查找服务器';
+
+  @override
+  String get serverFilterAll => '全部';
+
+  @override
+  String get serverNoEvents => '暂无已加载消息';
+
+  @override
+  String get serverOffline => '离线';
+
+  @override
+  String get removeServer => '从应用移除';
+
+  @override
+  String get removeServerConfirm => '此设备上的历史将被删除。以后可以重新添加服务器。';
+
+  @override
+  String get serverAccessRemoved => '访问已撤销，服务器已移除。';
+
+  @override
+  String get serverRemoveFailed => '无法移除服务器。请重试。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:space_admin_ui/space_admin_ui.dart'
+    show spaceControls, SpacedControl;
+export 'package:space_admin_ui/space_admin_ui.dart' show spaceControls;
 
 const areaRadius = 20.0;
 
@@ -49,7 +52,10 @@ class _SurfaceCardState extends State<SurfaceCard> {
           borderRadius: BorderRadius.circular(areaRadius),
           side: BorderSide(color: colors.outlineVariant),
         ),
-        child: Padding(padding: widget.padding, child: widget.child),
+        child: Padding(
+          padding: widget.padding,
+          child: spaceControls(widget.child),
+        ),
       );
     }
     final card = AnimatedContainer(
@@ -69,7 +75,10 @@ class _SurfaceCardState extends State<SurfaceCard> {
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(areaRadius),
-        child: Padding(padding: widget.padding, child: widget.child),
+        child: Padding(
+          padding: widget.padding,
+          child: spaceControls(widget.child),
+        ),
       ),
     );
     return MouseRegion(
@@ -151,7 +160,7 @@ class AdaptiveCards extends StatelessWidget {
   );
 }
 
-class SpaceActionButton extends StatelessWidget {
+class SpaceActionButton extends StatelessWidget implements SpacedControl {
   const SpaceActionButton({
     super.key,
     required this.label,

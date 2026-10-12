@@ -91,6 +91,8 @@ void main() {
       }
       if (width < 760) {
         await tester.tap(find.byType(NavigationDestination).at(1));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('server-inbox-http://127.0.0.1:8080')));
       } else {
         await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
       }

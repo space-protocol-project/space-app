@@ -210,7 +210,10 @@ void main() {
       final destinations = find.byType(NavigationDestination);
       await tester.tap(destinations.at(2));
       await tester.pumpAndSettle();
-      expect(find.text('Идентичности и ключи этого устройства.'), findsOneWidget);
+      expect(
+        find.text('Идентичности и ключи этого устройства.'),
+        findsOneWidget,
+      );
       await tester.tap(find.byTooltip('Настройки приложения'));
       await tester.pumpAndSettle();
       expect(find.text('Оформление пространства'), findsNothing);

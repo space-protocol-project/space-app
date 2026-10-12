@@ -1,3 +1,5 @@
+import 'channels_test.dart' show MemoryHistory;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grpc/grpc.dart';
@@ -40,6 +42,7 @@ void main() {
       final controller =
           ChatController(
               Vault(),
+              historyStore: MemoryHistory(),
               openSession: (_, _) async {
                 calls++;
                 throw const GrpcError.permissionDenied('private-server-data');

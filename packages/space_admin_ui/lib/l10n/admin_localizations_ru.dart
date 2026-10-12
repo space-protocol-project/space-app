@@ -134,7 +134,7 @@ class AdminLocalizationsRu extends AdminLocalizations {
   String get accessBlocked => 'Доступ к пространству заблокирован';
 
   @override
-  String get bothNames => 'Укажите оба названия';
+  String get bothNames => 'Укажите название пространства';
 
   @override
   String get settingsConflict =>

@@ -38,7 +38,7 @@
   "signInFirst": "Sign in first",
   "identityChanged": "Identity changed. Sign in again",
   "accessBlocked": "Access to this space is blocked",
-  "bothNames": "Enter both names",
+  "bothNames": "Enter the space name",
   "settingsConflict": "Settings have changed. Reload them and try again.",
   "settingsRevision": "Space settings · revision {revision}",
   "@settingsRevision": {

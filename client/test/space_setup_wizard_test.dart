@@ -48,10 +48,10 @@ void main() {
       expect(boxes.skip(1).every((item) => item.onChanged == null), true);
       await tester.tap(find.byType(CheckboxListTile).first);
       await tester.ensureVisible(
-        find.widgetWithText(FilledButton, 'Создать своё пространство'),
+        find.widgetWithText(FilledButton, 'Создать пространство'),
       );
       await tester.tap(
-        find.widgetWithText(FilledButton, 'Создать своё пространство'),
+        find.widgetWithText(FilledButton, 'Создать пространство'),
       );
       await tester.pumpAndSettle();
       expect(calls, 1);

@@ -1670,7 +1670,7 @@ abstract class AppLocalizations {
   /// No description provided for @createOwnSpace.
   ///
   /// In ru, this message translates to:
-  /// **'Создать своё пространство'**
+  /// **'Создать пространство'**
   String get createOwnSpace;
 
   /// No description provided for @setupSpaceName.
@@ -1852,6 +1852,54 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Заменить существующий файл QR-карточки?'**
   String get recoveryOverwriteQr;
+
+  /// No description provided for @serverSearch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Найти сервер'**
+  String get serverSearch;
+
+  /// No description provided for @serverFilterAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все'**
+  String get serverFilterAll;
+
+  /// No description provided for @serverNoEvents.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет загруженных сообщений'**
+  String get serverNoEvents;
+
+  /// No description provided for @serverOffline.
+  ///
+  /// In ru, this message translates to:
+  /// **'Офлайн'**
+  String get serverOffline;
+
+  /// No description provided for @removeServer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Убрать из приложения'**
+  String get removeServer;
+
+  /// No description provided for @removeServerConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'История на этом устройстве будет удалена. Сервер можно добавить снова.'**
+  String get removeServerConfirm;
+
+  /// No description provided for @serverAccessRemoved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ отозван. Сервер убран.'**
+  String get serverAccessRemoved;
+
+  /// No description provided for @serverRemoveFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось убрать сервер. Повторите.'**
+  String get serverRemoveFailed;
 }
 
 class _AppLocalizationsDelegate
