@@ -33,18 +33,14 @@ List<int> _decode(dynamic value, int? size) {
   return bytes;
 }
 
-Future<SecretKey> _key(String password, List<int> salt) {
-  if (password.length < 12 || utf8.encode(password).length > 512) {
-    throw const LocalFailure(
-      LocalFailureCode.passwordInvalid,
-      'Пароль должен содержать от 12 символов',
-    );
-  }
+Future<SecretKey> _key(String password, List<int> salt) async {
+  final bytes = utf8.encode(password);
+  final hmacKey = bytes.length > 64 ? (await Sha256().hash(bytes)).bytes : bytes;
   return Pbkdf2(
     macAlgorithm: Hmac.sha256(),
     iterations: cardIterations,
     bits: 256,
-  ).deriveKey(secretKey: SecretKey(utf8.encode(password)), nonce: salt);
+  ).deriveKey(secretKey: SecretKey(hmacKey), nonce: salt);
 }
 
 Future<String> sealRecoveryCard(

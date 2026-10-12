@@ -2,10 +2,18 @@ import 'dart:convert';
 
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/foundation.dart';
+import 'package:space_client/ui/recovery_panel.dart' show restoreRecordInWorker;
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/recovery_card.dart';
 
 void main() {
+  test('Пароль допускает любую длину, пустое значение и Unicode', () async {
+    for (final password in ['', 'я🔑\n ', '密' * 600]) {
+      final card = await sealRecoveryCard({'test': 'payload'}, password);
+      expect(await openRecoveryCard(card, password), {'test': 'payload'});
+    }
+  });
   test(
     'Карточка защищает секрет, проверяет параметры и создаёт новый device key',
     () async {
@@ -24,6 +32,11 @@ void main() {
       final packet = await sealRecoveryCard(payload, password);
       expect(packet.contains(payload['secret'] as String), false);
       final decoded = await openRecoveryCard(packet, password);
+      final workerRecord = await compute(restoreRecordInWorker, [
+        packet,
+        password,
+      ]);
+      expect(workerRecord.origin, payload['origin']);
       final first = await recordFromRecovery(decoded),
           second = await recordFromRecovery(decoded);
       expect(first.rootSeed, second.rootSeed);

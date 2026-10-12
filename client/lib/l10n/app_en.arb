@@ -374,5 +374,14 @@
   "myDeviceStorage": "Space keys are kept in this device’s protected system storage.",
   "myDeviceAccessHelp": "Manage keys stored on this device: create a QR recovery card, restore a file or scan with the camera. Each space verifies access on its server.",
   "deviceIdentityChoice": "Identity on this device",
-  "deviceConnectIdentity": "Connect identity"
+  "deviceConnectIdentity": "Connect identity",
+  "recoveryReadingFile": "Reading file…",
+  "recoveryDecryptingCard": "Decrypting and validating keys…",
+  "recoveryCheckingServer": "Checking server…",
+  "recoveryConnectingDevice": "Connecting device…",
+  "recoveryChooseFile": "Choose a PNG or JSON card",
+  "recoveryParentFolder": "Parent folder",
+  "recoveryFilePath": "Full file path",
+  "recoveryOpenFile": "Open file",
+  "recoveryFolderUnavailable": "Could not read this folder. Enter the full file path."
 }

@@ -1189,7 +1189,7 @@ abstract class AdminLocalizations {
   /// No description provided for @recoveryPasswordInvalid.
   ///
   /// In ru, this message translates to:
-  /// **'Пароль слишком короткий или значения не совпадают.'**
+  /// **'Пароли не совпадают.'**
   String get recoveryPasswordInvalid;
 
   /// No description provided for @recoveryEncrypt.

@@ -981,4 +981,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deviceConnectIdentity => 'Connect identity';
+
+  @override
+  String get recoveryReadingFile => 'Reading file…';
+
+  @override
+  String get recoveryDecryptingCard => 'Decrypting and validating keys…';
+
+  @override
+  String get recoveryCheckingServer => 'Checking server…';
+
+  @override
+  String get recoveryConnectingDevice => 'Connecting device…';
+
+  @override
+  String get recoveryChooseFile => 'Choose a PNG or JSON card';
+
+  @override
+  String get recoveryParentFolder => 'Parent folder';
+
+  @override
+  String get recoveryFilePath => 'Full file path';
+
+  @override
+  String get recoveryOpenFile => 'Open file';
+
+  @override
+  String get recoveryFolderUnavailable =>
+      'Could not read this folder. Enter the full file path.';
 }

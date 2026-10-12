@@ -575,7 +575,7 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String get recoveryPasswordRepeat => '再次输入密码';
 
   @override
-  String get recoveryPasswordInvalid => '密码太短或两次输入不一致。';
+  String get recoveryPasswordInvalid => '两次密码不一致。';
 
   @override
   String get recoveryEncrypt => '加密';

@@ -1774,6 +1774,60 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Подключить идентичность'**
   String get deviceConnectIdentity;
+
+  /// No description provided for @recoveryReadingFile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чтение файла…'**
+  String get recoveryReadingFile;
+
+  /// No description provided for @recoveryDecryptingCard.
+  ///
+  /// In ru, this message translates to:
+  /// **'Расшифровка и проверка ключей…'**
+  String get recoveryDecryptingCard;
+
+  /// No description provided for @recoveryCheckingServer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверка сервера…'**
+  String get recoveryCheckingServer;
+
+  /// No description provided for @recoveryConnectingDevice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключение устройства…'**
+  String get recoveryConnectingDevice;
+
+  /// No description provided for @recoveryChooseFile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите карточку PNG или JSON'**
+  String get recoveryChooseFile;
+
+  /// No description provided for @recoveryParentFolder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Папка выше'**
+  String get recoveryParentFolder;
+
+  /// No description provided for @recoveryFilePath.
+  ///
+  /// In ru, this message translates to:
+  /// **'Полный путь к файлу'**
+  String get recoveryFilePath;
+
+  /// No description provided for @recoveryOpenFile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть файл'**
+  String get recoveryOpenFile;
+
+  /// No description provided for @recoveryFolderUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось прочитать папку. Укажите полный путь к файлу.'**
+  String get recoveryFolderUnavailable;
 }
 
 class _AppLocalizationsDelegate

@@ -374,5 +374,14 @@
   "myDeviceStorage": "Ключи Space хранятся в системном защищённом хранилище этого устройства.",
   "myDeviceAccessHelp": "Управляйте сохранёнными на этом устройстве ключами: создавайте QR-карточку, восстанавливайте её из файла или сканируйте камерой. Доступ к пространствам проверяется их серверами.",
   "deviceIdentityChoice": "Идентичность на этом устройстве",
-  "deviceConnectIdentity": "Подключить идентичность"
+  "deviceConnectIdentity": "Подключить идентичность",
+  "recoveryReadingFile": "Чтение файла…",
+  "recoveryDecryptingCard": "Расшифровка и проверка ключей…",
+  "recoveryCheckingServer": "Проверка сервера…",
+  "recoveryConnectingDevice": "Подключение устройства…",
+  "recoveryChooseFile": "Выберите карточку PNG или JSON",
+  "recoveryParentFolder": "Папка выше",
+  "recoveryFilePath": "Полный путь к файлу",
+  "recoveryOpenFile": "Открыть файл",
+  "recoveryFolderUnavailable": "Не удалось прочитать папку. Укажите полный путь к файлу."
 }

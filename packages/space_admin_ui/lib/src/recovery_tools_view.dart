@@ -23,6 +23,7 @@ class RecoveryToolsView extends StatelessWidget {
     required this.hasRootAuthority,
     required this.canRotate,
     required this.pending,
+    this.progress = '',
     required this.message,
     required this.pairingCode,
     required this.pairingEntered,
@@ -50,6 +51,7 @@ class RecoveryToolsView extends StatelessWidget {
       pending,
       pairingPrepared;
   final String message, pairingCheck, currentGrantId;
+  final String progress;
   final TextEditingController pairingCode, pairingEntered;
   final List<RecoveryDeviceView> devices;
   final VoidCallback onRotate,
@@ -162,6 +164,12 @@ class RecoveryToolsView extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(strings.recoveryHelp),
+              if (pending && progress.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                const LinearProgressIndicator(),
+                const SizedBox(height: 8),
+                Text(progress),
+              ],
               const SizedBox(height: 16),
               Wrap(
                 spacing: 12,
@@ -247,7 +255,7 @@ class RecoveryToolsView extends StatelessWidget {
             ],
           ),
         ),
-        if (pending) ...[
+        if (pending && progress.isEmpty) ...[
           const SizedBox(height: 16),
           const LinearProgressIndicator(),
         ],

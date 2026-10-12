@@ -882,6 +882,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deviceConnectIdentity => '连接身份';
+
+  @override
+  String get recoveryReadingFile => '正在读取文件…';
+
+  @override
+  String get recoveryDecryptingCard => '正在解密并验证密钥…';
+
+  @override
+  String get recoveryCheckingServer => '正在检查服务器…';
+
+  @override
+  String get recoveryConnectingDevice => '正在连接设备…';
+
+  @override
+  String get recoveryChooseFile => '选择 PNG 或 JSON 恢复卡';
+
+  @override
+  String get recoveryParentFolder => '上级文件夹';
+
+  @override
+  String get recoveryFilePath => '完整文件路径';
+
+  @override
+  String get recoveryOpenFile => '打开文件';
+
+  @override
+  String get recoveryFolderUnavailable => '无法读取文件夹。请输入完整文件路径。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

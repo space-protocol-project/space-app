@@ -611,8 +611,7 @@ class AdminLocalizationsRu extends AdminLocalizations {
   String get recoveryPasswordRepeat => 'Повторите пароль';
 
   @override
-  String get recoveryPasswordInvalid =>
-      'Пароль слишком короткий или значения не совпадают.';
+  String get recoveryPasswordInvalid => 'Пароли не совпадают.';
 
   @override
   String get recoveryEncrypt => 'Зашифровать';

@@ -266,7 +266,7 @@
   "recoveryPasswordHelp": "密码仅在此设备上加密文件，不会发送到服务器。请使用多个随机单词，并单独保存密码。",
   "recoveryPassword": "密码（至少 12 个字符）",
   "recoveryPasswordRepeat": "再次输入密码",
-  "recoveryPasswordInvalid": "密码太短或两次输入不一致。",
+  "recoveryPasswordInvalid": "两次密码不一致。",
   "recoveryEncrypt": "加密",
   "recoveryOpenButton": "打开",
   "pairingIdentity": "已有身份？",

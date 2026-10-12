@@ -266,7 +266,7 @@
   "recoveryPasswordHelp": "The password encrypts the file only on this device. It is not sent to the server. Use several random words and store the password separately.",
   "recoveryPassword": "Password (at least 12 characters)",
   "recoveryPasswordRepeat": "Repeat password",
-  "recoveryPasswordInvalid": "The password is too short or the values do not match.",
+  "recoveryPasswordInvalid": "The passwords do not match.",
   "recoveryEncrypt": "Encrypt",
   "recoveryOpenButton": "Open",
   "pairingIdentity": "Already have an identity?",

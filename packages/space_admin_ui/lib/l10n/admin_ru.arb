@@ -266,7 +266,7 @@
   "recoveryPasswordHelp": "Пароль шифрует файл только на этом устройстве. Сервер его не получает. Используйте несколько случайных слов и храните пароль отдельно.",
   "recoveryPassword": "Пароль (от 12 символов)",
   "recoveryPasswordRepeat": "Повторите пароль",
-  "recoveryPasswordInvalid": "Пароль слишком короткий или значения не совпадают.",
+  "recoveryPasswordInvalid": "Пароли не совпадают.",
   "recoveryEncrypt": "Зашифровать",
   "recoveryOpenButton": "Открыть",
   "pairingIdentity": "У вас уже есть идентичность?",

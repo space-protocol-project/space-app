@@ -87,7 +87,7 @@ Future<String?> askRecoveryPassword(
               ),
               FilledButton(
                 onPressed: () {
-                  if (first.length < 12 || (creating && first != second)) {
+                  if (creating && first != second) {
                     update(() => invalid = true);
                     return;
                   }

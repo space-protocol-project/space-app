@@ -985,4 +985,32 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deviceConnectIdentity => 'Подключить идентичность';
+
+  @override
+  String get recoveryReadingFile => 'Чтение файла…';
+
+  @override
+  String get recoveryDecryptingCard => 'Расшифровка и проверка ключей…';
+
+  @override
+  String get recoveryCheckingServer => 'Проверка сервера…';
+
+  @override
+  String get recoveryConnectingDevice => 'Подключение устройства…';
+
+  @override
+  String get recoveryChooseFile => 'Выберите карточку PNG или JSON';
+
+  @override
+  String get recoveryParentFolder => 'Папка выше';
+
+  @override
+  String get recoveryFilePath => 'Полный путь к файлу';
+
+  @override
+  String get recoveryOpenFile => 'Открыть файл';
+
+  @override
+  String get recoveryFolderUnavailable =>
+      'Не удалось прочитать папку. Укажите полный путь к файлу.';
 }

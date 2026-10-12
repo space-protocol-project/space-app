@@ -611,8 +611,7 @@ class AdminLocalizationsEn extends AdminLocalizations {
   String get recoveryPasswordRepeat => 'Repeat password';
 
   @override
-  String get recoveryPasswordInvalid =>
-      'The password is too short or the values do not match.';
+  String get recoveryPasswordInvalid => 'The passwords do not match.';
 
   @override
   String get recoveryEncrypt => 'Encrypt';

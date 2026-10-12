@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
@@ -16,6 +17,7 @@ import '../src/generated/space/v1/space.pbgrpc.dart' show AuthServiceClient;
 import 'package:space_admin_ui/space_admin_ui.dart';
 
 import 'camera_scanner.dart';
+import 'recovery_file_picker.dart';
 import '../l10n/strings.dart';
 import '../l10n/failure_strings.dart';
 import '../src/local_failure.dart';
@@ -38,6 +40,11 @@ class RecoveryPanel extends StatefulWidget {
 
 class _RecoveryPanelState extends State<RecoveryPanel> {
   bool pending = false;
+  int restoreStage = 0;
+  void stage(int value) {
+    if (mounted) setState(() => restoreStage = value);
+  }
+
   String message = '';
   String? messageKey;
   LocalFailureCode? failureCode;
@@ -67,6 +74,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     if (pending || widget.controller.busy) return;
     setState(() {
       pending = true;
+      restoreStage = 0;
       message = '';
       messageKey = null;
       failureCode = null;
@@ -159,17 +167,31 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     if (cameraPacket != null) {
       packet = cameraPacket;
     } else {
-      final file = await openFile(acceptedTypeGroups: files);
+      final selectedPath = Platform.isWindows
+          ? await pickRecoveryFile(context)
+          : null;
+      final file = Platform.isWindows
+          ? (selectedPath == null ? null : XFile(selectedPath))
+          : await openFile(acceptedTypeGroups: files);
       if (file == null) return;
-      if (await file.length() > maxRecoveryImageBytes) {
+      stage(1);
+      if (await file.length().timeout(const Duration(seconds: 10)) >
+          maxRecoveryImageBytes) {
         throw RecoveryOperationError('recoveryTooLarge');
       }
-      packet = await compute(artifactInWorker, await file.readAsBytes());
+      packet = await compute(
+        artifactInWorker,
+        await file.readAsBytes().timeout(const Duration(seconds: 10)),
+      ).timeout(const Duration(seconds: 30));
     }
     final pass = await password(false);
     if (pass == null) return;
-    final payload = await compute(openCardInWorker, [packet, pass]);
-    final record = await recordFromRecovery(payload);
+    stage(2);
+    final record = await compute(restoreRecordInWorker, [
+      packet,
+      pass,
+    ]).timeout(const Duration(seconds: 60));
+    stage(3);
     final server = await discover(
       record.origin,
       tlsFingerprint: record.tlsFingerprint,
@@ -188,6 +210,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     }
     final target =
         widget.restoreController?.call(record.origin) ?? widget.controller;
+    stage(4);
     await target.disconnect();
     await target.inspect(record.origin, tlsFingerprint: record.tlsFingerprint);
     await target.connect(restoredRecord: record);
@@ -358,6 +381,13 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
 
   @override
   Widget build(BuildContext context) => RecoveryToolsView(
+    progress: switch (restoreStage) {
+      1 => context.strings.recoveryReadingFile,
+      2 => context.strings.recoveryDecryptingCard,
+      3 => context.strings.recoveryCheckingServer,
+      4 => context.strings.recoveryConnectingDevice,
+      _ => '',
+    },
     connected: widget.controller.connected,
     hasServer: widget.controller.preview != null,
     hasDeviceManagement: widget.controller.deviceManagement != null,
@@ -400,6 +430,9 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     onRevoke: (id) => run(() => revoke(devices.firstWhere((g) => g.id == id))),
   );
 }
+
+Future<DeviceRecord> restoreRecordInWorker(List<String> input) async =>
+    recordFromRecovery(await openCardInWorker(input));
 
 class RecoveryOperationError implements Exception {
   const RecoveryOperationError(this.key);
