@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppPreferences extends ChangeNotifier {
-  bool dark = true, compact = false;
+  bool dark = true;
   String palette = 'gruvbox', error = '';
   String language = 'ru';
   String sendShortcut = 'enter';
@@ -37,7 +37,6 @@ class AppPreferences extends ChangeNotifier {
       final data = await SharedPreferences.getInstance();
       if (_disposed) return;
       dark = data.getBool('space.ui.dark') ?? true;
-      compact = data.getBool('space.ui.compact') ?? false;
       final savedSend = data.getString('space.ui.sendShortcut');
       if (['enter', 'shiftEnter'].contains(savedSend)) {
         sendShortcut = savedSend!;
@@ -67,7 +66,6 @@ class AppPreferences extends ChangeNotifier {
 
   Future<void> change({
     bool? dark,
-    bool? compact,
     String? palette,
     String? language,
     String? sendShortcut,
@@ -80,7 +78,6 @@ class AppPreferences extends ChangeNotifier {
       this.language = language;
     }
     if (dark != null) this.dark = dark;
-    if (compact != null) this.compact = compact;
     if (palette != null && ['gruvbox', 'ocean', 'iris'].contains(palette)) {
       this.palette = palette;
     }
@@ -98,7 +95,6 @@ class AppPreferences extends ChangeNotifier {
   Future<void> _save() {
     final snapshot = (
       dark: dark,
-      compact: compact,
       palette: palette,
       language: language,
       sendShortcut: sendShortcut,
@@ -110,7 +106,6 @@ class AppPreferences extends ChangeNotifier {
         final data = await SharedPreferences.getInstance();
         final results = await Future.wait([
           data.setBool('space.ui.dark', snapshot.dark),
-          data.setBool('space.ui.compact', snapshot.compact),
           data.setString('space.ui.palette', snapshot.palette),
           data.setString('space.ui.language', snapshot.language),
           data.setString('space.ui.sendShortcut', snapshot.sendShortcut),
@@ -176,7 +171,7 @@ class AppPreferences extends ChangeNotifier {
       colorScheme: scheme,
       scaffoldBackgroundColor: background,
       fontFamily: 'Nunito Sans',
-      visualDensity: compact ? VisualDensity.compact : VisualDensity.standard,
+      visualDensity: VisualDensity.compact,
       filledButtonTheme: const FilledButtonThemeData(
         style: ButtonStyle(
           padding: WidgetStatePropertyAll(

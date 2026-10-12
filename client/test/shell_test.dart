@@ -115,12 +115,12 @@ void main() {
   test('Личные настройки сохраняются отдельно от ключей', () async {
     final settings = AppPreferences();
     await settings.load();
-    await settings.change(dark: false, compact: true, palette: 'iris');
+    await settings.change(dark: false, palette: 'iris');
     await settings.remember('http://127.0.0.1:8080');
     final reopened = AppPreferences();
     await reopened.load();
     expect(reopened.dark, false);
-    expect(reopened.compact, true);
+    expect(reopened.theme.visualDensity, VisualDensity.compact);
     expect(reopened.palette, 'iris');
     expect(reopened.origins, ['http://127.0.0.1:8080']);
     settings.dispose();

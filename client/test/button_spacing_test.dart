@@ -4,11 +4,10 @@ import 'package:space_client/src/preferences.dart';
 import 'package:space_client/ui/components.dart';
 
 void main() {
-  for (final compact in [false, true]) {
-    testWidgets('Многострочные кнопки сохраняют отступы, compact=$compact', (
-      tester,
-    ) async {
-      final preferences = AppPreferences()..compact = compact;
+  testWidgets(
+    'Многострочные кнопки сохраняют отступы в компактном интерфейсе',
+    (tester) async {
+      final preferences = AppPreferences();
       await tester.pumpWidget(
         MaterialApp(
           theme: preferences.theme,
@@ -69,6 +68,6 @@ void main() {
       }
       expect(tester.takeException(), isNull);
       preferences.dispose();
-    });
-  }
+    },
+  );
 }
