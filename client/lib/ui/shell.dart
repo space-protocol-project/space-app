@@ -691,6 +691,12 @@ class _SpaceShellState extends State<SpaceShell> {
           ),
         ),
         railButton(
+          key: const ValueKey('home-server-details-tab'),
+          tooltip: context.strings.myServer,
+          onPressed: showHomeDetails,
+          icon: const Icon(Icons.dns_outlined),
+        ),
+        railButton(
           key: const ValueKey('home-server-toggle'),
           tooltip: home.running
               ? context.strings.stopHome

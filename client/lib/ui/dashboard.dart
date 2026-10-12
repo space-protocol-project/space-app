@@ -103,7 +103,7 @@ class Dashboard extends StatelessWidget {
               icon: const Icon(Icons.refresh),
               label: Text(context.strings.dashboardRefresh),
             ),
-            if (homeDetails != null)
+            if (MediaQuery.sizeOf(context).width < 760 && homeDetails != null)
               OutlinedButton.icon(
                 key: const ValueKey('home-server-details'),
                 onPressed: homeDetails,
