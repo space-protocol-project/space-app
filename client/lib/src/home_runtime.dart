@@ -16,6 +16,41 @@ class HomeRelease {
   final Uri url;
   final int bytes;
 
+  bool isNewerThan(HomeRelease other) => isNewerVersion(version, other.version);
+
+  static bool isNewerVersion(String version, String previousVersion) {
+    final left = version
+        .substring(1)
+        .split('-')
+        .first
+        .split('.')
+        .map(int.parse)
+        .toList();
+    final right = previousVersion
+        .substring(1)
+        .split('-')
+        .first
+        .split('.')
+        .map(int.parse)
+        .toList();
+    for (var i = 0; i < 3; i++) {
+      if (left[i] != right[i]) return left[i] > right[i];
+    }
+    final a = version.indexOf('-'), b = previousVersion.indexOf('-');
+    if (a < 0) return b >= 0;
+    if (b < 0) return false;
+    final pre = version.substring(a + 1).split('.'),
+        old = previousVersion.substring(b + 1).split('.');
+    for (var i = 0; i < pre.length && i < old.length; i++) {
+      if (pre[i] == old[i]) continue;
+      final number = int.tryParse(pre[i]), previous = int.tryParse(old[i]);
+      if (number != null && previous != null) return number > previous;
+      if (number != null || previous != null) return number == null;
+      return pre[i].compareTo(old[i]) > 0;
+    }
+    return pre.length > old.length;
+  }
+
   Map<String, dynamic> toJson() => {
     'version': version,
     'platform': platform,
@@ -73,6 +108,18 @@ Future<HomeRelease> bundledHomeRelease() async {
     );
   }
   return HomeRelease.fromJson(Map<String, dynamic>.from(entry));
+}
+
+Future<List<HomeRelease>> legacyHomeReleases() async {
+  final entries = jsonDecode(
+    await rootBundle.loadString('assets/home/legacy-runtime-manifest.json'),
+  ) as Map<String, dynamic>;
+  return entries.values
+      .map(
+        (value) =>
+            HomeRelease.fromJson(Map<String, dynamic>.from(value as Map)),
+      )
+      .toList();
 }
 
 Future<void> downloadHomeRelease(

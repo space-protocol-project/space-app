@@ -459,6 +459,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeInstalling => 'Проверяем и устанавливаем выпуск';
 
   @override
+  String get homeUpdating => 'Проверка и обновление сервера';
+
+  @override
+  String get homeUpdate => 'Обновить сервер';
+
+  @override
+  String get homeResumeUpdate => 'Продолжить обновление или восстановление';
+
+  @override
+  String get homeUpdateConfirm =>
+      'Сервер будет временно отключён для участников. Перед миграциями создаётся резервная копия. После операции сервер останется выключенным: запустите его кнопкой «Выйти в эфир».';
+
+  @override
   String get homeStarting => 'Запускаем сохранённый сервер';
 
   @override
@@ -729,6 +742,10 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get failureHomeUpdatePending =>
       'Обновление домашнего сервера не завершено. Сначала завершите обновление или восстановление; обычный запуск заблокирован.';
+
+  @override
+  String get failureHomeUpdateFailed =>
+      'Обновление не выполнено. Проверьте состояние операции и повторите попытку; новая версия не будет запущена без проверки.';
 
   @override
   String get failurePermissionDenied =>

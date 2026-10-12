@@ -60,6 +60,7 @@ String localFailureText(
   LocalFailureCode.homeStartFailed => context.strings.failureHomeStartFailed,
   LocalFailureCode.homeStopFailed => context.strings.failureHomeStopFailed,
   LocalFailureCode.homeUpdatePending => context.strings.failureHomeUpdatePending,
+  LocalFailureCode.homeUpdateFailed => context.strings.failureHomeUpdateFailed,
 };
 
 String chatFailureText(BuildContext context, ChatController controller) {

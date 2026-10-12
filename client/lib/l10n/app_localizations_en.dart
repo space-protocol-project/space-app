@@ -455,6 +455,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeInstalling => 'Verifying and installing the release';
 
   @override
+  String get homeUpdating => 'Checking and updating server';
+
+  @override
+  String get homeUpdate => 'Update server';
+
+  @override
+  String get homeResumeUpdate => 'Resume update or recovery';
+
+  @override
+  String get homeUpdateConfirm =>
+      'The server will be temporarily unavailable to participants. A backup is created before migrations. The server stays off after the operation: start it with Go live.';
+
+  @override
   String get homeStarting => 'Starting your existing server';
 
   @override
@@ -725,6 +738,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get failureHomeUpdatePending =>
       'The home server update is unfinished. Complete the update or recovery first; normal startup is blocked.';
+
+  @override
+  String get failureHomeUpdateFailed =>
+      'The update was not completed. Check the operation state and retry; the new version will not start without verification.';
 
   @override
   String get failurePermissionDenied =>

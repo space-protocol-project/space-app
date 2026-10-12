@@ -433,6 +433,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeInstalling => '正在验证并安装版本';
 
   @override
+  String get homeUpdating => '正在检查并更新服务器';
+
+  @override
+  String get homeUpdate => '更新服务器';
+
+  @override
+  String get homeResumeUpdate => '继续更新或恢复';
+
+  @override
+  String get homeUpdateConfirm =>
+      '参与者将暂时无法访问服务器。迁移前会创建备份。操作后服务器仍保持关闭，请点击上线重新启动。';
+
+  @override
   String get homeStarting => '正在启动已有的服务器';
 
   @override
@@ -666,6 +679,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get failureHomeUpdatePending => '家庭服务器更新尚未完成。请先完成更新或恢复；正常启动已被阻止。';
+
+  @override
+  String get failureHomeUpdateFailed => '更新未完成。请检查操作状态并重试；未经验证的新版本不会启动。';
 
   @override
   String get failurePermissionDenied => '服务器拒绝访问。请检查角色、封禁状态和邀请。';

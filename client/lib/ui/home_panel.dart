@@ -29,6 +29,48 @@ class _HomePanelState extends State<HomePanel> {
   late final address = TextEditingController(text: widget.home.ip);
   bool detecting = false;
   bool detectionFailed = false;
+  bool updateAction = false;
+
+  Future<void> updateServer() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          widget.home.pendingUpdate
+              ? context.strings.homeResumeUpdate
+              : context.strings.homeUpdate,
+        ),
+        content: Text(context.strings.homeUpdateConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(context.strings.close),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              widget.home.pendingUpdate
+                  ? context.strings.homeResumeUpdate
+                  : context.strings.homeUpdate,
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => updateAction = true);
+    try {
+      final recovering = widget.home.pendingUpdate;
+      if (!recovering && !await widget.home.prepareUpdate()) return;
+      if (widget.home.running) await widget.onStop();
+      if (!widget.home.running) {
+        await widget.home.performUpdate(recover: recovering);
+      }
+    } finally {
+      if (mounted) setState(() => updateAction = false);
+    }
+  }
+
   @override
   void dispose() {
     address.dispose();
@@ -133,7 +175,7 @@ class _HomePanelState extends State<HomePanel> {
               const SizedBox(height: 16),
             ],
             SpaceActionButton(
-              onPressed: home.busy || detecting
+              onPressed: home.busy || detecting || updateAction
                   ? null
                   : () async {
                       if (home.running) {
@@ -147,6 +189,23 @@ class _HomePanelState extends State<HomePanel> {
                   ? context.strings.stopHome
                   : context.strings.goLive,
             ),
+            if (home.updateAvailable || home.pendingUpdate) ...[
+              const SizedBox(height: 12),
+              if (home.installedVersion.isNotEmpty &&
+                  home.availableVersion.isNotEmpty)
+                Text('${home.installedVersion} → ${home.availableVersion}'),
+              OutlinedButton.icon(
+                onPressed: home.busy || detecting || updateAction
+                    ? null
+                    : updateServer,
+                icon: const Icon(Icons.system_update_alt),
+                label: Text(
+                  home.pendingUpdate
+                      ? context.strings.homeResumeUpdate
+                      : context.strings.homeUpdate,
+                ),
+              ),
+            ],
             if (home.state != null) ...[
               const SizedBox(height: 20),
               Text(context.strings.homeLink),

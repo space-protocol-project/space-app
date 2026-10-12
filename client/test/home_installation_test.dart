@@ -35,6 +35,13 @@ Future<void> installed(
 }
 
 void main() {
+  test('Выпуски сравниваются как версии, без незаметного понижения', () {
+    expect(release('v0.10.0').isNewerThan(release('v0.2.0')), true);
+    expect(release('v0.1.0').isNewerThan(release('v0.2.0')), false);
+    expect(release('v0.2.0').isNewerThan(release('v0.2.0')), false);
+    expect(release('v0.2.0').isNewerThan(release('v0.2.0-rc.1')), true);
+    expect(release('v0.2.0-rc.2').isNewerThan(release('v0.2.0-rc.1')), true);
+  });
   late Directory root;
   late HomeInstallation store;
   setUp(() async {
@@ -62,6 +69,25 @@ void main() {
     final old = release('v0.1.0');
     await installed(store, old, legacy: true);
     expect((await store.active(old))!.version, old.version);
+    expect(await store.selection.exists(), true);
+  });
+
+  test('Старый marker распознаётся новым приложением по закреплённому legacy descriptor', () async {
+    final old = release('v0.1.0');
+    await installed(store, old, legacy: true);
+    expect(
+      (await store.active(
+        release('v0.2.0'),
+        legacy: [old],
+        persist: false,
+      ))!.version,
+      'v0.1.0',
+    );
+    expect(await store.selection.exists(), false);
+    expect(
+      (await store.active(release('v0.2.0'), legacy: [old]))!.version,
+      'v0.1.0',
+    );
     expect(await store.selection.exists(), true);
   });
   test(

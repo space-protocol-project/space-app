@@ -917,6 +917,30 @@ abstract class AppLocalizations {
   /// **'Проверяем и устанавливаем выпуск'**
   String get homeInstalling;
 
+  /// No description provided for @homeUpdating.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверка и обновление сервера'**
+  String get homeUpdating;
+
+  /// No description provided for @homeUpdate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить сервер'**
+  String get homeUpdate;
+
+  /// No description provided for @homeResumeUpdate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продолжить обновление или восстановление'**
+  String get homeResumeUpdate;
+
+  /// No description provided for @homeUpdateConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер будет временно отключён для участников. Перед миграциями создаётся резервная копия. После операции сервер останется выключенным: запустите его кнопкой «Выйти в эфир».'**
+  String get homeUpdateConfirm;
+
   /// No description provided for @homeStarting.
   ///
   /// In ru, this message translates to:
@@ -1360,6 +1384,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Обновление домашнего сервера не завершено. Сначала завершите обновление или восстановление; обычный запуск заблокирован.'**
   String get failureHomeUpdatePending;
+
+  /// No description provided for @failureHomeUpdateFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновление не выполнено. Проверьте состояние операции и повторите попытку; новая версия не будет запущена без проверки.'**
+  String get failureHomeUpdateFailed;
 
   /// No description provided for @failurePermissionDenied.
   ///

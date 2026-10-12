@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'home_runtime.dart';
 import 'home_installation.dart';
 import 'home_update_journal.dart';
+import 'home_update_executor.dart';
 import 'local_failure.dart';
 
 enum HomePhase {
@@ -16,6 +17,7 @@ enum HomePhase {
   detectingIP,
   downloading,
   installing,
+  updating,
   starting,
   running,
   stopping,
@@ -54,6 +56,12 @@ class HomeController extends ChangeNotifier {
   RandomAccessFile? _lock;
   bool busy = false, running = false, _disposed = false;
   String ip = '', error = '';
+  String installedVersion = '', availableVersion = '';
+  bool pendingUpdate = false;
+  bool get updateAvailable =>
+      installedVersion.isNotEmpty &&
+      availableVersion.isNotEmpty &&
+      HomeRelease.isNewerVersion(availableVersion, installedVersion);
   LocalFailureCode? failureCode;
   HomePhase phase = HomePhase.idle;
   double progress = 0;
@@ -81,6 +89,7 @@ class HomeController extends ChangeNotifier {
     HomePhase.detectingIP => 0.02,
     HomePhase.downloading => 0.05 + 0.55 * progress.clamp(0, 1),
     HomePhase.installing => 0.65,
+    HomePhase.updating => 0.85,
     HomePhase.starting => 0.80,
     HomePhase.stopping => stopProgress,
     HomePhase.running || HomePhase.stopped => 1,
@@ -130,6 +139,30 @@ class HomeController extends ChangeNotifier {
             jsonDecode(await config.readAsString()) as Map<String, dynamic>;
         ip = data['ip'] as String;
       }
+      final offered = await release();
+      availableVersion = offered.version;
+      final selection = HomeInstallation(root).selection;
+      if (await selection.exists() && await selection.length() < 8192) {
+        final saved = jsonDecode(await selection.readAsString()) as Map;
+        installedVersion = HomeRelease.fromJson(
+          Map<String, dynamic>.from(saved['active'] as Map),
+        ).version;
+      }
+      if (installedVersion.isEmpty && ip.isNotEmpty) {
+        installedVersion =
+            (await HomeInstallation(root).active(
+              offered,
+              legacy: await legacyHomeReleases(),
+              persist: false,
+            ))?.version ??
+            '';
+      }
+      try {
+        pendingUpdate =
+            (await HomeUpdateJournal(root).read())?.settled == false;
+      } catch (_) {
+        pendingUpdate = true;
+      }
     } catch (_) {
       /* Первый запуск или недоступное хранилище проверяются при запуске. */
     }
@@ -166,45 +199,111 @@ class HomeController extends ChangeNotifier {
   Future<Directory> _install(Directory root) async {
     final offered = await release();
     final installation = HomeInstallation(root);
-    final active = await installation.active(offered);
+    final active = await installation.active(
+      offered,
+      legacy: await legacyHomeReleases(),
+    );
+    installedVersion = active?.version ?? offered.version;
+    availableVersion = offered.version;
     if (active != null) return installation.runtime(active);
-    final descriptor = offered;
-    final target = installation.runtime(descriptor);
+    final target = await _prepare(root, offered);
+    await installation.selectInitial(offered);
+    return target;
+  }
+
+  Future<Directory> _prepare(Directory root, HomeRelease descriptor) async {
     phase = HomePhase.downloading;
     _downloadClock.start();
     _update();
-    final staging = await Directory('${root.path}/runtimes')
-        .create(recursive: true);
-    final temporary = await staging.createTemp('download-');
-    try {
-      final archive = File('${temporary.path}/runtime.zip');
-      await download(descriptor, archive, (value) {
+    return HomeInstallation(root).prepare(
+      descriptor,
+      download: download,
+      progress: (value) {
         progress = value;
         _update();
-      });
-      _downloadClock.stop();
-      phase = HomePhase.installing;
-      _update();
-      final unpacked = await Directory('${temporary.path}/unpacked').create();
-      await extractHomeRelease(archive, unpacked, descriptor.sha256);
-      final executable = Platform.isWindows
-          ? 'space-server.exe'
-          : 'space-server';
-      if (!await File('${unpacked.path}/$executable').exists()) {
-        throw const FormatException('В выпуске нет сервера');
+      },
+      extracting: () {
+        _downloadClock.stop();
+        phase = HomePhase.installing;
+        _update();
+      },
+    );
+  }
+
+  Future<bool> prepareUpdate() async {
+    if (busy || _disposed) return false;
+    busy = true;
+    error = '';
+    failureCode = null;
+    progress = 0;
+    _beginProgress();
+    var ownLock = false;
+    try {
+      final root = await _directory();
+      if (!running) {
+        _lock = await File('${root.path}/process.lock')
+            .open(mode: FileMode.append);
+        ownLock = true;
+        await _lock!.lock(FileLock.exclusive);
       }
-      await File('${unpacked.path}/installed.json').writeAsString(
-        jsonEncode({
-          'sha256': descriptor.sha256,
-          'release': descriptor.toJson(),
-        }),
-        flush: true,
-      );
-      await unpacked.rename(target.path);
-      await installation.selectInitial(descriptor);
-      return target;
+      await HomeUpdateJournal(root).requireSettled();
+      final target = await release();
+      final source = await HomeInstallation(root)
+          .active(target, legacy: await legacyHomeReleases());
+      if (source == null || !target.isNewerThan(source)) return false;
+      await _prepare(root, target);
+      await HomeUpdateExecutor(root).verifyCandidate(target);
+      return true;
+    } catch (e) {
+      failureCode = e is LocalFailure
+          ? e.code
+          : LocalFailureCode.homeUpdateFailed;
+      error = e.toString();
+      return false;
     } finally {
-      await temporary.delete(recursive: true);
+      if (ownLock) await _unlock();
+      busy = false;
+      phase = running ? HomePhase.running : HomePhase.stopped;
+      _endProgress();
+      _update();
+    }
+  }
+
+  Future<void> performUpdate({bool recover = false}) async {
+    if (busy || running || _disposed) return;
+    busy = true;
+    error = '';
+    failureCode = null;
+    phase = HomePhase.updating;
+    _beginProgress();
+    _update();
+    try {
+      final root = await _directory();
+      _lock = await File('${root.path}/process.lock')
+          .open(mode: FileMode.append);
+      await _lock!.lock(FileLock.exclusive);
+      final executor = HomeUpdateExecutor(root);
+      if (recover) {
+        await executor.recover();
+      } else {
+        final target = await release();
+        final source = await HomeInstallation(root)
+            .active(target, legacy: await legacyHomeReleases());
+        if (source == null || !target.isNewerThan(source)) return;
+        await executor.update(source, target);
+      }
+    } catch (e) {
+      failureCode = e is LocalFailure
+          ? e.code
+          : LocalFailureCode.homeUpdateFailed;
+      error = e.toString();
+    } finally {
+      await _unlock();
+      busy = false;
+      phase = HomePhase.stopped;
+      _endProgress();
+      await load();
+      _update();
     }
   }
 

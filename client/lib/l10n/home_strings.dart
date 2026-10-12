@@ -9,6 +9,7 @@ extension HomePhaseStrings on HomePhase {
     HomePhase.detectingIP => context.strings.homeDetectingIP,
     HomePhase.downloading => context.strings.homeDownloading,
     HomePhase.installing => context.strings.homeInstalling,
+    HomePhase.updating => context.strings.homeUpdating,
     HomePhase.starting => context.strings.homeStarting,
     HomePhase.running => context.strings.homeRunning,
     HomePhase.stopping => context.strings.homeStopping,

@@ -38,7 +38,11 @@ class HomeInstallation {
   }
 
   /// Новый манифест приложения не заменяет уже выбранный выпуск.
-  Future<HomeRelease?> active(HomeRelease offered) async {
+  Future<HomeRelease?> active(
+    HomeRelease offered, {
+    Iterable<HomeRelease> legacy = const [],
+    bool persist = true,
+  }) async {
     if (await selection.exists()) {
       final saved = await _read(selection);
       if (saved['format'] != 1) throw _invalid;
@@ -65,12 +69,24 @@ class HomeInstallation {
           release = HomeRelease.fromJson(
             Map<String, dynamic>.from(saved['release'] as Map),
           );
-        } else if (_sameDirectory(item, runtime(offered)) &&
-            saved['sha256'] == offered.sha256) {
-          release = offered;
         } else {
-          // Не угадываем версию старой базы при изменившемся манифесте.
-          throw _invalid;
+          final matches =
+              [
+                    offered,
+                    ...legacy.where(
+                      (known) =>
+                          known.version != offered.version ||
+                          known.platform != offered.platform,
+                    ),
+                  ]
+                  .where(
+                    (known) =>
+                        _sameDirectory(item, runtime(known)) &&
+                        saved['sha256'] == known.sha256,
+                  )
+                  .toList();
+          if (matches.length != 1) throw _invalid;
+          release = matches.single;
         }
         if (!_sameDirectory(item, runtime(release)) ||
             release.platform != offered.platform) {
@@ -82,7 +98,7 @@ class HomeInstallation {
     }
     if (candidates.length > 1) throw _invalid;
     if (candidates.isNotEmpty) {
-      await selectInitial(candidates.single);
+      if (persist) await selectInitial(candidates.single);
       return candidates.single;
     }
     if (await Directory('${root.path}/data').exists()) throw _invalid;
@@ -98,5 +114,69 @@ class HomeInstallation {
       flush: true,
     );
     await pending.rename(selection.path);
+  }
+
+  Future<void> activate(HomeRelease expected, HomeRelease next) async {
+    await verify(next);
+    final saved = await _read(selection);
+    final current = HomeRelease.fromJson(
+      Map<String, dynamic>.from(saved['active'] as Map),
+    );
+    bool same(HomeRelease a, HomeRelease b) =>
+        jsonEncode(a.toJson()) == jsonEncode(b.toJson());
+    if (same(current, next)) return;
+    if (!same(current, expected)) throw _invalid;
+    await verify(expected);
+    final temporary = File('${selection.path}.tmp');
+    await temporary.writeAsString(
+      jsonEncode({
+        'format': 1,
+        'active': next.toJson(),
+        'previous': expected.toJson(),
+      }),
+      flush: true,
+    );
+    await temporary.rename(selection.path);
+  }
+
+  Future<Directory> prepare(
+    HomeRelease release, {
+    required Future<void> Function(HomeRelease, File, void Function(double))
+    download,
+    required void Function(double) progress,
+    required void Function() extracting,
+  }) async {
+    final target = runtime(release);
+    if (await target.exists()) {
+      await verify(release);
+      return target;
+    }
+    final folder = await Directory('${root.path}/runtimes')
+        .create(recursive: true);
+    final temporary = await folder.createTemp('download-');
+    try {
+      final archive = File('${temporary.path}/runtime.zip');
+      await download(release, archive, progress);
+      extracting();
+      final unpacked = await Directory('${temporary.path}/unpacked').create();
+      await extractHomeRelease(archive, unpacked, release.sha256);
+      if (!await File(
+        '${unpacked.path}/${Platform.isWindows ? 'space-server.exe' : 'space-server'}',
+      ).exists()) {
+        throw const LocalFailure(
+          LocalFailureCode.releaseInvalid,
+          'В выпуске нет сервера',
+        );
+      }
+      await File('${unpacked.path}/installed.json').writeAsString(
+        jsonEncode({'sha256': release.sha256, 'release': release.toJson()}),
+        flush: true,
+      );
+      await unpacked.rename(target.path);
+      await verify(release);
+      return target;
+    } finally {
+      await temporary.delete(recursive: true);
+    }
   }
 }

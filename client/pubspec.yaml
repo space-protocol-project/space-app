@@ -115,6 +115,7 @@ flutter:
 
   assets:
     - assets/home/runtime-manifest.json
+    - assets/home/legacy-runtime-manifest.json
     - assets/branding/space-app-icon.png
     - assets/fonts/Nunito-OFL.txt
     - assets/fonts/NunitoSans-OFL.txt
