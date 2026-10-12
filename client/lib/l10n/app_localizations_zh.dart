@@ -910,6 +910,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get setupExisting => '配置已保存的空间。';
+
+  @override
+  String get recoveryGeneratingQr => '正在创建二维码…';
+
+  @override
+  String get recoverySaveQr => '保存二维码';
+
+  @override
+  String get recoveryOverwriteQr => '替换现有二维码恢复卡文件？';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

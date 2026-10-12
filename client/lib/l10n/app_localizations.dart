@@ -1834,6 +1834,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Настройка вашего сохранённого пространства.'**
   String get setupExisting;
+
+  /// No description provided for @recoveryGeneratingQr.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создаём QR…'**
+  String get recoveryGeneratingQr;
+
+  /// No description provided for @recoverySaveQr.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить QR'**
+  String get recoverySaveQr;
+
+  /// No description provided for @recoveryOverwriteQr.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заменить существующий файл QR-карточки?'**
+  String get recoveryOverwriteQr;
 }
 
 class _AppLocalizationsDelegate

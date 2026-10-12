@@ -14,9 +14,33 @@ Future<String?> pickRecoveryFile(BuildContext context) async {
   );
 }
 
+Future<String?> pickRecoveryQrDestination(
+  BuildContext context, {
+  String name = 'space-recovery.png',
+  String? label,
+}) async {
+  final directory = await getApplicationDocumentsDirectory();
+  if (!context.mounted) return null;
+  return showDialog<String>(
+    context: context,
+    builder: (_) => RecoveryFilePicker(
+      initialDirectory: directory.path,
+      saveName: name,
+      saveLabel: label,
+    ),
+  );
+}
+
 class RecoveryFilePicker extends StatefulWidget {
-  const RecoveryFilePicker({super.key, required this.initialDirectory});
+  const RecoveryFilePicker({
+    super.key,
+    required this.initialDirectory,
+    this.saveName,
+    this.saveLabel,
+  });
   final String initialDirectory;
+  final String? saveName;
+  final String? saveLabel;
   @override
   State<RecoveryFilePicker> createState() => _RecoveryFilePickerState();
 }
@@ -31,6 +55,9 @@ class _RecoveryFilePickerState extends State<RecoveryFilePicker> {
   @override
   void initState() {
     super.initState();
+    if (widget.saveName != null) {
+      path.text = '$directory${Platform.pathSeparator}${widget.saveName}';
+    }
     load(directory);
   }
 
@@ -82,9 +109,20 @@ class _RecoveryFilePickerState extends State<RecoveryFilePicker> {
     }
   }
 
+  void navigate(String value) {
+    if (widget.saveName != null) {
+      path.text = '$value${Platform.pathSeparator}${widget.saveName}';
+    }
+    load(value);
+  }
+
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text(context.strings.recoveryChooseFile),
+    title: Text(
+      widget.saveName == null
+          ? context.strings.recoveryChooseFile
+          : widget.saveLabel ?? context.strings.recoverySaveQr,
+    ),
     content: SizedBox(
       width: 560,
       height: 420,
@@ -96,7 +134,7 @@ class _RecoveryFilePickerState extends State<RecoveryFilePicker> {
                 tooltip: context.strings.recoveryParentFolder,
                 onPressed: loading
                     ? null
-                    : () => load(Directory(directory).parent.path),
+                    : () => navigate(Directory(directory).parent.path),
                 icon: const Icon(Icons.arrow_upward),
               ),
               Expanded(
@@ -132,7 +170,7 @@ class _RecoveryFilePickerState extends State<RecoveryFilePicker> {
                       ? null
                       : () {
                           if (entry is Directory) {
-                            load(entry.path);
+                            navigate(entry.path);
                           } else {
                             setState(() => path.text = entry.path);
                           }
@@ -163,7 +201,11 @@ class _RecoveryFilePickerState extends State<RecoveryFilePicker> {
         onPressed: path.text.isEmpty
             ? null
             : () => Navigator.pop(context, path.text),
-        child: Text(context.strings.recoveryOpenFile),
+        child: Text(
+          widget.saveName == null
+              ? context.strings.recoveryOpenFile
+              : widget.saveLabel ?? context.strings.recoverySaveQr,
+        ),
       ),
     ],
   );

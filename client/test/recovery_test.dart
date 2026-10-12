@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/foundation.dart';
-import 'package:space_client/ui/recovery_panel.dart' show restoreRecordInWorker;
+import 'package:space_client/ui/recovery_panel.dart'
+    show restoreRecordInWorker, rootCardPayloadInWorker;
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/recovery_card.dart';
 
@@ -39,6 +40,9 @@ void main() {
       expect(workerRecord.origin, payload['origin']);
       final first = await recordFromRecovery(decoded),
           second = await recordFromRecovery(decoded);
+      final localPayload = await compute(rootCardPayloadInWorker, first);
+      expect(localPayload['origin'], payload['origin']);
+      expect(localPayload['secret'], payload['secret']);
       expect(first.rootSeed, second.rootSeed);
       expect(first.deviceSeed, isNot(second.deviceSeed));
       expect(first.grantId, isEmpty);

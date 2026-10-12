@@ -404,7 +404,12 @@ class _SpaceShellState extends State<SpaceShell> {
       context: context,
       delegate: SpaceSearch(
         {
-          for (final section in Section.values)
+          for (final section in [
+            Section.overview,
+            Section.chat,
+            Section.identity,
+            Section.settings,
+          ])
             section.name: section == Section.chat
                 ? chatLabel
                 : section.localized(context),
@@ -420,14 +425,15 @@ class _SpaceShellState extends State<SpaceShell> {
   String get chatLabel =>
       controller.connected ? controller.chatTitle : context.strings.chat;
 
-  int get bottomIndex => switch (selected) {
-    Section.overview => 0,
-    Section.chat => 1,
-    Section.forum || Section.feed => 2,
-    Section.rooms => 3,
-    Section.identity => 4,
-    Section.settings => 5,
-  };
+  int get bottomIndex => devicePage
+      ? 2
+      : dashboard || applicationSettings
+      ? 0
+      : switch (selected) {
+          Section.chat => 1,
+          Section.settings => 3,
+          _ => 0,
+        };
   void showApplicationSettings() {
     setState(() {
       devicePage = false;
@@ -549,6 +555,68 @@ class _SpaceShellState extends State<SpaceShell> {
   String get spaceLabel => controller.spaceTitle.isNotEmpty
       ? controller.spaceTitle
       : controller.preview?.origin.authority ?? context.strings.yourSpace;
+  Widget chatGroup() => SurfaceCard(
+    key: const ValueKey('server-chats'),
+    color: Theme.of(context).colorScheme.surfaceContainerHigh,
+    hoverBorder: true,
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Column(
+      children: [
+        ListTile(
+          leading: const Icon(Icons.forum_outlined, size: 20),
+          title: Text(context.strings.chats),
+          onTap: () => select(Section.chat),
+        ),
+        for (final channel in controller.channels.where(
+          (channel) => !channel.archived,
+        ))
+          ListTile(
+            dense: true,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            selected:
+                selected == Section.chat && controller.channelId == channel.id,
+            leading: Icon(
+              channel.archived
+                  ? Icons.archive_outlined
+                  : !channel.permissions.read
+                  ? Icons.lock_outline
+                  : Icons.tag,
+              size: 18,
+            ),
+            title: Text(channel.title, overflow: TextOverflow.ellipsis),
+            trailing: controller.unreadCount(channel.id) > 0
+                ? Tooltip(
+                    message: context.strings.unreadCount(
+                      controller.unreadCount(channel.id),
+                    ),
+                    child: Badge(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      textColor: Theme.of(context).colorScheme.onPrimary,
+                      label: Text(
+                        controller.unreadCount(channel.id) > 99
+                            ? '99+'
+                            : '${controller.unreadCount(channel.id)}',
+                      ),
+                    ),
+                  )
+                : null,
+            subtitle: channel.archived
+                ? Text(context.strings.archived)
+                : !channel.permissions.read
+                ? Text(context.strings.noReadAccess)
+                : null,
+            onTap: controller.busy
+                ? null
+                : () {
+                    controller.selectChannel(channel.id);
+                    select(Section.chat);
+                  },
+          ),
+      ],
+    ),
+  );
   Widget sidebar() => SizedBox(
     width: 280,
     child: Material(
@@ -572,88 +640,44 @@ class _SpaceShellState extends State<SpaceShell> {
             ),
           ),
           const SizedBox(height: 16),
-          if (controller.channels.isNotEmpty) ...[
-            const Divider(height: 24),
-            Text(context.strings.channels, style: TextStyle(fontSize: 12)),
-            for (final channel in controller.channels)
-              ListTile(
-                dense: true,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          for (final section in [
+            Section.overview,
+            Section.chat,
+            Section.settings,
+          ])
+            if (section == Section.chat)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: chatGroup(),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: ListTile(
+                  dense: true,
+                  minTileHeight: 48,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  selected: !applicationSettings && selected == section,
+                  selectedTileColor: Theme.of(context)
+                      .colorScheme
+                      .primaryContainer,
+                  leading: Icon(section.icon, size: 20),
+                  title: Text(
+                    section == Section.chat
+                        ? controller.channels.isEmpty
+                              ? chatLabel
+                              : context.strings.chats
+                        : section.localized(context),
+                  ),
+                  onTap:
+                      section == Section.settings &&
+                          (controller.busy || controller.administration == null)
+                      ? null
+                      : () => select(section),
                 ),
-                selected:
-                    selected == Section.chat &&
-                    controller.channelId == channel.id,
-                leading: Icon(
-                  channel.archived
-                      ? Icons.archive_outlined
-                      : !channel.permissions.read
-                      ? Icons.lock_outline
-                      : Icons.tag,
-                  size: 18,
-                ),
-                title: Text(channel.title, overflow: TextOverflow.ellipsis),
-                trailing: controller.unreadCount(channel.id) > 0
-                    ? Tooltip(
-                        message: context.strings.unreadCount(
-                          controller.unreadCount(channel.id),
-                        ),
-                        child: Badge(
-                          backgroundColor: Theme.of(context)
-                              .colorScheme
-                              .primary,
-                          textColor: Theme.of(context).colorScheme.onPrimary,
-                          label: Text(
-                            controller.unreadCount(channel.id) > 99
-                                ? '99+'
-                                : '${controller.unreadCount(channel.id)}',
-                          ),
-                        ),
-                      )
-                    : null,
-                subtitle: channel.archived
-                    ? Text(context.strings.archived)
-                    : !channel.permissions.read
-                    ? Text(context.strings.noReadAccess)
-                    : null,
-                onTap: controller.busy
-                    ? null
-                    : () {
-                        controller.selectChannel(channel.id);
-                        select(Section.chat);
-                      },
               ),
-          ],
-          for (final section in Section.values.where(
-            (section) => section != Section.identity,
-          ))
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: ListTile(
-                dense: true,
-                minTileHeight: 48,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                selected: !applicationSettings && selected == section,
-                selectedTileColor: Theme.of(context)
-                    .colorScheme
-                    .primaryContainer,
-                leading: Icon(section.icon, size: 20),
-                title: Text(
-                  section == Section.chat
-                      ? controller.channels.isEmpty
-                            ? chatLabel
-                            : context.strings.chats
-                      : section.localized(context),
-                ),
-                onTap:
-                    section == Section.settings &&
-                        (controller.busy || controller.administration == null)
-                    ? null
-                    : () => select(section),
-              ),
-            ),
         ],
       ),
     ),
@@ -1201,8 +1225,6 @@ class _SpaceShellState extends State<SpaceShell> {
                               [
                                 Section.overview,
                                 Section.chat,
-                                Section.forum,
-                                Section.rooms,
                                 Section.identity,
                                 Section.settings,
                               ][index],
@@ -1215,14 +1237,6 @@ class _SpaceShellState extends State<SpaceShell> {
                         NavigationDestination(
                           icon: Icon(Icons.tag),
                           label: context.strings.chatTab,
-                        ),
-                        NavigationDestination(
-                          icon: Icon(Icons.forum_outlined),
-                          label: context.strings.topicsTab,
-                        ),
-                        NavigationDestination(
-                          icon: Icon(Icons.headset_mic_outlined),
-                          label: context.strings.rooms,
                         ),
                         NavigationDestination(
                           icon: Icon(Icons.computer_outlined),

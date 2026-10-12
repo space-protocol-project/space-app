@@ -1345,13 +1345,13 @@ abstract class AdminLocalizations {
   /// No description provided for @recoveryHelp.
   ///
   /// In ru, this message translates to:
-  /// **'Зашифрованная карточка сохраняет доступ к этой идентичности на выбранном сервере. Рабочий ключ устройства в неё не копируется. Владение карточкой и паролем позволяет подключать новые устройства. Устройство из карточки восстановления не сохраняет управляющий секрет; для отзыва других устройств её нужно открыть заново. Корневая карточка восстанавливает полный управляющий root. Карточку можно сохранить как QR в PNG или JSON и восстановить из выбранного файла.'**
+  /// **'QR-карточка восстанавливает идентичность. Задайте пароль и храните его отдельно.'**
   String get recoveryHelp;
 
   /// No description provided for @recoveryExport.
   ///
   /// In ru, this message translates to:
-  /// **'Сохранить карточку'**
+  /// **'Сохранить QR'**
   String get recoveryExport;
 
   /// No description provided for @recoveryRestore.
@@ -1467,6 +1467,18 @@ abstract class AdminLocalizations {
   /// In ru, this message translates to:
   /// **'Ракета'**
   String get iconRocket;
+
+  /// No description provided for @recoveryCreateQr.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать QR'**
+  String get recoveryCreateQr;
+
+  /// No description provided for @recoveryOriginalCardNeeded.
+  ///
+  /// In ru, this message translates to:
+  /// **'На устройстве нет ключа восстановления. Используйте исходную карточку.'**
+  String get recoveryOriginalCardNeeded;
 }
 
 class _AdminLocalizationsDelegate

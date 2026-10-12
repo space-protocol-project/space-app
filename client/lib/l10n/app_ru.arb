@@ -384,5 +384,8 @@
   "recoveryFilePath": "Полный путь к файлу",
   "recoveryOpenFile": "Открыть файл",
   "recoveryFolderUnavailable": "Не удалось прочитать папку. Укажите полный путь к файлу.",
-  "setupExisting": "Настройка вашего сохранённого пространства."
+  "setupExisting": "Настройка вашего сохранённого пространства.",
+  "recoveryGeneratingQr": "Создаём QR…",
+  "recoverySaveQr": "Сохранить QR",
+  "recoveryOverwriteQr": "Заменить существующий файл QR-карточки?"
 }

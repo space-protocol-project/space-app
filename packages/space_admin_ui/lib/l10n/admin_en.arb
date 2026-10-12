@@ -292,8 +292,8 @@
   "pairingEnteredCode": "Verification code from the new device",
   "pairingSign": "Codes match — sign",
   "recoveryTitle": "Access recovery",
-  "recoveryHelp": "An encrypted card preserves access to this identity on the selected server. It does not include the device's working key. Anyone holding the card and password can connect new devices. A device restored from a recovery card does not retain the management secret; reopen the card to revoke other devices. A root card restores the full root authority. Save the card as a QR image in PNG or as JSON and restore it from a selected file.",
-  "recoveryExport": "Save card",
+  "recoveryHelp": "The QR card restores your identity. Set a password and keep it separately.",
+  "recoveryExport": "Save QR",
   "recoveryRestore": "Restore from file",
   "recoveryScan": "Scan with camera",
   "recoveryDevices": "Your devices",
@@ -322,5 +322,7 @@
   "iconLeaf": "Leaf",
   "iconStar": "Star",
   "iconBolt": "Bolt",
-  "iconRocket": "Rocket"
+  "iconRocket": "Rocket",
+  "recoveryCreateQr": "Create QR",
+  "recoveryOriginalCardNeeded": "This device has no recovery key. Use the original card."
 }

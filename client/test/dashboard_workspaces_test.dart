@@ -151,6 +151,18 @@ void main() {
         }
         await tester.tap(find.byKey(const ValueKey('server-tab-$first')));
         await tester.pumpAndSettle();
+        for (final name in ['Общий · Основа', 'Команда · Основа']) {
+          expect(
+            find.descendant(
+              of: find.byKey(const ValueKey('server-chats')),
+              matching: find.text(name),
+            ),
+            findsOneWidget,
+          );
+        }
+        for (final name in ['Обсуждения', 'Лента', 'Встречи']) {
+          expect(find.widgetWithText(ListTile, name), findsNothing);
+        }
         await tester.enterText(
           find.byKey(const ValueKey('chat-draft')),
           'Черновик сервера A',

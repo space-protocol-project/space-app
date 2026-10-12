@@ -1005,4 +1005,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get setupExisting => 'Настройка вашего сохранённого пространства.';
+
+  @override
+  String get recoveryGeneratingQr => 'Создаём QR…';
+
+  @override
+  String get recoverySaveQr => 'Сохранить QR';
+
+  @override
+  String get recoveryOverwriteQr => 'Заменить существующий файл QR-карточки?';
 }

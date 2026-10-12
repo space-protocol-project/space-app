@@ -655,11 +655,10 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String get recoveryTitle => '恢复访问';
 
   @override
-  String get recoveryHelp =>
-      '加密身份卡可保留对所选服务器上此身份的访问，不包含设备的工作密钥。持有身份卡和密码即可连接新设备。通过恢复身份卡连接的设备不会保留管理密钥；撤销其他设备时需要重新打开身份卡。根身份卡可恢复完整的根管理权限。身份卡可保存为包含二维码的 PNG 或 JSON，并从所选文件恢复。';
+  String get recoveryHelp => '二维码恢复卡可恢复您的身份。请设置密码并单独保存。';
 
   @override
-  String get recoveryExport => '保存身份卡';
+  String get recoveryExport => '保存二维码';
 
   @override
   String get recoveryRestore => '从文件恢复';
@@ -720,4 +719,10 @@ class AdminLocalizationsZh extends AdminLocalizations {
 
   @override
   String get iconRocket => '火箭';
+
+  @override
+  String get recoveryCreateQr => '创建二维码';
+
+  @override
+  String get recoveryOriginalCardNeeded => '此设备没有恢复密钥。请使用原始恢复卡。';
 }

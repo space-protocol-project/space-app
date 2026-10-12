@@ -104,6 +104,7 @@ class _DevicePanelState extends State<DevicePanel> {
           RecoveryPanel(
             key: ObjectKey(controller),
             controller: controller,
+            identityOrigin: origin,
             restoreController: widget.restoreController,
             onRestored: (origin, target) async {
               await widget.onRestored(origin, target);

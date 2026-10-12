@@ -24,6 +24,10 @@ class RecoveryToolsView extends StatelessWidget {
     required this.canRotate,
     required this.pending,
     this.progress = '',
+    this.canCreateQr = false,
+    this.onCreateQr,
+    this.qrPreview,
+    this.onExportJson,
     required this.message,
     required this.pairingCode,
     required this.pairingEntered,
@@ -52,6 +56,10 @@ class RecoveryToolsView extends StatelessWidget {
       pairingPrepared;
   final String message, pairingCheck, currentGrantId;
   final String progress;
+  final bool canCreateQr;
+  final VoidCallback? onCreateQr;
+  final Widget? qrPreview;
+  final VoidCallback? onExportJson;
   final TextEditingController pairingCode, pairingEntered;
   final List<RecoveryDeviceView> devices;
   final VoidCallback onRotate,
@@ -164,6 +172,10 @@ class RecoveryToolsView extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(strings.recoveryHelp),
+              if (qrPreview != null) ...[
+                const SizedBox(height: 16),
+                qrPreview!,
+              ],
               if (pending && progress.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 const LinearProgressIndicator(),
@@ -175,12 +187,21 @@ class RecoveryToolsView extends StatelessWidget {
                 spacing: 12,
                 runSpacing: 12,
                 children: [
+                  if (onCreateQr != null) OutlinedButton.icon(
+                    onPressed: pending || !canCreateQr ? null : onCreateQr,
+                    icon: const Icon(Icons.qr_code),
+                    label: Text(strings.recoveryCreateQr),
+                  ),
                   FilledButton.icon(
-                    onPressed: pending || !connected || !hasRootAuthority
+                    onPressed: pending || (onCreateQr != null ? qrPreview == null : !connected || !hasRootAuthority)
                         ? null
                         : onExport,
                     icon: const Icon(Icons.save_alt),
                     label: Text(strings.recoveryExport),
+                  ),
+                  if (onExportJson != null) TextButton(
+                    onPressed: pending ? null : onExportJson,
+                    child: const Text('JSON'),
                   ),
                   OutlinedButton.icon(
                     onPressed: pending ? null : onRestore,
@@ -194,6 +215,10 @@ class RecoveryToolsView extends StatelessWidget {
                   ),
                 ],
               ),
+              if (onCreateQr != null && !canCreateQr && qrPreview == null) ...[
+                const SizedBox(height: 12),
+                Text(strings.recoveryOriginalCardNeeded),
+              ],
             ],
           ),
         ),

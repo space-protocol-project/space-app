@@ -1001,4 +1001,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setupExisting => 'Configure your saved space.';
+
+  @override
+  String get recoveryGeneratingQr => 'Creating QR…';
+
+  @override
+  String get recoverySaveQr => 'Save QR';
+
+  @override
+  String get recoveryOverwriteQr => 'Replace the existing QR card file?';
 }

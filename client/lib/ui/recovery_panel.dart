@@ -1,9 +1,10 @@
-import 'dart:convert';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:cryptography/cryptography.dart';
 
 import '../src/chat_controller.dart';
 import '../src/core.dart';
@@ -29,8 +30,10 @@ class RecoveryPanel extends StatefulWidget {
     required this.controller,
     this.restoreController,
     this.onRestored,
+    this.identityOrigin,
   });
   final ChatController controller;
+  final String? identityOrigin;
   final ChatController Function(String origin)? restoreController;
   final Future<void> Function(String origin, ChatController controller)?
   onRestored;
@@ -39,6 +42,42 @@ class RecoveryPanel extends StatefulWidget {
 }
 
 class _RecoveryPanelState extends State<RecoveryPanel> {
+  Uint8List? qrBytes;
+  String? cardPacket;
+  bool localRoot = false;
+  String? get identityOrigin =>
+      widget.identityOrigin ?? widget.controller.preview?.origin.toString();
+  @override
+  void initState() {
+    super.initState();
+    loadLocalRoot();
+  }
+
+  @override
+  void didUpdateWidget(covariant RecoveryPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.identityOrigin != widget.identityOrigin ||
+        oldWidget.controller != widget.controller) {
+      qrBytes = null;
+      cardPacket = null;
+      localRoot = false;
+      loadLocalRoot();
+    }
+  }
+
+  Future<void> loadLocalRoot() async {
+    final origin = identityOrigin;
+    if (origin == null) return;
+    try {
+      final record = await widget.controller.vault
+          .load(origin)
+          .timeout(const Duration(seconds: 10));
+      if (mounted) setState(() => localRoot = record?.rootSeed.length == 32);
+    } catch (_) {
+      if (mounted) setState(() => localRoot = false);
+    }
+  }
+
   bool pending = false;
   int restoreStage = 0;
   void stage(int value) {
@@ -109,39 +148,60 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
   Future<String?> password(bool creating) =>
       askRecoveryPassword(context, creating: creating);
 
-  Future<void> export() async {
-    final manager = widget.controller.deviceManagement;
-    if (manager == null) return;
+  Future<void> generateQr() async {
+    final origin = identityOrigin;
+    if (origin == null) return;
+    final record = await widget.controller.vault.load(origin);
+    if (record == null || record.rootSeed.isEmpty) {
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'На этом устройстве нет ключа восстановления. Используйте исходную карточку.',
+      );
+    }
     final pass = await password(true);
     if (pass == null) return;
+    stage(5);
     final packet = await compute(sealCardInWorker, [
-      await manager.recoveryPayload(),
+      await compute(rootCardPayloadInWorker, record),
       pass,
     ]);
+    if (mounted) {
+      setState(() {
+        cardPacket = packet;
+        qrBytes = null;
+      });
+    }
+    final bytes = await compute(pngInWorker, packet);
+    if (mounted) setState(() => qrBytes = bytes);
+  }
+
+  Future<void> export({bool json = false}) async {
+    final content = json && cardPacket != null
+        ? Uint8List.fromList(utf8.encode(cardPacket!))
+        : qrBytes;
+    if (content == null) return;
+    final extension = json ? 'json' : 'png';
     if (!mounted) return;
-    final png = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.strings.recoveryFormat),
-        content: Text(context.strings.recoveryFormatHelp),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('JSON'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(context.strings.recoveryPng),
-          ),
-        ],
-      ),
-    );
-    if (png == null) return;
-    final extension = png ? 'png' : 'json';
-    final content = png
-        ? await compute(pngInWorker, packet)
-        : Uint8List.fromList(utf8.encode(packet));
-    if (!mounted) return;
+    if (Platform.isWindows) {
+      final selected = await pickRecoveryQrDestination(
+        context,
+        name: 'space-recovery.$extension',
+        label: json ? 'JSON' : null,
+      );
+      if (selected == null || !mounted) return;
+      final destination = File(
+        selected.toLowerCase().endsWith('.$extension')
+            ? selected
+            : '$selected.$extension',
+      );
+      if (await destination.exists() &&
+          !await confirm((strings) => strings.recoveryOverwriteQr)) {
+        return;
+      }
+      await destination.writeAsBytes(content, flush: true);
+      if (mounted) setState(() => messageKey = 'recoveryCardSaved');
+      return;
+    }
     final destination = await getSaveLocation(
       suggestedName: 'space-recovery.$extension',
       acceptedTypeGroups: [
@@ -154,7 +214,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     if (destination == null) return;
     await XFile.fromData(
       content,
-      mimeType: png ? 'image/png' : 'application/json',
+      mimeType: json ? 'application/json' : 'image/png',
       name: 'space-recovery.$extension',
     ).saveTo(destination.path);
     if (mounted) {
@@ -210,6 +270,12 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     }
     final target =
         widget.restoreController?.call(record.origin) ?? widget.controller;
+    if (mounted) {
+      setState(() {
+        qrBytes = null;
+        cardPacket = null;
+      });
+    }
     stage(4);
     await target.disconnect();
     await target.inspect(record.origin, tlsFingerprint: record.tlsFingerprint);
@@ -230,6 +296,12 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
   }
 
   Future<void> rotate({bool renew = false}) async {
+    if (mounted) {
+      setState(() {
+        qrBytes = null;
+        cardPacket = null;
+      });
+    }
     final manager = widget.controller.deviceManagement;
     if (manager is! RootRotationControl) return;
     if (!await confirm(
@@ -243,6 +315,12 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
   }
 
   Future<void> finishRotation() async {
+    if (mounted) {
+      setState(() {
+        qrBytes = null;
+        cardPacket = null;
+      });
+    }
     final server = widget.controller.preview, vault = widget.controller.vault;
     if (server == null || vault is! RotationJournalVault) {
       throw RecoveryOperationError('rotationServerRequired');
@@ -381,11 +459,29 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
 
   @override
   Widget build(BuildContext context) => RecoveryToolsView(
+    onExportJson: cardPacket == null
+        ? null
+        : () => run(() => export(json: true)),
+    canCreateQr:
+        localRoot ||
+        widget.controller.deviceManagement?.hasRootAuthority == true,
+    onCreateQr: () => run(generateQr),
+    qrPreview: qrBytes == null
+        ? null
+        : Center(
+            child: Image.memory(
+              qrBytes!,
+              width: 240,
+              height: 240,
+              filterQuality: FilterQuality.none,
+            ),
+          ),
     progress: switch (restoreStage) {
       1 => context.strings.recoveryReadingFile,
       2 => context.strings.recoveryDecryptingCard,
       3 => context.strings.recoveryCheckingServer,
       4 => context.strings.recoveryConnectingDevice,
+      5 => context.strings.recoveryGeneratingQr,
       _ => '',
     },
     connected: widget.controller.connected,
@@ -433,6 +529,25 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
 
 Future<DeviceRecord> restoreRecordInWorker(List<String> input) async =>
     recordFromRecovery(await openCardInWorker(input));
+
+Future<Map<String, dynamic>> rootCardPayloadInWorker(
+  DeviceRecord record,
+) async {
+  await record.identity();
+  final pair = await Ed25519().newKeyPairFromSeed(record.rootSeed);
+  return {
+    'v': record.rootHistory.isEmpty ? 1 : 2,
+    'origin': record.origin,
+    'server_id': record.serverId,
+    'server_key': record.serverKey,
+    if (record.tlsFingerprint.isNotEmpty)
+      'tls_fingerprint': record.tlsFingerprint,
+    'root_public_key': url64((await pair.extractPublicKey()).bytes),
+    'credential': 'root',
+    'secret': url64(record.rootSeed),
+    if (record.rootHistory.isNotEmpty) 'root_history': record.rootHistory,
+  };
+}
 
 class RecoveryOperationError implements Exception {
   const RecoveryOperationError(this.key);

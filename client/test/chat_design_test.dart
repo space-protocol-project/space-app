@@ -92,7 +92,7 @@ void main() {
       if (width < 760) {
         await tester.tap(find.byType(NavigationDestination).at(1));
       } else {
-        await tester.tap(find.widgetWithText(ListTile, 'Общий чат'));
+        await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
       }
       await tester.pumpAndSettle();
       expect(find.byType(MessageBubble), findsNWidgets(4));

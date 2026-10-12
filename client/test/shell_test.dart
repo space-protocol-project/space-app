@@ -44,7 +44,7 @@ void main() {
     );
     await tester.pumpWidget(SpaceApp(controller: controller));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Общий чат'));
+    await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
     await tester.pumpAndSettle();
     final field = find.byKey(const ValueKey('chat-draft'));
     await tester.enterText(
@@ -94,7 +94,7 @@ void main() {
     );
     await tester.pumpWidget(SpaceApp(controller: controller));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Общий чат'));
+    await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
     await tester.pumpAndSettle();
     final field = tester.widget<TextField>(
       find.byKey(const ValueKey('chat-draft')),
@@ -141,7 +141,7 @@ void main() {
     controller.server(original);
     await tester.pumpWidget(SpaceApp(controller: controller));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Общий чат'));
+    await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
     await tester.pumpAndSettle();
     await tester.enterText(
       find.byKey(const ValueKey('chat-draft')),
@@ -151,7 +151,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(ChoiceChip, 'Мягкий ирис'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Общий чат'));
+    await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
     await tester.pumpAndSettle();
     expect(
       tester
@@ -187,11 +187,11 @@ void main() {
     );
     await tester.tap(find.byTooltip('Поиск'));
     await tester.pumpAndSettle();
-    await tester.enterText(find.byType(TextField), 'Встречи');
+    await tester.enterText(find.byType(TextField), 'Обзор');
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Встречи'));
+    await tester.tap(find.widgetWithText(ListTile, 'Обзор'));
     await tester.pumpAndSettle();
-    expect(find.text('Быть рядом — по-разному.'), findsOneWidget);
+    expect(find.text('Каналы и ресурсы сервера.'), findsOneWidget);
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox());
     controller.dispose();
@@ -210,7 +210,7 @@ void main() {
       final destinations = find.byType(NavigationDestination);
       await tester.tap(destinations.at(2));
       await tester.pumpAndSettle();
-      expect(find.text('Пока недоступно'), findsOneWidget);
+      expect(find.text('Идентичности и ключи этого устройства.'), findsOneWidget);
       await tester.tap(find.byTooltip('Настройки приложения'));
       await tester.pumpAndSettle();
       expect(find.text('Оформление пространства'), findsNothing);

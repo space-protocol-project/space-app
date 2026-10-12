@@ -695,10 +695,10 @@ class AdminLocalizationsEn extends AdminLocalizations {
 
   @override
   String get recoveryHelp =>
-      'An encrypted card preserves access to this identity on the selected server. It does not include the device\'s working key. Anyone holding the card and password can connect new devices. A device restored from a recovery card does not retain the management secret; reopen the card to revoke other devices. A root card restores the full root authority. Save the card as a QR image in PNG or as JSON and restore it from a selected file.';
+      'The QR card restores your identity. Set a password and keep it separately.';
 
   @override
-  String get recoveryExport => 'Save card';
+  String get recoveryExport => 'Save QR';
 
   @override
   String get recoveryRestore => 'Restore from file';
@@ -762,4 +762,11 @@ class AdminLocalizationsEn extends AdminLocalizations {
 
   @override
   String get iconRocket => 'Rocket';
+
+  @override
+  String get recoveryCreateQr => 'Create QR';
+
+  @override
+  String get recoveryOriginalCardNeeded =>
+      'This device has no recovery key. Use the original card.';
 }

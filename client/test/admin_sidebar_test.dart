@@ -141,7 +141,7 @@ void main() {
         );
         expect(find.byType(AdminPage), findsNothing);
         expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
-        expect(find.text('Сохранить карточку'), findsOneWidget);
+        expect(find.text('Сохранить QR'), findsOneWidget);
         expect(find.text('Восстановить из файла'), findsOneWidget);
         expect(find.text('Сканировать камерой'), findsOneWidget);
         if (width >= 760) {

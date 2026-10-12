@@ -384,5 +384,8 @@
   "recoveryFilePath": "Full file path",
   "recoveryOpenFile": "Open file",
   "recoveryFolderUnavailable": "Could not read this folder. Enter the full file path.",
-  "setupExisting": "Configure your saved space."
+  "setupExisting": "Configure your saved space.",
+  "recoveryGeneratingQr": "Creating QR…",
+  "recoverySaveQr": "Save QR",
+  "recoveryOverwriteQr": "Replace the existing QR card file?"
 }

@@ -695,10 +695,10 @@ class AdminLocalizationsRu extends AdminLocalizations {
 
   @override
   String get recoveryHelp =>
-      'Зашифрованная карточка сохраняет доступ к этой идентичности на выбранном сервере. Рабочий ключ устройства в неё не копируется. Владение карточкой и паролем позволяет подключать новые устройства. Устройство из карточки восстановления не сохраняет управляющий секрет; для отзыва других устройств её нужно открыть заново. Корневая карточка восстанавливает полный управляющий root. Карточку можно сохранить как QR в PNG или JSON и восстановить из выбранного файла.';
+      'QR-карточка восстанавливает идентичность. Задайте пароль и храните его отдельно.';
 
   @override
-  String get recoveryExport => 'Сохранить карточку';
+  String get recoveryExport => 'Сохранить QR';
 
   @override
   String get recoveryRestore => 'Восстановить из файла';
@@ -763,4 +763,11 @@ class AdminLocalizationsRu extends AdminLocalizations {
 
   @override
   String get iconRocket => 'Ракета';
+
+  @override
+  String get recoveryCreateQr => 'Создать QR';
+
+  @override
+  String get recoveryOriginalCardNeeded =>
+      'На устройстве нет ключа восстановления. Используйте исходную карточку.';
 }

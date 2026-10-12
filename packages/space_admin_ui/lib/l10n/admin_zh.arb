@@ -292,8 +292,8 @@
   "pairingEnteredCode": "新设备上的验证码",
   "pairingSign": "代码一致 — 签名",
   "recoveryTitle": "恢复访问",
-  "recoveryHelp": "加密身份卡可保留对所选服务器上此身份的访问，不包含设备的工作密钥。持有身份卡和密码即可连接新设备。通过恢复身份卡连接的设备不会保留管理密钥；撤销其他设备时需要重新打开身份卡。根身份卡可恢复完整的根管理权限。身份卡可保存为包含二维码的 PNG 或 JSON，并从所选文件恢复。",
-  "recoveryExport": "保存身份卡",
+  "recoveryHelp": "二维码恢复卡可恢复您的身份。请设置密码并单独保存。",
+  "recoveryExport": "保存二维码",
   "recoveryRestore": "从文件恢复",
   "recoveryScan": "使用摄像头扫描",
   "recoveryDevices": "您的设备",
@@ -322,5 +322,7 @@
   "iconLeaf": "叶子",
   "iconStar": "星星",
   "iconBolt": "闪电",
-  "iconRocket": "火箭"
+  "iconRocket": "火箭",
+  "recoveryCreateQr": "创建二维码",
+  "recoveryOriginalCardNeeded": "此设备没有恢复密钥。请使用原始恢复卡。"
 }

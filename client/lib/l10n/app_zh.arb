@@ -384,5 +384,8 @@
   "recoveryFilePath": "完整文件路径",
   "recoveryOpenFile": "打开文件",
   "recoveryFolderUnavailable": "无法读取文件夹。请输入完整文件路径。",
-  "setupExisting": "配置已保存的空间。"
+  "setupExisting": "配置已保存的空间。",
+  "recoveryGeneratingQr": "正在创建二维码…",
+  "recoverySaveQr": "保存二维码",
+  "recoveryOverwriteQr": "替换现有二维码恢复卡文件？"
 }
