@@ -14,6 +14,7 @@ class Dashboard extends StatelessWidget {
     required this.openSpace,
     required this.openChannel,
     this.homeAction,
+    this.homeDetails,
     this.homeRunning = false,
     this.homeBusy = false,
   });
@@ -23,6 +24,7 @@ class Dashboard extends StatelessWidget {
   final ValueChanged<String> openSpace;
   final void Function(String, String) openChannel;
   final VoidCallback? homeAction;
+  final VoidCallback? homeDetails;
   final bool homeRunning, homeBusy;
 
   @override
@@ -101,6 +103,13 @@ class Dashboard extends StatelessWidget {
               icon: const Icon(Icons.refresh),
               label: Text(context.strings.dashboardRefresh),
             ),
+            if (homeDetails != null)
+              OutlinedButton.icon(
+                key: const ValueKey('home-server-details'),
+                onPressed: homeDetails,
+                icon: const Icon(Icons.dns_outlined),
+                label: Text(context.strings.myServer),
+              ),
             if (MediaQuery.sizeOf(context).width < 760 && homeAction != null)
               OutlinedButton.icon(
                 onPressed: homeBusy ? null : homeAction,

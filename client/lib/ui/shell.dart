@@ -995,6 +995,7 @@ class _SpaceShellState extends State<SpaceShell> {
                           workspaces: workspaces,
                           presence: presence,
                           homeAction: showHome,
+                          homeDetails: showHomeDetails,
                           homeRunning: home.running,
                           homeBusy: home.busy,
                           addSpace: addSpace,
