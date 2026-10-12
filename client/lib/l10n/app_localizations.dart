@@ -188,7 +188,7 @@ abstract class AppLocalizations {
   /// No description provided for @recentSpaces.
   ///
   /// In ru, this message translates to:
-  /// **'Недавние пространства'**
+  /// **'Недавние серверы'**
   String get recentSpaces;
 
   /// No description provided for @prototype.

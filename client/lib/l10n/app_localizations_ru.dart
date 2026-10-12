@@ -52,7 +52,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get channels => 'Каналы';
 
   @override
-  String get recentSpaces => 'Недавние пространства';
+  String get recentSpaces => 'Недавние серверы';
 
   @override
   String get prototype => 'Локальный прототип · Windows';

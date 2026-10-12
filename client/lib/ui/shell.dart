@@ -543,11 +543,6 @@ class _SpaceShellState extends State<SpaceShell> {
             child: ListView(
               padding: const EdgeInsets.all(20),
               children: [
-                Text(
-                  context.strings.recentSpaces,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 16),
                 SpaceActionButton(
                   onPressed: addSpace,
                   icon: Icons.add,
@@ -559,8 +554,15 @@ class _SpaceShellState extends State<SpaceShell> {
                   title: Text(context.strings.dashboard),
                   onTap: showDashboard,
                 ),
+                const SizedBox(height: 20),
+                Text(
+                  context.strings.recentSpaces,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const SizedBox(height: 8),
                 for (final origin in widget.preferences.origins)
                   ListTile(
+                    enabled: presence.online(origin) == true,
                     leading: Icon(
                       presence.online(origin) == true
                           ? Icons.cloud_done_outlined
@@ -576,7 +578,9 @@ class _SpaceShellState extends State<SpaceShell> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    onTap: () => openSpace(origin),
+                    onTap: presence.online(origin) == true
+                        ? () => openSpace(origin)
+                        : null,
                   ),
               ],
             ),
