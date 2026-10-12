@@ -145,7 +145,7 @@ void main() {
           'dashboard-tab',
           'server-tab-$first',
           'server-tab-$second',
-          'home-server-toggle',
+          'home-server-details-tab',
         ]) {
           expect(tester.getSize(find.byKey(ValueKey(key))), const Size(48, 48));
         }

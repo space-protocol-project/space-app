@@ -421,7 +421,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeStartHelp => '在此电脑上运行自己的空间。';
 
   @override
-  String get myServer => '我的服务器';
+  String get myServer => '上线';
 
   @override
   String get homeDetectingIP => '正在通过 ipify 获取公网 IP';
@@ -826,6 +826,43 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sendShortcutHelp => '选择 Enter 或 Shift+Enter 发送。另一组合键用于换行。';
+
+  @override
+  String get createOwnSpace => '创建自己的空间';
+
+  @override
+  String get setupSpaceName => '空间名称';
+
+  @override
+  String get setupResources => '空间包含的功能';
+
+  @override
+  String get setupComingSoon => '即将推出，暂不可用';
+
+  @override
+  String get setupInternetHelp =>
+      '邀请朋友需要公网 IPv4 和路由器 TCP 8443 端口转发。服务器和证书将自动创建。';
+
+  @override
+  String get setupReady => '空间已准备好';
+
+  @override
+  String get setupInviteHelp => '邀请仅可使用一次，有效期为24小时。可在空间管理中创建更多邀请。';
+
+  @override
+  String get setupWorking => '正在创建和配置服务器…';
+
+  @override
+  String get setupBack => '返回';
+
+  @override
+  String get setupNext => '下一步';
+
+  @override
+  String get setupOwnerRequired => '无法以所有者身份连接。请打开上线并检查服务器状态。';
+
+  @override
+  String get setupUpdateRequired => '请先更新家庭服务器，然后设置图标。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

@@ -160,7 +160,7 @@
   "myHomeServer": "Мой домашний сервер",
   "homeRunningHelp": "Сервер работает. После отключения все данные сохранятся.",
   "homeStartHelp": "Запустите своё пространство на этом компьютере.",
-  "myServer": "Мой сервер",
+  "myServer": "Выйти в эфир",
   "homeDetectingIP": "Определяем публичный IP через ipify",
   "homeDownloading": "Скачиваем сервер и PostgreSQL",
   "homeInstalling": "Проверяем и устанавливаем выпуск",
@@ -170,7 +170,16 @@
   "managementTab": "Управление",
   "homeNoReleaseNotes": "Описание изменений для этого выпуска не предоставлено.",
   "homeSpaceDetails": "Нужно: {required} МиБ · доступно: {available} МиБ",
-  "@homeSpaceDetails": {"placeholders":{"required":{"type":"String"},"available":{"type":"String"}}},
+  "@homeSpaceDetails": {
+    "placeholders": {
+      "required": {
+        "type": "String"
+      },
+      "available": {
+        "type": "String"
+      }
+    }
+  },
   "failureHomeSpaceLow": "Недостаточно свободного места для операции домашнего сервера. Освободите место и повторите попытку.",
   "failureHomeSpaceUnknown": "Не удалось проверить свободное место. Проверьте доступность диска и повторите попытку.",
   "homeResumeUpdate": "Продолжить обновление или восстановление",
@@ -347,5 +356,17 @@
   },
   "identityDescription": "Ключи, разрешения и восстановление доступа в выбранном пространстве.",
   "sendShortcutTitle": "Клавиша отправки",
-  "sendShortcutHelp": "Выберите Enter или Shift+Enter для отправки. Другая комбинация добавляет новую строку."
+  "sendShortcutHelp": "Выберите Enter или Shift+Enter для отправки. Другая комбинация добавляет новую строку.",
+  "createOwnSpace": "Создать своё пространство",
+  "setupSpaceName": "Название пространства",
+  "setupResources": "Что включено в пространство",
+  "setupComingSoon": "Скоро — пока недоступно",
+  "setupInternetHelp": "Для друзей нужен публичный IPv4 и проброс TCP 8443 на роутере. Сервер и сертификат будут созданы автоматически.",
+  "setupReady": "Пространство готово",
+  "setupInviteHelp": "Приглашение на один вход действует 24 часа. Для следующих участников создайте новые приглашения в управлении пространством.",
+  "setupWorking": "Создание сервера и настройка…",
+  "setupBack": "Назад",
+  "setupNext": "Далее",
+  "setupOwnerRequired": "Не удалось подключиться владельцем. Откройте «Выйти в эфир» и проверьте состояние сервера.",
+  "setupUpdateRequired": "Для настройки иконки сначала обновите домашний сервер."
 }

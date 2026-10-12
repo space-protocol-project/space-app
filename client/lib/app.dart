@@ -35,6 +35,7 @@ class _SpaceAppState extends State<SpaceApp> {
     builder: (context, _) => MaterialApp(
       title: 'Space',
       debugShowCheckedModeBanner: false,
+      scrollBehavior: const _SpaceScrollBehavior(),
       theme: preferences.theme,
       locale: preferences.locale,
       localizationsDelegates: [
@@ -45,4 +46,18 @@ class _SpaceAppState extends State<SpaceApp> {
       home: SpaceShell(preferences: preferences, controller: widget.controller),
     ),
   );
+}
+
+class _SpaceScrollBehavior extends MaterialScrollBehavior {
+  const _SpaceScrollBehavior();
+
+  @override
+  Widget buildScrollbar(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    if (ModalRoute.of(context) is PopupRoute) return child;
+    return super.buildScrollbar(context, child, details);
+  }
 }

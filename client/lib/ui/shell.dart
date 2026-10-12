@@ -18,6 +18,7 @@ import '../src/server_presence.dart';
 import '../src/server_workspaces.dart';
 import 'dashboard.dart';
 import 'home_panel.dart';
+import 'space_setup_wizard.dart';
 import 'chat_view.dart';
 import 'connection_panel.dart';
 import 'panels.dart';
@@ -283,6 +284,78 @@ class _SpaceShellState extends State<SpaceShell> {
             },
           ),
         ),
+      ),
+    );
+  }
+
+  Future<void> createOwnSpace() async {
+    await home.load();
+    if (!mounted) return;
+    final strings = context.strings;
+    if (home.ip.isNotEmpty || home.running || home.pendingUpdate) {
+      await showHomeDetails();
+      return;
+    }
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => SpaceSetupWizard(
+        create: (title, icon, chatEnabled) async {
+          if (!home.running) {
+            final ip = home.ip.isEmpty ? await home.detectIP() : home.ip;
+            await startHome(ip);
+          }
+          final owner = workspaces[home.state?.publicOrigin ?? ''];
+          final session = owner?.administration;
+          if (session == null || !session.canManageSpace) {
+            throw StateError(
+              home.error.isNotEmpty ? home.error : strings.setupOwnerRequired,
+            );
+          }
+          final response = await session.adminRequest('/api/v1/space/settings');
+          final settings = response['settings'] as Map;
+          if (!settings.containsKey('icon')) {
+            throw StateError(strings.setupUpdateRequired);
+          }
+          await session.adminRequest(
+            '/api/v1/space/settings',
+            method: 'PATCH',
+            body: {
+              'title': title,
+              'chatTitle': settings['chatTitle'],
+              'chatEnabled': chatEnabled,
+              'registrationPolicy': settings['registrationPolicy'],
+              'expectedRevision': settings['revision'],
+              'icon': icon,
+            },
+          );
+          final invite = await session.adminRequest(
+            '/api/v1/space/invites',
+            method: 'POST',
+            body: {'role': 'member', 'ttlSeconds': 86400, 'maxUses': 1},
+          );
+          return Uri.parse(home.state!.publicOrigin)
+              .replace(
+                fragment: Uri(
+                  queryParameters: {
+                    'invite': invite['token'] as String,
+                    'tls': home.state!.tlsFingerprint,
+                  },
+                ).query,
+              )
+              .toString();
+        },
+        manage: () {
+          Navigator.pop(context);
+          final owner = workspaces[home.state?.publicOrigin ?? ''];
+          if (owner == null || !mounted) return;
+          setState(() {
+            activeController = owner;
+            dashboard = false;
+            applicationSettings = false;
+          });
+          select(Section.settings);
+        },
       ),
     );
   }
@@ -694,20 +767,12 @@ class _SpaceShellState extends State<SpaceShell> {
         ),
         railButton(
           key: const ValueKey('home-server-details-tab'),
-          tooltip: context.strings.myServer,
+          tooltip: context.strings.goLive,
           onPressed: showHomeDetails,
-          icon: const Icon(Icons.dns_outlined),
-        ),
-        railButton(
-          key: const ValueKey('home-server-toggle'),
-          tooltip: home.running
-              ? context.strings.stopHome
-              : context.strings.goLive,
           selected: home.running,
-          onPressed: home.busy || controller.busy ? null : showHome,
           icon: home.busy
               ? HomeOperationProgress(home: home, compact: true)
-              : Icon(home.running ? Icons.power_settings_new : Icons.sensors),
+              : const Icon(Icons.sensors),
         ),
         railButton(
           key: const ValueKey('app-settings-tab'),
@@ -1004,6 +1069,7 @@ class _SpaceShellState extends State<SpaceShell> {
                           presence: presence,
                           homeAction: showHome,
                           homeDetails: showHomeDetails,
+                          createOwnSpace: createOwnSpace,
                           homeRunning: home.running,
                           homeBusy: home.busy,
                           addSpace: addSpace,

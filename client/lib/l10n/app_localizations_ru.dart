@@ -447,7 +447,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeStartHelp => 'Запустите своё пространство на этом компьютере.';
 
   @override
-  String get myServer => 'Мой сервер';
+  String get myServer => 'Выйти в эфир';
 
   @override
   String get homeDetectingIP => 'Определяем публичный IP через ipify';
@@ -924,4 +924,44 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get sendShortcutHelp =>
       'Выберите Enter или Shift+Enter для отправки. Другая комбинация добавляет новую строку.';
+
+  @override
+  String get createOwnSpace => 'Создать своё пространство';
+
+  @override
+  String get setupSpaceName => 'Название пространства';
+
+  @override
+  String get setupResources => 'Что включено в пространство';
+
+  @override
+  String get setupComingSoon => 'Скоро — пока недоступно';
+
+  @override
+  String get setupInternetHelp =>
+      'Для друзей нужен публичный IPv4 и проброс TCP 8443 на роутере. Сервер и сертификат будут созданы автоматически.';
+
+  @override
+  String get setupReady => 'Пространство готово';
+
+  @override
+  String get setupInviteHelp =>
+      'Приглашение на один вход действует 24 часа. Для следующих участников создайте новые приглашения в управлении пространством.';
+
+  @override
+  String get setupWorking => 'Создание сервера и настройка…';
+
+  @override
+  String get setupBack => 'Назад';
+
+  @override
+  String get setupNext => 'Далее';
+
+  @override
+  String get setupOwnerRequired =>
+      'Не удалось подключиться владельцем. Откройте «Выйти в эфир» и проверьте состояние сервера.';
+
+  @override
+  String get setupUpdateRequired =>
+      'Для настройки иконки сначала обновите домашний сервер.';
 }

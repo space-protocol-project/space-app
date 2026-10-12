@@ -896,7 +896,7 @@ abstract class AppLocalizations {
   /// No description provided for @myServer.
   ///
   /// In ru, this message translates to:
-  /// **'Мой сервер'**
+  /// **'Выйти в эфир'**
   String get myServer;
 
   /// No description provided for @homeDetectingIP.
@@ -1666,6 +1666,78 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Выберите Enter или Shift+Enter для отправки. Другая комбинация добавляет новую строку.'**
   String get sendShortcutHelp;
+
+  /// No description provided for @createOwnSpace.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать своё пространство'**
+  String get createOwnSpace;
+
+  /// No description provided for @setupSpaceName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название пространства'**
+  String get setupSpaceName;
+
+  /// No description provided for @setupResources.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что включено в пространство'**
+  String get setupResources;
+
+  /// No description provided for @setupComingSoon.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скоро — пока недоступно'**
+  String get setupComingSoon;
+
+  /// No description provided for @setupInternetHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для друзей нужен публичный IPv4 и проброс TCP 8443 на роутере. Сервер и сертификат будут созданы автоматически.'**
+  String get setupInternetHelp;
+
+  /// No description provided for @setupReady.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пространство готово'**
+  String get setupReady;
+
+  /// No description provided for @setupInviteHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приглашение на один вход действует 24 часа. Для следующих участников создайте новые приглашения в управлении пространством.'**
+  String get setupInviteHelp;
+
+  /// No description provided for @setupWorking.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создание сервера и настройка…'**
+  String get setupWorking;
+
+  /// No description provided for @setupBack.
+  ///
+  /// In ru, this message translates to:
+  /// **'Назад'**
+  String get setupBack;
+
+  /// No description provided for @setupNext.
+  ///
+  /// In ru, this message translates to:
+  /// **'Далее'**
+  String get setupNext;
+
+  /// No description provided for @setupOwnerRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось подключиться владельцем. Откройте «Выйти в эфир» и проверьте состояние сервера.'**
+  String get setupOwnerRequired;
+
+  /// No description provided for @setupUpdateRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для настройки иконки сначала обновите домашний сервер.'**
+  String get setupUpdateRequired;
 }
 
 class _AppLocalizationsDelegate

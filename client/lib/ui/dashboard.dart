@@ -15,6 +15,7 @@ class Dashboard extends StatelessWidget {
     required this.openChannel,
     this.homeAction,
     this.homeDetails,
+    this.createOwnSpace,
     this.homeRunning = false,
     this.homeBusy = false,
   });
@@ -25,6 +26,7 @@ class Dashboard extends StatelessWidget {
   final void Function(String, String) openChannel;
   final VoidCallback? homeAction;
   final VoidCallback? homeDetails;
+  final VoidCallback? createOwnSpace;
   final bool homeRunning, homeBusy;
 
   @override
@@ -90,10 +92,26 @@ class Dashboard extends StatelessWidget {
           spacing: 12,
           runSpacing: 12,
           children: [
-            FilledButton.icon(
-              onPressed: addSpace,
-              icon: const Icon(Icons.add),
-              label: Text(context.strings.addSpace),
+            IntrinsicWidth(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FilledButton.icon(
+                    onPressed: addSpace,
+                    icon: const Icon(Icons.add),
+                    label: Text(context.strings.addSpace),
+                  ),
+                  if (createOwnSpace != null) ...[
+                    const SizedBox(height: 12),
+                    FilledButton.icon(
+                      onPressed: homeBusy ? null : createOwnSpace,
+                      icon: const Icon(Icons.add_home_outlined),
+                      label: Text(context.strings.createOwnSpace),
+                    ),
+                  ],
+                ],
+              ),
             ),
             OutlinedButton.icon(
               onPressed: () {
@@ -107,20 +125,8 @@ class Dashboard extends StatelessWidget {
               OutlinedButton.icon(
                 key: const ValueKey('home-server-details'),
                 onPressed: homeDetails,
-                icon: const Icon(Icons.dns_outlined),
-                label: Text(context.strings.myServer),
-              ),
-            if (MediaQuery.sizeOf(context).width < 760 && homeAction != null)
-              OutlinedButton.icon(
-                onPressed: homeBusy ? null : homeAction,
-                icon: Icon(
-                  homeRunning ? Icons.power_settings_new : Icons.sensors,
-                ),
-                label: Text(
-                  homeRunning
-                      ? context.strings.stopHome
-                      : context.strings.goLive,
-                ),
+                icon: const Icon(Icons.sensors),
+                label: Text(context.strings.goLive),
               ),
           ],
         ),

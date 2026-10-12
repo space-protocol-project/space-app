@@ -160,7 +160,7 @@
   "myHomeServer": "My home server",
   "homeRunningHelp": "The server is running. Disconnecting preserves all data.",
   "homeStartHelp": "Run your own space on this computer.",
-  "myServer": "My server",
+  "myServer": "Go live",
   "homeDetectingIP": "Detecting public IP with ipify",
   "homeDownloading": "Downloading the server and PostgreSQL",
   "homeInstalling": "Verifying and installing the release",
@@ -170,7 +170,16 @@
   "managementTab": "Manage",
   "homeNoReleaseNotes": "No change description was provided for this release.",
   "homeSpaceDetails": "Required: {required} MiB · available: {available} MiB",
-  "@homeSpaceDetails": {"placeholders":{"required":{"type":"String"},"available":{"type":"String"}}},
+  "@homeSpaceDetails": {
+    "placeholders": {
+      "required": {
+        "type": "String"
+      },
+      "available": {
+        "type": "String"
+      }
+    }
+  },
   "failureHomeSpaceLow": "There is not enough free space for the home server operation. Free up space and retry.",
   "failureHomeSpaceUnknown": "Free space could not be checked. Check that the disk is accessible and retry.",
   "homeResumeUpdate": "Resume update or recovery",
@@ -347,5 +356,17 @@
   },
   "identityDescription": "Keys, permissions and recovery for the selected space.",
   "sendShortcutTitle": "Send shortcut",
-  "sendShortcutHelp": "Choose Enter or Shift+Enter to send. The other combination inserts a new line."
+  "sendShortcutHelp": "Choose Enter or Shift+Enter to send. The other combination inserts a new line.",
+  "createOwnSpace": "Create your own space",
+  "setupSpaceName": "Space name",
+  "setupResources": "Included in the space",
+  "setupComingSoon": "Coming soon — unavailable",
+  "setupInternetHelp": "Friends need a public IPv4 address and router forwarding for TCP 8443. The server and certificate will be created automatically.",
+  "setupReady": "Your space is ready",
+  "setupInviteHelp": "This single-use invitation expires in 24 hours. Create more invitations in space management.",
+  "setupWorking": "Creating and configuring the server…",
+  "setupBack": "Back",
+  "setupNext": "Next",
+  "setupOwnerRequired": "Could not connect as owner. Open Go live and check the server status.",
+  "setupUpdateRequired": "Update the home server before configuring its icon."
 }

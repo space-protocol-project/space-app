@@ -51,22 +51,9 @@ class OverviewPanel extends StatelessWidget {
                 spacing: 12,
                 runSpacing: 10,
                 children: [
-                  FilledButton.icon(
-                    onPressed: home!.busy || controller.busy
-                        ? null
-                        : homeAction,
-                    icon: Icon(
-                      home!.running ? Icons.power_settings_new : Icons.sensors,
-                    ),
-                    label: Text(
-                      home!.running
-                          ? context.strings.stopHome
-                          : context.strings.goLive,
-                    ),
-                  ),
                   OutlinedButton.icon(
                     onPressed: home!.busy ? null : homeDetails,
-                    icon: const Icon(Icons.tune),
+                    icon: const Icon(Icons.sensors),
                     label: Text(context.strings.myServer),
                   ),
                 ],

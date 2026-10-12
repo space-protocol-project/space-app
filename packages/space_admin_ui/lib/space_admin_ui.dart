@@ -1,4 +1,5 @@
 export 'src/server_icon.dart';
+export 'src/server_icon_picker.dart';
 import 'src/server_icon_picker.dart';
 export 'src/recovery_dialogs.dart';
 export 'src/recovery_camera_view.dart';

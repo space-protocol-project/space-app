@@ -443,7 +443,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeStartHelp => 'Run your own space on this computer.';
 
   @override
-  String get myServer => 'My server';
+  String get myServer => 'Go live';
 
   @override
   String get homeDetectingIP => 'Detecting public IP with ipify';
@@ -921,4 +921,44 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get sendShortcutHelp =>
       'Choose Enter or Shift+Enter to send. The other combination inserts a new line.';
+
+  @override
+  String get createOwnSpace => 'Create your own space';
+
+  @override
+  String get setupSpaceName => 'Space name';
+
+  @override
+  String get setupResources => 'Included in the space';
+
+  @override
+  String get setupComingSoon => 'Coming soon — unavailable';
+
+  @override
+  String get setupInternetHelp =>
+      'Friends need a public IPv4 address and router forwarding for TCP 8443. The server and certificate will be created automatically.';
+
+  @override
+  String get setupReady => 'Your space is ready';
+
+  @override
+  String get setupInviteHelp =>
+      'This single-use invitation expires in 24 hours. Create more invitations in space management.';
+
+  @override
+  String get setupWorking => 'Creating and configuring the server…';
+
+  @override
+  String get setupBack => 'Back';
+
+  @override
+  String get setupNext => 'Next';
+
+  @override
+  String get setupOwnerRequired =>
+      'Could not connect as owner. Open Go live and check the server status.';
+
+  @override
+  String get setupUpdateRequired =>
+      'Update the home server before configuring its icon.';
 }

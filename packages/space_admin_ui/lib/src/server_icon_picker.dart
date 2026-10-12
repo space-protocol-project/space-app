@@ -73,10 +73,10 @@ class _ServerIconPickerState extends State<ServerIconPicker> {
           children: [
             ServerIconView(value: widget.value, size: 40),
             const SizedBox(width: 12),
-            Text(
+            Expanded(child: Text(
               s.serverIconTitle,
               style: Theme.of(context).textTheme.titleMedium,
-            ),
+            )),
           ],
         ),
         const SizedBox(height: 12),
