@@ -5,6 +5,7 @@ import 'home_installation.dart';
 import 'home_runtime.dart';
 import 'home_update_journal.dart';
 import 'local_failure.dart';
+import 'home_storage.dart';
 
 typedef HomeTool = Future<Map<String, dynamic>> Function(
   Directory runtime,
@@ -34,9 +35,14 @@ Future<Map<String, dynamic>> runHomeTool(
 
 /// Исполнитель вызывается только под process.lock и после остановки сервера.
 class HomeUpdateExecutor {
-  HomeUpdateExecutor(this.root, {this.tool = runHomeTool});
+  HomeUpdateExecutor(
+    this.root, {
+    this.tool = runHomeTool,
+    this.storage = const HomeStorage(),
+  });
   final Directory root;
   final HomeTool tool;
+  final HomeStorage storage;
   HomeInstallation get installation => HomeInstallation(root);
   HomeUpdateJournal get journal => HomeUpdateJournal(root);
   String get data => '${root.path}/data';
@@ -129,11 +135,13 @@ class HomeUpdateExecutor {
       throw HomeUpdateJournal.pending;
     }
     final schema = await _capabilities(target);
+    await storage.check(root);
     final runtime = installation.runtime(target);
     final record = await journal.begin(source, target);
     try {
       await journal.advance(record.id, HomeUpdateStep.staged);
       final before = await _check(runtime, data);
+      await storage.check(root);
       if ((before['schemaVersion'] as int) > schema) {
         throw HomeUpdateJournal.pending;
       }
@@ -204,6 +212,13 @@ class HomeUpdateExecutor {
       final failed = Directory('${root.path}/failed-data/${record.id}');
       final current = Directory(data);
       if (!await restore.exists()) {
+        await storage.check(
+          root,
+          dataCopies: 0,
+          additionalBytes: await homeDirectoryBytes(
+            Directory('${root.path}/${record.backupPath}/data'),
+          ),
+        );
         await tool(runtime, [
           '-home-restore',
           '${root.path}/${record.backupPath}',

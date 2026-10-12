@@ -61,6 +61,8 @@ String localFailureText(
   LocalFailureCode.homeStopFailed => context.strings.failureHomeStopFailed,
   LocalFailureCode.homeUpdatePending => context.strings.failureHomeUpdatePending,
   LocalFailureCode.homeUpdateFailed => context.strings.failureHomeUpdateFailed,
+  LocalFailureCode.homeSpaceLow => context.strings.failureHomeSpaceLow,
+  LocalFailureCode.homeSpaceUnknown => context.strings.failureHomeSpaceUnknown,
 };
 
 String chatFailureText(BuildContext context, ChatController controller) {

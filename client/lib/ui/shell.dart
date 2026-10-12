@@ -78,7 +78,6 @@ class _SpaceShellState extends State<SpaceShell> {
       widget.workspaces ?? ServerWorkspaces(vault: initialController.vault);
   bool dashboard = true;
   bool applicationSettings = false;
-  bool managementOpen = false;
   void showDashboard() {
     setState(() {
       applicationSettings = false;
@@ -145,7 +144,12 @@ class _SpaceShellState extends State<SpaceShell> {
 
   void announcePresence(ServerPresenceChange change) {
     if (!mounted) return;
-    if (change.online) unawaited(workspaces.reconnect(change.origin));
+    if (change.online &&
+        !(home.busy &&
+            home.phase == HomePhase.stopping &&
+            home.state?.publicOrigin == change.origin)) {
+      unawaited(workspaces.reconnect(change.origin));
+    }
     final name = Uri.parse(change.origin).authority;
     final label = change.online
         ? context.strings.serverNowOnline(name)
@@ -226,8 +230,7 @@ class _SpaceShellState extends State<SpaceShell> {
 
   Future<void> stopHome() async {
     final owner = workspaces[home.state?.publicOrigin ?? ''];
-    if (owner != null) await owner.disconnect();
-    await home.stop();
+    await home.stop(disconnectClient: owner?.disconnect);
   }
 
   Future<void> showHome() async {
@@ -274,8 +277,7 @@ class _SpaceShellState extends State<SpaceShell> {
                 return;
               }
               Navigator.pop(context);
-              select(Section.identity);
-              unawaited(openServerAdministration(this.context, administration));
+              select(Section.settings);
             },
           ),
         ),
@@ -310,35 +312,21 @@ class _SpaceShellState extends State<SpaceShell> {
     Section.chat => 1,
     Section.forum || Section.feed => 2,
     Section.rooms => 3,
-    Section.identity || Section.settings => 4,
+    Section.identity => 4,
+    Section.settings => 5,
   };
   void showApplicationSettings() {
     setState(() => applicationSettings = true);
     scaffold.currentState?.closeDrawer();
   }
 
-  Future<void> showServerSettings() async {
-    final target = controller;
-    final administration = target.administration;
-    if (target.busy || administration == null) return;
-    scaffold.currentState?.closeDrawer();
-    setState(() => managementOpen = true);
-    try {
-      await openServerAdministration(
-        context,
-        administration,
-        onDeviceRevoked: () => target.disconnect(),
-      );
-    } finally {
-      if (mounted) setState(() => managementOpen = false);
-    }
-    await target.refreshChannels();
-  }
-
   void select(Section section) {
-    if (section == Section.settings) {
-      unawaited(showServerSettings());
+    if (section == Section.settings &&
+        (controller.busy || controller.administration == null)) {
       return;
+    }
+    if (selected == Section.settings && section != Section.settings) {
+      unawaited(controller.refreshChannels());
     }
     setState(() {
       selected = section;
@@ -804,11 +792,7 @@ class _SpaceShellState extends State<SpaceShell> {
       ChatView(
         key: const ValueKey('live-chat'),
         controller: controller,
-        active:
-            !managementOpen &&
-            !applicationSettings &&
-            !dashboard &&
-            selected == Section.chat,
+        active: !applicationSettings && !dashboard && selected == Section.chat,
         showHeader: false,
         sendWithShift: widget.preferences.sendShortcut == 'shiftEnter',
         openConnection: () => connection(),
@@ -829,9 +813,26 @@ class _SpaceShellState extends State<SpaceShell> {
         controller: controller,
         revoke: revoke,
       ),
-      const SizedBox.shrink(),
+      administrationPage(),
     ],
   );
+  Widget administrationPage() {
+    final target = controller;
+    final session = target.administration;
+    if (selected != Section.settings ||
+        dashboard ||
+        applicationSettings ||
+        session == null) {
+      return const SizedBox.shrink();
+    }
+    return serverAdministration(
+      context,
+      session,
+      key: ObjectKey(session),
+      onDeviceRevoked: () => target.disconnect(),
+    );
+  }
+
   Widget header(bool compact) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
     child: Row(
@@ -1037,6 +1038,7 @@ class _SpaceShellState extends State<SpaceShell> {
                                 Section.forum,
                                 Section.rooms,
                                 Section.identity,
+                                Section.settings,
                               ][index],
                             ),
                       destinations: [
@@ -1059,6 +1061,13 @@ class _SpaceShellState extends State<SpaceShell> {
                         NavigationDestination(
                           icon: Icon(Icons.shield_outlined),
                           label: context.strings.profileTab,
+                        ),
+                        NavigationDestination(
+                          icon: const Icon(Icons.settings_suggest_outlined),
+                          label: context.strings.managementTab,
+                          enabled:
+                              controller.administration != null &&
+                              !controller.busy,
                         ),
                       ],
                     )

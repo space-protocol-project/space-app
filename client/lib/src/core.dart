@@ -1176,7 +1176,14 @@ class SpaceSession
   }
 
   @override
-  Future<void> close() => channel.shutdown();
+  Future<void> close() async {
+    try {
+      await channel.terminate().timeout(const Duration(seconds: 5));
+    } catch (_) {
+      /* Транспорт уже завершается; закрытие не блокирует повторное подключение. */
+    }
+  }
+
   @override
   Future<List<DeviceGrant>> listDevices() async {
     await _ensureSession();

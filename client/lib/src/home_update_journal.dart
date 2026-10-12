@@ -100,7 +100,7 @@ class HomeUpdateJournal {
   Future<HomeUpdateRecord?> read() async {
     if (!await file.exists()) return null;
     try {
-      if (await file.length() > 16384) throw pending;
+      if (await file.length() > 65536) throw pending;
       return HomeUpdateRecord.fromJson(
         Map<String, dynamic>.from(jsonDecode(await file.readAsString()) as Map),
       );

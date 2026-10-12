@@ -439,6 +439,26 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeUpdate => '更新服务器';
 
   @override
+  String get homeReleaseChanges => '版本变更';
+
+  @override
+  String get managementTab => '管理';
+
+  @override
+  String get homeNoReleaseNotes => '此版本未提供变更说明。';
+
+  @override
+  String homeSpaceDetails(String required, String available) {
+    return '所需：$required MiB · 可用：$available MiB';
+  }
+
+  @override
+  String get failureHomeSpaceLow => '家庭服务器操作所需的磁盘空间不足。请释放空间后重试。';
+
+  @override
+  String get failureHomeSpaceUnknown => '无法检查可用空间。请检查磁盘是否可访问后重试。';
+
+  @override
   String get homeResumeUpdate => '继续更新或恢复';
 
   @override

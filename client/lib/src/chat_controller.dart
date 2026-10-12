@@ -792,12 +792,18 @@ class ChatController extends ChangeNotifier {
     _stopCatalog();
     _stopSubscription();
     _update();
+    final session = _session;
+    final save = _savePositions();
+    _session = null;
     try {
       _positionTimer?.cancel();
-      await _savePositions();
-      _stopCatalog();
-      await _session?.close();
-      _session = null;
+      try {
+        await save.timeout(const Duration(seconds: 3));
+      } catch (_) {}
+      try {
+        await session?.close().timeout(const Duration(seconds: 5));
+      } catch (_) {}
+    } finally {
       preview = null;
       fingerprint = '';
       cursor = '';
@@ -809,7 +815,6 @@ class ChatController extends ChangeNotifier {
       _readThrough.clear();
       _readSequences.clear();
       error = '';
-    } finally {
       busy = false;
       _update();
     }

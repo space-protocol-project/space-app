@@ -1,6 +1,5 @@
 import '../l10n/home_strings.dart';
 import '../l10n/strings.dart';
-import 'admin_panel.dart';
 
 import 'package:flutter/material.dart';
 
@@ -379,21 +378,6 @@ class IdentityPanel extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 20),
-      if (controller.administration != null)
-        FilledButton.icon(
-          onPressed: () async {
-            await openServerAdministration(
-              context,
-              controller.administration!,
-              onDeviceRevoked: () {
-                controller.disconnect();
-              },
-            );
-            await controller.refreshChannels();
-          },
-          icon: const Icon(Icons.settings_outlined),
-          label: const Text('Управление пространством'),
-        ),
       const SizedBox(height: 20),
       RecoveryPanel(controller: controller),
     ],

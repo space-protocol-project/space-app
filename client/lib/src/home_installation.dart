@@ -16,7 +16,7 @@ class HomeInstallation {
       Directory('${root.path}/runtimes/${release.version}-${release.platform}');
 
   Future<Map<String, dynamic>> _read(File file) async {
-    if (await file.length() > 8192) throw _invalid;
+    if (await file.length() > 65536) throw _invalid;
     final value = jsonDecode(await file.readAsString());
     if (value is! Map<String, dynamic>) throw _invalid;
     return value;
@@ -159,7 +159,12 @@ class HomeInstallation {
       await download(release, archive, progress);
       extracting();
       final unpacked = await Directory('${temporary.path}/unpacked').create();
-      await extractHomeRelease(archive, unpacked, release.sha256);
+      await extractHomeRelease(
+        archive,
+        unpacked,
+        release.sha256,
+        maximumBytes: release.unpackedBytes,
+      );
       if (!await File(
         '${unpacked.path}/${Platform.isWindows ? 'space-server.exe' : 'space-server'}',
       ).exists()) {

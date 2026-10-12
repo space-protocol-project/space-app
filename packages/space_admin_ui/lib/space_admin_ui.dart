@@ -372,6 +372,7 @@ class _AdminPageState extends State<AdminPage> {
                     subtitle: Text(strings.chatsHelp),
                   ),
                   DropdownButtonFormField<String>(
+                    isExpanded: true,
                     key: ValueKey(policy),
                     initialValue: policy,
                     decoration: InputDecoration(

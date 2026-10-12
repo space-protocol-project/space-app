@@ -465,6 +465,29 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeUpdate => 'Обновить сервер';
 
   @override
+  String get homeReleaseChanges => 'Изменения выпуска';
+
+  @override
+  String get managementTab => 'Управление';
+
+  @override
+  String get homeNoReleaseNotes =>
+      'Описание изменений для этого выпуска не предоставлено.';
+
+  @override
+  String homeSpaceDetails(String required, String available) {
+    return 'Нужно: $required МиБ · доступно: $available МиБ';
+  }
+
+  @override
+  String get failureHomeSpaceLow =>
+      'Недостаточно свободного места для операции домашнего сервера. Освободите место и повторите попытку.';
+
+  @override
+  String get failureHomeSpaceUnknown =>
+      'Не удалось проверить свободное место. Проверьте доступность диска и повторите попытку.';
+
+  @override
   String get homeResumeUpdate => 'Продолжить обновление или восстановление';
 
   @override

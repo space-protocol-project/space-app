@@ -929,6 +929,42 @@ abstract class AppLocalizations {
   /// **'Обновить сервер'**
   String get homeUpdate;
 
+  /// No description provided for @homeReleaseChanges.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменения выпуска'**
+  String get homeReleaseChanges;
+
+  /// No description provided for @managementTab.
+  ///
+  /// In ru, this message translates to:
+  /// **'Управление'**
+  String get managementTab;
+
+  /// No description provided for @homeNoReleaseNotes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Описание изменений для этого выпуска не предоставлено.'**
+  String get homeNoReleaseNotes;
+
+  /// No description provided for @homeSpaceDetails.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нужно: {required} МиБ · доступно: {available} МиБ'**
+  String homeSpaceDetails(String required, String available);
+
+  /// No description provided for @failureHomeSpaceLow.
+  ///
+  /// In ru, this message translates to:
+  /// **'Недостаточно свободного места для операции домашнего сервера. Освободите место и повторите попытку.'**
+  String get failureHomeSpaceLow;
+
+  /// No description provided for @failureHomeSpaceUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось проверить свободное место. Проверьте доступность диска и повторите попытку.'**
+  String get failureHomeSpaceUnknown;
+
   /// No description provided for @homeResumeUpdate.
   ///
   /// In ru, this message translates to:

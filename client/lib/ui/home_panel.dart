@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../src/home_controller.dart';
+import '../src/local_failure.dart';
 import 'components.dart';
 
 class HomePanel extends StatefulWidget {
@@ -40,7 +41,30 @@ class _HomePanelState extends State<HomePanel> {
               ? context.strings.homeResumeUpdate
               : context.strings.homeUpdate,
         ),
-        content: Text(context.strings.homeUpdateConfirm),
+        content: SizedBox(
+          width: 560,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${widget.home.installedVersion} → ${widget.home.availableVersion}',
+                ),
+                const SizedBox(height: 12),
+                Text(context.strings.homeUpdateConfirm),
+                const Divider(height: 24),
+                Text(context.strings.homeReleaseChanges),
+                const SizedBox(height: 8),
+                SelectableText(
+                  widget.home.availableReleaseNotes.isEmpty
+                      ? context.strings.homeNoReleaseNotes
+                      : widget.home.availableReleaseNotes,
+                ),
+              ],
+            ),
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -173,6 +197,18 @@ class _HomePanelState extends State<HomePanel> {
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
               const SizedBox(height: 16),
+              if (home.spaceReport != null &&
+                  home.failureCode == LocalFailureCode.homeSpaceLow)
+                Text(
+                  context.strings.homeSpaceDetails(
+                    (home.spaceReport!.requiredBytes / (1024 * 1024))
+                        .ceil()
+                        .toString(),
+                    (home.spaceReport!.availableBytes / (1024 * 1024))
+                        .floor()
+                        .toString(),
+                  ),
+                ),
             ],
             SpaceActionButton(
               onPressed: home.busy || detecting || updateAction

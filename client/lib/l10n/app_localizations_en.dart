@@ -461,6 +461,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeUpdate => 'Update server';
 
   @override
+  String get homeReleaseChanges => 'Release changes';
+
+  @override
+  String get managementTab => 'Manage';
+
+  @override
+  String get homeNoReleaseNotes =>
+      'No change description was provided for this release.';
+
+  @override
+  String homeSpaceDetails(String required, String available) {
+    return 'Required: $required MiB · available: $available MiB';
+  }
+
+  @override
+  String get failureHomeSpaceLow =>
+      'There is not enough free space for the home server operation. Free up space and retry.';
+
+  @override
+  String get failureHomeSpaceUnknown =>
+      'Free space could not be checked. Check that the disk is accessible and retry.';
+
+  @override
   String get homeResumeUpdate => 'Resume update or recovery';
 
   @override

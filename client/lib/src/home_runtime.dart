@@ -11,10 +11,20 @@ import 'package:crypto/crypto.dart' as crypto;
 import 'package:flutter/services.dart';
 
 class HomeRelease {
-  HomeRelease(this.version, this.platform, this.url, this.sha256, this.bytes);
+  HomeRelease(
+    this.version,
+    this.platform,
+    this.url,
+    this.sha256,
+    this.bytes, {
+    this.unpackedBytes = 2 * 1024 * 1024 * 1024,
+    this.releaseNotes = '',
+  });
   final String version, platform, sha256;
   final Uri url;
   final int bytes;
+  final int unpackedBytes;
+  final String releaseNotes;
 
   bool isNewerThan(HomeRelease other) => isNewerVersion(version, other.version);
 
@@ -57,6 +67,8 @@ class HomeRelease {
     'url': url.toString(),
     'sha256': sha256,
     'bytes': bytes,
+    'unpackedBytes': unpackedBytes,
+    'releaseNotes': releaseNotes,
   };
 
   factory HomeRelease.fromJson(Map<String, dynamic> data) {
@@ -66,6 +78,8 @@ class HomeRelease {
       Uri.parse(data['url'] as String),
       data['sha256'] as String,
       data['bytes'] as int,
+      unpackedBytes: data['unpackedBytes'] as int? ?? 2 * 1024 * 1024 * 1024,
+      releaseNotes: data['releaseNotes'] as String? ?? '',
     );
     if (!RegExp(r'^v[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.-]+)?$')
             .hasMatch(release.version) ||
@@ -74,6 +88,9 @@ class HomeRelease {
         !RegExp(r'^[0-9a-f]{64}$').hasMatch(release.sha256) ||
         release.bytes < 1 ||
         release.bytes > 512 * 1024 * 1024 ||
+        release.unpackedBytes < 1 ||
+        release.unpackedBytes > 2 * 1024 * 1024 * 1024 ||
+        utf8.encode(release.releaseNotes).length > 8192 ||
         release.url.toString() !=
             'https://github.com/space-protocol-project/space-server/releases/download/${release.version}/Space-home-${release.platform}.zip') {
       throw const LocalFailure(
@@ -195,8 +212,9 @@ Future<void> downloadHomeRelease(
 Future<void> extractHomeRelease(
   File archiveFile,
   Directory destination,
-  String expectedHash,
-) async {
+  String expectedHash, {
+  int maximumBytes = 2 * 1024 * 1024 * 1024,
+}) async {
   final hash = await crypto.sha256.bind(archiveFile.openRead()).first;
   if (hash.toString() != expectedHash) {
     throw const LocalFailure(
@@ -205,11 +223,19 @@ Future<void> extractHomeRelease(
     );
   }
   await Isolate.run(
-    () => extractVerifiedHomeArchive(archiveFile.path, destination.path),
+    () => extractVerifiedHomeArchive(
+      archiveFile.path,
+      destination.path,
+      maximumBytes: maximumBytes,
+    ),
   );
 }
 
-void extractVerifiedHomeArchive(String archivePath, String destination) {
+void extractVerifiedHomeArchive(
+  String archivePath,
+  String destination, {
+  int maximumBytes = 2 * 1024 * 1024 * 1024,
+}) {
   final input = InputFileStream(archivePath);
   try {
     final archive = ZipDecoder().decodeStream(input);
@@ -234,6 +260,7 @@ void extractVerifiedHomeArchive(String archivePath, String destination) {
           ) ||
           entry.name.startsWith('/') ||
           entry.name.startsWith('\\') ||
+          total > maximumBytes ||
           total > 2 * 1024 * 1024 * 1024) {
         throw const LocalFailure(
           LocalFailureCode.archiveInvalid,

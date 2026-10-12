@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/home_installation.dart';
 import 'package:space_client/src/home_update_executor.dart';
 import 'package:space_client/src/home_update_journal.dart';
+import 'package:space_client/src/home_storage.dart';
 
 import 'home_installation_test.dart' show installed, release;
 
@@ -86,7 +87,11 @@ void main() {
     migrationFails = false;
     restorationFails = false;
     wrongIdentity = false;
-    executor = HomeUpdateExecutor(root, tool: tool);
+    executor = HomeUpdateExecutor(
+      root,
+      tool: tool,
+      storage: HomeStorage(available: (_) async => 1024 * 1024 * 1024),
+    );
   });
   tearDown(() => root.delete(recursive: true));
 
@@ -147,7 +152,11 @@ void main() {
         HomeUpdateStep.restoring,
       );
       restorationFails = false;
-      await HomeUpdateExecutor(root, tool: tool).recover();
+      await HomeUpdateExecutor(
+        root,
+        tool: tool,
+        storage: HomeStorage(available: (_) async => 1024 * 1024 * 1024),
+      ).recover();
       expect(
         (await HomeUpdateJournal(root).read())!.step,
         HomeUpdateStep.completeRestored,

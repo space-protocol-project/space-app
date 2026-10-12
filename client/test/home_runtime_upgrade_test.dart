@@ -1,6 +1,7 @@
 // Сквозная проверка выполняется только на одноразовом CI runner.
 import 'dart:io';
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:flutter_test/flutter_test.dart';
@@ -50,8 +51,18 @@ void main() {
               .toList();
       expect(archives, hasLength(1));
       final archive = File(archives.single.path);
+      final metadata = jsonDecode(
+        await File(
+          '${Platform.environment['SPACE_HOME_CANDIDATE_DIRECTORY']}/${old.platform}.json',
+        ).readAsString(),
+      ) as Map<String, dynamic>;
+      expect(
+        metadata['sha256'],
+        (await crypto.sha256.bind(archive.openRead()).first).toString(),
+      );
       // v0.2.0 здесь — имя локального CI-кандидата, а не опубликованный выпуск.
       final candidate = HomeRelease.fromJson({
+        ...metadata,
         'version': 'v0.2.0',
         'platform': old.platform,
         'url':
@@ -89,11 +100,24 @@ void main() {
         );
         final principal = session.principalId;
         await session.send('Сообщение до обновления', 'upgrade-check-1');
-        await session.close();
+        // Подписка остаётся открытой и приостановленной после первого кадра.
+        final iterator = StreamIterator(session.subscribe(''));
+        expect(
+          await iterator.moveNext().timeout(const Duration(seconds: 10)),
+          true,
+        );
+        await session.close().timeout(const Duration(seconds: 7));
+        await iterator.cancel();
         session = null;
         await original.stop();
         expect(original.error, isEmpty);
+        final stillOld = await updated.start('203.0.113.10');
+        expect(stillOld, isNotNull, reason: updated.error);
+        expect(updated.installedVersion, 'v0.1.0');
         expect(await updated.prepareUpdate(), true, reason: updated.error);
+        expect(updated.running, true);
+        await updated.stop();
+        expect(updated.error, isEmpty);
         await updated.performUpdate();
         expect(updated.error, isEmpty);
         expect(updated.pendingUpdate, false);

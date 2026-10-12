@@ -10,6 +10,7 @@ import 'home_runtime.dart';
 import 'home_installation.dart';
 import 'home_update_journal.dart';
 import 'home_update_executor.dart';
+import 'home_storage.dart';
 import 'local_failure.dart';
 
 enum HomePhase {
@@ -46,17 +47,22 @@ class HomeController extends ChangeNotifier {
     this.directory = homeDirectory,
     this.release = bundledHomeRelease,
     this.download = downloadHomeRelease,
+    this.storage = const HomeStorage(),
   });
   final Future<Directory> Function() directory;
   final Future<HomeRelease> Function() release;
+  final HomeStorage storage;
   final Future<void> Function(HomeRelease, File, void Function(double))
   download;
   Directory? _root;
   Process? _process;
   RandomAccessFile? _lock;
+  Future<void>? _unlocking;
   bool busy = false, running = false, _disposed = false;
   String ip = '', error = '';
   String installedVersion = '', availableVersion = '';
+  String availableReleaseNotes = '';
+  HomeSpaceReport? spaceReport;
   bool pendingUpdate = false;
   bool get updateAvailable =>
       installedVersion.isNotEmpty &&
@@ -141,8 +147,9 @@ class HomeController extends ChangeNotifier {
       }
       final offered = await release();
       availableVersion = offered.version;
+      availableReleaseNotes = offered.releaseNotes;
       final selection = HomeInstallation(root).selection;
-      if (await selection.exists() && await selection.length() < 8192) {
+      if (await selection.exists() && await selection.length() <= 65536) {
         final saved = jsonDecode(await selection.readAsString()) as Map;
         installedVersion = HomeRelease.fromJson(
           Map<String, dynamic>.from(saved['active'] as Map),
@@ -205,6 +212,7 @@ class HomeController extends ChangeNotifier {
     );
     installedVersion = active?.version ?? offered.version;
     availableVersion = offered.version;
+    availableReleaseNotes = offered.releaseNotes;
     if (active != null) return installation.runtime(active);
     final target = await _prepare(root, offered);
     await installation.selectInitial(offered);
@@ -212,6 +220,13 @@ class HomeController extends ChangeNotifier {
   }
 
   Future<Directory> _prepare(Directory root, HomeRelease descriptor) async {
+    phase = HomePhase.installing;
+    _update();
+    final ready = await HomeInstallation(root).runtime(descriptor).exists();
+    spaceReport = await storage.check(
+      root,
+      additionalBytes: ready ? 0 : descriptor.bytes + descriptor.unpackedBytes,
+    );
     phase = HomePhase.downloading;
     _downloadClock.start();
     _update();
@@ -235,6 +250,7 @@ class HomeController extends ChangeNotifier {
     busy = true;
     error = '';
     failureCode = null;
+    spaceReport = null;
     progress = 0;
     _beginProgress();
     var ownLock = false;
@@ -255,6 +271,7 @@ class HomeController extends ChangeNotifier {
       await HomeUpdateExecutor(root).verifyCandidate(target);
       return true;
     } catch (e) {
+      if (e is HomeSpaceFailure) spaceReport = e.report;
       failureCode = e is LocalFailure
           ? e.code
           : LocalFailureCode.homeUpdateFailed;
@@ -282,7 +299,7 @@ class HomeController extends ChangeNotifier {
       _lock = await File('${root.path}/process.lock')
           .open(mode: FileMode.append);
       await _lock!.lock(FileLock.exclusive);
-      final executor = HomeUpdateExecutor(root);
+      final executor = HomeUpdateExecutor(root, storage: storage);
       if (recover) {
         await executor.recover();
       } else {
@@ -293,6 +310,7 @@ class HomeController extends ChangeNotifier {
         await executor.update(source, target);
       }
     } catch (e) {
+      if (e is HomeSpaceFailure) spaceReport = e.report;
       failureCode = e is LocalFailure
           ? e.code
           : LocalFailureCode.homeUpdateFailed;
@@ -445,26 +463,35 @@ class HomeController extends ChangeNotifier {
     }
   }
 
-  Future<void> _unlock() async {
+  Future<void> _unlock() {
+    if (_unlocking != null) return _unlocking!;
     final lock = _lock;
     _lock = null;
-    if (lock != null) {
-      await lock.close();
-    }
+    if (lock == null) return Future.value();
+    _unlocking = lock.close().whenComplete(() => _unlocking = null);
+    return _unlocking!;
   }
 
   Future<void> _stop() async {
     phase = HomePhase.stopping;
-    stopProgress = .1;
+    stopProgress = .2;
     _update();
     final process = _process;
     if (process != null) {
       // EOF запускает штатное завершение Go, затем остановку собственной PostgreSQL.
-      await process.stdin.close();
+      await process.stdin.close().timeout(const Duration(seconds: 3));
       stopProgress = .35;
       _update();
       final code = await process.exitCode.timeout(const Duration(seconds: 30));
-      if (code != 0) {
+      stopProgress = .8;
+      _update();
+      final pidFile = _root == null
+          ? null
+          : File('${_root!.path}/data/postgres/postmaster.pid');
+      if (pidFile != null && await pidFile.exists()) {
+        throw StateError('PostgreSQL не подтвердила остановку: $_diagnostic');
+      }
+      if (code != 0 && pidFile == null) {
         throw StateError('Ошибка остановки домашнего сервера: $_diagnostic');
       }
       _process = null;
@@ -477,7 +504,7 @@ class HomeController extends ChangeNotifier {
     await _unlock();
   }
 
-  Future<void> stop() async {
+  Future<void> stop({Future<void> Function()? disconnectClient}) async {
     if (busy) return;
     busy = true;
     phase = HomePhase.stopping;
@@ -487,6 +514,15 @@ class HomeController extends ChangeNotifier {
     failureCode = null;
     _update();
     try {
+      stopProgress = .05;
+      _update();
+      if (disconnectClient != null) {
+        try {
+          await disconnectClient().timeout(const Duration(seconds: 5));
+        } catch (_) {
+          /* Остановка клиента не должна блокировать завершение сервера. */
+        }
+      }
       await _stop();
     } catch (_) {
       failureCode = LocalFailureCode.homeStopFailed;

@@ -51,6 +51,8 @@ enum LocalFailureCode {
   homeStopFailed,
   homeUpdatePending,
   homeUpdateFailed,
+  homeSpaceLow,
+  homeSpaceUnknown,
 }
 
 /// Стабильный код передаётся из вычислителя в интерфейс, включая isolate.
