@@ -80,7 +80,8 @@ class _DevicePanelState extends State<DevicePanel> {
                     ],
                     onChanged: (value) => setState(() => selected = value),
                   ),
-                  if (!controller.connected)
+                  if (!controller.connected) ...[
+                    const SizedBox(height: 20),
                     OutlinedButton.icon(
                       onPressed: controller.busy
                           ? null
@@ -88,6 +89,7 @@ class _DevicePanelState extends State<DevicePanel> {
                       icon: const Icon(Icons.link),
                       label: Text(context.strings.deviceConnectIdentity),
                     ),
+                  ],
                   if (controller.principalId.isNotEmpty) ...[
                     const SizedBox(height: 16),
                     SelectableText(controller.principalId),
