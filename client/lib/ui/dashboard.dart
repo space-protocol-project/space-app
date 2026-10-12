@@ -63,27 +63,28 @@ class Dashboard extends StatelessWidget {
           spacing: 12,
           runSpacing: 12,
           children: [
-            IntrinsicWidth(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  FilledButton.icon(
-                    onPressed: addSpace,
-                    icon: const Icon(Icons.add),
-                    label: Text(context.strings.addSpace),
-                  ),
-                  if (createOwnSpace != null) ...[
-                    const SizedBox(height: 12),
+            if (MediaQuery.sizeOf(context).width < 760)
+              IntrinsicWidth(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                     FilledButton.icon(
-                      onPressed: homeBusy ? null : createOwnSpace,
-                      icon: const Icon(Icons.add_home_outlined),
-                      label: Text(context.strings.createOwnSpace),
+                      onPressed: addSpace,
+                      icon: const Icon(Icons.add),
+                      label: Text(context.strings.addSpace),
                     ),
+                    if (createOwnSpace != null) ...[
+                      const SizedBox(height: 12),
+                      FilledButton.icon(
+                        onPressed: homeBusy ? null : createOwnSpace,
+                        icon: const Icon(Icons.add_home_outlined),
+                        label: Text(context.strings.createOwnSpace),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
             OutlinedButton.icon(
               onPressed: () {
                 workspaces.refresh();

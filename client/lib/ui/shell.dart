@@ -671,6 +671,12 @@ class _SpaceShellState extends State<SpaceShell> {
                   icon: Icons.add,
                   label: context.strings.addSpace,
                 ),
+                const SizedBox(height: 12),
+                SpaceActionButton(
+                  onPressed: home.busy ? null : createOwnSpace,
+                  icon: Icons.add_home_outlined,
+                  label: context.strings.createOwnSpace,
+                ),
                 const SizedBox(height: 20),
                 ListTile(
                   leading: const Icon(Icons.home_outlined),
