@@ -75,20 +75,62 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
                   children: [
                     OutlinedButton.icon(
                       key: const ValueKey('check-app-updates'),
-                      onPressed: updates.status == AppUpdateStatus.checking
+                      onPressed:
+                          updates.downloading ||
+                              updates.status == AppUpdateStatus.checking
                           ? null
                           : updates.check,
                       icon: const Icon(Icons.refresh),
                       label: Text(context.strings.updatesCheck),
                     ),
-                    if (updates.status == AppUpdateStatus.available)
+                    if (updates.status == AppUpdateStatus.available &&
+                        updates.package != null)
                       FilledButton.icon(
+                        key: const ValueKey('download-app-update'),
+                        onPressed:
+                            updates.downloading ||
+                                updates.downloadedPackage != null
+                            ? null
+                            : updates.download,
+                        icon: const Icon(Icons.download_outlined),
+                        label: Text(context.strings.updatesDownload),
+                      ),
+                    if (updates.status == AppUpdateStatus.available)
+                      OutlinedButton.icon(
                         onPressed: openRelease,
                         icon: const Icon(Icons.open_in_new),
                         label: Text(context.strings.updatesOpen),
                       ),
                   ],
                 ),
+                if (updates.downloading) ...[
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 32,
+                        height: 32,
+                        child: CircularProgressIndicator(
+                          value:
+                              updates.downloadedBytes / updates.package!.size,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        '${(100 * updates.downloadedBytes / updates.package!.size).floor()}%',
+                      ),
+                    ],
+                  ),
+                ],
+                if (updates.downloadFailed ||
+                    updates.downloadedPackage != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    updates.downloadFailed
+                        ? context.strings.updatesDownloadFailed
+                        : context.strings.updatesDownloaded,
+                  ),
+                ],
                 if (message.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   Text(message, key: const ValueKey('app-update-status')),

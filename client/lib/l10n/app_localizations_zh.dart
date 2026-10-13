@@ -1000,6 +1000,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String updatesPackage(String platform, String size) {
     return '$platform · $size MB';
   }
+
+  @override
+  String get updatesDownload => '下载';
+
+  @override
+  String get updatesDownloadFailed => '下载失败，请重试。';
+
+  @override
+  String get updatesDownloaded => '安装包已下载并验证。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

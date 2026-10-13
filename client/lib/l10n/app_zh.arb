@@ -436,5 +436,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "updatesDownload": "下载",
+  "updatesDownloadFailed": "下载失败，请重试。",
+  "updatesDownloaded": "安装包已下载并验证。"
 }

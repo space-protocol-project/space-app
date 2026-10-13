@@ -2002,6 +2002,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'{platform} · {size} МБ'**
   String updatesPackage(String platform, String size);
+
+  /// No description provided for @updatesDownload.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скачать'**
+  String get updatesDownload;
+
+  /// No description provided for @updatesDownloadFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось скачать. Повторите загрузку.'**
+  String get updatesDownloadFailed;
+
+  /// No description provided for @updatesDownloaded.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пакет скачан и проверен.'**
+  String get updatesDownloaded;
 }
 
 class _AppLocalizationsDelegate

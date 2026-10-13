@@ -436,5 +436,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "updatesDownload": "Download",
+  "updatesDownloadFailed": "Download failed. Please retry.",
+  "updatesDownloaded": "Package downloaded and verified."
 }

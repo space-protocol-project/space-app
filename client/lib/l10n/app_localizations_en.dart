@@ -1093,4 +1093,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String updatesPackage(String platform, String size) {
     return '$platform · $size MB';
   }
+
+  @override
+  String get updatesDownload => 'Download';
+
+  @override
+  String get updatesDownloadFailed => 'Download failed. Please retry.';
+
+  @override
+  String get updatesDownloaded => 'Package downloaded and verified.';
 }

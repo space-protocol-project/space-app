@@ -436,5 +436,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "updatesDownload": "Скачать",
+  "updatesDownloadFailed": "Не удалось скачать. Повторите загрузку.",
+  "updatesDownloaded": "Пакет скачан и проверен."
 }

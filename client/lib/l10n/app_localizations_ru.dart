@@ -1097,4 +1097,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String updatesPackage(String platform, String size) {
     return '$platform · $size МБ';
   }
+
+  @override
+  String get updatesDownload => 'Скачать';
+
+  @override
+  String get updatesDownloadFailed => 'Не удалось скачать. Повторите загрузку.';
+
+  @override
+  String get updatesDownloaded => 'Пакет скачан и проверен.';
 }

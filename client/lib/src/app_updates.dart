@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:crypto/crypto.dart' as crypto;
+import 'package:path_provider/path_provider.dart';
 
 const appRepository = 'space-protocol-project/space-app';
 const appReleaseAssets = {
@@ -151,9 +153,16 @@ class AppUpdates extends ChangeNotifier {
     http.Client? client,
     Future<String> Function()? readVersion,
     String? platform,
+    Future<Directory> Function()? downloadDirectory,
   }) : client = client ?? http.Client(),
        readVersion = readVersion ?? installedAppVersion,
-       platform = platform ?? installedAppPlatform();
+       platform = platform ?? installedAppPlatform(),
+       downloadDirectory = downloadDirectory ?? appUpdateDirectory;
+  final Future<Directory> Function() downloadDirectory;
+  bool downloading = false;
+  int downloadedBytes = 0;
+  bool downloadFailed = false;
+  File? downloadedPackage;
   final String platform;
   AppPackage? get package => release?.packages[appPackages[platform]];
   final http.Client client;
@@ -177,7 +186,10 @@ class AppUpdates extends ChangeNotifier {
   }
 
   Future<void> check() async {
-    if (_disposed || status == AppUpdateStatus.checking) return;
+    if (_disposed || downloading || status == AppUpdateStatus.checking) return;
+    downloadedPackage = null;
+    downloadFailed = false;
+    downloadedBytes = 0;
     status = AppUpdateStatus.checking;
     release = null;
     _notify();
@@ -222,6 +234,131 @@ class AppUpdates extends ChangeNotifier {
     _notify();
   }
 
+  Future<void> download() async {
+    final target = package;
+    if (_disposed ||
+        downloading ||
+        status != AppUpdateStatus.available ||
+        target == null) {
+      return;
+    }
+    downloading = true;
+    downloadFailed = false;
+    downloadedPackage = null;
+    _notify();
+    File? partial;
+    IOSink? sink;
+    try {
+      final directory = await downloadDirectory();
+      await directory.create(recursive: true);
+      final hash = target.digest.substring(7);
+      final output = File('${directory.path}/$hash-${target.name}');
+      partial = File('${output.path}.part');
+      if (await output.exists()) {
+        if (await validPackage(output, target)) {
+          downloadedBytes = target.size;
+          downloadedPackage = output;
+          return;
+        }
+        await output.delete();
+      }
+      var offset = await partial.exists() ? await partial.length() : 0;
+      if (offset > target.size) {
+        await partial.delete();
+        offset = 0;
+      }
+      downloadedBytes = offset;
+      if (offset < target.size) {
+        final response = await packageResponse(target, offset);
+        if (response.statusCode == 200) {
+          offset = 0;
+        } else if (response.statusCode != 206 ||
+            response.headers['content-range'] !=
+                'bytes $offset-${target.size - 1}/${target.size}') {
+          throw const FormatException('Неверный диапазон загрузки');
+        }
+        if (response.contentLength != null &&
+            response.contentLength != target.size - offset) {
+          throw const FormatException('Неверный размер пакета');
+        }
+        downloadedBytes = offset;
+        final writer = partial.openWrite(
+          mode: offset == 0 ? FileMode.write : FileMode.append,
+        );
+        sink = writer;
+        await for (final chunk in response.stream.timeout(
+          const Duration(seconds: 30),
+        )) {
+          if (_disposed) throw const FormatException('Загрузка остановлена');
+          if (downloadedBytes + chunk.length > target.size) {
+            await writer.close();
+            sink = null;
+            await partial.delete();
+            throw const FormatException('Пакет превышает ожидаемый размер');
+          }
+          writer.add(chunk);
+          downloadedBytes += chunk.length;
+          _notify();
+        }
+        await writer.close();
+        sink = null;
+      }
+      if (await partial.length() != target.size) {
+        throw const FormatException('Неполная загрузка');
+      }
+      if (!await validPackage(partial, target)) {
+        await partial.delete();
+        downloadedBytes = 0;
+        throw const FormatException('Контрольная сумма не совпадает');
+      }
+      if (_disposed) return;
+      downloadedPackage = await partial.rename(output.path);
+    } catch (_) {
+      downloadFailed = true;
+    } finally {
+      try {
+        await sink?.close();
+      } catch (_) {
+        downloadFailed = true;
+      }
+      downloading = false;
+      _notify();
+    }
+  }
+
+  Future<http.StreamedResponse> packageResponse(
+    AppPackage target,
+    int offset,
+  ) async {
+    var url = target.url;
+    for (var i = 0; i < 6; i++) {
+      if (url.scheme != 'https' ||
+          url.userInfo.isNotEmpty ||
+          url.port != 443 ||
+          !{
+            'github.com',
+            'release-assets.githubusercontent.com',
+            'objects.githubusercontent.com',
+          }.contains(url.host)) {
+        throw const FormatException('Недопустимый адрес загрузки');
+      }
+      final request = http.Request('GET', url)..followRedirects = false;
+      request.headers['Accept-Encoding'] = 'identity';
+      if (offset > 0) request.headers['Range'] = 'bytes=$offset-';
+      final response = await client
+          .send(request)
+          .timeout(const Duration(seconds: 30));
+      if (![301, 302, 303, 307, 308].contains(response.statusCode)) {
+        return response;
+      }
+      final location = response.headers['location'];
+      await response.stream.drain<void>().timeout(const Duration(seconds: 30));
+      if (location == null) break;
+      url = url.resolve(location);
+    }
+    throw const FormatException('Слишком много перенаправлений');
+  }
+
   void _notify() {
     if (!_disposed) notifyListeners();
   }
@@ -242,4 +379,13 @@ Future<String> installedAppVersion() async {
   ).firstMatch(source)?.group(1);
   if (version == null) throw const FormatException('Нет версии сборки');
   return version;
+}
+
+Future<Directory> appUpdateDirectory() async =>
+    Directory('${(await getApplicationSupportDirectory()).path}/updates');
+
+Future<bool> validPackage(File file, AppPackage package) async {
+  if (await file.length() != package.size) return false;
+  final digest = await crypto.sha256.bind(file.openRead()).first;
+  return 'sha256:$digest' == package.digest;
 }
