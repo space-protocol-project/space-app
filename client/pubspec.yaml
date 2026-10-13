@@ -64,6 +64,8 @@ dependencies:
   connectrpc: 2.0.0
   flutter_markdown_plus: 1.0.12
   url_launcher: 6.3.3
+  window_manager: 0.5.2
+  screen_retriever: 0.2.2
 
 dev_dependencies:
   flutter_test:

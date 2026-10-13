@@ -1,10 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'app.dart';
+import 'src/desktop_window.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   LicenseRegistry.addLicense(() async* {
     for (final entry in {
@@ -17,5 +20,14 @@ void main() {
       ], await rootBundle.loadString('assets/fonts/${entry.value}-OFL.txt'));
     }
   });
+  DesktopWindowState? desktopWindow;
+  try {
+    desktopWindow = await DesktopWindowState.initialize();
+  } catch (_) {
+    // Недоступные настройки окна не мешают запуску приложения.
+  }
   runApp(const SpaceApp());
+  if (desktopWindow != null) {
+    unawaited(desktopWindow.restore().catchError((Object _) {}));
+  }
 }

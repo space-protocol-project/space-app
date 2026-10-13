@@ -388,12 +388,15 @@
   "recoveryGeneratingQr": "Создаём QR…",
   "recoverySaveQr": "Сохранить QR",
   "recoveryOverwriteQr": "Заменить существующий файл QR-карточки?",
-  "serverSearch": "Найти сервер",
+  "serverSearch": "Найти пространство",
   "serverFilterAll": "Все",
   "serverNoEvents": "Нет загруженных сообщений",
   "serverOffline": "Офлайн",
   "removeServer": "Убрать из приложения",
   "removeServerConfirm": "История на этом устройстве будет удалена. Сервер можно добавить снова.",
   "serverAccessRemoved": "Доступ отозван. Сервер убран.",
-  "serverRemoveFailed": "Не удалось убрать сервер. Повторите."
+  "serverRemoveFailed": "Не удалось убрать сервер. Повторите.",
+  "serverInAir": "Сервер в эфире",
+  "serverNoChannels": "Нет доступных каналов",
+  "spacesTitle": "Пространства"
 }

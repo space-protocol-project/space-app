@@ -1016,7 +1016,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get recoveryOverwriteQr => 'Заменить существующий файл QR-карточки?';
 
   @override
-  String get serverSearch => 'Найти сервер';
+  String get serverSearch => 'Найти пространство';
 
   @override
   String get serverFilterAll => 'Все';
@@ -1039,4 +1039,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get serverRemoveFailed => 'Не удалось убрать сервер. Повторите.';
+
+  @override
+  String get serverInAir => 'Сервер в эфире';
+
+  @override
+  String get serverNoChannels => 'Нет доступных каналов';
+
+  @override
+  String get spacesTitle => 'Пространства';
 }

@@ -388,12 +388,15 @@
   "recoveryGeneratingQr": "Creating QR…",
   "recoverySaveQr": "Save QR",
   "recoveryOverwriteQr": "Replace the existing QR card file?",
-  "serverSearch": "Find a server",
+  "serverSearch": "Find a space",
   "serverFilterAll": "All",
   "serverNoEvents": "No loaded messages",
   "serverOffline": "Offline",
   "removeServer": "Remove from app",
   "removeServerConfirm": "History on this device will be deleted. You can add the server again.",
   "serverAccessRemoved": "Access revoked. Server removed.",
-  "serverRemoveFailed": "Could not remove the server. Try again."
+  "serverRemoveFailed": "Could not remove the server. Try again.",
+  "serverInAir": "Server is online",
+  "serverNoChannels": "No available channels",
+  "spacesTitle": "Spaces"
 }

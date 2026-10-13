@@ -921,7 +921,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get recoveryOverwriteQr => '替换现有二维码恢复卡文件？';
 
   @override
-  String get serverSearch => '查找服务器';
+  String get serverSearch => '查找空间';
 
   @override
   String get serverFilterAll => '全部';
@@ -943,6 +943,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get serverRemoveFailed => '无法移除服务器。请重试。';
+
+  @override
+  String get serverInAir => '服务器在线';
+
+  @override
+  String get serverNoChannels => '暂无可用频道';
+
+  @override
+  String get spacesTitle => '空间';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

@@ -1856,7 +1856,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverSearch.
   ///
   /// In ru, this message translates to:
-  /// **'Найти сервер'**
+  /// **'Найти пространство'**
   String get serverSearch;
 
   /// No description provided for @serverFilterAll.
@@ -1900,6 +1900,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не удалось убрать сервер. Повторите.'**
   String get serverRemoveFailed;
+
+  /// No description provided for @serverInAir.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер в эфире'**
+  String get serverInAir;
+
+  /// No description provided for @serverNoChannels.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет доступных каналов'**
+  String get serverNoChannels;
+
+  /// No description provided for @spacesTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пространства'**
+  String get spacesTitle;
 }
 
 class _AppLocalizationsDelegate

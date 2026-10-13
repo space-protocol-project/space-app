@@ -136,37 +136,12 @@ class AppPreferences extends ChangeNotifier {
       'iris' => dark ? const Color(0xFFD3869B) : const Color(0xFF8F3F71),
       _ => dark ? const Color(0xFFFABD2F) : const Color(0xFF9D6000),
     };
-    final oceanLight = !dark && palette == 'ocean';
-    final background = dark
-        ? const Color(0xFF1D2021)
-        : oceanLight
-        ? const Color(0xFFEFF6F7)
-        : const Color(0xFFFBF1C7);
-    final surface = dark
-        ? const Color(0xFF32302F)
-        : oceanLight
-        ? const Color(0xFFF7FBFC)
-        : const Color(0xFFF9F5D7);
-    final text = dark
-        ? const Color(0xFFEBDBB2)
-        : oceanLight
-        ? const Color(0xFF223C42)
-        : const Color(0xFF3C3836);
-    final sidebar = dark
-        ? const Color(0xFF282828)
-        : oceanLight
-        ? const Color(0xFFE0EFF1)
-        : const Color(0xFFF2E5BC);
-    final soft = dark
-        ? const Color(0xFF3C3836)
-        : oceanLight
-        ? const Color(0xFFD0E4E8)
-        : const Color(0xFFEBDBB2);
-    final raised = dark
-        ? const Color(0xFF504945)
-        : oceanLight
-        ? const Color(0xFFAACFD5)
-        : const Color(0xFFD5C4A1);
+    final background = dark ? const Color(0xFF1D2021) : const Color(0xFFFBF1C7);
+    final surface = dark ? const Color(0xFF32302F) : const Color(0xFFF9F5D7);
+    final text = dark ? const Color(0xFFEBDBB2) : const Color(0xFF3C3836);
+    final sidebar = dark ? const Color(0xFF282828) : const Color(0xFFF2E5BC);
+    final soft = dark ? const Color(0xFF3C3836) : const Color(0xFFEBDBB2);
+    final raised = dark ? const Color(0xFF504945) : const Color(0xFFD5C4A1);
     final scheme = ColorScheme.fromSeed(
       seedColor: primary,
       brightness: brightness,

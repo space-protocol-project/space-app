@@ -1012,7 +1012,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recoveryOverwriteQr => 'Replace the existing QR card file?';
 
   @override
-  String get serverSearch => 'Find a server';
+  String get serverSearch => 'Find a space';
 
   @override
   String get serverFilterAll => 'All';
@@ -1035,4 +1035,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverRemoveFailed => 'Could not remove the server. Try again.';
+
+  @override
+  String get serverInAir => 'Server is online';
+
+  @override
+  String get serverNoChannels => 'No available channels';
+
+  @override
+  String get spacesTitle => 'Spaces';
 }

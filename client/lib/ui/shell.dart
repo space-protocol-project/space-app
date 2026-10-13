@@ -949,7 +949,9 @@ class _SpaceShellState extends State<SpaceShell> {
         ),
         railButton(
           key: const ValueKey('home-server-details-tab'),
-          tooltip: context.strings.goLive,
+          tooltip: home.running
+              ? context.strings.serverInAir
+              : context.strings.goLive,
           onPressed: showHomeDetails,
           selected: home.running,
           icon: home.busy
@@ -1044,14 +1046,10 @@ class _SpaceShellState extends State<SpaceShell> {
         switch (section) {
           Section.overview => OverviewPanel(
             controller: controller,
-            home:
-                controller.preview?.origin.toString() ==
-                    'https://${home.ip}:8443'
-                ? home
-                : null,
-            homeAction: showHome,
-            homeDetails: showHomeDetails,
-            openConnection: () => connection(),
+            openChannel: (id) {
+              unawaited(controller.selectChannel(id));
+              select(Section.chat);
+            },
             openChat: () => select(Section.chat),
           ),
           Section.chat => ChatView(
@@ -1131,7 +1129,7 @@ class _SpaceShellState extends State<SpaceShell> {
             children: [
               Text(
                 serverList
-                    ? context.strings.dashboardServers
+                    ? context.strings.spacesTitle
                     : devicePage
                     ? context.strings.myDevice
                     : applicationSettings
@@ -1356,7 +1354,7 @@ class _SpaceShellState extends State<SpaceShell> {
                         ),
                         NavigationDestination(
                           icon: Icon(Icons.dns_outlined),
-                          label: context.strings.dashboardServers,
+                          label: context.strings.spacesTitle,
                         ),
                         NavigationDestination(
                           icon: Icon(Icons.computer_outlined),

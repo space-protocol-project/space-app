@@ -1,4 +1,3 @@
-import '../l10n/home_strings.dart';
 import '../l10n/strings.dart';
 
 import 'package:flutter/material.dart';
@@ -7,154 +6,118 @@ import 'recovery_panel.dart';
 
 import '../src/chat_controller.dart';
 import '../src/preferences.dart';
-import '../src/home_controller.dart';
 import 'components.dart';
 
 class OverviewPanel extends StatelessWidget {
   const OverviewPanel({
     super.key,
     required this.controller,
-    required this.openConnection,
     required this.openChat,
-    this.home,
-    this.homeAction,
-    this.homeDetails,
+    required this.openChannel,
   });
   final ChatController controller;
-  final VoidCallback openConnection, openChat;
-  final HomeController? home;
-  final VoidCallback? homeAction, homeDetails;
+  final VoidCallback openChat;
+  final ValueChanged<String> openChannel;
+
   @override
-  Widget build(BuildContext context) => PageBody(
-    title: context.strings.welcome,
-    description: context.strings.welcomeDescription,
-    children: [
-      if (home != null) ...[
+  Widget build(BuildContext context) {
+    final channels = controller.channels
+        .where((c) => !c.archived && c.permissions.visible)
+        .toList();
+    final unread = channels.fold(
+      0,
+      (total, c) => total + controller.unreadCount(c.id),
+    );
+    final status = controller.reconnecting
+        ? context.strings.reconnecting
+        : controller.connected
+        ? context.strings.connected
+        : context.strings.serverOffline;
+    Widget metric(String label, int count) => SurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('$count', style: Theme.of(context).textTheme.headlineMedium),
+          const SizedBox(height: 12),
+          Text(label),
+        ],
+      ),
+    );
+    return PageBody(
+      title: controller.spaceTitle.isEmpty
+          ? context.strings.welcome
+          : controller.spaceTitle,
+      description: context.strings.welcomeDescription,
+      children: [
         SurfaceCard(
+          hoverBorder: true,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                context.strings.myHomeServer,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 10),
-              Text(
-                home!.busy
-                    ? home!.phase.label(context)
-                    : home!.running
-                    ? context.strings.homeRunningHelp
-                    : context.strings.homeStartHelp,
-              ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 12,
-                runSpacing: 10,
+              Row(
                 children: [
-                  OutlinedButton.icon(
-                    onPressed: home!.busy ? null : homeDetails,
-                    icon: const Icon(Icons.sensors),
-                    label: Text(context.strings.myServer),
+                  Icon(
+                    controller.connected
+                        ? Icons.cloud_done_outlined
+                        : Icons.cloud_off_outlined,
                   ),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(status)),
                 ],
               ),
-              if (home!.error.isNotEmpty) ...[
+              if (controller.knownOrigin.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                Text(
-                  home!.error,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
+                SelectableText(controller.knownOrigin),
               ],
             ],
           ),
         ),
         const SizedBox(height: 24),
-      ],
-      SurfaceCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        AdaptiveCards(
           children: [
-            Icon(
-              Icons.auto_awesome,
-              color: Theme.of(context).colorScheme.primary,
-              size: 36,
-            ),
-            const SizedBox(height: 20),
-            Text(
-              context.strings.ideas,
-              style: Theme.of(context).textTheme.headlineMedium
-                  ?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              context.strings.connectDescription,
-              style: TextStyle(height: 1.8),
-            ),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: controller.busy
-                  ? null
-                  : controller.connected
-                  ? openChat
-                  : openConnection,
-              icon: Icon(
-                controller.connected ? Icons.arrow_forward : Icons.add,
-              ),
-              label: Text(
-                controller.connected
-                    ? context.strings.returnChat
-                    : context.strings.addSpace,
-              ),
-            ),
+            metric(context.strings.dashboardChannels, channels.length),
+            metric(context.strings.dashboardUnread, unread),
           ],
         ),
-      ),
-      const SizedBox(height: 24),
-      AdaptiveCards(
-        children: [
-          SurfaceCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  context.strings.yourConversation,
-                  style: Theme.of(context).textTheme.titleLarge,
+        const SizedBox(height: 24),
+        SurfaceCard(
+          hoverBorder: true,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                context.strings.channels,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 16),
+              if (channels.isEmpty) Text(context.strings.serverNoChannels),
+              for (final channel in channels)
+                ListTile(
+                  key: ValueKey('overview-channel-${channel.id}'),
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.tag),
+                  title: Text(channel.title),
+                  trailing: controller.unreadCount(channel.id) > 0
+                      ? Badge(
+                          label: Text('${controller.unreadCount(channel.id)}'),
+                        )
+                      : const Icon(Icons.chevron_right),
+                  onTap: () => openChannel(channel.id),
                 ),
-                const SizedBox(height: 14),
-                Text(
-                  controller.connected
-                      ? context.strings.messageCount(controller.messages.length)
-                      : context.strings.noMessages,
-                ),
-                const SizedBox(height: 20),
-                OutlinedButton.icon(
-                  onPressed: openChat,
-                  icon: const Icon(Icons.chat_bubble_outline),
-                  label: Text(context.strings.openChat),
-                ),
-              ],
-            ),
+            ],
           ),
-          SurfaceCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  context.strings.yourAttention,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  context.strings.attentionDescription,
-                  style: TextStyle(height: 1.7),
-                ),
-              ],
-            ),
+        ),
+        if (controller.canRead) ...[
+          const SizedBox(height: 24),
+          OutlinedButton.icon(
+            onPressed: openChat,
+            icon: const Icon(Icons.chat_bubble_outline),
+            label: Text(context.strings.openChat),
           ),
         ],
-      ),
-    ],
-  );
+      ],
+    );
+  }
 }
 
 class SettingsPanel extends StatelessWidget {
