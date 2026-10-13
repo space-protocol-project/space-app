@@ -1,10 +1,14 @@
 #ifndef AppVersion
   #define AppVersion "0.1.0"
 #endif
+#ifndef AppNumericVersion
+  #define AppNumericVersion AppVersion
+#endif
 [Setup]
 AppId={{A1D164D7-8CE9-4FF1-98B7-3D9970218441}
 AppName=Space
 AppVersion={#AppVersion}
+VersionInfoVersion={#AppNumericVersion}
 AppPublisher=Space Protocol
 AppPublisherURL=https://github.com/space-protocol-project/space-protocol
 DefaultDirName={localappdata}\Programs\Space

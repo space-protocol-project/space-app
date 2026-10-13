@@ -116,6 +116,7 @@ flutter:
           weight: 600
 
   assets:
+    - pubspec.yaml
     - assets/home/runtime-manifest.json
     - assets/home/legacy-runtime-manifest.json
     - assets/branding/space-app-icon.png

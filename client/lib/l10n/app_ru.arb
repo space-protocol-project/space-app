@@ -398,5 +398,31 @@
   "serverRemoveFailed": "Не удалось убрать сервер. Повторите.",
   "serverInAir": "Сервер в эфире",
   "serverNoChannels": "Нет доступных каналов",
-  "spacesTitle": "Пространства"
+  "spacesTitle": "Пространства",
+  "updatesTitle": "Обновления",
+  "updatesCheck": "Проверить обновления",
+  "updatesChecking": "Проверяем…",
+  "updatesCurrent": "Установлена актуальная версия",
+  "updatesAvailable": "Доступна версия {version}",
+  "updatesEmpty": "Опубликованных сборок пока нет",
+  "updatesFailed": "Не удалось проверить. Повторите.",
+  "updatesOpen": "Открыть выпуск",
+  "updatesChanges": "Изменения",
+  "updatesInstalled": "Версия {version}",
+  "updatesUnknownVersion": "Версия недоступна",
+  "updatesOpenFailed": "Не удалось открыть страницу выпуска",
+  "@updatesAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updatesInstalled": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  }
 }

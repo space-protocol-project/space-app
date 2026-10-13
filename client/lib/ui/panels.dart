@@ -7,6 +7,7 @@ import 'recovery_panel.dart';
 import '../src/chat_controller.dart';
 import '../src/preferences.dart';
 import 'components.dart';
+import 'app_updates_view.dart';
 
 class OverviewPanel extends StatelessWidget {
   const OverviewPanel({
@@ -206,6 +207,8 @@ class SettingsPanel extends StatelessWidget {
           style: TextStyle(color: Theme.of(context).colorScheme.error),
         ),
       ],
+      const SizedBox(height: 24),
+      const AppUpdatesView(),
     ],
   );
 }

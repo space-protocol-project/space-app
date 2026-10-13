@@ -1918,6 +1918,78 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Пространства'**
   String get spacesTitle;
+
+  /// No description provided for @updatesTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновления'**
+  String get updatesTitle;
+
+  /// No description provided for @updatesCheck.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверить обновления'**
+  String get updatesCheck;
+
+  /// No description provided for @updatesChecking.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверяем…'**
+  String get updatesChecking;
+
+  /// No description provided for @updatesCurrent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Установлена актуальная версия'**
+  String get updatesCurrent;
+
+  /// No description provided for @updatesAvailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступна версия {version}'**
+  String updatesAvailable(String version);
+
+  /// No description provided for @updatesEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Опубликованных сборок пока нет'**
+  String get updatesEmpty;
+
+  /// No description provided for @updatesFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось проверить. Повторите.'**
+  String get updatesFailed;
+
+  /// No description provided for @updatesOpen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть выпуск'**
+  String get updatesOpen;
+
+  /// No description provided for @updatesChanges.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменения'**
+  String get updatesChanges;
+
+  /// No description provided for @updatesInstalled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Версия {version}'**
+  String updatesInstalled(String version);
+
+  /// No description provided for @updatesUnknownVersion.
+  ///
+  /// In ru, this message translates to:
+  /// **'Версия недоступна'**
+  String get updatesUnknownVersion;
+
+  /// No description provided for @updatesOpenFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось открыть страницу выпуска'**
+  String get updatesOpenFailed;
 }
 
 class _AppLocalizationsDelegate

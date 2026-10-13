@@ -1048,4 +1048,44 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get spacesTitle => 'Пространства';
+
+  @override
+  String get updatesTitle => 'Обновления';
+
+  @override
+  String get updatesCheck => 'Проверить обновления';
+
+  @override
+  String get updatesChecking => 'Проверяем…';
+
+  @override
+  String get updatesCurrent => 'Установлена актуальная версия';
+
+  @override
+  String updatesAvailable(String version) {
+    return 'Доступна версия $version';
+  }
+
+  @override
+  String get updatesEmpty => 'Опубликованных сборок пока нет';
+
+  @override
+  String get updatesFailed => 'Не удалось проверить. Повторите.';
+
+  @override
+  String get updatesOpen => 'Открыть выпуск';
+
+  @override
+  String get updatesChanges => 'Изменения';
+
+  @override
+  String updatesInstalled(String version) {
+    return 'Версия $version';
+  }
+
+  @override
+  String get updatesUnknownVersion => 'Версия недоступна';
+
+  @override
+  String get updatesOpenFailed => 'Не удалось открыть страницу выпуска';
 }

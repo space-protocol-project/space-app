@@ -952,6 +952,46 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get spacesTitle => '空间';
+
+  @override
+  String get updatesTitle => '更新';
+
+  @override
+  String get updatesCheck => '检查更新';
+
+  @override
+  String get updatesChecking => '正在检查…';
+
+  @override
+  String get updatesCurrent => '已是最新版本';
+
+  @override
+  String updatesAvailable(String version) {
+    return '版本 $version 可用';
+  }
+
+  @override
+  String get updatesEmpty => '尚无已发布的构建';
+
+  @override
+  String get updatesFailed => '无法检查，请重试。';
+
+  @override
+  String get updatesOpen => '打开发布页面';
+
+  @override
+  String get updatesChanges => '更新内容';
+
+  @override
+  String updatesInstalled(String version) {
+    return '版本 $version';
+  }
+
+  @override
+  String get updatesUnknownVersion => '版本不可用';
+
+  @override
+  String get updatesOpenFailed => '无法打开发布页面';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

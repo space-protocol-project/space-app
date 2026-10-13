@@ -1044,4 +1044,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get spacesTitle => 'Spaces';
+
+  @override
+  String get updatesTitle => 'Updates';
+
+  @override
+  String get updatesCheck => 'Check for updates';
+
+  @override
+  String get updatesChecking => 'Checking…';
+
+  @override
+  String get updatesCurrent => 'You are up to date';
+
+  @override
+  String updatesAvailable(String version) {
+    return 'Version $version is available';
+  }
+
+  @override
+  String get updatesEmpty => 'No published builds yet';
+
+  @override
+  String get updatesFailed => 'Unable to check. Try again.';
+
+  @override
+  String get updatesOpen => 'Open release';
+
+  @override
+  String get updatesChanges => 'Changes';
+
+  @override
+  String updatesInstalled(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get updatesUnknownVersion => 'Version unavailable';
+
+  @override
+  String get updatesOpenFailed => 'Unable to open the release page';
 }

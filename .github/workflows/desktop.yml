@@ -4,16 +4,32 @@ on:
   push:
     branches: [main]
     tags: ['v*']
-    paths: ['client/**', 'packages/**', 'packaging/**', '.github/workflows/desktop.yml']
+    paths: ['client/**', 'packages/**', 'packaging/**', 'Changelog.md', '.github/workflows/desktop.yml']
   pull_request:
-    paths: ['client/**', 'packages/**', 'packaging/**', '.github/workflows/desktop.yml']
+    paths: ['client/**', 'packages/**', 'packaging/**', 'Changelog.md', '.github/workflows/desktop.yml']
 permissions:
   contents: read
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Проверка подготовки и публикации выпусков
+        run: python3 -m unittest discover -s packaging -p '*_test.py'
+      - name: Проверка тега и changelog до сборки
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: python3 packaging/check-release.py "$GITHUB_REF_NAME"
   verify-release:
     if: startsWith(github.ref, 'refs/tags/v')
+    needs: validate
     uses: space-protocol-project/space-server/.github/workflows/server.yml@main
+    with:
+      app_ref: ${{ github.sha }}
   desktop:
+    needs: validate
     strategy:
       fail-fast: false
       matrix:
@@ -27,6 +43,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Версия из тега
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: python packaging/stamp-app-version.py "$GITHUB_REF_NAME"
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.6'
@@ -44,14 +67,16 @@ jobs:
         run: |
           version=$(sed -n 's/^version: \([^+]*\).*/\1/p' pubspec.yaml)
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then version=${GITHUB_REF_NAME#v}; fi
-          flutter build ${{ matrix.target }} --release --build-name "$version"
+          native_version=${version%%-*}
+          flutter build ${{ matrix.target }} --release --build-name "$native_version"
       - name: Windows Setup
         if: matrix.target == 'windows'
         shell: pwsh
         run: |
           $appVersion = (Select-String -Path client/pubspec.yaml -Pattern '^version: (.+?)(\+.*)?$').Matches.Groups[1].Value
           if ($env:GITHUB_REF -like 'refs/tags/v*') { $appVersion = $env:GITHUB_REF_NAME.Substring(1) }
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=$appVersion" packaging/windows.iss
+          $appNumericVersion = ($appVersion -split '-')[0]
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=$appVersion" "/DAppNumericVersion=$appNumericVersion" packaging/windows.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Get-FileHash dist/Space-Setup-windows-x64.exe -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  Space-Setup-windows-x64.exe" } | Set-Content dist/SHA256SUMS-windows-x64.txt
       - name: macOS DMG
@@ -69,8 +94,8 @@ jobs:
           if-no-files-found: error
           retention-days: 30
   publish:
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: [desktop, verify-release]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: [validate, desktop, verify-release]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -87,6 +112,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          (cd dist && sha256sum Space-* > SHA256SUMS.txt)
-          gh release create "$GITHUB_REF_NAME" dist/Space-* dist/SHA256SUMS.txt --verify-tag --title "Space $GITHUB_REF_NAME" --notes-file dist/release-notes.md --prerelease
-          gh release edit "$GITHUB_REF_NAME" --draft=false
+          python3 packaging/publish-release.py app "$GITHUB_REF_NAME" dist

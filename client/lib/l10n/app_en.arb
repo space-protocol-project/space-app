@@ -398,5 +398,31 @@
   "serverRemoveFailed": "Could not remove the server. Try again.",
   "serverInAir": "Server is online",
   "serverNoChannels": "No available channels",
-  "spacesTitle": "Spaces"
+  "spacesTitle": "Spaces",
+  "updatesTitle": "Updates",
+  "updatesCheck": "Check for updates",
+  "updatesChecking": "Checking…",
+  "updatesCurrent": "You are up to date",
+  "updatesAvailable": "Version {version} is available",
+  "updatesEmpty": "No published builds yet",
+  "updatesFailed": "Unable to check. Try again.",
+  "updatesOpen": "Open release",
+  "updatesChanges": "Changes",
+  "updatesInstalled": "Version {version}",
+  "updatesUnknownVersion": "Version unavailable",
+  "updatesOpenFailed": "Unable to open the release page",
+  "@updatesAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updatesInstalled": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  }
 }

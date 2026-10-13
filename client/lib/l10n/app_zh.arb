@@ -398,5 +398,31 @@
   "serverRemoveFailed": "无法移除服务器。请重试。",
   "serverInAir": "服务器在线",
   "serverNoChannels": "暂无可用频道",
-  "spacesTitle": "空间"
+  "spacesTitle": "空间",
+  "updatesTitle": "更新",
+  "updatesCheck": "检查更新",
+  "updatesChecking": "正在检查…",
+  "updatesCurrent": "已是最新版本",
+  "updatesAvailable": "版本 {version} 可用",
+  "updatesEmpty": "尚无已发布的构建",
+  "updatesFailed": "无法检查，请重试。",
+  "updatesOpen": "打开发布页面",
+  "updatesChanges": "更新内容",
+  "updatesInstalled": "版本 {version}",
+  "updatesUnknownVersion": "版本不可用",
+  "updatesOpenFailed": "无法打开发布页面",
+  "@updatesAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updatesInstalled": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  }
 }
