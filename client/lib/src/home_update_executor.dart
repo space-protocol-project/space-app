@@ -6,6 +6,7 @@ import 'home_runtime.dart';
 import 'home_update_journal.dart';
 import 'local_failure.dart';
 import 'home_storage.dart';
+import 'home_backup.dart';
 
 typedef HomeTool = Future<Map<String, dynamic>> Function(
   Directory runtime,
@@ -104,13 +105,56 @@ class HomeUpdateExecutor {
   File _evidence(HomeUpdateRecord record) =>
       File('${root.path}/${record.id}-baseline.json');
   Future<Map<String, dynamic>> _baseline(HomeUpdateRecord record) async {
-    final file = _evidence(record);
-    if (!await file.exists() || await file.length() > 16384) {
-      throw HomeUpdateJournal.pending;
+    try {
+      final file = _evidence(record);
+      if (!await file.exists() || await file.length() > 16384) {
+        throw HomeUpdateJournal.pending;
+      }
+      final info = Map<String, dynamic>.from(
+        jsonDecode(await file.readAsString()) as Map,
+      );
+      if (info['serverId'] is! String ||
+          !RegExp(r'^srv_[0-9a-f]{32}$').hasMatch(info['serverId']) ||
+          info['tlsFingerprint'] is! String ||
+          !RegExp(r'^[0-9a-f]{64}$').hasMatch(info['tlsFingerprint']) ||
+          info['schemaVersion'] is! int ||
+          info['schemaVersion'] < 1 ||
+          info['postgresMajor'] != 17) {
+        throw HomeUpdateJournal.pending;
+      }
+      return info;
+    } catch (_) {
+      throw const LocalFailure(
+        LocalFailureCode.homeRecoveryInvalid,
+        'Контрольная запись исходной базы отсутствует или повреждена',
+      );
     }
-    return Map<String, dynamic>.from(
-      jsonDecode(await file.readAsString()) as Map,
-    );
+  }
+
+  void _sameBaseline(Map<String, dynamic> before, Map<String, dynamic> after) {
+    if (before['serverId'] != after['serverId'] ||
+        before['tlsFingerprint'] != after['tlsFingerprint'] ||
+        before['schemaVersion'] != after['schemaVersion']) {
+      throw const LocalFailure(
+        LocalFailureCode.homeRecoveryInvalid,
+        'Восстановленная схема не соответствует исходной базе',
+      );
+    }
+  }
+
+  Future<HomeUpdateRecord?> inspectRecovery() async {
+    final record = await journal.read();
+    if (record == null ||
+        record.settled ||
+        record.recovery == HomeRecoveryAction.resumePreparation) {
+      return record;
+    }
+    await _baseline(record);
+    if (record.recovery == HomeRecoveryAction.restoreBackup &&
+        !await Directory('${root.path}/${record.restorePath}').exists()) {
+      await requireHomeBackup(Directory('${root.path}/${record.backupPath}'));
+    }
+    return record;
   }
 
   void _sameIdentity(Map<String, dynamic> before, Map<String, dynamic> after) {
@@ -252,6 +296,10 @@ class HomeUpdateExecutor {
       final failed = Directory('${root.path}/failed-data/${record.id}');
       final current = Directory(data);
       if (!await restore.exists()) {
+        await verifyHomeBackup(
+          Directory('${root.path}/${record.backupPath}'),
+          record.target,
+        );
         await storage.check(
           root,
           dataCopies: 0,
@@ -269,7 +317,7 @@ class HomeUpdateExecutor {
         ]);
       }
       if (await restoredData.exists()) {
-        _sameIdentity(baseline, await _check(runtime, restoredData.path));
+        _sameBaseline(baseline, await _check(runtime, restoredData.path));
         if (!await failed.exists()) {
           await tool(runtime, _arguments(runtime, '-home-stopped', data));
           await failed.parent.create(recursive: true);
@@ -279,9 +327,12 @@ class HomeUpdateExecutor {
         }
         await restoredData.rename(data);
       } else if (!await failed.exists() || !await current.exists()) {
-        throw HomeUpdateJournal.pending;
+        throw const LocalFailure(
+          LocalFailureCode.homeRecoveryInvalid,
+          'Каталоги восстановления находятся в неоднозначном состоянии',
+        );
       }
-      _sameIdentity(baseline, await _check(runtime, data));
+      _sameBaseline(baseline, await _check(runtime, data));
       await journal.advance(record.id, HomeUpdateStep.restored);
     }
     final restoredCheck = await _check(runtime, data);

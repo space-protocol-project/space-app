@@ -1,10 +1,99 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/l10n/app_localizations.dart';
 import 'package:space_client/src/home_controller.dart';
 import 'package:space_client/ui/home_panel.dart';
+import 'package:space_client/src/local_failure.dart';
 
 void main() {
+  testWidgets(
+    'Причина блокировки восстановления переведена, запуск отключён, сведения не содержат ошибку или секрет',
+    (tester) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      String copied = '';
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+            if (call.method == 'Clipboard.setData') {
+              copied = (call.arguments as Map)['text'] as String;
+            }
+            return null;
+          });
+      addTearDown(
+        () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(SystemChannels.platform, null),
+      );
+      final home = HomeController()
+        ..pendingUpdate = true
+        ..error = 'PRIVATE_PASSWORD_SHOULD_NOT_BE_SHOWN'
+        ..recoverySummary = 'directory: fixture\noperation: update-test';
+      addTearDown(home.dispose);
+      for (final locale in [
+        const Locale('ru'),
+        const Locale('en'),
+        const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
+      ]) {
+        for (final code in [
+          LocalFailureCode.homeJournalInvalid,
+          LocalFailureCode.homeBackupMissing,
+          LocalFailureCode.homeBackupInvalid,
+          LocalFailureCode.homeRecoveryInvalid,
+        ]) {
+          home.failureCode = code;
+          await tester.pumpWidget(
+            MaterialApp(
+              locale: locale,
+              supportedLocales: AppLocalizations.supportedLocales,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              home: Scaffold(
+                body: HomePanel(
+                  home: home,
+                  onStart: (_) async {
+                    fail('Запуск заблокирован');
+                  },
+                  onStop: () async {},
+                  openAdministration: () {},
+                ),
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+          final strings = lookupAppLocalizations(locale);
+          expect(
+            tester
+                .widget<OutlinedButton>(
+                  find.widgetWithText(OutlinedButton, strings.goLive),
+                )
+                .onPressed,
+            isNull,
+          );
+          expect(
+            tester
+                .widget<OutlinedButton>(
+                  find.widgetWithText(OutlinedButton, strings.homeResumeUpdate),
+                )
+                .onPressed,
+            isNull,
+          );
+          expect(find.text(strings.homeRecoveryGuide), findsOneWidget);
+          expect(find.text(home.error), findsNothing);
+          await tester.ensureVisible(
+            find.byKey(const ValueKey('home-recovery-diagnostics')),
+          );
+          await tester.tap(
+            find.byKey(const ValueKey('home-recovery-diagnostics')),
+          );
+          await tester.pumpAndSettle();
+          expect(copied, contains(code.name));
+          expect(copied, isNot(contains('PRIVATE_PASSWORD')));
+        }
+      }
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
   testWidgets(
     'Язык домашнего сервера меняется без потери IP, прогресса и ссылки',
     (tester) async {

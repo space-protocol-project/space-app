@@ -72,8 +72,7 @@ class HomeUpdateRecord {
     final target = HomeRelease.fromJson(
       Map<String, dynamic>.from(json['target'] as Map),
     );
-    if (source.platform != target.platform ||
-        source.version == target.version) {
+    if (source.platform != target.platform || !target.isNewerThan(source)) {
       throw const FormatException('Недопустимая пара выпусков');
     }
     return HomeUpdateRecord(
@@ -96,26 +95,28 @@ class HomeUpdateJournal {
     LocalFailureCode.homeUpdatePending,
     'Обновление домашнего сервера не завершено; сначала восстановите операцию',
   );
+  static const invalid = LocalFailure(
+    LocalFailureCode.homeJournalInvalid,
+    'Журнал обновления повреждён или недоступен; требуется ручная проверка',
+  );
 
   Future<HomeUpdateRecord?> read() async {
-    if (!await file.exists()) return null;
     try {
-      if (await file.length() > 65536) throw pending;
+      if (!await file.exists()) {
+        if (await File('${file.path}.tmp').exists()) throw invalid;
+        return null;
+      }
+      if (await file.length() > 65536) throw invalid;
       return HomeUpdateRecord.fromJson(
         Map<String, dynamic>.from(jsonDecode(await file.readAsString()) as Map),
       );
     } catch (_) {
-      throw pending;
+      throw invalid;
     }
   }
 
   Future<void> requireSettled() async {
     if ((await read())?.settled == false) throw pending;
-    // .tmp без основного журнала мог остаться до подтверждения начала.
-    // Пока стадия неизвестна, не запускаем старую базу наугад.
-    if (!await file.exists() && await File('${file.path}.tmp').exists()) {
-      throw pending;
-    }
   }
 
   Future<HomeUpdateRecord> begin(HomeRelease source, HomeRelease target) async {

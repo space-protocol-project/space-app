@@ -59,7 +59,16 @@ String localFailureText(
     context.strings.failureExecutePermission,
   LocalFailureCode.homeStartFailed => context.strings.failureHomeStartFailed,
   LocalFailureCode.homeStopFailed => context.strings.failureHomeStopFailed,
-  LocalFailureCode.homeUpdatePending => context.strings.failureHomeUpdatePending,
+  LocalFailureCode.homeUpdatePending =>
+    context.strings.failureHomeUpdatePending,
+  LocalFailureCode.homeJournalInvalid =>
+    context.strings.failureHomeJournalInvalid,
+  LocalFailureCode.homeBackupMissing =>
+    context.strings.failureHomeBackupMissing,
+  LocalFailureCode.homeBackupInvalid =>
+    context.strings.failureHomeBackupInvalid,
+  LocalFailureCode.homeRecoveryInvalid =>
+    context.strings.failureHomeRecoveryInvalid,
   LocalFailureCode.homeUpdateFailed => context.strings.failureHomeUpdateFailed,
   LocalFailureCode.homeSpaceLow => context.strings.failureHomeSpaceLow,
   LocalFailureCode.homeSpaceUnknown => context.strings.failureHomeSpaceUnknown,

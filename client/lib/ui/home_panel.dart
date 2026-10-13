@@ -5,6 +5,7 @@ import '../l10n/failure_strings.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../src/home_controller.dart';
 import '../src/local_failure.dart';
@@ -31,6 +32,24 @@ class _HomePanelState extends State<HomePanel> {
   bool detecting = false;
   bool detectionFailed = false;
   bool updateAction = false;
+
+  Future<void> openRecoveryGuide() async {
+    try {
+      if (await launchUrl(
+        Uri.parse(
+          'https://github.com/space-protocol-project/space-app/blob/main/docs/HOME-RECOVERY.md',
+        ),
+        mode: LaunchMode.externalApplication,
+      )) {
+        return;
+      }
+    } catch (_) {}
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.strings.homeRecoveryGuideFailed)),
+      );
+    }
+  }
 
   Future<void> updateServer() async {
     final confirmed = await showDialog<bool>(
@@ -211,7 +230,11 @@ class _HomePanelState extends State<HomePanel> {
                 ),
             ],
             SpaceActionButton(
-              onPressed: home.busy || detecting || updateAction
+              onPressed:
+                  home.busy ||
+                      detecting ||
+                      updateAction ||
+                      (home.pendingUpdate && !home.running)
                   ? null
                   : () async {
                       if (home.running) {
@@ -231,7 +254,11 @@ class _HomePanelState extends State<HomePanel> {
                   home.availableVersion.isNotEmpty)
                 Text('${home.installedVersion} → ${home.availableVersion}'),
               OutlinedButton.icon(
-                onPressed: home.busy || detecting || updateAction
+                onPressed:
+                    home.busy ||
+                        detecting ||
+                        updateAction ||
+                        home.recoveryBlocked
                     ? null
                     : updateServer,
                 icon: const Icon(Icons.system_update_alt),
@@ -241,6 +268,26 @@ class _HomePanelState extends State<HomePanel> {
                       : context.strings.homeUpdate,
                 ),
               ),
+              if (home.recoveryBlocked) ...[
+                const SizedBox(height: 12),
+                Text(context.strings.homeRecoveryHelp),
+                TextButton.icon(
+                  onPressed: openRecoveryGuide,
+                  icon: const Icon(Icons.help_outline),
+                  label: Text(context.strings.homeRecoveryGuide),
+                ),
+                OutlinedButton.icon(
+                  key: const ValueKey('home-recovery-diagnostics'),
+                  onPressed: () => Clipboard.setData(
+                    ClipboardData(
+                      text:
+                          '${home.recoverySummary}\ncode: ${home.failureCode?.name}',
+                    ),
+                  ),
+                  icon: const Icon(Icons.copy_outlined),
+                  label: Text(context.strings.homeRecoveryCopy),
+                ),
+              ],
             ],
             if (home.state != null) ...[
               const SizedBox(height: 20),

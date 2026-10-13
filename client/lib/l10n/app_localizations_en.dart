@@ -753,6 +753,35 @@ class AppLocalizationsEn extends AppLocalizations {
       'The home server update is unfinished. Complete the update or recovery first; normal startup is blocked.';
 
   @override
+  String get failureHomeJournalInvalid =>
+      'The update journal is corrupt or inaccessible. Automatic continuation is blocked; manual inspection is required.';
+
+  @override
+  String get failureHomeBackupMissing =>
+      'The backup is missing. Automatic recovery is blocked.';
+
+  @override
+  String get failureHomeBackupInvalid =>
+      'The backup is corrupt, incomplete or inaccessible. Current data was not replaced.';
+
+  @override
+  String get failureHomeRecoveryInvalid =>
+      'The baseline or recovery directories do not match the original database. Switching is blocked.';
+
+  @override
+  String get homeRecoveryHelp =>
+      'Preserve the entire home-server directory, including the journal, backups, recoveries and failed-data. Do not delete the journal or replace the database manually. Open the recovery guide.';
+
+  @override
+  String get homeRecoveryGuide => 'Recovery guide';
+
+  @override
+  String get homeRecoveryGuideFailed => 'Could not open the recovery guide.';
+
+  @override
+  String get homeRecoveryCopy => 'Copy diagnostics';
+
+  @override
   String get failureHomeUpdateFailed =>
       'The update was not completed. Check the operation state and retry; the new version will not start without verification.';
 

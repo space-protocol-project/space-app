@@ -9,6 +9,7 @@ import 'package:space_client/src/core.dart';
 import 'package:space_client/src/home_controller.dart';
 import 'package:space_client/src/home_runtime.dart';
 import 'package:space_client/src/home_update_journal.dart';
+import 'package:space_client/src/local_failure.dart';
 
 class _Binding extends AutomatedTestWidgetsFlutterBinding {
   @override
@@ -152,6 +153,23 @@ void main() {
           jsonEncode({...record.toJson(), 'step': 'migrating'}),
           flush: true,
         );
+        // Повреждённая реальная копия не должна заменять текущую базу.
+        final backupKey = File(
+          '${root.path}/${record.backupPath}/data/server.key',
+        );
+        final originalKey = await backupKey.readAsBytes();
+        await backupKey.writeAsBytes([...originalKey, 0], flush: true);
+        await updated.performUpdate(recover: true);
+        expect(updated.failureCode, LocalFailureCode.homeBackupInvalid);
+        expect(updated.pendingUpdate, true);
+        expect(await Directory('${root.path}/data').exists(), true);
+        expect(
+          await Directory('${root.path}/failed-data/${record.id}').exists(),
+          false,
+        );
+        await backupKey.writeAsBytes(originalKey, flush: true);
+        await updated.load();
+        expect(updated.recoveryBlocked, false);
         await updated.performUpdate(recover: true);
         expect(updated.error, isEmpty);
         expect(updated.installedVersion, 'v0.1.0');

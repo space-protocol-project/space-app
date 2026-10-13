@@ -8,6 +8,9 @@ import 'package:space_client/src/home_update_journal.dart';
 import 'package:space_client/src/home_storage.dart';
 
 import 'home_installation_test.dart' show installed, release;
+import 'home_backup_test.dart' show writeBackupManifest;
+
+import 'package:space_client/src/local_failure.dart';
 
 Future<void> copyFixture(Directory source, Directory destination) async {
   await destination.create(recursive: true);
@@ -53,6 +56,7 @@ void main() {
         Directory(value('-home-data')),
         Directory('${value('-home-backup')}/data'),
       );
+      await writeBackupManifest(Directory(value('-home-backup')));
       if (changeAfterBackup == 'runtime') advertisedSchema = 12;
       if (changeAfterBackup == 'target') reportedTargetSchema = 12;
       if (changeAfterBackup == 'schema') {
@@ -97,6 +101,9 @@ void main() {
     await installation.selectInitial(release('v0.1.0'));
     await Directory('${root.path}/data').create();
     await File('${root.path}/data/schema').writeAsString('9');
+    await Directory('${root.path}/data/postgres').create();
+    await File('${root.path}/data/postgres/PG_VERSION').writeAsString('17');
+    await File('${root.path}/data/database-password').writeAsString('fixture');
     calls = [];
     migrationFails = false;
     restorationFails = false;
@@ -122,6 +129,63 @@ void main() {
     );
     expect((await installation.active(release('v0.2.0')))!.version, 'v0.2.0');
   });
+
+  for (final checkpoint in [
+    HomeUpdateStep.staged,
+    HomeUpdateStep.stopped,
+    HomeUpdateStep.backedUp,
+  ]) {
+    test(
+      'Подготовка продолжается после прерывания: ${checkpoint.name}',
+      () async {
+        final journal = HomeUpdateJournal(root);
+        final record = await journal.begin(
+          release('v0.1.0'),
+          release('v0.2.0'),
+        );
+        for (final step in [
+          HomeUpdateStep.staged,
+          HomeUpdateStep.stopped,
+          HomeUpdateStep.backedUp,
+        ]) {
+          await journal.advance(record.id, step);
+          if (step == checkpoint) break;
+        }
+        await executor.recover();
+        expect((await journal.read())!.step, HomeUpdateStep.completeUpdated);
+        expect(await File('${root.path}/data/schema').readAsString(), '11');
+      },
+    );
+  }
+
+  for (final checkpoint in [
+    HomeUpdateStep.verified,
+    HomeUpdateStep.activating,
+  ]) {
+    test(
+      'Подтверждённая активация продолжается после прерывания: ${checkpoint.name}',
+      () async {
+        await executor.update(release('v0.1.0'), release('v0.2.0'));
+        if (checkpoint == HomeUpdateStep.verified) {
+          await installation.activate(release('v0.2.0'), release('v0.1.0'));
+        }
+        final journal = HomeUpdateJournal(root);
+        final record = (await journal.read())!;
+        await journal.file.writeAsString(
+          jsonEncode({...record.toJson(), 'step': checkpoint.name}),
+        );
+        calls.clear();
+        await executor.recover();
+        expect((await journal.read())!.step, HomeUpdateStep.completeUpdated);
+        expect(
+          (await installation.active(release('v0.2.0')))!.version,
+          'v0.2.0',
+        );
+        expect(calls, isNot(contains('-home-migrate')));
+        expect(calls, isNot(contains('-home-restore')));
+      },
+    );
+  }
 
   test('Успех: копия до миграций, прежний runtime сохранён, новая версия закреплена', () async {
     await executor.update(release('v0.1.0'), release('v0.2.0'));
@@ -271,4 +335,145 @@ void main() {
       );
     },
   );
+
+  for (final checkpoint in [
+    'beforeSwap',
+    'afterOldMove',
+    'afterNewMove',
+    'restored',
+  ]) {
+    test('Восстановление продолжается после прерывания: $checkpoint', () async {
+      migrationFails = true;
+      restorationFails = true;
+      await expectLater(
+        executor.update(release('v0.1.0'), release('v0.2.0')),
+        throwsStateError,
+      );
+      final record = (await HomeUpdateJournal(root).read())!;
+      final staged = Directory('${root.path}/${record.restorePath}/data');
+      await copyFixture(
+        Directory('${root.path}/${record.backupPath}/data'),
+        staged,
+      );
+      final current = Directory('${root.path}/data');
+      final failed = Directory('${root.path}/failed-data/${record.id}');
+      if (checkpoint != 'beforeSwap') {
+        await failed.parent.create();
+        await current.rename(failed.path);
+      }
+      if (checkpoint == 'afterNewMove' || checkpoint == 'restored') {
+        await staged.rename(current.path);
+      }
+      if (checkpoint == 'restored') {
+        await HomeUpdateJournal(root)
+            .advance(record.id, HomeUpdateStep.restored);
+      }
+      await HomeUpdateExecutor(root, tool: tool).recover();
+      expect(
+        (await HomeUpdateJournal(root).read())!.step,
+        HomeUpdateStep.completeRestored,
+      );
+      expect(await File('${root.path}/data/schema').readAsString(), '9');
+      expect(await File('${failed.path}/schema').readAsString(), '11');
+      expect((await installation.active(release('v0.2.0')))!.version, 'v0.1.0');
+    });
+  }
+
+  test(
+    'Неизвестная схема восстановленной копии не заменяет текущую базу',
+    () async {
+      migrationFails = true;
+      restorationFails = true;
+      await expectLater(
+        executor.update(release('v0.1.0'), release('v0.2.0')),
+        throwsStateError,
+      );
+      final record = (await HomeUpdateJournal(root).read())!;
+      final staged = Directory('${root.path}/${record.restorePath}/data');
+      await copyFixture(
+        Directory('${root.path}/${record.backupPath}/data'),
+        staged,
+      );
+      await File('${staged.path}/schema').writeAsString('10');
+      await expectLater(
+        executor.recover(),
+        throwsA(
+          isA<LocalFailure>().having(
+            (e) => e.code,
+            'code',
+            LocalFailureCode.homeRecoveryInvalid,
+          ),
+        ),
+      );
+      expect(await File('${root.path}/data/schema').readAsString(), '11');
+      expect(
+        await Directory('${root.path}/failed-data/${record.id}').exists(),
+        false,
+      );
+      expect(
+        (await HomeUpdateJournal(root).read())!.step,
+        HomeUpdateStep.restoring,
+      );
+    },
+  );
+
+  for (final missing in [false, true]) {
+    test(
+      'Копия ${missing ? 'отсутствует' : 'повреждена'}: текущие данные сохраняются',
+      () async {
+        migrationFails = true;
+        restorationFails = true;
+        await expectLater(
+          executor.update(release('v0.1.0'), release('v0.2.0')),
+          throwsStateError,
+        );
+        final record = (await HomeUpdateJournal(root).read())!;
+        final backup = Directory('${root.path}/${record.backupPath}');
+        if (missing) {
+          await backup.rename('${backup.path}-saved');
+        } else {
+          await File('${backup.path}/data/schema').writeAsString('changed');
+        }
+        calls.clear();
+        await expectLater(
+          executor.recover(),
+          throwsA(
+            isA<LocalFailure>().having(
+              (e) => e.code,
+              'code',
+              missing
+                  ? LocalFailureCode.homeBackupMissing
+                  : LocalFailureCode.homeBackupInvalid,
+            ),
+          ),
+        );
+        expect(calls, isNot(contains('-home-restore')));
+        expect(await File('${root.path}/data/schema').readAsString(), '11');
+      },
+    );
+  }
+
+  test('Повреждённая контрольная запись блокирует восстановление без догадок о прежней базе', () async {
+    migrationFails = true;
+    restorationFails = true;
+    await expectLater(
+      executor.update(release('v0.1.0'), release('v0.2.0')),
+      throwsStateError,
+    );
+    final record = (await HomeUpdateJournal(root).read())!;
+    await File('${root.path}/${record.id}-baseline.json').writeAsString('{');
+    calls.clear();
+    await expectLater(
+      executor.recover(),
+      throwsA(
+        isA<LocalFailure>().having(
+          (e) => e.code,
+          'code',
+          LocalFailureCode.homeRecoveryInvalid,
+        ),
+      ),
+    );
+    expect(calls, isEmpty);
+    expect(await File('${root.path}/data/schema').readAsString(), '11');
+  });
 }

@@ -12,6 +12,7 @@ import 'home_update_journal.dart';
 import 'home_update_executor.dart';
 import 'home_storage.dart';
 import 'local_failure.dart';
+import 'home_backup.dart';
 
 enum HomePhase {
   idle,
@@ -64,6 +65,13 @@ class HomeController extends ChangeNotifier {
   String availableReleaseNotes = '';
   HomeSpaceReport? spaceReport;
   bool pendingUpdate = false;
+  String recoverySummary = '';
+  bool get recoveryBlocked => {
+    LocalFailureCode.homeJournalInvalid,
+    LocalFailureCode.homeBackupMissing,
+    LocalFailureCode.homeBackupInvalid,
+    LocalFailureCode.homeRecoveryInvalid,
+  }.contains(failureCode);
   bool get updateAvailable =>
       installedVersion.isNotEmpty &&
       availableVersion.isNotEmpty &&
@@ -139,6 +147,31 @@ class HomeController extends ChangeNotifier {
   Future<void> load() async {
     try {
       final root = await _directory();
+      try {
+        final record = await HomeUpdateExecutor(root).inspectRecovery();
+        pendingUpdate = record != null && !record.settled;
+        recoverySummary =
+            'directory: ${root.path}\n'
+            'operation: ${record?.id ?? '-'}\nstep: ${record?.step.name ?? '-'}\n'
+            'source: ${record?.source.version ?? '-'}\ntarget: ${record?.target.version ?? '-'}';
+        if (recoveryBlocked) {
+          if (record != null &&
+              record.recovery == HomeRecoveryAction.restoreBackup &&
+              failureCode == LocalFailureCode.homeBackupInvalid) {
+            await verifyHomeBackup(
+              Directory('${root.path}/${record.backupPath}'),
+              record.target,
+            );
+          }
+          failureCode = null;
+          error = '';
+        }
+      } on LocalFailure catch (problem) {
+        pendingUpdate = true;
+        failureCode = problem.code;
+        error = problem.message;
+        recoverySummary = 'directory: ${root.path}';
+      }
       final config = File('${root.path}/config.json');
       if (await config.exists()) {
         final data =
@@ -163,12 +196,6 @@ class HomeController extends ChangeNotifier {
               persist: false,
             ))?.version ??
             '';
-      }
-      try {
-        pendingUpdate =
-            (await HomeUpdateJournal(root).read())?.settled == false;
-      } catch (_) {
-        pendingUpdate = true;
       }
     } catch (_) {
       /* Первый запуск или недоступное хранилище проверяются при запуске. */

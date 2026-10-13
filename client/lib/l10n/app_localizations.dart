@@ -1421,6 +1421,54 @@ abstract class AppLocalizations {
   /// **'Обновление домашнего сервера не завершено. Сначала завершите обновление или восстановление; обычный запуск заблокирован.'**
   String get failureHomeUpdatePending;
 
+  /// No description provided for @failureHomeJournalInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Журнал обновления повреждён или недоступен. Автоматическое продолжение заблокировано; нужна ручная проверка.'**
+  String get failureHomeJournalInvalid;
+
+  /// No description provided for @failureHomeBackupMissing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Резервная копия отсутствует. Автоматическое восстановление заблокировано.'**
+  String get failureHomeBackupMissing;
+
+  /// No description provided for @failureHomeBackupInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Резервная копия повреждена, неполна или недоступна. Текущие данные не заменены.'**
+  String get failureHomeBackupInvalid;
+
+  /// No description provided for @failureHomeRecoveryInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Контрольная запись или каталоги восстановления не соответствуют исходной базе. Переключение заблокировано.'**
+  String get failureHomeRecoveryInvalid;
+
+  /// No description provided for @homeRecoveryHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохраните каталог home-server целиком, включая журнал, backups, recoveries и failed-data. Не удаляйте журнал и не заменяйте базу вручную. Откройте инструкцию восстановления.'**
+  String get homeRecoveryHelp;
+
+  /// No description provided for @homeRecoveryGuide.
+  ///
+  /// In ru, this message translates to:
+  /// **'Инструкция восстановления'**
+  String get homeRecoveryGuide;
+
+  /// No description provided for @homeRecoveryGuideFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось открыть инструкцию восстановления.'**
+  String get homeRecoveryGuideFailed;
+
+  /// No description provided for @homeRecoveryCopy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировать сведения'**
+  String get homeRecoveryCopy;
+
   /// No description provided for @failureHomeUpdateFailed.
   ///
   /// In ru, this message translates to:

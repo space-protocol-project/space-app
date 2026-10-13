@@ -701,6 +701,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get failureHomeUpdatePending => '家庭服务器更新尚未完成。请先完成更新或恢复；正常启动已被阻止。';
 
   @override
+  String get failureHomeJournalInvalid => '更新日志损坏或无法访问。自动继续已被阻止，需要手动检查。';
+
+  @override
+  String get failureHomeBackupMissing => '备份不存在。自动恢复已被阻止。';
+
+  @override
+  String get failureHomeBackupInvalid => '备份损坏、不完整或无法访问。当前数据未被替换。';
+
+  @override
+  String get failureHomeRecoveryInvalid => '原始记录或恢复目录与原始数据库不匹配。已阻止切换。';
+
+  @override
+  String get homeRecoveryHelp =>
+      '保留整个 home-server 目录，包括日志、backups、recoveries 和 failed-data。请勿删除日志或手动替换数据库。请打开恢复指南。';
+
+  @override
+  String get homeRecoveryGuide => '恢复指南';
+
+  @override
+  String get homeRecoveryGuideFailed => '无法打开恢复指南。';
+
+  @override
+  String get homeRecoveryCopy => '复制诊断信息';
+
+  @override
   String get failureHomeUpdateFailed => '更新未完成。请检查操作状态并重试；未经验证的新版本不会启动。';
 
   @override

@@ -108,6 +108,39 @@ void main() {
     await journal.file.writeAsString('{');
     await expectLater(journal.requireSettled(), throwsFormatException);
   });
+  test(
+    'Повреждённый журнал диагностируется даже при повреждённой конфигурации',
+    () async {
+      await journal.file.writeAsString('{');
+      await File('${root.path}/config.json').writeAsString('{');
+      final home = HomeController(
+        directory: () async => root,
+        release: () async => release('v0.2.0'),
+      );
+      addTearDown(home.dispose);
+      await home.load();
+      expect(home.pendingUpdate, true);
+      expect(home.recoveryBlocked, true);
+      expect(home.failureCode, LocalFailureCode.homeJournalInvalid);
+      expect(home.recoverySummary, contains(root.path));
+    },
+  );
+  test(
+    'Неподтверждённый временный журнал не считается завершённой операцией',
+    () async {
+      await File('${journal.file.path}.tmp').writeAsString('{');
+      await expectLater(
+        journal.read(),
+        throwsA(
+          isA<LocalFailure>().having(
+            (e) => e.code,
+            'code',
+            LocalFailureCode.homeJournalInvalid,
+          ),
+        ),
+      );
+    },
+  );
   test('Версии, платформа и пути операции проверяются при чтении', () async {
     final record = await journal.begin(release('v0.1.0'), release('v0.2.0'));
     await journal.file.writeAsString(

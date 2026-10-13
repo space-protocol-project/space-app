@@ -758,6 +758,36 @@ class AppLocalizationsRu extends AppLocalizations {
       'Обновление домашнего сервера не завершено. Сначала завершите обновление или восстановление; обычный запуск заблокирован.';
 
   @override
+  String get failureHomeJournalInvalid =>
+      'Журнал обновления повреждён или недоступен. Автоматическое продолжение заблокировано; нужна ручная проверка.';
+
+  @override
+  String get failureHomeBackupMissing =>
+      'Резервная копия отсутствует. Автоматическое восстановление заблокировано.';
+
+  @override
+  String get failureHomeBackupInvalid =>
+      'Резервная копия повреждена, неполна или недоступна. Текущие данные не заменены.';
+
+  @override
+  String get failureHomeRecoveryInvalid =>
+      'Контрольная запись или каталоги восстановления не соответствуют исходной базе. Переключение заблокировано.';
+
+  @override
+  String get homeRecoveryHelp =>
+      'Сохраните каталог home-server целиком, включая журнал, backups, recoveries и failed-data. Не удаляйте журнал и не заменяйте базу вручную. Откройте инструкцию восстановления.';
+
+  @override
+  String get homeRecoveryGuide => 'Инструкция восстановления';
+
+  @override
+  String get homeRecoveryGuideFailed =>
+      'Не удалось открыть инструкцию восстановления.';
+
+  @override
+  String get homeRecoveryCopy => 'Скопировать сведения';
+
+  @override
   String get failureHomeUpdateFailed =>
       'Обновление не выполнено. Проверьте состояние операции и повторите попытку; новая версия не будет запущена без проверки.';
 
