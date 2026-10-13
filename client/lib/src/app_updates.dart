@@ -154,10 +154,20 @@ class AppUpdates extends ChangeNotifier {
     Future<String> Function()? readVersion,
     String? platform,
     Future<Directory> Function()? downloadDirectory,
+    Future<Directory?> Function()? installationDirectory,
+    Future<void> Function(File, List<String>)? launchInstaller,
+    void Function()? closeApplication,
   }) : client = client ?? http.Client(),
        readVersion = readVersion ?? installedAppVersion,
        platform = platform ?? installedAppPlatform(),
-       downloadDirectory = downloadDirectory ?? appUpdateDirectory;
+       downloadDirectory = downloadDirectory ?? appUpdateDirectory,
+       installationDirectory = installationDirectory ?? installedAppDirectory,
+       launchInstaller = launchInstaller ?? startAppInstaller,
+       closeApplication = closeApplication ?? (() => exit(0));
+  final Future<Directory?> Function() installationDirectory;
+  final Future<void> Function(File, List<String>) launchInstaller;
+  final void Function() closeApplication;
+  bool installing = false, installFailed = false;
   final Future<Directory> Function() downloadDirectory;
   bool downloading = false;
   int downloadedBytes = 0;
@@ -186,7 +196,12 @@ class AppUpdates extends ChangeNotifier {
   }
 
   Future<void> check() async {
-    if (_disposed || downloading || status == AppUpdateStatus.checking) return;
+    if (_disposed ||
+        downloading ||
+        installing ||
+        status == AppUpdateStatus.checking) {
+      return;
+    }
     downloadedPackage = null;
     downloadFailed = false;
     downloadedBytes = 0;
@@ -238,6 +253,7 @@ class AppUpdates extends ChangeNotifier {
     final target = package;
     if (_disposed ||
         downloading ||
+        installing ||
         status != AppUpdateStatus.available ||
         target == null) {
       return;
@@ -359,6 +375,51 @@ class AppUpdates extends ChangeNotifier {
     throw const FormatException('Слишком много перенаправлений');
   }
 
+  Future<void> install({required Future<void> Function() prepare}) async {
+    final file = downloadedPackage, target = package;
+    if (_disposed ||
+        installing ||
+        downloading ||
+        file == null ||
+        target == null ||
+        status != AppUpdateStatus.available ||
+        platform != 'windows-x64') {
+      return;
+    }
+    installing = true;
+    installFailed = false;
+    _notify();
+    try {
+      final directory = await installationDirectory();
+      if (directory == null || !await validPackage(file, target)) {
+        throw const FormatException('Нет установки или пакет повреждён');
+      }
+      final logs = await downloadDirectory();
+      await logs.create(recursive: true);
+      await prepare();
+      // Повторная проверка после ожидания отправки и остановки сервера.
+      if (_disposed || !await validPackage(file, target)) {
+        throw const FormatException('Пакет изменился');
+      }
+      await launchInstaller(file, [
+        '/VERYSILENT',
+        '/SUPPRESSMSGBOXES',
+        '/NORESTART',
+        '/CLOSEAPPLICATIONS',
+        '/NORESTARTAPPLICATIONS',
+        '/RELAUNCH',
+        '/DIR=${directory.path}',
+        '/LOG=${logs.path}/install.log',
+      ]);
+      closeApplication();
+    } catch (_) {
+      installFailed = true;
+    } finally {
+      installing = false;
+      _notify();
+    }
+  }
+
   void _notify() {
     if (!_disposed) notifyListeners();
   }
@@ -383,6 +444,21 @@ Future<String> installedAppVersion() async {
 
 Future<Directory> appUpdateDirectory() async =>
     Directory('${(await getApplicationSupportDirectory()).path}/updates');
+
+Future<Directory?> installedAppDirectory() async {
+  if (!Platform.isWindows) return null;
+  final executable = File(Platform.resolvedExecutable);
+  final directory = executable.parent;
+  if (executable.uri.pathSegments.last.toLowerCase() != 'space_client.exe' ||
+      !await File('${directory.path}/unins000.exe').exists()) {
+    return null;
+  }
+  return Directory(await directory.resolveSymbolicLinks());
+}
+
+Future<void> startAppInstaller(File file, List<String> arguments) async {
+  await Process.start(file.path, arguments, mode: ProcessStartMode.detached);
+}
 
 Future<bool> validPackage(File file, AppPackage package) async {
   if (await file.length() != package.size) return false;

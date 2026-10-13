@@ -8,20 +8,30 @@ import '../src/app_updates.dart';
 import 'components.dart';
 
 class AppUpdatesView extends StatefulWidget {
-  const AppUpdatesView({super.key, this.updates});
+  const AppUpdatesView({super.key, this.updates, this.prepareInstall});
   final AppUpdates? updates;
+  final Future<void> Function()? prepareInstall;
   @override
   State<AppUpdatesView> createState() => _AppUpdatesViewState();
 }
 
 class _AppUpdatesViewState extends State<AppUpdatesView> {
   late final updates = widget.updates ?? AppUpdates();
+  bool installedCopy = false;
   @override
   void initState() {
     super.initState();
+    unawaited(checkInstalledCopy());
     if (updates.installed.isEmpty && updates.status == AppUpdateStatus.idle) {
       unawaited(updates.initialize());
     }
+  }
+
+  Future<void> checkInstalledCopy() async {
+    try {
+      final directory = await updates.installationDirectory();
+      if (mounted) setState(() => installedCopy = directory != null);
+    } catch (_) {}
   }
 
   @override
@@ -77,6 +87,7 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
                       key: const ValueKey('check-app-updates'),
                       onPressed:
                           updates.downloading ||
+                              updates.installing ||
                               updates.status == AppUpdateStatus.checking
                           ? null
                           : updates.check,
@@ -89,11 +100,26 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
                         key: const ValueKey('download-app-update'),
                         onPressed:
                             updates.downloading ||
+                                updates.installing ||
                                 updates.downloadedPackage != null
                             ? null
                             : updates.download,
                         icon: const Icon(Icons.download_outlined),
                         label: Text(context.strings.updatesDownload),
+                      ),
+                    if (updates.downloadedPackage != null &&
+                        installedCopy &&
+                        widget.prepareInstall != null &&
+                        updates.platform == 'windows-x64')
+                      FilledButton.icon(
+                        key: const ValueKey('install-app-update'),
+                        onPressed: updates.installing
+                            ? null
+                            : () => updates.install(
+                                prepare: widget.prepareInstall!,
+                              ),
+                        icon: const Icon(Icons.restart_alt),
+                        label: Text(context.strings.updatesInstall),
                       ),
                     if (updates.status == AppUpdateStatus.available)
                       OutlinedButton.icon(
@@ -120,6 +146,14 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
                         '${(100 * updates.downloadedBytes / updates.package!.size).floor()}%',
                       ),
                     ],
+                  ),
+                ],
+                if (updates.installing || updates.installFailed) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    updates.installFailed
+                        ? context.strings.updatesInstallFailed
+                        : context.strings.updatesPreparing,
                   ),
                 ],
                 if (updates.downloadFailed ||

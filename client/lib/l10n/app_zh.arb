@@ -439,5 +439,12 @@
   },
   "updatesDownload": "下载",
   "updatesDownloadFailed": "下载失败，请重试。",
-  "updatesDownloaded": "安装包已下载并验证。"
+  "updatesDownloaded": "安装包已下载并验证。",
+  "updatesInstall": "安装并重启",
+  "updatesPreparing": "正在完成操作并停止家庭服务器…",
+  "updatesInstallFailed": "无法开始安装。请检查消息发送和家庭服务器状态，然后重试。",
+  "updatesHomeTitle": "家庭服务器",
+  "updatesHomeResume": "更新前家庭服务器正在运行。是否重新启动？",
+  "updatesLater": "稍后",
+  "updatesHomeStart": "启动"
 }

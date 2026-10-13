@@ -1106,4 +1106,28 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get updatesDownloaded => 'Пакет скачан и проверен.';
+
+  @override
+  String get updatesInstall => 'Установить и перезапустить';
+
+  @override
+  String get updatesPreparing =>
+      'Завершаем операции и останавливаем домашний сервер…';
+
+  @override
+  String get updatesInstallFailed =>
+      'Не удалось начать установку. Проверьте отправку сообщений и состояние домашнего сервера, затем повторите.';
+
+  @override
+  String get updatesHomeTitle => 'Домашний сервер';
+
+  @override
+  String get updatesHomeResume =>
+      'Перед обновлением домашний сервер работал. Запустить его снова?';
+
+  @override
+  String get updatesLater => 'Позже';
+
+  @override
+  String get updatesHomeStart => 'Запустить';
 }

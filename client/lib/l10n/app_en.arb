@@ -439,5 +439,12 @@
   },
   "updatesDownload": "Download",
   "updatesDownloadFailed": "Download failed. Please retry.",
-  "updatesDownloaded": "Package downloaded and verified."
+  "updatesDownloaded": "Package downloaded and verified.",
+  "updatesInstall": "Install and restart",
+  "updatesPreparing": "Finishing operations and stopping the home server…",
+  "updatesInstallFailed": "Installation could not start. Check message delivery and the home server, then retry.",
+  "updatesHomeTitle": "Home server",
+  "updatesHomeResume": "The home server was running before the update. Start it again?",
+  "updatesLater": "Later",
+  "updatesHomeStart": "Start"
 }

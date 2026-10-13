@@ -2020,6 +2020,48 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Пакет скачан и проверен.'**
   String get updatesDownloaded;
+
+  /// No description provided for @updatesInstall.
+  ///
+  /// In ru, this message translates to:
+  /// **'Установить и перезапустить'**
+  String get updatesInstall;
+
+  /// No description provided for @updatesPreparing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завершаем операции и останавливаем домашний сервер…'**
+  String get updatesPreparing;
+
+  /// No description provided for @updatesInstallFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось начать установку. Проверьте отправку сообщений и состояние домашнего сервера, затем повторите.'**
+  String get updatesInstallFailed;
+
+  /// No description provided for @updatesHomeTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Домашний сервер'**
+  String get updatesHomeTitle;
+
+  /// No description provided for @updatesHomeResume.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перед обновлением домашний сервер работал. Запустить его снова?'**
+  String get updatesHomeResume;
+
+  /// No description provided for @updatesLater.
+  ///
+  /// In ru, this message translates to:
+  /// **'Позже'**
+  String get updatesLater;
+
+  /// No description provided for @updatesHomeStart.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запустить'**
+  String get updatesHomeStart;
 }
 
 class _AppLocalizationsDelegate

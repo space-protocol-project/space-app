@@ -35,3 +35,15 @@ Name: "{group}\Space"; Filename: "{app}\space_client.exe"
 Name: "{autodesktop}\Space"; Filename: "{app}\space_client.exe"; Tasks: desktopicon
 [Run]
 Filename: "{app}\space_client.exe"; Description: "{cm:LaunchProgram,Space}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\space_client.exe"; Flags: nowait; Check: ShouldRelaunch
+
+[Code]
+function ShouldRelaunch: Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I := 1 to ParamCount do
+    if CompareText(ParamStr(I), '/RELAUNCH') = 0 then
+      Result := True;
+end;

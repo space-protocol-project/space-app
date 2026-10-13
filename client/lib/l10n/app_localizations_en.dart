@@ -1102,4 +1102,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updatesDownloaded => 'Package downloaded and verified.';
+
+  @override
+  String get updatesInstall => 'Install and restart';
+
+  @override
+  String get updatesPreparing =>
+      'Finishing operations and stopping the home server…';
+
+  @override
+  String get updatesInstallFailed =>
+      'Installation could not start. Check message delivery and the home server, then retry.';
+
+  @override
+  String get updatesHomeTitle => 'Home server';
+
+  @override
+  String get updatesHomeResume =>
+      'The home server was running before the update. Start it again?';
+
+  @override
+  String get updatesLater => 'Later';
+
+  @override
+  String get updatesHomeStart => 'Start';
 }

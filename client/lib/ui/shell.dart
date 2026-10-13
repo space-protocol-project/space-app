@@ -9,6 +9,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../src/chat_controller.dart';
 import '../src/preferences.dart';
@@ -288,6 +289,9 @@ class _SpaceShellState extends State<SpaceShell> {
     dashboard = widget.controller == null;
     unawaited(home.load());
     unawaited(updates.check());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => unawaited(offerHomeAfterUpdate()),
+    );
     final initialOrigin = initialController.preview?.origin.toString();
     if (initialOrigin != null && initialController.connected) {
       workspaces.adopt(
@@ -344,6 +348,70 @@ class _SpaceShellState extends State<SpaceShell> {
   Future<void> stopHome() async {
     final owner = workspaces[home.state?.publicOrigin ?? ''];
     await home.stop(disconnectClient: owner?.disconnect);
+  }
+
+  Future<void> prepareAppInstall() async {
+    final sessions = {
+      ...workspaces.controllers.values,
+      ...transientControllers,
+      initialController,
+    };
+    final deadline = DateTime.now().add(const Duration(seconds: 30));
+    while (sessions.any((session) => session.busy)) {
+      if (!mounted || DateTime.now().isAfter(deadline)) {
+        throw StateError('Операции приложения ещё не завершены');
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+    if (sessions.any(
+          (session) => session.sendStatus == MessageSendStatus.unconfirmed,
+        ) ||
+        home.busy) {
+      throw StateError(
+        'Есть неподтверждённые сообщения или операция домашнего сервера',
+      );
+    }
+    final resumeHome = home.running;
+    if (resumeHome) {
+      await stopHome();
+      if (home.running || home.failureCode != null || home.busy) {
+        throw StateError('Домашний сервер не подтвердил остановку');
+      }
+      final preferences = await SharedPreferences.getInstance();
+      if (!await preferences.setBool('space.update.resumeHome', true)) {
+        throw StateError('Не удалось сохранить состояние домашнего сервера');
+      }
+    }
+    for (final session in sessions) {
+      await session.disconnect().timeout(const Duration(seconds: 5));
+    }
+  }
+
+  Future<void> offerHomeAfterUpdate() async {
+    final preferences = await SharedPreferences.getInstance();
+    if (preferences.getBool('space.update.resumeHome') != true) return;
+    await home.load();
+    if (!mounted) return;
+    final start = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.strings.updatesHomeTitle),
+        content: Text(context.strings.updatesHomeResume),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(context.strings.updatesLater),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(context.strings.updatesHomeStart),
+          ),
+        ],
+      ),
+    );
+    if (start == null) return;
+    await preferences.remove('space.update.resumeHome');
+    if (start && mounted) await startHome(home.ip);
   }
 
   Future<void> showHome() async {
@@ -1221,210 +1289,227 @@ class _SpaceShellState extends State<SpaceShell> {
       updates,
       presence,
     ]),
-    builder: (context, _) => LayoutBuilder(
-      builder: (context, box) {
-        final compact = box.maxWidth < 760;
-        final workspace = Column(
-          children: [
-            header(compact),
-            if (!dashboard && controller.reconnecting)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Row(
-                  children: [
-                    const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+    builder: (context, _) => AbsorbPointer(
+      absorbing: updates.installing,
+      child: ExcludeFocus(
+        excluding: updates.installing,
+        child: LayoutBuilder(
+          builder: (context, box) {
+            final compact = box.maxWidth < 760;
+            final workspace = Column(
+              children: [
+                header(compact),
+                if (!dashboard && controller.reconnecting)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        context.strings.recoveringEvents,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            if (!dashboard && controller.busy)
-              const LinearProgressIndicator(minHeight: 2),
-            if (!applicationSettings &&
-                !dashboard &&
-                controller.error.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Text(
-                  chatFailureText(context, controller),
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
-              ),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: IndexedStack(
-                      index: serverList
-                          ? 4
-                          : devicePage
-                          ? 3
-                          : applicationSettings
-                          ? 2
-                          : dashboard
-                          ? 0
-                          : 1,
+                    child: Row(
                       children: [
-                        Dashboard(
-                          workspaces: workspaces,
-                          presence: presence,
-                          homeAction: showHome,
-                          homeDetails: showHomeDetails,
-                          createOwnSpace: createOwnSpace,
-                          homeRunning: home.running,
-                          homeBusy: home.busy,
-                          addSpace: addSpace,
-                          openSpace: (origin) => openSpace(origin),
-                          removeSpace: (origin) => removeSpace(origin),
-                          openChannel: (origin, channel) =>
-                              openSpace(origin, channel: channel),
+                        const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         ),
-                        pages(),
-                        SettingsPanel(
-                          preferences: widget.preferences,
-                          updates: updates,
-                        ),
-                        DevicePanel(
-                          workspaces: workspaces,
-                          fallback: deviceController,
-                          restoreController: (origin) =>
-                              workspaces[origin] ?? createTransient(),
-                          onRestored: (origin, target) async {
-                            workspaces.adopt(
-                              origin,
-                              target,
-                              owned: target != widget.controller,
-                            );
-                            transientControllers.remove(target);
-                            await widget.preferences.remember(origin);
-                          },
-                        ),
-                        ServerInbox(
-                          controllers: workspaces.controllers,
-                          presence: presence,
-                          icons: widget.preferences.serverIcons,
-                          open: (origin) => openSpace(origin),
-                          remove: (origin) => removeSpace(origin),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            context.strings.recoveringEvents,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  if (box.maxWidth >= 1320 &&
-                      !dashboard &&
-                      !applicationSettings)
-                    contextPanel(),
-                ],
-              ),
-            ),
-          ],
-        );
-        return CallbackShortcuts(
-          bindings: {
-            const SingleActivator(LogicalKeyboardKey.keyK, control: true): () =>
-                unawaited(search()),
-            const SingleActivator(LogicalKeyboardKey.keyK, meta: true): () =>
-                unawaited(search()),
-          },
-          child: Focus(
-            autofocus: true,
-            child: Scaffold(
-              key: scaffold,
-              drawer: compact
-                  ? Drawer(child: SafeArea(child: navigationSidebar()))
-                  : null,
-              bottomNavigationBar: compact
-                  ? NavigationBar(
-                      selectedIndex: bottomIndex,
-                      onDestinationSelected: (index) => index == 0
-                          ? showDashboard()
-                          : index == 1
-                          ? showServers()
-                          : select(
-                              [
-                                Section.overview,
-                                Section.chat,
-                                Section.identity,
-                                Section.settings,
-                              ][index],
-                            ),
-                      destinations: [
-                        NavigationDestination(
-                          icon: Icon(Icons.home_outlined),
-                          label: context.strings.overview,
-                        ),
-                        NavigationDestination(
-                          icon: Icon(Icons.dns_outlined),
-                          label: context.strings.spacesTitle,
-                        ),
-                        NavigationDestination(
-                          icon: Icon(Icons.computer_outlined),
-                          label: context.strings.myDevice,
-                        ),
-                        NavigationDestination(
-                          icon: const Icon(Icons.settings_suggest_outlined),
-                          label: context.strings.managementTab,
-                          enabled:
-                              controller.administration != null &&
-                              !controller.busy,
-                        ),
-                      ],
-                    )
-                  : null,
-              body: SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.all(compact ? 6 : 8),
+                if (!dashboard && controller.busy)
+                  const LinearProgressIndicator(minHeight: 2),
+                if (!applicationSettings &&
+                    !dashboard &&
+                    controller.error.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Text(
+                      chatFailureText(context, controller),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ),
+                Expanded(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (!compact) ...[
-                        rail(),
-                        const SizedBox(width: 8),
-                        ClipRRect(
-                          borderRadius: const BorderRadius.horizontal(
-                            left: Radius.circular(20),
-                          ),
-                          child: navigationSidebar(),
-                        ),
-                      ],
                       Expanded(
-                        child: ClipRRect(
-                          borderRadius: compact
-                              ? BorderRadius.circular(20)
-                              : const BorderRadius.horizontal(
-                                  right: Radius.circular(20),
-                                ),
-                          child: ColoredBox(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerLow,
-                            child: workspace,
-                          ),
+                        child: IndexedStack(
+                          index: serverList
+                              ? 4
+                              : devicePage
+                              ? 3
+                              : applicationSettings
+                              ? 2
+                              : dashboard
+                              ? 0
+                              : 1,
+                          children: [
+                            Dashboard(
+                              workspaces: workspaces,
+                              presence: presence,
+                              homeAction: showHome,
+                              homeDetails: showHomeDetails,
+                              createOwnSpace: createOwnSpace,
+                              homeRunning: home.running,
+                              homeBusy: home.busy,
+                              addSpace: addSpace,
+                              openSpace: (origin) => openSpace(origin),
+                              removeSpace: (origin) => removeSpace(origin),
+                              openChannel: (origin, channel) =>
+                                  openSpace(origin, channel: channel),
+                            ),
+                            pages(),
+                            SettingsPanel(
+                              preferences: widget.preferences,
+                              updates: updates,
+                              prepareInstall: prepareAppInstall,
+                            ),
+                            DevicePanel(
+                              workspaces: workspaces,
+                              fallback: deviceController,
+                              restoreController: (origin) =>
+                                  workspaces[origin] ?? createTransient(),
+                              onRestored: (origin, target) async {
+                                workspaces.adopt(
+                                  origin,
+                                  target,
+                                  owned: target != widget.controller,
+                                );
+                                transientControllers.remove(target);
+                                await widget.preferences.remember(origin);
+                              },
+                            ),
+                            ServerInbox(
+                              controllers: workspaces.controllers,
+                              presence: presence,
+                              icons: widget.preferences.serverIcons,
+                              open: (origin) => openSpace(origin),
+                              remove: (origin) => removeSpace(origin),
+                            ),
+                          ],
                         ),
                       ),
+                      if (box.maxWidth >= 1320 &&
+                          !dashboard &&
+                          !applicationSettings)
+                        contextPanel(),
                     ],
                   ),
                 ),
+              ],
+            );
+            return CallbackShortcuts(
+              bindings: {
+                const SingleActivator(
+                  LogicalKeyboardKey.keyK,
+                  control: true,
+                ): () =>
+                    unawaited(search()),
+                const SingleActivator(
+                  LogicalKeyboardKey.keyK,
+                  meta: true,
+                ): () =>
+                    unawaited(search()),
+              },
+              child: Focus(
+                autofocus: true,
+                child: Scaffold(
+                  key: scaffold,
+                  drawer: compact
+                      ? Drawer(child: SafeArea(child: navigationSidebar()))
+                      : null,
+                  bottomNavigationBar: compact
+                      ? NavigationBar(
+                          selectedIndex: bottomIndex,
+                          onDestinationSelected: (index) => index == 0
+                              ? showDashboard()
+                              : index == 1
+                              ? showServers()
+                              : select(
+                                  [
+                                    Section.overview,
+                                    Section.chat,
+                                    Section.identity,
+                                    Section.settings,
+                                  ][index],
+                                ),
+                          destinations: [
+                            NavigationDestination(
+                              icon: Icon(Icons.home_outlined),
+                              label: context.strings.overview,
+                            ),
+                            NavigationDestination(
+                              icon: Icon(Icons.dns_outlined),
+                              label: context.strings.spacesTitle,
+                            ),
+                            NavigationDestination(
+                              icon: Icon(Icons.computer_outlined),
+                              label: context.strings.myDevice,
+                            ),
+                            NavigationDestination(
+                              icon: const Icon(Icons.settings_suggest_outlined),
+                              label: context.strings.managementTab,
+                              enabled:
+                                  controller.administration != null &&
+                                  !controller.busy,
+                            ),
+                          ],
+                        )
+                      : null,
+                  body: SafeArea(
+                    child: Padding(
+                      padding: EdgeInsets.all(compact ? 6 : 8),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (!compact) ...[
+                            rail(),
+                            const SizedBox(width: 8),
+                            ClipRRect(
+                              borderRadius: const BorderRadius.horizontal(
+                                left: Radius.circular(20),
+                              ),
+                              child: navigationSidebar(),
+                            ),
+                          ],
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: compact
+                                  ? BorderRadius.circular(20)
+                                  : const BorderRadius.horizontal(
+                                      right: Radius.circular(20),
+                                    ),
+                              child: ColoredBox(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerLow,
+                                child: workspace,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        );
-      },
+            );
+          },
+        ),
+      ),
     ),
   );
 }

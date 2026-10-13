@@ -1009,6 +1009,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get updatesDownloaded => '安装包已下载并验证。';
+
+  @override
+  String get updatesInstall => '安装并重启';
+
+  @override
+  String get updatesPreparing => '正在完成操作并停止家庭服务器…';
+
+  @override
+  String get updatesInstallFailed => '无法开始安装。请检查消息发送和家庭服务器状态，然后重试。';
+
+  @override
+  String get updatesHomeTitle => '家庭服务器';
+
+  @override
+  String get updatesHomeResume => '更新前家庭服务器正在运行。是否重新启动？';
+
+  @override
+  String get updatesLater => '稍后';
+
+  @override
+  String get updatesHomeStart => '启动';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

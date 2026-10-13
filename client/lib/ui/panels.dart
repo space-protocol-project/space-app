@@ -123,8 +123,14 @@ class OverviewPanel extends StatelessWidget {
 }
 
 class SettingsPanel extends StatelessWidget {
-  const SettingsPanel({super.key, required this.preferences, this.updates});
+  const SettingsPanel({
+    super.key,
+    required this.preferences,
+    this.updates,
+    this.prepareInstall,
+  });
   final AppUpdates? updates;
+  final Future<void> Function()? prepareInstall;
   final AppPreferences preferences;
   @override
   Widget build(BuildContext context) => PageBody(
@@ -210,7 +216,7 @@ class SettingsPanel extends StatelessWidget {
         ),
       ],
       const SizedBox(height: 24),
-      AppUpdatesView(updates: updates),
+      AppUpdatesView(updates: updates, prepareInstall: prepareInstall),
     ],
   );
 }
