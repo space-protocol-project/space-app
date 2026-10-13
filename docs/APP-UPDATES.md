@@ -1,5 +1,7 @@
 # Простое обновление приложения
 
+Опубликовано в [v0.2.2](https://github.com/space-protocol-project/space-app/releases/latest). [CI выпуска](https://github.com/space-protocol-project/space-app/actions/runs/38483265549) проверил установку Windows поверх v0.2.1 и перезапуск. [Скачать последнюю версию](../README.md#публикация).
+
 Обновления проверяются при запуске и в настройках. Приложение получает выпуск
 из `space-protocol-project/space-app`, выбирает пакет для своей ОС/архитектуры
 и загружает его с процентами и докачкой. Обязательны размер и SHA-256 из
