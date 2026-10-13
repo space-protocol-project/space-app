@@ -96,6 +96,8 @@ jobs:
       - name: Проверка установки поверх v0.2.1 и перезапуска
         if: matrix.target == 'windows'
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           $candidateBundle = Join-Path $env:RUNNER_TEMP 'space-update-candidate'
           Copy-Item -LiteralPath client/build/windows/x64/runner/Release -Destination $candidateBundle -Recurse

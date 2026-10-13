@@ -43,6 +43,7 @@ function Stop-OwnedApp($Process) {
 }
 
 $headers = @{ Accept = 'application/vnd.github+json'; 'User-Agent' = 'Space-update-CI' }
+if ($env:GH_TOKEN) { $headers.Authorization = "Bearer $env:GH_TOKEN" }
 $release = Invoke-RestMethod -Uri 'https://api.github.com/repos/space-protocol-project/space-app/releases/tags/v0.2.1' -Headers $headers
 $asset = @($release.assets | Where-Object name -eq 'Space-Setup-windows-x64.exe')
 if ($asset.Count -ne 1 -or $release.draft -or $asset[0].digest -notmatch '^sha256:[0-9a-f]{64}$') { throw 'Неверные метаданные исходного выпуска' }
