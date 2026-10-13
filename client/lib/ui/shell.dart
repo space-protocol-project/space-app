@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 
 import '../src/chat_controller.dart';
 import '../src/preferences.dart';
+import '../src/app_updates.dart';
 import '../src/secure_vault.dart';
 import '../src/home_controller.dart';
 import '../src/server_presence.dart';
@@ -56,8 +57,10 @@ class SpaceShell extends StatefulWidget {
     this.controller,
     this.presence,
     this.workspaces,
+    this.updates,
   });
   final AppPreferences preferences;
+  final AppUpdates? updates;
   final ChatController? controller;
   final ServerPresence? presence;
   final ServerWorkspaces? workspaces;
@@ -221,6 +224,7 @@ class _SpaceShellState extends State<SpaceShell> {
 
   final scaffold = GlobalKey<ScaffoldState>();
   final home = HomeController();
+  late final updates = widget.updates ?? AppUpdates();
   late final presence =
       widget.presence ??
       ServerPresence(
@@ -283,6 +287,7 @@ class _SpaceShellState extends State<SpaceShell> {
     super.initState();
     dashboard = widget.controller == null;
     unawaited(home.load());
+    unawaited(updates.check());
     final initialOrigin = initialController.preview?.origin.toString();
     if (initialOrigin != null && initialController.connected) {
       workspaces.adopt(
@@ -569,6 +574,7 @@ class _SpaceShellState extends State<SpaceShell> {
     unawaited(presenceChanges?.cancel());
     if (widget.presence == null) presence.dispose();
     home.dispose();
+    if (widget.updates == null) updates.dispose();
     for (final pending in transientControllers) {
       pending.dispose();
     }
@@ -963,7 +969,7 @@ class _SpaceShellState extends State<SpaceShell> {
           tooltip: context.strings.appSettings,
           selected: applicationSettings,
           onPressed: showApplicationSettings,
-          icon: const Icon(Icons.settings_outlined),
+          icon: updateBadge(Icons.settings_outlined),
         ),
         railButton(
           key: const ValueKey('my-device-tab'),
@@ -1189,7 +1195,7 @@ class _SpaceShellState extends State<SpaceShell> {
           IconButton(
             tooltip: context.strings.appSettings,
             onPressed: showApplicationSettings,
-            icon: const Icon(Icons.tune),
+            icon: updateBadge(Icons.tune),
           ),
         IconButton(
           tooltip: context.strings.search,
@@ -1199,6 +1205,12 @@ class _SpaceShellState extends State<SpaceShell> {
       ],
     ),
   );
+  Widget updateBadge(IconData icon) => Badge(
+    key: const ValueKey('app-update-badge'),
+    isLabelVisible: updates.status == AppUpdateStatus.available,
+    child: Icon(icon),
+  );
+
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: Listenable.merge([
@@ -1206,6 +1218,7 @@ class _SpaceShellState extends State<SpaceShell> {
       workspaces,
       widget.preferences,
       home,
+      updates,
       presence,
     ]),
     builder: (context, _) => LayoutBuilder(
@@ -1283,7 +1296,10 @@ class _SpaceShellState extends State<SpaceShell> {
                               openSpace(origin, channel: channel),
                         ),
                         pages(),
-                        SettingsPanel(preferences: widget.preferences),
+                        SettingsPanel(
+                          preferences: widget.preferences,
+                          updates: updates,
+                        ),
                         DevicePanel(
                           workspaces: workspaces,
                           fallback: deviceController,

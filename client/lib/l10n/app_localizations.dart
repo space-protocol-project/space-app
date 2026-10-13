@@ -1990,6 +1990,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не удалось открыть страницу выпуска'**
   String get updatesOpenFailed;
+
+  /// No description provided for @updatesPackageUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для этой системы пакет пока недоступен.'**
+  String get updatesPackageUnavailable;
+
+  /// No description provided for @updatesPackage.
+  ///
+  /// In ru, this message translates to:
+  /// **'{platform} · {size} МБ'**
+  String updatesPackage(String platform, String size);
 }
 
 class _AppLocalizationsDelegate

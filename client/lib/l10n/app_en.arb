@@ -424,5 +424,17 @@
         "type": "String"
       }
     }
+  },
+  "updatesPackageUnavailable": "No package is available for this system yet.",
+  "updatesPackage": "{platform} · {size} MB",
+  "@updatesPackage": {
+    "placeholders": {
+      "platform": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
   }
 }

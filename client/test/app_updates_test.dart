@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:space_client/ui/shell.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -16,7 +18,14 @@ Map<String, dynamic> release(String tag, {bool draft = false}) => {
   'draft': draft,
   'html_url': 'https://github.com/$appRepository/releases/tag/$tag',
   'assets': [
-    for (final name in appReleaseAssets) {'name': name},
+    for (final name in appReleaseAssets)
+      {
+        'name': name,
+        'size': 10485760,
+        'digest': 'sha256:${'a' * 64}',
+        'browser_download_url':
+            'https://github.com/$appRepository/releases/download/$tag/$name',
+      },
   ],
   'body': '- Исправления',
 };
@@ -86,6 +95,37 @@ void main() {
       expect(updates.release!.tag, 'v0.2.10');
     },
   );
+  test('Пакет выбирается по системе; чужой URL и неверный digest отклоняются', () async {
+    for (final platform in [...appPackages.keys, 'unsupported']) {
+      final updates = AppUpdates(
+        platform: platform,
+        readVersion: () async => '0.2.0',
+        client: MockClient(
+          (_) async => http.Response.bytes(
+            utf8.encode(jsonEncode([release('v0.3.0')])),
+            200,
+          ),
+        ),
+      );
+      await updates.check();
+      expect(updates.package?.name, appPackages[platform]);
+      updates.dispose();
+    }
+    final data = release('v0.3.0');
+    final asset = (data['assets'] as List).first as Map;
+    asset['browser_download_url'] = 'https://example.org/package.exe';
+    expect(
+      AppRelease.fromJson(data)!.packages.containsKey(asset['name']),
+      false,
+    );
+    asset['browser_download_url'] =
+        'https://github.com/$appRepository/releases/download/v0.3.0/${asset['name']}';
+    asset['digest'] = 'sha256:invalid';
+    expect(
+      AppRelease.fromJson(data)!.packages.containsKey(asset['name']),
+      false,
+    );
+  });
   test('Неполный релиз и ссылка на посторонний адрес не принимаются', () {
     expect(AppRelease.fromJson(release('v0.3.0')..['assets'] = []), isNull);
     expect(
@@ -126,6 +166,42 @@ void main() {
       expect(updates.status, AppUpdateStatus.current);
     },
   );
+  testWidgets('Запуск проверяет обновление и показывает отметку у настроек', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    var calls = 0;
+    final updates = AppUpdates(
+      readVersion: () async => '0.2.0',
+      client: MockClient((_) async {
+        calls++;
+        return http.Response.bytes(
+          utf8.encode(jsonEncode([release('v0.3.0')])),
+          200,
+        );
+      }),
+    );
+    addTearDown(updates.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ru'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        home: SpaceShell(preferences: AppPreferences(), updates: updates),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(calls, 1);
+    final badge = tester.widget<Badge>(
+      find.byKey(const ValueKey('app-update-badge')),
+    );
+    expect(badge.isLabelVisible, true);
+    await tester.pumpWidget(const SizedBox());
+  });
   testWidgets(
     'Настройки показывают версию, результат проверки и изменения на узком экране',
     (tester) async {

@@ -6,6 +6,7 @@ import 'recovery_panel.dart';
 
 import '../src/chat_controller.dart';
 import '../src/preferences.dart';
+import '../src/app_updates.dart';
 import 'components.dart';
 import 'app_updates_view.dart';
 
@@ -122,7 +123,8 @@ class OverviewPanel extends StatelessWidget {
 }
 
 class SettingsPanel extends StatelessWidget {
-  const SettingsPanel({super.key, required this.preferences});
+  const SettingsPanel({super.key, required this.preferences, this.updates});
+  final AppUpdates? updates;
   final AppPreferences preferences;
   @override
   Widget build(BuildContext context) => PageBody(
@@ -208,7 +210,7 @@ class SettingsPanel extends StatelessWidget {
         ),
       ],
       const SizedBox(height: 24),
-      const AppUpdatesView(),
+      AppUpdatesView(updates: updates),
     ],
   );
 }

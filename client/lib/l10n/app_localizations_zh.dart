@@ -992,9 +992,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get updatesOpenFailed => '无法打开发布页面';
+
+  @override
+  String get updatesPackageUnavailable => '此系统暂无安装包。';
+
+  @override
+  String updatesPackage(String platform, String size) {
+    return '$platform · $size MB';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
 class AppLocalizationsZhHans extends AppLocalizationsZh {
   AppLocalizationsZhHans() : super('zh_Hans');
+
+  @override
+  String get updatesPackageUnavailable => '此系统暂无安装包。';
+
+  @override
+  String updatesPackage(String platform, String size) {
+    return '$platform · $size MB';
+  }
 }

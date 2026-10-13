@@ -1,1 +1,15 @@
-{"@@locale": "zh_Hans"}
+{
+  "@@locale": "zh_Hans",
+  "updatesPackageUnavailable": "此系统暂无安装包。",
+  "updatesPackage": "{platform} · {size} MB",
+  "@updatesPackage": {
+    "placeholders": {
+      "platform": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  }
+}

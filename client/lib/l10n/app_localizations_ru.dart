@@ -1088,4 +1088,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get updatesOpenFailed => 'Не удалось открыть страницу выпуска';
+
+  @override
+  String get updatesPackageUnavailable =>
+      'Для этой системы пакет пока недоступен.';
+
+  @override
+  String updatesPackage(String platform, String size) {
+    return '$platform · $size МБ';
+  }
 }

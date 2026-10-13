@@ -1084,4 +1084,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updatesOpenFailed => 'Unable to open the release page';
+
+  @override
+  String get updatesPackageUnavailable =>
+      'No package is available for this system yet.';
+
+  @override
+  String updatesPackage(String platform, String size) {
+    return '$platform · $size MB';
+  }
 }

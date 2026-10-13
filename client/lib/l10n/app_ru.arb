@@ -424,5 +424,17 @@
         "type": "String"
       }
     }
+  },
+  "updatesPackageUnavailable": "Для этой системы пакет пока недоступен.",
+  "updatesPackage": "{platform} · {size} МБ",
+  "@updatesPackage": {
+    "placeholders": {
+      "platform": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
   }
 }

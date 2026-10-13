@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:ffi';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -63,8 +65,47 @@ class AppVersion implements Comparable<AppVersion> {
   }
 }
 
+const appPackages = {
+  'windows-x64': 'Space-Setup-windows-x64.exe',
+  'macos-arm64': 'Space-macos-arm64.dmg',
+  'linux-x64': 'Space-linux-x64.run',
+};
+
+String installedAppPlatform() {
+  if (Platform.isWindows && Abi.current() == Abi.windowsX64) {
+    return 'windows-x64';
+  }
+  if (Platform.isMacOS && Abi.current() == Abi.macosArm64) return 'macos-arm64';
+  if (Platform.isLinux && Abi.current() == Abi.linuxX64) return 'linux-x64';
+  return '';
+}
+
+class AppPackage {
+  AppPackage(this.name, this.url, this.size, this.digest);
+  final String name, digest;
+  final Uri url;
+  final int size;
+
+  static AppPackage? fromJson(Map asset, String tag) {
+    final name = asset['name'], size = asset['size'], digest = asset['digest'];
+    if (!appReleaseAssets.contains(name) ||
+        size is! int ||
+        size <= 0 ||
+        size > 1024 * 1024 * 1024 ||
+        digest is! String ||
+        !RegExp(r'^sha256:[0-9a-f]{64}$').hasMatch(digest)) {
+      return null;
+    }
+    final expected =
+        'https://github.com/$appRepository/releases/download/${Uri.encodeComponent(tag)}/$name';
+    if (asset['browser_download_url'] != expected) return null;
+    return AppPackage(name as String, Uri.parse(expected), size, digest);
+  }
+}
+
 class AppRelease {
-  AppRelease(this.tag, this.url, this.notes, this.version);
+  AppRelease(this.tag, this.url, this.notes, this.version, this.packages);
+  final Map<String, AppPackage> packages;
   final String tag, notes;
   final Uri url;
   final AppVersion version;
@@ -94,6 +135,11 @@ class AppRelease {
       Uri.parse(expected),
       notes.length > 65536 ? notes.substring(0, 65536) : notes,
       version,
+      {
+        for (final asset in assets.whereType<Map>())
+          if (AppPackage.fromJson(asset, tag) case final AppPackage package)
+            package.name: package,
+      },
     );
   }
 }
@@ -101,9 +147,15 @@ class AppRelease {
 enum AppUpdateStatus { idle, checking, current, available, empty, failed }
 
 class AppUpdates extends ChangeNotifier {
-  AppUpdates({http.Client? client, Future<String> Function()? readVersion})
-    : client = client ?? http.Client(),
-      readVersion = readVersion ?? installedAppVersion;
+  AppUpdates({
+    http.Client? client,
+    Future<String> Function()? readVersion,
+    String? platform,
+  }) : client = client ?? http.Client(),
+       readVersion = readVersion ?? installedAppVersion,
+       platform = platform ?? installedAppPlatform();
+  final String platform;
+  AppPackage? get package => release?.packages[appPackages[platform]];
   final http.Client client;
   final Future<String> Function() readVersion;
   String installed = '';

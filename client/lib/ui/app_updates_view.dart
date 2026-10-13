@@ -19,7 +19,9 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
   @override
   void initState() {
     super.initState();
-    unawaited(updates.initialize());
+    if (updates.installed.isEmpty && updates.status == AppUpdateStatus.idle) {
+      unawaited(updates.initialize());
+    }
   }
 
   @override
@@ -90,6 +92,18 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
                 if (message.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   Text(message, key: const ValueKey('app-update-status')),
+                ],
+                if (updates.status == AppUpdateStatus.available) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    updates.package == null
+                        ? context.strings.updatesPackageUnavailable
+                        : context.strings.updatesPackage(
+                            updates.platform,
+                            (updates.package!.size / (1024 * 1024))
+                                .toStringAsFixed(1),
+                          ),
+                  ),
                 ],
                 if (updates.release?.notes.isNotEmpty == true)
                   ExpansionTile(
