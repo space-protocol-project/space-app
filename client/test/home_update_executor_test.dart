@@ -27,6 +27,10 @@ void main() {
   late HomeUpdateExecutor executor;
   late List<String> calls;
   var migrationFails = false, restorationFails = false, wrongIdentity = false;
+  var advertisedSchema = 11;
+  Object? reportedTargetSchema = 11;
+  Map<String, dynamic> capabilityOverrides = {};
+  String? changeAfterBackup;
   Future<Map<String, dynamic>> tool(
     Directory runtime,
     List<String> arguments,
@@ -40,7 +44,8 @@ void main() {
         'arch': 'amd64',
         'postgresMajor': 17,
         'protocolVersion': '0.1-experimental',
-        'schemaVersion': 11,
+        'schemaVersion': advertisedSchema,
+        ...capabilityOverrides,
       };
     }
     if (arguments.first == '-home-backup') {
@@ -48,6 +53,11 @@ void main() {
         Directory(value('-home-data')),
         Directory('${value('-home-backup')}/data'),
       );
+      if (changeAfterBackup == 'runtime') advertisedSchema = 12;
+      if (changeAfterBackup == 'target') reportedTargetSchema = 12;
+      if (changeAfterBackup == 'schema') {
+        await File('${value('-home-data')}/schema').writeAsString('10');
+      }
       return {};
     }
     if (arguments.first == '-home-restore') {
@@ -66,11 +76,15 @@ void main() {
     }
     return {
       'schemaVersion': int.parse(await File('$data/schema').readAsString()),
-      'targetSchemaVersion': 11,
+      'targetSchemaVersion': reportedTargetSchema,
       'postgresMajor': 17,
       'serverId': 'srv_${'1' * 32}',
       'tlsFingerprint':
-          (wrongIdentity && arguments.first == '-home-migrate' ? 'b' : 'a') *
+          ((wrongIdentity && arguments.first == '-home-migrate') ||
+                  (changeAfterBackup == 'identity' &&
+                      calls.contains('-home-backup'))
+              ? 'b'
+              : 'a') *
           64,
     };
   }
@@ -87,6 +101,10 @@ void main() {
     migrationFails = false;
     restorationFails = false;
     wrongIdentity = false;
+    advertisedSchema = 11;
+    reportedTargetSchema = 11;
+    changeAfterBackup = null;
+    capabilityOverrides = {};
     executor = HomeUpdateExecutor(
       root,
       tool: tool,
@@ -111,6 +129,12 @@ void main() {
       calls.indexOf('-home-backup'),
       lessThan(calls.indexOf('-home-migrate')),
     );
+    final backupIndex = calls.indexOf('-home-backup');
+    final migrationIndex = calls.indexOf('-home-migrate');
+    expect(calls.sublist(backupIndex + 1, migrationIndex), [
+      '-runtime-info',
+      '-home-check',
+    ]);
     expect((await installation.active(release('v0.2.0')))!.version, 'v0.2.0');
     final selection =
         jsonDecode(await installation.selection.readAsString()) as Map;
@@ -121,6 +145,74 @@ void main() {
     );
     expect(await File('${root.path}/data/schema').readAsString(), '11');
     expect(await installation.runtime(release('v0.1.0')).exists(), true);
+  });
+  test('Будущая схема и несогласованные возможности блокируют резервное копирование и миграции', () async {
+    for (final mismatch in ['schema', 'target', 'missing', 'fraction']) {
+      if (mismatch == 'schema') {
+        await File('${root.path}/data/schema').writeAsString('12');
+      } else {
+        reportedTargetSchema = switch (mismatch) {
+          'missing' => null,
+          'fraction' => 11.0,
+          _ => 12,
+        };
+      }
+      await expectLater(
+        executor.update(release('v0.1.0'), release('v0.2.0')),
+        throwsFormatException,
+      );
+      expect(calls, isNot(contains('-home-backup')));
+      expect(calls, isNot(contains('-home-migrate')));
+      expect((await installation.active(release('v0.2.0')))!.version, 'v0.1.0');
+      expect(
+        (await HomeUpdateJournal(root).read())!.step,
+        HomeUpdateStep.cancelled,
+      );
+      await File('${root.path}/data/schema').writeAsString('9');
+      calls.clear();
+    }
+  });
+
+  test('Неподходящие платформа, протокол и PostgreSQL отклоняются до проверки базы', () async {
+    for (final mismatch in [
+      {'os': 'linux'},
+      {'arch': 'arm64'},
+      {'postgresMajor': 18},
+      {'protocolVersion': 'other'},
+      {'format': 2},
+      {'schemaVersion': 0},
+    ]) {
+      capabilityOverrides = mismatch;
+      calls.clear();
+      await expectLater(
+        executor.verifyCandidate(release('v0.2.0')),
+        throwsFormatException,
+      );
+      expect(calls, ['-runtime-info']);
+      expect((await installation.active(release('v0.2.0')))!.version, 'v0.1.0');
+    }
+  });
+
+  test('Изменение комплекта, схемы или идентичности после копии не допускает миграцию', () async {
+    for (final change in ['runtime', 'target', 'schema', 'identity']) {
+      advertisedSchema = 11;
+      reportedTargetSchema = 11;
+      await File('${root.path}/data/schema').writeAsString('9');
+      calls.clear();
+      changeAfterBackup = change;
+      await expectLater(
+        executor.update(release('v0.1.0'), release('v0.2.0')),
+        throwsFormatException,
+      );
+      expect(calls, contains('-home-backup'));
+      expect(calls, isNot(contains('-home-migrate')));
+      expect(calls, isNot(contains('-home-restore')));
+      expect((await installation.active(release('v0.2.0')))!.version, 'v0.1.0');
+      expect(
+        (await HomeUpdateJournal(root).read())!.step,
+        HomeUpdateStep.cancelled,
+      );
+    }
   });
   test('Сбой после миграций восстанавливает копию и сохраняет изменённую базу отдельно', () async {
     migrationFails = true;

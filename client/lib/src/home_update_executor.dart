@@ -120,6 +120,18 @@ class HomeUpdateExecutor {
     }
   }
 
+  void _compatible(Map<String, dynamic> info, int schema) {
+    final target = info['targetSchemaVersion'];
+    if (target is! int ||
+        target != schema ||
+        (info['schemaVersion'] as int) > schema) {
+      throw const LocalFailure(
+        LocalFailureCode.releaseInvalid,
+        'Схема базы не соответствует возможностям runtime',
+      );
+    }
+  }
+
   Future<void> update(HomeRelease source, HomeRelease target) async {
     if (!target.isNewerThan(source)) {
       throw const LocalFailure(
@@ -142,9 +154,7 @@ class HomeUpdateExecutor {
       await journal.advance(record.id, HomeUpdateStep.staged);
       final before = await _check(runtime, data);
       await storage.check(root);
-      if ((before['schemaVersion'] as int) > schema) {
-        throw HomeUpdateJournal.pending;
-      }
+      _compatible(before, schema);
       await journal.advance(record.id, HomeUpdateStep.stopped);
       await tool(runtime, [
         '-home-backup',
@@ -156,18 +166,48 @@ class HomeUpdateExecutor {
       ]);
       await _evidence(record).writeAsString(jsonEncode(before), flush: true);
       await journal.advance(record.id, HomeUpdateStep.backedUp);
+      // process.lock всё ещё удерживается; проверяем комплект и базу
+      // повторно после резервной копии, до первого изменения схемы.
+      await installation.verify(target);
+      if (await _capabilities(target) != schema) {
+        throw const LocalFailure(
+          LocalFailureCode.releaseInvalid,
+          'Возможности runtime изменились после подготовки',
+        );
+      }
+      final current = await _check(runtime, data);
+      _compatible(current, schema);
+      _sameIdentity(before, current);
+      if (current['schemaVersion'] != before['schemaVersion']) {
+        throw const LocalFailure(
+          LocalFailureCode.releaseInvalid,
+          'Схема базы изменилась после резервного копирования',
+        );
+      }
       await journal.advance(record.id, HomeUpdateStep.migrating);
       final after = await _check(runtime, data, migrate: true);
+      _compatible(after, schema);
       _sameIdentity(before, after);
       if (after['schemaVersion'] != schema) throw HomeUpdateJournal.pending;
       await journal.advance(record.id, HomeUpdateStep.verified);
       await journal.advance(record.id, HomeUpdateStep.activating);
       await installation.activate(source, target);
       await journal.advance(record.id, HomeUpdateStep.completeUpdated);
-    } catch (_) {
+    } catch (problem) {
       await recover(retryPreparation: false);
-      if ((await journal.read())?.step == HomeUpdateStep.completeUpdated) {
+      final step = (await journal.read())?.step;
+      if (step == HomeUpdateStep.completeUpdated) {
         return;
+      }
+      if (step == HomeUpdateStep.cancelled) {
+        if (problem is LocalFailure &&
+            problem.code == LocalFailureCode.releaseInvalid) {
+          rethrow;
+        }
+        throw const LocalFailure(
+          LocalFailureCode.homeUpdateFailed,
+          'Подготовка прервана до миграций; прежний выпуск остаётся активным',
+        );
       }
       throw const LocalFailure(
         LocalFailureCode.homeUpdateFailed,
