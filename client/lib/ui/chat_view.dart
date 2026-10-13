@@ -539,6 +539,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                         ? send
                         : null,
                     tooltip: context.strings.sendMessage,
+                    style: IconButton.styleFrom(
+                      foregroundColor: colors.onPrimary,
+                    ),
                     icon: const Icon(Icons.arrow_upward),
                   ),
                 ],

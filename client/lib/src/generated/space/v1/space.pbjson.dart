@@ -1191,6 +1191,35 @@ final $typed_data.Uint8List updateChannelRequestDescriptor = $convert.base64Deco
     'aXZlZBgEIAEoCFIIYXJjaGl2ZWQSJQoOcHVibGljX3ByZXZpZXcYBSABKAhSDXB1YmxpY1ByZX'
     'ZpZXcSKwoRZXhwZWN0ZWRfcmV2aXNpb24YBiABKANSEGV4cGVjdGVkUmV2aXNpb24=');
 
+@$core.Deprecated('Use deleteChannelRequestDescriptor instead')
+const DeleteChannelRequest$json = {
+  '1': 'DeleteChannelRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {
+      '1': 'expected_revision',
+      '3': 2,
+      '4': 1,
+      '5': 3,
+      '10': 'expectedRevision'
+    },
+  ],
+};
+
+/// Descriptor for `DeleteChannelRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deleteChannelRequestDescriptor = $convert.base64Decode(
+    'ChREZWxldGVDaGFubmVsUmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSWQSKw'
+    'oRZXhwZWN0ZWRfcmV2aXNpb24YAiABKANSEGV4cGVjdGVkUmV2aXNpb24=');
+
+@$core.Deprecated('Use deleteChannelResponseDescriptor instead')
+const DeleteChannelResponse$json = {
+  '1': 'DeleteChannelResponse',
+};
+
+/// Descriptor for `DeleteChannelResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deleteChannelResponseDescriptor =
+    $convert.base64Decode('ChVEZWxldGVDaGFubmVsUmVzcG9uc2U=');
+
 @$core.Deprecated('Use createChannelResponseDescriptor instead')
 const CreateChannelResponse$json = {
   '1': 'CreateChannelResponse',

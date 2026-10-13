@@ -1479,6 +1479,24 @@ abstract class AdminLocalizations {
   /// In ru, this message translates to:
   /// **'На устройстве нет ключа восстановления. Используйте исходную карточку.'**
   String get recoveryOriginalCardNeeded;
+
+  /// No description provided for @channelDelete.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить канал'**
+  String get channelDelete;
+
+  /// No description provided for @channelDeleteConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить канал «{name}» и всю его историю? Это действие нельзя отменить.'**
+  String channelDeleteConfirm(String name);
+
+  /// No description provided for @channelDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Канал удалён.'**
+  String get channelDeleted;
 }
 
 class _AdminLocalizationsDelegate

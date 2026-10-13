@@ -324,5 +324,15 @@
   "iconBolt": "Bolt",
   "iconRocket": "Rocket",
   "recoveryCreateQr": "Create QR",
-  "recoveryOriginalCardNeeded": "This device has no recovery key. Use the original card."
+  "recoveryOriginalCardNeeded": "This device has no recovery key. Use the original card.",
+  "channelDelete": "Delete channel",
+  "channelDeleteConfirm": "Delete “{name}” and all its messages? This cannot be undone.",
+  "channelDeleted": "Channel deleted.",
+  "@channelDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

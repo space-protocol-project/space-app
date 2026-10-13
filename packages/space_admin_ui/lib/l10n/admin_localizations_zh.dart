@@ -725,4 +725,15 @@ class AdminLocalizationsZh extends AdminLocalizations {
 
   @override
   String get recoveryOriginalCardNeeded => '此设备没有恢复密钥。请使用原始恢复卡。';
+
+  @override
+  String get channelDelete => '删除频道';
+
+  @override
+  String channelDeleteConfirm(String name) {
+    return '删除“$name”及其全部消息？此操作无法撤销。';
+  }
+
+  @override
+  String get channelDeleted => '频道已删除。';
 }

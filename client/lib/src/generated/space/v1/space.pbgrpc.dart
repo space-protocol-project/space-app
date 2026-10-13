@@ -63,6 +63,13 @@ class ChannelServiceClient extends $grpc.Client {
     return $createUnaryCall(_$updateChannel, request, options: options);
   }
 
+  $grpc.ResponseFuture<$0.DeleteChannelResponse> deleteChannel(
+    $0.DeleteChannelRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$deleteChannel, request, options: options);
+  }
+
   $grpc.ResponseFuture<$0.GetChannelAccessResponse> getChannelAccess(
     $0.GetChannelAccessRequest request, {
     $grpc.CallOptions? options,
@@ -106,6 +113,11 @@ class ChannelServiceClient extends $grpc.Client {
           '/space.v1.ChannelService/UpdateChannel',
           ($0.UpdateChannelRequest value) => value.writeToBuffer(),
           $0.UpdateChannelResponse.fromBuffer);
+  static final _$deleteChannel =
+      $grpc.ClientMethod<$0.DeleteChannelRequest, $0.DeleteChannelResponse>(
+          '/space.v1.ChannelService/DeleteChannel',
+          ($0.DeleteChannelRequest value) => value.writeToBuffer(),
+          $0.DeleteChannelResponse.fromBuffer);
   static final _$getChannelAccess = $grpc.ClientMethod<
           $0.GetChannelAccessRequest, $0.GetChannelAccessResponse>(
       '/space.v1.ChannelService/GetChannelAccess',
@@ -164,6 +176,15 @@ abstract class ChannelServiceBase extends $grpc.Service {
             ($core.List<$core.int> value) =>
                 $0.UpdateChannelRequest.fromBuffer(value),
             ($0.UpdateChannelResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.DeleteChannelRequest, $0.DeleteChannelResponse>(
+            'DeleteChannel',
+            deleteChannel_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.DeleteChannelRequest.fromBuffer(value),
+            ($0.DeleteChannelResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.GetChannelAccessRequest,
             $0.GetChannelAccessResponse>(
         'GetChannelAccess',
@@ -228,6 +249,15 @@ abstract class ChannelServiceBase extends $grpc.Service {
 
   $async.Future<$0.UpdateChannelResponse> updateChannel(
       $grpc.ServiceCall call, $0.UpdateChannelRequest request);
+
+  $async.Future<$0.DeleteChannelResponse> deleteChannel_Pre(
+      $grpc.ServiceCall $call,
+      $async.Future<$0.DeleteChannelRequest> $request) async {
+    return deleteChannel($call, await $request);
+  }
+
+  $async.Future<$0.DeleteChannelResponse> deleteChannel(
+      $grpc.ServiceCall call, $0.DeleteChannelRequest request);
 
   $async.Future<$0.GetChannelAccessResponse> getChannelAccess_Pre(
       $grpc.ServiceCall $call,

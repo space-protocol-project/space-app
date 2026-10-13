@@ -324,5 +324,15 @@
   "iconBolt": "闪电",
   "iconRocket": "火箭",
   "recoveryCreateQr": "创建二维码",
-  "recoveryOriginalCardNeeded": "此设备没有恢复密钥。请使用原始恢复卡。"
+  "recoveryOriginalCardNeeded": "此设备没有恢复密钥。请使用原始恢复卡。",
+  "channelDelete": "删除频道",
+  "channelDeleteConfirm": "删除“{name}”及其全部消息？此操作无法撤销。",
+  "channelDeleted": "频道已删除。",
+  "@channelDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

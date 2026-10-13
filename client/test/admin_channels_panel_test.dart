@@ -68,6 +68,15 @@ class ChannelServer {
       return {'channels': channels.values.map(copy).toList()};
     }
     final id = uri.path.split('/')[4];
+    if (method == 'DELETE') {
+      final c = channels[id]!;
+      if (uri.queryParameters['expectedRevision'] != c['revision']) {
+        throw SpaceApiError(409, 'Конфликт');
+      }
+      channels.remove(id);
+      access.remove(id);
+      return {};
+    }
     final c = channels[id]!;
     if (method == 'PATCH' || method == 'PUT') {
       if (body!['expectedRevision'] != c['revision']) {
@@ -203,6 +212,18 @@ void main() {
             .text,
         'Рабочая группа',
       );
+      await press(tester, strings.channelDelete);
+      await tester.tap(find.widgetWithText(TextButton, strings.cancel));
+      await tester.pumpAndSettle();
+      expect(server.channels.containsKey(id), true);
+      await press(tester, strings.channelDelete);
+      await tester.tap(
+        find.widgetWithText(FilledButton, strings.channelDelete),
+      );
+      await tester.pumpAndSettle();
+      expect(server.channels.containsKey(id), false);
+      expect(find.byKey(const ValueKey('channel-title')), findsNothing);
+      expect(find.text(strings.channelDeleted), findsOneWidget);
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
     });

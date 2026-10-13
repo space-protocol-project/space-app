@@ -770,4 +770,15 @@ class AdminLocalizationsRu extends AdminLocalizations {
   @override
   String get recoveryOriginalCardNeeded =>
       'На устройстве нет ключа восстановления. Используйте исходную карточку.';
+
+  @override
+  String get channelDelete => 'Удалить канал';
+
+  @override
+  String channelDeleteConfirm(String name) {
+    return 'Удалить канал «$name» и всю его историю? Это действие нельзя отменить.';
+  }
+
+  @override
+  String get channelDeleted => 'Канал удалён.';
 }

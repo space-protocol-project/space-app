@@ -324,5 +324,15 @@
   "iconBolt": "Молния",
   "iconRocket": "Ракета",
   "recoveryCreateQr": "Создать QR",
-  "recoveryOriginalCardNeeded": "На устройстве нет ключа восстановления. Используйте исходную карточку."
+  "recoveryOriginalCardNeeded": "На устройстве нет ключа восстановления. Используйте исходную карточку.",
+  "channelDelete": "Удалить канал",
+  "channelDeleteConfirm": "Удалить канал «{name}» и всю его историю? Это действие нельзя отменить.",
+  "channelDeleted": "Канал удалён.",
+  "@channelDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

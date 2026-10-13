@@ -39,6 +39,13 @@ abstract final class ChannelService {
     spacev1space.UpdateChannelResponse.new,
   );
 
+  static const deleteChannel = connect.Spec(
+    '/$name/DeleteChannel',
+    connect.StreamType.unary,
+    spacev1space.DeleteChannelRequest.new,
+    spacev1space.DeleteChannelResponse.new,
+  );
+
   static const getChannelAccess = connect.Spec(
     '/$name/GetChannelAccess',
     connect.StreamType.unary,

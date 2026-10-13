@@ -677,6 +677,17 @@ class SpaceSession
           ),
         );
       }
+      if (method == 'DELETE') {
+        return json(
+          await channelClient.deleteChannel(
+            DeleteChannelRequest()..mergeFromProto3Json({
+              'channelId': id,
+              'expectedRevision': uri.queryParameters['expectedRevision'] ?? '',
+            }),
+            options: _options,
+          ),
+        );
+      }
       if (method != 'PATCH') {
         throw const GrpcError.unimplemented('Неподдерживаемая операция канала');
       }

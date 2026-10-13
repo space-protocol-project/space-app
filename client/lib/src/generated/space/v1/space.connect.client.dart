@@ -77,6 +77,23 @@ extension type ChannelServiceClient (connect.Transport _transport) {
     );
   }
 
+  Future<spacev1space.DeleteChannelResponse> deleteChannel(
+    spacev1space.DeleteChannelRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ChannelService.deleteChannel,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
   Future<spacev1space.GetChannelAccessResponse> getChannelAccess(
     spacev1space.GetChannelAccessRequest input, {
     connect.Headers? headers,

@@ -4899,6 +4899,119 @@ class UpdateChannelRequest extends $pb.GeneratedMessage {
   void clearExpectedRevision() => $_clearField(6);
 }
 
+class DeleteChannelRequest extends $pb.GeneratedMessage {
+  factory DeleteChannelRequest({
+    $core.String? channelId,
+    $fixnum.Int64? expectedRevision,
+  }) {
+    final result = DeleteChannelRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    return result;
+  }
+
+  DeleteChannelRequest._();
+
+  factory DeleteChannelRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeleteChannelRequest()..mergeFromBuffer(data, registry);
+  factory DeleteChannelRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeleteChannelRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'DeleteChannelRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: DeleteChannelRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aInt64(2, _omitFieldNames ? '' : 'expectedRevision')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeleteChannelRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeleteChannelRequest copyWith(void Function(DeleteChannelRequest) updates) =>
+      super.copyWith((message) => updates(message as DeleteChannelRequest))
+          as DeleteChannelRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DeleteChannelRequest() / DeleteChannelRequest.new instead')
+  static DeleteChannelRequest create() => DeleteChannelRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DeleteChannelRequest._();
+  @$core.override
+  DeleteChannelRequest createEmptyInstance() => DeleteChannelRequest._();
+  @$core.pragma('dart2js:noInline')
+  static DeleteChannelRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DeleteChannelRequest>(
+          DeleteChannelRequest.$_createMessage);
+  static DeleteChannelRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get expectedRevision => $_getI64(1);
+  @$pb.TagNumber(2)
+  set expectedRevision($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasExpectedRevision() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearExpectedRevision() => $_clearField(2);
+}
+
+class DeleteChannelResponse extends $pb.GeneratedMessage {
+  factory DeleteChannelResponse() => DeleteChannelResponse._();
+
+  DeleteChannelResponse._();
+
+  factory DeleteChannelResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeleteChannelResponse()..mergeFromBuffer(data, registry);
+  factory DeleteChannelResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeleteChannelResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'DeleteChannelResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: DeleteChannelResponse.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeleteChannelResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeleteChannelResponse copyWith(
+          void Function(DeleteChannelResponse) updates) =>
+      super.copyWith((message) => updates(message as DeleteChannelResponse))
+          as DeleteChannelResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DeleteChannelResponse() / DeleteChannelResponse.new instead')
+  static DeleteChannelResponse create() => DeleteChannelResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DeleteChannelResponse._();
+  @$core.override
+  DeleteChannelResponse createEmptyInstance() => DeleteChannelResponse._();
+  @$core.pragma('dart2js:noInline')
+  static DeleteChannelResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DeleteChannelResponse>(
+          DeleteChannelResponse.$_createMessage);
+  static DeleteChannelResponse? _defaultInstance;
+}
+
 class CreateChannelResponse extends $pb.GeneratedMessage {
   factory CreateChannelResponse({
     Channel? channel,

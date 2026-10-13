@@ -32,6 +32,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     'channelLoaded' => strings.channelLoaded,
     'channelCreated' => strings.channelCreated,
     'channelSaved' => strings.channelSaved,
+    'channelDeleted' => strings.channelDeleted,
     'channelAccessSaved' => strings.channelAccessSaved,
     'channelRuleAdded' => strings.channelRuleAdded,
     'channelConflict' => strings.channelConflict,
@@ -167,6 +168,39 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     await load();
     await choose(Map<String, dynamic>.from(result['channel'] as Map));
     statusKey = 'channelCreated';
+  }
+
+  Future<void> deleteChannel() async {
+    final channel = selected!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(strings.channelDelete),
+        content: Text(strings.channelDeleteConfirm(channel['title'] as String)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(strings.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(strings.channelDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    await run(() async {
+      await widget.call(
+        '${channelPath(channel['id'] as String)}?expectedRevision=${channel['revision']}',
+        method: 'DELETE',
+      );
+      if (!mounted) return;
+      selected = null;
+      rules = [];
+      await load();
+      statusKey = 'channelDeleted';
+    });
   }
 
   Future<void> saveChannel() async {
@@ -369,6 +403,10 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
             children: [
               action(strings.channelSave, saveChannel, primary: true),
               action(strings.channelReload, reloadSelected),
+              OutlinedButton(
+                onPressed: busy ? null : deleteChannel,
+                child: Text(strings.channelDelete),
+              ),
             ],
           ),
           const Divider(height: 32),

@@ -769,4 +769,15 @@ class AdminLocalizationsEn extends AdminLocalizations {
   @override
   String get recoveryOriginalCardNeeded =>
       'This device has no recovery key. Use the original card.';
+
+  @override
+  String get channelDelete => 'Delete channel';
+
+  @override
+  String channelDeleteConfirm(String name) {
+    return 'Delete “$name” and all its messages? This cannot be undone.';
+  }
+
+  @override
+  String get channelDeleted => 'Channel deleted.';
 }
