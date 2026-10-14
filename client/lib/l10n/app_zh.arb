@@ -363,6 +363,8 @@
     }
   },
   "identityDescription": "所选空间的密钥、权限和访问恢复。",
+  "hotkeysTitle": "键盘快捷键",
+  "resetShortcut": "恢复默认 Enter",
   "sendShortcutTitle": "发送快捷键",
   "sendShortcutHelp": "选择 Enter 或 Shift+Enter 发送。另一组合键用于换行。",
   "createOwnSpace": "创建空间",

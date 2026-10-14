@@ -847,6 +847,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get identityDescription => '所选空间的密钥、权限和访问恢复。';
 
   @override
+  String get hotkeysTitle => '键盘快捷键';
+
+  @override
+  String get resetShortcut => '恢复默认 Enter';
+
+  @override
   String get sendShortcutTitle => '发送快捷键';
 
   @override

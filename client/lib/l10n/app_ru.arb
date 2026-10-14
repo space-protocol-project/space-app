@@ -363,6 +363,8 @@
     }
   },
   "identityDescription": "Ключи, разрешения и восстановление доступа в выбранном пространстве.",
+  "hotkeysTitle": "Горячие клавиши",
+  "resetShortcut": "Вернуть Enter по умолчанию",
   "sendShortcutTitle": "Клавиша отправки",
   "sendShortcutHelp": "Выберите Enter или Shift+Enter для отправки. Другая комбинация добавляет новую строку.",
   "createOwnSpace": "Создать пространство",

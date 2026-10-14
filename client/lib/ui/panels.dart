@@ -11,6 +11,7 @@ import '../src/preferences.dart';
 import '../src/app_updates.dart';
 import 'components.dart';
 import 'app_updates_view.dart';
+import 'shortcut_settings.dart';
 
 class OverviewPanel extends StatelessWidget {
   const OverviewPanel({
@@ -182,25 +183,6 @@ class SettingsPanel extends StatelessWidget {
               onChanged: (value) => preferences.change(effects: value),
             ),
             const Divider(),
-            DropdownButtonFormField<String>(
-              key: ValueKey('send-shortcut-${state.sendShortcut}'),
-              isExpanded: true,
-              initialValue: state.sendShortcut,
-              decoration: InputDecoration(
-                labelText: context.strings.sendShortcutTitle,
-              ),
-              items: const [
-                DropdownMenuItem(value: 'enter', child: Text('Enter')),
-                DropdownMenuItem(
-                  value: 'shiftEnter',
-                  child: Text('Shift + Enter'),
-                ),
-              ],
-              onChanged: (value) => preferences.change(sendShortcut: value),
-            ),
-            const SizedBox(height: 16),
-            Text(context.strings.sendShortcutHelp),
-            const Divider(),
             const SizedBox(height: 16),
             Text(context.strings.myColors),
             const SizedBox(height: 14),
@@ -223,6 +205,8 @@ class SettingsPanel extends StatelessWidget {
           ],
         ),
       ),
+      const SizedBox(height: 24),
+      ShortcutSettings(preferences: preferences, value: state.sendShortcut),
       if (state.error.isNotEmpty) ...[
         const SizedBox(height: 16),
         Text(

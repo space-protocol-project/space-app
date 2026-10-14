@@ -170,10 +170,6 @@ class Dashboard extends StatelessWidget {
                       openChannel: (id) => openChannel(entry.key, id),
                     ),
                   ),
-                SizedBox(
-                  width: width,
-                  child: _AddSpaceCard(open: addSpace),
-                ),
               ],
             );
           },
@@ -276,45 +272,6 @@ class _SpaceOverviewCard extends StatelessWidget {
           ),
         ),
       ],
-    ),
-  );
-}
-
-class _AddSpaceCard extends StatelessWidget {
-  const _AddSpaceCard({required this.open});
-  final VoidCallback open;
-  @override
-  Widget build(BuildContext context) => SurfaceCard(
-    hoverBorder: true,
-    padding: EdgeInsets.zero,
-    child: InkWell(
-      onTap: open,
-      borderRadius: BorderRadius.circular(areaRadius),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              Icons.add,
-              size: 36,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: 20),
-            Text(
-              context.strings.addSpace,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            Text(context.strings.dashboardEmptyHelp),
-            const SizedBox(height: 20),
-            Icon(
-              Icons.arrow_forward,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ],
-        ),
-      ),
     ),
   );
 }

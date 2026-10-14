@@ -363,6 +363,8 @@
     }
   },
   "identityDescription": "Keys, permissions and recovery for the selected space.",
+  "hotkeysTitle": "Keyboard shortcuts",
+  "resetShortcut": "Restore default Enter",
   "sendShortcutTitle": "Send shortcut",
   "sendShortcutHelp": "Choose Enter or Shift+Enter to send. The other combination inserts a new line.",
   "createOwnSpace": "Create space",

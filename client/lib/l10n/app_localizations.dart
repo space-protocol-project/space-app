@@ -1703,6 +1703,18 @@ abstract class AppLocalizations {
   /// **'Ключи, разрешения и восстановление доступа в выбранном пространстве.'**
   String get identityDescription;
 
+  /// No description provided for @hotkeysTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Горячие клавиши'**
+  String get hotkeysTitle;
+
+  /// No description provided for @resetShortcut.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вернуть Enter по умолчанию'**
+  String get resetShortcut;
+
   /// No description provided for @sendShortcutTitle.
   ///
   /// In ru, this message translates to:

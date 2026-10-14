@@ -1157,30 +1157,49 @@ class _SpaceShellState extends State<SpaceShell> {
                 ),
                 const SizedBox(height: 16),
                 for (final origin in widget.preferences.origins)
-                  ListTile(
-                    enabled:
-                        presence.online(origin) == true ||
-                        workspaces[origin]?.hasOfflineHistory == true,
-                    leading: Icon(
-                      presence.online(origin) == true
-                          ? Icons.cloud_done_outlined
-                          : Icons.dns_outlined,
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      horizontalTitleGap: 12,
+                      minLeadingWidth: 24,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      tileColor: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
+                          .withValues(alpha: .35),
+                      enabled:
+                          presence.online(origin) == true ||
+                          workspaces[origin]?.hasOfflineHistory == true,
+                      leading: Icon(
+                        presence.online(origin) == true
+                            ? Icons.cloud_done_outlined
+                            : Icons.dns_outlined,
+                      ),
+                      title: Text(
+                        workspaces[origin]?.spaceTitle.isNotEmpty == true
+                            ? workspaces[origin]!.spaceTitle
+                            : Uri.parse(origin).authority,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      subtitle: Text(
+                        origin,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      onTap:
+                          (presence.online(origin) == true ||
+                              workspaces[origin]?.hasOfflineHistory == true)
+                          ? () => openSpace(origin)
+                          : null,
                     ),
-                    title: Text(
-                      workspaces[origin]?.spaceTitle.isNotEmpty == true
-                          ? workspaces[origin]!.spaceTitle
-                          : Uri.parse(origin).authority,
-                    ),
-                    subtitle: Text(
-                      origin,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    onTap:
-                        (presence.online(origin) == true ||
-                            workspaces[origin]?.hasOfflineHistory == true)
-                        ? () => openSpace(origin)
-                        : null,
                   ),
               ],
             ),

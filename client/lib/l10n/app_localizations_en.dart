@@ -935,6 +935,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Keys, permissions and recovery for the selected space.';
 
   @override
+  String get hotkeysTitle => 'Keyboard shortcuts';
+
+  @override
+  String get resetShortcut => 'Restore default Enter';
+
+  @override
   String get sendShortcutTitle => 'Send shortcut';
 
   @override

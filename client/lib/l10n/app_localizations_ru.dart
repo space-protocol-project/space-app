@@ -940,6 +940,12 @@ class AppLocalizationsRu extends AppLocalizations {
       'Ключи, разрешения и восстановление доступа в выбранном пространстве.';
 
   @override
+  String get hotkeysTitle => 'Горячие клавиши';
+
+  @override
+  String get resetShortcut => 'Вернуть Enter по умолчанию';
+
+  @override
   String get sendShortcutTitle => 'Клавиша отправки';
 
   @override

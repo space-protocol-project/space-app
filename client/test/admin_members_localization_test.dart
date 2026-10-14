@@ -53,6 +53,10 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    final card = find.byKey(ValueKey('member-card-$id'));
+    final size = tester.getSize(card);
+    expect(size.height, closeTo(size.width, 1));
+    expect(tester.takeException(), isNull);
     final search = find.byKey(const ValueKey('member-search'));
     await tester.enterText(search, id);
     await tester.pumpAndSettle();

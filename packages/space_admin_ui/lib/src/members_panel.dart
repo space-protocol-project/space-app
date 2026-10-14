@@ -164,60 +164,85 @@ class _MembersPanelState extends State<MembersPanel> {
   Widget editor(Map<String, dynamic> m) {
     final id = m['principalId'] as String;
     final draft = drafts[id]!;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SelectableText(
-            id,
-            style: const TextStyle(fontSize: 12, fontFamily: 'JetBrains Mono'),
-          ),
-          Text(
-            '${memberRoleLabel(m['role'] as String, strings)}${m['blocked'] == true ? strings.memberBlockedSuffix : ''}',
-          ),
-          if (widget.owner && m['role'] != 'owner')
-            TextButton(
-              key: ValueKey('edit-member-$id'),
-              onPressed: busy
-                  ? null
-                  : () => setState(() => editing = editing == id ? null : id),
-              child: Text(
-                editing == id ? strings.memberCollapse : strings.memberEdit,
+    return Card.outlined(
+      key: ValueKey('member-card-$id'),
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: CircleAvatar(
+                radius: 16,
+                child: Icon(Icons.person_outline),
               ),
             ),
-          if (widget.owner && m['role'] != 'owner' && editing == id) ...[
-            const SizedBox(height: 10),
-            DropdownButtonFormField<String>(
-              key: ValueKey('role-$id-${m['revision']}'),
-              initialValue: draft['role'] as String,
-              decoration: InputDecoration(labelText: strings.memberRole),
-              items: [
-                for (final role in ['reader', 'member', 'admin'])
-                  DropdownMenuItem(
-                    value: role,
-                    child: Text(memberRoleLabel(role, strings)),
-                  ),
-              ],
-              onChanged: busy ? null : (v) => setState(() => draft['role'] = v),
+            const SizedBox(height: 12),
+            SelectableText(
+              id,
+              style: const TextStyle(
+                fontSize: 12,
+                fontFamily: 'JetBrains Mono',
+              ),
             ),
-            SwitchListTile(
-              key: ValueKey('blocked-$id'),
-              contentPadding: EdgeInsets.zero,
-              title: Text(strings.memberBlock),
-              value: draft['blocked'] == true,
-              onChanged: busy
-                  ? null
-                  : (v) => setState(() => draft['blocked'] = v),
+            Text(
+              '${memberRoleLabel(m['role'] as String, strings)}${m['blocked'] == true ? strings.memberBlockedSuffix : ''}',
             ),
-            OutlinedButton(
-              key: ValueKey('save-member-$id'),
-              onPressed: busy ? null : () => save(m),
-              child: Text(strings.memberSave),
-            ),
+            if (widget.owner && m['role'] != 'owner')
+              TextButton(
+                key: ValueKey('edit-member-$id'),
+                onPressed: busy
+                    ? null
+                    : () => setState(() => editing = editing == id ? null : id),
+                child: Text(
+                  editing == id ? strings.memberCollapse : strings.memberEdit,
+                ),
+              ),
+            if (widget.owner && m['role'] != 'owner' && editing == id) ...[
+              const SizedBox(height: 10),
+              DropdownButtonFormField<String>(
+                isExpanded: true,
+                key: ValueKey('role-$id-${m['revision']}'),
+                initialValue: draft['role'] as String,
+                decoration: InputDecoration(labelText: strings.memberRole),
+                items: [
+                  for (final role in ['reader', 'member', 'admin'])
+                    DropdownMenuItem(
+                      value: role,
+                      child: Text(
+                        memberRoleLabel(role, strings),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                ],
+                onChanged: busy
+                    ? null
+                    : (v) => setState(() => draft['role'] = v),
+              ),
+              SwitchListTile(
+                key: ValueKey('blocked-$id'),
+                contentPadding: EdgeInsets.zero,
+                title: Text(strings.memberBlock),
+                value: draft['blocked'] == true,
+                onChanged: busy
+                    ? null
+                    : (v) => setState(() => draft['blocked'] = v),
+              ),
+              OutlinedButton(
+                key: ValueKey('save-member-$id'),
+                onPressed: busy ? null : () => save(m),
+                child: Text(strings.memberSave),
+              ),
+            ],
           ],
-          const Divider(),
-        ],
+        ),
       ),
     );
   }
@@ -269,7 +294,26 @@ class _MembersPanelState extends State<MembersPanel> {
               decoration: InputDecoration(labelText: strings.membersSearch),
             ),
             Text(strings.membersCount(members.length)),
-            for (final m in filtered) editor(m),
+            const SizedBox(height: 16),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth.clamp(0.0, 240.0);
+                return Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    for (final m in filtered)
+                      SizedBox(
+                        width: width,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(minHeight: width),
+                          child: editor(m),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
             if (filtered.isEmpty && !busy)
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 12),
