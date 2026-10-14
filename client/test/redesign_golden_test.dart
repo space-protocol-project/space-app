@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -68,7 +70,9 @@ void main() {
         }
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
-        if (size.width == 390 || size.width == 1280) {
+        // Эталоны сняты на Windows: другие ОС проверяют компоновку ниже.
+        // Пиксельное сравнение обязательно выполняется Windows-задачей CI.
+        if (Platform.isWindows && (size.width == 390 || size.width == 1280)) {
           await expectLater(
             find.byKey(key),
             matchesGoldenFile(
@@ -79,12 +83,16 @@ void main() {
         if (size.width == 1280) {
           await tester.tap(find.byKey(const ValueKey('space-details')));
           await tester.pump();
-          await expectLater(
-            find.byKey(key),
-            matchesGoldenFile(
-              'goldens/quiet-space-details-${dark ? 'dark' : 'light'}.png',
-            ),
-          );
+          expect(find.byType(Dialog), findsOneWidget);
+          expect(tester.takeException(), isNull);
+          if (Platform.isWindows) {
+            await expectLater(
+              find.byKey(key),
+              matchesGoldenFile(
+                'goldens/quiet-space-details-${dark ? 'dark' : 'light'}.png',
+              ),
+            );
+          }
         }
         await tester.pumpWidget(const SizedBox());
         await tester.runAsync(controller.close);
