@@ -175,12 +175,7 @@ class _FavoriteMarkerState extends State<_FavoriteMarker> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    widget.message.text
-                                        .split('\n')
-                                        .firstWhere(
-                                          (line) => line.trim().isNotEmpty,
-                                          orElse: () => author,
-                                        ),
+                                    previewLines.firstOrNull ?? author,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
@@ -197,12 +192,7 @@ class _FavoriteMarkerState extends State<_FavoriteMarker> {
                             ),
                             Flexible(
                               child: Text(
-                                widget.message.text.split('\n').length > 1
-                                    ? widget.message.text
-                                          .split('\n')
-                                          .skip(1)
-                                          .join('\n')
-                                    : widget.message.text,
+                                previewExcerpt,
                                 maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -259,6 +249,14 @@ class _FavoriteMarkerState extends State<_FavoriteMarker> {
       ),
     );
   }
+
+  List<String> get previewLines => widget.message.text
+      .split('\n')
+      .where((line) => line.trim().isNotEmpty)
+      .toList();
+  String get previewExcerpt => previewLines.length > 1
+      ? previewLines.skip(1).join('\n')
+      : widget.message.text;
 
   void jump() {
     overlay.hide();
