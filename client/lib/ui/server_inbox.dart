@@ -4,6 +4,8 @@ import 'package:space_admin_ui/space_admin_ui.dart';
 import '../l10n/strings.dart';
 import '../src/chat_controller.dart';
 import '../src/server_presence.dart';
+import 'space_availability.dart';
+import 'components.dart';
 
 class ServerInbox extends StatefulWidget {
   const ServerInbox({
@@ -73,122 +75,150 @@ class _ServerInboxState extends State<ServerInbox> {
             ),
       );
     return Material(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              onChanged: (value) => setState(() => query = value),
-              decoration: InputDecoration(
-                hintText: context.strings.serverSearch,
-                prefixIcon: const Icon(Icons.search),
+      color: Colors.transparent,
+      child: CustomScrollView(
+        primary: false,
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                16,
+                16 + SpaceContentInsets.topOf(context),
+                16,
+                16,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
+                    onChanged: (value) => setState(() => query = value),
+                    decoration: InputDecoration(
+                      hintText: context.strings.serverSearch,
+                      prefixIcon: const Icon(Icons.search),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final entry in [
+                        context.strings.serverFilterAll,
+                        context.strings.dashboardOnline,
+                        context.strings.dashboardUnread,
+                      ].indexed)
+                        ChoiceChip(
+                          label: Text(entry.$2),
+                          selected: filter == entry.$1,
+                          onSelected: (_) => setState(() => filter = entry.$1),
+                        ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
+          if (entries.isEmpty)
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(child: Text(context.strings.nothingFound)),
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+              sliver: SliverList.builder(
+                itemCount: entries.length,
+                itemBuilder: (context, index) =>
+                    serverRow(context, entries[index]),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget serverRow(
+    BuildContext context,
+    MapEntry<String, ChatController> entry,
+  ) {
+    final controller = entry.value;
+    final latest = controller.latestKnownMessage;
+    final channel = controller.channels
+        .where((c) => c.id == latest?.channelId)
+        .firstOrNull;
+    final online = widget.presence.online(entry.key);
+    final preview = latest == null
+        ? context.strings.serverNoEvents
+        : '${channel?.title ?? latest.channelId}: ${String.fromCharCodes(latest.text.runes.take(180)).replaceAll(RegExp(r'\s+'), ' ')}';
+    final count = unread(controller);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: SurfaceCard(
+        padding: EdgeInsets.zero,
+        hoverBorder: true,
+        child: ListTile(
+          key: ValueKey('server-inbox-${entry.key}'),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
+          leading: Badge(
+            isLabelVisible: online == true,
+            backgroundColor: Colors.green,
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              alignment: Alignment.center,
+              child: ServerIconView(value: widget.icons[entry.key], size: 32),
+            ),
+          ),
+          title: Text(
+            title(entry.key, controller),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (final entry in [
-                  context.strings.serverFilterAll,
-                  context.strings.dashboardOnline,
-                  context.strings.dashboardUnread,
-                ].indexed)
-                  ChoiceChip(
-                    label: Text(entry.$2),
-                    selected: filter == entry.$1,
-                    onSelected: (_) => setState(() => filter = entry.$1),
-                  ),
+                SpaceAvailability(online: online),
+                const SizedBox(height: 6),
+                Text(preview, maxLines: 2, overflow: TextOverflow.ellipsis),
               ],
             ),
           ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: entries.isEmpty
-                ? Center(child: Text(context.strings.nothingFound))
-                : ListView.builder(
-                    itemCount: entries.length,
-                    itemBuilder: (context, index) {
-                      final entry = entries[index], controller = entry.value;
-                      final latest = controller.latestKnownMessage;
-                      final channel = controller.channels
-                          .where((c) => c.id == latest?.channelId)
-                          .firstOrNull;
-                      final online = widget.presence.online(entry.key) == true;
-                      final preview = latest == null
-                          ? context.strings.serverNoEvents
-                          : '${channel?.title ?? latest.channelId}: ${String.fromCharCodes(latest.text.runes.take(180)).replaceAll(RegExp(r'\s+'), ' ')}';
-                      final count = unread(controller);
-                      return ListTile(
-                        key: ValueKey('server-inbox-${entry.key}'),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        leading: Badge(
-                          isLabelVisible: online,
-                          backgroundColor: Colors.green,
-                          child: Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .surfaceContainerHigh,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            alignment: Alignment.center,
-                            child: ServerIconView(
-                              value: widget.icons[entry.key],
-                              size: 32,
-                            ),
-                          ),
-                        ),
-                        title: Text(
-                          title(entry.key, controller),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Text(
-                          '${online ? context.strings.dashboardOnline : context.strings.serverOffline}\n$preview',
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  timeLabel(
-                                    context,
-                                    latest?.createdAtUnixMs.toInt() ?? 0,
-                                  ),
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                                if (count > 0) Badge(label: Text('$count')),
-                              ],
-                            ),
-                            PopupMenuButton<String>(
-                              onSelected: (_) => widget.remove(entry.key),
-                              itemBuilder: (_) => [
-                                PopupMenuItem(
-                                  value: 'remove',
-                                  child: Text(context.strings.removeServer),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        onTap: () => widget.open(entry.key),
-                      );
-                    },
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    timeLabel(context, latest?.createdAtUnixMs.toInt() ?? 0),
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
+                  if (count > 0) Badge(label: Text('$count')),
+                ],
+              ),
+              PopupMenuButton<String>(
+                onSelected: (_) => widget.remove(entry.key),
+                itemBuilder: (_) => [
+                  PopupMenuItem(
+                    value: 'remove',
+                    child: Text(context.strings.removeServer),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+          onTap: () => widget.open(entry.key),
+        ),
       ),
     );
   }

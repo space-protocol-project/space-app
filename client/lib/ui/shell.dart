@@ -1453,10 +1453,7 @@ class _SpaceShellState extends State<SpaceShell> {
           ),
           Section.rooms => const RoomsPanel(),
           Section.identity => const SizedBox.shrink(),
-          Section.settings => Padding(
-            padding: EdgeInsets.only(top: headerHeight),
-            child: administrationPage(),
-          ),
+          Section.settings => administrationPage(),
         },
     ],
   );
@@ -1514,17 +1511,22 @@ class _SpaceShellState extends State<SpaceShell> {
           onPressed: drawerOpen ? closeNavigation : openNavigation,
           icon: const Icon(Icons.menu),
         ),
-      if (!compact) ...[Icon(_headerIcon, size: 22), const SizedBox(width: 12)],
+      if (!compact) ...[
+        IgnorePointer(child: Icon(_headerIcon, size: 22)),
+        const SizedBox(width: 12),
+      ],
     ],
     actions: [
       if (!compact && !dashboard && !applicationSettings)
         Padding(
           padding: const EdgeInsets.only(right: 12),
-          child: Text(
-            _connectionLabel,
-            style: TextStyle(
-              fontSize: 12,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+          child: IgnorePointer(
+            child: Text(
+              _connectionLabel,
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ),
@@ -1705,15 +1707,12 @@ class _SpaceShellState extends State<SpaceShell> {
                                   workspaces[origin] ?? createTransient(),
                               onRestored: _onDeviceRestored,
                             ),
-                            Padding(
-                              padding: EdgeInsets.only(top: headerHeight),
-                              child: ServerInbox(
-                                controllers: workspaces.controllers,
-                                presence: presence,
-                                icons: widget.preferences.serverIcons,
-                                open: (origin) => openSpace(origin),
-                                remove: (origin) => removeSpace(origin),
-                              ),
+                            ServerInbox(
+                              controllers: workspaces.controllers,
+                              presence: presence,
+                              icons: widget.preferences.serverIcons,
+                              open: (origin) => openSpace(origin),
+                              remove: (origin) => removeSpace(origin),
                             ),
                           ],
                         ),

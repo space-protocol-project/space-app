@@ -4,6 +4,10 @@ import '../l10n/strings.dart';
 import '../src/server_presence.dart';
 import '../src/server_workspaces.dart';
 import 'components.dart';
+import 'space_availability.dart';
+import '../src/chat_controller.dart';
+
+import 'package:space_admin_ui/space_admin_ui.dart' show ServerIconView;
 
 class Dashboard extends StatelessWidget {
   const Dashboard({
@@ -114,35 +118,15 @@ class Dashboard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            _Metric(
-              label: context.strings.dashboardServers,
-              value: entries.length,
-              icon: Icons.dns_outlined,
-            ),
-            _Metric(
-              label: context.strings.dashboardOnline,
-              value: entries
-                  .where((entry) => presence.online(entry.key) == true)
-                  .length,
-              icon: Icons.cloud_done_outlined,
-            ),
-            _Metric(
-              label: context.strings.dashboardChannels,
-              value: channels,
-              icon: Icons.tag,
-            ),
-            _Metric(
-              label: context.strings.dashboardUnread,
-              value: unread,
-              icon: Icons.mark_chat_unread_outlined,
-            ),
-          ],
+        _DashboardMetrics(
+          servers: entries.length,
+          online: entries
+              .where((entry) => presence.online(entry.key) == true)
+              .length,
+          channels: channels,
+          unread: unread,
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 28),
         if (entries.isEmpty)
           SurfaceCard(
             child: Column(
@@ -163,105 +147,257 @@ class Dashboard extends StatelessWidget {
               ],
             ),
           ),
-        for (final entry in entries)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: SurfaceCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ListTile(
-                    trailing: removeSpace == null
-                        ? null
-                        : PopupMenuButton<String>(
-                            onSelected: (_) => removeSpace!(entry.key),
-                            itemBuilder: (_) => [
-                              PopupMenuItem(
-                                value: 'remove',
-                                child: Text(context.strings.removeServer),
-                              ),
-                            ],
-                          ),
-                    contentPadding: EdgeInsets.zero,
-                    leading: Icon(
-                      presence.online(entry.key) == true
-                          ? Icons.cloud_done_outlined
-                          : Icons.dns_outlined,
-                    ),
-                    title: Text(
-                      entry.value.spaceTitle.isEmpty
-                          ? Uri.parse(entry.key).authority
-                          : entry.value.spaceTitle,
-                    ),
-                    subtitle: Text(
-                      '${entry.key}\n${presence.online(entry.key) == null
-                          ? context.strings.serverAvailabilityUnknown
-                          : presence.online(entry.key) == true
-                          ? context.strings.dashboardAvailable
-                          : context.strings.dashboardUnavailable}',
-                    ),
-                    onTap: () => openSpace(entry.key),
-                  ),
-                  if (!entry.value.connected ||
-                      presence.online(entry.key) == false)
-                    Text(context.strings.dashboardCatalogUnknown)
-                  else
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        for (final channel in entry.value.channels)
-                          ActionChip(
-                            avatar: Icon(
-                              channel.permissions.read
-                                  ? Icons.tag
-                                  : Icons.lock_outline,
-                              size: 16,
-                            ),
-                            label: Text(
-                              '${channel.title}${entry.value.unreadCount(channel.id) > 0 ? ' · ${entry.value.unreadCount(channel.id)}' : ''}',
-                            ),
-                            onPressed: entry.value.busy
-                                ? null
-                                : () => openChannel(entry.key, channel.id),
-                          ),
-                      ],
-                    ),
-                  const SizedBox(height: 16),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton.icon(
-                      onPressed: () => openSpace(entry.key),
-                      icon: const Icon(Icons.arrow_forward),
-                      label: Text(context.strings.dashboardOpen),
+        LayoutBuilder(
+          builder: (context, box) {
+            final width = box.maxWidth < 700
+                ? box.maxWidth
+                : (box.maxWidth - 20) / 2;
+            return Wrap(
+              spacing: 20,
+              runSpacing: 20,
+              children: [
+                for (final entry in entries)
+                  SizedBox(
+                    width: width,
+                    child: _SpaceOverviewCard(
+                      origin: entry.key,
+                      controller: entry.value,
+                      online: presence.online(entry.key),
+                      open: () => openSpace(entry.key),
+                      remove: removeSpace == null
+                          ? null
+                          : () => removeSpace!(entry.key),
+                      openChannel: (id) => openChannel(entry.key, id),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
+                SizedBox(
+                  width: width,
+                  child: _AddSpaceCard(open: addSpace),
+                ),
+              ],
+            );
+          },
+        ),
       ],
     );
   }
 }
 
+class _SpaceOverviewCard extends StatelessWidget {
+  const _SpaceOverviewCard({
+    required this.origin,
+    required this.controller,
+    required this.online,
+    required this.open,
+    required this.openChannel,
+    this.remove,
+  });
+  final String origin;
+  final ChatController controller;
+  final bool? online;
+  final VoidCallback open;
+  final VoidCallback? remove;
+  final ValueChanged<String> openChannel;
+  @override
+  Widget build(BuildContext context) => SurfaceCard(
+    hoverBorder: true,
+    padding: const EdgeInsets.all(20),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          onTap: open,
+          leading: ServerIconView(
+            value: controller.serverIcon?.toProto3Json(),
+            size: 44,
+          ),
+          title: Text(
+            controller.spaceTitle.isEmpty
+                ? Uri.parse(origin).authority
+                : controller.spaceTitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: SpaceAvailability(online: online),
+          ),
+          trailing: remove == null
+              ? null
+              : PopupMenuButton<String>(
+                  onSelected: (_) => remove!(),
+                  itemBuilder: (_) => [
+                    PopupMenuItem(
+                      value: 'remove',
+                      child: Text(context.strings.removeServer),
+                    ),
+                  ],
+                ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          origin,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        const SizedBox(height: 20),
+        if (!controller.connected || online == false)
+          Text(context.strings.dashboardCatalogUnknown)
+        else
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final channel in controller.channels)
+                ActionChip(
+                  avatar: Icon(
+                    channel.permissions.read ? Icons.tag : Icons.lock_outline,
+                    size: 16,
+                  ),
+                  label: Text(
+                    '${channel.title}${controller.unreadCount(channel.id) > 0 ? ' · ${controller.unreadCount(channel.id)}' : ''}',
+                  ),
+                  onPressed: controller.busy
+                      ? null
+                      : () => openChannel(channel.id),
+                ),
+            ],
+          ),
+        const SizedBox(height: 16),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            onPressed: open,
+            icon: const Icon(Icons.arrow_forward),
+            label: Text(context.strings.dashboardOpen),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class _AddSpaceCard extends StatelessWidget {
+  const _AddSpaceCard({required this.open});
+  final VoidCallback open;
+  @override
+  Widget build(BuildContext context) => SurfaceCard(
+    hoverBorder: true,
+    padding: EdgeInsets.zero,
+    child: InkWell(
+      onTap: open,
+      borderRadius: BorderRadius.circular(areaRadius),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.add,
+              size: 36,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              context.strings.addSpace,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 12),
+            Text(context.strings.dashboardEmptyHelp),
+            const SizedBox(height: 20),
+            Icon(
+              Icons.arrow_forward,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+class _DashboardMetrics extends StatelessWidget {
+  const _DashboardMetrics({
+    required this.servers,
+    required this.online,
+    required this.channels,
+    required this.unread,
+  });
+  final int servers, online, channels, unread;
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, box) {
+      final columns = box.maxWidth < 700 ? 2 : 4;
+      final width = (box.maxWidth - (columns - 1) * 12) / columns;
+      return Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        children: [
+          _Metric(
+            width: width,
+            label: context.strings.dashboardServers,
+            value: servers,
+            icon: Icons.dns_outlined,
+          ),
+          _Metric(
+            width: width,
+            label: context.strings.dashboardOnline,
+            value: online,
+            icon: Icons.cloud_done_outlined,
+          ),
+          _Metric(
+            width: width,
+            label: context.strings.dashboardChannels,
+            value: channels,
+            icon: Icons.tag,
+          ),
+          _Metric(
+            width: width,
+            label: context.strings.dashboardUnread,
+            value: unread,
+            icon: Icons.mark_chat_unread_outlined,
+          ),
+        ],
+      );
+    },
+  );
+}
+
 class _Metric extends StatelessWidget {
-  const _Metric({required this.label, required this.value, required this.icon});
+  const _Metric({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.width,
+  });
   final String label;
   final int value;
   final IconData icon;
+  final double width;
   @override
   Widget build(BuildContext context) => SizedBox(
-    width: 210,
+    width: width,
     child: SurfaceCard(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Theme.of(context).colorScheme.primary),
-          const SizedBox(height: 16),
-          Text('$value', style: Theme.of(context).textTheme.headlineMedium),
-          Text(label),
+          Row(
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const Spacer(),
+              Text('$value', style: Theme.of(context).textTheme.headlineSmall),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(label, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
     ),

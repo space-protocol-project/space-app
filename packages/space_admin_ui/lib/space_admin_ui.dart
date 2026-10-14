@@ -1,5 +1,7 @@
 export 'src/server_icon.dart';
 export 'src/control_spacing.dart';
+export 'src/content_insets.dart';
+import 'src/content_insets.dart';
 import 'src/control_spacing.dart';
 export 'src/server_icon_picker.dart';
 import 'src/server_icon_picker.dart';
@@ -187,8 +189,6 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   Widget card(List<Widget> children) => Card(
-    color: Theme.of(context).colorScheme.surface,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     child: Padding(
       padding: const EdgeInsets.all(24),
       child: spaceControls(
@@ -216,6 +216,7 @@ class _AdminPageState extends State<AdminPage> {
             Text(strings.authorizeDetails),
             if (identity!['hasRootAuthority'] != true)
               TextField(
+                scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
                 obscureText: true,
                 onChanged: (v) => password = v,
                 decoration: InputDecoration(labelText: strings.rootPassword),
@@ -278,7 +279,13 @@ class _AdminPageState extends State<AdminPage> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 900),
           child: ListView(
-            padding: const EdgeInsets.all(20),
+            primary: false,
+            padding: EdgeInsets.fromLTRB(
+              20,
+              20 + SpaceContentInsets.topOf(context),
+              20,
+              20,
+            ),
             children: [
               if (widget.onClose != null)
                 Align(
@@ -291,7 +298,7 @@ class _AdminPageState extends State<AdminPage> {
                 ),
               Text(
                 strings.managementTitle,
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 12),
@@ -316,6 +323,7 @@ class _AdminPageState extends State<AdminPage> {
                   Text(strings.setupHelp),
                   const SizedBox(height: 16),
                   TextField(
+                    scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
                     controller: code,
                     obscureText: true,
                     decoration: InputDecoration(labelText: strings.setupCode),
@@ -361,6 +369,7 @@ class _AdminPageState extends State<AdminPage> {
                     const SizedBox(height: 20),
                   ],
                   TextField(
+                    scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
                     controller: title,
                     maxLength: 80,
                     decoration: InputDecoration(labelText: strings.spaceName),

@@ -2,19 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'space_appearance.dart';
 
-class SpaceContentInsets extends InheritedWidget {
-  const SpaceContentInsets({
-    super.key,
-    required this.top,
-    required super.child,
-  });
-  final double top;
-  static double topOf(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<SpaceContentInsets>()?.top ??
-      0;
-  @override
-  bool updateShouldNotify(SpaceContentInsets oldWidget) => top != oldWidget.top;
-}
+export 'package:space_admin_ui/space_admin_ui.dart' show SpaceContentInsets;
 
 class SpaceFrame extends StatelessWidget {
   const SpaceFrame({
