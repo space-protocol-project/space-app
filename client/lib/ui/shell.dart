@@ -61,7 +61,9 @@ class SpaceShell extends StatefulWidget {
     this.presence,
     this.workspaces,
     this.updates,
+    this.hostingEnabled = true,
   });
+  final bool hostingEnabled;
   final AppPreferences preferences;
   final AppUpdates? updates;
   final ChatController? controller;
@@ -226,7 +228,7 @@ class _SpaceShellState extends State<SpaceShell> {
   }
 
   final scaffold = GlobalKey<ScaffoldState>();
-  final home = HomeController();
+  late final home = HomeController(hostingEnabled: widget.hostingEnabled);
   late final updates = widget.updates ?? AppUpdates();
   late final presence =
       widget.presence ??
@@ -288,7 +290,7 @@ class _SpaceShellState extends State<SpaceShell> {
   void initState() {
     super.initState();
     dashboard = widget.controller == null;
-    unawaited(home.load());
+    if (home.supported) unawaited(home.load());
     unawaited(updates.check());
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => unawaited(offerHomeAfterUpdate()),
@@ -307,7 +309,7 @@ class _SpaceShellState extends State<SpaceShell> {
   Future<void> startHome(String ip) async {
     final state = await home.start(ip);
     if (state == null || !mounted) return;
-    final existing = workspaces[state.publicOrigin];
+    final existing = homeClient(state.publicOrigin);
     final target = existing != null && !existing.busy
         ? existing
         : createTransient();
@@ -332,18 +334,27 @@ class _SpaceShellState extends State<SpaceShell> {
     await target.connect(setupCode: state.setupCode);
     if (!target.connected) home.reportError(target.error);
     if (mounted && target.connected) {
+      final identityOrigin = target.preview!.origin.toString();
       await workspaces.adopt(
-        state.publicOrigin,
+        identityOrigin,
         target,
         owned: target != widget.controller,
       );
       transientControllers.remove(target);
-      await widget.preferences.remember(state.publicOrigin);
+      await widget.preferences.remember(identityOrigin);
     }
   }
 
+  ChatController? homeClient(String endpoint) =>
+      workspaces[endpoint] ??
+      workspaces.controllers.values
+          .where(
+            (controller) => controller.preview?.endpoint.toString() == endpoint,
+          )
+          .firstOrNull;
+
   Future<void> stopHome() async {
-    final owner = workspaces[home.server?.publicOrigin ?? ''];
+    final owner = homeClient(home.server?.publicOrigin ?? '');
     await home.stop(disconnectClient: owner?.disconnect);
   }
 
@@ -385,6 +396,7 @@ class _SpaceShellState extends State<SpaceShell> {
   }
 
   Future<void> offerHomeAfterUpdate() async {
+    if (!home.supported) return;
     final preferences = await SharedPreferences.getInstance();
     if (preferences.getBool('space.update.resumeHome') != true) return;
     await home.load();
@@ -412,6 +424,7 @@ class _SpaceShellState extends State<SpaceShell> {
   }
 
   Future<void> showHome() async {
+    if (!home.supported) return;
     if (home.running) {
       await stopHome();
       return;
@@ -424,6 +437,7 @@ class _SpaceShellState extends State<SpaceShell> {
   }
 
   Future<void> showHomeDetails() async {
+    if (!home.supported) return;
     await home.load();
     if (!mounted) return;
     await showDialog<void>(
@@ -468,6 +482,7 @@ class _SpaceShellState extends State<SpaceShell> {
   }
 
   Future<void> createOwnSpace() async {
+    if (!home.supported) return;
     await home.load();
     if (!mounted) return;
     final strings = context.strings;
@@ -671,7 +686,7 @@ class _SpaceShellState extends State<SpaceShell> {
       controller: target,
       origin:
           origin ??
-          controller.preview?.origin.toString() ??
+          controller.preview?.endpoint.toString() ??
           'http://127.0.0.1:8080',
       onConnected: (address) async {
         await workspaces.adopt(
@@ -878,11 +893,12 @@ class _SpaceShellState extends State<SpaceShell> {
                   label: context.strings.addSpace,
                 ),
                 const SizedBox(height: 16),
-                SpaceActionButton(
-                  onPressed: home.busy ? null : createOwnSpace,
-                  icon: Icons.add_home_outlined,
-                  label: context.strings.createOwnSpace,
-                ),
+                if (home.supported)
+                  SpaceActionButton(
+                    onPressed: home.busy ? null : createOwnSpace,
+                    icon: Icons.add_home_outlined,
+                    label: context.strings.createOwnSpace,
+                  ),
                 const SizedBox(height: 20),
                 ListTile(
                   leading: const Icon(Icons.home_outlined),
@@ -1031,17 +1047,18 @@ class _SpaceShellState extends State<SpaceShell> {
             ],
           ),
         ),
-        railButton(
-          key: const ValueKey('home-server-details-tab'),
-          tooltip: home.running
-              ? context.strings.serverInAir
-              : context.strings.goLive,
-          onPressed: showHomeDetails,
-          selected: home.running,
-          icon: home.busy
-              ? HomeOperationProgress(home: home, compact: true)
-              : const Icon(Icons.sensors),
-        ),
+        if (home.supported)
+          railButton(
+            key: const ValueKey('home-server-details-tab'),
+            tooltip: home.running
+                ? context.strings.serverInAir
+                : context.strings.goLive,
+            onPressed: showHomeDetails,
+            selected: home.running,
+            icon: home.busy
+                ? HomeOperationProgress(home: home, compact: true)
+                : const Icon(Icons.sensors),
+          ),
         railButton(
           key: const ValueKey('app-settings-tab'),
           tooltip: context.strings.appSettings,
@@ -1378,9 +1395,12 @@ class _SpaceShellState extends State<SpaceShell> {
                     Dashboard(
                       workspaces: workspaces,
                       presence: presence,
-                      homeAction: showHome,
-                      homeDetails: showHomeDetails,
-                      createOwnSpace: createOwnSpace,
+                      homeAction: home.supported ? showHome : null,
+                      homeDetails: home.supported ? showHomeDetails : null,
+                      createOwnSpace: home.supported ? createOwnSpace : null,
+                      importSpace: home.supported && home.ip.isEmpty
+                          ? showHomeDetails
+                          : null,
                       homeRunning: home.running,
                       homeBusy: home.busy,
                       addSpace: addSpace,

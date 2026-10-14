@@ -7,7 +7,7 @@ import subprocess
 import sys
 
 ASSETS = {
-    "app": ["Space-Setup-windows-x64.exe", "Space-macos-arm64.dmg", "Space-linux-x64.run"],
+    "app": ["Space-Setup-windows-x64.exe", "Space-macos-arm64.dmg", "Space-linux-x64.run", "Space-android.apk"],
     "server": ["Space-home-windows-x64.zip", "Space-home-macos-arm64.zip", "Space-home-linux-x64.zip",
                "windows-x64.json", "macos-arm64.json", "linux-x64.json"],
 }

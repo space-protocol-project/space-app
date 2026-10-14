@@ -21,6 +21,7 @@ class HomeOperationProgress extends StatelessWidget {
 
   Widget _build(BuildContext context, HomeState state) {
     final size = compact ? 30.0 : 80.0;
+    final transferring = state.phase == HomePhase.transferring;
     final ring = TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: state.operationProgress),
       duration: MediaQuery.disableAnimationsOf(context)
@@ -34,20 +35,25 @@ class HomeOperationProgress extends StatelessWidget {
           children: [
             SizedBox.expand(
               child: CircularProgressIndicator(
-                value: value,
+                value: transferring ? null : value,
                 strokeWidth: compact ? 2 : 5,
                 backgroundColor: Theme.of(context).colorScheme.outlineVariant,
                 semanticsLabel: state.phase.label(context),
-                semanticsValue: '${(value * 100).round()}%',
+                semanticsValue: transferring
+                    ? null
+                    : '${(value * 100).round()}%',
               ),
             ),
-            Text(
-              '${(value * 100).round()}%',
-              style: TextStyle(
-                fontSize: compact ? 9 : 18,
-                fontWeight: FontWeight.w700,
+            if (transferring)
+              const Icon(Icons.swap_horiz)
+            else
+              Text(
+                '${(value * 100).round()}%',
+                style: TextStyle(
+                  fontSize: compact ? 9 : 18,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
           ],
         ),
       ),

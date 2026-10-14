@@ -1,4 +1,5 @@
 import '../l10n/failure_strings.dart';
+import '../l10n/strings.dart';
 import '../src/local_failure.dart';
 
 import 'dart:async';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
 import '../src/camera_qr.dart';
+import '../src/space_link_qr.dart';
 
 import 'package:space_admin_ui/space_admin_ui.dart';
 
@@ -18,8 +20,15 @@ Future<String?> scanRecoveryCamera(BuildContext context) => showDialog<String>(
   builder: (_) => const RecoveryCameraDialog(),
 );
 
+Future<String?> scanSpaceCamera(BuildContext context) => showDialog<String>(
+  context: context,
+  barrierDismissible: false,
+  builder: (_) => const RecoveryCameraDialog(spaceLink: true),
+);
+
 class RecoveryCameraDialog extends StatefulWidget {
-  const RecoveryCameraDialog({super.key});
+  const RecoveryCameraDialog({super.key, this.spaceLink = false});
+  final bool spaceLink;
   @override
   State<RecoveryCameraDialog> createState() => _RecoveryCameraDialogState();
 }
@@ -120,7 +129,7 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
       photo = await camera.takePicture();
       if (await photo.length() > 8 * 1024 * 1024) return;
       final packet = await compute(
-        cameraCardInWorker,
+        widget.spaceLink ? spaceLinkFromImage : cameraCardInWorker,
         await photo.readAsBytes(),
       );
       if (packet != null && mounted && token == generation) {
@@ -171,6 +180,7 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
 
   @override
   Widget build(BuildContext context) => RecoveryCameraView(
+    help: widget.spaceLink ? context.strings.spaceQrCamera : null,
     cameras: [for (final camera in cameras) camera.name],
     selected: selected?.name,
     starting: starting,

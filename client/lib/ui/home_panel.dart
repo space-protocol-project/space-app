@@ -12,6 +12,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../src/home_controller.dart';
 import '../src/local_failure.dart';
 import 'components.dart';
+import 'space_link_qr.dart';
+
+import 'package:file_selector/file_selector.dart';
 
 class HomePanel extends StatefulWidget {
   const HomePanel({
@@ -34,6 +37,7 @@ class _HomePanelState extends State<HomePanel> {
   bool detecting = false;
   bool detectionFailed = false;
   bool updateAction = false;
+  bool transferAction = false;
 
   Future<void> openRecoveryGuide() async {
     try {
@@ -116,6 +120,135 @@ class _HomePanelState extends State<HomePanel> {
     }
   }
 
+  Future<void> transferServer({bool importing = false}) async {
+    if (transferAction || widget.home.busy) return;
+    setState(() => transferAction = true);
+    try {
+      final publicIP = await _confirmTransfer(importing);
+      if (publicIP == null || !mounted) return;
+      final path = importing ? await _importPath() : await _exportPath();
+      if (path == null || !mounted) return;
+      await _transferArchive(path, publicIP, importing);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.strings.homeTransferFailed)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => transferAction = false);
+    }
+  }
+
+  Future<void> _transferArchive(
+    String path,
+    String publicIP,
+    bool importing,
+  ) async {
+    final wasRunning = widget.home.running;
+    if (wasRunning) await widget.onStop();
+    if (widget.home.running) return;
+    final success = importing
+        ? await widget.home.importData(path, publicIP: publicIP)
+        : await widget.home.exportData(path);
+    if (!importing && wasRunning && mounted) {
+      await widget.onStart(address.text);
+    }
+    if (success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            importing
+                ? context.strings.homeImported
+                : context.strings.homeExported,
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<String?> _confirmTransfer(bool importing) async {
+    var ip = '';
+    return showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          importing ? context.strings.homeImport : context.strings.homeExport,
+        ),
+        content: SizedBox(
+          width: 500,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(context.strings.homeTransferHelp),
+                if (importing)
+                  TextField(
+                    onChanged: (value) => ip = value.trim(),
+                    decoration: InputDecoration(
+                      labelText: context.strings.homeImportIP,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(context.strings.close),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, ip),
+            child: Text(
+              importing
+                  ? context.strings.homeImport
+                  : context.strings.homeExport,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<String?> _importPath() async => (await openFile(
+    acceptedTypeGroups: const [
+      XTypeGroup(label: 'Space', extensions: ['zip']),
+    ],
+  ))?.path;
+  Future<String?> _exportPath() async => (await getSaveLocation(
+    suggestedName: 'space-export-${DateTime.now().millisecondsSinceEpoch}.zip',
+    acceptedTypeGroups: const [
+      XTypeGroup(label: 'Space', extensions: ['zip']),
+    ],
+  ))?.path;
+
+  List<Widget> _transferControls(HomeState view) => [
+    const SizedBox(height: 20),
+    Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: [
+        OutlinedButton.icon(
+          key: const ValueKey('home-export'),
+          onPressed: view.busy || transferAction || view.ip.isEmpty
+              ? null
+              : () => transferServer(),
+          icon: const Icon(Icons.file_upload_outlined),
+          label: Text(context.strings.homeExport),
+        ),
+        OutlinedButton.icon(
+          key: const ValueKey('home-import'),
+          onPressed: view.busy || transferAction || view.ip.isNotEmpty
+              ? null
+              : () => transferServer(importing: true),
+          icon: const Icon(Icons.file_download_outlined),
+          label: Text(context.strings.homeImport),
+        ),
+      ],
+    ),
+  ];
+
   @override
   void dispose() {
     address.dispose();
@@ -140,7 +273,11 @@ class _HomePanelState extends State<HomePanel> {
   }
 
   @override
-  Widget build(BuildContext context) => BlocBuilder<HomeController, HomeState>(
+  Widget build(BuildContext context) => BlocConsumer<HomeController, HomeState>(
+    listenWhen: (before, after) => before.ip != after.ip,
+    listener: (_, view) {
+      if (view.ip.isNotEmpty) address.text = view.ip;
+    },
     bloc: widget.home,
     builder: (context, view) {
       final home = widget.home;
@@ -212,6 +349,7 @@ class _HomePanelState extends State<HomePanel> {
             ],
             ..._failureDetails(context, view),
             _powerControl(context, view),
+            ..._transferControls(view),
             ..._updateControls(context, view),
             ..._connectionDetails(context, view),
           ],
@@ -252,7 +390,11 @@ class _HomePanelState extends State<HomePanel> {
       ],
       OutlinedButton.icon(
         onPressed:
-            view.busy || detecting || updateAction || view.recoveryBlocked
+            view.busy ||
+                detecting ||
+                updateAction ||
+                transferAction ||
+                view.recoveryBlocked
             ? null
             : updateServer,
         icon: const Icon(Icons.system_update_alt),
@@ -289,7 +431,15 @@ class _HomePanelState extends State<HomePanel> {
       const SizedBox(height: 20),
       Text(context.strings.homeLink),
       const SizedBox(height: 16),
-      SelectableText(view.server!.link),
+      Wrap(
+        spacing: 20,
+        runSpacing: 16,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          SpaceLinkQr(view.server!.link),
+          SizedBox(width: 300, child: SelectableText(view.server!.link)),
+        ],
+      ),
       const SizedBox(height: 10),
       Wrap(
         spacing: 12,
@@ -319,6 +469,7 @@ class _HomePanelState extends State<HomePanel> {
             view.busy ||
                 detecting ||
                 updateAction ||
+                transferAction ||
                 (view.pendingUpdate && !view.running)
             ? null
             : () async {

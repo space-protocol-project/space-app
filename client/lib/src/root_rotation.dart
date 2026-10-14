@@ -112,6 +112,7 @@ Future<Map<String, dynamic>> prepareRootRotation(
   }
   final next = DeviceRecord(
     origin: current.origin,
+    endpoint: current.endpoint,
     serverId: current.serverId,
     serverKey: current.serverKey,
     rootSeed: await newRoot.extractPrivateKeyBytes(),

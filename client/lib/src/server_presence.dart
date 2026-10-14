@@ -28,7 +28,7 @@ Future<bool?> probeSavedServer(String origin, IdentityVault vault) async {
   if (record == null) return null;
   try {
     final server = await discover(
-      origin,
+      record.connectionAddress,
       tlsFingerprint: record.tlsFingerprint,
     );
     checkTrust(server, record);

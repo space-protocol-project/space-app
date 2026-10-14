@@ -7,6 +7,11 @@ import 'package:flutter/material.dart';
 
 import '../src/chat_controller.dart';
 import 'pairing_panel.dart';
+import 'camera_scanner.dart';
+import '../src/space_link_qr.dart';
+
+import 'package:file_selector/file_selector.dart';
+import 'package:flutter/foundation.dart';
 
 class ConnectionPanel extends StatefulWidget {
   const ConnectionPanel({
@@ -41,6 +46,64 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
     }
   }
 
+  Future<void> readQr({bool camera = false}) async {
+    try {
+      final link = camera
+          ? await scanSpaceCamera(context)
+          : await _pickQrImage();
+      if (link == null || !mounted) return;
+      address.text = link;
+      invitation.clear();
+      await widget.controller.inspect(link);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.strings.spaceQrInvalid)));
+      }
+    }
+  }
+
+  Future<String?> _pickQrImage() async {
+    final file = await openFile(
+      acceptedTypeGroups: const [
+        XTypeGroup(
+          label: 'QR',
+          extensions: ['png', 'jpg', 'jpeg'],
+          mimeTypes: ['image/png', 'image/jpeg'],
+        ),
+      ],
+    );
+    if (file == null) return null;
+    if (await file.length() > 8 * 1024 * 1024) {
+      throw const FormatException('QR');
+    }
+    final link = await compute(spaceLinkFromImage, await file.readAsBytes());
+    if (link == null) throw const FormatException('QR');
+    return link;
+  }
+
+  Widget _qrActions(ChatState view) => Wrap(
+    spacing: 12,
+    runSpacing: 12,
+    children: [
+      OutlinedButton.icon(
+        key: const ValueKey('space-qr-camera'),
+        onPressed: view.busy || view.connected
+            ? null
+            : () => readQr(camera: true),
+        icon: const Icon(Icons.qr_code_scanner),
+        label: Text(context.strings.spaceQrCamera),
+      ),
+      OutlinedButton.icon(
+        key: const ValueKey('space-qr-image'),
+        onPressed: view.busy || view.connected ? null : readQr,
+        icon: const Icon(Icons.image_outlined),
+        label: Text(context.strings.spaceQrImage),
+      ),
+    ],
+  );
+
   @override
   Widget build(BuildContext context) => BlocBuilder<ChatController, ChatState>(
     bloc: widget.controller,
@@ -71,6 +134,8 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
             ),
             const SizedBox(height: 16),
             Text(context.strings.connectionIntro),
+            const SizedBox(height: 16),
+            _qrActions(view),
             const SizedBox(height: 20),
             TextField(
               controller: address,
@@ -118,7 +183,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 10),
-              SelectableText(view.preview!.origin.toString()),
+              SelectableText(view.preview!.endpoint.toString()),
               const SizedBox(height: 10),
               Text(context.strings.serverKeyFingerprint),
               const SizedBox(height: 6),

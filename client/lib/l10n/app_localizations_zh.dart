@@ -1067,6 +1067,40 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get failureConnectRequired => '服务器需要支持 ConnectRPC。请更新家庭运行环境或联系空间所有者。';
+
+  @override
+  String get spaceQrCamera => '扫描二维码';
+
+  @override
+  String get spaceQrImage => '选择二维码图片';
+
+  @override
+  String get spaceQrInvalid => '无法读取包含空间链接的二维码。';
+
+  @override
+  String get homeExport => '导出空间';
+
+  @override
+  String get homeImport => '导入空间';
+
+  @override
+  String get homeTransferHelp =>
+      '存档包含消息、设置和服务器密钥。请保密并仅导入您自己的存档。导出期间服务器会停止，导入不会覆盖现有空间。更改 IP 会保留空间身份和 TLS 指纹。在新电脑上需单独恢复所有者恢复卡。';
+
+  @override
+  String get homeImportIP => '新的公网 IPv4（留空保留原地址）';
+
+  @override
+  String get homeExported => '空间已导出';
+
+  @override
+  String get homeImported => '空间已导入，现在可以启动服务器。';
+
+  @override
+  String get homeTransferring => '正在迁移空间';
+
+  @override
+  String get homeTransferFailed => '无法打开存档或完成迁移。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1092,4 +1126,38 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get failureConnectRequired => '服务器需要支持 ConnectRPC。请更新家庭运行环境或联系空间所有者。';
+
+  @override
+  String get spaceQrCamera => '扫描二维码';
+
+  @override
+  String get spaceQrImage => '选择二维码图片';
+
+  @override
+  String get spaceQrInvalid => '无法读取包含空间链接的二维码。';
+
+  @override
+  String get homeExport => '导出空间';
+
+  @override
+  String get homeImport => '导入空间';
+
+  @override
+  String get homeTransferHelp =>
+      '存档包含消息、设置和服务器密钥。请保密并仅导入您自己的存档。导出期间服务器会停止，导入不会覆盖现有空间。更改 IP 会保留空间身份和 TLS 指纹。在新电脑上需单独恢复所有者恢复卡。';
+
+  @override
+  String get homeImportIP => '新的公网 IPv4（留空保留原地址）';
+
+  @override
+  String get homeExported => '空间已导出';
+
+  @override
+  String get homeImported => '空间已导入，现在可以启动服务器。';
+
+  @override
+  String get homeTransferring => '正在迁移空间';
+
+  @override
+  String get homeTransferFailed => '无法打开存档或完成迁移。';
 }

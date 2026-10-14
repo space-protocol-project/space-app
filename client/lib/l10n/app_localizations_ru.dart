@@ -1173,4 +1173,41 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get failureConnectRequired =>
       'Нужен сервер с поддержкой ConnectRPC. Обновите домашний runtime или обратитесь к владельцу пространства.';
+
+  @override
+  String get spaceQrCamera => 'Сканировать QR';
+
+  @override
+  String get spaceQrImage => 'Выбрать изображение QR';
+
+  @override
+  String get spaceQrInvalid =>
+      'Не удалось прочитать QR со ссылкой на пространство.';
+
+  @override
+  String get homeExport => 'Экспортировать пространство';
+
+  @override
+  String get homeImport => 'Импортировать пространство';
+
+  @override
+  String get homeTransferHelp =>
+      'Архив содержит сообщения, настройки и ключи сервера. Храните его в тайне и импортируйте только свой архив. На время экспорта сервер остановится; импорт не заменяет существующее пространство. При смене IP сохранятся идентичность пространства и TLS-отпечаток. На новом компьютере отдельно восстановите карточку владельца.';
+
+  @override
+  String get homeImportIP => 'Новый публичный IPv4 (пусто — сохранить прежний)';
+
+  @override
+  String get homeExported => 'Пространство экспортировано';
+
+  @override
+  String get homeImported =>
+      'Пространство импортировано. Теперь можно запустить сервер.';
+
+  @override
+  String get homeTransferring => 'Перенос пространства';
+
+  @override
+  String get homeTransferFailed =>
+      'Не удалось открыть архив или завершить перенос.';
 }

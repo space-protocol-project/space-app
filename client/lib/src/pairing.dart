@@ -270,6 +270,7 @@ class PendingPairing {
     }
     return DeviceRecord(
       origin: server.origin.toString(),
+      endpoint: server.endpoint.toString(),
       serverId: server.serverId,
       serverKey: url64(server.publicKey),
       rootSeed: [],

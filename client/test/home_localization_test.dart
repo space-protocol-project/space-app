@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/l10n/app_localizations.dart';
 import 'package:space_client/src/home_controller.dart';
 import 'package:space_client/ui/home_panel.dart';
+import 'package:space_client/ui/space_link_qr.dart';
 import 'package:space_client/src/local_failure.dart';
 
 void main() {
@@ -168,6 +169,7 @@ void main() {
         home.publishState();
         await tester.pumpAndSettle();
         expect(find.text(state.link), findsOneWidget);
+        expect(tester.widget<SpaceLinkQr>(find.byType(SpaceLinkQr)).link, state.link);
         await tester.ensureVisible(find.text(strings.stopHome));
         await tester.tap(find.text(strings.stopHome));
         await tester.pumpAndSettle();

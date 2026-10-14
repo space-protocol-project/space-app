@@ -1168,4 +1168,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get failureConnectRequired =>
       'This server must support ConnectRPC. Update the home runtime or contact the space owner.';
+
+  @override
+  String get spaceQrCamera => 'Scan QR';
+
+  @override
+  String get spaceQrImage => 'Choose QR image';
+
+  @override
+  String get spaceQrInvalid =>
+      'Could not read a QR code containing a space link.';
+
+  @override
+  String get homeExport => 'Export space';
+
+  @override
+  String get homeImport => 'Import space';
+
+  @override
+  String get homeTransferHelp =>
+      'The archive contains messages, settings and server keys. Keep it private and import only your own archive. The server stops during export; import never replaces an existing space. Changing IP keeps the space identity and TLS fingerprint. On a new computer, restore your owner recovery card separately.';
+
+  @override
+  String get homeImportIP => 'New public IPv4 (empty keeps the old address)';
+
+  @override
+  String get homeExported => 'Space exported';
+
+  @override
+  String get homeImported => 'Space imported. You can now start the server.';
+
+  @override
+  String get homeTransferring => 'Transferring space';
+
+  @override
+  String get homeTransferFailed =>
+      'Could not open the archive or complete the transfer.';
 }

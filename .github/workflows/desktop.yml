@@ -117,9 +117,52 @@ jobs:
             ${{ runner.temp }}/Space update check */*.error
           if-no-files-found: warn
           retention-days: 14
+  android:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.6'
+          channel: stable
+          cache: true
+      - name: Зависимости приложения
+        working-directory: client
+        run: flutter pub get
+      - name: Подпись выпуска Android
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          SPACE_ANDROID_KEYSTORE: ${{ secrets.SPACE_ANDROID_KEYSTORE }}
+          SPACE_ANDROID_STORE_PASSWORD: ${{ secrets.SPACE_ANDROID_STORE_PASSWORD }}
+          SPACE_ANDROID_KEY_PASSWORD: ${{ secrets.SPACE_ANDROID_KEY_PASSWORD }}
+          SPACE_ANDROID_KEY_ALIAS: ${{ secrets.SPACE_ANDROID_KEY_ALIAS }}
+        run: python3 packaging/prepare-android-signing.py
+      - name: Сборка Android
+        working-directory: client
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            flutter build apk --release --build-name "${GITHUB_REF_NAME#v}"
+            mkdir -p ../dist
+            cp build/app/outputs/flutter-apk/app-release.apk ../dist/Space-android.apk
+            (cd ../dist && sha256sum Space-android.apk > SHA256SUMS-android.txt)
+          else
+            flutter build apk --debug
+          fi
+      - uses: actions/upload-artifact@v4
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          name: Space-android
+          path: dist/*
+          if-no-files-found: error
   publish:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    needs: [validate, desktop, verify-release]
+    needs: [validate, desktop, android, verify-release]
     runs-on: ubuntu-latest
     permissions:
       contents: write

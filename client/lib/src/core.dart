@@ -12,6 +12,7 @@ import 'package:protobuf/protobuf.dart' show GeneratedMessage;
 
 import 'rpc_clients.dart';
 import 'root_history.dart';
+import 'origin_binding.dart';
 import 'rpc_connection.dart';
 import 'root_rotation.dart' as rotation;
 
@@ -25,8 +26,10 @@ class Discovery {
     this.dialHost,
     this.tlsFingerprint = '',
     Uri? connectOrigin,
-  }) : connectOrigin = connectOrigin ?? origin;
-  final Uri origin, connectOrigin;
+    Uri? endpoint,
+  }) : connectOrigin = connectOrigin ?? origin,
+       endpoint = endpoint ?? origin;
+  final Uri origin, connectOrigin, endpoint;
   final String serverId;
   final List<int> publicKey;
   final String? dialHost;
@@ -192,7 +195,7 @@ Future<Discovery> discover(
         );
       }
     }
-    return _discoveryFromBytes(
+    return await _discoveryFromBytes(
       bytes,
       origin,
       networkOrigin,
@@ -205,14 +208,14 @@ Future<Discovery> discover(
   }
 }
 
-Discovery _discoveryFromBytes(
+Future<Discovery> _discoveryFromBytes(
   List<int> bytes,
   Uri origin,
   Uri networkOrigin,
   String? homeOrigin,
   String tlsFingerprint,
   String actualFingerprint,
-) {
+) async {
   final data = jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
   final id = data['server_id'] as String;
   final key = base64Url.decode(
@@ -228,13 +231,21 @@ Discovery _discoveryFromBytes(
       'Discovery несовместим с профилем Space',
     );
   }
-  return Discovery(
+  final fingerprint = homeOrigin == null ? actualFingerprint : tlsFingerprint;
+  final identityOrigin = await verifiedIdentityOrigin(
+    data,
     origin,
+    fingerprint,
+    key,
+  );
+  return Discovery(
+    identityOrigin,
     id,
     key,
     dialHost: networkOrigin.host,
-    tlsFingerprint: homeOrigin == null ? actualFingerprint : tlsFingerprint,
+    tlsFingerprint: fingerprint,
     connectOrigin: discoveryConnectOrigin(data, networkOrigin),
+    endpoint: origin,
   );
 }
 
@@ -252,9 +263,12 @@ class DeviceRecord {
     this.administrative = false,
     this.rootHistory = const [],
     this.tlsFingerprint = '',
+    this.endpoint = '',
   });
   final String origin, serverId, serverKey;
   final String tlsFingerprint;
+  String endpoint;
+  String get connectionAddress => endpoint.isEmpty ? origin : endpoint;
   final List<int> rootSeed, deviceSeed;
   final List<int> rootPublicKey;
   List<int> recoverySeed;
@@ -277,6 +291,7 @@ class DeviceRecord {
     'serverId': serverId,
     'serverKey': serverKey,
     'tlsFingerprint': tlsFingerprint,
+    'endpoint': endpoint,
     'rootSeed': url64(rootSeed),
     'deviceSeed': url64(deviceSeed),
     'grantId': grantId,
@@ -298,6 +313,7 @@ class DeviceRecord {
       serverId: data['serverId'] as String,
       serverKey: data['serverKey'] as String,
       tlsFingerprint: data['tlsFingerprint'] as String? ?? '',
+      endpoint: data['endpoint'] as String? ?? '',
       rootSeed: base64Url.decode(
         base64Url.normalize(data['rootSeed'] as String),
       ),
@@ -317,20 +333,25 @@ class DeviceRecord {
           .map((v) => Map<String, dynamic>.from(v as Map))
           .toList(),
     );
-    if ((record.rootSeed.length != 32 &&
-            !(record.rootSeed.isEmpty &&
-                record.rootPublicKey.length == 32 &&
-                (record.recoverySeed.isEmpty ||
-                    (record.recoverySeed.length == 32 &&
-                        RegExp(r'^dg_[A-Za-z0-9_-]{43}$')
-                            .hasMatch(record.recoveryGrantId))))) ||
-        record.deviceSeed.length != 32) {
-      throw const LocalFailure(
-        LocalFailureCode.identityInvalid,
-        'Повреждено хранилище ключей',
-      );
-    }
+    _requireDeviceSecrets(record);
+    localOrigin(record.connectionAddress);
     return record;
+  }
+}
+
+void _requireDeviceSecrets(DeviceRecord record) {
+  if ((record.rootSeed.length != 32 &&
+          !(record.rootSeed.isEmpty &&
+              record.rootPublicKey.length == 32 &&
+              (record.recoverySeed.isEmpty ||
+                  (record.recoverySeed.length == 32 &&
+                      RegExp(r'^dg_[A-Za-z0-9_-]{43}$')
+                          .hasMatch(record.recoveryGrantId))))) ||
+      record.deviceSeed.length != 32) {
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Повреждено хранилище ключей',
+    );
   }
 }
 
@@ -921,6 +942,7 @@ class SpaceSession
       if (automatic && !record.administrative && record.rootSeed.isNotEmpty) {
         record = DeviceRecord(
           origin: record.origin,
+          endpoint: record.endpoint,
           serverId: record.serverId,
           serverKey: record.serverKey,
           tlsFingerprint: record.tlsFingerprint,
@@ -946,6 +968,8 @@ class SpaceSession
       );
       await vault.save(record);
     }
+    record.endpoint = server.endpoint.toString();
+    await vault.save(record);
     return record;
   }
 
@@ -1339,6 +1363,7 @@ class SpaceSession
     }
     final signer = DeviceRecord(
       origin: record.origin,
+      endpoint: record.endpoint,
       serverId: record.serverId,
       serverKey: record.serverKey,
       rootSeed: credentials.rootSeed,
@@ -1424,6 +1449,7 @@ class SpaceSession
     final payload = <String, dynamic>{
       'v': record.rootHistory.isEmpty ? 1 : 2,
       'origin': record.origin,
+      'endpoint': record.connectionAddress,
       'server_id': record.serverId,
       'server_key': record.serverKey,
       if (record.tlsFingerprint.isNotEmpty)
@@ -1569,6 +1595,8 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
     );
   }
   final origin = localOrigin(payload['origin'] as String).toString();
+  final endpoint = localOrigin(payload['endpoint'] as String? ?? origin)
+      .toString();
   final rootPublic = base64Url.decode(
     base64Url.normalize(payload['root_public_key'] as String),
   );
@@ -1597,18 +1625,10 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
   }
   _validateRecoveryGrant(payload, isRoot);
   final device = await Ed25519().newKeyPair();
-  final history = (payload['root_history'] as List? ?? [])
-      .map((v) => Map<String, dynamic>.from(v as Map))
-      .toList();
-  if (payload['v'] == 1 && history.isNotEmpty ||
-      payload['v'] == 2 && history.isEmpty) {
-    throw const LocalFailure(
-      LocalFailureCode.identityInvalid,
-      'Версия карточки не соответствует истории ключей',
-    );
-  }
+  final history = _recoveryHistory(payload);
   final record = DeviceRecord(
     origin: origin,
+    endpoint: endpoint,
     serverId: serverId,
     serverKey: serverKey,
     tlsFingerprint: tlsFingerprint,
@@ -1622,6 +1642,20 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
   );
   await record.identity();
   return record;
+}
+
+List<Map<String, dynamic>> _recoveryHistory(Map<String, dynamic> payload) {
+  final history = (payload['root_history'] as List? ?? [])
+      .map((value) => Map<String, dynamic>.from(value as Map))
+      .toList();
+  if (payload['v'] == 1 && history.isNotEmpty ||
+      payload['v'] == 2 && history.isEmpty) {
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Версия карточки не соответствует истории ключей',
+    );
+  }
+  return history;
 }
 
 String newRequestKey() =>

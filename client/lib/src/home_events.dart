@@ -34,3 +34,13 @@ final class HomeStatePublished extends HomeEvent<void> {
 }
 
 final class HomeProgressTicked extends HomeEvent<void> {}
+
+final class HomeExportRequested extends HomeEvent<bool> {
+  HomeExportRequested(this.path);
+  final String path;
+}
+
+final class HomeImportRequested extends HomeEvent<bool> {
+  HomeImportRequested(this.path, this.publicIP);
+  final String path, publicIP;
+}

@@ -5,6 +5,7 @@ import '../l10n/admin_localizations.dart';
 class RecoveryCameraView extends StatelessWidget {
   const RecoveryCameraView({
     super.key,
+    this.help,
     required this.cameras,
     required this.selected,
     required this.starting,
@@ -14,6 +15,7 @@ class RecoveryCameraView extends StatelessWidget {
     required this.onRestart,
     required this.onCancel,
   });
+  final String? help;
   final List<String> cameras;
   final String? selected, error;
   final bool starting;
@@ -33,7 +35,7 @@ class RecoveryCameraView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(strings.cameraHelp),
+              Text(help ?? strings.cameraHelp),
               const SizedBox(height: 12),
               if (cameras.length > 1)
                 DropdownButton<String>(

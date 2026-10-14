@@ -15,5 +15,16 @@
   "addFavorite": "添加到收藏",
   "removeFavorite": "取消收藏",
   "favoriteMessages": "收藏消息",
-  "failureConnectRequired": "服务器需要支持 ConnectRPC。请更新家庭运行环境或联系空间所有者。"
+  "failureConnectRequired": "服务器需要支持 ConnectRPC。请更新家庭运行环境或联系空间所有者。",
+  "spaceQrCamera": "扫描二维码",
+  "spaceQrImage": "选择二维码图片",
+  "spaceQrInvalid": "无法读取包含空间链接的二维码。",
+  "homeExport": "导出空间",
+  "homeImport": "导入空间",
+  "homeTransferHelp": "存档包含消息、设置和服务器密钥。请保密并仅导入您自己的存档。导出期间服务器会停止，导入不会覆盖现有空间。更改 IP 会保留空间身份和 TLS 指纹。在新电脑上需单独恢复所有者恢复卡。",
+  "homeImportIP": "新的公网 IPv4（留空保留原地址）",
+  "homeExported": "空间已导出",
+  "homeImported": "空间已导入，现在可以启动服务器。",
+  "homeTransferring": "正在迁移空间",
+  "homeTransferFailed": "无法打开存档或完成迁移。"
 }

@@ -1,8 +1,7 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qr/qr.dart';
+import 'space_link_qr.dart';
 import 'package:space_admin_ui/space_admin_ui.dart';
 
 import '../l10n/strings.dart';
@@ -158,7 +157,7 @@ class _SpaceSetupWizardState extends State<SpaceSetupWizard> {
                     child: SizedBox(
                       width: 240,
                       height: 240,
-                      child: CustomPaint(painter: _LinkQrPainter(link)),
+                      child: CustomPaint(painter: LinkQrPainter(link)),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -227,36 +226,4 @@ class _SpaceSetupWizardState extends State<SpaceSetupWizard> {
       ),
     );
   }
-}
-
-class _LinkQrPainter extends CustomPainter {
-  _LinkQrPainter(String link)
-    : matrix = QrImage(
-        QrCode(
-          payload: QrPayload.fromTypedData(
-            Uint8List.fromList(utf8.encode(link)),
-          ),
-          errorCorrectLevel: QrErrorCorrectLevel.medium,
-        ),
-      );
-  final QrImage matrix;
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(Offset.zero & size, Paint()..color = Colors.white);
-    final cell = size.shortestSide / (matrix.moduleCount + 8);
-    final paint = Paint()..color = Colors.black;
-    for (var y = 0; y < matrix.moduleCount; y++) {
-      for (var x = 0; x < matrix.moduleCount; x++) {
-        if (matrix.isDark(y, x)) {
-          canvas.drawRect(
-            Rect.fromLTWH((x + 4) * cell, (y + 4) * cell, cell, cell),
-            paint,
-          );
-        }
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_LinkQrPainter oldDelegate) => true;
 }

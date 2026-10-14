@@ -458,5 +458,16 @@
   "addFavorite": "Add to favorites",
   "removeFavorite": "Remove from favorites",
   "favoriteMessages": "Favorite messages",
-  "failureConnectRequired": "This server must support ConnectRPC. Update the home runtime or contact the space owner."
+  "failureConnectRequired": "This server must support ConnectRPC. Update the home runtime or contact the space owner.",
+  "spaceQrCamera": "Scan QR",
+  "spaceQrImage": "Choose QR image",
+  "spaceQrInvalid": "Could not read a QR code containing a space link.",
+  "homeExport": "Export space",
+  "homeImport": "Import space",
+  "homeTransferHelp": "The archive contains messages, settings and server keys. Keep it private and import only your own archive. The server stops during export; import never replaces an existing space. Changing IP keeps the space identity and TLS fingerprint. On a new computer, restore your owner recovery card separately.",
+  "homeImportIP": "New public IPv4 (empty keeps the old address)",
+  "homeExported": "Space exported",
+  "homeImported": "Space imported. You can now start the server.",
+  "homeTransferring": "Transferring space",
+  "homeTransferFailed": "Could not open the archive or complete the transfer."
 }

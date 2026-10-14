@@ -17,6 +17,7 @@ class Dashboard extends StatelessWidget {
     this.homeAction,
     this.homeDetails,
     this.createOwnSpace,
+    this.importSpace,
     this.homeRunning = false,
     this.homeBusy = false,
   });
@@ -29,6 +30,7 @@ class Dashboard extends StatelessWidget {
   final VoidCallback? homeAction;
   final VoidCallback? homeDetails;
   final VoidCallback? createOwnSpace;
+  final VoidCallback? importSpace;
   final bool homeRunning, homeBusy;
 
   @override
@@ -95,6 +97,13 @@ class Dashboard extends StatelessWidget {
               icon: const Icon(Icons.refresh),
               label: Text(context.strings.dashboardRefresh),
             ),
+            if (importSpace != null)
+              OutlinedButton.icon(
+                key: const ValueKey('import-space-entry'),
+                onPressed: homeBusy ? null : importSpace,
+                icon: const Icon(Icons.file_download_outlined),
+                label: Text(context.strings.homeImport),
+              ),
             if (MediaQuery.sizeOf(context).width < 760 && homeDetails != null)
               OutlinedButton.icon(
                 key: const ValueKey('home-server-details'),

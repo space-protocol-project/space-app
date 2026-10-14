@@ -2134,6 +2134,72 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Нужен сервер с поддержкой ConnectRPC. Обновите домашний runtime или обратитесь к владельцу пространства.'**
   String get failureConnectRequired;
+
+  /// No description provided for @spaceQrCamera.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сканировать QR'**
+  String get spaceQrCamera;
+
+  /// No description provided for @spaceQrImage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбрать изображение QR'**
+  String get spaceQrImage;
+
+  /// No description provided for @spaceQrInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось прочитать QR со ссылкой на пространство.'**
+  String get spaceQrInvalid;
+
+  /// No description provided for @homeExport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Экспортировать пространство'**
+  String get homeExport;
+
+  /// No description provided for @homeImport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Импортировать пространство'**
+  String get homeImport;
+
+  /// No description provided for @homeTransferHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Архив содержит сообщения, настройки и ключи сервера. Храните его в тайне и импортируйте только свой архив. На время экспорта сервер остановится; импорт не заменяет существующее пространство. При смене IP сохранятся идентичность пространства и TLS-отпечаток. На новом компьютере отдельно восстановите карточку владельца.'**
+  String get homeTransferHelp;
+
+  /// No description provided for @homeImportIP.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новый публичный IPv4 (пусто — сохранить прежний)'**
+  String get homeImportIP;
+
+  /// No description provided for @homeExported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пространство экспортировано'**
+  String get homeExported;
+
+  /// No description provided for @homeImported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пространство импортировано. Теперь можно запустить сервер.'**
+  String get homeImported;
+
+  /// No description provided for @homeTransferring.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перенос пространства'**
+  String get homeTransferring;
+
+  /// No description provided for @homeTransferFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось открыть архив или завершить перенос.'**
+  String get homeTransferFailed;
 }
 
 class _AppLocalizationsDelegate

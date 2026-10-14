@@ -17,6 +17,7 @@ const appReleaseAssets = {
   'Space-Setup-windows-x64.exe',
   'Space-macos-arm64.dmg',
   'Space-linux-x64.run',
+  'Space-android.apk',
 };
 
 class AppVersion implements Comparable<AppVersion> {

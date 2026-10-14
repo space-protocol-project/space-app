@@ -265,8 +265,12 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       pass,
     ]).timeout(const Duration(seconds: 60));
     stage(3);
+    final preview = widget.controller.preview;
+    final endpoint = preview != null && preview.serverId == record.serverId
+        ? preview.endpoint.toString()
+        : record.connectionAddress;
     final server = await discover(
-      record.origin,
+      endpoint,
       tlsFingerprint: record.tlsFingerprint,
     );
     checkTrust(server, record);
@@ -291,7 +295,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     }
     stage(4);
     await target.disconnect();
-    await target.inspect(record.origin, tlsFingerprint: record.tlsFingerprint);
+    await target.inspect(endpoint, tlsFingerprint: record.tlsFingerprint);
     await target.connect(restoredRecord: record);
     if (!target.connected) {
       throw RecoveryOperationError('recoveryConnectionDenied');
@@ -557,6 +561,7 @@ Future<Map<String, dynamic>> rootCardPayloadInWorker(
   return {
     'v': record.rootHistory.isEmpty ? 1 : 2,
     'origin': record.origin,
+    'endpoint': record.connectionAddress,
     'server_id': record.serverId,
     'server_key': record.serverKey,
     if (record.tlsFingerprint.isNotEmpty)

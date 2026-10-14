@@ -140,7 +140,10 @@ class ServerWorkspaces
           .load(origin)
           .timeout(const Duration(seconds: 5));
       if (record == null || _disposed) return;
-      await controller.inspect(origin, tlsFingerprint: record.tlsFingerprint);
+      await controller.inspect(
+        record.connectionAddress,
+        tlsFingerprint: record.tlsFingerprint,
+      );
       if (_disposed || !identical(_controllers[origin], controller)) return;
       if (controller.preview != null) {
         await controller.connect(restoredRecord: record);
