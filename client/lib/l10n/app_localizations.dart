@@ -101,6 +101,12 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @interfaceScale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Масштаб интерфейса'**
+  String get interfaceScale;
+
   /// No description provided for @overview.
   ///
   /// In ru, this message translates to:

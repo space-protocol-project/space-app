@@ -29,6 +29,7 @@ class AppPreferences
             palette: event.palette,
             language: event.language,
             sendShortcut: event.sendShortcut,
+            uiScale: event.uiScale,
           ),
           ServerRemembered() => _remember(event.origin),
           ServerForgotten() => _forget(event.origin),
@@ -46,8 +47,10 @@ class AppPreferences
     String? palette,
     String? language,
     String? sendShortcut,
+    double? uiScale,
   }) => sendRequest(
     PreferencesChanged(
+      uiScale: uiScale,
       dark: dark,
       effects: effects,
       palette: palette,
@@ -64,6 +67,8 @@ class AppPreferences
   String palette = 'gruvbox', error = '';
   String language = 'ru';
   String sendShortcut = 'enter';
+  double uiScale = 1;
+  static const uiScales = [0.75, 0.9, 1.0, 1.1, 1.25, 1.5];
   static const languages = ['ru', 'zh-Hans', 'en'];
   Locale get locale => language == 'zh-Hans'
       ? const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans')
@@ -91,6 +96,7 @@ class AppPreferences
       if (_disposed) return;
       dark = data.getBool('space.ui.dark') ?? true;
       effects = data.getBool('space.ui.effects') ?? true;
+      uiScale = validUiScale(data.getDouble('space.ui.scale') ?? 1);
       final savedSend = data.getString('space.ui.sendShortcut');
       if (['enter', 'shiftEnter'].contains(savedSend)) {
         sendShortcut = savedSend!;
@@ -127,7 +133,9 @@ class AppPreferences
     String? palette,
     String? language,
     String? sendShortcut,
+    double? uiScale,
   }) {
+    if (uiScale != null) this.uiScale = validUiScale(uiScale);
     if (sendShortcut != null &&
         ['enter', 'shiftEnter'].contains(sendShortcut)) {
       this.sendShortcut = sendShortcut;
@@ -143,6 +151,9 @@ class AppPreferences
     publishState();
     return _save();
   }
+
+  static double validUiScale(double value) =>
+      uiScales.contains(value) ? value : 1;
 
   Future<void> _remember(String origin) {
     origins.remove(origin);
@@ -160,6 +171,7 @@ class AppPreferences
 
   Future<void> _save() {
     final snapshot = (
+      uiScale: uiScale,
       dark: dark,
       effects: effects,
       palette: palette,
@@ -172,6 +184,7 @@ class AppPreferences
       try {
         final data = await SharedPreferences.getInstance();
         final results = await Future.wait([
+          data.setDouble('space.ui.scale', snapshot.uiScale),
           data.setBool('space.ui.dark', snapshot.dark),
           data.setBool('space.ui.effects', snapshot.effects),
           data.setString('space.ui.palette', snapshot.palette),

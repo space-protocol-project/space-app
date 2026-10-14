@@ -1,4 +1,5 @@
 {
+  "interfaceScale": "界面缩放",
   "@@locale": "zh",
   "overview": "概览",
   "chat": "公共聊天",

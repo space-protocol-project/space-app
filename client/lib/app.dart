@@ -9,6 +9,7 @@ import 'src/chat_controller.dart';
 import 'src/preferences.dart';
 import 'l10n/app_localizations.dart';
 import 'ui/shell.dart';
+import 'ui/interface_scale.dart';
 
 class SpaceApp extends StatefulWidget {
   const SpaceApp({super.key, this.controller});
@@ -37,6 +38,10 @@ class _SpaceAppState extends State<SpaceApp> {
         bloc: preferences,
         builder: (context, state) => MaterialApp(
           title: 'Space',
+          builder: (context, child) => InterfaceScale(
+            scale: state.uiScale,
+            child: child ?? const SizedBox.shrink(),
+          ),
           debugShowCheckedModeBanner: false,
           scrollBehavior: const MaterialScrollBehavior(),
           theme: state.theme ?? preferences.theme,

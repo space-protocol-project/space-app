@@ -182,6 +182,23 @@ class SettingsPanel extends StatelessWidget {
               value: state.effects,
               onChanged: (value) => preferences.change(effects: value),
             ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<double>(
+              key: ValueKey('ui-scale-${state.uiScale}'),
+              initialValue: state.uiScale,
+              isExpanded: true,
+              decoration: InputDecoration(
+                labelText: context.strings.interfaceScale,
+              ),
+              items: [
+                for (final scale in AppPreferences.uiScales)
+                  DropdownMenuItem(
+                    value: scale,
+                    child: Text('${(scale * 100).round()}%'),
+                  ),
+              ],
+              onChanged: (value) => preferences.change(uiScale: value),
+            ),
             const Divider(),
             const SizedBox(height: 16),
             Text(context.strings.myColors),

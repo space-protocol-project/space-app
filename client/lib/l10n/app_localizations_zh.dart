@@ -10,6 +10,9 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get interfaceScale => '界面缩放';
+
+  @override
   String get overview => '概览';
 
   @override

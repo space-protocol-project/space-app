@@ -2,6 +2,7 @@ part of 'preferences.dart';
 
 final class PreferencesState {
   const PreferencesState({
+    this.uiScale = 1,
     this.dark = true,
     this.effects = true,
     this.palette = 'gruvbox',
@@ -14,6 +15,7 @@ final class PreferencesState {
   });
   factory PreferencesState.fromController(AppPreferences controller) =>
       PreferencesState(
+        uiScale: controller.uiScale,
         dark: controller.dark,
         effects: controller.effects,
         palette: controller.palette,
@@ -29,6 +31,7 @@ final class PreferencesState {
         ),
         theme: controller.theme,
       );
+  final double uiScale;
   final bool dark, effects;
   final String palette, language, sendShortcut, error;
   final List<String> origins;

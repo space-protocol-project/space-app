@@ -10,6 +10,9 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
+  String get interfaceScale => 'Масштаб интерфейса';
+
+  @override
   String get overview => 'Обзор';
 
   @override

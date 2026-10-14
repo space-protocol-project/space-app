@@ -13,7 +13,9 @@ final class PreferencesChanged extends PreferencesCommand<void> {
     this.palette,
     this.language,
     this.sendShortcut,
+    this.uiScale,
   });
+  final double? uiScale;
   final bool? dark, effects;
   final String? palette, language, sendShortcut;
 }
