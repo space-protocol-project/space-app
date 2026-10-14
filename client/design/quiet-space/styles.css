@@ -992,3 +992,18 @@ body.light .favorite-marker:not(.mine) span { background: #63754a; }
 .favorite-excerpt span { -webkit-line-clamp: 3; white-space: pre-line; }
 .chat-area .chat-scroll { padding-left: 60px; }
 @media(max-width:720px) { .favorite-markers { left: 5px; } .favorite-preview { width: calc(100vw - 130px); } .chat-area .chat-scroll { padding-left: 50px; } }
+
+/* Поле ввода парит над историей; сообщения прокручиваются под стеклом. */
+#content { position: relative; }
+.composer-wrap {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 3;
+  background: transparent;
+  pointer-events: none;
+}
+.composer-wrap .composer { pointer-events: auto; }
+.chat-area .chat-scroll {
+  padding-bottom: calc(var(--composer-height, 170px) + 24px);
+  scroll-padding-bottom: calc(var(--composer-height, 170px) + 24px);
+}

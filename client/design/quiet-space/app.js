@@ -112,7 +112,9 @@ function message(m) {
   const own = m.author === "Вы";
   return `<article id="message-${m.id}" class="message ${own ? "own" : ""}">${own ? "" : `<div class="avatar ${m.author === "Миша" ? "lilac" : ""}">${esc(m.author[0])}</div>`}<div class="message-body">${own ? "" : `<div class="message-meta">${esc(m.author)}<time>${esc(m.time)}</time></div>`}<p>${esc(m.text).replace(/\n/g, "<br>")}</p>${(m.files || []).map((f) => `<div class="attachment">${icon("clip")}${esc(f.name)} <small>${Math.max(1, Math.round(f.size / 1024))} КБ</small></div>`).join("")}<div class="message-actions"><button class="reaction ${state.liked.includes(m.id) ? "on" : ""}" data-like="${m.id}" aria-label="Нравится" aria-pressed="${state.liked.includes(m.id)}">♡ ${state.liked.includes(m.id) ? 1 : ""}</button><button class="save ${state.saved.includes(m.id) ? "is-saved" : ""}" data-save="${m.id}" aria-pressed="${state.saved.includes(m.id)}" aria-label="${state.saved.includes(m.id) ? "Убрать из избранного" : "Добавить в избранное"}" title="${state.saved.includes(m.id) ? "Убрать из избранного" : "Добавить в избранное"}">${icon("bookmark")}</button>${own ? `<time class="fine">${esc(m.time)} · локально</time>` : ""}</div></div></article>`;
 }
+let composerResize;
 function render() {
+  composerResize?.disconnect();
   $(".favorite-preview")?.remove();
   channels();
   $("#title").textContent =
@@ -138,6 +140,13 @@ function renderChat() {
   const list = state.messages.filter((m) => m.channel === channel);
   $("#content").innerHTML =
     `<div class="chat-area"><div class="chat-scroll"><div class="conversation"><div class="intro"><div class="symbol">✧</div><h1>${channel === state.channels[0] ? "Хорошо, что вы здесь." : esc(channel)}</h1><p>${channel === state.channels[0] ? "Разговоры, из которых складывается близость." : "Место для нового разговора."}</p></div><div class="date">${list.length ? "Сегодня · демонстрационный разговор" : "Начало вашей истории"}</div><div id="messages">${list.map(message).join("")}</div></div></div>${favoriteMarkers(list)}</div><div class="composer-wrap"><form class="composer" id="compose"><div id="attachments"></div><textarea id="message" aria-label="Сообщение" placeholder="Что у вас нового?" rows="2"></textarea><div class="composer-footer"><button type="button" data-action="attach" title="Прикрепить файл">${icon("plus")}</button><span class="hint">Можно просто перетащить файл сюда</span><button class="send" type="submit" title="Отправить сообщение">${icon("arrow")}</button></div></form><p class="below">Ваш маленький уголок большого мира</p></div>`;
+  const composerWrap = $('.composer-wrap');
+  const syncComposerHeight = () => {
+    $('#content').style.setProperty('--composer-height', `${composerWrap.offsetHeight}px`);
+  };
+  syncComposerHeight();
+  composerResize = new ResizeObserver(syncComposerHeight);
+  composerResize.observe(composerWrap);
   bindFavoritePreviews();
   $("#message").value = drafts[channel] || "";
   renderAttachments();
