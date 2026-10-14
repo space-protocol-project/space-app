@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Space · Место для своих</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <nav class="rail" aria-label="Пространства">
+        <img class="logo" src="assets/logo.png" alt="Space" /><button
+          data-view="home"
+          title="Сводка"
+          data-icon="home"
+        ></button
+        ><button class="space active" data-view="chat" title="Моё пространство">
+          м<span class="online"></span></button
+        ><button
+          data-action="add"
+          title="Добавить пространство"
+          data-icon="plus"
+        ></button>
+        <div class="rail-bottom">
+          <button
+            data-action="theme"
+            title="Сменить тему"
+            data-icon="sun"
+          ></button
+          ><button
+            data-view="settings"
+            title="Настройки"
+            data-icon="settings"
+          ></button>
+          <div class="avatar me">В</div>
+        </div>
+      </nav>
+      <aside class="sidebar">
+        <div class="space-heading">
+          <div>
+            <strong>Моё пространство</strong><small><i></i> Здесь свои</small>
+          </div>
+          <button
+            data-action="info"
+            title="О пространстве"
+            data-icon="chevron"
+          ></button>
+        </div>
+        <button class="search" data-action="search">
+          <span data-icon="search"></span>Поиск<kbd>Ctrl K</kbd></button
+        ><button class="nav-row" data-view="home">
+          <span data-icon="home"></span>Обзор
+        </button>
+        <div class="section-label">
+          ОБЩЕНИЕ<button
+            data-action="channel"
+            title="Создать канал"
+            data-icon="plus"
+          ></button>
+        </div>
+        <div id="channels"></div>
+        <div class="section-label">ПРОСТРАНСТВО</div>
+        <button class="nav-row" data-view="saved">
+          <span data-icon="bookmark"></span>Сохранённое<span
+            id="saved-count"
+          ></span></button
+        ><button class="nav-row" data-view="settings">
+          <span data-icon="settings"></span>Управление
+        </button>
+        <div class="sidebar-note">
+          <div class="mini-orbit">✧</div>
+          <strong>Можно быть собой.</strong>
+          <p>Место для разговоров,<br />идей и маленьких открытий.</p>
+        </div>
+        <div class="profile">
+          <div class="avatar me">В</div>
+          <div><strong>Виталий</strong><small>Личное пространство</small></div>
+          <span class="status-dot"></span>
+        </div>
+      </aside>
+      <main>
+        <header>
+          <button
+            class="mobile-menu"
+            data-action="menu"
+            title="Открыть меню"
+            data-icon="menu"
+          ></button>
+          <div class="breadcrumb">
+            Моё пространство <span>/</span> <strong id="title">Чатик</strong>
+          </div>
+          <span class="demo">Прототип</span>
+          <div class="header-actions">
+            <button
+              data-action="search"
+              title="Поиск"
+              data-icon="search"
+            ></button
+            ><button
+              data-action="info"
+              title="Открыть сведения"
+              data-icon="panel"
+            ></button>
+          </div>
+        </header>
+        <div id="content"></div>
+        <div id="dropzone">
+          <span data-icon="upload"></span>
+          <h2>Отпустите — и поделитесь</h2>
+          <p>Файлы будут добавлены к сообщению</p>
+        </div>
+      </main>
+    </div>
+    <aside id="info" class="glass" hidden>
+      <button
+        class="close"
+        data-action="info"
+        title="Закрыть"
+        data-icon="close"
+      ></button>
+      <div class="space-emblem">м</div>
+      <h2>Моё пространство</h2>
+      <p>Разговоры и маленькие открытия.</p>
+      <div class="info-line"><span>Участники</span><strong>3</strong></div>
+      <div class="people">
+        <div class="avatar">А</div>
+        Аня <i></i>
+      </div>
+      <div class="people">
+        <div class="avatar lilac">М</div>
+        Миша <i></i>
+      </div>
+      <div class="people">
+        <div class="avatar me">В</div>
+        Вы <i></i>
+      </div>
+      <p class="fine">
+        Демонстрационные участники. Подключение к серверу не выполняется.
+      </p>
+      <button class="wide" data-view="settings">
+        Настройки пространства →
+      </button>
+    </aside>
+    <dialog id="modal" class="glass">
+      <div id="modal-body"></div>
+      <button
+        class="close"
+        data-action="close"
+        title="Закрыть"
+        data-icon="close"
+      ></button>
+    </dialog>
+    <div id="toast" role="status"></div>
+    <input id="file-input" type="file" multiple hidden />
+    <script src="app.js"></script>
+  </body>
+</html>
