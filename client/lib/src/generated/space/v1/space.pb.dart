@@ -10,6 +10,7 @@
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
+import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -5430,6 +5431,9 @@ class Content extends $pb.GeneratedMessage {
     $core.String? authorId,
     $fixnum.Int64? sequence,
     $fixnum.Int64? createdAtUnixMs,
+    $fixnum.Int64? revision,
+    $fixnum.Int64? updatedAtUnixMs,
+    $core.bool? deleted,
   }) {
     final result = Content._();
     if (id != null) result.id = id;
@@ -5438,6 +5442,9 @@ class Content extends $pb.GeneratedMessage {
     if (authorId != null) result.authorId = authorId;
     if (sequence != null) result.sequence = sequence;
     if (createdAtUnixMs != null) result.createdAtUnixMs = createdAtUnixMs;
+    if (revision != null) result.revision = revision;
+    if (updatedAtUnixMs != null) result.updatedAtUnixMs = updatedAtUnixMs;
+    if (deleted != null) result.deleted = deleted;
     return result;
   }
 
@@ -5460,6 +5467,9 @@ class Content extends $pb.GeneratedMessage {
     ..aOS(4, _omitFieldNames ? '' : 'authorId')
     ..aInt64(5, _omitFieldNames ? '' : 'sequence')
     ..aInt64(6, _omitFieldNames ? '' : 'createdAtUnixMs')
+    ..aInt64(7, _omitFieldNames ? '' : 'revision')
+    ..aInt64(8, _omitFieldNames ? '' : 'updatedAtUnixMs')
+    ..aOB(9, _omitFieldNames ? '' : 'deleted')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -5536,6 +5546,333 @@ class Content extends $pb.GeneratedMessage {
   $core.bool hasCreatedAtUnixMs() => $_has(5);
   @$pb.TagNumber(6)
   void clearCreatedAtUnixMs() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $fixnum.Int64 get revision => $_getI64(6);
+  @$pb.TagNumber(7)
+  set revision($fixnum.Int64 value) => $_setInt64(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasRevision() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearRevision() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $fixnum.Int64 get updatedAtUnixMs => $_getI64(7);
+  @$pb.TagNumber(8)
+  set updatedAtUnixMs($fixnum.Int64 value) => $_setInt64(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasUpdatedAtUnixMs() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearUpdatedAtUnixMs() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.bool get deleted => $_getBF(8);
+  @$pb.TagNumber(9)
+  set deleted($core.bool value) => $_setBool(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasDeleted() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearDeleted() => $_clearField(9);
+}
+
+class UpdateContentRequest extends $pb.GeneratedMessage {
+  factory UpdateContentRequest({
+    $core.String? channelId,
+    $core.String? id,
+    $core.String? text,
+    $fixnum.Int64? expectedRevision,
+  }) {
+    final result = UpdateContentRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (id != null) result.id = id;
+    if (text != null) result.text = text;
+    if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    return result;
+  }
+
+  UpdateContentRequest._();
+
+  factory UpdateContentRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateContentRequest()..mergeFromBuffer(data, registry);
+  factory UpdateContentRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateContentRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UpdateContentRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: UpdateContentRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'id')
+    ..aOS(3, _omitFieldNames ? '' : 'text')
+    ..aInt64(4, _omitFieldNames ? '' : 'expectedRevision')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateContentRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateContentRequest copyWith(void Function(UpdateContentRequest) updates) =>
+      super.copyWith((message) => updates(message as UpdateContentRequest))
+          as UpdateContentRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use UpdateContentRequest() / UpdateContentRequest.new instead')
+  static UpdateContentRequest create() => UpdateContentRequest._();
+  static $pb.GeneratedMessage $_createMessage() => UpdateContentRequest._();
+  @$core.override
+  UpdateContentRequest createEmptyInstance() => UpdateContentRequest._();
+  @$core.pragma('dart2js:noInline')
+  static UpdateContentRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UpdateContentRequest>(
+          UpdateContentRequest.$_createMessage);
+  static UpdateContentRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get id => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set id($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get text => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set text($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasText() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearText() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get expectedRevision => $_getI64(3);
+  @$pb.TagNumber(4)
+  set expectedRevision($fixnum.Int64 value) => $_setInt64(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasExpectedRevision() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearExpectedRevision() => $_clearField(4);
+}
+
+class UpdateContentResponse extends $pb.GeneratedMessage {
+  factory UpdateContentResponse({
+    Content? content,
+  }) {
+    final result = UpdateContentResponse._();
+    if (content != null) result.content = content;
+    return result;
+  }
+
+  UpdateContentResponse._();
+
+  factory UpdateContentResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateContentResponse()..mergeFromBuffer(data, registry);
+  factory UpdateContentResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateContentResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UpdateContentResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: UpdateContentResponse.$_createMessage)
+    ..aOM<Content>(1, _omitFieldNames ? '' : 'content',
+        subBuilder: Content.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateContentResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateContentResponse copyWith(
+          void Function(UpdateContentResponse) updates) =>
+      super.copyWith((message) => updates(message as UpdateContentResponse))
+          as UpdateContentResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use UpdateContentResponse() / UpdateContentResponse.new instead')
+  static UpdateContentResponse create() => UpdateContentResponse._();
+  static $pb.GeneratedMessage $_createMessage() => UpdateContentResponse._();
+  @$core.override
+  UpdateContentResponse createEmptyInstance() => UpdateContentResponse._();
+  @$core.pragma('dart2js:noInline')
+  static UpdateContentResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UpdateContentResponse>(
+          UpdateContentResponse.$_createMessage);
+  static UpdateContentResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Content get content => $_getN(0);
+  @$pb.TagNumber(1)
+  set content(Content value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasContent() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearContent() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Content ensureContent() => $_ensure(0);
+}
+
+class DeleteContentRequest extends $pb.GeneratedMessage {
+  factory DeleteContentRequest({
+    $core.String? channelId,
+    $core.String? id,
+    $fixnum.Int64? expectedRevision,
+  }) {
+    final result = DeleteContentRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (id != null) result.id = id;
+    if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    return result;
+  }
+
+  DeleteContentRequest._();
+
+  factory DeleteContentRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeleteContentRequest()..mergeFromBuffer(data, registry);
+  factory DeleteContentRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeleteContentRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'DeleteContentRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: DeleteContentRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'id')
+    ..aInt64(3, _omitFieldNames ? '' : 'expectedRevision')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeleteContentRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeleteContentRequest copyWith(void Function(DeleteContentRequest) updates) =>
+      super.copyWith((message) => updates(message as DeleteContentRequest))
+          as DeleteContentRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DeleteContentRequest() / DeleteContentRequest.new instead')
+  static DeleteContentRequest create() => DeleteContentRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DeleteContentRequest._();
+  @$core.override
+  DeleteContentRequest createEmptyInstance() => DeleteContentRequest._();
+  @$core.pragma('dart2js:noInline')
+  static DeleteContentRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DeleteContentRequest>(
+          DeleteContentRequest.$_createMessage);
+  static DeleteContentRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get id => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set id($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get expectedRevision => $_getI64(2);
+  @$pb.TagNumber(3)
+  set expectedRevision($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasExpectedRevision() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearExpectedRevision() => $_clearField(3);
+}
+
+class DeleteContentResponse extends $pb.GeneratedMessage {
+  factory DeleteContentResponse({
+    Content? content,
+  }) {
+    final result = DeleteContentResponse._();
+    if (content != null) result.content = content;
+    return result;
+  }
+
+  DeleteContentResponse._();
+
+  factory DeleteContentResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeleteContentResponse()..mergeFromBuffer(data, registry);
+  factory DeleteContentResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeleteContentResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'DeleteContentResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: DeleteContentResponse.$_createMessage)
+    ..aOM<Content>(1, _omitFieldNames ? '' : 'content',
+        subBuilder: Content.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeleteContentResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeleteContentResponse copyWith(
+          void Function(DeleteContentResponse) updates) =>
+      super.copyWith((message) => updates(message as DeleteContentResponse))
+          as DeleteContentResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DeleteContentResponse() / DeleteContentResponse.new instead')
+  static DeleteContentResponse create() => DeleteContentResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DeleteContentResponse._();
+  @$core.override
+  DeleteContentResponse createEmptyInstance() => DeleteContentResponse._();
+  @$core.pragma('dart2js:noInline')
+  static DeleteContentResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DeleteContentResponse>(
+          DeleteContentResponse.$_createMessage);
+  static DeleteContentResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Content get content => $_getN(0);
+  @$pb.TagNumber(1)
+  set content(Content value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasContent() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearContent() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Content ensureContent() => $_ensure(0);
 }
 
 class CreateContentRequest extends $pb.GeneratedMessage {
@@ -6559,6 +6896,206 @@ class WatchChannelsResponse extends $pb.GeneratedMessage {
   void clearIcon() => $_clearField(6);
   @$pb.TagNumber(6)
   ServerIcon ensureIcon() => $_ensure(5);
+}
+
+/// Экспериментальный контракт первого локального прототипа.
+class ChannelServiceApi {
+  final $pb.RpcClient _client;
+
+  ChannelServiceApi(this._client);
+
+  $async.Future<WatchChannelsResponse> watchChannels(
+          $pb.ClientContext? ctx, WatchChannelsRequest request) =>
+      _client.invoke<WatchChannelsResponse>(ctx, 'ChannelService',
+          'WatchChannels', request, WatchChannelsResponse());
+  $async.Future<ListChannelsResponse> listChannels(
+          $pb.ClientContext? ctx, ListChannelsRequest request) =>
+      _client.invoke<ListChannelsResponse>(ctx, 'ChannelService',
+          'ListChannels', request, ListChannelsResponse());
+  $async.Future<CreateChannelResponse> createChannel(
+          $pb.ClientContext? ctx, CreateChannelRequest request) =>
+      _client.invoke<CreateChannelResponse>(ctx, 'ChannelService',
+          'CreateChannel', request, CreateChannelResponse());
+  $async.Future<UpdateChannelResponse> updateChannel(
+          $pb.ClientContext? ctx, UpdateChannelRequest request) =>
+      _client.invoke<UpdateChannelResponse>(ctx, 'ChannelService',
+          'UpdateChannel', request, UpdateChannelResponse());
+  $async.Future<DeleteChannelResponse> deleteChannel(
+          $pb.ClientContext? ctx, DeleteChannelRequest request) =>
+      _client.invoke<DeleteChannelResponse>(ctx, 'ChannelService',
+          'DeleteChannel', request, DeleteChannelResponse());
+  $async.Future<GetChannelAccessResponse> getChannelAccess(
+          $pb.ClientContext? ctx, GetChannelAccessRequest request) =>
+      _client.invoke<GetChannelAccessResponse>(ctx, 'ChannelService',
+          'GetChannelAccess', request, GetChannelAccessResponse());
+  $async.Future<UpdateChannelAccessResponse> updateChannelAccess(
+          $pb.ClientContext? ctx, UpdateChannelAccessRequest request) =>
+      _client.invoke<UpdateChannelAccessResponse>(ctx, 'ChannelService',
+          'UpdateChannelAccess', request, UpdateChannelAccessResponse());
+  $async.Future<GetManifestResponse> getManifest(
+          $pb.ClientContext? ctx, GetManifestRequest request) =>
+      _client.invoke<GetManifestResponse>(
+          ctx, 'ChannelService', 'GetManifest', request, GetManifestResponse());
+}
+
+class ContentServiceApi {
+  final $pb.RpcClient _client;
+
+  ContentServiceApi(this._client);
+
+  $async.Future<UpdateContentResponse> updateContent(
+          $pb.ClientContext? ctx, UpdateContentRequest request) =>
+      _client.invoke<UpdateContentResponse>(ctx, 'ContentService',
+          'UpdateContent', request, UpdateContentResponse());
+  $async.Future<DeleteContentResponse> deleteContent(
+          $pb.ClientContext? ctx, DeleteContentRequest request) =>
+      _client.invoke<DeleteContentResponse>(ctx, 'ContentService',
+          'DeleteContent', request, DeleteContentResponse());
+  $async.Future<CreateContentResponse> createContent(
+          $pb.ClientContext? ctx, CreateContentRequest request) =>
+      _client.invoke<CreateContentResponse>(ctx, 'ContentService',
+          'CreateContent', request, CreateContentResponse());
+  $async.Future<ListContentResponse> listContent(
+          $pb.ClientContext? ctx, ListContentRequest request) =>
+      _client.invoke<ListContentResponse>(
+          ctx, 'ContentService', 'ListContent', request, ListContentResponse());
+}
+
+class AuthServiceApi {
+  final $pb.RpcClient _client;
+
+  AuthServiceApi(this._client);
+
+  /// Экспериментальный API; требует поддержки stable principal у клиента.
+  $async.Future<CreateRootRotationResponse> createRootRotation(
+          $pb.ClientContext? ctx, CreateRootRotationRequest request) =>
+      _client.invoke<CreateRootRotationResponse>(ctx, 'AuthService',
+          'CreateRootRotation', request, CreateRootRotationResponse());
+  $async.Future<CompleteRootRotationResponse> completeRootRotation(
+          $pb.ClientContext? ctx, CompleteRootRotationRequest request) =>
+      _client.invoke<CompleteRootRotationResponse>(ctx, 'AuthService',
+          'CompleteRootRotation', request, CompleteRootRotationResponse());
+  $async.Future<ProposePairingResponse> proposePairing(
+          $pb.ClientContext? ctx, ProposePairingRequest request) =>
+      _client.invoke<ProposePairingResponse>(ctx, 'AuthService',
+          'ProposePairing', request, ProposePairingResponse());
+  $async.Future<CreatePairingResponse> createPairing(
+          $pb.ClientContext? ctx, CreatePairingRequest request) =>
+      _client.invoke<CreatePairingResponse>(ctx, 'AuthService', 'CreatePairing',
+          request, CreatePairingResponse());
+  $async.Future<InspectPairingResponse> inspectPairing(
+          $pb.ClientContext? ctx, InspectPairingRequest request) =>
+      _client.invoke<InspectPairingResponse>(ctx, 'AuthService',
+          'InspectPairing', request, InspectPairingResponse());
+  $async.Future<PollPairingResponse> pollPairing(
+          $pb.ClientContext? ctx, PollPairingRequest request) =>
+      _client.invoke<PollPairingResponse>(
+          ctx, 'AuthService', 'PollPairing', request, PollPairingResponse());
+  $async.Future<CancelPairingResponse> cancelPairing(
+          $pb.ClientContext? ctx, CancelPairingRequest request) =>
+      _client.invoke<CancelPairingResponse>(ctx, 'AuthService', 'CancelPairing',
+          request, CancelPairingResponse());
+  $async.Future<ClaimPairingResponse> claimPairing(
+          $pb.ClientContext? ctx, ClaimPairingRequest request) =>
+      _client.invoke<ClaimPairingResponse>(
+          ctx, 'AuthService', 'ClaimPairing', request, ClaimPairingResponse());
+  $async.Future<RevokeCurrentDeviceResponse> revokeCurrentDevice(
+          $pb.ClientContext? ctx, RevokeCurrentDeviceRequest request) =>
+      _client.invoke<RevokeCurrentDeviceResponse>(ctx, 'AuthService',
+          'RevokeCurrentDevice', request, RevokeCurrentDeviceResponse());
+  $async.Future<ListDevicesResponse> listDevices(
+          $pb.ClientContext? ctx, ListDevicesRequest request) =>
+      _client.invoke<ListDevicesResponse>(
+          ctx, 'AuthService', 'ListDevices', request, ListDevicesResponse());
+  $async.Future<LogoutResponse> logout(
+          $pb.ClientContext? ctx, LogoutRequest request) =>
+      _client.invoke<LogoutResponse>(
+          ctx, 'AuthService', 'Logout', request, LogoutResponse());
+  $async.Future<CreateChallengeResponse> createChallenge(
+          $pb.ClientContext? ctx, CreateChallengeRequest request) =>
+      _client.invoke<CreateChallengeResponse>(ctx, 'AuthService',
+          'CreateChallenge', request, CreateChallengeResponse());
+  $async.Future<CompleteChallengeResponse> completeChallenge(
+          $pb.ClientContext? ctx, CompleteChallengeRequest request) =>
+      _client.invoke<CompleteChallengeResponse>(ctx, 'AuthService',
+          'CompleteChallenge', request, CompleteChallengeResponse());
+}
+
+class SyncServiceApi {
+  final $pb.RpcClient _client;
+
+  SyncServiceApi(this._client);
+
+  $async.Future<SubscribeResponse> subscribe(
+          $pb.ClientContext? ctx, SubscribeRequest request) =>
+      _client.invoke<SubscribeResponse>(
+          ctx, 'SyncService', 'Subscribe', request, SubscribeResponse());
+  $async.Future<ListEventsResponse> listEvents(
+          $pb.ClientContext? ctx, ListEventsRequest request) =>
+      _client.invoke<ListEventsResponse>(
+          ctx, 'SyncService', 'ListEvents', request, ListEventsResponse());
+}
+
+class AdminServiceApi {
+  final $pb.RpcClient _client;
+
+  AdminServiceApi(this._client);
+
+  $async.Future<ListMembersResponse> listMembers(
+          $pb.ClientContext? ctx, ListMembersRequest request) =>
+      _client.invoke<ListMembersResponse>(
+          ctx, 'AdminService', 'ListMembers', request, ListMembersResponse());
+  $async.Future<UpdateMemberResponse> updateMember(
+          $pb.ClientContext? ctx, UpdateMemberRequest request) =>
+      _client.invoke<UpdateMemberResponse>(
+          ctx, 'AdminService', 'UpdateMember', request, UpdateMemberResponse());
+  $async.Future<CreateInviteResponse> createInvite(
+          $pb.ClientContext? ctx, CreateInviteRequest request) =>
+      _client.invoke<CreateInviteResponse>(
+          ctx, 'AdminService', 'CreateInvite', request, CreateInviteResponse());
+  $async.Future<ListInvitesResponse> listInvites(
+          $pb.ClientContext? ctx, ListInvitesRequest request) =>
+      _client.invoke<ListInvitesResponse>(
+          ctx, 'AdminService', 'ListInvites', request, ListInvitesResponse());
+  $async.Future<RevokeInviteResponse> revokeInvite(
+          $pb.ClientContext? ctx, RevokeInviteRequest request) =>
+      _client.invoke<RevokeInviteResponse>(
+          ctx, 'AdminService', 'RevokeInvite', request, RevokeInviteResponse());
+  $async.Future<GetSetupStatusResponse> getSetupStatus(
+          $pb.ClientContext? ctx, GetSetupStatusRequest request) =>
+      _client.invoke<GetSetupStatusResponse>(ctx, 'AdminService',
+          'GetSetupStatus', request, GetSetupStatusResponse());
+  $async.Future<ClaimOwnerResponse> claimOwner(
+          $pb.ClientContext? ctx, ClaimOwnerRequest request) =>
+      _client.invoke<ClaimOwnerResponse>(
+          ctx, 'AdminService', 'ClaimOwner', request, ClaimOwnerResponse());
+  $async.Future<GetSettingsResponse> getSettings(
+          $pb.ClientContext? ctx, GetSettingsRequest request) =>
+      _client.invoke<GetSettingsResponse>(
+          ctx, 'AdminService', 'GetSettings', request, GetSettingsResponse());
+  $async.Future<UpdateSettingsResponse> updateSettings(
+          $pb.ClientContext? ctx, UpdateSettingsRequest request) =>
+      _client.invoke<UpdateSettingsResponse>(ctx, 'AdminService',
+          'UpdateSettings', request, UpdateSettingsResponse());
+}
+
+class MembershipServiceApi {
+  final $pb.RpcClient _client;
+
+  MembershipServiceApi(this._client);
+
+  $async.Future<PreviewInviteResponse> previewInvite(
+          $pb.ClientContext? ctx, PreviewInviteRequest request) =>
+      _client.invoke<PreviewInviteResponse>(ctx, 'MembershipService',
+          'PreviewInvite', request, PreviewInviteResponse());
+  $async.Future<AcceptInviteResponse> acceptInvite(
+          $pb.ClientContext? ctx, AcceptInviteRequest request) =>
+      _client.invoke<AcceptInviteResponse>(ctx, 'MembershipService',
+          'AcceptInvite', request, AcceptInviteResponse());
+  $async.Future<GetMembershipResponse> getMembership(
+          $pb.ClientContext? ctx, GetMembershipRequest request) =>
+      _client.invoke<GetMembershipResponse>(ctx, 'MembershipService',
+          'GetMembership', request, GetMembershipResponse());
 }
 
 const $core.bool _omitFieldNames =

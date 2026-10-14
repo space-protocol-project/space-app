@@ -85,6 +85,22 @@ class ContentServiceClient {
     request,
     options: options,
   );
+  Future<UpdateContentResponse> updateContent(
+    UpdateContentRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.ContentService.updateContent,
+    request,
+    options: options,
+  );
+  Future<DeleteContentResponse> deleteContent(
+    DeleteContentRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.ContentService.deleteContent,
+    request,
+    options: options,
+  );
   Future<ListContentResponse> listContent(
     ListContentRequest request, {
     RpcOptions? options,

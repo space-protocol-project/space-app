@@ -60,6 +60,9 @@ class ChatHistory {
     for (final message in messages) {
       if (!allowed.contains(message.channelId)) continue;
       final key = '${message.channelId}/${message.id}';
+      if (message.deleted) favorites.remove(key);
+      final previous = entries[key]?.content;
+      if (previous != null && previous.revision > message.revision) continue;
       entries[key] = CachedMessage(
         Content()..mergeFromProto3Json(message.toProto3Json()),
         entries[key]?.receivedAt ?? now.millisecondsSinceEpoch,

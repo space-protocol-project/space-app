@@ -40,6 +40,7 @@ String localFailureText(
   LocalFailureCode.connectRequired => context.strings.failureConnectRequired,
   LocalFailureCode.identityInvalid => context.strings.failureIdentityInvalid,
   LocalFailureCode.addressInvalid => context.strings.failureAddressInvalid,
+  LocalFailureCode.conflict => context.strings.failureConflict,
   LocalFailureCode.operationFailed => context.strings.failureOperationFailed,
   LocalFailureCode.cardCorrupt => context.strings.failureCardCorrupt,
   LocalFailureCode.passwordInvalid => context.strings.failurePasswordInvalid,

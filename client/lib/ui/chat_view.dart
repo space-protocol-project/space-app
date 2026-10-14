@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 
 import '../src/chat_controller.dart';
 import 'message_bubble.dart';
+import 'message_actions.dart';
 import 'favorite_messages.dart';
 import 'space_appearance.dart';
 import 'measure_size.dart';
@@ -359,6 +360,11 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
             ),
           MessageBubble(
             text: message.text,
+            edited: message.updatedAtUnixMs > 0,
+            deleted: message.deleted,
+            actions: controller.canChangeMessage(message)
+                ? MessageActions(controller: controller, message: message)
+                : null,
             author: author,
             mine: mine,
             grouped: grouped,
@@ -372,8 +378,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                 : null,
             accepted: mine,
             favorite: view.isFavorite(message),
-            onToggleFavorite: () =>
-                unawaited(controller.toggleFavorite(message)),
+            onToggleFavorite: message.deleted
+                ? null
+                : () => unawaited(controller.toggleFavorite(message)),
           ),
         ],
       ),

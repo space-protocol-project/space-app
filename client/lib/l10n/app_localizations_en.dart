@@ -10,6 +10,41 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get failureConflict =>
+      'The message has changed. Close the editor and open the latest version; you can copy your text before closing.';
+
+  @override
+  String get messageDeleted => 'Message deleted';
+
+  @override
+  String get messageEdited => 'edited';
+
+  @override
+  String get messageActions => 'Message actions';
+
+  @override
+  String get editMessage => 'Edit';
+
+  @override
+  String get deleteMessage => 'Delete';
+
+  @override
+  String get deleteMessageConfirm =>
+      'Delete this message for everyone? This cannot be undone.';
+
+  @override
+  String get saveMessage => 'Save';
+
+  @override
+  String get cancelMessageChange => 'Cancel';
+
+  @override
+  String get messageText => 'Message text';
+
+  @override
+  String get messageTextInvalid => 'Enter text up to 4096 bytes.';
+
+  @override
   String get interfaceScale => 'Interface scale';
 
   @override

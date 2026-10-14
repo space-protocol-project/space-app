@@ -146,6 +146,40 @@ extension type ChannelServiceClient (connect.Transport _transport) {
   }
 }
 extension type ContentServiceClient (connect.Transport _transport) {
+  Future<spacev1space.UpdateContentResponse> updateContent(
+    spacev1space.UpdateContentRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ContentService.updateContent,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1space.DeleteContentResponse> deleteContent(
+    spacev1space.DeleteContentRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ContentService.deleteContent,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
   Future<spacev1space.CreateContentResponse> createContent(
     spacev1space.CreateContentRequest input, {
     connect.Headers? headers,

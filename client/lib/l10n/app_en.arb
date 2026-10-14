@@ -1,4 +1,16 @@
 {
+  "failureConflict": "The message has changed. Close the editor and open the latest version; you can copy your text before closing.",
+  "messageDeleted": "Message deleted",
+  "messageEdited": "edited",
+  "messageActions": "Message actions",
+  "editMessage": "Edit",
+  "deleteMessage": "Delete",
+  "deleteMessageConfirm": "Delete this message for everyone? This cannot be undone.",
+  "saveMessage": "Save",
+  "cancelMessageChange": "Cancel",
+  "messageText": "Message text",
+  "messageTextInvalid": "Enter text up to 4096 bytes.",
+
   "interfaceScale": "Interface scale",
   "@@locale": "en",
   "overview": "Overview",

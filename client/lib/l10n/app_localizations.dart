@@ -101,6 +101,72 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @failureConflict.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщение уже изменено. Закройте редактор и откройте актуальную версию; ваш текст можно скопировать перед закрытием.'**
+  String get failureConflict;
+
+  /// No description provided for @messageDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщение удалено'**
+  String get messageDeleted;
+
+  /// No description provided for @messageEdited.
+  ///
+  /// In ru, this message translates to:
+  /// **'изменено'**
+  String get messageEdited;
+
+  /// No description provided for @messageActions.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действия с сообщением'**
+  String get messageActions;
+
+  /// No description provided for @editMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Редактировать'**
+  String get editMessage;
+
+  /// No description provided for @deleteMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить'**
+  String get deleteMessage;
+
+  /// No description provided for @deleteMessageConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить сообщение для всех участников? Это действие нельзя отменить.'**
+  String get deleteMessageConfirm;
+
+  /// No description provided for @saveMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить'**
+  String get saveMessage;
+
+  /// No description provided for @cancelMessageChange.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отмена'**
+  String get cancelMessageChange;
+
+  /// No description provided for @messageText.
+  ///
+  /// In ru, this message translates to:
+  /// **'Текст сообщения'**
+  String get messageText;
+
+  /// No description provided for @messageTextInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите текст длиной до 4096 байт.'**
+  String get messageTextInvalid;
+
   /// No description provided for @interfaceScale.
   ///
   /// In ru, this message translates to:

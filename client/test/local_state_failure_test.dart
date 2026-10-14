@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:space_client/l10n/app_localizations.dart';
 import 'package:space_client/src/chat_controller.dart';
 import 'package:space_client/src/core.dart';
@@ -72,6 +73,7 @@ void main() {
   testWidgets('Ошибка чтения позиций переводится без потери канала и сессии', (
     tester,
   ) async {
+    SharedPreferences.setMockInitialValues({});
     final session = ChannelSession();
     final controller =
         ChatController(

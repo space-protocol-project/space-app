@@ -15,11 +15,15 @@ class MessageBubble extends StatelessWidget {
     this.accepted = false,
     this.favorite = false,
     this.onToggleFavorite,
+    this.actions,
+    this.edited = false,
+    this.deleted = false,
   });
   final String text, author;
   final bool mine, grouped, accepted;
   final DateTime? sentAt;
-  final bool favorite;
+  final bool favorite, edited, deleted;
+  final Widget? actions;
   final VoidCallback? onToggleFavorite;
 
   @override
@@ -75,15 +79,37 @@ class MessageBubble extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                       ],
-                      MessageMarkdown(text: text),
+                      if (deleted)
+                        Text(
+                          context.strings.messageDeleted,
+                          style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            color: colors.onSurfaceVariant,
+                          ),
+                        )
+                      else
+                        MessageMarkdown(text: text),
                       if (sentAt != null ||
                           accepted ||
-                          onToggleFavorite != null)
+                          onToggleFavorite != null ||
+                          actions != null ||
+                          edited)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              ?actions,
+                              if (edited && !deleted) ...[
+                                Text(
+                                  context.strings.messageEdited,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: colors.onSurfaceVariant,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                              ],
                               if (onToggleFavorite != null)
                                 IconButton(
                                   tooltip: favorite

@@ -10,6 +10,39 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get failureConflict => '消息已更改。请关闭编辑器并打开最新版本；关闭前可以复制您输入的文本。';
+
+  @override
+  String get messageDeleted => '消息已删除';
+
+  @override
+  String get messageEdited => '已编辑';
+
+  @override
+  String get messageActions => '消息操作';
+
+  @override
+  String get editMessage => '编辑';
+
+  @override
+  String get deleteMessage => '删除';
+
+  @override
+  String get deleteMessageConfirm => '为所有成员删除此消息？此操作无法撤销。';
+
+  @override
+  String get saveMessage => '保存';
+
+  @override
+  String get cancelMessageChange => '取消';
+
+  @override
+  String get messageText => '消息内容';
+
+  @override
+  String get messageTextInvalid => '请输入不超过4096字节的文本。';
+
+  @override
   String get interfaceScale => '界面缩放';
 
   @override

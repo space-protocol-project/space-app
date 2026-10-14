@@ -389,6 +389,11 @@ abstract interface class LiveSession {
   Future<void> close();
 }
 
+abstract interface class MessageChanges {
+  Future<Content> updateMessage(Content message, String text);
+  Future<Content> deleteMessage(Content message);
+}
+
 abstract interface class SpacePresentation {
   String get spaceTitle;
   String get chatTitle;
@@ -447,6 +452,7 @@ abstract interface class ServerIconPresentation {
 class SpaceSession
     implements
         LiveSession,
+        MessageChanges,
         SpacePresentation,
         ServerIconPresentation,
         SpaceAccess,
@@ -1212,6 +1218,35 @@ class SpaceSession
     await _ensureSession();
     final result = await ContentServiceClient(channel).createContent(
       CreateContentRequest(channelId: id, text: text, idempotencyKey: key),
+      options: _options,
+    );
+    return result.content;
+  }
+
+  @override
+  Future<Content> updateMessage(Content message, String text) async {
+    await _ensureSession();
+    final result = await ContentServiceClient(channel).updateContent(
+      UpdateContentRequest(
+        channelId: message.channelId,
+        id: message.id,
+        text: text,
+        expectedRevision: message.revision,
+      ),
+      options: _options,
+    );
+    return result.content;
+  }
+
+  @override
+  Future<Content> deleteMessage(Content message) async {
+    await _ensureSession();
+    final result = await ContentServiceClient(channel).deleteContent(
+      DeleteContentRequest(
+        channelId: message.channelId,
+        id: message.id,
+        expectedRevision: message.revision,
+      ),
       options: _options,
     );
     return result.content;

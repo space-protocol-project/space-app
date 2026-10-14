@@ -88,3 +88,10 @@ final class ChatCatalogFailed extends ChatEvent<bool> {
   final int generation;
   final Object error;
 }
+
+final class ChatMessageChanged extends ChatEvent<bool> {
+  ChatMessageChanged(Content message, this.text)
+    : message = message.deepCopy()..freeze();
+  final Content message;
+  final String? text;
+}

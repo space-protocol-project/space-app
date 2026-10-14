@@ -1,4 +1,16 @@
 {
+  "failureConflict": "消息已更改。请关闭编辑器并打开最新版本；关闭前可以复制您输入的文本。",
+  "messageDeleted": "消息已删除",
+  "messageEdited": "已编辑",
+  "messageActions": "消息操作",
+  "editMessage": "编辑",
+  "deleteMessage": "删除",
+  "deleteMessageConfirm": "为所有成员删除此消息？此操作无法撤销。",
+  "saveMessage": "保存",
+  "cancelMessageChange": "取消",
+  "messageText": "消息内容",
+  "messageTextInvalid": "请输入不超过4096字节的文本。",
+
   "interfaceScale": "界面缩放",
   "@@locale": "zh",
   "overview": "概览",

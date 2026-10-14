@@ -1,4 +1,16 @@
 {
+  "failureConflict": "Сообщение уже изменено. Закройте редактор и откройте актуальную версию; ваш текст можно скопировать перед закрытием.",
+  "messageDeleted": "Сообщение удалено",
+  "messageEdited": "изменено",
+  "messageActions": "Действия с сообщением",
+  "editMessage": "Редактировать",
+  "deleteMessage": "Удалить",
+  "deleteMessageConfirm": "Удалить сообщение для всех участников? Это действие нельзя отменить.",
+  "saveMessage": "Сохранить",
+  "cancelMessageChange": "Отмена",
+  "messageText": "Текст сообщения",
+  "messageTextInvalid": "Введите текст длиной до 4096 байт.",
+
   "interfaceScale": "Масштаб интерфейса",
   "@@locale": "ru",
   "overview": "Обзор",

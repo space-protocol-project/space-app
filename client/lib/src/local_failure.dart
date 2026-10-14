@@ -34,6 +34,7 @@ enum LocalFailureCode {
   identityInvalid,
   addressInvalid,
   operationFailed,
+  conflict,
   cardCorrupt,
   passwordInvalid,
   cardTooLarge,
@@ -74,6 +75,7 @@ LocalFailureCode classifyFailure(Object problem) {
   }
   if (problem is GrpcError) {
     return switch (problem.code) {
+      StatusCode.aborted => LocalFailureCode.conflict,
       StatusCode.permissionDenied => LocalFailureCode.permissionDenied,
       StatusCode.unauthenticated => LocalFailureCode.unauthenticated,
       StatusCode.resourceExhausted => LocalFailureCode.serverLimit,

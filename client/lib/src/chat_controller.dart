@@ -88,6 +88,10 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     on<ChatMessageSent>(
       (event, _) => handleRequest(event, () => _send(event.text)),
     );
+    on<ChatMessageChanged>(
+      (event, _) =>
+          handleRequest(event, () => _changeMessage(event.message, event.text)),
+    );
     on<ChatDeviceRevoked>((event, _) => handleRequest(event, _revoke));
     on<ChatDisconnected>((event, _) => handleRequest(event, _disconnect));
   }
@@ -126,6 +130,19 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   Future<void> selectChannel(String id) => sendRequest(ChatChannelSelected(id));
   Future<void> refreshChannels() => sendRequest(ChatChannelsRefreshed());
   Future<bool> send(String text) => sendRequest(ChatMessageSent(text));
+  Future<bool> updateMessage(Content message, String text) =>
+      sendRequest(ChatMessageChanged(message, text));
+  Future<bool> deleteMessage(Content message) =>
+      sendRequest(ChatMessageChanged(message, null));
+  bool canChangeMessage(Content message) =>
+      canWrite &&
+      !busy &&
+      _session is MessageChanges &&
+      !message.deleted &&
+      message.revision > 0 &&
+      message.authorId == principalId &&
+      message.channelId == channelId;
+
   Future<void> revoke() => sendRequest(ChatDeviceRevoked());
   Future<void> disconnect() => sendRequest(ChatDisconnected());
 
@@ -361,6 +378,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   Future<void> _toggleFavorite(Content message) async {
     if (accessRemoved ||
         !canRead ||
+        message.deleted ||
         message.channelId != channelId ||
         !messages.any((value) => value.id == message.id)) {
       return;
@@ -647,6 +665,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       _stopCatalog();
       await _session?.close();
       _session = null;
+      await _restoreHistory(server.origin.toString());
       final session = await _openChatSession(
         server,
         restoredRecord,
@@ -1009,7 +1028,11 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
 
   void _validateContentFrame(SubscribeResponse frame, String watchedChannel) {
     if (!frame.hasEvent() ||
-        frame.event.type != 'content.created' ||
+        ![
+          'content.created',
+          'content.updated',
+          'content.deleted',
+        ].contains(frame.event.type) ||
         !frame.event.hasContent() ||
         frame.event.content.channelId != watchedChannel ||
         frame.event.content.id.isEmpty ||
@@ -1037,7 +1060,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       return _streamChannelAvailable(watchedChannel);
     }
     _validateContentFrame(frame, watchedChannel);
-    _messages[frame.event.content.id] = frame.event.content;
+    _mergeMessage(frame.event.content);
     cursor = frame.cursor;
     _cursors[watchedChannel] = cursor;
     _queuePositions();
@@ -1178,6 +1201,55 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
           ].contains(problem.code);
   MessageSendStatus sendStatus = MessageSendStatus.idle;
 
+  void _mergeMessage(Content message) {
+    final previous = _messages[message.id];
+    if (previous != null && previous.revision > message.revision) return;
+    _messages[message.id] = message;
+    if (message.deleted) {
+      _history?.favorites.remove('${message.channelId}/${message.id}');
+    }
+  }
+
+  Future<bool> _changeMessage(Content message, String? text) async {
+    final session = _session;
+    if (!canChangeMessage(message) ||
+        session == null ||
+        session is! MessageChanges) {
+      return false;
+    }
+    final changes = session as MessageChanges;
+    final startingChannel = channelId;
+    busy = true;
+    error = '';
+    _update();
+    try {
+      final result = text == null
+          ? await changes.deleteMessage(message)
+          : await changes.updateMessage(message, text);
+      if (!identical(session, _session) || channelId != startingChannel) {
+        return false;
+      }
+      if (result.id != message.id || result.channelId != startingChannel) {
+        throw const LocalFailure(
+          LocalFailureCode.protocolInvalid,
+          'Неверное сообщение в ответе',
+        );
+      }
+      _mergeMessage(result);
+      return true;
+    } catch (problem) {
+      if (!identical(session, _session) || channelId != startingChannel) {
+        return false;
+      }
+      if (await _channelDenied(problem)) return false;
+      error = _explain(problem);
+      return false;
+    } finally {
+      busy = false;
+      _update();
+    }
+  }
+
   Future<bool> _send(String text) async {
     final session = _session;
     if (busy ||
@@ -1208,7 +1280,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
           'Ответ другого канала',
         );
       }
-      _messages[content.id] = content;
+      _mergeMessage(content);
       _pendingKey = '';
       _pendingText = '';
       sendStatus = MessageSendStatus.accepted;

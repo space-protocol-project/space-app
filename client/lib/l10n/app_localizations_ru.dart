@@ -10,6 +10,41 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
+  String get failureConflict =>
+      'Сообщение уже изменено. Закройте редактор и откройте актуальную версию; ваш текст можно скопировать перед закрытием.';
+
+  @override
+  String get messageDeleted => 'Сообщение удалено';
+
+  @override
+  String get messageEdited => 'изменено';
+
+  @override
+  String get messageActions => 'Действия с сообщением';
+
+  @override
+  String get editMessage => 'Редактировать';
+
+  @override
+  String get deleteMessage => 'Удалить';
+
+  @override
+  String get deleteMessageConfirm =>
+      'Удалить сообщение для всех участников? Это действие нельзя отменить.';
+
+  @override
+  String get saveMessage => 'Сохранить';
+
+  @override
+  String get cancelMessageChange => 'Отмена';
+
+  @override
+  String get messageText => 'Текст сообщения';
+
+  @override
+  String get messageTextInvalid => 'Введите текст длиной до 4096 байт.';
+
+  @override
   String get interfaceScale => 'Масштаб интерфейса';
 
   @override
