@@ -21,6 +21,48 @@ class NetworkCounter extends HttpOverrides {
 }
 
 void main() {
+  testWidgets('Markdown выделяется и копируется целиком между абзацами', (
+    tester,
+  ) async {
+    String? copied;
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+          if (call.method == 'Clipboard.setData') {
+            copied = (call.arguments as Map)['text'] as String?;
+          }
+          if (call.method == 'Clipboard.getData') return {'text': copied};
+          return null;
+        });
+    addTearDown(
+      () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null),
+    );
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: MessageBubble(
+            text: '**Первое** слово\n\nВторой абзац.',
+            author: 'A',
+            mine: false,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.longPress(
+      find.textContaining('Первое', findRichText: true).first,
+    );
+    await tester.pumpAndSettle();
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyC);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pumpAndSettle();
+    expect(copied, contains('Первое слово'));
+    expect(copied, contains('Второй абзац.'));
+    expect(copied, isNot(contains('**')));
+    expect(tester.takeException(), isNull);
+  });
   for (final shift in [false, true]) {
     testWidgets('Отправка Enter/Shift+Enter: $shift', (tester) async {
       final session = Session();

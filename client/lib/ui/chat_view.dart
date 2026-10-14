@@ -52,6 +52,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   String entryReadThrough = '';
   bool foreground = true, jumping = false;
   bool previewVisible = false;
+  bool readCheckPending = false;
   @override
   void initState() {
     super.initState();
@@ -61,7 +62,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         WidgetsBinding.instance.lifecycleState == null ||
         WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
     WidgetsBinding.instance.addObserver(this);
-    scroll.addListener(markRead);
+    scroll.addListener(queueReadCheck);
   }
 
   @override
@@ -83,6 +84,16 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       draft.text = drafts[scope] ?? '';
       restoreScroll = true;
     }
+  }
+
+  void queueReadCheck() {
+    if (scroll.hasClients) offsets[scope] = scroll.offset;
+    if (readCheckPending) return;
+    readCheckPending = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      readCheckPending = false;
+      if (mounted) markRead();
+    });
   }
 
   void markRead() {
@@ -470,7 +481,15 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     final controller = widget.controller;
     final view = controller.state;
     final favorites = view.messages.where(view.isFavorite).toList();
-    if (view.messages.isEmpty) return _emptyMessageArea(context);
+    if (view.messages.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.only(
+          top: widget.topInset,
+          bottom: composerHeight + 36,
+        ),
+        child: _emptyMessageArea(context),
+      );
+    }
     return Stack(
       children: [
         Padding(

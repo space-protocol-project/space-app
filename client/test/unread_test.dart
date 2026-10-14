@@ -3,6 +3,8 @@ import 'package:flutter/material.dart' hide View;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/generated/space/v1/space.pb.dart';
 import 'package:space_client/ui/chat_view.dart';
+import 'package:space_client/ui/message_bubble.dart';
+import 'package:space_client/ui/measure_size.dart';
 
 import 'channels_test.dart'
     show CatalogSession, MemoryPositions, connected, chat, settle;
@@ -48,6 +50,66 @@ class LongSession extends SequencedSession {
 }
 
 void main() {
+  testWidgets(
+    'Прочтение учитывает заголовок и плавающее поле после прокрутки',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 700);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final controller = await tester.runAsync(
+        () => connected(LongSession(), MemoryPositions()),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ChatView(
+              controller: controller!,
+              openConnection: () {},
+              topInset: 120,
+              showHeader: false,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final history = find.descendant(
+        of: find.byType(ChatView),
+        matching: find.byType(ListView),
+      );
+      for (var step = 0; step < 3; step++) {
+        if (step > 0) await tester.drag(history, const Offset(0, -180));
+        await tester.pumpAndSettle();
+        final top = tester.getRect(find.byType(ChatView)).top + 120;
+        final bottom = tester.getRect(find.byType(MeasureSize)).top - 8;
+        final rows = find.descendant(
+          of: find.byType(ChatView),
+          matching: find.byWidgetPredicate(
+            (widget) => widget is Padding && widget.key is GlobalKey,
+          ),
+        );
+        final visible = <int>[];
+        for (final row in rows.evaluate()) {
+          final rect = tester.getRect(find.byWidget(row.widget));
+          if (rect.top < top || rect.bottom > bottom) continue;
+          final bubble = find.descendant(
+            of: find.byWidget(row.widget),
+            matching: find.byType(MessageBubble),
+          );
+          final text = tester.widget<MessageBubble>(bubble).text;
+          visible.add(
+            int.parse(RegExp(r'Сообщение (\d+):').firstMatch(text)!.group(1)!),
+          );
+        }
+        expect(visible, isNotEmpty);
+        expect(controller.readSequence('general'), visible.last);
+        expect(tester.takeException(), isNull);
+      }
+      await tester.pumpWidget(const SizedBox());
+      await tester.runAsync(controller.disconnect);
+      controller.dispose();
+    },
+  );
   testWidgets('Диалог поверх чата не отмечает новое сообщение прочитанным', (
     tester,
   ) async {

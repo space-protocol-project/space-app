@@ -10,46 +10,48 @@ class MessageMarkdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return MarkdownBody(
-      data: text,
-      selectable: true,
-      softLineBreak: true,
-      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-        p: TextStyle(fontSize: 15, height: 1.45, color: colors.onSurface),
-        code: TextStyle(
-          fontFamily: 'JetBrains Mono',
-          fontSize: 13,
-          color: colors.onSurface,
+    return SelectionArea(
+      child: MarkdownBody(
+        data: text,
+        selectable: false,
+        softLineBreak: true,
+        styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+          p: TextStyle(fontSize: 15, height: 1.45, color: colors.onSurface),
+          code: TextStyle(
+            fontFamily: 'JetBrains Mono',
+            fontSize: 13,
+            color: colors.onSurface,
+          ),
+          a: TextStyle(
+            color: colors.primary,
+            decoration: TextDecoration.underline,
+          ),
+          codeblockDecoration: BoxDecoration(
+            color: colors.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
-        a: TextStyle(
-          color: colors.primary,
-          decoration: TextDecoration.underline,
+        // Внешние изображения не загружаются автоматически из чужого сообщения.
+        imageBuilder: (_, _, alt) => Text(
+          alt?.isNotEmpty == true ? '🖼 $alt' : '🖼',
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
         ),
-        codeblockDecoration: BoxDecoration(
-          color: colors.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(8),
-        ),
+        onTapLink: (_, href, _) {
+          final uri = Uri.tryParse(href ?? '');
+          if (uri != null &&
+              ['https', 'http'].contains(uri.scheme) &&
+              uri.host.isNotEmpty &&
+              uri.userInfo.isEmpty) {
+            unawaited(
+              launchUrl(
+                uri,
+                mode: LaunchMode.externalApplication,
+              ).catchError((_) => false),
+            );
+          }
+        },
       ),
-      // Внешние изображения не загружаются автоматически из чужого сообщения.
-      imageBuilder: (_, _, alt) => Text(
-        alt?.isNotEmpty == true ? '🖼 $alt' : '🖼',
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-      ),
-      onTapLink: (_, href, _) {
-        final uri = Uri.tryParse(href ?? '');
-        if (uri != null &&
-            ['https', 'http'].contains(uri.scheme) &&
-            uri.host.isNotEmpty &&
-            uri.userInfo.isEmpty) {
-          unawaited(
-            launchUrl(
-              uri,
-              mode: LaunchMode.externalApplication,
-            ).catchError((_) => false),
-          );
-        }
-      },
     );
   }
 }
