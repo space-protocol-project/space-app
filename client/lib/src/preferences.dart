@@ -95,22 +95,25 @@ class AppPreferences
       final saved = data.getString('space.ui.palette');
       if (['gruvbox', 'ocean', 'iris'].contains(saved)) palette = saved!;
       origins.addAll(data.getStringList('space.ui.origins') ?? []);
-      final icons = data.getString('space.server.icons');
-      if (icons != null && icons.length < 2 * 1024 * 1024) {
-        try {
-          final decoded = jsonDecode(icons);
-          if (decoded is Map) {
-            for (final origin in origins) {
-              final icon = validatedServerIcon(decoded[origin]);
-              if (icon != null) serverIcons[origin] = icon;
-            }
-          }
-        } catch (_) {}
-      }
+      _loadServerIcons(data.getString('space.server.icons'));
     } catch (_) {
       error = 'Не удалось загрузить настройки оформления.';
     }
     if (!_disposed) publishState();
+  }
+
+  void _loadServerIcons(String? icons) {
+    if (icons != null && icons.length < 2 * 1024 * 1024) {
+      try {
+        final decoded = jsonDecode(icons);
+        if (decoded is Map) {
+          for (final origin in origins) {
+            final icon = validatedServerIcon(decoded[origin]);
+            if (icon != null) serverIcons[origin] = icon;
+          }
+        }
+      } catch (_) {}
+    }
   }
 
   Future<void> _change({
@@ -186,19 +189,22 @@ class AppPreferences
     }
   }
 
+  Color _tone(int darkColor, int lightColor) =>
+      Color(dark ? darkColor : lightColor);
+
   ThemeData get theme {
     final brightness = dark ? Brightness.dark : Brightness.light;
     final primary = switch (palette) {
-      'ocean' => dark ? const Color(0xFF83A598) : const Color(0xFF076678),
-      'iris' => dark ? const Color(0xFFD3869B) : const Color(0xFF8F3F71),
-      _ => dark ? const Color(0xFFFABD2F) : const Color(0xFF9D6000),
+      'ocean' => _tone(0xFF83A598, 0xFF076678),
+      'iris' => _tone(0xFFD3869B, 0xFF8F3F71),
+      _ => _tone(0xFFFABD2F, 0xFF9D6000),
     };
-    final background = dark ? const Color(0xFF1D2021) : const Color(0xFFFBF1C7);
-    final surface = dark ? const Color(0xFF32302F) : const Color(0xFFF9F5D7);
-    final text = dark ? const Color(0xFFEBDBB2) : const Color(0xFF3C3836);
-    final sidebar = dark ? const Color(0xFF282828) : const Color(0xFFF2E5BC);
-    final soft = dark ? const Color(0xFF3C3836) : const Color(0xFFEBDBB2);
-    final raised = dark ? const Color(0xFF504945) : const Color(0xFFD5C4A1);
+    final background = _tone(0xFF1D2021, 0xFFFBF1C7);
+    final surface = _tone(0xFF32302F, 0xFFF9F5D7);
+    final text = _tone(0xFFEBDBB2, 0xFF3C3836);
+    final sidebar = _tone(0xFF282828, 0xFFF2E5BC);
+    final soft = _tone(0xFF3C3836, 0xFFEBDBB2);
+    final raised = _tone(0xFF504945, 0xFFD5C4A1);
     final scheme = ColorScheme.fromSeed(
       seedColor: primary,
       brightness: brightness,
@@ -220,14 +226,12 @@ class AppPreferences
       tertiaryContainer: soft,
       onTertiaryContainer: text,
       onSurface: text,
-      secondary: dark ? const Color(0xFFB8BB26) : const Color(0xFF427B58),
+      secondary: _tone(0xFFB8BB26, 0xFF427B58),
       onSecondary: background,
-      onSurfaceVariant: dark
-          ? const Color(0xFFBDAE93)
-          : const Color(0xFF665C54),
-      outline: dark ? const Color(0xFF928374) : const Color(0xFF7C6F64),
-      outlineVariant: dark ? const Color(0xFF504945) : const Color(0xFFD5C4A1),
-      error: dark ? const Color(0xFFFB4934) : const Color(0xFF9D0006),
+      onSurfaceVariant: _tone(0xFFBDAE93, 0xFF665C54),
+      outline: _tone(0xFF928374, 0xFF7C6F64),
+      outlineVariant: _tone(0xFF504945, 0xFFD5C4A1),
+      error: _tone(0xFFFB4934, 0xFF9D0006),
     );
     final theme = ThemeData(
       useMaterial3: true,

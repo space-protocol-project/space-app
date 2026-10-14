@@ -65,33 +65,10 @@ Future<void> verifyHomeBackup(Directory backup, HomeRelease release) async {
         !files.containsKey('data/database-password')) {
       throw invalidHomeBackup;
     }
-    final actualFiles = <String>{}, actualDirectories = <String>{};
-    await for (final entry in backup.list(
-      recursive: true,
-      followLinks: false,
-    )) {
-      final name = entry.absolute.uri.path
-          .substring(backup.absolute.uri.path.length)
-          .replaceFirst(RegExp(r'/$'), '');
-      if (name == 'backup.json') continue;
-      if (entry is Directory) {
-        actualDirectories.add(name);
-      } else if (entry is File) {
-        actualFiles.add(name);
-        final expected = files[name];
-        if (expected is! String ||
-            !RegExp(r'^[0-9a-f]{64}$').hasMatch(expected) ||
-            (await sha256.bind(entry.openRead()).first).toString() !=
-                expected) {
-          throw invalidHomeBackup;
-        }
-      } else {
-        throw invalidHomeBackup;
-      }
-      if (actualFiles.length + actualDirectories.length > 100000) {
-        throw invalidHomeBackup;
-      }
-    }
+    final (actualFiles, actualDirectories) = await _verifyBackupEntries(
+      backup,
+      files,
+    );
     if (actualFiles.length != files.length ||
         actualDirectories.length != directories.length ||
         !actualDirectories.containsAll(directories)) {
@@ -100,4 +77,34 @@ Future<void> verifyHomeBackup(Directory backup, HomeRelease release) async {
   } catch (_) {
     throw invalidHomeBackup;
   }
+}
+
+Future<(Set<String>, Set<String>)> _verifyBackupEntries(
+  Directory backup,
+  Map<String, dynamic> files,
+) async {
+  final actualFiles = <String>{}, actualDirectories = <String>{};
+  await for (final entry in backup.list(recursive: true, followLinks: false)) {
+    final name = entry.absolute.uri.path
+        .substring(backup.absolute.uri.path.length)
+        .replaceFirst(RegExp(r'/$'), '');
+    if (name == 'backup.json') continue;
+    if (entry is Directory) {
+      actualDirectories.add(name);
+    } else if (entry is File) {
+      actualFiles.add(name);
+      final expected = files[name];
+      if (expected is! String ||
+          !RegExp(r'^[0-9a-f]{64}$').hasMatch(expected) ||
+          (await sha256.bind(entry.openRead()).first).toString() != expected) {
+        throw invalidHomeBackup;
+      }
+    } else {
+      throw invalidHomeBackup;
+    }
+    if (actualFiles.length + actualDirectories.length > 100000) {
+      throw invalidHomeBackup;
+    }
+  }
+  return (actualFiles, actualDirectories);
 }

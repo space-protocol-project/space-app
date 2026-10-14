@@ -291,49 +291,7 @@ class HomeUpdateExecutor {
       record = await journal.advance(record.id, HomeUpdateStep.restoring);
     }
     if (record.step == HomeUpdateStep.restoring) {
-      final restore = Directory('${root.path}/${record.restorePath}');
-      final restoredData = Directory('${restore.path}/data');
-      final failed = Directory('${root.path}/failed-data/${record.id}');
-      final current = Directory(data);
-      if (!await restore.exists()) {
-        await verifyHomeBackup(
-          Directory('${root.path}/${record.backupPath}'),
-          record.target,
-        );
-        await storage.check(
-          root,
-          dataCopies: 0,
-          additionalBytes: await homeDirectoryBytes(
-            Directory('${root.path}/${record.backupPath}/data'),
-          ),
-        );
-        await tool(runtime, [
-          '-home-restore',
-          '${root.path}/${record.backupPath}',
-          '-home-restore-to',
-          restore.path,
-          '-home-runtime',
-          runtime.path,
-        ]);
-      }
-      if (await restoredData.exists()) {
-        _sameBaseline(baseline, await _check(runtime, restoredData.path));
-        if (!await failed.exists()) {
-          await tool(runtime, _arguments(runtime, '-home-stopped', data));
-          await failed.parent.create(recursive: true);
-          await current.rename(failed.path);
-        } else if (await current.exists()) {
-          throw HomeUpdateJournal.pending;
-        }
-        await restoredData.rename(data);
-      } else if (!await failed.exists() || !await current.exists()) {
-        throw const LocalFailure(
-          LocalFailureCode.homeRecoveryInvalid,
-          'Каталоги восстановления находятся в неоднозначном состоянии',
-        );
-      }
-      _sameBaseline(baseline, await _check(runtime, data));
-      await journal.advance(record.id, HomeUpdateStep.restored);
+      await _restoreBackup(record, runtime, baseline);
     }
     final restoredCheck = await _check(runtime, data);
     _sameIdentity(baseline, restoredCheck);
@@ -342,5 +300,55 @@ class HomeUpdateExecutor {
     }
     await installation.activate(record.target, record.source);
     await journal.advance(record.id, HomeUpdateStep.completeRestored);
+  }
+
+  Future<void> _restoreBackup(
+    HomeUpdateRecord record,
+    Directory runtime,
+    Map<String, dynamic> baseline,
+  ) async {
+    final restore = Directory('${root.path}/${record.restorePath}');
+    final restoredData = Directory('${restore.path}/data');
+    final failed = Directory('${root.path}/failed-data/${record.id}');
+    final current = Directory(data);
+    if (!await restore.exists()) {
+      await verifyHomeBackup(
+        Directory('${root.path}/${record.backupPath}'),
+        record.target,
+      );
+      await storage.check(
+        root,
+        dataCopies: 0,
+        additionalBytes: await homeDirectoryBytes(
+          Directory('${root.path}/${record.backupPath}/data'),
+        ),
+      );
+      await tool(runtime, [
+        '-home-restore',
+        '${root.path}/${record.backupPath}',
+        '-home-restore-to',
+        restore.path,
+        '-home-runtime',
+        runtime.path,
+      ]);
+    }
+    if (await restoredData.exists()) {
+      _sameBaseline(baseline, await _check(runtime, restoredData.path));
+      if (!await failed.exists()) {
+        await tool(runtime, _arguments(runtime, '-home-stopped', data));
+        await failed.parent.create(recursive: true);
+        await current.rename(failed.path);
+      } else if (await current.exists()) {
+        throw HomeUpdateJournal.pending;
+      }
+      await restoredData.rename(data);
+    } else if (!await failed.exists() || !await current.exists()) {
+      throw const LocalFailure(
+        LocalFailureCode.homeRecoveryInvalid,
+        'Каталоги восстановления находятся в неоднозначном состоянии',
+      );
+    }
+    _sameBaseline(baseline, await _check(runtime, data));
+    await journal.advance(record.id, HomeUpdateStep.restored);
   }
 }

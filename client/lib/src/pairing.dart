@@ -100,50 +100,13 @@ class PendingPairing {
     return response;
   }
 
-  Future<DeviceRecord> verifiedRecord(PollPairingResponse response) async {
-    final history = response.rootHistory
-        .map(
-          (v) => <String, dynamic>{
-            'transcript': url64(v.transcript),
-            'old_signature': url64(v.oldSignature),
-            'new_signature': url64(v.newSignature),
-          },
-        )
-        .toList();
-    final identity = await verifyRootHistory(
-      history,
-      response.rootPublicKey,
-      server.origin.toString(),
-      server.serverId,
-    );
-    final p = response.pairing, expected = request.pairing;
-    if (p.id != expected.id ||
-        p.state != 'approved' ||
-        p.expiresAt != expected.expiresAt ||
-        p.createdAt != expected.createdAt ||
-        p.administrative != expected.administrative ||
-        url64(p.publicKey) != url64(expected.publicKey) ||
-        p.expiresAt.toInt() <= DateTime.now().millisecondsSinceEpoch ~/ 1000 ||
-        response.rootPublicKey.length != 32 ||
-        proposedRoot == null ||
-        url64(proposedRoot!) != url64(response.rootPublicKey) ||
-        response.signature.length != 64) {
-      throw const LocalFailure(
-        LocalFailureCode.identityInvalid,
-        'Сопряжение изменено или истекло',
-      );
-    }
-    final transcript =
-        jsonDecode(utf8.decode(response.transcript)) as Map<String, dynamic>;
-    if (transcript['grant_id'] != response.grantId ||
-        (transcript['issued_at'] as int) < p.createdAt.toInt() - 5 ||
-        (transcript['issued_at'] as int) >= p.expiresAt.toInt()) {
-      throw const LocalFailure(
-        LocalFailureCode.identityInvalid,
-        'Подтверждение не относится к запросу',
-      );
-    }
-    final delegated = transcript['purpose'] == 'device.delegate';
+  Future<List<int>> _pairingSigner(
+    PollPairingResponse response,
+    Map<String, dynamic> transcript,
+    Pairing p,
+    RootIdentity identity,
+    bool delegated,
+  ) async {
     List<int> signer = response.rootPublicKey;
     if (delegated) {
       if (response.parentTranscript.isEmpty ||
@@ -217,6 +180,60 @@ class PendingPairing {
         'Неожиданная цепочка подписи',
       );
     }
+    return signer;
+  }
+
+  Future<DeviceRecord> verifiedRecord(PollPairingResponse response) async {
+    final history = response.rootHistory
+        .map(
+          (v) => <String, dynamic>{
+            'transcript': url64(v.transcript),
+            'old_signature': url64(v.oldSignature),
+            'new_signature': url64(v.newSignature),
+          },
+        )
+        .toList();
+    final identity = await verifyRootHistory(
+      history,
+      response.rootPublicKey,
+      server.origin.toString(),
+      server.serverId,
+    );
+    final p = response.pairing, expected = request.pairing;
+    if (p.id != expected.id ||
+        p.state != 'approved' ||
+        p.expiresAt != expected.expiresAt ||
+        p.createdAt != expected.createdAt ||
+        p.administrative != expected.administrative ||
+        url64(p.publicKey) != url64(expected.publicKey) ||
+        p.expiresAt.toInt() <= DateTime.now().millisecondsSinceEpoch ~/ 1000 ||
+        response.rootPublicKey.length != 32 ||
+        proposedRoot == null ||
+        url64(proposedRoot!) != url64(response.rootPublicKey) ||
+        response.signature.length != 64) {
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Сопряжение изменено или истекло',
+      );
+    }
+    final transcript =
+        jsonDecode(utf8.decode(response.transcript)) as Map<String, dynamic>;
+    if (transcript['grant_id'] != response.grantId ||
+        (transcript['issued_at'] as int) < p.createdAt.toInt() - 5 ||
+        (transcript['issued_at'] as int) >= p.expiresAt.toInt()) {
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Подтверждение не относится к запросу',
+      );
+    }
+    final delegated = transcript['purpose'] == 'device.delegate';
+    final signer = await _pairingSigner(
+      response,
+      transcript,
+      p,
+      identity,
+      delegated,
+    );
     final signing = await checkedSigningBytes(
       CreateChallengeResponse(
         challengeId: transcript['challenge_id'] as String,

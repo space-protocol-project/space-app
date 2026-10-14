@@ -85,14 +85,7 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
         return;
       }
       setState(() => error = null);
-      timer = Timer.periodic(const Duration(milliseconds: 800), (_) {
-        if (frameJob == null && mounted && controller != null) {
-          frameJob = readFrame(
-            camera,
-            token,
-          ).whenComplete(() => frameJob = null);
-        }
-      });
+      _startFrameTimer(camera, token);
     } on CameraException catch (e) {
       await stop();
       if (mounted) {
@@ -111,6 +104,14 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
       starting = false;
       if (mounted) setState(() {});
     }
+  }
+
+  void _startFrameTimer(CameraController camera, int token) {
+    timer = Timer.periodic(const Duration(milliseconds: 800), (_) {
+      if (frameJob == null && mounted && controller != null) {
+        frameJob = readFrame(camera, token).whenComplete(() => frameJob = null);
+      }
+    });
   }
 
   Future<void> readFrame(CameraController camera, int token) async {

@@ -191,31 +191,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
   Future<void> _load() async {
     try {
       final root = await _directory();
-      try {
-        final record = await HomeUpdateExecutor(root).inspectRecovery();
-        pendingUpdate = record != null && !record.settled;
-        recoverySummary =
-            'directory: ${root.path}\n'
-            'operation: ${record?.id ?? '-'}\nstep: ${record?.step.name ?? '-'}\n'
-            'source: ${record?.source.version ?? '-'}\ntarget: ${record?.target.version ?? '-'}';
-        if (recoveryBlocked) {
-          if (record != null &&
-              record.recovery == HomeRecoveryAction.restoreBackup &&
-              failureCode == LocalFailureCode.homeBackupInvalid) {
-            await verifyHomeBackup(
-              Directory('${root.path}/${record.backupPath}'),
-              record.target,
-            );
-          }
-          failureCode = null;
-          error = '';
-        }
-      } on LocalFailure catch (problem) {
-        pendingUpdate = true;
-        failureCode = problem.code;
-        error = problem.message;
-        recoverySummary = 'directory: ${root.path}';
-      }
+      await _loadRecovery(root);
       final config = File('${root.path}/config.json');
       if (await config.exists()) {
         final data =
@@ -245,6 +221,34 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
       /* Первый запуск или недоступное хранилище проверяются при запуске. */
     }
     _update();
+  }
+
+  Future<void> _loadRecovery(Directory root) async {
+    try {
+      final record = await HomeUpdateExecutor(root).inspectRecovery();
+      pendingUpdate = record != null && !record.settled;
+      recoverySummary =
+          'directory: ${root.path}\n'
+          'operation: ${record?.id ?? '-'}\nstep: ${record?.step.name ?? '-'}\n'
+          'source: ${record?.source.version ?? '-'}\ntarget: ${record?.target.version ?? '-'}';
+      if (recoveryBlocked) {
+        if (record != null &&
+            record.recovery == HomeRecoveryAction.restoreBackup &&
+            failureCode == LocalFailureCode.homeBackupInvalid) {
+          await verifyHomeBackup(
+            Directory('${root.path}/${record.backupPath}'),
+            record.target,
+          );
+        }
+        failureCode = null;
+        error = '';
+      }
+    } on LocalFailure catch (problem) {
+      pendingUpdate = true;
+      failureCode = problem.code;
+      error = problem.message;
+      recoverySummary = 'directory: ${root.path}';
+    }
   }
 
   Future<String> _detectIP() async {
@@ -396,6 +400,73 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     }
   }
 
+  Future<void> _prepareConfiguration(Directory root, String address) async {
+    final config = File('${root.path}/config.json');
+    // Повторный запуск читает прежнюю конфигурацию, а не создаёт новый сервер.
+    if (await config.exists()) {
+      ip =
+          (jsonDecode(await config.readAsString())
+                  as Map<String, dynamic>)['ip']
+              as String;
+    } else {
+      var candidate = address.trim();
+      if (candidate.isEmpty) {
+        phase = HomePhase.detectingIP;
+        _update();
+        candidate = await _detectIP();
+      }
+      if (!isPublicHomeIPv4(candidate)) {
+        throw const FormatException('Нужен статический публичный IPv4');
+      }
+      final pending = File('${config.path}.tmp');
+      await pending.writeAsString(
+        jsonEncode({'ip': candidate, 'port': 8443}),
+        flush: true,
+      );
+      await pending.rename(config.path);
+      ip = candidate;
+    }
+  }
+
+  void _observeHomeProcess(Process process) {
+    void record(List<int> chunk) {
+      _diagnostic = '$_diagnostic${utf8.decode(chunk, allowMalformed: true)}';
+      if (_diagnostic.length > 8192) {
+        _diagnostic = _diagnostic.substring(_diagnostic.length - 8192);
+      }
+    }
+
+    process.stdout.listen(record);
+    process.stderr.listen(record);
+    unawaited(
+      process.exitCode.then((code) async {
+        if (_process != process) return;
+        _process = null;
+        running = false;
+        server = null;
+        if (!busy && code != 0) {
+          failureCode = LocalFailureCode.homeStartFailed;
+          error = 'Сервер завершился с ошибкой. $_diagnostic';
+        }
+        await _unlock();
+        _update();
+      }),
+    );
+  }
+
+  Future<void> _waitForHomeReady(File ready, Process process) async {
+    final deadline = DateTime.now().add(const Duration(seconds: 60));
+    while (!await ready.exists()) {
+      if (_disposed || _process != process) {
+        throw FormatException('Сервер не запущен. $_diagnostic');
+      }
+      if (DateTime.now().isAfter(deadline)) {
+        throw const FormatException('Сервер не успел запуститься');
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+    }
+  }
+
   Future<HomeServerState?> _start(String address) async {
     if (busy || running || _disposed) return server;
     busy = true;
@@ -413,31 +484,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
           .open(mode: FileMode.append);
       await _lock!.lock(FileLock.exclusive);
       await HomeUpdateJournal(root).requireSettled();
-      final config = File('${root.path}/config.json');
-      // Повторный запуск читает прежнюю конфигурацию, а не создаёт новый сервер.
-      if (await config.exists()) {
-        ip =
-            (jsonDecode(await config.readAsString())
-                    as Map<String, dynamic>)['ip']
-                as String;
-      } else {
-        var candidate = address.trim();
-        if (candidate.isEmpty) {
-          phase = HomePhase.detectingIP;
-          _update();
-          candidate = await _detectIP();
-        }
-        if (!isPublicHomeIPv4(candidate)) {
-          throw const FormatException('Нужен статический публичный IPv4');
-        }
-        final pending = File('${config.path}.tmp');
-        await pending.writeAsString(
-          jsonEncode({'ip': candidate, 'port': 8443}),
-          flush: true,
-        );
-        await pending.rename(config.path);
-        ip = candidate;
-      }
+      await _prepareConfiguration(root, address);
       final runtime = await _install(root);
       if (_disposed) {
         throw const FormatException('Запуск отменён при закрытии приложения');
@@ -467,39 +514,8 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
         '-managed',
       ], mode: ProcessStartMode.normal);
       _process = process;
-      void record(List<int> chunk) {
-        _diagnostic = '$_diagnostic${utf8.decode(chunk, allowMalformed: true)}';
-        if (_diagnostic.length > 8192) {
-          _diagnostic = _diagnostic.substring(_diagnostic.length - 8192);
-        }
-      }
-
-      process.stdout.listen(record);
-      process.stderr.listen(record);
-      unawaited(
-        process.exitCode.then((code) async {
-          if (_process != process) return;
-          _process = null;
-          running = false;
-          server = null;
-          if (!busy && code != 0) {
-            failureCode = LocalFailureCode.homeStartFailed;
-            error = 'Сервер завершился с ошибкой. $_diagnostic';
-          }
-          await _unlock();
-          _update();
-        }),
-      );
-      final deadline = DateTime.now().add(const Duration(seconds: 60));
-      while (!await ready.exists()) {
-        if (_disposed || _process != process) {
-          throw FormatException('Сервер не запущен. $_diagnostic');
-        }
-        if (DateTime.now().isAfter(deadline)) {
-          throw const FormatException('Сервер не успел запуститься');
-        }
-        await Future<void>.delayed(const Duration(milliseconds: 200));
-      }
+      _observeHomeProcess(process);
+      await _waitForHomeReady(ready, process);
       final result =
           jsonDecode(await ready.readAsString()) as Map<String, dynamic>;
       final pem = await File('${data.path}/server.crt').readAsString();

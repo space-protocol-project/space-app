@@ -95,16 +95,7 @@ class _PairingStartPanelState extends State<PairingStartPanel> {
           verification = code;
         });
       }
-      if (response.pairing.state == 'pending' && current.proposedRoot != null) {
-        final code = await pairVerificationCode(
-          current.server.serverId,
-          current.request.pairing.id,
-          current.proposedRoot!,
-          current.request.pairing.publicKey,
-          administrative: current.request.pairing.administrative,
-        );
-        if (mounted && pending == current) setState(() => verification = code);
-      }
+      if (response.pairing.state == 'pending') await _showPendingCode(current);
     } catch (_) {
       if (mounted && pending == current) {
         timer?.cancel();
@@ -112,6 +103,19 @@ class _PairingStartPanelState extends State<PairingStartPanel> {
       }
     } finally {
       polling = false;
+    }
+  }
+
+  Future<void> _showPendingCode(PendingPairing current) async {
+    if (current.proposedRoot != null) {
+      final code = await pairVerificationCode(
+        current.server.serverId,
+        current.request.pairing.id,
+        current.proposedRoot!,
+        current.request.pairing.publicKey,
+        administrative: current.request.pairing.administrative,
+      );
+      if (mounted && pending == current) setState(() => verification = code);
     }
   }
 

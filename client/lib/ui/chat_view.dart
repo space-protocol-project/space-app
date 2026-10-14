@@ -136,18 +136,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
           );
           break;
         }
-        final viewportBox = viewport.currentContext?.findRenderObject();
-        if (viewportBox is! RenderBox || !scroll.hasClients) break;
-        final top = viewportBox.localToGlobal(Offset.zero).dy;
-        final bottom = top + viewportBox.size.height;
-        final visible = <int>[];
-        for (var i = 0; i < list.length; i++) {
-          final box = messageKeys[list[i].id]?.currentContext
-              ?.findRenderObject();
-          if (box is! RenderBox || !box.hasSize) continue;
-          final y = box.localToGlobal(Offset.zero).dy;
-          if (y < bottom && y + box.size.height > top) visible.add(i);
-        }
+        final visible = _visibleMessageIndices([
+          for (final message in list) message.id,
+        ]);
         if (visible.isEmpty) break;
         if (index < visible.first) {
           high = scroll.offset;
@@ -160,13 +151,33 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         await WidgetsBinding.instance.endOfFrame;
       }
     } finally {
-      if (mounted) {
-        setState(() => jumping = false);
-        if (scope == startingScope) markRead();
-      } else {
-        jumping = false;
-      }
+      _finishMessageJump(startingScope);
     }
+  }
+
+  List<int> _visibleMessageIndices(List<String> messageIds) {
+    final viewportBox = viewport.currentContext?.findRenderObject();
+    if (viewportBox is! RenderBox || !scroll.hasClients) return [];
+    final top = viewportBox.localToGlobal(Offset.zero).dy;
+    final bottom = top + viewportBox.size.height;
+    final visible = <int>[];
+    for (var index = 0; index < messageIds.length; index++) {
+      final box = messageKeys[messageIds[index]]?.currentContext
+          ?.findRenderObject();
+      if (box is! RenderBox || !box.hasSize) continue;
+      final y = box.localToGlobal(Offset.zero).dy;
+      if (y < bottom && y + box.size.height > top) visible.add(index);
+    }
+    return visible;
+  }
+
+  void _finishMessageJump(String startingScope) {
+    if (!mounted) {
+      jumping = false;
+      return;
+    }
+    setState(() => jumping = false);
+    if (scope == startingScope) markRead();
   }
 
   @override
@@ -184,13 +195,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     final target = widget.controller, startingScope = scope;
     final sent = await target.send(text);
     if (!mounted) return;
-    if (sent) {
-      if (scope == startingScope && identical(widget.controller, target)) {
-        if (draft.text == text) draft.clear();
-      } else if (drafts[startingScope] == text) {
-        drafts[startingScope] = '';
-      }
-    }
+    if (sent) _clearSentDraft(text, startingScope, target);
     if (restoreFocus) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted &&
@@ -205,6 +210,18 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
           draftFocus.requestFocus();
         }
       });
+    }
+  }
+
+  void _clearSentDraft(
+    String text,
+    String startingScope,
+    ChatController target,
+  ) {
+    if (scope == startingScope && identical(widget.controller, target)) {
+      if (draft.text == text) draft.clear();
+    } else if (drafts[startingScope] == text) {
+      drafts[startingScope] = '';
     }
   }
 

@@ -78,15 +78,7 @@ bool safeServerSvg(Uint8List bytes) {
           (e.name.namespaceUri != null &&
               e.name.namespaceUri != 'http://www.w3.org/2000/svg'))
         return false;
-      for (final a in e.attributes) {
-        if (!_svgAttrs.contains(a.name.local) ||
-            (a.name.prefix != null && a.name.prefix != 'xmlns') ||
-            a.value
-                .replaceAll(RegExp(r'\s+'), '')
-                .toLowerCase()
-                .contains('url('))
-          return false;
-      }
+      if (!_safeSvgAttributes(e)) return false;
     }
     return true;
   } catch (_) {
@@ -112,21 +104,7 @@ Map<String, dynamic>? validatedServerIcon(Object? value) {
     if (preset.isNotEmpty) return null;
     final bytes = base64Decode(data);
     if (bytes.length > 8192) return null;
-    if (mime == 'image/svg+xml') {
-      if (!safeServerSvg(bytes)) return null;
-    } else if (mime == 'image/png') {
-      if (bytes.length < 24 ||
-          bytes[0] != 137 ||
-          bytes[1] != 80 ||
-          bytes[2] != 78 ||
-          bytes[3] != 71)
-        return null;
-      final header = ByteData.sublistView(bytes);
-      final w = header.getUint32(16), h = header.getUint32(20);
-      if (w < 1 || h < 1 || w > 256 || h > 256) return null;
-    } else {
-      return null;
-    }
+    if (!_validIconBytes(bytes, mime)) return null;
     return {'mediaType': mime, 'data': data};
   } catch (_) {
     return null;
@@ -198,4 +176,33 @@ class ServerIconView extends StatelessWidget {
       ),
     );
   }
+}
+
+bool _safeSvgAttributes(XmlElement e) {
+  for (final a in e.attributes) {
+    if (!_svgAttrs.contains(a.name.local) ||
+        (a.name.prefix != null && a.name.prefix != 'xmlns') ||
+        a.value.replaceAll(RegExp(r'\s+'), '').toLowerCase().contains('url('))
+      return false;
+  }
+  return true;
+}
+
+bool _validIconBytes(Uint8List bytes, String mime) {
+  if (mime == 'image/svg+xml') {
+    if (!safeServerSvg(bytes)) return false;
+  } else if (mime == 'image/png') {
+    if (bytes.length < 24 ||
+        bytes[0] != 137 ||
+        bytes[1] != 80 ||
+        bytes[2] != 78 ||
+        bytes[3] != 71)
+      return false;
+    final header = ByteData.sublistView(bytes);
+    final w = header.getUint32(16), h = header.getUint32(20);
+    if (w < 1 || h < 1 || w > 256 || h > 256) return false;
+  } else {
+    return false;
+  }
+  return true;
 }

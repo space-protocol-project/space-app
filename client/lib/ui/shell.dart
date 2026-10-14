@@ -1178,6 +1178,28 @@ class _SpaceShellState extends State<SpaceShell> {
     );
   }
 
+  IconData get _headerIcon {
+    if (devicePage) return Icons.computer_outlined;
+    if (serverList) return Icons.dns_outlined;
+    if (applicationSettings) return Icons.settings_outlined;
+    return selected.icon;
+  }
+
+  String get _headerTitle {
+    if (serverList) return context.strings.spacesTitle;
+    if (devicePage) return context.strings.myDevice;
+    if (applicationSettings) return context.strings.appSettings;
+    if (dashboard) return context.strings.dashboard;
+    if (selected == Section.chat) return chatLabel;
+    return selected.localized(context);
+  }
+
+  String get _connectionLabel {
+    if (controller.reconnecting) return context.strings.reconnecting;
+    if (controller.connected) return context.strings.keyLogin;
+    return context.strings.disconnected;
+  }
+
   Widget header(bool compact) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
     child: Row(
@@ -1195,16 +1217,7 @@ class _SpaceShellState extends State<SpaceShell> {
             icon: const Icon(Icons.menu),
           ),
         if (!compact) ...[
-          Icon(
-            devicePage
-                ? Icons.computer_outlined
-                : serverList
-                ? Icons.dns_outlined
-                : applicationSettings
-                ? Icons.settings_outlined
-                : selected.icon,
-            size: 26,
-          ),
+          Icon(_headerIcon, size: 26),
           const SizedBox(width: 12),
         ],
         Expanded(
@@ -1212,17 +1225,7 @@ class _SpaceShellState extends State<SpaceShell> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                serverList
-                    ? context.strings.spacesTitle
-                    : devicePage
-                    ? context.strings.myDevice
-                    : applicationSettings
-                    ? context.strings.appSettings
-                    : dashboard
-                    ? context.strings.dashboard
-                    : selected == Section.chat
-                    ? chatLabel
-                    : selected.localized(context),
+                _headerTitle,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
@@ -1241,34 +1244,14 @@ class _SpaceShellState extends State<SpaceShell> {
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: Text(
-              controller.reconnecting
-                  ? context.strings.reconnecting
-                  : controller.connected
-                  ? context.strings.keyLogin
-                  : context.strings.disconnected,
+              _connectionLabel,
               style: TextStyle(
                 fontSize: 12,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),
-        IconButton(
-          tooltip: dashboard
-              ? context.strings.addSpace
-              : context.strings.serverConnection,
-          onPressed: controller.busy
-              ? null
-              : dashboard
-              ? addSpace
-              : () => connection(),
-          icon: Icon(
-            dashboard
-                ? Icons.add
-                : controller.connected
-                ? Icons.cloud_done_outlined
-                : Icons.cloud_off_outlined,
-          ),
-        ),
+        _connectionButton(),
         if (compact)
           IconButton(
             tooltip: context.strings.appSettings,
@@ -1281,6 +1264,23 @@ class _SpaceShellState extends State<SpaceShell> {
           icon: const Icon(Icons.search),
         ),
       ],
+    ),
+  );
+  Widget _connectionButton() => IconButton(
+    tooltip: dashboard
+        ? context.strings.addSpace
+        : context.strings.serverConnection,
+    onPressed: controller.busy
+        ? null
+        : dashboard
+        ? addSpace
+        : () => connection(),
+    icon: Icon(
+      dashboard
+          ? Icons.add
+          : controller.connected
+          ? Icons.cloud_done_outlined
+          : Icons.cloud_off_outlined,
     ),
   );
   Widget updateBadge(IconData icon) =>

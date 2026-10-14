@@ -325,14 +325,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
               .length ??
           0;
     }
-    var latest = entry!.latestMessageSequence.toInt();
-    if (id == channelId) {
-      for (final message in messages) {
-        if (message.sequence.toInt() > latest) {
-          latest = message.sequence.toInt();
-        }
-      }
-    }
+    final latest = _latestSequence(id, entry!.latestMessageSequence.toInt());
     if (id != channelId &&
         (_readThrough[id] ?? '').isNotEmpty &&
         readSequence(id) == 0) {
@@ -343,6 +336,17 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     if (id != channelId) return 0;
     final index = messages.indexWhere((m) => m.id == (_readThrough[id] ?? ''));
     return messages.length - index - 1;
+  }
+
+  int _latestSequence(String id, int latest) {
+    if (id == channelId) {
+      for (final message in messages) {
+        if (message.sequence.toInt() > latest) {
+          latest = message.sequence.toInt();
+        }
+      }
+    }
+    return latest;
   }
 
   String get readThrough => _readThrough[channelId] ?? '';
@@ -389,19 +393,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       final savedChannels = data['channels'];
       for (final entry in channels) {
         final item = savedChannels is Map ? savedChannels[entry.id] : null;
-        if (item is Map) {
-          if (item['cursor'] is String &&
-              (item['cursor'] as String).length <= 128) {
-            _cursors[entry.id] = item['cursor'];
-          }
-          if (item['readSequence'] is int && item['readSequence'] >= 0) {
-            _readSequences[entry.id] = item['readSequence'];
-          }
-          if (item['readThrough'] is String &&
-              (item['readThrough'] as String).length <= 128) {
-            _readThrough[entry.id] = item['readThrough'];
-          }
-        }
+        _restoreChannelPosition(entry.id, item);
       }
       final selected = data['selected'];
       if (selected is String && channels.any((c) => c.id == selected)) {
@@ -414,6 +406,22 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
           'Не удалось загрузить позиции чтения. История будет загружена заново.',
         ),
       );
+    }
+  }
+
+  void _restoreChannelPosition(String id, dynamic item) {
+    if (item is Map) {
+      if (item['cursor'] is String &&
+          (item['cursor'] as String).length <= 128) {
+        _cursors[id] = item['cursor'];
+      }
+      if (item['readSequence'] is int && item['readSequence'] >= 0) {
+        _readSequences[id] = item['readSequence'];
+      }
+      if (item['readThrough'] is String &&
+          (item['readThrough'] as String).length <= 128) {
+        _readThrough[id] = item['readThrough'];
+      }
     }
   }
 
@@ -639,19 +647,12 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       _stopCatalog();
       await _session?.close();
       _session = null;
-      final session =
-          _invitationToken.isEmpty &&
-              restoredRecord == null &&
-              setupCode.isEmpty
-          ? await openSession(server, vault)
-          : await SpaceSession.connect(
-              server,
-              vault,
-              invitationToken: pairingId.isEmpty ? _invitationToken : '',
-              restoredRecord: restoredRecord,
-              pairingId: pairingId,
-              setupCode: setupCode,
-            );
+      final session = await _openChatSession(
+        server,
+        restoredRecord,
+        pairingId,
+        setupCode,
+      );
       if (_disposed || accessRemoved) {
         await session.close();
         return;
@@ -676,13 +677,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
         }
         _messages[message.id] = message;
       }
-      if (readSequence(channelId) == 0 && readThrough.isNotEmpty) {
-        final marked = messages.where((m) => m.id == readThrough).firstOrNull;
-        if (marked != null && marked.sequence.toInt() > 0) {
-          _readSequences[channelId] = marked.sequence.toInt();
-          _queuePositions();
-        }
-      }
+      _restoreReadSequence();
       cursor = _cursors[channelId] ?? '';
       connected = true;
       if (session is ChannelUpdates) {
@@ -698,18 +693,53 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     }
   }
 
+  void _restoreReadSequence() {
+    if (readSequence(channelId) == 0 && readThrough.isNotEmpty) {
+      final marked = messages.where((m) => m.id == readThrough).firstOrNull;
+      if (marked != null && marked.sequence.toInt() > 0) {
+        _readSequences[channelId] = marked.sequence.toInt();
+        _queuePositions();
+      }
+    }
+  }
+
+  Future<LiveSession> _openChatSession(
+    Discovery server,
+    DeviceRecord? restoredRecord,
+    String pairingId,
+    String setupCode,
+  ) async {
+    return _invitationToken.isEmpty &&
+            restoredRecord == null &&
+            setupCode.isEmpty
+        ? await openSession(server, vault)
+        : await SpaceSession.connect(
+            server,
+            vault,
+            invitationToken: pairingId.isEmpty ? _invitationToken : '',
+            restoredRecord: restoredRecord,
+            pairingId: pairingId,
+            setupCode: setupCode,
+          );
+  }
+
+  Future<void> _selectCachedChannel(String id) async {
+    if (!_history!.channels.any((c) => c.id == id && c.permissions.read)) {
+      return;
+    }
+    _stopSubscription();
+    navigation?.selectChannel(id);
+    _history!.selected = id;
+    _messages.clear();
+    connected = false;
+    await _flushHistory();
+    _update();
+    return;
+  }
+
   Future<void> _selectChannel(String id) async {
     if ((!connected || reconnecting) && _history != null && !accessRemoved) {
-      if (!_history!.channels.any((c) => c.id == id && c.permissions.read)) {
-        return;
-      }
-      _stopSubscription();
-      navigation?.selectChannel(id);
-      _history!.selected = id;
-      _messages.clear();
-      connected = false;
-      await _flushHistory();
-      _update();
+      await _selectCachedChannel(id);
       return;
     }
     final nav = navigation;
@@ -923,8 +953,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
           return;
         }
       } finally {
-        if (identical(_catalogIterator, iterator)) _catalogIterator = null;
-        await _cancelIterator(iterator);
+        await _releaseCatalogIterator(iterator);
       }
       if (!active()) return;
       final done = Completer<void>();
@@ -933,6 +962,11 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       await done.future;
       if (attempt < 5) attempt++;
     }
+  }
+
+  Future<void> _releaseCatalogIterator(StreamIterator<dynamic> iterator) async {
+    if (identical(_catalogIterator, iterator)) _catalogIterator = null;
+    await _cancelIterator(iterator);
   }
 
   bool _current(LiveSession session, int generation) =>

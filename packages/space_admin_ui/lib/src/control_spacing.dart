@@ -47,10 +47,7 @@ Widget spaceControls(Widget child) {
         ),
       );
     } else {
-      if (previous != null &&
-          !_separator(current) &&
-          !_separator(previous) &&
-          _besideControl(previous, current)) {
+      if (_needsControlGap(previous, current)) {
         children.add(const SizedBox(height: 16));
       }
       children.add(current);
@@ -67,3 +64,9 @@ Widget spaceControls(Widget child) {
     children: children,
   );
 }
+
+bool _needsControlGap(Widget? previous, Widget current) =>
+    previous != null &&
+    !_separator(current) &&
+    !_separator(previous) &&
+    _besideControl(previous, current);

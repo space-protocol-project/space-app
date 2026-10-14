@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'control_spacing.dart';
 
 import '../l10n/admin_localizations.dart';
@@ -81,206 +82,13 @@ class RecoveryToolsView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        RecoverySurface(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                strings.rotationTitle,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 12),
-              Text(strings.rotationHelp),
-              const SizedBox(height: 12),
-              if (connected && hasRootAuthority && canRotate) ...[
-                OutlinedButton(
-                  onPressed: pending ? null : onRotate,
-                  child: Text(strings.rotationStart),
-                ),
-                TextButton(
-                  onPressed: pending ? null : onRenewRotation,
-                  child: Text(strings.rotationRenew),
-                ),
-              ],
-              OutlinedButton(
-                onPressed: pending || !hasServer ? null : onFinishRotation,
-                child: Text(strings.rotationFinish),
-              ),
-            ],
-          ),
-        ),
+        _rotationTools(context, strings),
         const SizedBox(height: 20),
-        RecoverySurface(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                strings.pairingApproveTitle,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 12),
-              Text(strings.pairingApproveHelp),
-              const SizedBox(height: 12),
-              TextField(
-                controller: pairingCode,
-                onChanged: onPairingCodeChanged,
-                decoration: InputDecoration(
-                  labelText: strings.pairingCode,
-                  hintText: 'pc_…',
-                ),
-              ),
-              const SizedBox(height: 12),
-              OutlinedButton.icon(
-                onPressed: pending || !connected || !hasDeviceManagement
-                    ? null
-                    : onPreparePairing,
-                icon: const Icon(Icons.verified_user_outlined),
-                label: Text(strings.pairingPrepare),
-              ),
-              if (pairingCheck.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Text(strings.pairingComparison),
-                SelectableText(
-                  pairingCheck,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                if (pairingPrepared) ...[
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: pairingEntered,
-                    decoration: InputDecoration(
-                      labelText: strings.pairingEnteredCode,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  FilledButton(
-                    onPressed: pending ? null : onApprovePairing,
-                    child: Text(strings.pairingSign),
-                  ),
-                ],
-              ],
-            ],
-          ),
-        ),
+        _pairingTools(context, strings),
         const SizedBox(height: 20),
-        RecoverySurface(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                strings.recoveryTitle,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 12),
-              Text(strings.recoveryHelp),
-              if (qrPreview != null) ...[
-                const SizedBox(height: 16),
-                qrPreview!,
-              ],
-              if (pending && progress.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                const LinearProgressIndicator(),
-                const SizedBox(height: 8),
-                Text(progress),
-              ],
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  if (onCreateQr != null) OutlinedButton.icon(
-                    onPressed: pending || !canCreateQr ? null : onCreateQr,
-                    icon: const Icon(Icons.qr_code),
-                    label: Text(strings.recoveryCreateQr),
-                  ),
-                  FilledButton.icon(
-                    onPressed: pending || (onCreateQr != null ? qrPreview == null : !connected || !hasRootAuthority)
-                        ? null
-                        : onExport,
-                    icon: const Icon(Icons.save_alt),
-                    label: Text(strings.recoveryExport),
-                  ),
-                  if (onExportJson != null) TextButton(
-                    onPressed: pending ? null : onExportJson,
-                    child: const Text('JSON'),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: pending ? null : onRestore,
-                    icon: const Icon(Icons.restore),
-                    label: Text(strings.recoveryRestore),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: pending ? null : onScan,
-                    icon: const Icon(Icons.qr_code_scanner),
-                    label: Text(strings.recoveryScan),
-                  ),
-                ],
-              ),
-              if (onCreateQr != null && !canCreateQr && qrPreview == null) ...[
-                const SizedBox(height: 12),
-                Text(strings.recoveryOriginalCardNeeded),
-              ],
-            ],
-          ),
-        ),
+        _recoveryCardTools(context, strings),
         const SizedBox(height: 20),
-        RecoverySurface(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      strings.recoveryDevices,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: strings.devicesRefresh,
-                    onPressed: pending || !connected || !hasDeviceManagement
-                        ? null
-                        : onRefreshDevices,
-                    icon: const Icon(Icons.refresh),
-                  ),
-                ],
-              ),
-              Text(strings.recoveryDevicesHelp),
-              for (final grant in devices) ...[
-                const Divider(),
-                Text(
-                  grant.recovery
-                      ? strings.deviceRecovery
-                      : grant.id == currentGrantId
-                      ? strings.deviceCurrent
-                      : strings.deviceOther,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                SelectableText(
-                  grant.id,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'JetBrains Mono',
-                  ),
-                ),
-                Text(
-                  grant.revoked
-                      ? strings.inviteRevokedState
-                      : strings.deviceAccessUntil(
-                          '${DateTime.fromMillisecondsSinceEpoch(grant.expiresAt * 1000).toLocal()}',
-                        ),
-                ),
-                if (!grant.revoked &&
-                    grant.expiresAt >
-                        DateTime.now().millisecondsSinceEpoch ~/ 1000)
-                  TextButton(
-                    onPressed: pending ? null : () => onRevoke(grant.id),
-                    child: Text(strings.deviceRevokeAccess),
-                  ),
-              ],
-            ],
-          ),
-        ),
+        _deviceTools(context, strings),
         if (pending && progress.isEmpty) ...[
           const SizedBox(height: 16),
           const LinearProgressIndicator(),
@@ -289,6 +97,212 @@ class RecoveryToolsView extends StatelessWidget {
       ],
     );
   }
+
+  Widget _rotationTools(BuildContext context, AdminLocalizations strings) =>
+      RecoverySurface(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              strings.rotationTitle,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 12),
+            Text(strings.rotationHelp),
+            const SizedBox(height: 12),
+            if (connected && hasRootAuthority && canRotate) ...[
+              OutlinedButton(
+                onPressed: pending ? null : onRotate,
+                child: Text(strings.rotationStart),
+              ),
+              TextButton(
+                onPressed: pending ? null : onRenewRotation,
+                child: Text(strings.rotationRenew),
+              ),
+            ],
+            OutlinedButton(
+              onPressed: pending || !hasServer ? null : onFinishRotation,
+              child: Text(strings.rotationFinish),
+            ),
+          ],
+        ),
+      );
+
+  Widget _pairingTools(BuildContext context, AdminLocalizations strings) =>
+      RecoverySurface(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              strings.pairingApproveTitle,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 12),
+            Text(strings.pairingApproveHelp),
+            const SizedBox(height: 12),
+            TextField(
+              controller: pairingCode,
+              onChanged: onPairingCodeChanged,
+              decoration: InputDecoration(
+                labelText: strings.pairingCode,
+                hintText: 'pc_…',
+              ),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: pending || !connected || !hasDeviceManagement
+                  ? null
+                  : onPreparePairing,
+              icon: const Icon(Icons.verified_user_outlined),
+              label: Text(strings.pairingPrepare),
+            ),
+            if (pairingCheck.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text(strings.pairingComparison),
+              SelectableText(
+                pairingCheck,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              if (pairingPrepared) ...[
+                const SizedBox(height: 12),
+                TextField(
+                  controller: pairingEntered,
+                  decoration: InputDecoration(
+                    labelText: strings.pairingEnteredCode,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: pending ? null : onApprovePairing,
+                  child: Text(strings.pairingSign),
+                ),
+              ],
+            ],
+          ],
+        ),
+      );
+
+  Widget _recoveryCardTools(BuildContext context, AdminLocalizations strings) =>
+      RecoverySurface(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              strings.recoveryTitle,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 12),
+            Text(strings.recoveryHelp),
+            if (qrPreview != null) ...[const SizedBox(height: 16), qrPreview!],
+            if (pending && progress.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              const LinearProgressIndicator(),
+              const SizedBox(height: 8),
+              Text(progress),
+            ],
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                if (onCreateQr != null)
+                  OutlinedButton.icon(
+                    onPressed: pending || !canCreateQr ? null : onCreateQr,
+                    icon: const Icon(Icons.qr_code),
+                    label: Text(strings.recoveryCreateQr),
+                  ),
+                FilledButton.icon(
+                  onPressed:
+                      pending ||
+                          (onCreateQr != null
+                              ? qrPreview == null
+                              : !connected || !hasRootAuthority)
+                      ? null
+                      : onExport,
+                  icon: const Icon(Icons.save_alt),
+                  label: Text(strings.recoveryExport),
+                ),
+                if (onExportJson != null)
+                  TextButton(
+                    onPressed: pending ? null : onExportJson,
+                    child: const Text('JSON'),
+                  ),
+                OutlinedButton.icon(
+                  onPressed: pending ? null : onRestore,
+                  icon: const Icon(Icons.restore),
+                  label: Text(strings.recoveryRestore),
+                ),
+                OutlinedButton.icon(
+                  onPressed: pending ? null : onScan,
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: Text(strings.recoveryScan),
+                ),
+              ],
+            ),
+            if (onCreateQr != null && !canCreateQr && qrPreview == null) ...[
+              const SizedBox(height: 12),
+              Text(strings.recoveryOriginalCardNeeded),
+            ],
+          ],
+        ),
+      );
+
+  Widget _deviceTools(
+    BuildContext context,
+    AdminLocalizations strings,
+  ) => RecoverySurface(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                strings.recoveryDevices,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+            IconButton(
+              tooltip: strings.devicesRefresh,
+              onPressed: pending || !connected || !hasDeviceManagement
+                  ? null
+                  : onRefreshDevices,
+              icon: const Icon(Icons.refresh),
+            ),
+          ],
+        ),
+        Text(strings.recoveryDevicesHelp),
+        for (final grant in devices) ...[
+          const Divider(),
+          Text(
+            grant.recovery
+                ? strings.deviceRecovery
+                : grant.id == currentGrantId
+                ? strings.deviceCurrent
+                : strings.deviceOther,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          SelectableText(
+            grant.id,
+            style: const TextStyle(fontSize: 12, fontFamily: 'JetBrains Mono'),
+          ),
+          Text(
+            grant.revoked
+                ? strings.inviteRevokedState
+                : strings.deviceAccessUntil(
+                    '${DateTime.fromMillisecondsSinceEpoch(grant.expiresAt * 1000).toLocal()}',
+                  ),
+          ),
+          if (!grant.revoked &&
+              grant.expiresAt > DateTime.now().millisecondsSinceEpoch ~/ 1000)
+            TextButton(
+              onPressed: pending ? null : () => onRevoke(grant.id),
+              child: Text(strings.deviceRevokeAccess),
+            ),
+        ],
+      ],
+    ),
+  );
 }
 
 class RecoverySurface extends StatelessWidget {
@@ -301,6 +315,9 @@ class RecoverySurface extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
     ),
-    child: Padding(padding: const EdgeInsets.all(24), child: spaceControls(child)),
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: spaceControls(child),
+    ),
   );
 }

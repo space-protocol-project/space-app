@@ -52,24 +52,26 @@ class _ServerInboxState extends State<ServerInbox> {
     }
   }
 
+  bool _includeServer(MapEntry<String, ChatController> entry) {
+    final matches = '${title(entry.key, entry.value)} ${entry.key}'
+        .toLowerCase()
+        .contains(query.toLowerCase());
+    final included =
+        filter == 0 ||
+        filter == 1 && widget.presence.online(entry.key) == true ||
+        filter == 2 && unread(entry.value) > 0;
+    return matches && included;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final entries =
-        widget.controllers.entries.where((entry) {
-          final matches = '${title(entry.key, entry.value)} ${entry.key}'
-              .toLowerCase()
-              .contains(query.toLowerCase());
-          final included =
-              filter == 0 ||
-              filter == 1 && widget.presence.online(entry.key) == true ||
-              filter == 2 && unread(entry.value) > 0;
-          return matches && included;
-        }).toList()..sort(
-          (a, b) => (b.value.latestKnownMessage?.createdAtUnixMs.toInt() ?? 0)
-              .compareTo(
-                a.value.latestKnownMessage?.createdAtUnixMs.toInt() ?? 0,
-              ),
-        );
+    final entries = widget.controllers.entries.where(_includeServer).toList()
+      ..sort(
+        (a, b) => (b.value.latestKnownMessage?.createdAtUnixMs.toInt() ?? 0)
+            .compareTo(
+              a.value.latestKnownMessage?.createdAtUnixMs.toInt() ?? 0,
+            ),
+      );
     return Material(
       child: Column(
         children: [

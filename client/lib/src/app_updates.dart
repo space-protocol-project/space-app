@@ -51,25 +51,32 @@ class AppVersion implements Comparable<AppVersion> {
       final result = core[i].compareTo(other.core[i]);
       if (result != 0) return result;
     }
-    if (preview.isEmpty || other.preview.isEmpty) {
-      return preview.isEmpty == other.preview.isEmpty
-          ? 0
-          : preview.isEmpty
-          ? 1
-          : -1;
-    }
-    for (var i = 0; i < preview.length && i < other.preview.length; i++) {
-      final a = int.tryParse(preview[i]), b = int.tryParse(other.preview[i]);
-      final result = a != null && b != null
-          ? a.compareTo(b)
-          : a != null
-          ? -1
-          : b != null
-          ? 1
-          : preview[i].compareTo(other.preview[i]);
+    if (preview.isEmpty && other.preview.isEmpty) return 0;
+    if (preview.isEmpty) return 1;
+    if (other.preview.isEmpty) return -1;
+    for (
+      var index = 0;
+      index < preview.length && index < other.preview.length;
+      index++
+    ) {
+      final result = _comparePreviewIdentifier(
+        preview[index],
+        other.preview[index],
+      );
       if (result != 0) return result;
     }
     return preview.length.compareTo(other.preview.length);
+  }
+
+  static int _comparePreviewIdentifier(String left, String right) {
+    final leftNumber = int.tryParse(left);
+    final rightNumber = int.tryParse(right);
+    if (leftNumber != null && rightNumber != null) {
+      return leftNumber.compareTo(rightNumber);
+    }
+    if (leftNumber != null) return -1;
+    if (rightNumber != null) return 1;
+    return left.compareTo(right);
   }
 }
 
@@ -294,21 +301,13 @@ class AppUpdates
     downloadedPackage = null;
     _notify();
     File? partial;
-    IOSink? sink;
     try {
       final directory = await downloadDirectory();
       await directory.create(recursive: true);
       final hash = target.digest.substring(7);
       final output = File('${directory.path}/$hash-${target.name}');
       partial = File('${output.path}.part');
-      if (await output.exists()) {
-        if (await validPackage(output, target)) {
-          downloadedBytes = target.size;
-          downloadedPackage = output;
-          return;
-        }
-        await output.delete();
-      }
+      if (await _reuseDownloadedPackage(output, target)) return;
       var offset = await partial.exists() ? await partial.length() : 0;
       if (offset > target.size) {
         await partial.delete();
@@ -316,39 +315,7 @@ class AppUpdates
       }
       downloadedBytes = offset;
       if (offset < target.size) {
-        final response = await packageResponse(target, offset);
-        if (response.statusCode == 200) {
-          offset = 0;
-        } else if (response.statusCode != 206 ||
-            response.headers['content-range'] !=
-                'bytes $offset-${target.size - 1}/${target.size}') {
-          throw const FormatException('Неверный диапазон загрузки');
-        }
-        if (response.contentLength != null &&
-            response.contentLength != target.size - offset) {
-          throw const FormatException('Неверный размер пакета');
-        }
-        downloadedBytes = offset;
-        final writer = partial.openWrite(
-          mode: offset == 0 ? FileMode.write : FileMode.append,
-        );
-        sink = writer;
-        await for (final chunk in response.stream.timeout(
-          const Duration(seconds: 30),
-        )) {
-          if (_disposed) throw const FormatException('Загрузка остановлена');
-          if (downloadedBytes + chunk.length > target.size) {
-            await writer.close();
-            sink = null;
-            await partial.delete();
-            throw const FormatException('Пакет превышает ожидаемый размер');
-          }
-          writer.add(chunk);
-          downloadedBytes += chunk.length;
-          _notify();
-        }
-        await writer.close();
-        sink = null;
+        await _receivePackage(partial, target, offset);
       }
       if (await partial.length() != target.size) {
         throw const FormatException('Неполная загрузка');
@@ -363,13 +330,68 @@ class AppUpdates
     } catch (_) {
       downloadFailed = true;
     } finally {
+      downloading = false;
+      _notify();
+    }
+  }
+
+  Future<bool> _reuseDownloadedPackage(File output, AppPackage target) async {
+    if (!await output.exists()) return false;
+    if (!await validPackage(output, target)) {
+      await output.delete();
+      return false;
+    }
+    downloadedBytes = target.size;
+    downloadedPackage = output;
+    return true;
+  }
+
+  Future<void> _receivePackage(
+    File partial,
+    AppPackage target,
+    int offset,
+  ) async {
+    final response = await packageResponse(target, offset);
+    if (response.statusCode == 200) {
+      offset = 0;
+    } else if (response.statusCode != 206 ||
+        response.headers['content-range'] !=
+            'bytes $offset-${target.size - 1}/${target.size}') {
+      throw const FormatException('Неверный диапазон загрузки');
+    }
+    if (response.contentLength != null &&
+        response.contentLength != target.size - offset) {
+      throw const FormatException('Неверный размер пакета');
+    }
+    IOSink? sink;
+    try {
+      downloadedBytes = offset;
+      final writer = partial.openWrite(
+        mode: offset == 0 ? FileMode.write : FileMode.append,
+      );
+      sink = writer;
+      await for (final chunk in response.stream.timeout(
+        const Duration(seconds: 30),
+      )) {
+        if (_disposed) throw const FormatException('Загрузка остановлена');
+        if (downloadedBytes + chunk.length > target.size) {
+          await writer.close();
+          sink = null;
+          await partial.delete();
+          throw const FormatException('Пакет превышает ожидаемый размер');
+        }
+        writer.add(chunk);
+        downloadedBytes += chunk.length;
+        _notify();
+      }
+      await writer.close();
+      sink = null;
+    } finally {
       try {
         await sink?.close();
       } catch (_) {
         downloadFailed = true;
       }
-      downloading = false;
-      _notify();
     }
   }
 

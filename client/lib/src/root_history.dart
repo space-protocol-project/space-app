@@ -56,13 +56,7 @@ Future<RootIdentity> verifyRootHistory(
   final seenRoots = <String>{};
   for (var index = 0; index < history.length; index++) {
     final proof = history[index];
-    final raw = _bytes(proof['transcript'], null);
-    if (raw.length > 2048) {
-      throw const LocalFailure(
-        LocalFailureCode.identityInvalid,
-        'Доказательство слишком большое',
-      );
-    }
+    final raw = _rotationProofBytes(proof);
     final text = utf8.decode(raw);
     final t = jsonDecode(text) as Map<String, dynamic>;
     final fields = t.keys.toList()..sort();
@@ -79,21 +73,17 @@ Future<RootIdentity> verifyRootHistory(
       );
     }
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    final integers = ['auth_epoch', 'expires_at', 'issued_at', 'v'];
-    final numbers = integers.every(
-      (k) =>
-          t[k] is int && (t[k] as int) > 0 && (t[k] as int) < 9007199254740991,
-    );
     final scopes = jsonEncode(t['scopes']);
-    if (!numbers ||
-        fields.join(',') != rotationFields ||
-        canonical != text ||
-        t['v'] != 1 ||
-        t['purpose'] != 'identity.root.rotate' ||
-        t['auth_epoch'] != index + 1 ||
-        t['principal_id'] != principal ||
-        t['origin'] != origin ||
-        t['server_id'] != serverId ||
+    if (!_validRotationTranscript(
+          t,
+          fields,
+          canonical,
+          text,
+          index,
+          principal,
+          origin,
+          serverId,
+        ) ||
         (previous != null && _url(oldRoot) != _url(previous)) ||
         _url(newRoot) == _url(oldRoot) ||
         _url(device) == _url(newRoot) ||
@@ -114,25 +104,7 @@ Future<RootIdentity> verifyRootHistory(
         'Цепочка смены root не соответствует идентичности',
       );
     }
-    for (final role in ['old', 'new']) {
-      final signed = [
-        ...utf8.encode('space/root.rotate/$role/v1\u0000'),
-        ...raw,
-      ];
-      final signature = Signature(
-        _bytes(proof['${role}_signature'], 64),
-        publicKey: SimplePublicKey(
-          role == 'old' ? oldRoot : newRoot,
-          type: KeyPairType.ed25519,
-        ),
-      );
-      if (!await Ed25519().verify(signed, signature: signature)) {
-        throw const LocalFailure(
-          LocalFailureCode.identityInvalid,
-          'Подпись смены root недействительна',
-        );
-      }
-    }
+    await _verifyRotationSignatures(proof, raw, oldRoot, newRoot);
     previous = newRoot;
     issuedBefore = t['issued_at'] as int;
   }
@@ -143,4 +115,64 @@ Future<RootIdentity> verifyRootHistory(
     );
   }
   return RootIdentity(principal!, history.length + 1, currentRoot);
+}
+
+Future<void> _verifyRotationSignatures(
+  Map<String, dynamic> proof,
+  List<int> raw,
+  List<int> oldRoot,
+  List<int> newRoot,
+) async {
+  for (final role in ['old', 'new']) {
+    final signed = [...utf8.encode('space/root.rotate/$role/v1\u0000'), ...raw];
+    final signature = Signature(
+      _bytes(proof['${role}_signature'], 64),
+      publicKey: SimplePublicKey(
+        role == 'old' ? oldRoot : newRoot,
+        type: KeyPairType.ed25519,
+      ),
+    );
+    if (!await Ed25519().verify(signed, signature: signature)) {
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Подпись смены root недействительна',
+      );
+    }
+  }
+}
+
+bool _validRotationTranscript(
+  Map<String, dynamic> t,
+  List<String> fields,
+  String canonical,
+  String text,
+  int index,
+  String principal,
+  String origin,
+  String serverId,
+) {
+  final integers = ['auth_epoch', 'expires_at', 'issued_at', 'v'];
+  final numbers = integers.every(
+    (k) => t[k] is int && (t[k] as int) > 0 && (t[k] as int) < 9007199254740991,
+  );
+  return !(!numbers ||
+      fields.join(',') != rotationFields ||
+      canonical != text ||
+      t['v'] != 1 ||
+      t['purpose'] != 'identity.root.rotate' ||
+      t['auth_epoch'] != index + 1 ||
+      t['principal_id'] != principal ||
+      t['origin'] != origin ||
+      t['server_id'] != serverId);
+}
+
+List<int> _rotationProofBytes(Map<String, dynamic> proof) {
+  final raw = _bytes(proof['transcript'], null);
+  if (raw.length > 2048) {
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Доказательство слишком большое',
+    );
+  }
+  return raw;
 }

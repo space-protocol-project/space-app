@@ -58,17 +58,7 @@ ConnectionInput parseConnectionInput(
   var token = invitationToken.trim();
   if (uri.hasFragment) {
     final fields = Uri.splitQueryString(uri.fragment);
-    if (fields.keys.any((key) => !['invite', 'tls'].contains(key)) ||
-        (!fields.containsKey('invite') && !fields.containsKey('tls')) ||
-        (fields.containsKey('tls') &&
-            !RegExp(r'^[0-9a-f]{64}$').hasMatch(fields['tls']!)) ||
-        (fields.containsKey('invite') &&
-            !RegExp(r'^iv_[A-Za-z0-9_-]{43}$').hasMatch(fields['invite']!))) {
-      throw const LocalFailure(
-        LocalFailureCode.addressInvalid,
-        'Некорректная ссылка приглашения',
-      );
-    }
+    _validateInvitationFields(fields);
     if (fields.containsKey('invite') &&
         token.isNotEmpty &&
         token != fields['invite']) {
@@ -91,6 +81,20 @@ ConnectionInput parseConnectionInput(
     );
   }
   return ConnectionInput(localOrigin(address), token);
+}
+
+void _validateInvitationFields(Map<String, String> fields) {
+  if (fields.keys.any((key) => !['invite', 'tls'].contains(key)) ||
+      (!fields.containsKey('invite') && !fields.containsKey('tls')) ||
+      (fields.containsKey('tls') &&
+          !RegExp(r'^[0-9a-f]{64}$').hasMatch(fields['tls']!)) ||
+      (fields.containsKey('invite') &&
+          !RegExp(r'^iv_[A-Za-z0-9_-]{43}$').hasMatch(fields['invite']!))) {
+    throw const LocalFailure(
+      LocalFailureCode.addressInvalid,
+      'Некорректная ссылка приглашения',
+    );
+  }
 }
 
 Uri localOrigin(String input) {
@@ -188,32 +192,50 @@ Future<Discovery> discover(
         );
       }
     }
-    final data = jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
-    final id = data['server_id'] as String;
-    final key = base64Url.decode(
-      base64Url.normalize(data['signing_public_key'] as String),
-    );
-    if (data['protocol_version'] != '0.1-experimental' ||
-        data['signing_algorithm'] != 'Ed25519' ||
-        data['manifest'] != '/api/v1/manifest' ||
-        !RegExp(r'^srv_[0-9a-f]{32}$').hasMatch(id) ||
-        key.length != 32) {
-      throw const LocalFailure(
-        LocalFailureCode.protocolInvalid,
-        'Discovery несовместим с профилем Space',
-      );
-    }
-    return Discovery(
+    return _discoveryFromBytes(
+      bytes,
       origin,
-      id,
-      key,
-      dialHost: networkOrigin.host,
-      tlsFingerprint: homeOrigin == null ? actualFingerprint : tlsFingerprint,
-      connectOrigin: discoveryConnectOrigin(data, networkOrigin),
+      networkOrigin,
+      homeOrigin,
+      tlsFingerprint,
+      actualFingerprint,
     );
   } finally {
     client.close(force: true);
   }
+}
+
+Discovery _discoveryFromBytes(
+  List<int> bytes,
+  Uri origin,
+  Uri networkOrigin,
+  String? homeOrigin,
+  String tlsFingerprint,
+  String actualFingerprint,
+) {
+  final data = jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
+  final id = data['server_id'] as String;
+  final key = base64Url.decode(
+    base64Url.normalize(data['signing_public_key'] as String),
+  );
+  if (data['protocol_version'] != '0.1-experimental' ||
+      data['signing_algorithm'] != 'Ed25519' ||
+      data['manifest'] != '/api/v1/manifest' ||
+      !RegExp(r'^srv_[0-9a-f]{32}$').hasMatch(id) ||
+      key.length != 32) {
+    throw const LocalFailure(
+      LocalFailureCode.protocolInvalid,
+      'Discovery несовместим с профилем Space',
+    );
+  }
+  return Discovery(
+    origin,
+    id,
+    key,
+    dialHost: networkOrigin.host,
+    tlsFingerprint: homeOrigin == null ? actualFingerprint : tlsFingerprint,
+    connectOrigin: discoveryConnectOrigin(data, networkOrigin),
+  );
 }
 
 class DeviceRecord {
@@ -611,6 +633,116 @@ class SpaceSession
             .listDevices(ListDevicesRequest(), options: _options),
       );
     }
+    if (uri.path == '/api/v1/channels' ||
+        RegExp(r'^/api/v1/channels/([a-z][a-z0-9_-]{0,63})(/access)?$')
+            .hasMatch(uri.path)) {
+      return _channelAdminRequest(uri, body, method);
+    }
+    if (uri.path == '/api/v1/space/members') {
+      return json(
+        await AdminServiceClient(channel).listMembers(
+          ListMembersRequest(after: uri.queryParameters['after'] ?? ''),
+          options: _options,
+        ),
+      );
+    }
+    final memberTarget = RegExp(r'^/api/v1/space/members/(u_[0-9a-f]{64})$')
+        .firstMatch(uri.path);
+    if (memberTarget != null && method == 'PATCH') {
+      return json(
+        await AdminServiceClient(channel).updateMember(
+          UpdateMemberRequest()..mergeFromProto3Json({
+            ...body!,
+            'principalId': memberTarget.group(1)!,
+          }),
+          options: _options,
+        ),
+      );
+    }
+    if (uri.path == '/api/v1/space/invites') {
+      if (method == 'POST') {
+        return json(
+          await AdminServiceClient(channel).createInvite(
+            CreateInviteRequest()..mergeFromProto3Json(body!),
+            options: _options,
+          ),
+        );
+      }
+      return json(
+        await AdminServiceClient(channel).listInvites(
+          ListInvitesRequest(after: uri.queryParameters['after'] ?? ''),
+          options: _options,
+        ),
+      );
+    }
+    final inviteTarget = RegExp(
+      r'^/api/v1/space/invites/(in_[A-Za-z0-9_-]+)/revoke$',
+    ).firstMatch(uri.path);
+    if (inviteTarget != null && method == 'POST') {
+      return json(
+        await AdminServiceClient(channel).revokeInvite(
+          RevokeInviteRequest(inviteId: inviteTarget.group(1)!),
+          options: _options,
+        ),
+      );
+    }
+    return _spaceAdminRequest(path, body, method);
+  }
+
+  Future<Map<String, dynamic>> _spaceAdminRequest(
+    String path,
+    Map<String, dynamic>? body,
+    String? method,
+  ) async {
+    Map<String, dynamic> json(GeneratedMessage value) =>
+        Map<String, dynamic>.from(value.toProto3Json() as Map);
+    final client = AdminServiceClient(channel);
+    switch (path) {
+      case '/api/v1/space/setup':
+        return Map<String, dynamic>.from(
+          (await client.getSetupStatus(
+                GetSetupStatusRequest(),
+                options: _options,
+              )).toProto3Json()
+              as Map,
+        );
+      case '/api/v1/space/setup/claim':
+        final response = await client.claimOwner(
+          ClaimOwnerRequest()..mergeFromProto3Json(body!),
+          options: _options,
+        );
+        _needsOwnerSetup = false;
+        await refreshMembership();
+        return json(response);
+      case '/api/v1/space/settings':
+        if (method == 'PATCH') {
+          final request = UpdateSettingsRequest()..mergeFromProto3Json(body!);
+          final response = await client.updateSettings(
+            request,
+            options: _options,
+          );
+          await refreshChannels();
+          return json(response);
+        }
+        return Map<String, dynamic>.from(
+          (await client.getSettings(
+                GetSettingsRequest(),
+                options: _options,
+              )).toProto3Json()
+              as Map,
+        );
+      default:
+        throw const GrpcError.unimplemented('Операция ещё не перенесена');
+    }
+  }
+
+  Future<Map<String, dynamic>> _channelAdminRequest(
+    Uri uri,
+    Map<String, dynamic>? body,
+    String? method,
+  ) async {
+    Map<String, dynamic> json(GeneratedMessage value) =>
+        Map<String, dynamic>.from(value.toProto3Json() as Map);
     final channelClient = ChannelServiceClient(channel);
     if (uri.path == '/api/v1/channels') {
       if (method == 'POST') {
@@ -674,92 +806,7 @@ class SpaceSession
         ),
       );
     }
-    if (uri.path == '/api/v1/space/members') {
-      return json(
-        await AdminServiceClient(channel).listMembers(
-          ListMembersRequest(after: uri.queryParameters['after'] ?? ''),
-          options: _options,
-        ),
-      );
-    }
-    final memberTarget = RegExp(r'^/api/v1/space/members/(u_[0-9a-f]{64})$')
-        .firstMatch(uri.path);
-    if (memberTarget != null && method == 'PATCH') {
-      return json(
-        await AdminServiceClient(channel).updateMember(
-          UpdateMemberRequest()..mergeFromProto3Json({
-            ...body!,
-            'principalId': memberTarget.group(1)!,
-          }),
-          options: _options,
-        ),
-      );
-    }
-    if (uri.path == '/api/v1/space/invites') {
-      if (method == 'POST') {
-        return json(
-          await AdminServiceClient(channel).createInvite(
-            CreateInviteRequest()..mergeFromProto3Json(body!),
-            options: _options,
-          ),
-        );
-      }
-      return json(
-        await AdminServiceClient(channel).listInvites(
-          ListInvitesRequest(after: uri.queryParameters['after'] ?? ''),
-          options: _options,
-        ),
-      );
-    }
-    final inviteTarget = RegExp(
-      r'^/api/v1/space/invites/(in_[A-Za-z0-9_-]+)/revoke$',
-    ).firstMatch(uri.path);
-    if (inviteTarget != null && method == 'POST') {
-      return json(
-        await AdminServiceClient(channel).revokeInvite(
-          RevokeInviteRequest(inviteId: inviteTarget.group(1)!),
-          options: _options,
-        ),
-      );
-    }
-    final client = AdminServiceClient(channel);
-    switch (path) {
-      case '/api/v1/space/setup':
-        return Map<String, dynamic>.from(
-          (await client.getSetupStatus(
-                GetSetupStatusRequest(),
-                options: _options,
-              )).toProto3Json()
-              as Map,
-        );
-      case '/api/v1/space/setup/claim':
-        final response = await client.claimOwner(
-          ClaimOwnerRequest()..mergeFromProto3Json(body!),
-          options: _options,
-        );
-        _needsOwnerSetup = false;
-        await refreshMembership();
-        return json(response);
-      case '/api/v1/space/settings':
-        if (method == 'PATCH') {
-          final request = UpdateSettingsRequest()..mergeFromProto3Json(body!);
-          final response = await client.updateSettings(
-            request,
-            options: _options,
-          );
-          await refreshChannels();
-          return json(response);
-        }
-        return Map<String, dynamic>.from(
-          (await client.getSettings(
-                GetSettingsRequest(),
-                options: _options,
-              )).toProto3Json()
-              as Map,
-        );
-      default:
-        throw const GrpcError.unimplemented('Операция ещё не перенесена');
-    }
+    throw const GrpcError.unimplemented('Неподдерживаемая операция канала');
   }
 
   static Future<SpaceSession> connect(
@@ -788,38 +835,13 @@ class SpaceSession
     } finally {
       await setupChannel.shutdown();
     }
-    var record = restoredRecord ?? await vault.load(server.origin.toString());
-    if (record != null) {
-      checkTrust(server, record);
-      await record.identity();
-      if (automatic && !record.administrative && record.rootSeed.isNotEmpty) {
-        record = DeviceRecord(
-          origin: record.origin,
-          serverId: record.serverId,
-          serverKey: record.serverKey,
-          tlsFingerprint: record.tlsFingerprint,
-          rootSeed: record.rootSeed,
-          deviceSeed: record.deviceSeed,
-          rootPublicKey: record.rootPublicKey,
-          rootHistory: record.rootHistory,
-          administrative: true,
-        );
-      }
-    } else {
-      final algorithm = Ed25519();
-      final root = await algorithm.newKeyPair();
-      final device = await algorithm.newKeyPair();
-      record = DeviceRecord(
-        origin: server.origin.toString(),
-        serverId: server.serverId,
-        serverKey: url64(server.publicKey),
-        tlsFingerprint: server.tlsFingerprint,
-        rootSeed: await root.extractPrivateKeyBytes(),
-        deviceSeed: await device.extractPrivateKeyBytes(),
-        administrative: automatic || setupCode.isNotEmpty,
-      );
-      await vault.save(record);
-    }
+    final record = await _connectionRecord(
+      server,
+      vault,
+      restoredRecord,
+      automatic,
+      setupCode,
+    );
     final channel = server.openConnection();
     final session = SpaceSession._(server, record, vault, channel);
     try {
@@ -885,6 +907,48 @@ class SpaceSession
     }
   }
 
+  static Future<DeviceRecord> _connectionRecord(
+    Discovery server,
+    IdentityVault vault,
+    DeviceRecord? restoredRecord,
+    bool automatic,
+    String setupCode,
+  ) async {
+    var record = restoredRecord ?? await vault.load(server.origin.toString());
+    if (record != null) {
+      checkTrust(server, record);
+      await record.identity();
+      if (automatic && !record.administrative && record.rootSeed.isNotEmpty) {
+        record = DeviceRecord(
+          origin: record.origin,
+          serverId: record.serverId,
+          serverKey: record.serverKey,
+          tlsFingerprint: record.tlsFingerprint,
+          rootSeed: record.rootSeed,
+          deviceSeed: record.deviceSeed,
+          rootPublicKey: record.rootPublicKey,
+          rootHistory: record.rootHistory,
+          administrative: true,
+        );
+      }
+    } else {
+      final algorithm = Ed25519();
+      final root = await algorithm.newKeyPair();
+      final device = await algorithm.newKeyPair();
+      record = DeviceRecord(
+        origin: server.origin.toString(),
+        serverId: server.serverId,
+        serverKey: url64(server.publicKey),
+        tlsFingerprint: server.tlsFingerprint,
+        rootSeed: await root.extractPrivateKeyBytes(),
+        deviceSeed: await device.extractPrivateKeyBytes(),
+        administrative: automatic || setupCode.isNotEmpty,
+      );
+      await vault.save(record);
+    }
+    return record;
+  }
+
   @override
   Future<void> login() =>
       _loginTask ??= _login().whenComplete(() => _loginTask = null);
@@ -947,6 +1011,116 @@ class SpaceSession
     final delegated =
         purpose == 'device.delegate' || purpose == 'recovery.device.revoke';
     final grantId = target?.id ?? credentials.grantId;
+    final request = _authorizationRequest(
+      purpose,
+      credentials,
+      rootPublic,
+      devicePublic,
+      grantId,
+      pairing,
+      delegated,
+    );
+    final auth = AuthServiceClient(channel);
+    final options = RpcOptions(timeout: const Duration(seconds: 10));
+    final challenge = await auth.createChallenge(request, options: options);
+    final checkedIdentity = await credentials.identity();
+    final signing = await checkedSigningBytes(
+      challenge,
+      server,
+      rootPublic,
+      devicePublic,
+      purpose,
+      grantId,
+      expectedScopes: _authorizationScopes(credentials, target, pairing),
+      authorizerGrantId: delegated ? credentials.recoveryGrantId : '',
+      pairingId: pairing?.id ?? '',
+      expectedPrincipal: checkedIdentity.principalId,
+      expectedEpoch: checkedIdentity.epoch,
+    );
+    final key = await _authorizationKey(
+      purpose,
+      delegated,
+      device,
+      root,
+      credentials,
+      algorithm,
+    );
+    final signature = await algorithm.sign(signing, keyPair: key);
+    final result = await auth.completeChallenge(
+      CompleteChallengeRequest(
+        challengeId: challenge.challengeId,
+        signature: signature.bytes,
+        invitationToken: invitationToken,
+      ),
+      options: options,
+    );
+    _validateAuthorizationResult(
+      result,
+      checkedIdentity.principalId,
+      purpose,
+      grantId,
+    );
+    return result;
+  }
+
+  Future<KeyPair> _authorizationKey(
+    String purpose,
+    bool delegated,
+    KeyPair device,
+    KeyPair? root,
+    DeviceRecord credentials,
+    Ed25519 algorithm,
+  ) async => purpose == 'auth.login'
+      ? device
+      : delegated
+      ? await algorithm.newKeyPairFromSeed(credentials.recoverySeed)
+      : root!;
+
+  List<String> _authorizationScopes(
+    DeviceRecord credentials,
+    DeviceGrant? target,
+    Pairing? pairing,
+  ) =>
+      (pairing == null
+          ? target?.scopes
+          : [
+              'chat.read',
+              'chat.write',
+              if (pairing.administrative) 'space.manage',
+            ]) ??
+      [
+        'chat.read',
+        'chat.write',
+        if (credentials.administrative) 'space.manage',
+      ];
+
+  void _validateAuthorizationResult(
+    CompleteChallengeResponse result,
+    String principal,
+    String purpose,
+    String grantId,
+  ) {
+    if (result.principalId != principal ||
+        !RegExp(r'^dg_[A-Za-z0-9_-]{43}$').hasMatch(result.grantId) ||
+        (purpose != 'device.register' &&
+            purpose != 'device.delegate' &&
+            result.grantId != grantId)) {
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Ответ входа не соответствует ключам',
+      );
+    }
+  }
+
+  CreateChallengeRequest _authorizationRequest(
+    String purpose,
+    DeviceRecord credentials,
+    List<int> rootPublic,
+    List<int> devicePublic,
+    String grantId,
+    Pairing? pairing,
+    bool delegated,
+  ) {
     final request = CreateChallengeRequest(purpose: purpose);
     if (purpose == 'device.register') {
       request.rootPublicKey = rootPublic;
@@ -968,61 +1142,7 @@ class SpaceSession
       request.pairingId = pairing.id;
       request.administrative = pairing.administrative;
     }
-    final auth = AuthServiceClient(channel);
-    final options = RpcOptions(timeout: const Duration(seconds: 10));
-    final challenge = await auth.createChallenge(request, options: options);
-    final checkedIdentity = await credentials.identity();
-    final signing = await checkedSigningBytes(
-      challenge,
-      server,
-      rootPublic,
-      devicePublic,
-      purpose,
-      grantId,
-      expectedScopes:
-          (pairing == null
-              ? target?.scopes
-              : [
-                  'chat.read',
-                  'chat.write',
-                  if (pairing.administrative) 'space.manage',
-                ]) ??
-          [
-            'chat.read',
-            'chat.write',
-            if (credentials.administrative) 'space.manage',
-          ],
-      authorizerGrantId: delegated ? credentials.recoveryGrantId : '',
-      pairingId: pairing?.id ?? '',
-      expectedPrincipal: checkedIdentity.principalId,
-      expectedEpoch: checkedIdentity.epoch,
-    );
-    final key = purpose == 'auth.login'
-        ? device
-        : delegated
-        ? await algorithm.newKeyPairFromSeed(credentials.recoverySeed)
-        : root!;
-    final signature = await algorithm.sign(signing, keyPair: key);
-    final result = await auth.completeChallenge(
-      CompleteChallengeRequest(
-        challengeId: challenge.challengeId,
-        signature: signature.bytes,
-        invitationToken: invitationToken,
-      ),
-      options: options,
-    );
-    final principal = checkedIdentity.principalId;
-    if (result.principalId != principal ||
-        !RegExp(r'^dg_[A-Za-z0-9_-]{43}$').hasMatch(result.grantId) ||
-        (purpose != 'device.register' &&
-            purpose != 'device.delegate' &&
-            result.grantId != grantId)) {
-      throw const LocalFailure(
-        LocalFailureCode.identityInvalid,
-        'Ответ входа не соответствует ключам',
-      );
-    }
-    return result;
+    return request;
   }
 
   @override
@@ -1458,17 +1578,13 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
   final serverKey = payload['server_key'] as String,
       serverId = payload['server_id'] as String;
   final tlsFingerprint = payload['tls_fingerprint'] as String? ?? '';
-  if (rootPublic.length != 32 ||
-      secret.length != 32 ||
-      !RegExp(r'^srv_[0-9a-f]{32}$').hasMatch(serverId) ||
-      !RegExp(r'^[A-Za-z0-9_-]{43}$').hasMatch(serverKey) ||
-      (tlsFingerprint.isNotEmpty &&
-          !RegExp(r'^[0-9a-f]{64}$').hasMatch(tlsFingerprint))) {
-    throw const LocalFailure(
-      LocalFailureCode.identityInvalid,
-      'Повреждены сведения о сервере или ключах',
-    );
-  }
+  _validateRecoveryKeys(
+    rootPublic,
+    secret,
+    serverId,
+    serverKey,
+    tlsFingerprint,
+  );
   final pair = await Ed25519().newKeyPairFromSeed(secret);
   final actual = url64((await pair.extractPublicKey()).bytes);
   final isRoot = payload['credential'] == 'root';
@@ -1479,17 +1595,7 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
       'Ключ карточки не соответствует публичному ключу',
     );
   }
-  if (!isRoot &&
-      (payload['expires_at'] is! int ||
-          (payload['expires_at'] as int) <=
-              DateTime.now().millisecondsSinceEpoch ~/ 1000 ||
-          !RegExp(r'^dg_[A-Za-z0-9_-]{43}$')
-              .hasMatch(payload['recovery_grant_id'] as String))) {
-    throw const LocalFailure(
-      LocalFailureCode.protocolInvalid,
-      'Разрешение восстановления недействительно',
-    );
-  }
+  _validateRecoveryGrant(payload, isRoot);
   final device = await Ed25519().newKeyPair();
   final history = (payload['root_history'] as List? ?? [])
       .map((v) => Map<String, dynamic>.from(v as Map))
@@ -1624,4 +1730,38 @@ Future<List<int>> checkedSigningBytes(
     );
   }
   return utf8.encode('$prefix\u0000$canonical');
+}
+
+void _validateRecoveryKeys(
+  List<int> rootPublic,
+  List<int> secret,
+  String serverId,
+  String serverKey,
+  String tlsFingerprint,
+) {
+  if (rootPublic.length != 32 ||
+      secret.length != 32 ||
+      !RegExp(r'^srv_[0-9a-f]{32}$').hasMatch(serverId) ||
+      !RegExp(r'^[A-Za-z0-9_-]{43}$').hasMatch(serverKey) ||
+      (tlsFingerprint.isNotEmpty &&
+          !RegExp(r'^[0-9a-f]{64}$').hasMatch(tlsFingerprint))) {
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Повреждены сведения о сервере или ключах',
+    );
+  }
+}
+
+void _validateRecoveryGrant(Map<String, dynamic> payload, bool isRoot) {
+  if (!isRoot &&
+      (payload['expires_at'] is! int ||
+          (payload['expires_at'] as int) <=
+              DateTime.now().millisecondsSinceEpoch ~/ 1000 ||
+          !RegExp(r'^dg_[A-Za-z0-9_-]{43}$')
+              .hasMatch(payload['recovery_grant_id'] as String))) {
+    throw const LocalFailure(
+      LocalFailureCode.protocolInvalid,
+      'Разрешение восстановления недействительно',
+    );
+  }
 }

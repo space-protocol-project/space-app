@@ -116,6 +116,29 @@ class _RecoveryFilePickerState extends State<RecoveryFilePicker> {
     load(value);
   }
 
+  Widget _fileEntry(BuildContext context, int index) {
+    final entry = entries[index];
+    return ListTile(
+      dense: true,
+      leading: Icon(
+        entry is Directory ? Icons.folder_outlined : Icons.description_outlined,
+      ),
+      title: Text(
+        entry.uri.pathSegments.where((part) => part.isNotEmpty).last,
+        overflow: TextOverflow.ellipsis,
+      ),
+      onTap: loading
+          ? null
+          : () {
+              if (entry is Directory) {
+                navigate(entry.path);
+              } else {
+                setState(() => path.text = entry.path);
+              }
+            },
+    );
+  }
+
   @override
   Widget build(BuildContext context) => AlertDialog(
     title: Text(
@@ -151,32 +174,7 @@ class _RecoveryFilePickerState extends State<RecoveryFilePicker> {
           Expanded(
             child: ListView.builder(
               itemCount: entries.length,
-              itemBuilder: (context, index) {
-                final entry = entries[index];
-                return ListTile(
-                  dense: true,
-                  leading: Icon(
-                    entry is Directory
-                        ? Icons.folder_outlined
-                        : Icons.description_outlined,
-                  ),
-                  title: Text(
-                    entry.uri.pathSegments
-                        .where((part) => part.isNotEmpty)
-                        .last,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  onTap: loading
-                      ? null
-                      : () {
-                          if (entry is Directory) {
-                            navigate(entry.path);
-                          } else {
-                            setState(() => path.text = entry.path);
-                          }
-                        },
-                );
-              },
+              itemBuilder: _fileEntry,
             ),
           ),
           TextField(

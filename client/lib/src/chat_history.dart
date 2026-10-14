@@ -206,41 +206,43 @@ class LocalChatHistory implements ChatHistoryStore {
       throw const FormatException('Большая история');
     }
     final epoch = _epochs[origin] ?? 0;
-    return _queue(origin, () async {
-      if ((_epochs[origin] ?? 0) != epoch) return;
-      final id = await _id(origin);
-      final keyName = 'space.history.key.$id';
-      var key = await storage.read(key: keyName);
-      if ((_epochs[origin] ?? 0) != epoch) return;
-      if (key == null) {
-        key = base64Encode(
-          await (await AesGcm.with256bits().newSecretKey()).extractBytes(),
-        );
-        await storage.write(key: keyName, value: key);
-      }
-      final box = await AesGcm.with256bits().encrypt(
-        bytes,
-        secretKey: SecretKey(base64Decode(key)),
-        aad: utf8.encode(origin),
+    return _queue(origin, () => _writeSnapshot(origin, bytes, epoch));
+  }
+
+  Future<void> _writeSnapshot(String origin, List<int> bytes, int epoch) async {
+    if ((_epochs[origin] ?? 0) != epoch) return;
+    final id = await _id(origin);
+    final keyName = 'space.history.key.$id';
+    var key = await storage.read(key: keyName);
+    if ((_epochs[origin] ?? 0) != epoch) return;
+    if (key == null) {
+      key = base64Encode(
+        await (await AesGcm.with256bits().newSecretKey()).extractBytes(),
       );
-      final prefs = await SharedPreferences.getInstance();
-      if ((_epochs[origin] ?? 0) != epoch) return;
-      if (!await prefs.setString(
-        'space.history.data.$id',
-        jsonEncode({
-          'v': 1,
-          'data': base64Encode(box.cipherText),
-          'nonce': base64Encode(box.nonce),
-          'mac': base64Encode(box.mac.bytes),
-        }),
-      )) {
-        throw StateError('История не сохранена');
-      }
-      if ((_epochs[origin] ?? 0) != epoch) return;
-      if (!await prefs.setBool('space.history.denied.$id', false)) {
-        throw StateError('История не сохранена');
-      }
-    });
+      await storage.write(key: keyName, value: key);
+    }
+    final box = await AesGcm.with256bits().encrypt(
+      bytes,
+      secretKey: SecretKey(base64Decode(key)),
+      aad: utf8.encode(origin),
+    );
+    final prefs = await SharedPreferences.getInstance();
+    if ((_epochs[origin] ?? 0) != epoch) return;
+    if (!await prefs.setString(
+      'space.history.data.$id',
+      jsonEncode({
+        'v': 1,
+        'data': base64Encode(box.cipherText),
+        'nonce': base64Encode(box.nonce),
+        'mac': base64Encode(box.mac.bytes),
+      }),
+    )) {
+      throw StateError('История не сохранена');
+    }
+    if ((_epochs[origin] ?? 0) != epoch) return;
+    if (!await prefs.setBool('space.history.denied.$id', false)) {
+      throw StateError('История не сохранена');
+    }
   }
 
   @override

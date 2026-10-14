@@ -8,6 +8,7 @@ import 'package:cryptography/cryptography.dart';
 import 'package:fixnum/fixnum.dart';
 
 import 'core.dart';
+import 'root_history.dart';
 import 'rpc_clients.dart';
 
 Future<String> _digest(DeviceRecord record) async => url64(
@@ -57,20 +58,7 @@ Future<Map<String, dynamic>> prepareRootRotation(
       ? null
       : DeviceRecord.fromJson(existing['next'] as Map<String, dynamic>);
   if (saved != null) {
-    checkTrust(server, saved);
-    final checked = await saved.identity();
-    if (existing!['old_digest'] != await _digest(current) ||
-        checked.principalId != identity.principalId ||
-        checked.epoch != identity.epoch + 1 ||
-        jsonEncode(
-              saved.rootHistory.take(saved.rootHistory.length - 1).toList(),
-            ) !=
-            jsonEncode(current.rootHistory)) {
-      throw const LocalFailure(
-        LocalFailureCode.identityInvalid,
-        'Сохранённая ротация относится к другой записи',
-      );
-    }
+    await _validateSavedRotation(server, saved, current, existing!, identity);
   }
   final newRoot = saved == null
           ? await algorithm.newKeyPair()
@@ -100,29 +88,15 @@ Future<Map<String, dynamic>> prepareRootRotation(
   );
   final raw = utf8.decode(challenge.transcript);
   final t = jsonDecode(raw) as Map<String, dynamic>;
-  final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-  final expectedScopes = [
-    'chat.read',
-    'chat.write',
-    if (current.administrative) 'space.manage',
-  ];
-  if (t['challenge_id'] != challenge.challengeId ||
-      t['operation_id'] != operation ||
-      t['principal_id'] != identity.principalId ||
-      t['auth_epoch'] != identity.epoch ||
-      t['old_root_public_key'] != url64(identity.publicKey) ||
-      t['new_root_public_key'] != url64(public) ||
-      t['new_device_public_key'] != url64(devicePublic) ||
-      t['origin'] != current.origin ||
-      t['server_id'] != current.serverId ||
-      t['expires_at'] is! int ||
-      t['expires_at'] <= now ||
-      jsonEncode(t['scopes']) != jsonEncode(expectedScopes)) {
-    throw const LocalFailure(
-      LocalFailureCode.identityInvalid,
-      'Запрос ротации не соответствует выбранной операции',
-    );
-  }
+  _validateRotationChallenge(
+    t,
+    challenge,
+    operation,
+    identity,
+    current,
+    public,
+    devicePublic,
+  );
   final proof = <String, dynamic>{'transcript': url64(challenge.transcript)};
   for (final role in ['old', 'new']) {
     final signed = [
@@ -146,34 +120,7 @@ Future<Map<String, dynamic>> prepareRootRotation(
     administrative: current.administrative,
     rootHistory: [...current.rootHistory, proof],
   );
-  final nextIdentity = await next.identity();
-  final recoverySize = utf8
-      .encode(
-        jsonEncode({
-          'v': 2,
-          'origin': next.origin,
-          'server_id': next.serverId,
-          'server_key': next.serverKey,
-          'root_public_key': url64(public),
-          'credential': 'root',
-          'secret': url64(next.rootSeed),
-          'root_history': next.rootHistory,
-        }),
-      )
-      .length;
-  if (recoverySize > 8176) {
-    throw const LocalFailure(
-      LocalFailureCode.identityInvalid,
-      'История не помещается в recovery-карточку; смена не отправлена',
-    );
-  }
-  if (nextIdentity.principalId != identity.principalId ||
-      nextIdentity.epoch != identity.epoch + 1) {
-    throw const LocalFailure(
-      LocalFailureCode.identityInvalid,
-      'Ротация меняет идентичность',
-    );
-  }
+  await _verifyPreparedRotation(next, identity, public);
   final pending = <String, dynamic>{
     'v': 1,
     'old_digest': await _digest(current),
@@ -216,17 +163,7 @@ Future<DeviceRecord?> finishRootRotation(
       'Журнал содержит другое устройство',
     );
   }
-  DeviceRecord? current;
-  try {
-    current = await vault.load(next.origin);
-  } catch (_) {
-    // Частично записанный active slot после commit восстанавливается из отдельного
-    // защищённого журнала, только после проверки обеих подписей и receipt сервера.
-    current = null;
-  }
-  if (current != null) {
-    checkTrust(server, current);
-  }
+  final current = await _currentRotationRecord(server, vault, next);
   final oldState =
       current == null || await _digest(current) == pending['old_digest'];
   final alreadyActivated =
@@ -266,4 +203,115 @@ Future<DeviceRecord?> finishRootRotation(
   await vault.save(next);
   await vault.clearRotation(next.origin);
   return next;
+}
+
+void _validateRotationChallenge(
+  Map<String, dynamic> t,
+  CreateRootRotationResponse challenge,
+  String operation,
+  RootIdentity identity,
+  DeviceRecord current,
+  List<int> public,
+  List<int> devicePublic,
+) {
+  final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  final expectedScopes = [
+    'chat.read',
+    'chat.write',
+    if (current.administrative) 'space.manage',
+  ];
+  if (t['challenge_id'] != challenge.challengeId ||
+      t['operation_id'] != operation ||
+      t['principal_id'] != identity.principalId ||
+      t['auth_epoch'] != identity.epoch ||
+      t['old_root_public_key'] != url64(identity.publicKey) ||
+      t['new_root_public_key'] != url64(public) ||
+      t['new_device_public_key'] != url64(devicePublic) ||
+      t['origin'] != current.origin ||
+      t['server_id'] != current.serverId ||
+      t['expires_at'] is! int ||
+      t['expires_at'] <= now ||
+      jsonEncode(t['scopes']) != jsonEncode(expectedScopes)) {
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Запрос ротации не соответствует выбранной операции',
+    );
+  }
+}
+
+Future<DeviceRecord?> _currentRotationRecord(
+  Discovery server,
+  RotationJournalVault vault,
+  DeviceRecord next,
+) async {
+  DeviceRecord? current;
+  try {
+    current = await vault.load(next.origin);
+  } catch (_) {
+    // Частично записанный active slot после commit восстанавливается из отдельного
+    // защищённого журнала, только после проверки обеих подписей и receipt сервера.
+    current = null;
+  }
+  if (current != null) {
+    checkTrust(server, current);
+  }
+  return current;
+}
+
+Future<void> _verifyPreparedRotation(
+  DeviceRecord next,
+  RootIdentity identity,
+  List<int> public,
+) async {
+  final nextIdentity = await next.identity();
+  final recoverySize = utf8
+      .encode(
+        jsonEncode({
+          'v': 2,
+          'origin': next.origin,
+          'server_id': next.serverId,
+          'server_key': next.serverKey,
+          'root_public_key': url64(public),
+          'credential': 'root',
+          'secret': url64(next.rootSeed),
+          'root_history': next.rootHistory,
+        }),
+      )
+      .length;
+  if (recoverySize > 8176) {
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'История не помещается в recovery-карточку; смена не отправлена',
+    );
+  }
+  if (nextIdentity.principalId != identity.principalId ||
+      nextIdentity.epoch != identity.epoch + 1) {
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Ротация меняет идентичность',
+    );
+  }
+}
+
+Future<void> _validateSavedRotation(
+  Discovery server,
+  DeviceRecord saved,
+  DeviceRecord current,
+  Map<String, dynamic> existing,
+  RootIdentity identity,
+) async {
+  checkTrust(server, saved);
+  final checked = await saved.identity();
+  if (existing['old_digest'] != await _digest(current) ||
+      checked.principalId != identity.principalId ||
+      checked.epoch != identity.epoch + 1 ||
+      jsonEncode(
+            saved.rootHistory.take(saved.rootHistory.length - 1).toList(),
+          ) !=
+          jsonEncode(current.rootHistory)) {
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Сохранённая ротация относится к другой записи',
+    );
+  }
 }

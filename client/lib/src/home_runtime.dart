@@ -239,35 +239,13 @@ void extractVerifiedHomeArchive(
   final input = InputFileStream(archivePath);
   try {
     final archive = ZipDecoder().decodeStream(input);
-    var total = 0;
     if (archive.length > 50000) {
       throw const LocalFailure(
         LocalFailureCode.archiveInvalid,
         'Слишком много файлов в выпуске',
       );
     }
-    for (final entry in archive) {
-      final parts = entry.name.replaceAll('\\', '/').split('/');
-      total += entry.size;
-      if (entry.isSymbolicLink ||
-          parts.any(
-            (part) =>
-                part == '..' ||
-                part == '.' ||
-                part.contains(':') ||
-                part.trim() != part ||
-                part.endsWith('.'),
-          ) ||
-          entry.name.startsWith('/') ||
-          entry.name.startsWith('\\') ||
-          total > maximumBytes ||
-          total > 2 * 1024 * 1024 * 1024) {
-        throw const LocalFailure(
-          LocalFailureCode.archiveInvalid,
-          'Недопустимый путь или размер в выпуске',
-        );
-      }
-    }
+    _verifyArchiveEntries(archive, maximumBytes);
     for (final entry in archive) {
       final path = '$destination/${entry.name}';
       if (!entry.isFile) {
@@ -293,5 +271,31 @@ void extractVerifiedHomeArchive(
     }
   } finally {
     input.closeSync();
+  }
+}
+
+void _verifyArchiveEntries(Archive archive, int maximumBytes) {
+  var total = 0;
+  for (final entry in archive) {
+    final parts = entry.name.replaceAll('\\', '/').split('/');
+    total += entry.size;
+    if (entry.isSymbolicLink ||
+        parts.any(
+          (part) =>
+              part == '..' ||
+              part == '.' ||
+              part.contains(':') ||
+              part.trim() != part ||
+              part.endsWith('.'),
+        ) ||
+        entry.name.startsWith('/') ||
+        entry.name.startsWith('\\') ||
+        total > maximumBytes ||
+        total > 2 * 1024 * 1024 * 1024) {
+      throw const LocalFailure(
+        LocalFailureCode.archiveInvalid,
+        'Недопустимый путь или размер в выпуске',
+      );
+    }
   }
 }

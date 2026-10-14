@@ -203,6 +203,56 @@ class _AdminPageState extends State<AdminPage> {
     onPressed: busy || iconLoading ? null : () => run(action),
     child: Text(label),
   );
+  Future<void> _authorizeDevice() async {
+    var password = '';
+    setState(() => confirming = true);
+    final accepted = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(strings.authorizeConfirm),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(strings.authorizeDetails),
+            if (identity!['hasRootAuthority'] != true)
+              TextField(
+                obscureText: true,
+                onChanged: (v) => password = v,
+                decoration: InputDecoration(labelText: strings.rootPassword),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(strings.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(strings.allow),
+          ),
+        ],
+      ),
+    );
+    if (mounted) setState(() => confirming = false);
+    if (accepted != true) return;
+    await widget.authorizeDevice!(password);
+    password = '';
+    await signIn(false);
+  }
+
+  Future<void> _claimOwner() async {
+    if (widget.authorizeDevice != null && identity!['administrative'] != true) {
+      throw StateError(strings.authorizeFirst);
+    }
+    final value = code.text;
+    code.clear();
+    await call('/api/v1/space/setup/claim', body: {'setupCode': value});
+    initialized = true;
+    identity!['role'] = 'owner';
+    await load();
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     bottomNavigationBar: localizedStatus.isEmpty && !busy
@@ -271,21 +321,7 @@ class _AdminPageState extends State<AdminPage> {
                     decoration: InputDecoration(labelText: strings.setupCode),
                   ),
                   const SizedBox(height: 16),
-                  button(strings.confirmOwner, () async {
-                    if (widget.authorizeDevice != null &&
-                        identity!['administrative'] != true) {
-                      throw StateError(strings.authorizeFirst);
-                    }
-                    final value = code.text;
-                    code.clear();
-                    await call(
-                      '/api/v1/space/setup/claim',
-                      body: {'setupCode': value},
-                    );
-                    initialized = true;
-                    identity!['role'] = 'owner';
-                    await load();
-                  }),
+                  button(strings.confirmOwner, _claimOwner),
                 ]),
               if (identity != null &&
                   widget.authorizeDevice != null &&
@@ -295,45 +331,7 @@ class _AdminPageState extends State<AdminPage> {
                 card([
                   Text(strings.authorizeTitle, style: TextStyle(fontSize: 20)),
                   Text(strings.authorizeHelp),
-                  button(strings.authorizeDevice, () async {
-                    var password = '';
-                    setState(() => confirming = true);
-                    final accepted = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(strings.authorizeConfirm),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(strings.authorizeDetails),
-                            if (identity!['hasRootAuthority'] != true)
-                              TextField(
-                                obscureText: true,
-                                onChanged: (v) => password = v,
-                                decoration: InputDecoration(
-                                  labelText: strings.rootPassword,
-                                ),
-                              ),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: Text(strings.cancel),
-                          ),
-                          FilledButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            child: Text(strings.allow),
-                          ),
-                        ],
-                      ),
-                    );
-                    if (mounted) setState(() => confirming = false);
-                    if (accepted != true) return;
-                    await widget.authorizeDevice!(password);
-                    password = '';
-                    await signIn(false);
-                  }),
+                  button(strings.authorizeDevice, _authorizeDevice),
                 ]),
               if (settings != null)
                 card([

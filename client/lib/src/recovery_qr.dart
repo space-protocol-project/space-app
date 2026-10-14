@@ -57,20 +57,7 @@ String cardFromArtifact(Uint8List bytes) {
       bytes.length >= 8 &&
       List.generate(8, (i) => bytes[i]).join(',') == _pngSignature.join(',');
   if (!png) {
-    if (bytes.length > 16384) {
-      throw const LocalFailure(
-        LocalFailureCode.qrFileTooLarge,
-        'JSON-карточка слишком большая',
-      );
-    }
-    try {
-      return utf8.decode(bytes);
-    } on FormatException {
-      throw const LocalFailure(
-        LocalFailureCode.cardCorrupt,
-        'Некорректный UTF-8 карточки',
-      );
-    }
+    return _jsonRecoveryCard(bytes);
   }
   if (bytes.length < 24) {
     throw const LocalFailure(
@@ -97,14 +84,7 @@ String cardFromArtifact(Uint8List bytes) {
       'Повреждённый PNG',
     );
   }
-  final pixels = Int32List(width * height);
-  for (var y = 0; y < height; y++) {
-    for (var x = 0; x < width; x++) {
-      final p = image.getPixel(x, y);
-      pixels[y * width + x] =
-          (p.r.toInt() << 16) | (p.g.toInt() << 8) | p.b.toInt();
-    }
-  }
+  final pixels = _qrPixels(image, width, height);
   try {
     final reader = zx.QRCodeReader();
     final bitmap = zx.BinaryBitmap(
@@ -142,3 +122,32 @@ String cardFromArtifact(Uint8List bytes) {
 
 Uint8List pngInWorker(String packet) => recoveryPng(packet);
 String artifactInWorker(Uint8List bytes) => cardFromArtifact(bytes);
+
+Int32List _qrPixels(img.Image image, int width, int height) {
+  final pixels = Int32List(width * height);
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      final p = image.getPixel(x, y);
+      pixels[y * width + x] =
+          (p.r.toInt() << 16) | (p.g.toInt() << 8) | p.b.toInt();
+    }
+  }
+  return pixels;
+}
+
+String _jsonRecoveryCard(Uint8List bytes) {
+  if (bytes.length > 16384) {
+    throw const LocalFailure(
+      LocalFailureCode.qrFileTooLarge,
+      'JSON-карточка слишком большая',
+    );
+  }
+  try {
+    return utf8.decode(bytes);
+  } on FormatException {
+    throw const LocalFailure(
+      LocalFailureCode.cardCorrupt,
+      'Некорректный UTF-8 карточки',
+    );
+  }
+}

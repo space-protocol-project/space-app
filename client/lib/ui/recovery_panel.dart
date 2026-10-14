@@ -121,21 +121,25 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     try {
       await action();
     } catch (error) {
-      if (mounted) {
-        setState(() {
-          failureCode = error is RecoveryOperationError
-              ? null
-              : classifyFailure(error);
-          messageKey = error is RecoveryOperationError
-              ? error.key
-              : error is FormatException
-              ? null
-              : 'recoveryOperationFailed';
-          message = error is FormatException ? error.message.toString() : '';
-        });
-      }
+      _showRecoveryError(error);
     } finally {
       if (mounted) setState(() => pending = false);
+    }
+  }
+
+  void _showRecoveryError(Object error) {
+    if (mounted) {
+      setState(() {
+        failureCode = error is RecoveryOperationError
+            ? null
+            : classifyFailure(error);
+        messageKey = error is RecoveryOperationError
+            ? error.key
+            : error is FormatException
+            ? null
+            : 'recoveryOperationFailed';
+        message = error is FormatException ? error.message.toString() : '';
+      });
     }
   }
 
@@ -183,23 +187,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     final extension = json ? 'json' : 'png';
     if (!mounted) return;
     if (Platform.isWindows) {
-      final selected = await pickRecoveryQrDestination(
-        context,
-        name: 'space-recovery.$extension',
-        label: json ? 'JSON' : null,
-      );
-      if (selected == null || !mounted) return;
-      final destination = File(
-        selected.toLowerCase().endsWith('.$extension')
-            ? selected
-            : '$selected.$extension',
-      );
-      if (await destination.exists() &&
-          !await confirm((strings) => strings.recoveryOverwriteQr)) {
-        return;
-      }
-      await destination.writeAsBytes(content, flush: true);
-      if (mounted) setState(() => messageKey = 'recoveryCardSaved');
+      await _exportOnWindows(content, extension, json);
       return;
     }
     final destination = await getSaveLocation(
@@ -222,28 +210,53 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     }
   }
 
-  Future<void> restore({String? cameraPacket}) async {
-    String packet;
-    if (cameraPacket != null) {
-      packet = cameraPacket;
-    } else {
-      final selectedPath = Platform.isWindows
-          ? await pickRecoveryFile(context)
-          : null;
-      final file = Platform.isWindows
-          ? (selectedPath == null ? null : XFile(selectedPath))
-          : await openFile(acceptedTypeGroups: files);
-      if (file == null) return;
-      stage(1);
-      if (await file.length().timeout(const Duration(seconds: 10)) >
-          maxRecoveryImageBytes) {
-        throw RecoveryOperationError('recoveryTooLarge');
-      }
-      packet = await compute(
-        artifactInWorker,
-        await file.readAsBytes().timeout(const Duration(seconds: 10)),
-      ).timeout(const Duration(seconds: 30));
+  Future<void> _exportOnWindows(
+    Uint8List content,
+    String extension,
+    bool json,
+  ) async {
+    final selected = await pickRecoveryQrDestination(
+      context,
+      name: 'space-recovery.$extension',
+      label: json ? 'JSON' : null,
+    );
+    if (selected == null || !mounted) return;
+    final destination = File(
+      selected.toLowerCase().endsWith('.$extension')
+          ? selected
+          : '$selected.$extension',
+    );
+    if (await destination.exists() &&
+        !await confirm((strings) => strings.recoveryOverwriteQr)) {
+      return;
     }
+    await destination.writeAsBytes(content, flush: true);
+    if (mounted) setState(() => messageKey = 'recoveryCardSaved');
+    return;
+  }
+
+  Future<String?> _readRestorePacket() async {
+    final selectedPath = Platform.isWindows
+        ? await pickRecoveryFile(context)
+        : null;
+    final file = Platform.isWindows
+        ? (selectedPath == null ? null : XFile(selectedPath))
+        : await openFile(acceptedTypeGroups: files);
+    if (file == null) return null;
+    stage(1);
+    if (await file.length().timeout(const Duration(seconds: 10)) >
+        maxRecoveryImageBytes) {
+      throw RecoveryOperationError('recoveryTooLarge');
+    }
+    return await compute(
+      artifactInWorker,
+      await file.readAsBytes().timeout(const Duration(seconds: 10)),
+    ).timeout(const Duration(seconds: 30));
+  }
+
+  Future<void> restore({String? cameraPacket}) async {
+    final packet = cameraPacket ?? await _readRestorePacket();
+    if (packet == null) return;
     final pass = await password(false);
     if (pass == null) return;
     stage(2);
@@ -353,6 +366,22 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     }
   }
 
+  Future<DeviceRecord?> _readRevocationAuthority() async {
+    final file = await openFile(acceptedTypeGroups: files);
+    if (file == null) return null;
+    if (await file.length() > maxRecoveryImageBytes) {
+      throw RecoveryOperationError('recoveryTooLarge');
+    }
+    final pass = await password(false);
+    if (pass == null) return null;
+    return await recordFromRecovery(
+      await compute(openCardInWorker, [
+        await compute(artifactInWorker, await file.readAsBytes()),
+        pass,
+      ]),
+    );
+  }
+
   Future<void> revoke(DeviceGrant grant) async {
     final manager = widget.controller.deviceManagement;
     if (manager == null) return;
@@ -365,19 +394,8 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     }
     DeviceRecord? authority;
     if (!manager.hasRootAuthority && grant.id != manager.currentGrantId) {
-      final file = await openFile(acceptedTypeGroups: files);
-      if (file == null) return;
-      if (await file.length() > maxRecoveryImageBytes) {
-        throw RecoveryOperationError('recoveryTooLarge');
-      }
-      final pass = await password(false);
-      if (pass == null) return;
-      authority = await recordFromRecovery(
-        await compute(openCardInWorker, [
-          await compute(artifactInWorker, await file.readAsBytes()),
-          pass,
-        ]),
-      );
+      authority = await _readRevocationAuthority();
+      if (authority == null) return;
     }
     await manager.revokeDevice(grant, authority: authority);
     if (grant.id == manager.currentGrantId) {

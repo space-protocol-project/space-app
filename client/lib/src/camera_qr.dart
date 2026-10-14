@@ -6,10 +6,7 @@ import 'recovery_qr.dart';
 
 String? cameraCardInWorker(Uint8List bytes) {
   if (bytes.length > 8 * 1024 * 1024 || bytes.length < 8) return null;
-  final jpeg = bytes[0] == 255 && bytes[1] == 216 && bytes[2] == 255;
-  final png =
-      bytes[0] == 137 && bytes[1] == 80 && bytes[2] == 78 && bytes[3] == 71;
-  if (!jpeg && !png) return null;
+  if (!_isCameraImage(bytes)) return null;
   final decoder = img.findDecoderForData(bytes);
   final info = decoder?.startDecode(bytes);
   if (info == null ||
@@ -34,4 +31,11 @@ String? cameraCardInWorker(Uint8List bytes) {
   } catch (_) {
     return null;
   }
+}
+
+bool _isCameraImage(Uint8List bytes) {
+  final jpeg = bytes[0] == 255 && bytes[1] == 216 && bytes[2] == 255;
+  final png =
+      bytes[0] == 137 && bytes[1] == 80 && bytes[2] == 78 && bytes[3] == 71;
+  return jpeg || png;
 }

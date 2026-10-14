@@ -81,56 +81,7 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 16),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    OutlinedButton.icon(
-                      key: const ValueKey('check-app-updates'),
-                      onPressed:
-                          view.downloading ||
-                              view.installing ||
-                              view.status == AppUpdateStatus.checking
-                          ? null
-                          : updates.check,
-                      icon: const Icon(Icons.refresh),
-                      label: Text(context.strings.updatesCheck),
-                    ),
-                    if (view.status == AppUpdateStatus.available &&
-                        view.package != null)
-                      FilledButton.icon(
-                        key: const ValueKey('download-app-update'),
-                        onPressed:
-                            view.downloading ||
-                                view.installing ||
-                                view.downloadedPackage != null
-                            ? null
-                            : updates.download,
-                        icon: const Icon(Icons.download_outlined),
-                        label: Text(context.strings.updatesDownload),
-                      ),
-                    if (view.downloadedPackage != null &&
-                        installedCopy &&
-                        widget.prepareInstall != null &&
-                        updates.platform == 'windows-x64')
-                      FilledButton.icon(
-                        key: const ValueKey('install-app-update'),
-                        onPressed: view.installing
-                            ? null
-                            : () => updates.install(
-                                prepare: widget.prepareInstall!,
-                              ),
-                        icon: const Icon(Icons.restart_alt),
-                        label: Text(context.strings.updatesInstall),
-                      ),
-                    if (view.status == AppUpdateStatus.available)
-                      OutlinedButton.icon(
-                        onPressed: openRelease,
-                        icon: const Icon(Icons.open_in_new),
-                        label: Text(context.strings.updatesOpen),
-                      ),
-                  ],
-                ),
+                _updateActions(context, view),
                 if (view.downloading) ...[
                   const SizedBox(height: 16),
                   Row(
@@ -209,5 +160,52 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
         ],
       );
     },
+  );
+  Widget _updateActions(BuildContext context, AppUpdateState view) => Wrap(
+    spacing: 12,
+    runSpacing: 12,
+    children: [
+      OutlinedButton.icon(
+        key: const ValueKey('check-app-updates'),
+        onPressed:
+            view.downloading ||
+                view.installing ||
+                view.status == AppUpdateStatus.checking
+            ? null
+            : updates.check,
+        icon: const Icon(Icons.refresh),
+        label: Text(context.strings.updatesCheck),
+      ),
+      if (view.status == AppUpdateStatus.available && view.package != null)
+        FilledButton.icon(
+          key: const ValueKey('download-app-update'),
+          onPressed:
+              view.downloading ||
+                  view.installing ||
+                  view.downloadedPackage != null
+              ? null
+              : updates.download,
+          icon: const Icon(Icons.download_outlined),
+          label: Text(context.strings.updatesDownload),
+        ),
+      if (view.downloadedPackage != null &&
+          installedCopy &&
+          widget.prepareInstall != null &&
+          updates.platform == 'windows-x64')
+        FilledButton.icon(
+          key: const ValueKey('install-app-update'),
+          onPressed: view.installing
+              ? null
+              : () => updates.install(prepare: widget.prepareInstall!),
+          icon: const Icon(Icons.restart_alt),
+          label: Text(context.strings.updatesInstall),
+        ),
+      if (view.status == AppUpdateStatus.available)
+        OutlinedButton.icon(
+          onPressed: openRelease,
+          icon: const Icon(Icons.open_in_new),
+          label: Text(context.strings.updatesOpen),
+        ),
+    ],
   );
 }
