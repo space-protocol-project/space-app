@@ -27,8 +27,8 @@ class FavoriteMessages extends StatefulWidget {
 }
 
 class _FavoriteMessagesState extends State<FavoriteMessages> {
-  // Одна карточка на всю полосу: портал не переезжает между маркерами.
-  final overlay = OverlayPortalController();
+  // Самостоятельный слой не переносит узлы доступности из списка маркеров.
+  OverlayEntry? overlay;
   final markers = <String, GlobalKey>{};
   Timer? closing;
   String? selected;
@@ -45,7 +45,14 @@ class _FavoriteMessagesState extends State<FavoriteMessages> {
     dismissedFocus = null;
     anchor = box.localToGlobal(Offset.zero) & box.size;
     setState(() => selected = message.id);
-    overlay.show();
+    if (overlay == null) {
+      overlay = OverlayEntry(
+        builder: (_) => InheritedTheme.captureAll(context, preview(context)),
+      );
+      Overlay.of(context).insert(overlay!);
+    } else {
+      overlay!.markNeedsBuild();
+    }
     widget.onPreviewChanged?.call(true);
   }
 
@@ -59,7 +66,7 @@ class _FavoriteMessagesState extends State<FavoriteMessages> {
     closing?.cancel();
     if (!mounted) return;
     dismissedFocus = selected ?? dismissedFocus;
-    overlay.hide();
+    removeOverlay();
     setState(() => selected = null);
     widget.onPreviewChanged?.call(false);
   }
@@ -95,16 +102,26 @@ class _FavoriteMessagesState extends State<FavoriteMessages> {
   @override
   void didUpdateWidget(covariant FavoriteMessages oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (selected != null && selectedMessage == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && selectedMessage == null) close();
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (selected != null && selectedMessage == null) {
+        close();
+      } else {
+        overlay?.markNeedsBuild();
+      }
+    });
+  }
+
+  void removeOverlay() {
+    overlay?.remove();
+    overlay?.dispose();
+    overlay = null;
   }
 
   @override
   void dispose() {
     closing?.cancel();
+    removeOverlay();
     super.dispose();
   }
 
@@ -185,25 +202,21 @@ class _FavoriteMessagesState extends State<FavoriteMessages> {
   }
 
   @override
-  Widget build(BuildContext context) => OverlayPortal(
-    controller: overlay,
-    overlayChildBuilder: preview,
-    child: LayoutBuilder(
-      builder: (context, constraints) => Align(
-        alignment: Alignment.centerLeft,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: constraints.maxHeight * .65),
-          child: SizedBox(
-            width: 44,
-            child: SingleChildScrollView(
-              primary: false,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  for (var i = 0; i < widget.messages.length; i++)
-                    marker(context, i),
-                ],
-              ),
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) => Align(
+      alignment: Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: constraints.maxHeight * .65),
+        child: SizedBox(
+          width: 44,
+          child: SingleChildScrollView(
+            primary: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i = 0; i < widget.messages.length; i++)
+                  marker(context, i),
+              ],
             ),
           ),
         ),
