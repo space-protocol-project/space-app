@@ -88,6 +88,7 @@ void main() {
         server.listen((request) async {
           expect(request.uri.path, '/space.v1.ChannelService/GetManifest');
           expect(request.headers.value('authorization'), 'Bearer test-token');
+          expect(request.headers.value('accept-encoding'), isNull);
           expect(request.headers.value('connect-timeout-ms'), isNotNull);
           await request.drain<void>();
           final manifest = GetManifestResponse(serverId: 'srv_test');

@@ -94,6 +94,7 @@ Future<connect.HttpResponse> sendRpcRequest(
 ) async {
   final request = await openRpcRequest(client, input);
   request.followRedirects = false;
+  request.headers.removeAll(HttpHeaders.acceptEncodingHeader);
   copyRequestHeaders(request, input.header);
   if (input.body != null) await request.addStream(input.body!);
   final response = await withSignal(request.close(), input.signal);
