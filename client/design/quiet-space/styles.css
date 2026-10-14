@@ -790,7 +790,12 @@ dialog .nav-row {
     padding: 5px 5px 5px 0;
   }
   .sidebar {
-    display: none;
+    display: flex;
+    visibility: hidden;
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 280ms cubic-bezier(.22, 1, .36, 1), opacity 200ms ease, visibility 0s linear 280ms;
     position: fixed;
     left: 52px;
     top: 5px;
@@ -800,7 +805,11 @@ dialog .nav-row {
     box-shadow: 20px 0 60px #0006;
   }
   .sidebar.open {
-    display: flex;
+    visibility: visible;
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+    transition-delay: 0s;
   }
   main {
     border-radius: 16px;
@@ -1006,4 +1015,71 @@ body.light .favorite-marker:not(.mine) span { background: #63754a; }
 .chat-area .chat-scroll {
   padding-bottom: calc(var(--composer-height, 170px) + 24px);
   scroll-padding-bottom: calc(var(--composer-height, 170px) + 24px);
+}
+
+/* Прозрачная верхняя панель поверх прокручиваемого содержимого. */
+main { --header-height: 76px; }
+main > header {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--header-height);
+  z-index: 4;
+  background: transparent;
+  pointer-events: none;
+}
+main > header button { pointer-events: auto; }
+.chat-area .chat-scroll {
+  padding-top: calc(var(--header-height) + 20px);
+  scroll-padding-top: calc(var(--header-height) + 12px);
+}
+#content > .page {
+  padding-top: calc(var(--header-height) + 40px);
+  scroll-padding-top: calc(var(--header-height) + 12px);
+}
+@media(min-width:1500px) {
+  .chat-area .chat-scroll { padding-top: calc(var(--header-height) + 45px); }
+}
+@media(max-width:1000px) {
+  .chat-area .chat-scroll { padding-top: calc(var(--header-height) + 10px); }
+}
+@media(max-width:720px) {
+  main { --header-height: 62px; }
+  .chat-area .chat-scroll { padding-top: var(--header-height); }
+  #content > .page { padding-top: calc(var(--header-height) + 25px); }
+}
+
+/* Матовое стекло верхней панели поверх прокручиваемого содержимого. */
+main > header {
+  background: linear-gradient(125deg, #ffffff08, transparent), var(--glass);
+  backdrop-filter: blur(24px) saturate(120%);
+  -webkit-backdrop-filter: blur(24px) saturate(120%);
+  border-bottom: 1px solid var(--line);
+  box-shadow: inset 0 1px #ffffff05;
+}
+body.no-glass main > header {
+  background: var(--surface);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+
+/* Обрезаем движение по правому краю панели пространств. */
+.sidebar-viewport { display: contents; }
+@media (max-width: 720px) {
+  .sidebar-viewport {
+    display: block;
+    position: fixed;
+    inset: 5px 0 5px 52px;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 8;
+    border-radius: 18px 0 0 18px;
+  }
+  .sidebar-viewport .sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    max-width: 100%;
+  }
 }
