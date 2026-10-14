@@ -30,6 +30,9 @@ import 'connection_panel.dart';
 import 'panels.dart';
 import 'search.dart';
 import 'components.dart';
+import 'space_appearance.dart';
+import 'space_frame.dart';
+import 'measure_size.dart';
 
 enum Section {
   overview(Icons.home_outlined),
@@ -93,6 +96,97 @@ class _SpaceShellState extends State<SpaceShell> {
   bool applicationSettings = false;
   bool devicePage = false;
   bool serverList = false;
+  bool drawerOpen = false;
+  double headerHeight = SpaceAppearance.headerHeight;
+  void closeNavigation() {
+    if (drawerOpen) setState(() => drawerOpen = false);
+  }
+
+  void headerResized(Size size) {
+    if (mounted && (size.height - headerHeight).abs() > 1) {
+      setState(() => headerHeight = size.height);
+    }
+  }
+
+  String? jumpRequest;
+  int jumpGeneration = 0;
+  void openMessage(String id) {
+    setState(() {
+      jumpRequest = id;
+      jumpGeneration++;
+    });
+    select(Section.chat);
+  }
+
+  Future<void> showFavorites() async {
+    closeNavigation();
+    final target = controller;
+    final id = await showDialog<String>(
+      context: context,
+      builder: (context) => Dialog(
+        child: SizedBox(
+          width: 600,
+          height: 480,
+          child: BlocBuilder<ChatController, ChatState>(
+            bloc: target,
+            builder: (context, state) {
+              final messages = state.messages.where(state.isFavorite).toList();
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            context.strings.favoriteMessages,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                        ),
+                        IconButton(
+                          tooltip: context.strings.close,
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: messages.isEmpty
+                        ? Center(child: Text(context.strings.nothingFound))
+                        : ListView.builder(
+                            primary: false,
+                            itemCount: messages.length,
+                            itemBuilder: (context, index) {
+                              final message = messages[index];
+                              return ListTile(
+                                title: Text(
+                                  message.text,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                subtitle: Text(message.authorId),
+                                onTap: () => Navigator.pop(context, message.id),
+                                trailing: IconButton(
+                                  tooltip: context.strings.removeFavorite,
+                                  onPressed: () =>
+                                      target.toggleFavorite(message),
+                                  icon: const Icon(Icons.bookmark),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+    if (mounted && identical(target, controller) && id != null) openMessage(id);
+  }
+
   final Set<String> removing = {}, deniedHandled = {};
   void showServers() {
     setState(() {
@@ -101,7 +195,7 @@ class _SpaceShellState extends State<SpaceShell> {
       dashboard = true;
       serverList = true;
     });
-    scaffold.currentState?.closeDrawer();
+    closeNavigation();
   }
 
   void handleDeniedServers() {
@@ -181,7 +275,7 @@ class _SpaceShellState extends State<SpaceShell> {
       dashboard = true;
       applicationSettings = false;
     });
-    scaffold.currentState?.closeDrawer();
+    closeNavigation();
   }
 
   void showDashboard() {
@@ -192,7 +286,7 @@ class _SpaceShellState extends State<SpaceShell> {
       dashboard = true;
       selected = Section.overview;
     });
-    scaffold.currentState?.closeDrawer();
+    closeNavigation();
   }
 
   Future<void> openSpace(String origin, {String? channel}) async {
@@ -207,7 +301,7 @@ class _SpaceShellState extends State<SpaceShell> {
       serverList = false;
       selected = Section.chat;
     });
-    scaffold.currentState?.closeDrawer();
+    closeNavigation();
     await workspaces.reconnect(origin);
     if (channel != null && mounted && identical(controller, target)) {
       await target.selectChannel(channel);
@@ -609,6 +703,10 @@ class _SpaceShellState extends State<SpaceShell> {
       ),
     );
     if (!mounted || route == null || route.isEmpty) return;
+    if (route.startsWith('message:')) {
+      openMessage(route.substring(8));
+      return;
+    }
     select(Section.values.firstWhere((section) => section.name == route));
   }
 
@@ -633,7 +731,7 @@ class _SpaceShellState extends State<SpaceShell> {
       serverList = false;
       applicationSettings = true;
     });
-    scaffold.currentState?.closeDrawer();
+    closeNavigation();
   }
 
   void select(Section section) {
@@ -655,7 +753,7 @@ class _SpaceShellState extends State<SpaceShell> {
       devicePage = false;
       serverList = false;
     });
-    scaffold.currentState?.closeDrawer();
+    closeNavigation();
   }
 
   @override
@@ -815,10 +913,11 @@ class _SpaceShellState extends State<SpaceShell> {
     ),
   );
   Widget sidebar() => SizedBox(
-    width: 280,
+    width: SpaceAppearance.sidebarWidth,
     child: Material(
-      color: Theme.of(context).colorScheme.surfaceContainerLowest,
+      color: SpaceAppearance.of(context).sidebar,
       child: ListView(
+        primary: false,
         padding: const EdgeInsets.fromLTRB(16, 24, 16, 18),
         children: [
           Text(
@@ -875,16 +974,22 @@ class _SpaceShellState extends State<SpaceShell> {
                       : () => select(section),
                 ),
               ),
+          ListTile(
+            leading: const Icon(Icons.bookmark_border),
+            title: Text(context.strings.favoriteMessages),
+            onTap: showFavorites,
+          ),
         ],
       ),
     ),
   );
   Widget navigationSidebar() => dashboard
       ? SizedBox(
-          width: 280,
+          width: SpaceAppearance.sidebarWidth,
           child: Material(
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            color: SpaceAppearance.of(context).sidebar,
             child: ListView(
+              primary: false,
               padding: const EdgeInsets.all(20),
               children: [
                 SpaceActionButton(
@@ -963,7 +1068,9 @@ class _SpaceShellState extends State<SpaceShell> {
             style: IconButton.styleFrom(
               padding: EdgeInsets.zero,
               fixedSize: const Size.square(48),
-              backgroundColor: colors.surfaceContainerHigh,
+              backgroundColor: selected
+                  ? colors.primaryContainer
+                  : Colors.transparent,
               foregroundColor: selected ? colors.primary : colors.onSurface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
@@ -993,7 +1100,7 @@ class _SpaceShellState extends State<SpaceShell> {
   }
 
   Widget rail() => SizedBox(
-    width: 64,
+    width: SpaceAppearance.railWidth,
     child: Column(
       children: [
         const SizedBox(height: 24),
@@ -1014,6 +1121,7 @@ class _SpaceShellState extends State<SpaceShell> {
         ),
         Expanded(
           child: ListView(
+            primary: false,
             padding: EdgeInsets.zero,
             children: [
               for (final origin in widget.preferences.origins)
@@ -1077,8 +1185,33 @@ class _SpaceShellState extends State<SpaceShell> {
       ],
     ),
   );
+  Future<void> showContextDetails() async {
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        child: SizedBox(
+          width: 420,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  tooltip: context.strings.close,
+                  onPressed: () => Navigator.pop(dialogContext),
+                  icon: const Icon(Icons.close),
+                ),
+              ),
+              Flexible(child: contextDetails()),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget contextPanel() => SizedBox(
-    width: 280,
+    width: SpaceAppearance.sidebarWidth,
     child: SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 20, 8, 20),
       child: SurfaceCard(
@@ -1157,8 +1290,16 @@ class _SpaceShellState extends State<SpaceShell> {
             key: const ValueKey('live-chat'),
             controller: controller,
             active:
-                !applicationSettings && !dashboard && selected == Section.chat,
+                !applicationSettings &&
+                !dashboard &&
+                !devicePage &&
+                !serverList &&
+                !drawerOpen &&
+                selected == Section.chat,
+            jumpRequest: jumpRequest,
+            jumpGeneration: jumpGeneration,
             showHeader: false,
+            topInset: headerHeight,
             sendWithShift: widget.preferences.sendShortcut == 'shiftEnter',
             openConnection: () => connection(),
           ),
@@ -1174,7 +1315,10 @@ class _SpaceShellState extends State<SpaceShell> {
           ),
           Section.rooms => const RoomsPanel(),
           Section.identity => const SizedBox.shrink(),
-          Section.settings => administrationPage(),
+          Section.settings => Padding(
+            padding: EdgeInsets.only(top: headerHeight),
+            child: administrationPage(),
+          ),
         },
     ],
   );
@@ -1217,72 +1361,51 @@ class _SpaceShellState extends State<SpaceShell> {
     return context.strings.disconnected;
   }
 
-  Widget header(bool compact) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-    child: Row(
-      children: [
-        if (compact)
-          IconButton(
-            tooltip: context.strings.myDevice,
-            onPressed: showDevice,
-            icon: const Icon(Icons.computer_outlined),
-          ),
-        if (compact)
-          IconButton(
-            tooltip: context.strings.openNavigation,
-            onPressed: () => scaffold.currentState?.openDrawer(),
-            icon: const Icon(Icons.menu),
-          ),
-        if (!compact) ...[
-          Icon(_headerIcon, size: 26),
-          const SizedBox(width: 12),
-        ],
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _headerTitle,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              if (!applicationSettings &&
-                  !dashboard &&
-                  selected == Section.chat &&
-                  !compact)
-                Text(
-                  context.strings.chatDescription,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-            ],
-          ),
+  Widget header(bool compact) => SpaceHeader(
+    title: _headerTitle,
+    subtitle:
+        !applicationSettings &&
+            !dashboard &&
+            selected == Section.chat &&
+            !compact
+        ? context.strings.chatDescription
+        : null,
+    leading: [
+      if (compact)
+        IconButton(
+          tooltip: context.strings.openNavigation,
+          onPressed: () => setState(() => drawerOpen = !drawerOpen),
+          icon: const Icon(Icons.menu),
         ),
-        if (!compact && !dashboard && !applicationSettings)
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: Text(
-              _connectionLabel,
-              style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+      if (!compact) ...[Icon(_headerIcon, size: 22), const SizedBox(width: 12)],
+    ],
+    actions: [
+      if (!compact && !dashboard && !applicationSettings)
+        Padding(
+          padding: const EdgeInsets.only(right: 12),
+          child: Text(
+            _connectionLabel,
+            style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
-        _connectionButton(),
-        if (compact)
-          IconButton(
-            tooltip: context.strings.appSettings,
-            onPressed: showApplicationSettings,
-            icon: updateBadge(Icons.tune),
-          ),
-        IconButton(
-          tooltip: context.strings.search,
-          onPressed: search,
-          icon: const Icon(Icons.search),
         ),
-      ],
-    ),
+      if (!compact || !dashboard) _connectionButton(),
+      IconButton(
+        tooltip: context.strings.search,
+        onPressed: search,
+        icon: const Icon(Icons.search),
+      ),
+      IconButton(
+        key: const ValueKey('space-details'),
+        tooltip: context.strings.connectionInformation,
+        onPressed: showContextDetails,
+        icon: const Icon(Icons.view_sidebar_outlined),
+      ),
+    ],
   );
+
   Widget _connectionButton() => IconButton(
     tooltip: dashboard
         ? context.strings.addSpace
@@ -1348,93 +1471,130 @@ class _SpaceShellState extends State<SpaceShell> {
 
   Widget _workspaceContent(BuildContext context, BoxConstraints box) {
     final compact = box.maxWidth < 760;
-    return Column(
+    return Stack(
       children: [
-        header(compact),
-        if (!dashboard && controller.reconnecting)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
+        Positioned.fill(
+          child: SpaceContentInsets(
+            top: headerHeight,
+            child: Column(
               children: [
-                const SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    context.strings.recoveringEvents,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                if (!dashboard &&
+                    selected == Section.chat &&
+                    (controller.reconnecting ||
+                        controller.busy ||
+                        controller.error.isNotEmpty))
+                  SizedBox(height: headerHeight),
+                if (!dashboard && controller.reconnecting)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
                     ),
+                    child: Row(
+                      children: [
+                        const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            context.strings.recoveringEvents,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                if (!dashboard && controller.busy)
+                  const LinearProgressIndicator(minHeight: 2),
+                if (!applicationSettings &&
+                    !dashboard &&
+                    controller.error.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Text(
+                      chatFailureText(context, controller),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ),
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: IndexedStack(
+                          index: _workspacePageIndex,
+                          children: [
+                            Dashboard(
+                              workspaces: workspaces,
+                              presence: presence,
+                              homeAction: home.supported ? showHome : null,
+                              homeDetails: home.supported
+                                  ? showHomeDetails
+                                  : null,
+                              createOwnSpace: home.supported
+                                  ? createOwnSpace
+                                  : null,
+                              importSpace: home.supported && home.ip.isEmpty
+                                  ? showHomeDetails
+                                  : null,
+                              homeRunning: home.running,
+                              homeBusy: home.busy,
+                              addSpace: addSpace,
+                              openSpace: (origin) => openSpace(origin),
+                              removeSpace: (origin) => removeSpace(origin),
+                              openChannel: (origin, channel) =>
+                                  openSpace(origin, channel: channel),
+                            ),
+                            pages(),
+                            SettingsPanel(
+                              preferences: widget.preferences,
+                              updates: updates,
+                              prepareInstall: prepareAppInstall,
+                            ),
+                            DevicePanel(
+                              workspaces: workspaces,
+                              fallback: deviceController,
+                              restoreController: (origin) =>
+                                  workspaces[origin] ?? createTransient(),
+                              onRestored: _onDeviceRestored,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: headerHeight),
+                              child: ServerInbox(
+                                controllers: workspaces.controllers,
+                                presence: presence,
+                                icons: widget.preferences.serverIcons,
+                                open: (origin) => openSpace(origin),
+                                remove: (origin) => removeSpace(origin),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-        if (!dashboard && controller.busy)
-          const LinearProgressIndicator(minHeight: 2),
-        if (!applicationSettings && !dashboard && controller.error.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(
-              chatFailureText(context, controller),
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ),
-        Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: IndexedStack(
-                  index: _workspacePageIndex,
-                  children: [
-                    Dashboard(
-                      workspaces: workspaces,
-                      presence: presence,
-                      homeAction: home.supported ? showHome : null,
-                      homeDetails: home.supported ? showHomeDetails : null,
-                      createOwnSpace: home.supported ? createOwnSpace : null,
-                      importSpace: home.supported && home.ip.isEmpty
-                          ? showHomeDetails
-                          : null,
-                      homeRunning: home.running,
-                      homeBusy: home.busy,
-                      addSpace: addSpace,
-                      openSpace: (origin) => openSpace(origin),
-                      removeSpace: (origin) => removeSpace(origin),
-                      openChannel: (origin, channel) =>
-                          openSpace(origin, channel: channel),
-                    ),
-                    pages(),
-                    SettingsPanel(
-                      preferences: widget.preferences,
-                      updates: updates,
-                      prepareInstall: prepareAppInstall,
-                    ),
-                    DevicePanel(
-                      workspaces: workspaces,
-                      fallback: deviceController,
-                      restoreController: (origin) =>
-                          workspaces[origin] ?? createTransient(),
-                      onRestored: _onDeviceRestored,
-                    ),
-                    ServerInbox(
-                      controllers: workspaces.controllers,
-                      presence: presence,
-                      icons: widget.preferences.serverIcons,
-                      open: (origin) => openSpace(origin),
-                      remove: (origin) => removeSpace(origin),
-                    ),
-                  ],
-                ),
-              ),
-              if (box.maxWidth >= 1320 && !dashboard && !applicationSettings)
-                contextPanel(),
-            ],
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: MeasureSize(
+            onChange: headerResized,
+            child: GlassSurface(radius: 0, blur: 24, child: header(compact)),
           ),
         ),
       ],
@@ -1482,52 +1642,30 @@ class _SpaceShellState extends State<SpaceShell> {
     final compact = box.maxWidth < 760;
     return CallbackShortcuts(
       bindings: {
+        const SingleActivator(LogicalKeyboardKey.escape): closeNavigation,
         const SingleActivator(LogicalKeyboardKey.keyK, control: true): () =>
             unawaited(search()),
         const SingleActivator(LogicalKeyboardKey.keyK, meta: true): () =>
             unawaited(search()),
       },
-      child: Focus(
-        autofocus: true,
-        child: Scaffold(
-          key: scaffold,
-          drawer: compact
-              ? Drawer(child: SafeArea(child: navigationSidebar()))
-              : null,
-          bottomNavigationBar: compact ? _bottomNavigation(context) : null,
-          body: SafeArea(
-            child: Padding(
-              padding: EdgeInsets.all(compact ? 6 : 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (!compact) ...[
-                    rail(),
-                    const SizedBox(width: 8),
-                    ClipRRect(
-                      borderRadius: const BorderRadius.horizontal(
-                        left: Radius.circular(20),
-                      ),
-                      child: navigationSidebar(),
-                    ),
-                  ],
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: compact
-                          ? BorderRadius.circular(20)
-                          : const BorderRadius.horizontal(
-                              right: Radius.circular(20),
-                            ),
-                      child: ColoredBox(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerLow,
-                        child: _workspaceContent(context, box),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+      child: PopScope(
+        canPop: !drawerOpen,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) closeNavigation();
+        },
+        child: Focus(
+          autofocus: true,
+          child: Scaffold(
+            key: scaffold,
+
+            bottomNavigationBar: compact ? _bottomNavigation(context) : null,
+            body: SpaceFrame(
+              compact: compact,
+              navigationOpen: drawerOpen,
+              closeNavigation: closeNavigation,
+              rail: rail(),
+              sidebar: navigationSidebar(),
+              content: _workspaceContent(context, box),
             ),
           ),
         ),

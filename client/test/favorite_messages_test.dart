@@ -156,8 +156,8 @@ void main() {
     await mouse.addPointer(location: const Offset(700, 100));
     await mouse.moveTo(tester.getCenter(marker));
     await tester.pumpAndSettle();
-    expect(find.text('Важное сообщение'), findsOneWidget);
-    await tester.tap(find.text('Важное сообщение'));
+    expect(find.text('Важное сообщение'), findsNWidgets(2));
+    await tester.tap(find.text('Важное сообщение').first);
     expect(jumped, isTrue);
     await tester.tap(find.byIcon(Icons.bookmark));
     expect(removed, isTrue);

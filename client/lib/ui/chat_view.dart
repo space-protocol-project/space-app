@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import '../src/chat_controller.dart';
 import 'message_bubble.dart';
 import 'favorite_messages.dart';
+import 'space_appearance.dart';
+import 'measure_size.dart';
 
 class ChatView extends StatefulWidget {
   const ChatView({
@@ -20,10 +22,16 @@ class ChatView extends StatefulWidget {
     this.active = true,
     this.showHeader = true,
     this.sendWithShift = false,
+    this.jumpRequest,
+    this.topInset = 0,
+    this.jumpGeneration = 0,
   });
   final ChatController controller;
   final VoidCallback openConnection;
   final bool active, showHeader, sendWithShift;
+  final String? jumpRequest;
+  final double topInset;
+  final int jumpGeneration;
   @override
   State<ChatView> createState() => _ChatViewState();
 }
@@ -37,9 +45,12 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   bool restoreScroll = true;
   String scope = '';
   final viewport = GlobalKey();
+  final composer = GlobalKey();
+  double composerHeight = 110;
   final messageKeys = <String, GlobalKey>{};
   String entryReadThrough = '';
   bool foreground = true, jumping = false;
+  bool previewVisible = false;
   @override
   void initState() {
     super.initState();
@@ -55,8 +66,15 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   @override
   void didUpdateWidget(covariant ChatView oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.jumpRequest != null &&
+        widget.jumpGeneration != oldWidget.jumpGeneration) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(jumpToMessage(widget.jumpRequest!));
+      });
+    }
     final next = widget.controller.draftScope;
     if (next != scope) {
+      previewVisible = false;
       drafts[scope] = draft.text;
       scope = next;
       entryReadThrough = widget.controller.readThrough;
@@ -70,6 +88,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     final controller = widget.controller;
     if (scroll.hasClients) offsets[scope] = scroll.offset;
     if (jumping ||
+        previewVisible ||
         ModalRoute.of(context)?.isCurrent == false ||
         !widget.active ||
         !foreground ||
@@ -78,14 +97,10 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         controller.messages.isEmpty) {
       return;
     }
-    if (scroll.position.extentAfter < 24) {
-      controller.markRead(controller.messages.last.id);
-      return;
-    }
     final box = viewport.currentContext?.findRenderObject();
     if (box is! RenderBox || !box.hasSize) return;
-    final top = box.localToGlobal(Offset.zero).dy,
-        bottom = box.localToGlobal(Offset(0, box.size.height)).dy;
+    final top = box.localToGlobal(Offset.zero).dy + widget.topInset;
+    final bottom = visibleBottom(box);
     String? lastVisible;
     for (final message in controller.messages) {
       final row = messageKeys[message.id]?.currentContext?.findRenderObject();
@@ -95,6 +110,22 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       if (start >= top && end <= bottom) lastVisible = message.id;
     }
     if (lastVisible != null) controller.markRead(lastVisible);
+  }
+
+  double visibleBottom(RenderBox history) {
+    final bottom = history.localToGlobal(Offset(0, history.size.height)).dy;
+    final field = composer.currentContext?.findRenderObject();
+    if (field is! RenderBox || !field.hasSize) return bottom;
+    return bottom.clamp(
+      double.negativeInfinity,
+      field.localToGlobal(Offset.zero).dy - 8,
+    );
+  }
+
+  void composerResized(Size size) {
+    if (mounted && (size.height - composerHeight).abs() > 1) {
+      setState(() => composerHeight = size.height);
+    }
   }
 
   @override
@@ -129,11 +160,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       ) {
         final target = messageKeys[id]?.currentContext;
         if (target != null && target.mounted) {
-          await Scrollable.ensureVisible(
-            target,
-            duration: const Duration(milliseconds: 260),
-            alignment: .1,
-          );
+          await revealTarget(target, startingScope);
           break;
         }
         final visible = _visibleMessageIndices([
@@ -153,6 +180,23 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     } finally {
       _finishMessageJump(startingScope);
     }
+  }
+
+  Future<void> revealTarget(BuildContext target, String startingScope) async {
+    await Scrollable.ensureVisible(
+      target,
+      duration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : const Duration(milliseconds: 260),
+      alignment: 0,
+    );
+    if (!mounted || !scroll.hasClients || scope != startingScope) return;
+    scroll.jumpTo(
+      (scroll.offset - widget.topInset - 12).clamp(
+        0,
+        scroll.position.maxScrollExtent,
+      ),
+    );
   }
 
   List<int> _visibleMessageIndices(List<String> messageIds) {
@@ -422,39 +466,73 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
 
   Widget _messageArea(BuildContext context) {
     final controller = widget.controller;
-    final view = widget.controller.state;
+    final view = controller.state;
     final favorites = view.messages.where(view.isFavorite).toList();
-    return Expanded(
-      child: view.messages.isEmpty
-          ? _emptyMessageArea(context)
-          : Stack(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: favorites.isEmpty ? 0 : 36),
-                  child: ListView.builder(
-                    key: viewport,
-                    controller: scroll,
-                    padding: const EdgeInsets.all(24),
-                    itemCount: view.messages.length,
-                    itemBuilder: (context, index) {
-                      return _messageRow(context, index);
-                    },
-                  ),
+    if (view.messages.isEmpty) return _emptyMessageArea(context);
+    return Stack(
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: favorites.isEmpty ? 0 : 44),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              width: SpaceAppearance.conversationWidth,
+              child: ListView.builder(
+                key: viewport,
+                controller: scroll,
+                padding: EdgeInsets.fromLTRB(
+                  24,
+                  24 + widget.topInset,
+                  24,
+                  composerHeight + 36,
                 ),
-                if (favorites.isNotEmpty)
-                  Positioned.fill(
-                    child: FavoriteMessages(
-                      messages: favorites,
-                      principalId: view.principalId,
-                      onJump: (message) => unawaited(jumpToMessage(message.id)),
-                      onRemove: (message) =>
-                          unawaited(controller.toggleFavorite(message)),
-                    ),
-                  ),
-              ],
+                itemCount: view.messages.length,
+                itemBuilder: _messageRow,
+              ),
             ),
+          ),
+        ),
+        if (favorites.isNotEmpty)
+          Positioned.fill(
+            child: FavoriteMessages(
+              messages: favorites,
+              principalId: view.principalId,
+              onPreviewChanged: (visible) => previewVisible = visible,
+              onJump: (message) => unawaited(jumpToMessage(message.id)),
+              onRemove: (message) =>
+                  unawaited(controller.toggleFavorite(message)),
+            ),
+          ),
+      ],
     );
   }
+
+  Widget _chatStack(BuildContext context) => LayoutBuilder(
+    builder: (context, box) => Stack(
+      children: [
+        Positioned.fill(child: _messageArea(context)),
+        Positioned(
+          left: 16,
+          right: 16,
+          bottom: 16,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: SpaceAppearance.conversationWidth,
+                maxHeight: box.maxHeight * .65,
+              ),
+              child: MeasureSize(
+                key: composer,
+                onChange: composerResized,
+                child: _composer(context),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 
   void _restoreViewport(Duration elapsed) {
     final controller = widget.controller;
@@ -527,7 +605,17 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         if (view.channels.isNotEmpty &&
             (widget.showHeader || MediaQuery.sizeOf(context).width < 760))
           _channelPicker(context),
-        _messageArea(context),
+        Expanded(child: _chatStack(context)),
+      ],
+    );
+  }
+
+  Widget _composer(BuildContext context) {
+    final view = widget.controller.state;
+    final colors = Theme.of(context).colorScheme;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
         if (view.canRead && view.unreadCount(view.channelId) > 0)
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
@@ -555,13 +643,8 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
               MessageSendStatus.idle => '',
             }, style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant)),
           ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 18),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: colors.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(22),
-            ),
+        Flexible(
+          child: GlassSurface(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: Row(
@@ -576,7 +659,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                         focusNode: draftFocus,
                         controller: draft,
                         enabled: view.connected && view.canWrite && !view.busy,
-                        minLines: 1,
+                        minLines: 2,
                         maxLines: 4,
                         maxLength: 1024,
                         decoration: InputDecoration(

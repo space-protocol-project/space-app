@@ -61,7 +61,7 @@ class SpaceSearch extends SearchDelegate<String> {
               overflow: TextOverflow.ellipsis,
             ),
             subtitle: Text(context.strings.loadedMessage),
-            onTap: () => close(context, 'chat'),
+            onTap: () => close(context, 'message:${message.id}'),
           ),
       ],
     );

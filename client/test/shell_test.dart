@@ -5,6 +5,7 @@ import 'package:space_client/app.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/chat_controller.dart';
 import 'package:space_client/src/preferences.dart';
+import 'package:space_client/ui/space_appearance.dart';
 
 class TestVault implements IdentityVault {
   @override
@@ -62,13 +63,16 @@ void main() {
     );
     final composer = tester
         .widgetList<DecoratedBox>(
-          find.ancestor(of: field, matching: find.byType(DecoratedBox)),
+          find.descendant(
+            of: find.ancestor(of: field, matching: find.byType(GlassSurface)),
+            matching: find.byType(DecoratedBox),
+          ),
         )
         .firstWhere(
           (box) =>
               box.decoration is BoxDecoration &&
               (box.decoration as BoxDecoration).borderRadius ==
-                  BorderRadius.circular(22),
+                  BorderRadius.circular(24),
         );
     expect((composer.decoration as BoxDecoration).color, isNotNull);
     expect(find.text('Space'), findsNothing);
