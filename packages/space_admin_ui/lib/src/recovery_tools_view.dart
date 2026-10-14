@@ -1,3 +1,5 @@
+import 'content_insets.dart';
+
 import 'package:flutter/material.dart';
 
 import 'control_spacing.dart';
@@ -141,6 +143,7 @@ class RecoveryToolsView extends StatelessWidget {
             Text(strings.pairingApproveHelp),
             const SizedBox(height: 12),
             TextField(
+              scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
               controller: pairingCode,
               onChanged: onPairingCodeChanged,
               decoration: InputDecoration(
@@ -166,6 +169,7 @@ class RecoveryToolsView extends StatelessWidget {
               if (pairingPrepared) ...[
                 const SizedBox(height: 12),
                 TextField(
+                  scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
                   controller: pairingEntered,
                   decoration: InputDecoration(
                     labelText: strings.pairingEnteredCode,

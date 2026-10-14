@@ -1,3 +1,5 @@
+import 'content_insets.dart';
+
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -324,6 +326,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
   }) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 8),
     child: TextField(
+      scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
       key: key,
       controller: c,
       enabled: !busy,
@@ -340,7 +343,6 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     final p = rule['permissions'] as Map? ?? {};
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -508,7 +510,6 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
   ) => BlocBuilder<AdminOperations, AdminOperationState>(
     bloc: operations,
     builder: (context, state) => Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       color: Theme.of(context).colorScheme.surface,
       child: Padding(
         padding: const EdgeInsets.all(24),

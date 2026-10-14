@@ -32,6 +32,7 @@ class RecoveryCameraView extends StatelessWidget {
       content: SizedBox(
         width: 560,
         child: SingleChildScrollView(
+          primary: false,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

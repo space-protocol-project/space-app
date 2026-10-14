@@ -1,3 +1,5 @@
+import 'content_insets.dart';
+
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -208,7 +210,6 @@ class _InvitesPanelState extends State<InvitesPanel> {
 
   Widget _build(BuildContext context) => Card(
     color: Theme.of(context).colorScheme.surface,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     child: Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -267,6 +268,7 @@ class _InvitesPanelState extends State<InvitesPanel> {
           ),
           const SizedBox(height: 12),
           TextField(
+            scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
             key: const ValueKey('invite-max-uses'),
             controller: uses,
             enabled: !busy,

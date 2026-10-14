@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -98,24 +99,33 @@ ThemeData quietSpaceTheme(
             tone(0xFF2B2B29, 0xFFF7F5ED),
           ),
   );
+  final primaryContainer = Color.alphaBlend(
+    accent.withValues(alpha: .12),
+    appearance.sidebar,
+  );
+  final textColor = tone(0xFFEEE5CF, 0xFF3D3B33);
+  final secondary = palette == 'gruvbox'
+      ? tone(0xFFA6B887, 0xFF63754A)
+      : base.colorScheme.secondary;
   final colors = base.colorScheme.copyWith(
     primary: accent,
-    secondary: palette == 'gruvbox'
-        ? tone(0xFFA6B887, 0xFF63754A)
-        : base.colorScheme.secondary,
-    onPrimary: appearance.background,
+    secondary: secondary,
+    onSecondary: _readableForeground(secondary, base.colorScheme.onSecondary),
+    onPrimary: _readableForeground(accent, appearance.background),
     surface: appearance.main,
     surfaceContainerLowest: appearance.sidebar,
     surfaceContainerLow: appearance.main,
     surfaceContainer: appearance.surface,
     surfaceContainerHigh: appearance.surface,
     surfaceContainerHighest: appearance.surface,
-    primaryContainer: Color.alphaBlend(
-      accent.withValues(alpha: .12),
-      appearance.sidebar,
+    primaryContainer: primaryContainer,
+    onPrimaryContainer: _readableForeground(
+      primaryContainer,
+      accent,
+      fallback: textColor,
     ),
-    onSurface: tone(0xFFEEE5CF, 0xFF3D3B33),
-    onSurfaceVariant: tone(0xFFAAA694, 0xFF777365),
+    onSurface: textColor,
+    onSurfaceVariant: tone(0xFFAAA694, 0xFF696659),
     outlineVariant: appearance.line,
   );
   return base.copyWith(
@@ -123,6 +133,37 @@ ThemeData quietSpaceTheme(
     scaffoldBackgroundColor: appearance.background,
     extensions: [...base.extensions.values, appearance],
     dividerTheme: DividerThemeData(color: appearance.line, thickness: 1),
+    cardTheme: CardThemeData(
+      color: appearance.surface,
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      surfaceTintColor: Colors.transparent,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(color: appearance.line),
+      ),
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: appearance.surface,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(color: appearance.line),
+      ),
+      titleTextStyle: base.textTheme.titleLarge,
+      contentTextStyle: base.textTheme.bodyMedium,
+    ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: appearance.surface,
+      surfaceTintColor: Colors.transparent,
+      elevation: 2,
+      shadowColor: Colors.black.withValues(alpha: .12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: appearance.line),
+      ),
+    ),
     scrollbarTheme: ScrollbarThemeData(
       thickness: WidgetStateProperty.resolveWith(
         (states) => states.contains(WidgetState.dragged) ? 8 : 6,
@@ -143,7 +184,7 @@ ThemeData quietSpaceTheme(
     listTileTheme: ListTileThemeData(
       iconColor: colors.onSurfaceVariant,
       textColor: colors.onSurface,
-      selectedColor: accent,
+      selectedColor: colors.onPrimaryContainer,
       selectedTileColor: colors.primaryContainer,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     ),
@@ -159,6 +200,21 @@ ThemeData quietSpaceTheme(
       ),
     ),
   );
+}
+
+Color _readableForeground(
+  Color background,
+  Color preferred, {
+  Color? fallback,
+}) {
+  bool readable(Color text) {
+    final back = background.computeLuminance(), front = text.computeLuminance();
+    return (math.max(back, front) + .05) / (math.min(back, front) + .05) >= 4.5;
+  }
+
+  if (readable(preferred)) return preferred;
+  if (fallback != null && readable(fallback)) return fallback;
+  return background.computeLuminance() > .179 ? Colors.black : Colors.white;
 }
 
 class GlassSurface extends StatelessWidget {

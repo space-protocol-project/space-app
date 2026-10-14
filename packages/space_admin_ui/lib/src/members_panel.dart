@@ -1,3 +1,5 @@
+import 'content_insets.dart';
+
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -239,7 +241,6 @@ class _MembersPanelState extends State<MembersPanel> {
         .toList();
     return Card(
       color: Theme.of(context).colorScheme.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -261,6 +262,7 @@ class _MembersPanelState extends State<MembersPanel> {
             Text(strings.membersHelp),
             const SizedBox(height: 12),
             TextField(
+              scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
               key: const ValueKey('member-search'),
               controller: search,
               onChanged: (_) => setState(() {}),

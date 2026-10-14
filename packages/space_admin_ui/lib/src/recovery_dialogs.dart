@@ -1,3 +1,5 @@
+import 'content_insets.dart';
+
 import 'package:flutter/material.dart';
 
 import '../l10n/admin_localizations.dart';
@@ -50,12 +52,14 @@ Future<String?> askRecoveryPassword(
               creating ? strings.recoveryProtect : strings.recoveryOpen,
             ),
             content: SingleChildScrollView(
+              primary: false,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(strings.recoveryPasswordHelp),
                   const SizedBox(height: 16),
                   TextField(
+                    scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
                     obscureText: true,
                     enableSuggestions: false,
                     autocorrect: false,
@@ -67,6 +71,9 @@ Future<String?> askRecoveryPassword(
                   if (creating) ...[
                     const SizedBox(height: 12),
                     TextField(
+                      scrollPadding: SpaceContentInsets.scrollPaddingOf(
+                        context,
+                      ),
                       obscureText: true,
                       enableSuggestions: false,
                       autocorrect: false,

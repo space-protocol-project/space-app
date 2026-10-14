@@ -1,3 +1,5 @@
+import 'content_insets.dart';
+
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -107,6 +109,7 @@ class _DevicesPanelState extends State<DevicesPanel> {
           return AlertDialog(
             title: Text(strings.deviceRevokeConfirm),
             content: SingleChildScrollView(
+              primary: false,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -121,6 +124,9 @@ class _DevicesPanelState extends State<DevicesPanel> {
                     const SizedBox(height: 16),
                     Text(strings.deviceCardHelp),
                     TextField(
+                      scrollPadding: SpaceContentInsets.scrollPaddingOf(
+                        context,
+                      ),
                       onChanged: (value) => password = value,
                       obscureText: true,
                       enableSuggestions: false,
