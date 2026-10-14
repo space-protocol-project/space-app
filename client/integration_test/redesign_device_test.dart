@@ -28,8 +28,7 @@ class DeviceController extends TestController {
   @override
   bool isFavorite(Content message) =>
       ['device-0', 'device-1'].contains(message.id);
-  @override
-  List<Content> get messages => List.generate(
+  final records = List<Content>.generate(
     300,
     (index) => Content(
       id: 'device-$index',
@@ -37,6 +36,8 @@ class DeviceController extends TestController {
       text: 'Сообщение $index. Проверка прокрутки настоящего интерфейса.',
     ),
   );
+  @override
+  List<Content> get messages => records;
 }
 
 Future<void> checkBookmarks(WidgetTester tester) async {
@@ -72,7 +73,11 @@ void main() {
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
-    final preferences = AppPreferences();
+    final preferences = AppPreferences()
+      ..effects = const bool.fromEnvironment(
+        'SPACE_EFFECTS',
+        defaultValue: true,
+      );
     final controller = DeviceController()..connected = true;
     controller.publishState();
     final updates = AppUpdates(
@@ -114,6 +119,7 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
     binding.reportData ??= {};
     binding.reportData!['platform'] = Platform.operatingSystem;
+    binding.reportData!['effects'] = preferences.effects;
     binding.reportData!['device_pixel_ratio'] = tester.view.devicePixelRatio;
     binding.reportData!['physical_width'] = tester.view.physicalSize.width;
     binding.reportData!['physical_height'] = tester.view.physicalSize.height;

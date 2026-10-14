@@ -87,6 +87,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
 
   void markRead() {
     final controller = widget.controller;
+    final messages = controller.state.messages;
     if (scroll.hasClients) offsets[scope] = scroll.offset;
     if (jumping ||
         previewVisible ||
@@ -95,7 +96,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         !foreground ||
         !controller.canRead ||
         !scroll.hasClients ||
-        controller.messages.isEmpty) {
+        messages.isEmpty) {
       return;
     }
     final box = viewport.currentContext?.findRenderObject();
@@ -103,7 +104,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     final top = box.localToGlobal(Offset.zero).dy + widget.topInset;
     final bottom = visibleBottom(box);
     String? lastVisible;
-    for (final message in controller.messages) {
+    for (final message in messages) {
       final row = messageKeys[message.id]?.currentContext?.findRenderObject();
       if (row is! RenderBox || !row.hasSize) continue;
       final start = row.localToGlobal(Offset.zero).dy;
