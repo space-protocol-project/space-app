@@ -360,7 +360,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get homeTitle => '家庭服务器';
+  String get homeTitle => '直播';
 
   @override
   String get close => '关闭';
@@ -1045,7 +1045,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updatesInstallFailed => '无法开始安装。请检查消息发送和家庭服务器状态，然后重试。';
 
   @override
-  String get updatesHomeTitle => '家庭服务器';
+  String get updatesHomeTitle => '直播';
 
   @override
   String get updatesHomeResume => '更新前家庭服务器正在运行。是否重新启动？';

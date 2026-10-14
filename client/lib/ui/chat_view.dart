@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/services.dart';
 
@@ -520,7 +521,10 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: SpaceAppearance.conversationWidth,
-                maxHeight: box.maxHeight * .65,
+                maxHeight: math.min(
+                  box.maxHeight * .65,
+                  MediaQuery.sizeOf(context).height / 3,
+                ),
               ),
               child: MeasureSize(
                 key: composer,
@@ -660,7 +664,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                         controller: draft,
                         enabled: view.connected && view.canWrite && !view.busy,
                         minLines: 2,
-                        maxLines: 4,
+                        maxLines: null,
                         maxLength: 1024,
                         decoration: InputDecoration(
                           hintText: view.connected && !view.canWrite

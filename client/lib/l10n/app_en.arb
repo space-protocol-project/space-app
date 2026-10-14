@@ -140,7 +140,7 @@
       }
     }
   },
-  "homeTitle": "Home server",
+  "homeTitle": "On air",
   "close": "Close",
   "homeFirstSetup": "The server and data will be created on this computer.",
   "homeReuse": "Your server and data are saved.",
@@ -451,7 +451,7 @@
   "updatesInstall": "Install and restart",
   "updatesPreparing": "Finishing operations and stopping the home server…",
   "updatesInstallFailed": "Installation could not start. Check message delivery and the home server, then retry.",
-  "updatesHomeTitle": "Home server",
+  "updatesHomeTitle": "On air",
   "updatesHomeResume": "The home server was running before the update. Start it again?",
   "updatesLater": "Later",
   "updatesHomeStart": "Start",

@@ -32,6 +32,7 @@ import 'search.dart';
 import 'components.dart';
 import 'space_appearance.dart';
 import 'space_frame.dart';
+import 'space_popup.dart';
 import 'measure_size.dart';
 
 enum Section {
@@ -97,9 +98,31 @@ class _SpaceShellState extends State<SpaceShell> {
   bool devicePage = false;
   bool serverList = false;
   bool drawerOpen = false;
+  final menuButtonFocus = FocusNode();
+  final menuFocus = FocusScopeNode();
+  FocusNode? returnFocus;
   double headerHeight = SpaceAppearance.headerHeight;
   void closeNavigation() {
-    if (drawerOpen) setState(() => drawerOpen = false);
+    if (!drawerOpen) return;
+    setState(() => drawerOpen = false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || drawerOpen || ModalRoute.of(context)?.isCurrent != true) {
+        return;
+      }
+      final target = returnFocus?.context != null
+          ? returnFocus!
+          : menuButtonFocus;
+      if (target.canRequestFocus) target.requestFocus();
+    });
+  }
+
+  void openNavigation() {
+    if (drawerOpen) return;
+    returnFocus = FocusManager.instance.primaryFocus;
+    setState(() => drawerOpen = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && drawerOpen) menuFocus.requestFocus();
+    });
   }
 
   void headerResized(Size size) {
@@ -684,10 +707,13 @@ class _SpaceShellState extends State<SpaceShell> {
 
   Section selected = Section.overview;
   Future<void> search() async {
-    final route = await showSearch<String>(
-      context: context,
-      delegate: SpaceSearch(
-        {
+    closeNavigation();
+    final route = await showSpacePopup<String>(
+      context,
+      top: headerHeight + 22,
+      surfaceKey: const ValueKey('space-search-surface'),
+      builder: (context) => SpaceSearchPanel(
+        sections: {
           for (final section in [
             Section.overview,
             Section.chat,
@@ -698,8 +724,7 @@ class _SpaceShellState extends State<SpaceShell> {
                 ? chatLabel
                 : section.localized(context),
         },
-        controller.messages,
-        context.strings.searchHint,
+        messages: controller.messages,
       ),
     );
     if (!mounted || route == null || route.isEmpty) return;
@@ -758,6 +783,8 @@ class _SpaceShellState extends State<SpaceShell> {
 
   @override
   void dispose() {
+    menuButtonFocus.dispose();
+    menuFocus.dispose();
     if (widget.presence == null) presence.dispose();
     home.dispose();
     if (widget.updates == null) updates.dispose();
@@ -854,7 +881,7 @@ class _SpaceShellState extends State<SpaceShell> {
     key: const ValueKey('server-chats'),
     color: Theme.of(context).colorScheme.surfaceContainerHigh,
     hoverBorder: true,
-    padding: const EdgeInsets.symmetric(vertical: 4),
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
     child: Column(
       children: [
         ListTile(
@@ -983,6 +1010,119 @@ class _SpaceShellState extends State<SpaceShell> {
       ),
     ),
   );
+  Widget mobileNavigation() => FocusScope(
+    node: menuFocus,
+    child: Material(
+      key: const ValueKey('mobile-navigation'),
+      color: SpaceAppearance.of(context).sidebar,
+      child: ListView(
+        primary: false,
+        padding: const EdgeInsets.all(16),
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  spaceLabel,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              IconButton(
+                tooltip: context.strings.close,
+                onPressed: closeNavigation,
+                icon: const Icon(Icons.close),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          for (final origin in widget.preferences.origins)
+            ListTile(
+              key: ValueKey('server-tab-$origin'),
+              leading: ServerIconView(
+                value:
+                    workspaces[origin]?.serverIcon?.toProto3Json() ??
+                    widget.preferences.serverIcons[origin],
+              ),
+              title: Text(
+                workspaces[origin]?.spaceTitle.isNotEmpty == true
+                    ? workspaces[origin]!.spaceTitle
+                    : Uri.parse(origin).authority,
+              ),
+              subtitle: Text(
+                serverTooltip(origin),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              onTap: () => openSpace(origin),
+            ),
+          ListTile(
+            leading: const Icon(Icons.add),
+            title: Text(context.strings.addSpace),
+            onTap: () {
+              closeNavigation();
+              unawaited(addSpace());
+            },
+          ),
+          if (home.supported)
+            ListTile(
+              leading: const Icon(Icons.add_home_outlined),
+              title: Text(context.strings.createOwnSpace),
+              onTap: home.busy
+                  ? null
+                  : () {
+                      closeNavigation();
+                      unawaited(createOwnSpace());
+                    },
+            ),
+          const Divider(),
+          ListTile(
+            key: const ValueKey('dashboard-tab'),
+            leading: const Icon(Icons.home_outlined),
+            title: Text(context.strings.overview),
+            onTap: showDashboard,
+          ),
+          ListTile(
+            leading: const Icon(Icons.dns_outlined),
+            title: Text(context.strings.spacesTitle),
+            onTap: showServers,
+          ),
+          if (controller.preview != null || controller.connected) chatGroup(),
+          ListTile(
+            leading: const Icon(Icons.bookmark_border),
+            title: Text(context.strings.favoriteMessages),
+            onTap: showFavorites,
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings_suggest_outlined),
+            title: Text(context.strings.manageSpace),
+            enabled: controller.administration != null && !controller.busy,
+            onTap: () => select(Section.settings),
+          ),
+          const Divider(),
+          ListTile(
+            key: const ValueKey('my-device-tab'),
+            leading: const Icon(Icons.computer_outlined),
+            title: Text(context.strings.myDevice),
+            onTap: showDevice,
+          ),
+          ListTile(
+            key: const ValueKey('app-settings-tab'),
+            leading: updateBadge(Icons.settings_outlined),
+            title: Text(context.strings.appSettings),
+            onTap: showApplicationSettings,
+          ),
+          SwitchListTile(
+            title: Text(context.strings.darkTheme),
+            value: widget.preferences.dark,
+            onChanged: (value) => widget.preferences.change(dark: value),
+          ),
+        ],
+      ),
+    ),
+  );
+
   Widget navigationSidebar() => dashboard
       ? SizedBox(
           width: SpaceAppearance.sidebarWidth,
@@ -1186,26 +1326,24 @@ class _SpaceShellState extends State<SpaceShell> {
     ),
   );
   Future<void> showContextDetails() async {
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) => Dialog(
-        child: SizedBox(
-          width: 420,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: IconButton(
-                  tooltip: context.strings.close,
-                  onPressed: () => Navigator.pop(dialogContext),
-                  icon: const Icon(Icons.close),
-                ),
-              ),
-              Flexible(child: contextDetails()),
-            ],
+    closeNavigation();
+    await showSpacePopup<void>(
+      context,
+      top: headerHeight + 22,
+      surfaceKey: const ValueKey('space-details-surface'),
+      builder: (dialogContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Align(
+            alignment: Alignment.centerRight,
+            child: IconButton(
+              tooltip: context.strings.close,
+              onPressed: () => Navigator.pop(dialogContext),
+              icon: const Icon(Icons.close),
+            ),
           ),
-        ),
+          Flexible(child: contextDetails()),
+        ],
       ),
     );
   }
@@ -1362,19 +1500,18 @@ class _SpaceShellState extends State<SpaceShell> {
   }
 
   Widget header(bool compact) => SpaceHeader(
+    minHeight: compact ? 62 : SpaceAppearance.headerHeight,
     title: _headerTitle,
-    subtitle:
-        !applicationSettings &&
-            !dashboard &&
-            selected == Section.chat &&
-            !compact
-        ? context.strings.chatDescription
+    subtitle: !applicationSettings && !dashboard && selected == Section.chat
+        ? (compact ? spaceLabel : context.strings.chatDescription)
         : null,
     leading: [
       if (compact)
         IconButton(
+          key: const ValueKey('navigation-menu-button'),
           tooltip: context.strings.openNavigation,
-          onPressed: () => setState(() => drawerOpen = !drawerOpen),
+          focusNode: menuButtonFocus,
+          onPressed: drawerOpen ? closeNavigation : openNavigation,
           icon: const Icon(Icons.menu),
         ),
       if (!compact) ...[Icon(_headerIcon, size: 22), const SizedBox(width: 12)],
@@ -1391,7 +1528,7 @@ class _SpaceShellState extends State<SpaceShell> {
             ),
           ),
         ),
-      if (!compact || !dashboard) _connectionButton(),
+      if (!compact) _connectionButton(),
       IconButton(
         tooltip: context.strings.search,
         onPressed: search,
@@ -1594,7 +1731,12 @@ class _SpaceShellState extends State<SpaceShell> {
           right: 0,
           child: MeasureSize(
             onChange: headerResized,
-            child: GlassSurface(radius: 0, blur: 24, child: header(compact)),
+            child: GlassSurface(
+              radius: 0,
+              blur: 24,
+              showBorder: false,
+              child: header(compact),
+            ),
           ),
         ),
       ],
@@ -1640,6 +1782,11 @@ class _SpaceShellState extends State<SpaceShell> {
 
   Widget _responsiveShell(BuildContext context, BoxConstraints box) {
     final compact = box.maxWidth < 760;
+    if (!compact && drawerOpen) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && drawerOpen) closeNavigation();
+      });
+    }
     return CallbackShortcuts(
       bindings: {
         const SingleActivator(LogicalKeyboardKey.escape): closeNavigation,
@@ -1658,13 +1805,25 @@ class _SpaceShellState extends State<SpaceShell> {
           child: Scaffold(
             key: scaffold,
 
-            bottomNavigationBar: compact ? _bottomNavigation(context) : null,
+            bottomNavigationBar: compact
+                ? IgnorePointer(
+                    ignoring: drawerOpen,
+                    child: ExcludeFocus(
+                      excluding: drawerOpen,
+                      child: ExcludeSemantics(
+                        excluding: drawerOpen,
+                        child: _bottomNavigation(context),
+                      ),
+                    ),
+                  )
+                : null,
             body: SpaceFrame(
               compact: compact,
               navigationOpen: drawerOpen,
               closeNavigation: closeNavigation,
+              openNavigation: openNavigation,
               rail: rail(),
-              sidebar: navigationSidebar(),
+              sidebar: compact ? mobileNavigation() : navigationSidebar(),
               content: _workspaceContent(context, box),
             ),
           ),

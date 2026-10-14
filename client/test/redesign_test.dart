@@ -1,13 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:space_client/app.dart';
 import 'package:space_client/src/preferences.dart';
 import 'package:space_client/src/generated/space/v1/space.pb.dart';
 import 'package:space_client/ui/search.dart';
+import 'package:space_client/ui/space_popup.dart';
 import 'package:space_client/ui/space_appearance.dart';
 import 'package:space_client/ui/space_frame.dart';
 
 void main() {
+  for (final width in [390.0, 1280.0]) {
+    testWidgets('Панель сведений справа вверху, стекло отключается: $width', (
+      tester,
+    ) async {
+      tester.view.physicalSize = Size(width, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      for (final effects in [true, false]) {
+        SharedPreferences.setMockInitialValues({'space.ui.effects': effects});
+        await tester.pumpWidget(const SpaceApp());
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('space-details')));
+        await tester.pumpAndSettle();
+        final panel = find.byKey(const ValueKey('space-details-surface'));
+        final rect = tester.getRect(panel);
+        expect(rect.right, closeTo(width - 22, 1));
+        expect(rect.top, greaterThanOrEqualTo(76));
+        expect(rect.top, lessThan(200));
+        expect(
+          find.descendant(of: panel, matching: find.byType(BackdropFilter)),
+          effects ? findsOneWidget : findsNothing,
+        );
+        expect(tester.takeException(), isNull);
+        await tester.tap(
+          find.descendant(of: panel, matching: find.byTooltip('Закрыть')),
+        );
+        await tester.pumpAndSettle();
+        expect(panel, findsNothing);
+        await tester.pumpWidget(const SizedBox());
+        await tester.pumpAndSettle();
+      }
+    });
+  }
+
   test('Выключенные эффекты сохраняются после перезапуска', () async {
     SharedPreferences.setMockInitialValues({});
     final first = AppPreferences();
@@ -46,11 +83,12 @@ void main() {
           builder: (context) => Scaffold(
             body: TextButton(
               onPressed: () async {
-                result = await showSearch<String>(
-                  context: context,
-                  delegate: SpaceSearch({}, [
-                    Content(id: 'точный-id', text: 'Найди меня'),
-                  ], 'Поиск'),
+                result = await showSpacePopup<String>(
+                  context,
+                  builder: (_) => SpaceSearchPanel(
+                    sections: {},
+                    messages: [Content(id: 'точный-id', text: 'Найди меня')],
+                  ),
                 );
               },
               child: const Text('Открыть'),
@@ -69,7 +107,7 @@ void main() {
   });
 
   testWidgets(
-    'Панель обрезается после полосы пространств и не перехватывает скрытые нажатия',
+    'Мобильная панель начинается от края и не перехватывает скрытые нажатия',
     (tester) async {
       tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1;
@@ -106,6 +144,7 @@ void main() {
       );
       await tester.tapAt(const Offset(150, 100));
       expect(tapped, 1);
+      expect(find.byKey(const ValueKey('полоса')), findsNothing);
       change(() => opened = true);
       await tester.pump();
       for (var frame = 0; frame < 4; frame++) {
@@ -123,10 +162,7 @@ void main() {
               matching: find.byType(ClipRect),
             )
             .first;
-        expect(
-          tester.getRect(clip).left,
-          tester.getRect(find.byKey(const ValueKey('полоса'))).right,
-        );
+        expect(tester.getRect(clip).left, 0);
         expect(tester.takeException(), isNull);
       }
       change(() => opened = false);

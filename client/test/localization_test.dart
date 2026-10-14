@@ -32,7 +32,10 @@ void main() {
       expect(tester.takeException(), isNull);
       tester.view.physicalSize = const Size(430, 900);
       await tester.pumpAndSettle();
-      expect(find.byTooltip(entry.value[1]), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('navigation-menu-button')),
+        findsOneWidget,
+      );
       expect(find.text(entry.value[2]), findsOneWidget);
       expect(tester.takeException(), isNull);
       if (entry.key == 'ru') {

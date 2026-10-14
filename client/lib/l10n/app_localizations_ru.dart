@@ -372,7 +372,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get homeTitle => 'Домашний сервер';
+  String get homeTitle => 'Эфир';
 
   @override
   String get close => 'Закрыть';
@@ -1149,7 +1149,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Не удалось начать установку. Проверьте отправку сообщений и состояние домашнего сервера, затем повторите.';
 
   @override
-  String get updatesHomeTitle => 'Домашний сервер';
+  String get updatesHomeTitle => 'Эфир';
 
   @override
   String get updatesHomeResume =>

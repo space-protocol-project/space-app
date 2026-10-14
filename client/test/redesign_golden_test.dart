@@ -76,6 +76,16 @@ void main() {
             ),
           );
         }
+        if (size.width == 1280) {
+          await tester.tap(find.byKey(const ValueKey('space-details')));
+          await tester.pump();
+          await expectLater(
+            find.byKey(key),
+            matchesGoldenFile(
+              'goldens/quiet-space-details-${dark ? 'dark' : 'light'}.png',
+            ),
+          );
+        }
         await tester.pumpWidget(const SizedBox());
         await tester.runAsync(controller.close);
       });

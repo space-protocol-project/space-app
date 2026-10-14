@@ -6,6 +6,7 @@ import 'package:space_client/src/core.dart';
 import 'package:space_client/src/chat_controller.dart';
 import 'package:space_client/src/preferences.dart';
 import 'package:space_client/ui/space_appearance.dart';
+import 'package:space_client/ui/search.dart';
 
 class TestVault implements IdentityVault {
   @override
@@ -187,9 +188,17 @@ void main() {
     );
     await tester.tap(find.byTooltip('Поиск'));
     await tester.pumpAndSettle();
-    await tester.enterText(find.byType(TextField), 'Обзор');
+    await tester.enterText(
+      find.byKey(const ValueKey('space-search-input')),
+      'Обзор',
+    );
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Обзор'));
+    await tester.tap(
+      find.descendant(
+        of: find.byType(SpaceSearchPanel),
+        matching: find.widgetWithText(ListTile, 'Обзор'),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(find.text('Каналы и ресурсы сервера.'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -214,7 +223,20 @@ void main() {
         find.text('Идентичности и ключи этого устройства.'),
         findsOneWidget,
       );
-      await tester.tap(find.byTooltip('Настройки приложения'));
+      await tester.tap(find.byTooltip('Открыть навигацию'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('app-settings-tab')),
+        160,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const ValueKey('mobile-navigation')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('app-settings-tab')));
       await tester.pumpAndSettle();
       expect(find.text('Оформление пространства'), findsNothing);
       expect(tester.takeException(), isNull);

@@ -81,7 +81,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('chat-draft')), findsNothing);
       expect(find.byTooltip('Отправить'), findsNothing);
-      await tester.tap(find.byTooltip('Добавить пространство'));
+      await tester.tap(find.byKey(const ValueKey('navigation-menu-button')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(ListTile, 'Добавить пространство'));
       await tester.pumpAndSettle();
       expect(find.text('Проверить сервер'), findsOneWidget);
       expect(tester.takeException(), isNull);

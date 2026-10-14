@@ -368,7 +368,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get homeTitle => 'Home server';
+  String get homeTitle => 'On air';
 
   @override
   String get close => 'Close';
@@ -1144,7 +1144,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Installation could not start. Check message delivery and the home server, then retry.';
 
   @override
-  String get updatesHomeTitle => 'Home server';
+  String get updatesHomeTitle => 'On air';
 
   @override
   String get updatesHomeResume =>

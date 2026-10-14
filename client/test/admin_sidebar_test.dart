@@ -129,11 +129,21 @@ void main() {
         final initialPushes = observer.pushes;
         if (width < 760) {
           await tester.tap(
-            find.byWidgetPredicate(
-              (widget) =>
-                  widget is IconButton && widget.tooltip == 'Моё устройство',
-            ),
+            find.byKey(const ValueKey('navigation-menu-button')),
           );
+          await tester.pumpAndSettle();
+          await tester.scrollUntilVisible(
+            find.byKey(const ValueKey('my-device-tab')),
+            160,
+            scrollable: find
+                .descendant(
+                  of: find.byKey(const ValueKey('mobile-navigation')),
+                  matching: find.byType(Scrollable),
+                )
+                .first,
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey('my-device-tab')));
         } else {
           await tester.tap(find.byKey(const ValueKey('my-device-tab')));
         }

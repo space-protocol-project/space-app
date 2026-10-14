@@ -776,7 +776,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Домашний сервер'**
+  /// **'Эфир'**
   String get homeTitle;
 
   /// No description provided for @close.
@@ -2090,7 +2090,7 @@ abstract class AppLocalizations {
   /// No description provided for @updatesHomeTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Домашний сервер'**
+  /// **'Эфир'**
   String get updatesHomeTitle;
 
   /// No description provided for @updatesHomeResume.

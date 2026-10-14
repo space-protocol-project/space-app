@@ -140,7 +140,7 @@
       }
     }
   },
-  "homeTitle": "家庭服务器",
+  "homeTitle": "直播",
   "close": "关闭",
   "homeFirstSetup": "服务器和数据将在此计算机上创建。",
   "homeReuse": "您的服务器和数据已保存。",
@@ -451,7 +451,7 @@
   "updatesInstall": "安装并重启",
   "updatesPreparing": "正在完成操作并停止家庭服务器…",
   "updatesInstallFailed": "无法开始安装。请检查消息发送和家庭服务器状态，然后重试。",
-  "updatesHomeTitle": "家庭服务器",
+  "updatesHomeTitle": "直播",
   "updatesHomeResume": "更新前家庭服务器正在运行。是否重新启动？",
   "updatesLater": "稍后",
   "updatesHomeStart": "启动",
