@@ -110,9 +110,10 @@ function channels() {
 }
 function message(m) {
   const own = m.author === "Вы";
-  return `<article class="message ${own ? "own" : ""}">${own ? "" : `<div class="avatar ${m.author === "Миша" ? "lilac" : ""}">${esc(m.author[0])}</div>`}<div class="message-body">${own ? "" : `<div class="message-meta">${esc(m.author)}<time>${esc(m.time)}</time></div>`}<p>${esc(m.text).replace(/\n/g, "<br>")}</p>${(m.files || []).map((f) => `<div class="attachment">${icon("clip")}${esc(f.name)} <small>${Math.max(1, Math.round(f.size / 1024))} КБ</small></div>`).join("")}<div class="message-actions"><button class="reaction ${state.liked.includes(m.id) ? "on" : ""}" data-like="${m.id}" aria-label="Нравится" aria-pressed="${state.liked.includes(m.id)}">♡ ${state.liked.includes(m.id) ? 1 : ""}</button><button class="save" data-save="${m.id}" aria-label="Сохранить сообщение">${icon("bookmark")}${state.saved.includes(m.id) ? "Сохранено" : ""}</button>${own ? `<time class="fine">${esc(m.time)} · локально</time>` : ""}</div></div></article>`;
+  return `<article id="message-${m.id}" class="message ${own ? "own" : ""}">${own ? "" : `<div class="avatar ${m.author === "Миша" ? "lilac" : ""}">${esc(m.author[0])}</div>`}<div class="message-body">${own ? "" : `<div class="message-meta">${esc(m.author)}<time>${esc(m.time)}</time></div>`}<p>${esc(m.text).replace(/\n/g, "<br>")}</p>${(m.files || []).map((f) => `<div class="attachment">${icon("clip")}${esc(f.name)} <small>${Math.max(1, Math.round(f.size / 1024))} КБ</small></div>`).join("")}<div class="message-actions"><button class="reaction ${state.liked.includes(m.id) ? "on" : ""}" data-like="${m.id}" aria-label="Нравится" aria-pressed="${state.liked.includes(m.id)}">♡ ${state.liked.includes(m.id) ? 1 : ""}</button><button class="save ${state.saved.includes(m.id) ? "is-saved" : ""}" data-save="${m.id}" aria-pressed="${state.saved.includes(m.id)}" aria-label="${state.saved.includes(m.id) ? "Убрать из избранного" : "Добавить в избранное"}" title="${state.saved.includes(m.id) ? "Убрать из избранного" : "Добавить в избранное"}">${icon("bookmark")}</button>${own ? `<time class="fine">${esc(m.time)} · локально</time>` : ""}</div></div></article>`;
 }
 function render() {
+  $(".favorite-preview")?.remove();
   channels();
   $("#title").textContent =
     { home: "Обзор", settings: "Управление", saved: "Сохранённое" }[view] ||
@@ -136,7 +137,8 @@ function render() {
 function renderChat() {
   const list = state.messages.filter((m) => m.channel === channel);
   $("#content").innerHTML =
-    `<div class="chat-scroll"><div class="conversation"><div class="intro"><div class="symbol">✧</div><h1>${channel === state.channels[0] ? "Хорошо, что вы здесь." : esc(channel)}</h1><p>${channel === state.channels[0] ? "Разговоры, из которых складывается близость." : "Место для нового разговора."}</p></div><div class="date">${list.length ? "Сегодня · демонстрационный разговор" : "Начало вашей истории"}</div><div id="messages">${list.map(message).join("")}</div></div></div><div class="composer-wrap"><form class="composer" id="compose"><div id="attachments"></div><textarea id="message" aria-label="Сообщение" placeholder="Что у вас нового?" rows="2"></textarea><div class="composer-footer"><button type="button" data-action="attach" title="Прикрепить файл">${icon("plus")}</button><span class="hint">Можно просто перетащить файл сюда</span><button class="send" type="submit" title="Отправить сообщение">${icon("arrow")}</button></div></form><p class="below">Ваш маленький уголок большого мира</p></div>`;
+    `<div class="chat-area"><div class="chat-scroll"><div class="conversation"><div class="intro"><div class="symbol">✧</div><h1>${channel === state.channels[0] ? "Хорошо, что вы здесь." : esc(channel)}</h1><p>${channel === state.channels[0] ? "Разговоры, из которых складывается близость." : "Место для нового разговора."}</p></div><div class="date">${list.length ? "Сегодня · демонстрационный разговор" : "Начало вашей истории"}</div><div id="messages">${list.map(message).join("")}</div></div></div>${favoriteMarkers(list)}</div><div class="composer-wrap"><form class="composer" id="compose"><div id="attachments"></div><textarea id="message" aria-label="Сообщение" placeholder="Что у вас нового?" rows="2"></textarea><div class="composer-footer"><button type="button" data-action="attach" title="Прикрепить файл">${icon("plus")}</button><span class="hint">Можно просто перетащить файл сюда</span><button class="send" type="submit" title="Отправить сообщение">${icon("arrow")}</button></div></form><p class="below">Ваш маленький уголок большого мира</p></div>`;
+  bindFavoritePreviews();
   $("#message").value = drafts[channel] || "";
   renderAttachments();
   $("#message").oninput = () => {
@@ -291,6 +293,14 @@ const actions = {
 document.addEventListener("click", (e) => {
   const b = e.target.closest("button");
   if (!b) return;
+  if (b.dataset.jump) {
+    const target = document.getElementById(`message-${b.dataset.jump}`);
+    target?.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'center'});
+    target?.setAttribute('tabindex', '-1');
+    target?.focus({preventScroll: true});
+    $('.favorite-preview')?.remove();
+    return;
+  }
   if (b.dataset.action) {
     actions[b.dataset.action]?.();
     return;
@@ -372,3 +382,63 @@ document.addEventListener("keydown", (e) => {
 });
 applyTheme();
 render();
+
+function favoriteMarkers(messages) {
+  const favorites = messages.filter(m => state.saved.includes(m.id));
+  if (!favorites.length) return '';
+  return `<nav class="favorite-markers" aria-label="Избранные сообщения">${favorites.map(m => `<button class="favorite-marker ${m.author === 'Вы' ? 'mine' : ''}" data-jump="${m.id}" aria-label="Избранное: ${esc(m.author)}. ${esc(m.text)}"><span></span></button>`).join('')}</nav>`;
+}
+function bindFavoritePreviews() {
+  let closing;
+  const hide = () => {
+    clearTimeout(closing);
+    closing = setTimeout(() => {
+      if (document.activeElement?.closest('.favorite-preview, .favorite-marker')) return;
+      $('.favorite-preview')?.remove();
+      document.querySelectorAll('.favorite-marker').forEach(b => b.style.removeProperty('--marker-width'));
+      document.querySelectorAll('.favorite-marker.expanded').forEach(b => b.classList.remove('expanded'));
+    }, 150);
+  };
+  const markers = [...document.querySelectorAll('.favorite-marker')];
+  markers.forEach((marker, index) => {
+    const show = () => {
+      clearTimeout(closing);
+      $('.favorite-preview')?.remove();
+      document.querySelectorAll('.favorite-marker.expanded').forEach(b => b.classList.remove('expanded'));
+      marker.classList.add('expanded');
+      markers.forEach((item, position) => {
+        const distance = Math.abs(position - index);
+        item.style.setProperty('--marker-width', `${Math.max(8, 38 - distance * 9)}px`);
+      });
+      const m = state.messages.find(m => String(m.id) === marker.dataset.jump);
+      const card = document.createElement('section');
+      card.className = `favorite-preview ${m.author === 'Вы' ? 'mine' : ''}`;
+      card.setAttribute('aria-label', 'Избранное сообщение');
+      const previewText = m.text || (m.files || []).map(f => f.name).join(', ');
+      const [heading, ...remaining] = previewText.split('\n').filter(line => line.trim());
+      const excerpt = remaining.join('\n') || previewText;
+      card.innerHTML = `<div class="favorite-preview-header"><button class="favorite-title" data-jump="${m.id}" title="${esc(heading || m.author)}">${esc(heading || m.author)}</button><button class="save is-saved" data-save="${m.id}" aria-label="Убрать из избранного" title="Убрать из избранного">${icon('bookmark')}</button></div><button class="favorite-excerpt" data-jump="${m.id}" aria-label="Перейти к сообщению"><span>${esc(excerpt)}</span></button>`;
+      document.body.append(card);
+      const rect = marker.getBoundingClientRect();
+      card.style.left = `${Math.min(rect.right + 14, innerWidth - card.offsetWidth - 8)}px`;
+      card.style.top = `${Math.max(8, Math.min(rect.top + rect.height / 2 - card.offsetHeight / 2, innerHeight - card.offsetHeight - 8))}px`;
+      card.onpointerenter = () => clearTimeout(closing);
+      card.onpointerleave = hide;
+      card.onfocusin = () => clearTimeout(closing);
+      card.onfocusout = hide;
+    };
+    marker.onpointerenter = show;
+    marker.onpointerleave = hide;
+    marker.onfocus = show;
+    marker.onblur = hide;
+    marker.onkeydown = e => {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        $('.favorite-preview button')?.focus();
+      }
+    };
+  });
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') $('.favorite-preview')?.remove();
+});

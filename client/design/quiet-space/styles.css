@@ -958,3 +958,37 @@ body.light {
     scrollbar-color: var(--scroll-thumb) var(--scroll-track);
   }
 }
+
+.chat-area { position: relative; flex: 1; min-height: 0; display: flex; }
+.chat-area .chat-scroll { min-width: 0; }
+.save.is-saved svg { fill: currentColor; }
+.favorite-markers { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 36px; max-height: 65%; overflow-y: auto; z-index: 2; }
+.favorite-marker { display: flex; width: 36px; height: 20px; border-radius: 3px; }
+.favorite-marker span { width: 14px; height: 3px; border-radius: 2px; background: #a6b887; transition: width 120ms ease; }
+.favorite-marker.mine span { background: var(--accent); }
+.favorite-marker:hover span,.favorite-marker:focus-visible span,.favorite-marker.expanded span { width: 28px; }
+.favorite-preview { position: fixed; z-index: 12; width: min(420px, calc(100vw - 100px)); padding: 8px 8px 16px 16px; border-radius: 18px; background: color-mix(in srgb, #a6b887 16%, var(--surface)); box-shadow: 0 8px 28px #0005; }
+.favorite-preview.mine { background: color-mix(in srgb, var(--accent) 16%, var(--surface)); }
+.favorite-preview-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.favorite-preview-header strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+.favorite-preview .save { width: 32px; height: 32px; flex-shrink: 0; color: var(--text); }
+.favorite-excerpt { width: 100%; text-align: left; justify-content: flex-start; padding: 0 8px 0 0; line-height: 1.6; }
+.favorite-excerpt span { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+body.light .favorite-marker:not(.mine) span { background: #63754a; }
+@media(max-width:720px) { .chat-area .chat-scroll { padding-left: 38px; } }
+
+/* Геометрия избранного по референсу; цвета собственных и чужих сообщений сохранены. */
+.favorite-markers { left: 12px; width: 44px; }
+.favorite-marker { width: 44px; height: 15px; justify-content: flex-start; border-radius: 0; }
+.favorite-marker:hover { background: transparent; }
+.favorite-marker span { width: var(--marker-width, 8px); height: 3px; border-radius: 0; opacity: .45; }
+.favorite-marker:hover span, .favorite-marker:focus-visible span, .favorite-marker.expanded span { width: 38px; opacity: 1; }
+.favorite-preview { width: min(480px, calc(100vw - 140px)); padding: 10px 12px 14px; border-radius: 20px; box-shadow: 0 8px 24px #0002; }
+.favorite-preview-header { gap: 8px; }
+.favorite-title { display: block; min-width: 0; flex: 1; padding: 0; text-align: left; font-weight: 700; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-radius: 3px; }
+.favorite-preview .save { width: 26px; height: 26px; color: var(--muted); }
+.favorite-preview .save svg { fill: none; width: 18px; height: 18px; }
+.favorite-excerpt { color: var(--muted); padding: 4px 0 0; font-size: 14px; line-height: 1.65; }
+.favorite-excerpt span { -webkit-line-clamp: 3; white-space: pre-line; }
+.chat-area .chat-scroll { padding-left: 60px; }
+@media(max-width:720px) { .favorite-markers { left: 5px; } .favorite-preview { width: calc(100vw - 130px); } .chat-area .chat-scroll { padding-left: 50px; } }
