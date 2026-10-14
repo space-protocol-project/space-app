@@ -5,6 +5,18 @@
 #include "flutter_window.h"
 #include "utils.h"
 
+// GetMessage возвращает -1 при ошибке, 0 при завершении и >0 для сообщения.
+static int RunMessageLoop() {
+  MSG message{};
+  while (true) {
+    const BOOL message_status = ::GetMessage(&message, nullptr, 0, 0);
+    if (message_status == -1) return EXIT_FAILURE;
+    if (message_status == 0) return EXIT_SUCCESS;
+    ::TranslateMessage(&message);
+    ::DispatchMessage(&message);
+  }
+}
+
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
   // Attach to console when present (e.g., 'flutter run') or create a
@@ -32,12 +44,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   }
   window.SetQuitOnClose(true);
 
-  ::MSG msg;
-  while (::GetMessage(&msg, nullptr, 0, 0)) {
-    ::TranslateMessage(&msg);
-    ::DispatchMessage(&msg);
-  }
+  const int exit_code = RunMessageLoop();
 
   ::CoUninitialize();
-  return EXIT_SUCCESS;
+  return exit_code;
 }

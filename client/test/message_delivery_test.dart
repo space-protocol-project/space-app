@@ -29,13 +29,21 @@ void main() {
       final session = DeliverySession();
       final controller = await connect(session);
       addTearDown(controller.dispose);
+      final sending = controller.stream.firstWhere(
+        (state) => state.sendStatus == MessageSendStatus.sending,
+      );
       final failed = controller.send('Текст');
+      await sending;
       expect(controller.sendStatus, MessageSendStatus.sending);
       expect(controller.messages, isEmpty);
       session.reply!.completeError(const GrpcError.unavailable());
       expect(await failed, false);
       expect(controller.sendStatus, MessageSendStatus.unconfirmed);
+      final retryStarted = controller.stream.firstWhere(
+        (state) => state.sendStatus == MessageSendStatus.sending,
+      );
       final repeated = controller.send('Текст');
+      await retryStarted;
       session.reply!.complete(
         Content(
           id: 'server-1',

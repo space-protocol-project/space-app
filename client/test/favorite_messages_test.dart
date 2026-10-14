@@ -1,3 +1,4 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -38,8 +39,8 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: AnimatedBuilder(
-              animation: controller,
+            body: BlocBuilder<ChatController, ChatState>(
+              bloc: controller,
               builder: (_, _) =>
                   ChatView(controller: controller, openConnection: () {}),
             ),

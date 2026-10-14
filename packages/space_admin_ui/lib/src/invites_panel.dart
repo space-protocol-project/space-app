@@ -1,3 +1,9 @@
+import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'admin_operations.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:space_api/space_api.dart';
@@ -21,12 +27,13 @@ class InvitesPanel extends StatefulWidget {
 }
 
 class _InvitesPanelState extends State<InvitesPanel> {
+  final operations = AdminOperations();
+  bool get busy => operations.state.busy;
   AdminLocalizations get strings =>
       AdminLocalizations.of(context) ??
       lookupAdminLocalizations(const Locale('ru'));
   final invites = <Map<String, dynamic>>[];
   final uses = TextEditingController(text: '1');
-  bool busy = false;
   String role = 'member', cursor = '', status = '', token = '', issuedId = '';
   int ttl = 86400;
   String? statusKey;
@@ -60,15 +67,17 @@ class _InvitesPanelState extends State<InvitesPanel> {
   void dispose() {
     uses.dispose();
     token = '';
+    unawaited(operations.close());
     super.dispose();
   }
 
   Future<void> run(Future<void> Function() action) async {
-    if (busy) return;
-    setState(() => busy = true);
+    if (!await operations.begin()) return;
+    Object? failure;
     try {
       await action();
     } catch (e) {
+      failure = e;
       statusKey = null;
       status = e.toString().replaceFirst('Bad state: ', '');
       if (e is SpaceApiError && [401, 403].contains(e.status)) {
@@ -78,7 +87,7 @@ class _InvitesPanelState extends State<InvitesPanel> {
         cursor = '';
       }
     } finally {
-      if (mounted) setState(() => busy = false);
+      if (mounted) operations.finish(error: failure);
     }
   }
 
@@ -191,7 +200,13 @@ class _InvitesPanelState extends State<InvitesPanel> {
       ? strings.inviteUsedState
       : strings.inviteActiveState;
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) =>
+      BlocBuilder<AdminOperations, AdminOperationState>(
+        bloc: operations,
+        builder: (context, state) => _build(context),
+      );
+
+  Widget _build(BuildContext context) => Card(
     color: Theme.of(context).colorScheme.surface,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     child: Padding(

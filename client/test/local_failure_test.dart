@@ -33,7 +33,8 @@ void main() {
       final home = HomeController()
         ..ip = '203.0.113.10'
         ..error = 'private-diagnostic'
-        ..failureCode = LocalFailureCode.hashMismatch;
+        ..failureCode = LocalFailureCode.hashMismatch
+        ..publishState();
       addTearDown(home.dispose);
       await tester.pumpWidget(
         ValueListenableBuilder<Locale>(

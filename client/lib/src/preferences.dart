@@ -1,12 +1,61 @@
-import 'package:flutter/foundation.dart' show mapEquals;
-
 import 'dart:convert';
 
-import 'package:space_admin_ui/space_admin_ui.dart' show validatedServerIcon;
+import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:flutter/foundation.dart' show mapEquals;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:space_admin_ui/space_admin_ui.dart' show validatedServerIcon;
 
-class AppPreferences extends ChangeNotifier {
+import 'event_controller.dart';
+
+part 'preferences_events.dart';
+part 'preferences_state.dart';
+
+class AppPreferences
+    extends EventController<PreferencesEvent<dynamic>, PreferencesState> {
+  AppPreferences() : super(const PreferencesState()) {
+    on<PreferencesStatePublished>(
+      (event, emit) => event.runAndComplete(() => emit(event.state)),
+    );
+    on<PreferencesCommand<dynamic>>(
+      (event, _) => handleRequest(
+        event,
+        () => switch (event) {
+          PreferencesLoaded() => _load(),
+          PreferencesChanged() => _change(
+            dark: event.dark,
+            palette: event.palette,
+            language: event.language,
+            sendShortcut: event.sendShortcut,
+          ),
+          ServerRemembered() => _remember(event.origin),
+          ServerForgotten() => _forget(event.origin),
+          ServerIconCached() => _cacheServerIcon(event.origin, event.value),
+        },
+      ),
+      transformer: sequential(),
+    );
+  }
+
+  Future<void> load() => sendRequest(PreferencesLoaded());
+  Future<void> change({
+    bool? dark,
+    String? palette,
+    String? language,
+    String? sendShortcut,
+  }) => sendRequest(
+    PreferencesChanged(
+      dark: dark,
+      palette: palette,
+      language: language,
+      sendShortcut: sendShortcut,
+    ),
+  );
+  Future<void> remember(String origin) => sendRequest(ServerRemembered(origin));
+  Future<void> forget(String origin) => sendRequest(ServerForgotten(origin));
+  Future<void> cacheServerIcon(String origin, Object? value) =>
+      sendRequest(ServerIconCached(origin, value));
+
   bool dark = true;
   String palette = 'gruvbox', error = '';
   String language = 'ru';
@@ -17,7 +66,7 @@ class AppPreferences extends ChangeNotifier {
       : Locale(language);
   final List<String> origins = [];
   final Map<String, Map<String, dynamic>> serverIcons = {};
-  Future<void> cacheServerIcon(String origin, Object? value) {
+  Future<void> _cacheServerIcon(String origin, Object? value) {
     final icon = validatedServerIcon(value);
     if (icon == null ||
         !origins.contains(origin) ||
@@ -25,14 +74,14 @@ class AppPreferences extends ChangeNotifier {
       return Future.value();
     }
     serverIcons[origin] = icon;
-    notifyListeners();
+    publishState();
     return _save();
   }
 
   bool _disposed = false;
   Future<void> _writes = Future.value();
 
-  Future<void> load() async {
+  Future<void> _load() async {
     try {
       final data = await SharedPreferences.getInstance();
       if (_disposed) return;
@@ -61,10 +110,10 @@ class AppPreferences extends ChangeNotifier {
     } catch (_) {
       error = 'Не удалось загрузить настройки оформления.';
     }
-    if (!_disposed) notifyListeners();
+    if (!_disposed) publishState();
   }
 
-  Future<void> change({
+  Future<void> _change({
     bool? dark,
     String? palette,
     String? language,
@@ -81,21 +130,21 @@ class AppPreferences extends ChangeNotifier {
     if (palette != null && ['gruvbox', 'ocean', 'iris'].contains(palette)) {
       this.palette = palette;
     }
-    notifyListeners();
+    publishState();
     return _save();
   }
 
-  Future<void> remember(String origin) {
+  Future<void> _remember(String origin) {
     origins.remove(origin);
     origins.insert(0, origin);
-    notifyListeners();
+    publishState();
     return _save();
   }
 
-  Future<void> forget(String origin) {
+  Future<void> _forget(String origin) {
     origins.remove(origin);
     serverIcons.remove(origin);
-    notifyListeners();
+    publishState();
     return _save();
   }
 
@@ -124,9 +173,17 @@ class AppPreferences extends ChangeNotifier {
       } catch (_) {
         error = 'Настройки изменены, но сохранить их на устройстве не удалось.';
       }
-      if (!_disposed) notifyListeners();
+      if (!_disposed) publishState();
     });
     return _writes;
+  }
+
+  void publishState() {
+    if (!_disposed && !isClosed) {
+      publishStateEvent(
+        PreferencesStatePublished(PreferencesState.fromController(this)),
+      );
+    }
   }
 
   ThemeData get theme {
@@ -257,8 +314,8 @@ class AppPreferences extends ChangeNotifier {
   }
 
   @override
-  void dispose() {
+  Future<void> close() async {
     _disposed = true;
-    super.dispose();
+    await super.close();
   }
 }

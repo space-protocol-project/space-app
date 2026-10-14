@@ -124,4 +124,20 @@ void main() {
       throwsFormatException,
     );
   });
+  test('Описатель выпуска не разрешает установку в чужом каталоге', () async {
+    final version = release('v0.1.0');
+    await installed(store, version);
+    await store.runtime(version).rename('${root.path}/runtimes/other');
+    await expectLater(store.active(version), throwsFormatException);
+    expect(await store.selection.exists(), false);
+  });
+
+  test('Старый marker с чужой контрольной суммой не выбирается', () async {
+    final version = release('v0.1.0');
+    await installed(store, version, legacy: true);
+    await File('${store.runtime(version).path}/installed.json')
+        .writeAsString(jsonEncode({'sha256': 'b' * 64}));
+    await expectLater(store.active(version), throwsFormatException);
+    expect(await store.selection.exists(), false);
+  });
 }

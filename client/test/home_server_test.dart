@@ -133,18 +133,18 @@ void main() {
                 launches++;
                 expect(ip, home.ip);
                 home.running = true;
-                home.state = HomeServerState(
+                home.server = HomeServerState(
                   'http://127.0.0.1:18080',
                   'https://203.0.113.10:8443',
                   '',
                   'a' * 64,
                 );
-                home.notifyListeners();
+                home.publishState();
               },
               onStop: () async {
                 home.running = false;
-                home.state = null;
-                home.notifyListeners();
+                home.server = null;
+                home.publishState();
               },
               openAdministration: () {},
             ),
@@ -154,14 +154,14 @@ void main() {
       await tester.tap(find.text('Выйти в эфир'));
       await tester.pumpAndSettle();
       expect(find.text('Отключиться'), findsOneWidget);
-      final link = home.state!.link;
+      final link = home.server!.link;
       await tester.ensureVisible(find.text('Отключиться'));
       await tester.tap(find.text('Отключиться'));
       await tester.pumpAndSettle();
       expect(find.text('Выйти в эфир'), findsOneWidget);
       await tester.tap(find.text('Выйти в эфир'));
       await tester.pumpAndSettle();
-      expect(home.state!.link, link);
+      expect(home.server!.link, link);
       expect(launches, 2);
       expect(tester.takeException(), isNull);
     },

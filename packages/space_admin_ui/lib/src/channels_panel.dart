@@ -1,3 +1,9 @@
+import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'admin_operations.dart';
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -20,6 +26,8 @@ class ChannelsPanel extends StatefulWidget {
 }
 
 class _ChannelsPanelState extends State<ChannelsPanel> {
+  final operations = AdminOperations();
+  bool get busy => operations.state.busy;
   AdminLocalizations get strings =>
       AdminLocalizations.of(context) ??
       lookupAdminLocalizations(const Locale('ru'));
@@ -38,7 +46,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     'channelConflict' => strings.channelConflict,
     _ => status,
   };
-  bool busy = false, archived = false, preview = false;
+  bool archived = false, preview = false;
   final newId = TextEditingController(),
       newTitle = TextEditingController(),
       newOrder = TextEditingController(text: '10');
@@ -65,21 +73,23 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     ]) {
       c.dispose();
     }
+    unawaited(operations.close());
     super.dispose();
   }
 
   Future<void> run(Future<void> Function() action) async {
-    if (busy) return;
-    setState(() => busy = true);
+    if (!await operations.begin()) return;
+    Object? failure;
     try {
       await action();
     } catch (e) {
+      failure = e;
       statusKey = e is SpaceApiError && e.status == 409
           ? 'channelConflict'
           : null;
       status = e.toString().replaceFirst('Bad state: ', '');
     } finally {
-      if (mounted) setState(() => busy = false);
+      if (mounted) operations.finish(error: failure);
     }
   }
 
@@ -493,78 +503,83 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
   );
 
   @override
-  Widget build(BuildContext context) => Card(
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    color: Theme.of(context).colorScheme.surface,
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Text(strings.channelsTitle, style: TextStyle(fontSize: 20)),
-              action(strings.channelsReload, load),
-            ],
-          ),
-          const SizedBox(height: 16),
-          for (final c in channels) ...[
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(c['title'] as String),
-              subtitle: Text(
-                '${c['id']}${c['archived'] == true ? strings.channelArchivedSuffix : ''}',
-              ),
-              trailing: Icon(
-                selected?['id'] == c['id']
-                    ? Icons.expand_less
-                    : Icons.expand_more,
-              ),
-              onTap: busy
-                  ? null
-                  : () {
-                      if (selected?['id'] == c['id']) {
-                        setState(() => selected = null);
-                      } else {
-                        run(() => choose(c));
-                      }
-                    },
+  Widget build(
+    BuildContext context,
+  ) => BlocBuilder<AdminOperations, AdminOperationState>(
+    bloc: operations,
+    builder: (context, state) => Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: Theme.of(context).colorScheme.surface,
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text(strings.channelsTitle, style: TextStyle(fontSize: 20)),
+                action(strings.channelsReload, load),
+              ],
             ),
-            if (selected?['id'] == c['id']) channelEditor(),
-          ],
-          if (channels.isEmpty && !busy) Text(strings.channelsEmpty),
-          ExpansionTile(
-            tilePadding: EdgeInsets.zero,
-            title: Text(strings.channelCreateSection),
-            children: [
-              field(
-                newTitle,
-                strings.channelNewTitle,
-                key: const ValueKey('new-channel-title'),
+            const SizedBox(height: 16),
+            for (final c in channels) ...[
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(c['title'] as String),
+                subtitle: Text(
+                  '${c['id']}${c['archived'] == true ? strings.channelArchivedSuffix : ''}',
+                ),
+                trailing: Icon(
+                  selected?['id'] == c['id']
+                      ? Icons.expand_less
+                      : Icons.expand_more,
+                ),
+                onTap: busy
+                    ? null
+                    : () {
+                        if (selected?['id'] == c['id']) {
+                          setState(() => selected = null);
+                        } else {
+                          run(() => choose(c));
+                        }
+                      },
               ),
-              field(newOrder, strings.channelNewOrder, number: true),
-              Text(strings.channelDefaults),
-              const SizedBox(height: 16),
-              action(strings.channelCreate, create, primary: true),
-              const SizedBox(height: 24),
+              if (selected?['id'] == c['id']) channelEditor(),
             ],
-          ),
-          if (busy)
+            if (channels.isEmpty && !busy) Text(strings.channelsEmpty),
+            ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              title: Text(strings.channelCreateSection),
+              children: [
+                field(
+                  newTitle,
+                  strings.channelNewTitle,
+                  key: const ValueKey('new-channel-title'),
+                ),
+                field(newOrder, strings.channelNewOrder, number: true),
+                Text(strings.channelDefaults),
+                const SizedBox(height: 16),
+                action(strings.channelCreate, create, primary: true),
+                const SizedBox(height: 24),
+              ],
+            ),
+            if (busy)
+              Padding(
+                padding: EdgeInsets.all(12),
+                child: LinearProgressIndicator(),
+              ),
             Padding(
-              padding: EdgeInsets.all(12),
-              child: LinearProgressIndicator(),
+              padding: const EdgeInsets.only(top: 16),
+              child: Text(
+                localizedStatus,
+                key: const ValueKey('channels-status'),
+              ),
             ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Text(
-              localizedStatus,
-              key: const ValueKey('channels-status'),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     ),
   );

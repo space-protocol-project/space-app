@@ -1,3 +1,5 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../l10n/failure_strings.dart';
 import '../l10n/strings.dart';
 
@@ -40,10 +42,10 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
   }
 
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-    animation: widget.controller,
-    builder: (context, _) {
-      final c = widget.controller;
+  Widget build(BuildContext context) => BlocBuilder<ChatController, ChatState>(
+    bloc: widget.controller,
+    builder: (context, view) {
+      final controller = widget.controller;
       return SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -72,7 +74,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
             const SizedBox(height: 20),
             TextField(
               controller: address,
-              enabled: !c.busy && !c.connected,
+              enabled: !view.busy && !view.connected,
               decoration: InputDecoration(
                 labelText: context.strings.serverAddress,
                 hintText: 'http://127.0.0.1:8080',
@@ -81,7 +83,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
             const SizedBox(height: 14),
             TextField(
               controller: invitation,
-              enabled: !c.busy && !c.connected,
+              enabled: !view.busy && !view.connected,
               decoration: InputDecoration(
                 labelText: context.strings.optionalInvite,
                 hintText: 'iv_…',
@@ -89,72 +91,75 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
             ),
             const SizedBox(height: 14),
             FilledButton.tonalIcon(
-              onPressed: c.busy || c.connected
+              onPressed: view.busy || view.connected
                   ? null
-                  : () => c.inspect(
+                  : () => controller.inspect(
                       address.text,
                       invitationToken: invitation.text,
                     ),
               icon: const Icon(Icons.search),
               label: Text(context.strings.checkServer),
             ),
-            if (c.busy) ...[
+            if (view.busy) ...[
               const SizedBox(height: 18),
               const LinearProgressIndicator(),
             ],
-            if (c.error.isNotEmpty) ...[
+            if (view.error.isNotEmpty) ...[
               const SizedBox(height: 18),
               Text(
-                chatFailureText(context, c),
+                chatFailureText(context, controller),
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             ],
-            if (c.preview != null) ...[
+            if (view.preview != null) ...[
               const SizedBox(height: 24),
               Text(
                 context.strings.verifyTrust,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 10),
-              SelectableText(c.preview!.origin.toString()),
+              SelectableText(view.preview!.origin.toString()),
               const SizedBox(height: 10),
               Text(context.strings.serverKeyFingerprint),
               const SizedBox(height: 6),
               SelectableText(
-                c.fingerprint,
+                view.fingerprint,
                 style: const TextStyle(fontSize: 12),
               ),
               const SizedBox(height: 16),
-              if (c.preview!.tlsFingerprint.isNotEmpty) ...[
+              if (view.preview!.tlsFingerprint.isNotEmpty) ...[
                 Text(context.strings.tlsCertificateFingerprint),
                 const SizedBox(height: 6),
                 SelectableText(
-                  c.preview!.tlsFingerprint,
+                  view.preview!.tlsFingerprint,
                   style: const TextStyle(fontSize: 12),
                 ),
                 const SizedBox(height: 16),
               ],
               Text(context.strings.firstTrustHelp),
               const SizedBox(height: 20),
-              if (c.invitationRole.isNotEmpty)
+              if (view.invitationRole.isNotEmpty)
                 Text(
-                  c.invitationRole == 'reader'
+                  view.invitationRole == 'reader'
                       ? context.strings.readerInvitation
                       : context.strings.memberInvitation,
                 ),
               FilledButton(
-                onPressed: c.busy || c.connected ? null : connect,
+                onPressed: view.busy || view.connected ? null : connect,
                 child: Text(context.strings.trustAndConnect),
               ),
-              PairingStartPanel(controller: c, onConnected: widget.onConnected),
+              PairingStartPanel(
+                controller: controller,
+                onConnected: widget.onConnected,
+              ),
             ],
-            if (c.connected) ...[
+            if (view.connected) ...[
               const SizedBox(height: 18),
               OutlinedButton(
-                onPressed: c.busy
+                onPressed: view.busy
                     ? null
                     : () async {
-                        await c.disconnect();
+                        await controller.disconnect();
                       },
                 child: Text(context.strings.disconnectServer),
               ),

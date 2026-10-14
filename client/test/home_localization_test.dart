@@ -43,6 +43,7 @@ void main() {
           LocalFailureCode.homeRecoveryInvalid,
         ]) {
           home.failureCode = code;
+          home.publishState();
           await tester.pumpWidget(
             MaterialApp(
               locale: locale,
@@ -128,9 +129,9 @@ void main() {
                 onStop: () async {
                   stops++;
                   home.running = false;
-                  home.state = null;
+                  home.server = null;
                   home.phase = HomePhase.stopped;
-                  home.notifyListeners();
+                  home.publishState();
                 },
                 openAdministration: () {},
               ),
@@ -144,7 +145,7 @@ void main() {
         home.busy = true;
         home.phase = HomePhase.downloading;
         home.progress = .37;
-        home.notifyListeners();
+        home.publishState();
         await tester.pumpAndSettle();
         expect(find.text(strings.homeDownloading), findsOneWidget);
         expect(
@@ -163,8 +164,8 @@ void main() {
         home.busy = false;
         home.running = true;
         home.phase = HomePhase.running;
-        home.state = state;
-        home.notifyListeners();
+        home.server = state;
+        home.publishState();
         await tester.pumpAndSettle();
         expect(find.text(state.link), findsOneWidget);
         await tester.ensureVisible(find.text(strings.stopHome));

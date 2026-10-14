@@ -1,3 +1,9 @@
+import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'admin_operations.dart';
+
 import 'package:flutter/material.dart';
 
 import 'channels_panel.dart';
@@ -27,11 +33,13 @@ class DevicesPanel extends StatefulWidget {
 }
 
 class _DevicesPanelState extends State<DevicesPanel> {
+  final operations = AdminOperations();
+  bool get busy => operations.state.busy;
   AdminLocalizations get strings =>
       AdminLocalizations.of(context) ??
       lookupAdminLocalizations(const Locale('ru'));
   List<Map<String, dynamic>> devices = [];
-  bool busy = false, revoked = false, confirming = false;
+  bool revoked = false, confirming = false;
   String status = '';
   String? statusKey;
   String get localizedStatus => switch (statusKey) {
@@ -47,18 +55,25 @@ class _DevicesPanelState extends State<DevicesPanel> {
     });
   }
 
+  @override
+  void dispose() {
+    unawaited(operations.close());
+    super.dispose();
+  }
+
   Future<void> run(Future<void> Function() action) async {
-    if (busy || revoked) return;
-    setState(() => busy = true);
+    if (revoked || !await operations.begin()) return;
+    Object? failure;
     try {
       await action();
     } catch (e) {
+      failure = e;
       if (mounted) {
         statusKey = null;
         status = e.toString().replaceFirst('Bad state: ', '');
       }
     } finally {
-      if (mounted) setState(() => busy = false);
+      if (mounted) operations.finish(error: failure);
     }
   }
 
@@ -157,7 +172,13 @@ class _DevicesPanelState extends State<DevicesPanel> {
   }
 
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) =>
+      BlocBuilder<AdminOperations, AdminOperationState>(
+        bloc: operations,
+        builder: (context, state) => _build(context),
+      );
+
+  Widget _build(BuildContext context) => Card(
     child: Padding(
       padding: const EdgeInsets.all(24),
       child: Column(

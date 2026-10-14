@@ -1,3 +1,5 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'home_operation_progress.dart';
 import '../l10n/strings.dart';
 import '../l10n/home_strings.dart';
@@ -138,9 +140,9 @@ class _HomePanelState extends State<HomePanel> {
   }
 
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-    animation: widget.home,
-    builder: (context, _) {
+  Widget build(BuildContext context) => BlocBuilder<HomeController, HomeState>(
+    bloc: widget.home,
+    builder: (context, view) {
       final home = widget.home;
       return SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -167,23 +169,23 @@ class _HomePanelState extends State<HomePanel> {
             ),
             const SizedBox(height: 16),
             Text(
-              home.ip.isEmpty
+              view.ip.isEmpty
                   ? context.strings.homeFirstSetup
                   : context.strings.homeReuse,
             ),
             const SizedBox(height: 20),
             TextField(
               controller: address,
-              enabled: home.ip.isEmpty && !home.busy && !detecting,
+              enabled: view.ip.isEmpty && !view.busy && !detecting,
               decoration: InputDecoration(
                 labelText: context.strings.homeIP,
                 hintText: context.strings.homeIPHint,
               ),
             ),
-            if (home.ip.isEmpty) ...[
+            if (view.ip.isEmpty) ...[
               const SizedBox(height: 16),
               TextButton.icon(
-                onPressed: home.busy || detecting ? null : detect,
+                onPressed: view.busy || detecting ? null : detect,
                 icon: const Icon(Icons.public),
                 label: Text(
                   detecting
@@ -200,130 +202,133 @@ class _HomePanelState extends State<HomePanel> {
             const SizedBox(height: 20),
             Text(context.strings.homePortHelp),
             const SizedBox(height: 20),
-            if (home.busy && home.error.isEmpty) ...[
+            if (view.busy && view.error.isEmpty) ...[
               HomeOperationProgress(home: home),
               const SizedBox(height: 16),
             ],
-            if (!home.busy && home.phase != HomePhase.idle) ...[
-              Text(home.phase.label(context)),
+            if (!view.busy && view.phase != HomePhase.idle) ...[
+              Text(view.phase.label(context)),
               const SizedBox(height: 16),
             ],
-            if (home.error.isNotEmpty) ...[
-              Text(
-                home.failureCode == null
-                    ? home.error
-                    : localFailureText(context, home.failureCode!),
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-              const SizedBox(height: 16),
-              if (home.spaceReport != null &&
-                  home.failureCode == LocalFailureCode.homeSpaceLow)
-                Text(
-                  context.strings.homeSpaceDetails(
-                    (home.spaceReport!.requiredBytes / (1024 * 1024))
-                        .ceil()
-                        .toString(),
-                    (home.spaceReport!.availableBytes / (1024 * 1024))
-                        .floor()
-                        .toString(),
-                  ),
-                ),
-            ],
-            SpaceActionButton(
-              onPressed:
-                  home.busy ||
-                      detecting ||
-                      updateAction ||
-                      (home.pendingUpdate && !home.running)
-                  ? null
-                  : () async {
-                      if (home.running) {
-                        await widget.onStop();
-                      } else {
-                        await widget.onStart(address.text);
-                      }
-                    },
-              icon: home.running ? Icons.power_settings_new : Icons.sensors,
-              label: home.running
-                  ? context.strings.stopHome
-                  : context.strings.goLive,
-            ),
-            if (home.updateAvailable || home.pendingUpdate) ...[
-              const SizedBox(height: 16),
-              if (home.installedVersion.isNotEmpty &&
-                  home.availableVersion.isNotEmpty) ...[
-                Text('${home.installedVersion} → ${home.availableVersion}'),
-                const SizedBox(height: 12),
-              ],
-              OutlinedButton.icon(
-                onPressed:
-                    home.busy ||
-                        detecting ||
-                        updateAction ||
-                        home.recoveryBlocked
-                    ? null
-                    : updateServer,
-                icon: const Icon(Icons.system_update_alt),
-                label: Text(
-                  home.pendingUpdate
-                      ? context.strings.homeResumeUpdate
-                      : context.strings.homeUpdate,
-                ),
-              ),
-              if (home.recoveryBlocked) ...[
-                const SizedBox(height: 12),
-                Text(context.strings.homeRecoveryHelp),
-                TextButton.icon(
-                  onPressed: openRecoveryGuide,
-                  icon: const Icon(Icons.help_outline),
-                  label: Text(context.strings.homeRecoveryGuide),
-                ),
-                OutlinedButton.icon(
-                  key: const ValueKey('home-recovery-diagnostics'),
-                  onPressed: () => Clipboard.setData(
-                    ClipboardData(
-                      text:
-                          '${home.recoverySummary}\ncode: ${home.failureCode?.name}',
-                    ),
-                  ),
-                  icon: const Icon(Icons.copy_outlined),
-                  label: Text(context.strings.homeRecoveryCopy),
-                ),
-              ],
-            ],
-            if (home.state != null) ...[
-              const SizedBox(height: 20),
-              Text(context.strings.homeLink),
-              const SizedBox(height: 16),
-              SelectableText(home.state!.link),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 12,
-                runSpacing: 8,
-                children: [
-                  OutlinedButton.icon(
-                    onPressed: () => Clipboard.setData(
-                      ClipboardData(text: home.state!.link),
-                    ),
-                    icon: const Icon(Icons.copy),
-                    label: Text(context.strings.copyLink),
-                  ),
-                  FilledButton.icon(
-                    onPressed: widget.openAdministration,
-                    icon: const Icon(Icons.tune),
-                    label: Text(context.strings.manageServer),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                context.strings.homeInviteHelp,
-                style: TextStyle(fontSize: 12),
-              ),
-            ],
+            ..._failureDetails(context, view),
+            _powerControl(context, view),
+            ..._updateControls(context, view),
+            ..._connectionDetails(context, view),
           ],
         ),
       );
     },
   );
+
+  List<Widget> _failureDetails(BuildContext context, HomeState view) => [
+    if (view.error.isNotEmpty) ...[
+      Text(
+        view.failureCode == null
+            ? view.error
+            : localFailureText(context, view.failureCode!),
+        style: TextStyle(color: Theme.of(context).colorScheme.error),
+      ),
+      const SizedBox(height: 16),
+      if (view.spaceReport != null &&
+          view.failureCode == LocalFailureCode.homeSpaceLow)
+        Text(
+          context.strings.homeSpaceDetails(
+            (view.spaceReport!.requiredBytes / (1024 * 1024)).ceil().toString(),
+            (view.spaceReport!.availableBytes / (1024 * 1024))
+                .floor()
+                .toString(),
+          ),
+        ),
+    ],
+  ];
+
+  List<Widget> _updateControls(BuildContext context, HomeState view) => [
+    if (view.updateAvailable || view.pendingUpdate) ...[
+      const SizedBox(height: 16),
+      if (view.installedVersion.isNotEmpty &&
+          view.availableVersion.isNotEmpty) ...[
+        Text('${view.installedVersion} → ${view.availableVersion}'),
+        const SizedBox(height: 12),
+      ],
+      OutlinedButton.icon(
+        onPressed:
+            view.busy || detecting || updateAction || view.recoveryBlocked
+            ? null
+            : updateServer,
+        icon: const Icon(Icons.system_update_alt),
+        label: Text(
+          view.pendingUpdate
+              ? context.strings.homeResumeUpdate
+              : context.strings.homeUpdate,
+        ),
+      ),
+      if (view.recoveryBlocked) ...[
+        const SizedBox(height: 12),
+        Text(context.strings.homeRecoveryHelp),
+        TextButton.icon(
+          onPressed: openRecoveryGuide,
+          icon: const Icon(Icons.help_outline),
+          label: Text(context.strings.homeRecoveryGuide),
+        ),
+        OutlinedButton.icon(
+          key: const ValueKey('home-recovery-diagnostics'),
+          onPressed: () => Clipboard.setData(
+            ClipboardData(
+              text: '${view.recoverySummary}\ncode: ${view.failureCode?.name}',
+            ),
+          ),
+          icon: const Icon(Icons.copy_outlined),
+          label: Text(context.strings.homeRecoveryCopy),
+        ),
+      ],
+    ],
+  ];
+
+  List<Widget> _connectionDetails(BuildContext context, HomeState view) => [
+    if (view.server != null) ...[
+      const SizedBox(height: 20),
+      Text(context.strings.homeLink),
+      const SizedBox(height: 16),
+      SelectableText(view.server!.link),
+      const SizedBox(height: 10),
+      Wrap(
+        spacing: 12,
+        runSpacing: 8,
+        children: [
+          OutlinedButton.icon(
+            onPressed: () =>
+                Clipboard.setData(ClipboardData(text: view.server!.link)),
+            icon: const Icon(Icons.copy),
+            label: Text(context.strings.copyLink),
+          ),
+          FilledButton.icon(
+            onPressed: widget.openAdministration,
+            icon: const Icon(Icons.tune),
+            label: Text(context.strings.manageServer),
+          ),
+        ],
+      ),
+      const SizedBox(height: 16),
+      Text(context.strings.homeInviteHelp, style: TextStyle(fontSize: 12)),
+    ],
+  ];
+
+  Widget _powerControl(BuildContext context, HomeState view) =>
+      SpaceActionButton(
+        onPressed:
+            view.busy ||
+                detecting ||
+                updateAction ||
+                (view.pendingUpdate && !view.running)
+            ? null
+            : () async {
+                if (view.running) {
+                  await widget.onStop();
+                } else {
+                  await widget.onStart(address.text);
+                }
+              },
+        icon: view.running ? Icons.power_settings_new : Icons.sensors,
+        label: view.running ? context.strings.stopHome : context.strings.goLive,
+      );
 }

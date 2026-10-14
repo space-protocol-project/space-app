@@ -1,3 +1,5 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'dart:async';
 
 import 'package:flutter/services.dart';
@@ -65,19 +67,19 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   }
 
   void markRead() {
-    final c = widget.controller;
+    final controller = widget.controller;
     if (scroll.hasClients) offsets[scope] = scroll.offset;
     if (jumping ||
         ModalRoute.of(context)?.isCurrent == false ||
         !widget.active ||
         !foreground ||
-        !c.canRead ||
+        !controller.canRead ||
         !scroll.hasClients ||
-        c.messages.isEmpty) {
+        controller.messages.isEmpty) {
       return;
     }
     if (scroll.position.extentAfter < 24) {
-      c.markRead(c.messages.last.id);
+      controller.markRead(controller.messages.last.id);
       return;
     }
     final box = viewport.currentContext?.findRenderObject();
@@ -85,14 +87,14 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     final top = box.localToGlobal(Offset.zero).dy,
         bottom = box.localToGlobal(Offset(0, box.size.height)).dy;
     String? lastVisible;
-    for (final message in c.messages) {
+    for (final message in controller.messages) {
       final row = messageKeys[message.id]?.currentContext?.findRenderObject();
       if (row is! RenderBox || !row.hasSize) continue;
       final start = row.localToGlobal(Offset.zero).dy;
       final end = row.localToGlobal(Offset(0, row.size.height)).dy;
       if (start >= top && end <= bottom) lastVisible = message.id;
     }
-    if (lastVisible != null) c.markRead(lastVisible);
+    if (lastVisible != null) controller.markRead(lastVisible);
   }
 
   @override
@@ -104,9 +106,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
 
   Future<void> jumpToNew() async {
     if (jumping || !scroll.hasClients) return;
-    final c = widget.controller;
-    final list = c.messages;
-    final index = list.indexWhere((m) => m.id == c.readThrough) + 1;
+    final controller = widget.controller;
+    final list = controller.messages;
+    final index = list.indexWhere((m) => m.id == controller.readThrough) + 1;
     if (index >= list.length) return;
     await jumpToMessage(list[index].id);
   }
@@ -206,27 +208,267 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final c = widget.controller;
-    final colors = Theme.of(context).colorScheme;
-    final favorites = c.messages.where(c.isFavorite).toList();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      if (restoreScroll && scroll.hasClients) {
-        restoreScroll = false;
-        final saved = offsets[scope];
-        final atEnd =
-            c.messages.isNotEmpty && c.readThrough == c.messages.last.id;
-        scroll.jumpTo(
-          (saved ?? (atEnd ? scroll.position.maxScrollExtent : 0)).clamp(
-            0,
-            scroll.position.maxScrollExtent,
-          ),
-        );
+  void _insertDraftNewline() {
+    final value = draft.value;
+    final selection = value.selection;
+    final start = selection.isValid ? selection.start : value.text.length;
+    final end = selection.isValid ? selection.end : value.text.length;
+    final updated = value.text.replaceRange(start, end, '\n');
+    if (updated.characters.length <= 1024) {
+      draft.value = TextEditingValue(
+        text: updated,
+        selection: TextSelection.collapsed(offset: start + 1),
+      );
+    }
+  }
+
+  KeyEventResult _draftKeyEvent(FocusNode node, KeyEvent event) {
+    final keyboard = HardwareKeyboard.instance;
+    if (event is KeyUpEvent ||
+        ![
+          LogicalKeyboardKey.enter,
+          LogicalKeyboardKey.numpadEnter,
+        ].contains(event.logicalKey) ||
+        keyboard.isControlPressed ||
+        keyboard.isAltPressed ||
+        keyboard.isMetaPressed ||
+        (draft.value.composing.isValid && !draft.value.composing.isCollapsed)) {
+      return KeyEventResult.ignored;
+    }
+    if (event is KeyDownEvent) {
+      if (keyboard.isShiftPressed == widget.sendWithShift) {
+        unawaited(send());
+      } else {
+        _insertDraftNewline();
       }
-      markRead();
-    });
+    }
+    return KeyEventResult.handled;
+  }
+
+  Widget _messageRow(BuildContext context, int index) {
+    final controller = widget.controller;
+    final view = widget.controller.state;
+    final colors = Theme.of(context).colorScheme;
+    final message = view.messages[index];
+    final mine = message.authorId == view.principalId;
+    final author = mine
+        ? context.strings.you
+        : message.authorId.length > 16
+        ? '${message.authorId.substring(0, 16)}…'
+        : message.authorId;
+    final boundary =
+        view.messages.indexWhere((m) => m.id == entryReadThrough) + 1;
+    final grouped =
+        index > 0 &&
+        view.messages[index - 1].authorId == message.authorId &&
+        index != boundary;
+    return Padding(
+      key: messageKeys.putIfAbsent(message.id, GlobalKey.new),
+      padding: EdgeInsets.only(
+        bottom:
+            index + 1 < view.messages.length &&
+                view.messages[index + 1].authorId == message.authorId
+            ? 6
+            : 18,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (index == boundary)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text(
+                context.strings.newMessages,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: colors.primary),
+              ),
+            ),
+          MessageBubble(
+            text: message.text,
+            author: author,
+            mine: mine,
+            grouped: grouped,
+            sentAt:
+                message.createdAtUnixMs > 0 &&
+                    message.createdAtUnixMs.toInt() <= 8640000000000000
+                ? DateTime.fromMillisecondsSinceEpoch(
+                    message.createdAtUnixMs.toInt(),
+                    isUtc: true,
+                  ).toLocal()
+                : null,
+            accepted: mine,
+            favorite: view.isFavorite(message),
+            onToggleFavorite: () =>
+                unawaited(controller.toggleFavorite(message)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _channelPicker(BuildContext context) {
+    final controller = widget.controller;
+    final view = widget.controller.state;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: DropdownButtonFormField<String>(
+              key: ValueKey(
+                'channels-${view.channelId}-${view.channels.map((v) => v.id).join(',')}',
+              ),
+              initialValue: view.channels.any((v) => v.id == view.channelId)
+                  ? view.channelId
+                  : null,
+              isExpanded: true,
+              decoration: InputDecoration(labelText: context.strings.channel),
+              items: [
+                for (final channel in view.channels)
+                  DropdownMenuItem(
+                    value: channel.id,
+                    child: Text(
+                      '${channel.title}${channel.archived ? ' · ${context.strings.archived}' : ''}${!channel.permissions.read ? ' · ${context.strings.noReading}' : ''}${view.unreadCount(channel.id) > 0 ? ' · ${context.strings.newChannelMessages(view.unreadCount(channel.id))}' : ''}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+              ],
+              onChanged: view.busy
+                  ? null
+                  : (id) {
+                      if (id != null) controller.selectChannel(id);
+                    },
+            ),
+          ),
+          IconButton(
+            tooltip: context.strings.refreshChat,
+            onPressed: view.busy
+                ? null
+                : () {
+                    controller.selectChannel(view.channelId);
+                  },
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _emptyMessageArea(BuildContext context) {
+    final view = widget.controller.state;
+    final colors = Theme.of(context).colorScheme;
+    return LayoutBuilder(
+      builder: (context, box) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: box.maxHeight),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.forum_outlined, size: 64, color: colors.primary),
+                const SizedBox(height: 20),
+                Text(
+                  view.connected && !view.canRead
+                      ? context.strings.noMessageAccess
+                      : view.connected
+                      ? context.strings.startConversation
+                      : context.strings.conversationStarts,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  view.connected && !view.canRead
+                      ? context.strings.contactOwner
+                      : view.connected
+                      ? context.strings.emptyChat
+                      : context.strings.connectChatHelp,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: colors.onSurfaceVariant, height: 1.6),
+                ),
+                if (!view.connected) ...[
+                  const SizedBox(height: 24),
+                  FilledButton.icon(
+                    onPressed: view.busy ? null : widget.openConnection,
+                    icon: const Icon(Icons.add),
+                    label: Text(context.strings.addSpace),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _messageArea(BuildContext context) {
+    final controller = widget.controller;
+    final view = widget.controller.state;
+    final favorites = view.messages.where(view.isFavorite).toList();
+    return Expanded(
+      child: view.messages.isEmpty
+          ? _emptyMessageArea(context)
+          : Stack(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(left: favorites.isEmpty ? 0 : 36),
+                  child: ListView.builder(
+                    key: viewport,
+                    controller: scroll,
+                    padding: const EdgeInsets.all(24),
+                    itemCount: view.messages.length,
+                    itemBuilder: (context, index) {
+                      return _messageRow(context, index);
+                    },
+                  ),
+                ),
+                if (favorites.isNotEmpty)
+                  Positioned.fill(
+                    child: FavoriteMessages(
+                      messages: favorites,
+                      principalId: view.principalId,
+                      onJump: (message) => unawaited(jumpToMessage(message.id)),
+                      onRemove: (message) =>
+                          unawaited(controller.toggleFavorite(message)),
+                    ),
+                  ),
+              ],
+            ),
+    );
+  }
+
+  void _restoreViewport(Duration elapsed) {
+    final controller = widget.controller;
+
+    if (!mounted) return;
+    if (restoreScroll && scroll.hasClients) {
+      restoreScroll = false;
+      final saved = offsets[scope];
+      final atEnd =
+          controller.messages.isNotEmpty &&
+          controller.readThrough == controller.messages.last.id;
+      scroll.jumpTo(
+        (saved ?? (atEnd ? scroll.position.maxScrollExtent : 0)).clamp(
+          0,
+          scroll.position.maxScrollExtent,
+        ),
+      );
+    }
+    markRead();
+  }
+
+  @override
+  Widget build(BuildContext context) => BlocBuilder<ChatController, ChatState>(
+    bloc: widget.controller,
+    builder: (context, state) => _build(context),
+  );
+
+  Widget _build(BuildContext context) {
+    final view = widget.controller.state;
+    final colors = Theme.of(context).colorScheme;
+    WidgetsBinding.instance.addPostFrameCallback(_restoreViewport);
     return Column(
       children: [
         if (widget.showHeader)
@@ -241,7 +483,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        c.connected ? c.chatTitle : context.strings.chat,
+                        view.connected ? view.chatTitle : context.strings.chat,
                         style: Theme.of(context).textTheme.titleLarge
                             ?.copyWith(fontWeight: FontWeight.w700),
                       ),
@@ -265,207 +507,11 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
             ),
           ),
         if (widget.showHeader) const Divider(height: 1),
-        if (c.channels.isNotEmpty &&
+        if (view.channels.isNotEmpty &&
             (widget.showHeader || MediaQuery.sizeOf(context).width < 760))
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    key: ValueKey(
-                      'channels-${c.channelId}-${c.channels.map((v) => v.id).join(',')}',
-                    ),
-                    initialValue: c.channels.any((v) => v.id == c.channelId)
-                        ? c.channelId
-                        : null,
-                    isExpanded: true,
-                    decoration: InputDecoration(
-                      labelText: context.strings.channel,
-                    ),
-                    items: [
-                      for (final channel in c.channels)
-                        DropdownMenuItem(
-                          value: channel.id,
-                          child: Text(
-                            '${channel.title}${channel.archived ? ' · ${context.strings.archived}' : ''}${!channel.permissions.read ? ' · ${context.strings.noReading}' : ''}${c.unreadCount(channel.id) > 0 ? ' · ${context.strings.newChannelMessages(c.unreadCount(channel.id))}' : ''}',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                    ],
-                    onChanged: c.busy
-                        ? null
-                        : (id) {
-                            if (id != null) c.selectChannel(id);
-                          },
-                  ),
-                ),
-                IconButton(
-                  tooltip: context.strings.refreshChat,
-                  onPressed: c.busy
-                      ? null
-                      : () {
-                          c.selectChannel(c.channelId);
-                        },
-                  icon: const Icon(Icons.refresh),
-                ),
-              ],
-            ),
-          ),
-        Expanded(
-          child: c.messages.isEmpty
-              ? LayoutBuilder(
-                  builder: (context, box) => SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: box.maxHeight),
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.forum_outlined,
-                              size: 64,
-                              color: colors.primary,
-                            ),
-                            const SizedBox(height: 20),
-                            Text(
-                              c.connected && !c.canRead
-                                  ? context.strings.noMessageAccess
-                                  : c.connected
-                                  ? context.strings.startConversation
-                                  : context.strings.conversationStarts,
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              c.connected && !c.canRead
-                                  ? context.strings.contactOwner
-                                  : c.connected
-                                  ? context.strings.emptyChat
-                                  : context.strings.connectChatHelp,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: colors.onSurfaceVariant,
-                                height: 1.6,
-                              ),
-                            ),
-                            if (!c.connected) ...[
-                              const SizedBox(height: 24),
-                              FilledButton.icon(
-                                onPressed: c.busy
-                                    ? null
-                                    : widget.openConnection,
-                                icon: const Icon(Icons.add),
-                                label: Text(context.strings.addSpace),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              : Stack(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: favorites.isEmpty ? 0 : 36,
-                      ),
-                      child: ListView.builder(
-                        key: viewport,
-                        controller: scroll,
-                        padding: const EdgeInsets.all(24),
-                        itemCount: c.messages.length,
-                        itemBuilder: (context, index) {
-                          final message = c.messages[index];
-                          final mine = message.authorId == c.principalId;
-                          final author = mine
-                              ? context.strings.you
-                              : message.authorId.length > 16
-                              ? '${message.authorId.substring(0, 16)}…'
-                              : message.authorId;
-                          final boundary =
-                              c.messages.indexWhere(
-                                (m) => m.id == entryReadThrough,
-                              ) +
-                              1;
-                          final grouped =
-                              index > 0 &&
-                              c.messages[index - 1].authorId ==
-                                  message.authorId &&
-                              index != boundary;
-                          return Padding(
-                            key: messageKeys.putIfAbsent(
-                              message.id,
-                              GlobalKey.new,
-                            ),
-                            padding: EdgeInsets.only(
-                              bottom:
-                                  index + 1 < c.messages.length &&
-                                      c.messages[index + 1].authorId ==
-                                          message.authorId
-                                  ? 6
-                                  : 18,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                if (index == boundary)
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 12,
-                                    ),
-                                    child: Text(
-                                      context.strings.newMessages,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: colors.primary,
-                                      ),
-                                    ),
-                                  ),
-                                MessageBubble(
-                                  text: message.text,
-                                  author: author,
-                                  mine: mine,
-                                  grouped: grouped,
-                                  sentAt:
-                                      message.createdAtUnixMs > 0 &&
-                                          message.createdAtUnixMs.toInt() <=
-                                              8640000000000000
-                                      ? DateTime.fromMillisecondsSinceEpoch(
-                                          message.createdAtUnixMs.toInt(),
-                                          isUtc: true,
-                                        ).toLocal()
-                                      : null,
-                                  accepted: mine,
-                                  favorite: c.isFavorite(message),
-                                  onToggleFavorite: () =>
-                                      unawaited(c.toggleFavorite(message)),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    if (favorites.isNotEmpty)
-                      Positioned.fill(
-                        child: FavoriteMessages(
-                          messages: favorites,
-                          principalId: c.principalId,
-                          onJump: (message) =>
-                              unawaited(jumpToMessage(message.id)),
-                          onRemove: (message) =>
-                              unawaited(c.toggleFavorite(message)),
-                        ),
-                      ),
-                  ],
-                ),
-        ),
-        if (c.canRead && c.unreadCount(c.channelId) > 0)
+          _channelPicker(context),
+        _messageArea(context),
+        if (view.canRead && view.unreadCount(view.channelId) > 0)
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
             child: Align(
@@ -474,15 +520,17 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                 onPressed: jumpToNew,
                 icon: const Icon(Icons.arrow_downward, size: 18),
                 label: Text(
-                  context.strings.newMessagesCount(c.unreadCount(c.channelId)),
+                  context.strings.newMessagesCount(
+                    view.unreadCount(view.channelId),
+                  ),
                 ),
               ),
             ),
           ),
-        if (c.sendStatus != MessageSendStatus.idle)
+        if (view.sendStatus != MessageSendStatus.idle)
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 6, 24, 0),
-            child: Text(switch (c.sendStatus) {
+            child: Text(switch (view.sendStatus) {
               MessageSendStatus.sending => context.strings.sendingMessage,
               MessageSendStatus.unconfirmed =>
                 context.strings.messageUnconfirmed,
@@ -505,59 +553,17 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                   Expanded(
                     child: Focus(
                       canRequestFocus: false,
-                      onKeyEvent: (_, event) {
-                        final keyboard = HardwareKeyboard.instance;
-                        if (event is KeyUpEvent ||
-                            ![
-                              LogicalKeyboardKey.enter,
-                              LogicalKeyboardKey.numpadEnter,
-                            ].contains(event.logicalKey) ||
-                            keyboard.isControlPressed ||
-                            keyboard.isAltPressed ||
-                            keyboard.isMetaPressed ||
-                            (draft.value.composing.isValid &&
-                                !draft.value.composing.isCollapsed)) {
-                          return KeyEventResult.ignored;
-                        }
-                        if (event is KeyDownEvent) {
-                          if (keyboard.isShiftPressed == widget.sendWithShift) {
-                            unawaited(send());
-                          } else {
-                            final value = draft.value;
-                            final selection = value.selection;
-                            final start = selection.isValid
-                                ? selection.start
-                                : value.text.length;
-                            final end = selection.isValid
-                                ? selection.end
-                                : value.text.length;
-                            final updated = value.text.replaceRange(
-                              start,
-                              end,
-                              '\n',
-                            );
-                            if (updated.characters.length <= 1024) {
-                              draft.value = TextEditingValue(
-                                text: updated,
-                                selection: TextSelection.collapsed(
-                                  offset: start + 1,
-                                ),
-                              );
-                            }
-                          }
-                        }
-                        return KeyEventResult.handled;
-                      },
+                      onKeyEvent: _draftKeyEvent,
                       child: TextField(
                         key: const ValueKey('chat-draft'),
                         focusNode: draftFocus,
                         controller: draft,
-                        enabled: c.connected && c.canWrite && !c.busy,
+                        enabled: view.connected && view.canWrite && !view.busy,
                         minLines: 1,
                         maxLines: 4,
                         maxLength: 1024,
                         decoration: InputDecoration(
-                          hintText: c.connected && !c.canWrite
+                          hintText: view.connected && !view.canWrite
                               ? context.strings.cannotSend
                               : context.strings.messageHint,
                           counterText: '',
@@ -576,7 +582,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                   ),
                   const SizedBox(width: 12),
                   IconButton.filled(
-                    onPressed: c.connected && c.canWrite && !c.busy
+                    onPressed: view.connected && view.canWrite && !view.busy
                         ? send
                         : null,
                     tooltip: context.strings.sendMessage,

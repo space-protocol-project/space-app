@@ -1,3 +1,4 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
 import '../src/home_controller.dart';
@@ -13,10 +14,15 @@ class HomeOperationProgress extends StatelessWidget {
   final HomeController home;
   final bool compact;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => BlocBuilder<HomeController, HomeState>(
+    bloc: home,
+    builder: (context, state) => _build(context, state),
+  );
+
+  Widget _build(BuildContext context, HomeState state) {
     final size = compact ? 30.0 : 80.0;
     final ring = TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: home.operationProgress),
+      tween: Tween(begin: 0, end: state.operationProgress),
       duration: MediaQuery.disableAnimationsOf(context)
           ? Duration.zero
           : const Duration(milliseconds: 220),
@@ -31,7 +37,7 @@ class HomeOperationProgress extends StatelessWidget {
                 value: value,
                 strokeWidth: compact ? 2 : 5,
                 backgroundColor: Theme.of(context).colorScheme.outlineVariant,
-                semanticsLabel: home.phase.label(context),
+                semanticsLabel: state.phase.label(context),
                 semanticsValue: '${(value * 100).round()}%',
               ),
             ),
@@ -47,7 +53,7 @@ class HomeOperationProgress extends StatelessWidget {
       ),
     );
     if (compact) return ring;
-    final remaining = home.downloadSecondsRemaining;
+    final remaining = state.downloadSecondsRemaining;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -58,11 +64,13 @@ class HomeOperationProgress extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                home.phase.label(context),
+                state.phase.label(context),
                 style: Theme.of(context).textTheme.titleSmall,
               ),
               const SizedBox(height: 6),
-              Text(context.strings.homeProgressElapsed(home.elapsed.inSeconds)),
+              Text(
+                context.strings.homeProgressElapsed(state.elapsed.inSeconds),
+              ),
               if (remaining != null)
                 Text(context.strings.homeDownloadEstimate(remaining)),
               const SizedBox(height: 6),

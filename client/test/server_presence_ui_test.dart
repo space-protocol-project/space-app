@@ -40,7 +40,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(SnackBar), findsNothing);
       expect(
-        find.byTooltip(strings.serverNowOnline('server.example')),
+        find.byTooltip(
+          'https://server.example\n${strings.serverNowOnline('server.example')}',
+        ),
         findsOneWidget,
       );
       online = false;
@@ -54,7 +56,9 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.byTooltip(strings.serverNowOffline('server.example')),
+        find.byTooltip(
+          'https://server.example\n${strings.serverNowOffline('server.example')}',
+        ),
         findsOneWidget,
       );
       await tester.pump(const Duration(seconds: 7));

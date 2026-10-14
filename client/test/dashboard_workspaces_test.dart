@@ -58,31 +58,32 @@ void main() {
         first: DashboardSession('Основа'),
         second: DashboardSession('Мастерская'),
       };
-      final workspaces = ServerWorkspaces(
-        vault: vault,
-        create: (origin) => ChatController(
-          vault,
-          positions: MemoryPositions(),
-          historyStore: MemoryHistory(),
-          openSession: (_, _) async => sessions[origin]!,
-        ),
-        resume: (origin, controller) async {
-          controller.preview = Discovery(
-            localOrigin(origin),
-            'srv_${sessions[origin]!.name}',
-            List.filled(32, 1),
-          );
-          await controller.connect();
-        },
-      );
-      workspaces.synchronize([first, second]);
-      await workspaces.refresh();
+      late ServerWorkspaces workspaces;
       await tester.runAsync(() async {
+        workspaces = ServerWorkspaces(
+          vault: vault,
+          create: (origin) => ChatController(
+            vault,
+            positions: MemoryPositions(),
+            historyStore: MemoryHistory(),
+            openSession: (_, _) async => sessions[origin]!,
+          ),
+          resume: (origin, controller) async {
+            controller.preview = Discovery(
+              localOrigin(origin),
+              'srv_${sessions[origin]!.name}',
+              List.filled(32, 1),
+            );
+            await controller.connect();
+          },
+        );
+        await workspaces.synchronize([first, second]);
+        await workspaces.refresh();
         await Future<void>.delayed(const Duration(milliseconds: 50));
       });
       final preferences = AppPreferences()..origins.addAll([first, second]);
       final presence = ServerPresence(probe: (_) async => true);
-      presence.watch([first, second]);
+      await presence.watch([first, second]);
       final boundary = GlobalKey();
       if (Platform.environment['SPACE_DASHBOARD_PREVIEW'] == '1') {
         for (final font in {
@@ -115,6 +116,9 @@ void main() {
           ),
         ),
       );
+      await tester.runAsync(() async {
+        await Future<void>.delayed(Duration.zero);
+      });
       await tester.pumpAndSettle();
       expect(find.text('Все ваши пространства — рядом.'), findsOneWidget);
       expect(workspaces[first]!.connected, true);
@@ -126,6 +130,9 @@ void main() {
             const AssetImage('assets/branding/space-app-icon.png'),
             boundary.currentContext!,
           );
+        });
+        await tester.runAsync(() async {
+          await Future<void>.delayed(Duration.zero);
         });
         await tester.pumpAndSettle();
         await tester.runAsync(() async {
@@ -150,6 +157,9 @@ void main() {
           expect(tester.getSize(find.byKey(ValueKey(key))), const Size(48, 48));
         }
         await tester.tap(find.byKey(const ValueKey('server-tab-$first')));
+        await tester.runAsync(() async {
+          await Future<void>.delayed(Duration.zero);
+        });
         await tester.pumpAndSettle();
         for (final name in ['Общий · Основа', 'Команда · Основа']) {
           expect(
@@ -169,6 +179,9 @@ void main() {
         );
         tester.testTextInput.hide();
         await tester.tap(find.byKey(const ValueKey('server-tab-$second')));
+        await tester.runAsync(() async {
+          await Future<void>.delayed(Duration.zero);
+        });
         await tester.pumpAndSettle();
         expect(
           tester
@@ -183,9 +196,15 @@ void main() {
         );
         tester.testTextInput.hide();
         await tester.tap(find.byKey(const ValueKey('dashboard-tab')));
+        await tester.runAsync(() async {
+          await Future<void>.delayed(Duration.zero);
+        });
         await tester.pumpAndSettle();
         expect(find.text('Все ваши пространства — рядом.'), findsOneWidget);
         await tester.tap(find.byKey(const ValueKey('server-tab-$first')));
+        await tester.runAsync(() async {
+          await Future<void>.delayed(Duration.zero);
+        });
         await tester.pumpAndSettle();
         expect(
           tester
@@ -205,6 +224,9 @@ void main() {
         await tester.tap(find.byTooltip('Отправить'));
         await tester.pump();
         await tester.tap(find.byKey(const ValueKey('server-tab-$second')));
+        await tester.runAsync(() async {
+          await Future<void>.delayed(Duration.zero);
+        });
         await tester.pumpAndSettle();
         await tester.enterText(
           find.byKey(const ValueKey('chat-draft')),
@@ -216,6 +238,9 @@ void main() {
         await tester.runAsync(() async {
           await Future<void>.delayed(const Duration(milliseconds: 20));
         });
+        await tester.runAsync(() async {
+          await Future<void>.delayed(Duration.zero);
+        });
         await tester.pumpAndSettle();
         expect(
           tester
@@ -226,6 +251,9 @@ void main() {
         );
         tester.testTextInput.hide();
         await tester.tap(find.byKey(const ValueKey('server-tab-$first')));
+        await tester.runAsync(() async {
+          await Future<void>.delayed(Duration.zero);
+        });
         await tester.pumpAndSettle();
         expect(
           tester

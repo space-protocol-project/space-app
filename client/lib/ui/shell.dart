@@ -1,8 +1,10 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:space_admin_ui/space_admin_ui.dart' show ServerIconView;
 
 import 'home_operation_progress.dart';
 import '../l10n/failure_strings.dart';
 import '../l10n/strings.dart';
+import '../l10n/app_localizations.dart';
 import 'admin_panel.dart';
 
 import 'dart:async';
@@ -152,7 +154,7 @@ class _SpaceShellState extends State<SpaceShell> {
           selected = Section.overview;
         });
       }
-      workspaces.remove(origin);
+      await workspaces.remove(origin);
       await widget.preferences.forget(origin);
       if (denied && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -192,7 +194,7 @@ class _SpaceShellState extends State<SpaceShell> {
   }
 
   Future<void> openSpace(String origin, {String? channel}) async {
-    workspaces.synchronize([origin]);
+    await workspaces.synchronize([origin]);
     final target = workspaces[origin];
     if (target == null || !mounted) return;
     setState(() {
@@ -231,7 +233,6 @@ class _SpaceShellState extends State<SpaceShell> {
       ServerPresence(
         probe: (origin) => probeSavedServer(origin, SecureIdentityVault()),
       );
-  StreamSubscription<ServerPresenceChange>? presenceChanges;
   void cacheServerIcons() {
     for (final entry in workspaces.controllers.entries) {
       final icon = entry.value.serverIcon;
@@ -243,12 +244,12 @@ class _SpaceShellState extends State<SpaceShell> {
     }
   }
 
-  void watchSavedServers() {
+  Future<void> watchSavedServers() async {
     deniedHandled.removeWhere(
       (origin) => workspaces[origin]?.accessRemoved != true,
     );
-    presence.watch(widget.preferences.origins);
-    workspaces.synchronize(widget.preferences.origins);
+    await presence.watch(widget.preferences.origins);
+    await workspaces.synchronize(widget.preferences.origins);
     cacheServerIcons();
   }
 
@@ -257,7 +258,7 @@ class _SpaceShellState extends State<SpaceShell> {
     if (change.online &&
         !(home.busy &&
             home.phase == HomePhase.stopping &&
-            home.state?.publicOrigin == change.origin)) {
+            home.server?.publicOrigin == change.origin)) {
       unawaited(workspaces.reconnect(change.origin));
     }
     final name = Uri.parse(change.origin).authority;
@@ -300,11 +301,7 @@ class _SpaceShellState extends State<SpaceShell> {
         owned: widget.controller == null,
       );
     }
-    widget.preferences.addListener(watchSavedServers);
-    workspaces.addListener(cacheServerIcons);
-    workspaces.addListener(handleDeniedServers);
-    presenceChanges = presence.changes.listen(announcePresence);
-    watchSavedServers();
+    unawaited(watchSavedServers());
   }
 
   Future<void> startHome(String ip) async {
@@ -335,7 +332,7 @@ class _SpaceShellState extends State<SpaceShell> {
     await target.connect(setupCode: state.setupCode);
     if (!target.connected) home.reportError(target.error);
     if (mounted && target.connected) {
-      workspaces.adopt(
+      await workspaces.adopt(
         state.publicOrigin,
         target,
         owned: target != widget.controller,
@@ -346,7 +343,7 @@ class _SpaceShellState extends State<SpaceShell> {
   }
 
   Future<void> stopHome() async {
-    final owner = workspaces[home.state?.publicOrigin ?? ''];
+    final owner = workspaces[home.server?.publicOrigin ?? ''];
     await home.stop(disconnectClient: owner?.disconnect);
   }
 
@@ -442,7 +439,7 @@ class _SpaceShellState extends State<SpaceShell> {
             onStart: startHome,
             onStop: stopHome,
             openAdministration: () {
-              final owner = workspaces[home.state?.publicOrigin ?? ''];
+              final owner = workspaces[home.server?.publicOrigin ?? ''];
               if (owner != null) {
                 setState(() {
                   activeController = owner;
@@ -479,18 +476,8 @@ class _SpaceShellState extends State<SpaceShell> {
       return;
     }
     final existing = home.ip.isNotEmpty;
-    final owner = workspaces[home.state?.publicOrigin ?? ''];
-    Map<String, dynamic>? settings;
-    if (owner?.administration != null) {
-      try {
-        final response = await owner!.administration!.adminRequest(
-          '/api/v1/space/settings',
-        );
-        settings = Map<String, dynamic>.from(response['settings'] as Map);
-      } catch (_) {
-        // Мастер повторит проверку перед сохранением.
-      }
-    }
+    final owner = workspaces[home.server?.publicOrigin ?? ''];
+    final settings = await _ownSpaceSettings(owner);
     if (!mounted) return;
     await showDialog<void>(
       context: context,
@@ -502,66 +489,88 @@ class _SpaceShellState extends State<SpaceShell> {
             ? Map<String, dynamic>.from(settings!['icon'] as Map)
             : null,
         initialChat: settings?['chatEnabled'] as bool? ?? true,
-        create: (title, icon, chatEnabled) async {
-          if (!home.running) {
-            final ip = home.ip.isEmpty ? await home.detectIP() : home.ip;
-            await startHome(ip);
-          }
-          final owner = workspaces[home.state?.publicOrigin ?? ''];
-          final session = owner?.administration;
-          if (session == null || !session.canManageSpace) {
-            throw StateError(
-              home.error.isNotEmpty ? home.error : strings.setupOwnerRequired,
-            );
-          }
-          final response = await session.adminRequest('/api/v1/space/settings');
-          final settings = response['settings'] as Map;
-          if (!settings.containsKey('icon')) {
-            throw StateError(strings.setupUpdateRequired);
-          }
-          await session.adminRequest(
-            '/api/v1/space/settings',
-            method: 'PATCH',
-            body: {
-              'title': title,
-              'chatTitle': settings['chatTitle'],
-              'chatEnabled': chatEnabled,
-              'registrationPolicy': settings['registrationPolicy'],
-              'expectedRevision': settings['revision'],
-              'icon': icon,
-            },
-          );
-          final invite = await session.adminRequest(
-            '/api/v1/space/invites',
-            method: 'POST',
-            body: {'role': 'member', 'ttlSeconds': 86400, 'maxUses': 1},
-          );
-          return Uri.parse(home.state!.publicOrigin)
-              .replace(
-                fragment: Uri(
-                  queryParameters: {
-                    'invite': invite['token'] as String,
-                    'tls': home.state!.tlsFingerprint,
-                  },
-                ).query,
-              )
-              .toString();
-        },
-        manage: () {
-          Navigator.pop(context);
-          final owner = workspaces[home.state?.publicOrigin ?? ''];
-          if (owner == null || !mounted) return;
-          setState(() {
-            activeController = owner;
-            dashboard = false;
-            applicationSettings = false;
-            devicePage = false;
-            serverList = false;
-          });
-          select(Section.settings);
-        },
+        create: (title, icon, chatEnabled) =>
+            _saveOwnSpace(title, icon, chatEnabled, strings),
+        manage: () => _manageOwnSpace(context),
       ),
     );
+  }
+
+  Future<Map<String, dynamic>?> _ownSpaceSettings(ChatController? owner) async {
+    final session = owner?.administration;
+    if (session == null) return null;
+    try {
+      final response = await session.adminRequest('/api/v1/space/settings');
+      return Map<String, dynamic>.from(response['settings'] as Map);
+    } catch (_) {
+      // Мастер повторит проверку перед сохранением.
+      return null;
+    }
+  }
+
+  Future<String> _saveOwnSpace(
+    String title,
+    Map<String, dynamic> icon,
+    bool chatEnabled,
+    AppLocalizations strings,
+  ) async {
+    if (!home.running) {
+      final ip = home.ip.isEmpty ? await home.detectIP() : home.ip;
+      await startHome(ip);
+    }
+    final owner = workspaces[home.server?.publicOrigin ?? ''];
+    final session = owner?.administration;
+    if (session == null || !session.canManageSpace) {
+      throw StateError(
+        home.error.isNotEmpty ? home.error : strings.setupOwnerRequired,
+      );
+    }
+    final response = await session.adminRequest('/api/v1/space/settings');
+    final settings = response['settings'] as Map;
+    if (!settings.containsKey('icon')) {
+      throw StateError(strings.setupUpdateRequired);
+    }
+    await session.adminRequest(
+      '/api/v1/space/settings',
+      method: 'PATCH',
+      body: {
+        'title': title,
+        'chatTitle': settings['chatTitle'],
+        'chatEnabled': chatEnabled,
+        'registrationPolicy': settings['registrationPolicy'],
+        'expectedRevision': settings['revision'],
+        'icon': icon,
+      },
+    );
+    final invite = await session.adminRequest(
+      '/api/v1/space/invites',
+      method: 'POST',
+      body: {'role': 'member', 'ttlSeconds': 86400, 'maxUses': 1},
+    );
+    return Uri.parse(home.server!.publicOrigin)
+        .replace(
+          fragment: Uri(
+            queryParameters: {
+              'invite': invite['token'] as String,
+              'tls': home.server!.tlsFingerprint,
+            },
+          ).query,
+        )
+        .toString();
+  }
+
+  void _manageOwnSpace(BuildContext dialogContext) {
+    Navigator.pop(dialogContext);
+    final owner = workspaces[home.server?.publicOrigin ?? ''];
+    if (owner == null || !mounted) return;
+    setState(() {
+      activeController = owner;
+      dashboard = false;
+      applicationSettings = false;
+      devicePage = false;
+      serverList = false;
+    });
+    select(Section.settings);
   }
 
   Section selected = Section.overview;
@@ -636,10 +645,6 @@ class _SpaceShellState extends State<SpaceShell> {
 
   @override
   void dispose() {
-    widget.preferences.removeListener(watchSavedServers);
-    workspaces.removeListener(cacheServerIcons);
-    workspaces.removeListener(handleDeniedServers);
-    unawaited(presenceChanges?.cancel());
     if (widget.presence == null) presence.dispose();
     home.dispose();
     if (widget.updates == null) updates.dispose();
@@ -657,7 +662,7 @@ class _SpaceShellState extends State<SpaceShell> {
 
   Future<void> connection([String? origin]) async {
     if (origin != null) {
-      workspaces.synchronize([origin]);
+      await workspaces.synchronize([origin]);
       activeController = workspaces[origin];
     }
     if (!mounted) return;
@@ -669,7 +674,11 @@ class _SpaceShellState extends State<SpaceShell> {
           controller.preview?.origin.toString() ??
           'http://127.0.0.1:8080',
       onConnected: (address) async {
-        workspaces.adopt(address, target, owned: target != widget.controller);
+        await workspaces.adopt(
+          address,
+          target,
+          owned: target != widget.controller,
+        );
         transientControllers.remove(target);
         activeController = target;
         await widget.preferences.remember(address);
@@ -955,6 +964,18 @@ class _SpaceShellState extends State<SpaceShell> {
     );
   }
 
+  String serverTooltip(String origin) {
+    final title = workspaces[origin]?.spaceTitle ?? '';
+    final label = title.isEmpty ? origin : '$title · $origin';
+    final online = presence.online(origin);
+    if (online == null) return label;
+    final host = Uri.parse(origin).host;
+    final status = online
+        ? context.strings.serverNowOnline(host)
+        : context.strings.serverNowOffline(host);
+    return '$label\n$status';
+  }
+
   Widget rail() => SizedBox(
     width: 64,
     child: Column(
@@ -982,34 +1003,23 @@ class _SpaceShellState extends State<SpaceShell> {
               for (final origin in widget.preferences.origins)
                 railButton(
                   key: ValueKey('server-tab-$origin'),
-                  tooltip: workspaces[origin]?.spaceTitle.isNotEmpty == true
-                      ? '${workspaces[origin]!.spaceTitle} · $origin'
-                      : origin,
+                  // Вложенный Tooltip у значка создаёт потерянные узлы AXTree
+                  // во Flutter 3.47.7. Название и статус имеют одну подсказку.
+                  tooltip: serverTooltip(origin),
                   selected:
                       !applicationSettings &&
                       !dashboard &&
                       identical(controller, workspaces[origin]),
                   onPressed: () => openSpace(origin),
-                  icon: Tooltip(
-                    message: presence.online(origin) == null
-                        ? origin
-                        : presence.online(origin) == true
-                        ? context.strings.serverNowOnline(
-                            Uri.parse(origin).host,
-                          )
-                        : context.strings.serverNowOffline(
-                            Uri.parse(origin).host,
-                          ),
-                    child: Badge(
-                      isLabelVisible: presence.online(origin) != null,
-                      backgroundColor: presence.online(origin) == true
-                          ? Colors.green
-                          : Theme.of(context).colorScheme.outlineVariant,
-                      child: ServerIconView(
-                        value:
-                            workspaces[origin]?.serverIcon?.toProto3Json() ??
-                            widget.preferences.serverIcons[origin],
-                      ),
+                  icon: Badge(
+                    isLabelVisible: presence.online(origin) != null,
+                    backgroundColor: presence.online(origin) == true
+                        ? Colors.green
+                        : Theme.of(context).colorScheme.outlineVariant,
+                    child: ServerIconView(
+                      value:
+                          workspaces[origin]?.serverIcon?.toProto3Json() ??
+                          widget.preferences.serverIcons[origin],
                     ),
                   ),
                 ),
@@ -1273,241 +1283,270 @@ class _SpaceShellState extends State<SpaceShell> {
       ],
     ),
   );
-  Widget updateBadge(IconData icon) => Badge(
-    key: const ValueKey('app-update-badge'),
-    isLabelVisible: updates.status == AppUpdateStatus.available,
-    child: Icon(icon),
-  );
+  Widget updateBadge(IconData icon) =>
+      BlocSelector<AppUpdates, AppUpdateState, bool>(
+        bloc: updates,
+        selector: (state) => state.status == AppUpdateStatus.available,
+        builder: (context, available) => Badge(
+          key: const ValueKey('app-update-badge'),
+          isLabelVisible: available,
+          child: Icon(icon),
+        ),
+      );
 
-  @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-    animation: Listenable.merge([
-      controller,
-      workspaces,
-      widget.preferences,
-      home,
-      updates,
-      presence,
-    ]),
-    builder: (context, _) => AbsorbPointer(
-      absorbing: updates.installing,
-      child: ExcludeFocus(
-        excluding: updates.installing,
-        child: LayoutBuilder(
-          builder: (context, box) {
-            final compact = box.maxWidth < 760;
-            final workspace = Column(
+  void _refreshShell() {
+    if (mounted) setState(() {});
+  }
+
+  void _preferencesChanged(BuildContext context, PreferencesState state) {
+    unawaited(watchSavedServers());
+    _refreshShell();
+  }
+
+  void _workspacesChanged(BuildContext context, WorkspaceState state) {
+    cacheServerIcons();
+    handleDeniedServers();
+    _refreshShell();
+  }
+
+  void _presenceChanged(BuildContext context, PresenceState state) {
+    final change = state.change;
+    if (change != null) announcePresence(change);
+    _refreshShell();
+  }
+
+  int get _workspacePageIndex {
+    if (serverList) return 4;
+    if (devicePage) return 3;
+    if (applicationSettings) return 2;
+    if (dashboard) return 0;
+    return 1;
+  }
+
+  Future<void> _onDeviceRestored(String origin, ChatController target) async {
+    await workspaces.adopt(origin, target, owned: target != widget.controller);
+    transientControllers.remove(target);
+    await widget.preferences.remember(origin);
+  }
+
+  Widget _workspaceContent(BuildContext context, BoxConstraints box) {
+    final compact = box.maxWidth < 760;
+    return Column(
+      children: [
+        header(compact),
+        if (!dashboard && controller.reconnecting)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
               children: [
-                header(compact),
-                if (!dashboard && controller.reconnecting)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: Row(
-                      children: [
-                        const SizedBox(
-                          width: 14,
-                          height: 14,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            context.strings.recoveringEvents,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                if (!dashboard && controller.busy)
-                  const LinearProgressIndicator(minHeight: 2),
-                if (!applicationSettings &&
-                    !dashboard &&
-                    controller.error.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Text(
-                      chatFailureText(context, controller),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    ),
-                  ),
+                const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                const SizedBox(width: 10),
                 Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: IndexedStack(
-                          index: serverList
-                              ? 4
-                              : devicePage
-                              ? 3
-                              : applicationSettings
-                              ? 2
-                              : dashboard
-                              ? 0
-                              : 1,
-                          children: [
-                            Dashboard(
-                              workspaces: workspaces,
-                              presence: presence,
-                              homeAction: showHome,
-                              homeDetails: showHomeDetails,
-                              createOwnSpace: createOwnSpace,
-                              homeRunning: home.running,
-                              homeBusy: home.busy,
-                              addSpace: addSpace,
-                              openSpace: (origin) => openSpace(origin),
-                              removeSpace: (origin) => removeSpace(origin),
-                              openChannel: (origin, channel) =>
-                                  openSpace(origin, channel: channel),
-                            ),
-                            pages(),
-                            SettingsPanel(
-                              preferences: widget.preferences,
-                              updates: updates,
-                              prepareInstall: prepareAppInstall,
-                            ),
-                            DevicePanel(
-                              workspaces: workspaces,
-                              fallback: deviceController,
-                              restoreController: (origin) =>
-                                  workspaces[origin] ?? createTransient(),
-                              onRestored: (origin, target) async {
-                                workspaces.adopt(
-                                  origin,
-                                  target,
-                                  owned: target != widget.controller,
-                                );
-                                transientControllers.remove(target);
-                                await widget.preferences.remember(origin);
-                              },
-                            ),
-                            ServerInbox(
-                              controllers: workspaces.controllers,
-                              presence: presence,
-                              icons: widget.preferences.serverIcons,
-                              open: (origin) => openSpace(origin),
-                              remove: (origin) => removeSpace(origin),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (box.maxWidth >= 1320 &&
-                          !dashboard &&
-                          !applicationSettings)
-                        contextPanel(),
-                    ],
+                  child: Text(
+                    context.strings.recoveringEvents,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ],
-            );
-            return CallbackShortcuts(
-              bindings: {
-                const SingleActivator(
-                  LogicalKeyboardKey.keyK,
-                  control: true,
-                ): () =>
-                    unawaited(search()),
-                const SingleActivator(
-                  LogicalKeyboardKey.keyK,
-                  meta: true,
-                ): () =>
-                    unawaited(search()),
-              },
-              child: Focus(
-                autofocus: true,
-                child: Scaffold(
-                  key: scaffold,
-                  drawer: compact
-                      ? Drawer(child: SafeArea(child: navigationSidebar()))
-                      : null,
-                  bottomNavigationBar: compact
-                      ? NavigationBar(
-                          selectedIndex: bottomIndex,
-                          onDestinationSelected: (index) => index == 0
-                              ? showDashboard()
-                              : index == 1
-                              ? showServers()
-                              : select(
-                                  [
-                                    Section.overview,
-                                    Section.chat,
-                                    Section.identity,
-                                    Section.settings,
-                                  ][index],
-                                ),
-                          destinations: [
-                            NavigationDestination(
-                              icon: Icon(Icons.home_outlined),
-                              label: context.strings.overview,
+            ),
+          ),
+        if (!dashboard && controller.busy)
+          const LinearProgressIndicator(minHeight: 2),
+        if (!applicationSettings && !dashboard && controller.error.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Text(
+              chatFailureText(context, controller),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          ),
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: IndexedStack(
+                  index: _workspacePageIndex,
+                  children: [
+                    Dashboard(
+                      workspaces: workspaces,
+                      presence: presence,
+                      homeAction: showHome,
+                      homeDetails: showHomeDetails,
+                      createOwnSpace: createOwnSpace,
+                      homeRunning: home.running,
+                      homeBusy: home.busy,
+                      addSpace: addSpace,
+                      openSpace: (origin) => openSpace(origin),
+                      removeSpace: (origin) => removeSpace(origin),
+                      openChannel: (origin, channel) =>
+                          openSpace(origin, channel: channel),
+                    ),
+                    pages(),
+                    SettingsPanel(
+                      preferences: widget.preferences,
+                      updates: updates,
+                      prepareInstall: prepareAppInstall,
+                    ),
+                    DevicePanel(
+                      workspaces: workspaces,
+                      fallback: deviceController,
+                      restoreController: (origin) =>
+                          workspaces[origin] ?? createTransient(),
+                      onRestored: _onDeviceRestored,
+                    ),
+                    ServerInbox(
+                      controllers: workspaces.controllers,
+                      presence: presence,
+                      icons: widget.preferences.serverIcons,
+                      open: (origin) => openSpace(origin),
+                      remove: (origin) => removeSpace(origin),
+                    ),
+                  ],
+                ),
+              ),
+              if (box.maxWidth >= 1320 && !dashboard && !applicationSettings)
+                contextPanel(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _bottomNavigation(BuildContext context) => NavigationBar(
+    selectedIndex: bottomIndex,
+    onDestinationSelected: _selectBottomPage,
+    destinations: [
+      NavigationDestination(
+        icon: Icon(Icons.home_outlined),
+        label: context.strings.overview,
+      ),
+      NavigationDestination(
+        icon: Icon(Icons.dns_outlined),
+        label: context.strings.spacesTitle,
+      ),
+      NavigationDestination(
+        icon: Icon(Icons.computer_outlined),
+        label: context.strings.myDevice,
+      ),
+      NavigationDestination(
+        icon: const Icon(Icons.settings_suggest_outlined),
+        label: context.strings.managementTab,
+        enabled: controller.administration != null && !controller.busy,
+      ),
+    ],
+  );
+
+  void _selectBottomPage(int index) {
+    switch (index) {
+      case 0:
+        showDashboard();
+      case 1:
+        showServers();
+      case 2:
+        select(Section.identity);
+      case 3:
+        select(Section.settings);
+    }
+  }
+
+  Widget _responsiveShell(BuildContext context, BoxConstraints box) {
+    final compact = box.maxWidth < 760;
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.keyK, control: true): () =>
+            unawaited(search()),
+        const SingleActivator(LogicalKeyboardKey.keyK, meta: true): () =>
+            unawaited(search()),
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scaffold(
+          key: scaffold,
+          drawer: compact
+              ? Drawer(child: SafeArea(child: navigationSidebar()))
+              : null,
+          bottomNavigationBar: compact ? _bottomNavigation(context) : null,
+          body: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.all(compact ? 6 : 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (!compact) ...[
+                    rail(),
+                    const SizedBox(width: 8),
+                    ClipRRect(
+                      borderRadius: const BorderRadius.horizontal(
+                        left: Radius.circular(20),
+                      ),
+                      child: navigationSidebar(),
+                    ),
+                  ],
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: compact
+                          ? BorderRadius.circular(20)
+                          : const BorderRadius.horizontal(
+                              right: Radius.circular(20),
                             ),
-                            NavigationDestination(
-                              icon: Icon(Icons.dns_outlined),
-                              label: context.strings.spacesTitle,
-                            ),
-                            NavigationDestination(
-                              icon: Icon(Icons.computer_outlined),
-                              label: context.strings.myDevice,
-                            ),
-                            NavigationDestination(
-                              icon: const Icon(Icons.settings_suggest_outlined),
-                              label: context.strings.managementTab,
-                              enabled:
-                                  controller.administration != null &&
-                                  !controller.busy,
-                            ),
-                          ],
-                        )
-                      : null,
-                  body: SafeArea(
-                    child: Padding(
-                      padding: EdgeInsets.all(compact ? 6 : 8),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          if (!compact) ...[
-                            rail(),
-                            const SizedBox(width: 8),
-                            ClipRRect(
-                              borderRadius: const BorderRadius.horizontal(
-                                left: Radius.circular(20),
-                              ),
-                              child: navigationSidebar(),
-                            ),
-                          ],
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: compact
-                                  ? BorderRadius.circular(20)
-                                  : const BorderRadius.horizontal(
-                                      right: Radius.circular(20),
-                                    ),
-                              child: ColoredBox(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainerLow,
-                                child: workspace,
-                              ),
-                            ),
-                          ),
-                        ],
+                      child: ColoredBox(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerLow,
+                        child: _workspaceContent(context, box),
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
-            );
-          },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) => MultiBlocListener(
+    listeners: [
+      BlocListener<AppPreferences, PreferencesState>(
+        bloc: widget.preferences,
+        listener: _preferencesChanged,
+      ),
+      BlocListener<ServerWorkspaces, WorkspaceState>(
+        bloc: workspaces,
+        listener: _workspacesChanged,
+      ),
+      BlocListener<HomeController, HomeState>(
+        bloc: home,
+        listener: (_, state) => _refreshShell(),
+      ),
+      BlocListener<AppUpdates, AppUpdateState>(
+        bloc: updates,
+        listenWhen: (before, after) => before.installing != after.installing,
+        listener: (_, state) => _refreshShell(),
+      ),
+      BlocListener<ServerPresence, PresenceState>(
+        bloc: presence,
+        listener: _presenceChanged,
+      ),
+    ],
+    child: BlocBuilder<ChatController, ChatState>(
+      bloc: controller,
+      builder: (context, _) => AbsorbPointer(
+        absorbing: updates.installing,
+        child: ExcludeFocus(
+          excluding: updates.installing,
+          child: LayoutBuilder(builder: _responsiveShell),
         ),
       ),
     ),

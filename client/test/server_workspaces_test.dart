@@ -37,7 +37,7 @@ void main() {
       create: (_) => InspectCounter(vault),
     );
     addTearDown(directory.dispose);
-    directory.synchronize(['https://server.example']);
+    await directory.synchronize(['https://server.example']);
     await Future<void>.delayed(Duration.zero);
     final controller = directory['https://server.example']! as InspectCounter;
     expect(controller.inspections, 0);
@@ -62,12 +62,12 @@ void main() {
         },
       );
       addTearDown(directory.dispose);
-      directory.synchronize(
+      await directory.synchronize(
         List.generate(4, (index) => 'https://$index.example'),
       );
       await Future<void>.delayed(Duration.zero);
       expect(calls, 4);
-      directory.synchronize(['https://next.example']);
+      await directory.synchronize(['https://next.example']);
       await Future<void>.delayed(Duration.zero);
       expect(calls, 4);
       gate.complete();

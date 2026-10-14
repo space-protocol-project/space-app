@@ -43,59 +43,8 @@ class HomeInstallation {
     Iterable<HomeRelease> legacy = const [],
     bool persist = true,
   }) async {
-    if (await selection.exists()) {
-      final saved = await _read(selection);
-      if (saved['format'] != 1) throw _invalid;
-      final release = HomeRelease.fromJson(
-        Map<String, dynamic>.from(saved['active'] as Map),
-      );
-      if (release.platform != offered.platform) throw _invalid;
-      await verify(release);
-      return release;
-    }
-
-    // Прежние установки не имели active-runtime.json. Только один
-    // подтверждённый выпуск можно перенести без выбора за владельца.
-    final folder = Directory('${root.path}/runtimes');
-    final candidates = <HomeRelease>[];
-    if (await folder.exists()) {
-      await for (final item in folder.list()) {
-        if (item is! Directory) continue;
-        final marker = File('${item.path}/installed.json');
-        if (!await marker.exists()) continue;
-        final saved = await _read(marker);
-        final HomeRelease release;
-        if (saved['release'] is Map) {
-          release = HomeRelease.fromJson(
-            Map<String, dynamic>.from(saved['release'] as Map),
-          );
-        } else {
-          final matches =
-              [
-                    offered,
-                    ...legacy.where(
-                      (known) =>
-                          known.version != offered.version ||
-                          known.platform != offered.platform,
-                    ),
-                  ]
-                  .where(
-                    (known) =>
-                        _sameDirectory(item, runtime(known)) &&
-                        saved['sha256'] == known.sha256,
-                  )
-                  .toList();
-          if (matches.length != 1) throw _invalid;
-          release = matches.single;
-        }
-        if (!_sameDirectory(item, runtime(release)) ||
-            release.platform != offered.platform) {
-          throw _invalid;
-        }
-        await verify(release);
-        candidates.add(release);
-      }
-    }
+    if (await selection.exists()) return _selectedRelease(offered.platform);
+    final candidates = await _installedReleases(offered, legacy);
     if (candidates.length > 1) throw _invalid;
     if (candidates.isNotEmpty) {
       if (persist) await selectInitial(candidates.single);
@@ -103,6 +52,76 @@ class HomeInstallation {
     }
     if (await Directory('${root.path}/data').exists()) throw _invalid;
     return null;
+  }
+
+  Future<HomeRelease> _selectedRelease(String platform) async {
+    final saved = await _read(selection);
+    if (saved['format'] != 1) throw _invalid;
+    final release = HomeRelease.fromJson(
+      Map<String, dynamic>.from(saved['active'] as Map),
+    );
+    if (release.platform != platform) throw _invalid;
+    await verify(release);
+    return release;
+  }
+
+  // Только один подтверждённый выпуск можно выбрать без решения владельца.
+  Future<List<HomeRelease>> _installedReleases(
+    HomeRelease offered,
+    Iterable<HomeRelease> legacy,
+  ) async {
+    final folder = Directory('${root.path}/runtimes');
+    final candidates = <HomeRelease>[];
+    if (!await folder.exists()) return candidates;
+    await for (final item in folder.list()) {
+      if (item is! Directory) continue;
+      final marker = File('${item.path}/installed.json');
+      if (!await marker.exists()) continue;
+      final release = _releaseFromMarker(
+        item,
+        await _read(marker),
+        offered,
+        legacy,
+      );
+      if (!_sameDirectory(item, runtime(release)) ||
+          release.platform != offered.platform) {
+        throw _invalid;
+      }
+      await verify(release);
+      candidates.add(release);
+    }
+    return candidates;
+  }
+
+  HomeRelease _releaseFromMarker(
+    Directory folder,
+    Map<String, dynamic> saved,
+    HomeRelease offered,
+    Iterable<HomeRelease> legacy,
+  ) {
+    if (saved['release'] is Map) {
+      return HomeRelease.fromJson(
+        Map<String, dynamic>.from(saved['release'] as Map),
+      );
+    }
+    // Прежний marker допустим лишь при единственном совпадении с известным выпуском.
+    final knownReleases = [
+      offered,
+      ...legacy.where(
+        (known) =>
+            known.version != offered.version ||
+            known.platform != offered.platform,
+      ),
+    ];
+    final matches = knownReleases
+        .where(
+          (known) =>
+              _sameDirectory(folder, runtime(known)) &&
+              saved['sha256'] == known.sha256,
+        )
+        .toList();
+    if (matches.length != 1) throw _invalid;
+    return matches.single;
   }
 
   Future<void> selectInitial(HomeRelease release) async {

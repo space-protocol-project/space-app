@@ -78,25 +78,26 @@ void main() {
           second: _AdminSession(second, 'B'),
         };
         final vault = ChannelVault();
-        final workspaces = ServerWorkspaces(
-          vault: vault,
-          create: (origin) => ChatController(
-            vault,
-            positions: MemoryPositions(),
-            historyStore: MemoryHistory(),
-            openSession: (_, _) async => sessions[origin]!,
-          ),
-          resume: (origin, controller) async {
-            controller.preview = Discovery(
-              Uri.parse(origin),
-              'srv_test',
-              List.filled(32, 1),
-            );
-            await controller.connect();
-          },
-        );
-        workspaces.synchronize([first, second]);
+        late ServerWorkspaces workspaces;
         await tester.runAsync(() async {
+          workspaces = ServerWorkspaces(
+            vault: vault,
+            create: (origin) => ChatController(
+              vault,
+              positions: MemoryPositions(),
+              historyStore: MemoryHistory(),
+              openSession: (_, _) async => sessions[origin]!,
+            ),
+            resume: (origin, controller) async {
+              controller.preview = Discovery(
+                Uri.parse(origin),
+                'srv_test',
+                List.filled(32, 1),
+              );
+              await controller.connect();
+            },
+          );
+          await workspaces.synchronize([first, second]);
           await workspaces.refresh();
           await Future<void>.delayed(const Duration(milliseconds: 50));
         });
@@ -121,6 +122,9 @@ void main() {
             ),
           ),
         );
+        await tester.runAsync(() async {
+          await Future<void>.delayed(Duration.zero);
+        });
         await tester.pumpAndSettle();
         final initialPushes = observer.pushes;
         if (width < 760) {
@@ -133,6 +137,9 @@ void main() {
         } else {
           await tester.tap(find.byKey(const ValueKey('my-device-tab')));
         }
+        await tester.runAsync(() async {
+          await Future<void>.delayed(Duration.zero);
+        });
         await tester.pumpAndSettle();
         expect(
           find.text('Идентичности и ключи этого устройства.'),
@@ -145,6 +152,9 @@ void main() {
         expect(find.text('Сканировать камерой'), findsOneWidget);
         if (width >= 760) {
           await tester.tap(find.byKey(const ValueKey('server-tab-$first')));
+          await tester.runAsync(() async {
+            await Future<void>.delayed(Duration.zero);
+          });
           await tester.pumpAndSettle();
         }
         if (width < 760) {
@@ -154,6 +164,9 @@ void main() {
             find.widgetWithText(ListTile, 'Управление пространством'),
           );
         }
+        await tester.runAsync(() async {
+          await Future<void>.delayed(Duration.zero);
+        });
         await tester.pumpAndSettle();
         expect(observer.pushes, initialPushes);
         expect(find.byType(AdminPage), findsOneWidget);
@@ -170,10 +183,16 @@ void main() {
             findsOneWidget,
           );
           await tester.tap(find.byKey(const ValueKey('server-tab-$second')));
+          await tester.runAsync(() async {
+            await Future<void>.delayed(Duration.zero);
+          });
           await tester.pumpAndSettle();
           await tester.tap(
             find.widgetWithText(ListTile, 'Управление пространством'),
           );
+          await tester.runAsync(() async {
+            await Future<void>.delayed(Duration.zero);
+          });
           await tester.pumpAndSettle();
           expect(
             find.byWidgetPredicate(

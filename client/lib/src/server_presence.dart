@@ -4,6 +4,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 import 'core.dart';
+import 'event_controller.dart';
+
+part 'presence_events.dart';
+part 'presence_state.dart';
 
 typedef PresenceProbe = Future<bool?> Function(String origin);
 
@@ -41,15 +45,35 @@ Future<bool?> probeSavedServer(String origin, IdentityVault vault) async {
   }
 }
 
-class ServerPresence extends ChangeNotifier {
+class ServerPresence
+    extends EventController<PresenceEvent<dynamic>, PresenceState> {
   ServerPresence({
     required this.probe,
     this.interval = const Duration(seconds: 20),
-  });
+  }) : super(const PresenceState()) {
+    on<PresenceProbeCompleted>(
+      (event, _) => handleRequest(
+        event,
+        () => _recordProbe(event.origin, event.generation, event.online),
+      ),
+    );
+    on<PresenceStatePublished>(
+      (event, emit) => event.runAndComplete(() => emit(event.state)),
+    );
+    on<PresenceWatched>(
+      (event, _) => handleRequest(event, () => _watch(event.origins)),
+    );
+    on<PresenceChecked>((event, _) => handleRequest(event, _check));
+  }
+  Future<void> watch(Iterable<String> origins) =>
+      sendRequest(PresenceWatched(origins));
+  Future<void> check() => sendRequest(PresenceChecked());
+
   final PresenceProbe probe;
   final Duration interval;
-  final _changes = StreamController<ServerPresenceChange>.broadcast();
-  Stream<ServerPresenceChange> get changes => _changes.stream;
+  Stream<ServerPresenceChange> get changes => stream
+      .where((state) => state.change != null)
+      .map((state) => state.change!);
   final Map<String, bool> _states = {};
   final Map<String, int> _failures = {};
   Set<String> _origins = {};
@@ -58,7 +82,7 @@ class ServerPresence extends ChangeNotifier {
   int _generation = 0;
   bool? online(String origin) => _states[origin];
 
-  void watch(Iterable<String> origins) {
+  void _watch(Iterable<String> origins) {
     if (_disposed) return;
     final next = origins.toSet();
     if (setEquals(next, _origins)) return;
@@ -71,10 +95,10 @@ class ServerPresence extends ChangeNotifier {
       _timer = Timer.periodic(interval, (_) => unawaited(check()));
       unawaited(check());
     }
-    notifyListeners();
+    publishState();
   }
 
-  Future<void> check() async {
+  Future<void> _check() async {
     if (_checking || _disposed || _origins.isEmpty) return;
     _checking = true;
     final generation = _generation;
@@ -89,7 +113,7 @@ class ServerPresence extends ChangeNotifier {
         );
         if (_disposed || generation != _generation) break;
       }
-      if (!_disposed) notifyListeners();
+      if (!_disposed) publishState();
     } finally {
       _checking = false;
     }
@@ -104,6 +128,12 @@ class ServerPresence extends ChangeNotifier {
     } catch (_) {
       result = null;
     }
+    if (!_disposed && !isClosed) {
+      await sendRequest(PresenceProbeCompleted(origin, generation, result));
+    }
+  }
+
+  void _recordProbe(String origin, int generation, bool? result) {
     if (_disposed || generation != _generation) return;
     if (result == null) {
       _states.remove(origin);
@@ -120,16 +150,25 @@ class ServerPresence extends ChangeNotifier {
     final previous = _states[origin];
     _states[origin] = result;
     if (previous != null && previous != result) {
-      _changes.add(ServerPresenceChange(origin, result));
+      publishState(change: ServerPresenceChange(origin, result));
+    }
+  }
+
+  void publishState({ServerPresenceChange? change}) {
+    if (!_disposed && !isClosed) {
+      publishStateEvent(
+        PresenceStatePublished(
+          PresenceState(online: Map.unmodifiable(_states), change: change),
+        ),
+      );
     }
   }
 
   @override
-  void dispose() {
+  Future<void> close() async {
     _disposed = true;
     _generation++;
     _timer?.cancel();
-    unawaited(_changes.close());
-    super.dispose();
+    await super.close();
   }
 }

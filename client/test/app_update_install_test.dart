@@ -51,7 +51,8 @@ void main() {
         '',
         AppVersion.parse('0.3.0')!,
         {package.name: package},
-      );
+      )
+      ..publishState();
   }
 
   test('Подготовка и остановка предшествуют запуску; приложение закрывается после запуска', () async {

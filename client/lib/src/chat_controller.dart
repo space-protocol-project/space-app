@@ -1,17 +1,21 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show VoidCallback;
 import 'package:grpc/grpc.dart';
 
-import 'core.dart';
-import 'local_failure.dart';
 import 'channel_positions.dart';
 import 'chat_history.dart';
+import 'core.dart';
+import 'event_controller.dart';
 import 'generated/space/v1/space.pb.dart';
+import 'local_failure.dart';
+
+part 'chat_events.dart';
+part 'chat_state.dart';
 
 enum MessageSendStatus { idle, sending, unconfirmed, accepted }
 
-class ChatController extends ChangeNotifier {
+class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   ChatController(
     this.vault, {
     this.openSession = SpaceSession.connect,
@@ -21,7 +25,110 @@ class ChatController extends ChangeNotifier {
     DateTime Function()? now,
   }) : positions = positions ?? LocalChannelPositions(),
        historyStore = historyStore ?? LocalChatHistory(),
-       now = now ?? DateTime.now;
+       now = now ?? DateTime.now,
+       super(const ChatState()) {
+    on<ChatFrameReceived>(
+      (event, _) => handleRequest(event, () => _receiveFrame(event)),
+    );
+    on<ChatCatalogFailed>(
+      (event, _) => handleRequest(
+        event,
+        () => _recoverCatalog(event.session, event.generation, event.error),
+      ),
+    );
+    on<ChatCatalogChanged>(
+      (event, _) => handleRequest(
+        event,
+        () => _catalogChanged(event.session, event.generation),
+      ),
+    );
+    on<ChatStatePublished>(
+      (event, emit) => event.runAndComplete(() => emit(event.state)),
+    );
+    on<ChatHistoryRestored>(
+      (event, _) => handleRequest(event, () => _restoreHistory(event.origin)),
+    );
+    on<ChatHistoryFlushed>((event, _) => handleRequest(event, _flushHistory));
+    on<ChatOfflineDataCleared>(
+      (event, _) => handleRequest(event, _clearOfflineData),
+    );
+    on<ChatFavoriteToggled>(
+      (event, _) => handleRequest(event, () => _toggleFavorite(event.message)),
+    );
+    on<ChatReadMarked>(
+      (event, _) => handleRequest(event, () => _markRead(event.id)),
+    );
+    on<ChatInspected>(
+      (event, _) => handleRequest(
+        event,
+        () => _inspect(
+          event.address,
+          invitationToken: event.invitationToken,
+          homeOrigin: event.homeOrigin,
+          tlsFingerprint: event.tlsFingerprint,
+        ),
+      ),
+    );
+    on<ChatConnected>(
+      (event, _) => handleRequest(
+        event,
+        () => _connect(
+          restoredRecord: event.restoredRecord,
+          pairingId: event.pairingId,
+          setupCode: event.setupCode,
+        ),
+      ),
+    );
+    on<ChatChannelSelected>(
+      (event, _) => handleRequest(event, () => _selectChannel(event.id)),
+    );
+    on<ChatChannelsRefreshed>(
+      (event, _) => handleRequest(event, _refreshChannels),
+    );
+    on<ChatMessageSent>(
+      (event, _) => handleRequest(event, () => _send(event.text)),
+    );
+    on<ChatDeviceRevoked>((event, _) => handleRequest(event, _revoke));
+    on<ChatDisconnected>((event, _) => handleRequest(event, _disconnect));
+  }
+
+  Future<void> restoreHistory(String origin) =>
+      sendRequest(ChatHistoryRestored(origin));
+  Future<void> flushHistory() => sendRequest(ChatHistoryFlushed());
+  Future<void> clearOfflineData() => sendRequest(ChatOfflineDataCleared());
+  Future<void> toggleFavorite(Content message) =>
+      sendRequest(ChatFavoriteToggled(message));
+  Future<void> markRead(String id) => sendRequest(ChatReadMarked(id));
+  Future<void> inspect(
+    String address, {
+    String invitationToken = '',
+    String? homeOrigin,
+    String tlsFingerprint = '',
+  }) => sendRequest(
+    ChatInspected(
+      address,
+      invitationToken: invitationToken,
+      homeOrigin: homeOrigin,
+      tlsFingerprint: tlsFingerprint,
+    ),
+  );
+  Future<void> connect({
+    DeviceRecord? restoredRecord,
+    String pairingId = '',
+    String setupCode = '',
+  }) => sendRequest(
+    ChatConnected(
+      restoredRecord: restoredRecord,
+      pairingId: pairingId,
+      setupCode: setupCode,
+    ),
+  );
+  Future<void> selectChannel(String id) => sendRequest(ChatChannelSelected(id));
+  Future<void> refreshChannels() => sendRequest(ChatChannelsRefreshed());
+  Future<bool> send(String text) => sendRequest(ChatMessageSent(text));
+  Future<void> revoke() => sendRequest(ChatDeviceRevoked());
+  Future<void> disconnect() => sendRequest(ChatDisconnected());
+
   final ChatHistoryStore historyStore;
   final DateTime Function() now;
   ChatHistory? _history;
@@ -42,7 +149,7 @@ class ChatController extends ChangeNotifier {
     return _history?.latest;
   }
 
-  Future<void> restoreHistory(String origin) async {
+  Future<void> _restoreHistory(String origin) async {
     if (accessRemoved || _historyOrigin == origin && _history != null) return;
     try {
       final saved = await historyStore.read(origin);
@@ -82,7 +189,7 @@ class ChatController extends ChangeNotifier {
         _historyTimer?.cancel();
         _historyTimer = Timer(
           const Duration(milliseconds: 500),
-          () => unawaited(flushHistory()),
+          () => unawaited(_flushHistory()),
         );
       }
     }
@@ -120,11 +227,11 @@ class ChatController extends ChangeNotifier {
     _historyTimer?.cancel();
     _historyTimer = Timer(
       const Duration(milliseconds: 500),
-      () => unawaited(flushHistory()),
+      () => unawaited(_flushHistory()),
     );
   }
 
-  Future<void> flushHistory() async {
+  Future<void> _flushHistory() async {
     _historyTimer?.cancel();
     final saved = _history;
     final origin = _historyOrigin;
@@ -137,7 +244,7 @@ class ChatController extends ChangeNotifier {
     }
   }
 
-  Future<void> clearOfflineData() async {
+  Future<void> _clearOfflineData() async {
     final origin = knownOrigin;
     accessRemoved = true;
     _historyTimer?.cancel();
@@ -164,7 +271,7 @@ class ChatController extends ChangeNotifier {
   Future<void> _rejectAccess(Object problem) async {
     if (!_accessDenied(problem)) return;
     try {
-      await clearOfflineData();
+      await _clearOfflineData();
     } catch (_) {
       cacheError = 'История не удалена';
     }
@@ -247,7 +354,7 @@ class ChatController extends ChangeNotifier {
       _history?.favorites.contains('${message.channelId}/${message.id}') ==
           true;
 
-  Future<void> toggleFavorite(Content message) async {
+  Future<void> _toggleFavorite(Content message) async {
     if (accessRemoved ||
         !canRead ||
         message.channelId != channelId ||
@@ -266,9 +373,9 @@ class ChatController extends ChangeNotifier {
       ),
     );
     if (!saved.favorites.remove(key)) saved.favorites.add(key);
-    notifyListeners();
-    await flushHistory();
-    if (!_disposed) notifyListeners();
+    publishState();
+    await _flushHistory();
+    if (!_disposed) publishState();
   }
 
   Future<void> _loadPositions() async {
@@ -337,7 +444,7 @@ class ChatController extends ChangeNotifier {
     }
   }
 
-  void markRead(String id) {
+  void _markRead(String id) {
     if (!canRead || id.isEmpty || _readThrough[channelId] == id) return;
     final list = messages;
     final index = list.indexWhere((m) => m.id == id);
@@ -350,7 +457,7 @@ class ChatController extends ChangeNotifier {
     if (sequence > 0) _readSequences[channelId] = sequence;
     if (_history != null) {
       _history!.readSequences = {..._history!.readSequences, ..._readSequences};
-      unawaited(flushHistory());
+      unawaited(_flushHistory());
     }
     _queuePositions();
     _update();
@@ -428,7 +535,13 @@ class ChatController extends ChangeNotifier {
       _lastServerIcon =
           (_session as ServerIconPresentation).serverIcon ?? _lastServerIcon;
     }
-    if (!_disposed) notifyListeners();
+    if (!_disposed) publishState();
+  }
+
+  void publishState() {
+    if (!_disposed && !isClosed) {
+      publishStateEvent(ChatStatePublished(ChatState.fromController(this)));
+    }
   }
 
   bool _failureRetry = false;
@@ -460,7 +573,7 @@ class ChatController extends ChangeNotifier {
     return 'Не удалось выполнить операцию. Проверьте сервер, соединение и доступ к хранилищу ключей.';
   }
 
-  Future<void> inspect(
+  Future<void> _inspect(
     String address, {
     String invitationToken = '',
     String? homeOrigin,
@@ -503,7 +616,7 @@ class ChatController extends ChangeNotifier {
     }
   }
 
-  Future<void> connect({
+  Future<void> _connect({
     DeviceRecord? restoredRecord,
     String pairingId = '',
     String setupCode = '',
@@ -585,7 +698,7 @@ class ChatController extends ChangeNotifier {
     }
   }
 
-  Future<void> selectChannel(String id) async {
+  Future<void> _selectChannel(String id) async {
     if ((!connected || reconnecting) && _history != null && !accessRemoved) {
       if (!_history!.channels.any((c) => c.id == id && c.permissions.read)) {
         return;
@@ -595,7 +708,7 @@ class ChatController extends ChangeNotifier {
       _history!.selected = id;
       _messages.clear();
       connected = false;
-      await flushHistory();
+      await _flushHistory();
       _update();
       return;
     }
@@ -643,7 +756,7 @@ class ChatController extends ChangeNotifier {
     }
   }
 
-  Future<void> refreshChannels() async {
+  Future<void> _refreshChannels() async {
     final nav = navigation;
     if (busy || nav == null) return;
     busy = true;
@@ -722,12 +835,74 @@ class ChatController extends ChangeNotifier {
     if (iterator != null) unawaited(_cancelIterator(iterator));
   }
 
+  bool _catalogCurrent(LiveSession session, int generation) =>
+      !_disposed &&
+      connected &&
+      identical(session, _session) &&
+      generation == _catalogGeneration;
+
+  Future<bool> _catalogChanged(LiveSession session, int generation) async {
+    if (!_catalogCurrent(session, generation)) return false;
+    if (!canRead) {
+      _stopSubscription();
+      _messages.clear();
+      cursor = '';
+      _pendingKey = '';
+      _pendingText = '';
+      sendStatus = MessageSendStatus.idle;
+      error = _explain(
+        const LocalFailure(
+          LocalFailureCode.channelUnavailable,
+          'Доступ к этому каналу изменён. Выберите доступный чат.',
+        ),
+      );
+    } else if (_activeIterator == null && !busy && channelId.isNotEmpty) {
+      await _selectChannel(channelId);
+    }
+    _update();
+    return true;
+  }
+
+  Future<void> _rejectCatalogAccess(Object problem) async {
+    await _rejectAccess(problem);
+    connected = false;
+    error = _explain(problem);
+    _stopSubscription();
+    _messages.clear();
+    _update();
+  }
+
+  Future<bool> _renewCatalogLogin(LiveSession session, int generation) async {
+    try {
+      await session.login();
+      return true;
+    } catch (problem) {
+      if (!_catalogCurrent(session, generation)) return false;
+      if (!_terminal(problem)) return true;
+      await _rejectCatalogAccess(problem);
+      return false;
+    }
+  }
+
+  Future<bool> _recoverCatalog(
+    LiveSession session,
+    int generation,
+    Object problem,
+  ) async {
+    if (!_catalogCurrent(session, generation)) return false;
+    if (problem is GrpcError && problem.code == StatusCode.unimplemented) {
+      return false;
+    }
+    if (problem is GrpcError && problem.code == StatusCode.unauthenticated) {
+      return _renewCatalogLogin(session, generation);
+    }
+    if (!_terminal(problem)) return true;
+    await _rejectCatalogAccess(problem);
+    return false;
+  }
+
   Future<void> _watchCatalog(LiveSession session, int generation) async {
-    bool active() =>
-        !_disposed &&
-        connected &&
-        identical(session, _session) &&
-        generation == _catalogGeneration;
+    bool active() => _catalogCurrent(session, generation);
     var attempt = 0;
     while (active()) {
       final iterator = StreamIterator(
@@ -736,54 +911,15 @@ class ChatController extends ChangeNotifier {
       _catalogIterator = iterator;
       try {
         while (await iterator.moveNext()) {
-          if (!active()) return;
-          attempt = 0;
-          if (!canRead) {
-            _stopSubscription();
-            _messages.clear();
-            cursor = '';
-            _pendingKey = '';
-            _pendingText = '';
-            sendStatus = MessageSendStatus.idle;
-            error = _explain(
-              const LocalFailure(
-                LocalFailureCode.channelUnavailable,
-                'Доступ к этому каналу изменён. Выберите доступный чат.',
-              ),
-            );
-          } else if (_activeIterator == null && !busy && channelId.isNotEmpty) {
-            await selectChannel(channelId);
+          if (!await sendRequest(ChatCatalogChanged(session, generation))) {
+            return;
           }
-          _update();
+          attempt = 0;
         }
       } catch (problem) {
-        if (!active()) return;
-        if (problem is GrpcError && problem.code == StatusCode.unimplemented) {
-          return;
-        }
-        if (problem is GrpcError &&
-            problem.code == StatusCode.unauthenticated) {
-          try {
-            await session.login();
-          } catch (error) {
-            if (!active()) return;
-            if (_terminal(error)) {
-              await _rejectAccess(error);
-              connected = false;
-              this.error = _explain(error);
-              _stopSubscription();
-              _messages.clear();
-              _update();
-              return;
-            }
-          }
-        } else if (_terminal(problem)) {
-          await _rejectAccess(problem);
-          connected = false;
-          error = _explain(problem);
-          _stopSubscription();
-          _messages.clear();
-          _update();
+        if (!await sendRequest(
+          ChatCatalogFailed(session, generation, problem),
+        )) {
           return;
         }
       } finally {
@@ -824,6 +960,56 @@ class ChatController extends ChangeNotifier {
     await done.future;
   }
 
+  bool _streamChannelAvailable(String watchedChannel) {
+    if (canRead && channelId == watchedChannel) return true;
+    _messages.clear();
+    error = _explain(
+      const LocalFailure(
+        LocalFailureCode.channelUnavailable,
+        'Канал больше не доступен для чтения.',
+      ),
+    );
+    _update();
+    return false;
+  }
+
+  void _validateContentFrame(SubscribeResponse frame, String watchedChannel) {
+    if (!frame.hasEvent() ||
+        frame.event.type != 'content.created' ||
+        !frame.event.hasContent() ||
+        frame.event.content.channelId != watchedChannel ||
+        frame.event.content.id.isEmpty ||
+        frame.event.content.sequence.isNegative ||
+        frame.cursor.isEmpty ||
+        frame.event.cursor != frame.cursor) {
+      throw const LocalFailure(
+        LocalFailureCode.protocolInvalid,
+        'Неподдерживаемое событие потока',
+      );
+    }
+  }
+
+  bool _acceptFrame(SubscribeResponse frame, String watchedChannel) {
+    if (navigation != null && !_streamChannelAvailable(watchedChannel)) {
+      return false;
+    }
+    if (frame.heartbeat) {
+      if (frame.hasEvent() || frame.cursor != cursor) {
+        throw const LocalFailure(
+          LocalFailureCode.protocolInvalid,
+          'Heartbeat содержит неверный курсор',
+        );
+      }
+      return _streamChannelAvailable(watchedChannel);
+    }
+    _validateContentFrame(frame, watchedChannel);
+    _messages[frame.event.content.id] = frame.event.content;
+    cursor = frame.cursor;
+    _cursors[watchedChannel] = cursor;
+    _queuePositions();
+    return true;
+  }
+
   Future<void> _watch(LiveSession session, int generation) async {
     final watchedChannel = channelId;
     var attempt = 0;
@@ -832,107 +1018,22 @@ class ChatController extends ChangeNotifier {
       final iterator = StreamIterator(session.subscribe(cursor));
       _activeIterator = iterator;
       try {
-        while (await iterator.moveNext()) {
-          final frame = iterator.current;
-          if (!_current(session, generation)) return;
-          if (navigation != null && (!canRead || channelId != watchedChannel)) {
-            _messages.clear();
-            error = _explain(
-              const LocalFailure(
-                LocalFailureCode.channelUnavailable,
-                'Канал больше не доступен для чтения.',
-              ),
-            );
-            _update();
-            return;
-          }
-          if (frame.heartbeat) {
-            if (frame.hasEvent() || frame.cursor != cursor) {
-              throw const LocalFailure(
-                LocalFailureCode.protocolInvalid,
-                'Heartbeat содержит неверный курсор',
-              );
-            }
-            if (!canRead || channelId != watchedChannel) {
-              _messages.clear();
-              error = _explain(
-                const LocalFailure(
-                  LocalFailureCode.channelUnavailable,
-                  'Канал больше не доступен для чтения.',
-                ),
-              );
-              _update();
-              return;
-            }
-          } else {
-            if (!frame.hasEvent() ||
-                frame.event.type != 'content.created' ||
-                !frame.event.hasContent() ||
-                frame.event.content.channelId != watchedChannel ||
-                frame.event.content.id.isEmpty ||
-                frame.event.content.sequence.isNegative ||
-                frame.cursor.isEmpty ||
-                frame.event.cursor != frame.cursor) {
-              throw const LocalFailure(
-                LocalFailureCode.protocolInvalid,
-                'Неподдерживаемое событие потока',
-              );
-            }
-            _messages[frame.event.content.id] = frame.event.content;
-            cursor = frame.cursor;
-            _cursors[watchedChannel] = cursor;
-            _queuePositions();
-          }
-          reconnecting = false;
-          if (DateTime.now().difference(started) >
-              const Duration(seconds: 20)) {
-            attempt = 0;
-          }
-          _update();
-        }
+        final keepWatching = await _readSubscription(
+          iterator,
+          session,
+          generation,
+          watchedChannel,
+          started,
+          () => attempt = 0,
+        );
+        if (!keepWatching) return;
       } catch (problem) {
-        if (!_current(session, generation)) return;
-        if (await _channelDenied(problem)) return;
-        if (problem is GrpcError &&
-            problem.code == StatusCode.unauthenticated) {
-          try {
-            await session.login();
-          } catch (loginError) {
-            if (!_current(session, generation)) return;
-            if (_terminal(loginError)) {
-              await _rejectAccess(loginError);
-              connected = false;
-              error = _explain(loginError);
-              _update();
-              return;
-            }
-          }
-        } else if (_terminal(problem)) {
-          if (problem is GrpcError &&
-              problem.code == StatusCode.invalidArgument) {
-            _cursors.remove(watchedChannel);
-            cursor = '';
-            await _savePositions();
-          }
-          connected = false;
-          error =
-              problem is GrpcError && problem.code == StatusCode.unimplemented
-              ? _explain(
-                  const LocalFailure(
-                    LocalFailureCode.eventsUnsupported,
-                    'Сервер пока не поддерживает подписку событий. Обновите сервер.',
-                  ),
-                )
-              : problem is GrpcError &&
-                    problem.code == StatusCode.invalidArgument
-              ? _explain(
-                  const LocalFailure(
-                    LocalFailureCode.cursorRejected,
-                    'Сервер не принял курсор истории. Подключитесь заново для загрузки сообщений.',
-                  ),
-                )
-              : _explain(problem);
-          _update();
+        if (!await _recoverSubscription(
+          session,
+          generation,
+          watchedChannel,
+          problem,
+        )) {
           return;
         }
       } finally {
@@ -947,6 +1048,90 @@ class ChatController extends ChangeNotifier {
     }
   }
 
+  bool _receiveFrame(ChatFrameReceived event) {
+    if (!_current(event.session, event.generation)) return false;
+    if (!_acceptFrame(event.frame, event.channelId)) return false;
+    reconnecting = false;
+    _update();
+    return true;
+  }
+
+  Future<bool> _readSubscription(
+    StreamIterator<SubscribeResponse> iterator,
+    LiveSession session,
+    int generation,
+    String watchedChannel,
+    DateTime started,
+    VoidCallback onStable,
+  ) async {
+    while (await iterator.moveNext()) {
+      final accepted = await sendRequest(
+        ChatFrameReceived(
+          iterator.current,
+          session,
+          generation,
+          watchedChannel,
+        ),
+      );
+      if (!accepted) return false;
+      if (DateTime.now().difference(started) > const Duration(seconds: 20)) {
+        onStable();
+      }
+    }
+    return true;
+  }
+
+  Future<bool> _recoverSubscription(
+    LiveSession session,
+    int generation,
+    String watchedChannel,
+    Object problem,
+  ) async {
+    if (!_current(session, generation)) return false;
+    if (await _channelDenied(problem)) return false;
+    if (problem is GrpcError && problem.code == StatusCode.unauthenticated) {
+      try {
+        await session.login();
+      } catch (loginError) {
+        if (!_current(session, generation)) return false;
+        if (_terminal(loginError)) {
+          await _rejectAccess(loginError);
+          connected = false;
+          error = _explain(loginError);
+          _update();
+          return false;
+        }
+      }
+    } else if (_terminal(problem)) {
+      if (problem is GrpcError && problem.code == StatusCode.invalidArgument) {
+        _cursors.remove(watchedChannel);
+        cursor = '';
+        await _savePositions();
+      }
+      connected = false;
+      error = _subscriptionError(problem);
+      _update();
+      return false;
+    }
+    return true;
+  }
+
+  String _subscriptionError(Object problem) {
+    if (problem is! GrpcError) return _explain(problem);
+    final failure = switch (problem.code) {
+      StatusCode.unimplemented => const LocalFailure(
+        LocalFailureCode.eventsUnsupported,
+        'Сервер пока не поддерживает подписку событий. Обновите сервер.',
+      ),
+      StatusCode.invalidArgument => const LocalFailure(
+        LocalFailureCode.cursorRejected,
+        'Сервер не принял курсор истории. Подключитесь заново для загрузки сообщений.',
+      ),
+      _ => problem,
+    };
+    return _explain(failure);
+  }
+
   bool _terminal(Object problem) =>
       problem is FormatException ||
       problem is GrpcError &&
@@ -959,7 +1144,7 @@ class ChatController extends ChangeNotifier {
           ].contains(problem.code);
   MessageSendStatus sendStatus = MessageSendStatus.idle;
 
-  Future<bool> send(String text) async {
+  Future<bool> _send(String text) async {
     final session = _session;
     if (busy ||
         !connected ||
@@ -1010,14 +1195,14 @@ class ChatController extends ChangeNotifier {
     }
   }
 
-  Future<void> revoke() async {
+  Future<void> _revoke() async {
     if (busy || _session == null) return;
     busy = true;
     _stopSubscription();
     _update();
     try {
       await _session!.revoke();
-      await clearOfflineData();
+      await _clearOfflineData();
       _stopCatalog();
       connected = false;
       error = _explain(
@@ -1037,10 +1222,10 @@ class ChatController extends ChangeNotifier {
     }
   }
 
-  Future<void> disconnect() async {
+  Future<void> _disconnect() async {
     if (busy) return;
     try {
-      await flushHistory().timeout(const Duration(seconds: 3));
+      await _flushHistory().timeout(const Duration(seconds: 3));
     } catch (_) {}
     busy = true;
     connected = false;
@@ -1076,7 +1261,7 @@ class ChatController extends ChangeNotifier {
   }
 
   @override
-  void dispose() {
+  Future<void> close() async {
     _historyTimer?.cancel();
     _disposed = true;
     _stopCatalog();
@@ -1084,6 +1269,6 @@ class ChatController extends ChangeNotifier {
     unawaited(_savePositions());
     _stopSubscription();
     unawaited(_session?.close());
-    super.dispose();
+    await super.close();
   }
 }

@@ -1,3 +1,5 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -30,22 +32,26 @@ class _SpaceAppState extends State<SpaceApp> {
   }
 
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-    animation: preferences,
-    builder: (context, _) => MaterialApp(
-      title: 'Space',
-      debugShowCheckedModeBanner: false,
-      scrollBehavior: const _SpaceScrollBehavior(),
-      theme: preferences.theme,
-      locale: preferences.locale,
-      localizationsDelegates: [
-        AdminLocalizations.delegate,
-        ...AppLocalizations.localizationsDelegates,
-      ],
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: SpaceShell(preferences: preferences, controller: widget.controller),
-    ),
-  );
+  Widget build(BuildContext context) =>
+      BlocBuilder<AppPreferences, PreferencesState>(
+        bloc: preferences,
+        builder: (context, state) => MaterialApp(
+          title: 'Space',
+          debugShowCheckedModeBanner: false,
+          scrollBehavior: const _SpaceScrollBehavior(),
+          theme: state.theme ?? preferences.theme,
+          locale: state.locale,
+          localizationsDelegates: [
+            AdminLocalizations.delegate,
+            ...AppLocalizations.localizationsDelegates,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: SpaceShell(
+            preferences: preferences,
+            controller: widget.controller,
+          ),
+        ),
+      );
 }
 
 class _SpaceScrollBehavior extends MaterialScrollBehavior {

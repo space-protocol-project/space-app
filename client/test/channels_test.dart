@@ -1,3 +1,4 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -241,7 +242,8 @@ void main() {
         ..selectedChannelId = '';
       final controller = await connected(session, MemoryPositions());
       var notifications = 0;
-      controller.addListener(() => notifications++);
+      final subscription = controller.stream.listen((_) => notifications++);
+      addTearDown(subscription.cancel);
       session.change([chat('general')]);
       session.selectedChannelId = 'general';
       await settle();
@@ -276,7 +278,7 @@ void main() {
     final c = await connected(session, positions);
     session.event('general', 'event-1', 'message-2');
     await settle();
-    c.markRead('message-2');
+    await c.markRead('message-2');
     await c.selectChannel('team');
     await settle();
     expect(c.messages.single.text, 'История team');
@@ -286,7 +288,7 @@ void main() {
     expect(c.messages.any((m) => m.id == 'old'), false);
     session.event('team', 'event-3', 'team-2');
     await settle();
-    c.markRead('team-2');
+    await c.markRead('team-2');
     await c.selectChannel('general');
     await settle();
     expect(c.cursor, 'event-1');
@@ -379,8 +381,8 @@ void main() {
         MaterialApp(
           theme: theme.theme,
           home: Scaffold(
-            body: ListenableBuilder(
-              listenable: c,
+            body: BlocBuilder<ChatController, ChatState>(
+              bloc: c,
               builder: (_, _) => ChatView(controller: c, openConnection: () {}),
             ),
           ),

@@ -3,16 +3,19 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart' as crypto;
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'home_runtime.dart';
-import 'home_installation.dart';
-import 'home_update_journal.dart';
-import 'home_update_executor.dart';
-import 'home_storage.dart';
-import 'local_failure.dart';
+import 'event_controller.dart';
 import 'home_backup.dart';
+import 'home_installation.dart';
+import 'home_runtime.dart';
+import 'home_storage.dart';
+import 'home_update_executor.dart';
+import 'home_update_journal.dart';
+import 'local_failure.dart';
+
+part 'home_events.dart';
+part 'home_state.dart';
 
 enum HomePhase {
   idle,
@@ -43,13 +46,49 @@ class HomeServerState {
 Future<Directory> homeDirectory() async =>
     Directory('${(await getApplicationSupportDirectory()).path}/home-server');
 
-class HomeController extends ChangeNotifier {
+class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
   HomeController({
     this.directory = homeDirectory,
     this.release = bundledHomeRelease,
     this.download = downloadHomeRelease,
     this.storage = const HomeStorage(),
-  });
+  }) : super(const HomeState()) {
+    on<HomeProgressTicked>((event, _) => handleRequest(event, _update));
+    on<HomeStatePublished>(
+      (event, emit) => event.runAndComplete(() => emit(event.state)),
+    );
+    on<HomeLoaded>((event, _) => handleRequest(event, _load));
+    on<HomeIPDetected>((event, _) => handleRequest(event, _detectIP));
+    on<HomeUpdatePrepared>((event, _) => handleRequest(event, _prepareUpdate));
+    on<HomeUpdateRequested>(
+      (event, _) =>
+          handleRequest(event, () => _performUpdate(recover: event.recover)),
+    );
+    on<HomeStarted>(
+      (event, _) => handleRequest(event, () => _start(event.address)),
+    );
+    on<HomeStopped>(
+      (event, _) => handleRequest(
+        event,
+        () => _stopRequested(disconnectClient: event.disconnectClient),
+      ),
+    );
+    on<HomeErrorReported>(
+      (event, _) => handleRequest(event, () => _reportError(event.message)),
+    );
+  }
+  Future<void> load() => sendRequest(HomeLoaded());
+  Future<String> detectIP() => sendRequest(HomeIPDetected());
+  Future<bool> prepareUpdate() => sendRequest(HomeUpdatePrepared());
+  Future<void> performUpdate({bool recover = false}) =>
+      sendRequest(HomeUpdateRequested(recover: recover));
+  Future<HomeServerState?> start(String address) =>
+      sendRequest(HomeStarted(address));
+  Future<void> stop({Future<void> Function()? disconnectClient}) =>
+      sendRequest(HomeStopped(disconnectClient: disconnectClient));
+  Future<void> reportError(String message) =>
+      sendRequest(HomeErrorReported(message));
+
   final Future<Directory> Function() directory;
   final Future<HomeRelease> Function() release;
   final HomeStorage storage;
@@ -113,10 +152,9 @@ class HomeController extends ChangeNotifier {
     _operationClock.start();
     _downloadClock.reset();
     _progressTimer?.cancel();
-    _progressTimer = Timer.periodic(
-      const Duration(seconds: 1),
-      (_) => _update(),
-    );
+    _progressTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!_disposed && !isClosed) add(HomeProgressTicked());
+    });
   }
 
   void _endProgress() {
@@ -125,8 +163,8 @@ class HomeController extends ChangeNotifier {
     _progressTimer?.cancel();
   }
 
-  HomeServerState? state;
-  void reportError(String message) {
+  HomeServerState? server;
+  void _reportError(String message) {
     error = message;
     failureCode = LocalFailureCode.homeStartFailed;
     _update();
@@ -135,7 +173,13 @@ class HomeController extends ChangeNotifier {
   String _diagnostic = '';
 
   void _update() {
-    if (!_disposed) notifyListeners();
+    if (!_disposed) publishState();
+  }
+
+  void publishState() {
+    if (!_disposed && !isClosed) {
+      publishStateEvent(HomeStatePublished(HomeState.fromController(this)));
+    }
   }
 
   Future<Directory> _directory() async {
@@ -144,7 +188,7 @@ class HomeController extends ChangeNotifier {
     return root;
   }
 
-  Future<void> load() async {
+  Future<void> _load() async {
     try {
       final root = await _directory();
       try {
@@ -203,7 +247,7 @@ class HomeController extends ChangeNotifier {
     _update();
   }
 
-  Future<String> detectIP() async {
+  Future<String> _detectIP() async {
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 5);
     try {
       final request = await client
@@ -272,7 +316,7 @@ class HomeController extends ChangeNotifier {
     );
   }
 
-  Future<bool> prepareUpdate() async {
+  Future<bool> _prepareUpdate() async {
     if (busy || _disposed) return false;
     busy = true;
     error = '';
@@ -313,7 +357,7 @@ class HomeController extends ChangeNotifier {
     }
   }
 
-  Future<void> performUpdate({bool recover = false}) async {
+  Future<void> _performUpdate({bool recover = false}) async {
     if (busy || running || _disposed) return;
     busy = true;
     error = '';
@@ -347,20 +391,20 @@ class HomeController extends ChangeNotifier {
       busy = false;
       phase = HomePhase.stopped;
       _endProgress();
-      await load();
+      await _load();
       _update();
     }
   }
 
-  Future<HomeServerState?> start(String address) async {
-    if (busy || running || _disposed) return state;
+  Future<HomeServerState?> _start(String address) async {
+    if (busy || running || _disposed) return server;
     busy = true;
     _beginProgress();
     error = '';
     failureCode = null;
     progress = 0;
     phase = HomePhase.idle;
-    state = null;
+    server = null;
     _diagnostic = '';
     _update();
     try {
@@ -381,7 +425,7 @@ class HomeController extends ChangeNotifier {
         if (candidate.isEmpty) {
           phase = HomePhase.detectingIP;
           _update();
-          candidate = await detectIP();
+          candidate = await _detectIP();
         }
         if (!isPublicHomeIPv4(candidate)) {
           throw const FormatException('Нужен статический публичный IPv4');
@@ -437,7 +481,7 @@ class HomeController extends ChangeNotifier {
           if (_process != process) return;
           _process = null;
           running = false;
-          state = null;
+          server = null;
           if (!busy && code != 0) {
             failureCode = LocalFailureCode.homeStartFailed;
             error = 'Сервер завершился с ошибкой. $_diagnostic';
@@ -462,7 +506,7 @@ class HomeController extends ChangeNotifier {
       final der = base64Decode(
         pem.replaceAll(RegExp(r'-----[^-]+-----|\s'), '').trim(),
       );
-      state = HomeServerState(
+      server = HomeServerState(
         result['local_origin'] as String,
         result['public_origin'] as String,
         result['setup_code'] as String,
@@ -470,7 +514,7 @@ class HomeController extends ChangeNotifier {
       );
       running = true;
       phase = HomePhase.running;
-      return state;
+      return server;
     } catch (e) {
       failureCode = e is LocalFailure
           ? e.code
@@ -526,12 +570,14 @@ class HomeController extends ChangeNotifier {
       _update();
     }
     running = false;
-    state = null;
+    server = null;
     phase = HomePhase.stopped;
     await _unlock();
   }
 
-  Future<void> stop({Future<void> Function()? disconnectClient}) async {
+  Future<void> _stopRequested({
+    Future<void> Function()? disconnectClient,
+  }) async {
     if (busy) return;
     busy = true;
     phase = HomePhase.stopping;
@@ -562,11 +608,11 @@ class HomeController extends ChangeNotifier {
   }
 
   @override
-  void dispose() {
+  Future<void> close() async {
     _disposed = true;
     _endProgress();
     unawaited(_process?.stdin.close());
-    super.dispose();
+    await super.close();
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -30,8 +31,8 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: AnimatedBuilder(
-            animation: home,
+          body: BlocBuilder<HomeController, HomeState>(
+            bloc: home,
             builder: (_, _) => HomeOperationProgress(home: home),
           ),
         ),

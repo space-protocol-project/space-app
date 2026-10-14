@@ -2,11 +2,15 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
+import 'package:crypto/crypto.dart' as crypto;
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:crypto/crypto.dart' as crypto;
 import 'package:path_provider/path_provider.dart';
+
+import 'event_controller.dart';
+
+part 'app_update_events.dart';
+part 'app_update_state.dart';
 
 const appRepository = 'space-protocol-project/space-app';
 const appReleaseAssets = {
@@ -16,7 +20,9 @@ const appReleaseAssets = {
 };
 
 class AppVersion implements Comparable<AppVersion> {
-  AppVersion(this.core, this.preview);
+  AppVersion(List<int> core, List<String> preview)
+    : core = List.unmodifiable(core),
+      preview = List.unmodifiable(preview);
   final List<int> core;
   final List<String> preview;
 
@@ -106,7 +112,13 @@ class AppPackage {
 }
 
 class AppRelease {
-  AppRelease(this.tag, this.url, this.notes, this.version, this.packages);
+  AppRelease(
+    this.tag,
+    this.url,
+    this.notes,
+    this.version,
+    Map<String, AppPackage> packages,
+  ) : packages = Map.unmodifiable(packages);
   final Map<String, AppPackage> packages;
   final String tag, notes;
   final Uri url;
@@ -148,7 +160,8 @@ class AppRelease {
 
 enum AppUpdateStatus { idle, checking, current, available, empty, failed }
 
-class AppUpdates extends ChangeNotifier {
+class AppUpdates
+    extends EventController<AppUpdateEvent<dynamic>, AppUpdateState> {
   AppUpdates({
     http.Client? client,
     Future<String> Function()? readVersion,
@@ -163,7 +176,25 @@ class AppUpdates extends ChangeNotifier {
        downloadDirectory = downloadDirectory ?? appUpdateDirectory,
        installationDirectory = installationDirectory ?? installedAppDirectory,
        launchInstaller = launchInstaller ?? startAppInstaller,
-       closeApplication = closeApplication ?? (() => exit(0));
+       closeApplication = closeApplication ?? (() => exit(0)),
+       super(const AppUpdateState()) {
+    on<AppUpdateStatePublished>(
+      (event, emit) => event.runAndComplete(() => emit(event.state)),
+    );
+    on<AppUpdateInitialized>((event, _) => handleRequest(event, _initialize));
+    on<AppUpdateChecked>((event, _) => handleRequest(event, _check));
+    on<AppUpdateDownloaded>((event, _) => handleRequest(event, _download));
+    on<AppUpdateInstalled>(
+      (event, _) =>
+          handleRequest(event, () => _install(prepare: event.prepare)),
+    );
+  }
+  Future<void> initialize() => sendRequest(AppUpdateInitialized());
+  Future<void> check() => sendRequest(AppUpdateChecked());
+  Future<void> download() => sendRequest(AppUpdateDownloaded());
+  Future<void> install({required Future<void> Function() prepare}) =>
+      sendRequest(AppUpdateInstalled(prepare));
+
   final Future<Directory?> Function() installationDirectory;
   final Future<void> Function(File, List<String>) launchInstaller;
   final void Function() closeApplication;
@@ -182,7 +213,7 @@ class AppUpdates extends ChangeNotifier {
   AppUpdateStatus status = AppUpdateStatus.idle;
   bool _disposed = false;
 
-  Future<void> initialize() async {
+  Future<void> _initialize() async {
     try {
       final value = await readVersion();
       if (AppVersion.parse(value) == null) {
@@ -195,7 +226,7 @@ class AppUpdates extends ChangeNotifier {
     _notify();
   }
 
-  Future<void> check() async {
+  Future<void> _check() async {
     if (_disposed ||
         downloading ||
         installing ||
@@ -209,7 +240,7 @@ class AppUpdates extends ChangeNotifier {
     release = null;
     _notify();
     try {
-      if (installed.isEmpty) await initialize();
+      if (installed.isEmpty) await _initialize();
       final current = AppVersion.parse(installed);
       if (current == null) {
         throw const FormatException('Нет установленной версии');
@@ -249,7 +280,7 @@ class AppUpdates extends ChangeNotifier {
     _notify();
   }
 
-  Future<void> download() async {
+  Future<void> _download() async {
     final target = package;
     if (_disposed ||
         downloading ||
@@ -375,7 +406,7 @@ class AppUpdates extends ChangeNotifier {
     throw const FormatException('Слишком много перенаправлений');
   }
 
-  Future<void> install({required Future<void> Function() prepare}) async {
+  Future<void> _install({required Future<void> Function() prepare}) async {
     final file = downloadedPackage, target = package;
     if (_disposed ||
         installing ||
@@ -421,14 +452,22 @@ class AppUpdates extends ChangeNotifier {
   }
 
   void _notify() {
-    if (!_disposed) notifyListeners();
+    if (!_disposed) publishState();
+  }
+
+  void publishState() {
+    if (!_disposed && !isClosed) {
+      publishStateEvent(
+        AppUpdateStatePublished(AppUpdateState.fromController(this)),
+      );
+    }
   }
 
   @override
-  void dispose() {
+  Future<void> close() async {
     _disposed = true;
     client.close();
-    super.dispose();
+    await super.close();
   }
 }
 

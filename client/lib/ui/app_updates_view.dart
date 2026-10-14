@@ -1,3 +1,5 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -54,15 +56,15 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
   }
 
   @override
-  Widget build(BuildContext context) => ListenableBuilder(
-    listenable: updates,
-    builder: (context, _) {
-      final message = switch (updates.status) {
+  Widget build(BuildContext context) => BlocBuilder<AppUpdates, AppUpdateState>(
+    bloc: updates,
+    builder: (context, view) {
+      final message = switch (view.status) {
         AppUpdateStatus.idle => '',
         AppUpdateStatus.checking => context.strings.updatesChecking,
         AppUpdateStatus.current => context.strings.updatesCurrent,
         AppUpdateStatus.available => context.strings.updatesAvailable(
-          updates.release!.tag,
+          view.release!.tag,
         ),
         AppUpdateStatus.empty => context.strings.updatesEmpty,
         AppUpdateStatus.failed => context.strings.updatesFailed,
@@ -86,34 +88,34 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
                     OutlinedButton.icon(
                       key: const ValueKey('check-app-updates'),
                       onPressed:
-                          updates.downloading ||
-                              updates.installing ||
-                              updates.status == AppUpdateStatus.checking
+                          view.downloading ||
+                              view.installing ||
+                              view.status == AppUpdateStatus.checking
                           ? null
                           : updates.check,
                       icon: const Icon(Icons.refresh),
                       label: Text(context.strings.updatesCheck),
                     ),
-                    if (updates.status == AppUpdateStatus.available &&
-                        updates.package != null)
+                    if (view.status == AppUpdateStatus.available &&
+                        view.package != null)
                       FilledButton.icon(
                         key: const ValueKey('download-app-update'),
                         onPressed:
-                            updates.downloading ||
-                                updates.installing ||
-                                updates.downloadedPackage != null
+                            view.downloading ||
+                                view.installing ||
+                                view.downloadedPackage != null
                             ? null
                             : updates.download,
                         icon: const Icon(Icons.download_outlined),
                         label: Text(context.strings.updatesDownload),
                       ),
-                    if (updates.downloadedPackage != null &&
+                    if (view.downloadedPackage != null &&
                         installedCopy &&
                         widget.prepareInstall != null &&
                         updates.platform == 'windows-x64')
                       FilledButton.icon(
                         key: const ValueKey('install-app-update'),
-                        onPressed: updates.installing
+                        onPressed: view.installing
                             ? null
                             : () => updates.install(
                                 prepare: widget.prepareInstall!,
@@ -121,7 +123,7 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
                         icon: const Icon(Icons.restart_alt),
                         label: Text(context.strings.updatesInstall),
                       ),
-                    if (updates.status == AppUpdateStatus.available)
+                    if (view.status == AppUpdateStatus.available)
                       OutlinedButton.icon(
                         onPressed: openRelease,
                         icon: const Icon(Icons.open_in_new),
@@ -129,7 +131,7 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
                       ),
                   ],
                 ),
-                if (updates.downloading) ...[
+                if (view.downloading) ...[
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -137,30 +139,28 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
                         width: 32,
                         height: 32,
                         child: CircularProgressIndicator(
-                          value:
-                              updates.downloadedBytes / updates.package!.size,
+                          value: view.downloadedBytes / view.package!.size,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        '${(100 * updates.downloadedBytes / updates.package!.size).floor()}%',
+                        '${(100 * view.downloadedBytes / view.package!.size).floor()}%',
                       ),
                     ],
                   ),
                 ],
-                if (updates.installing || updates.installFailed) ...[
+                if (view.installing || view.installFailed) ...[
                   const SizedBox(height: 16),
                   Text(
-                    updates.installFailed
+                    view.installFailed
                         ? context.strings.updatesInstallFailed
                         : context.strings.updatesPreparing,
                   ),
                 ],
-                if (updates.downloadFailed ||
-                    updates.downloadedPackage != null) ...[
+                if (view.downloadFailed || view.downloadedPackage != null) ...[
                   const SizedBox(height: 16),
                   Text(
-                    updates.downloadFailed
+                    view.downloadFailed
                         ? context.strings.updatesDownloadFailed
                         : context.strings.updatesDownloaded,
                   ),
@@ -169,26 +169,26 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
                   const SizedBox(height: 16),
                   Text(message, key: const ValueKey('app-update-status')),
                 ],
-                if (updates.status == AppUpdateStatus.available) ...[
+                if (view.status == AppUpdateStatus.available) ...[
                   const SizedBox(height: 12),
                   Text(
-                    updates.package == null
+                    view.package == null
                         ? context.strings.updatesPackageUnavailable
                         : context.strings.updatesPackage(
                             updates.platform,
-                            (updates.package!.size / (1024 * 1024))
+                            (view.package!.size / (1024 * 1024))
                                 .toStringAsFixed(1),
                           ),
                   ),
                 ],
-                if (updates.release?.notes.isNotEmpty == true)
+                if (view.release?.notes.isNotEmpty == true)
                   ExpansionTile(
                     tilePadding: EdgeInsets.zero,
                     title: Text(context.strings.updatesChanges),
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16),
-                        child: SelectableText(updates.release!.notes),
+                        child: SelectableText(view.release!.notes),
                       ),
                     ],
                   ),
@@ -197,9 +197,9 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
           ),
           const SizedBox(height: 20),
           Text(
-            updates.installed.isEmpty
+            view.installed.isEmpty
                 ? context.strings.updatesUnknownVersion
-                : context.strings.updatesInstalled(updates.installed),
+                : context.strings.updatesInstalled(view.installed),
             key: const ValueKey('installed-app-version'),
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(

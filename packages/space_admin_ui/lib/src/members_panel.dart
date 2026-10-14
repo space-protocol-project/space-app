@@ -1,3 +1,9 @@
+import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'admin_operations.dart';
+
 import 'package:flutter/material.dart';
 import 'package:space_api/space_api.dart';
 
@@ -24,13 +30,14 @@ class MembersPanel extends StatefulWidget {
 }
 
 class _MembersPanelState extends State<MembersPanel> {
+  final operations = AdminOperations();
+  bool get busy => operations.state.busy;
   AdminLocalizations get strings =>
       AdminLocalizations.of(context) ??
       lookupAdminLocalizations(const Locale('ru'));
   final members = <Map<String, dynamic>>[];
   final drafts = <String, Map<String, dynamic>>{};
   final search = TextEditingController();
-  bool busy = false;
   String cursor = '', status = '';
   String? editing, statusKey;
   String get localizedStatus => switch (statusKey) {
@@ -50,15 +57,17 @@ class _MembersPanelState extends State<MembersPanel> {
   @override
   void dispose() {
     search.dispose();
+    unawaited(operations.close());
     super.dispose();
   }
 
   Future<void> run(Future<void> Function() action) async {
-    if (busy) return;
-    setState(() => busy = true);
+    if (!await operations.begin()) return;
+    Object? failure;
     try {
       await action();
     } catch (e) {
+      failure = e;
       statusKey = e is SpaceApiError && e.status == 409
           ? 'membersConflict'
           : null;
@@ -69,7 +78,7 @@ class _MembersPanelState extends State<MembersPanel> {
         cursor = '';
       }
     } finally {
-      if (mounted) setState(() => busy = false);
+      if (mounted) operations.finish(error: failure);
     }
   }
 
@@ -212,7 +221,13 @@ class _MembersPanelState extends State<MembersPanel> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      BlocBuilder<AdminOperations, AdminOperationState>(
+        bloc: operations,
+        builder: (context, state) => _build(context),
+      );
+
+  Widget _build(BuildContext context) {
     final query = search.text.trim().toLowerCase();
     final filtered = members
         .where(

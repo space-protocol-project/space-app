@@ -39,7 +39,7 @@ class _Controller extends ChatController {
     );
     fingerprint = 'b' * 64;
     invitationRole = 'reader';
-    notifyListeners();
+    publishState();
   }
 
   @override
@@ -49,7 +49,7 @@ class _Controller extends ChatController {
     String setupCode = '',
   }) async {
     connected = true;
-    notifyListeners();
+    publishState();
   }
 }
 
@@ -112,7 +112,9 @@ void main() {
   testWidgets('Смена языка сохраняет черновик чата и переводит отправку', (
     tester,
   ) async {
-    final controller = _Controller()..connected = true;
+    final controller = _Controller()
+      ..connected = true
+      ..publishState();
     addTearDown(controller.dispose);
     for (final locale in [
       const Locale('ru'),

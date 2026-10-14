@@ -143,11 +143,11 @@ void main() {
       final c = await connected(session, positions);
       expect(c.unreadCount('general'), 5);
       expect(c.unreadCount('team'), 3);
-      c.markRead('m-3');
+      await c.markRead('m-3');
       expect(c.unreadCount('general'), 2);
       expect(c.readSequence('general'), 3);
-      c.markRead('m-2');
-      c.markRead('unknown');
+      await c.markRead('m-2');
+      await c.markRead('unknown');
       expect(c.readSequence('general'), 3);
       await c.disconnect();
       c.dispose();

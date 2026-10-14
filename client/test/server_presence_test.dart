@@ -29,7 +29,7 @@ void main() {
         18,
         (index) => 'https://server$index.example',
       );
-      monitor.watch(origins);
+      await monitor.watch(origins);
       await finished.future;
       await Future<void>.delayed(Duration.zero);
       expect(visited, origins.toSet());
@@ -93,7 +93,7 @@ void main() {
       final changes = <ServerPresenceChange>[];
       final subscription = monitor.changes.listen(changes.add);
       addTearDown(subscription.cancel);
-      monitor.watch(['https://server.example']);
+      await monitor.watch(['https://server.example']);
       await Future<void>.delayed(Duration.zero);
       expect(monitor.online('https://server.example'), true);
       expect(changes, isEmpty);
@@ -116,7 +116,7 @@ void main() {
       available = null;
       await monitor.check();
       expect(monitor.online('https://server.example'), isNull);
-      monitor.watch([]);
+      await monitor.watch([]);
       expect(monitor.online('https://server.example'), isNull);
     },
   );
@@ -133,10 +133,10 @@ void main() {
         },
       );
       addTearDown(monitor.dispose);
-      monitor.watch(['https://server.example']);
+      await monitor.watch(['https://server.example']);
       await monitor.check();
       expect(probes, 1);
-      monitor.watch([]);
+      await monitor.watch([]);
       pending.complete(true);
       await Future<void>.delayed(Duration.zero);
       expect(monitor.online('https://server.example'), isNull);

@@ -20,7 +20,7 @@ class TestController extends ChatController {
   bool get canWrite => connected && !readOnly;
   void server(Discovery value) {
     preview = value;
-    notifyListeners();
+    publishState();
   }
 }
 

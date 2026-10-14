@@ -1,3 +1,5 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../l10n/strings.dart';
 
 import 'package:flutter/material.dart';
@@ -133,7 +135,13 @@ class SettingsPanel extends StatelessWidget {
   final Future<void> Function()? prepareInstall;
   final AppPreferences preferences;
   @override
-  Widget build(BuildContext context) => PageBody(
+  Widget build(BuildContext context) =>
+      BlocBuilder<AppPreferences, PreferencesState>(
+        bloc: preferences,
+        builder: (context, state) => _build(context, state),
+      );
+
+  Widget _build(BuildContext context, PreferencesState state) => PageBody(
     title: context.strings.settingsTitle,
     description: context.strings.settingsDescription,
     children: [
@@ -144,7 +152,7 @@ class SettingsPanel extends StatelessWidget {
             DropdownButtonFormField<String>(
               key: const ValueKey('app-language'),
               isExpanded: true,
-              initialValue: preferences.language,
+              initialValue: state.language,
               decoration: InputDecoration(labelText: context.strings.language),
               items: const [
                 DropdownMenuItem(value: 'ru', child: Text('Русский')),
@@ -163,14 +171,14 @@ class SettingsPanel extends StatelessWidget {
               contentPadding: EdgeInsets.zero,
               title: Text(context.strings.darkTheme),
               subtitle: Text(context.strings.themeDescription),
-              value: preferences.dark,
+              value: state.dark,
               onChanged: (value) => preferences.change(dark: value),
             ),
             const Divider(),
             DropdownButtonFormField<String>(
-              key: ValueKey('send-shortcut-${preferences.sendShortcut}'),
+              key: ValueKey('send-shortcut-${state.sendShortcut}'),
               isExpanded: true,
-              initialValue: preferences.sendShortcut,
+              initialValue: state.sendShortcut,
               decoration: InputDecoration(
                 labelText: context.strings.sendShortcutTitle,
               ),
@@ -200,7 +208,7 @@ class SettingsPanel extends StatelessWidget {
                 }.entries)
                   ChoiceChip(
                     label: Text(entry.value),
-                    selected: preferences.palette == entry.key,
+                    selected: state.palette == entry.key,
                     onSelected: (_) => preferences.change(palette: entry.key),
                   ),
               ],
@@ -208,10 +216,10 @@ class SettingsPanel extends StatelessWidget {
           ],
         ),
       ),
-      if (preferences.error.isNotEmpty) ...[
+      if (state.error.isNotEmpty) ...[
         const SizedBox(height: 16),
         Text(
-          preferences.error,
+          state.error,
           style: TextStyle(color: Theme.of(context).colorScheme.error),
         ),
       ],

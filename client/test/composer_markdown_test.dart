@@ -45,6 +45,9 @@ void main() {
       if (shift) await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       if (shift) await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.runAsync(() async {
+        await Future<void>.delayed(Duration.zero);
+      });
       await tester.pumpAndSettle();
       expect(c.messages.single.text, 'Сообщение');
       expect(tester.widget<TextField>(field).controller!.text, isEmpty);
