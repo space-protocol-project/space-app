@@ -52,6 +52,9 @@ Future<void> checkMemberBlocking(
   SpaceSession owner,
   SpaceSession friend,
 ) async {
+  final updates = StreamIterator(
+    friend.subscribe((await friend.events('')).nextCursor),
+  );
   Future<void> setBlocked(bool blocked) async {
     final response = await owner.adminRequest('/api/v1/space/members');
     final member = (response['members'] as List).cast<Map>().firstWhere(
@@ -68,8 +71,14 @@ Future<void> checkMemberBlocking(
     );
   }
 
+  if (!await updates.moveNext().timeout(const Duration(seconds: 10))) {
+    throw StateError('Нет начального кадра подписки участника');
+  }
   await setBlocked(true);
   try {
+    await expectAccessDenied(() async {
+      await updates.moveNext().timeout(const Duration(seconds: 10));
+    }, 'уже открытая подписка заблокированного участника');
     await expectAccessDenied(() async {
       await friend.messages();
     }, 'чтение заблокированным участником');
@@ -77,6 +86,7 @@ Future<void> checkMemberBlocking(
       await friend.send('Запрещённая запись', 'blocked-home-drill');
     }, 'запись заблокированным участником');
   } finally {
+    await updates.cancel();
     await setBlocked(false);
   }
   await friend.messages();
@@ -161,6 +171,9 @@ Future<void> main(List<String> args) async {
           ownerVault,
           setupCode: state['setup_code'] as String,
         );
+        if (discovery.connectOrigin != null && !owner.channel.usesConnect) {
+          throw StateError('Домашний владелец не перешёл на Connect');
+        }
         if (owner.role != 'owner' || !owner.canManageSpace) {
           throw StateError('Не назначен владелец');
         }
@@ -172,6 +185,9 @@ Future<void> main(List<String> args) async {
           grpcHost: '127.0.0.1',
           tlsCertificate: pem,
           tlsFingerprint: fingerprint,
+          connectOrigin: discovery.connectOrigin == null
+              ? null
+              : discovery.origin,
         );
         if (attempt == 0) {
           await Future<void>.delayed(const Duration(seconds: 1));
@@ -189,13 +205,16 @@ Future<void> main(List<String> args) async {
             remote.grpcPort,
             grpcHost: remote.grpcHost,
             tlsFingerprint: '0' * 64,
+            connectOrigin: remote.connectOrigin,
           );
           try {
             await SpaceSession.previewInvitation(
               wrongCertificate,
               'iv_${'a' * 43}',
             );
-            throw StateError('gRPC принял неверный TLS-отпечаток');
+            throw StateError('RPC принял неверный TLS-отпечаток');
+          } on HandshakeException {
+            // Connect отклоняет сертификат до отправки запроса.
           } on GrpcError catch (error) {
             if (error.code != StatusCode.unavailable) rethrow;
           }
@@ -228,11 +247,34 @@ Future<void> main(List<String> args) async {
           if (preview.serverId != originalID) {
             throw StateError('Неверный сервер приглашения');
           }
+          final legacy = Discovery(
+            remote.origin,
+            remote.serverId,
+            remote.publicKey,
+            remote.grpcPort,
+            grpcHost: remote.grpcHost,
+            tlsCertificate: pem,
+            tlsFingerprint: fingerprint,
+          );
+          final legacyPreview = await SpaceSession.previewInvitation(
+            legacy,
+            invite['token'] as String,
+          );
+          if (legacyPreview.serverId != preview.serverId) {
+            throw StateError(
+              'Новый сервер несовместим с прежним gRPC-клиентом',
+            );
+          }
           friend = await SpaceSession.connect(
             remote,
             friendVault,
             invitationToken: invite['token'] as String,
           );
+          if (remote.connectOrigin != null && !friend.channel.usesConnect) {
+            throw StateError(
+              'Приглашённый участник не использует HTTPS Connect',
+            );
+          }
           messageID = (await friend.send(
             'Сохранённое сообщение домашнего сервера',
             'home-drill-message',
@@ -291,7 +333,7 @@ Future<void> main(List<String> args) async {
       }
     }
     stdout.writeln(
-      'Home: PostgreSQL, локальный владелец, публичный TLS/gRPC, приглашение, сообщение и повторный запуск проверены.',
+      'Home: PostgreSQL, локальный владелец, HTTPS Connect/прежний gRPC, pin, приглашение, ACL потока, сообщение и повторный запуск проверены.',
     );
   } finally {
     await directory.delete(recursive: true);

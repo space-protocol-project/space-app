@@ -8,7 +8,7 @@ import 'package:grpc/grpc.dart';
 import 'package:fixnum/fixnum.dart';
 
 import 'core.dart';
-import 'generated/space/v1/space.pbgrpc.dart';
+import 'rpc_clients.dart';
 
 Future<String> _digest(DeviceRecord record) async => url64(
   (await Sha256().hash(utf8.encode(jsonEncode(record.toJson())))).bytes,

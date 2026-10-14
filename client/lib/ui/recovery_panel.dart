@@ -13,7 +13,7 @@ import '../src/recovery_card.dart';
 import '../src/recovery_qr.dart';
 import '../src/pairing.dart';
 import '../src/root_rotation.dart' as rotation;
-import '../src/generated/space/v1/space.pbgrpc.dart' show AuthServiceClient;
+import '../src/rpc_clients.dart' show AuthServiceClient;
 
 import 'package:space_admin_ui/space_admin_ui.dart';
 
@@ -325,7 +325,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     if (server == null || vault is! RotationJournalVault) {
       throw RecoveryOperationError('rotationServerRequired');
     }
-    final channel = server.openChannel();
+    final channel = server.openConnection();
     try {
       final record = await rotation.finishRootRotation(
         server,

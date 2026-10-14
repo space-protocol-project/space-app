@@ -10,8 +10,9 @@ import 'package:crypto/crypto.dart' as crypto;
 import 'package:grpc/grpc.dart';
 import 'package:protobuf/protobuf.dart' show GeneratedMessage;
 
-import 'generated/space/v1/space.pbgrpc.dart';
+import 'rpc_clients.dart';
 import 'root_history.dart';
+import 'rpc_connection.dart';
 import 'root_rotation.dart' as rotation;
 
 String url64(List<int> value) => base64Url.encode(value).replaceAll('=', '');
@@ -26,10 +27,19 @@ class Discovery {
     this.tlsCertificate = '',
     this.tlsFingerprint = '',
     this.localTransport = false,
+    this.connectOrigin,
   });
   final String? grpcHost;
   final String tlsCertificate, tlsFingerprint;
   final bool localTransport;
+  final Uri? connectOrigin;
+  RpcConnection openConnection() => connectOrigin == null
+      ? RpcConnection.grpc(openChannel())
+      : RpcConnection.connect(
+          connectOrigin!,
+          tlsFingerprint,
+          dialHost: grpcHost,
+        );
   ClientChannel openChannel() => ClientChannel(
     grpcHost ?? origin.host,
     port: grpcPort,
@@ -141,6 +151,17 @@ bool certificateIsCurrent(X509Certificate certificate) {
       certificate.endValidity.isAfter(now);
 }
 
+Uri? discoveryConnectOrigin(Map<String, dynamic> data, Uri networkOrigin) {
+  if (!data.containsKey('connect_endpoint')) return null;
+  if (data['connect_endpoint'] != '/') {
+    throw const LocalFailure(
+      LocalFailureCode.protocolInvalid,
+      'Неизвестный Connect endpoint',
+    );
+  }
+  return networkOrigin;
+}
+
 Future<Discovery> discover(
   String input, {
   String tlsFingerprint = '',
@@ -235,6 +256,7 @@ Future<Discovery> discover(
       tlsCertificate: certificate?.pem ?? '',
       tlsFingerprint: homeOrigin == null ? actualFingerprint : tlsFingerprint,
       localTransport: homeOrigin != null,
+      connectOrigin: discoveryConnectOrigin(data, networkOrigin),
     );
   } finally {
     client.close(force: true);
@@ -442,7 +464,7 @@ class SpaceSession
   final Discovery server;
   DeviceRecord record;
   final IdentityVault vault;
-  final ClientChannel channel;
+  final RpcConnection channel;
   String _token = '';
   @override
   String spaceTitle = '';
@@ -803,7 +825,7 @@ class SpaceSession
         'Сначала завершите сохранённую смену ключа для этого сервера',
       );
     }
-    final setupChannel = server.openChannel();
+    final setupChannel = server.openConnection();
     bool automatic = false;
     try {
       automatic = (await AdminServiceClient(setupChannel).getSetupStatus(
@@ -845,7 +867,7 @@ class SpaceSession
       );
       await vault.save(record);
     }
-    final channel = server.openChannel();
+    final channel = server.openConnection();
     final session = SpaceSession._(server, record, vault, channel);
     try {
       final manifest = await ChannelServiceClient(channel).getManifest(
@@ -864,7 +886,7 @@ class SpaceSession
           manifest.protocolVersion != '0.1-experimental') {
         throw const LocalFailure(
           LocalFailureCode.protocolInvalid,
-          'gRPC manifest не соответствует discovery',
+          'RPC manifest не соответствует discovery',
         );
       }
       if (record.grantId.isEmpty) {
@@ -1158,7 +1180,7 @@ class SpaceSession
     Discovery server,
     String token,
   ) async {
-    final channel = server.openChannel();
+    final channel = server.openConnection();
     try {
       final result = await MembershipServiceClient(channel).previewInvite(
         PreviewInviteRequest(token: token),

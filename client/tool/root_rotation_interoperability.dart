@@ -8,7 +8,7 @@ import 'package:space_client/src/root_rotation.dart';
 import 'package:space_client/src/key_vault.dart';
 import 'package:space_client/src/recovery_card.dart';
 import 'package:space_client/src/recovery_qr.dart';
-import 'package:space_client/src/generated/space/v1/space.pbgrpc.dart';
+import 'package:space_client/src/rpc_clients.dart';
 
 class CrashStorage implements SecureKeyStorage {
   final values = <String, String>{};
