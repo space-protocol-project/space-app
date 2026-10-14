@@ -2200,6 +2200,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не удалось открыть архив или завершить перенос.'**
   String get homeTransferFailed;
+
+  /// No description provided for @glassEffects.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эффекты стекла'**
+  String get glassEffects;
+
+  /// No description provided for @glassEffectsHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Размытие плавающих панелей и заголовка.'**
+  String get glassEffectsHelp;
 }
 
 class _AppLocalizationsDelegate

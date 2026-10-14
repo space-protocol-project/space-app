@@ -3,6 +3,7 @@ part of 'preferences.dart';
 final class PreferencesState {
   const PreferencesState({
     this.dark = true,
+    this.effects = true,
     this.palette = 'gruvbox',
     this.language = 'ru',
     this.sendShortcut = 'enter',
@@ -14,6 +15,7 @@ final class PreferencesState {
   factory PreferencesState.fromController(AppPreferences controller) =>
       PreferencesState(
         dark: controller.dark,
+        effects: controller.effects,
         palette: controller.palette,
         language: controller.language,
         sendShortcut: controller.sendShortcut,
@@ -27,7 +29,7 @@ final class PreferencesState {
         ),
         theme: controller.theme,
       );
-  final bool dark;
+  final bool dark, effects;
   final String palette, language, sendShortcut, error;
   final List<String> origins;
   final Map<String, Map<String, dynamic>> serverIcons;

@@ -1204,4 +1204,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get homeTransferFailed =>
       'Could not open the archive or complete the transfer.';
+
+  @override
+  String get glassEffects => 'Glass effects';
+
+  @override
+  String get glassEffectsHelp => 'Blur floating panels and the header.';
 }

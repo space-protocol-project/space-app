@@ -174,6 +174,13 @@ class SettingsPanel extends StatelessWidget {
               value: state.dark,
               onChanged: (value) => preferences.change(dark: value),
             ),
+            SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              title: Text(context.strings.glassEffects),
+              subtitle: Text(context.strings.glassEffectsHelp),
+              value: state.effects,
+              onChanged: (value) => preferences.change(effects: value),
+            ),
             const Divider(),
             DropdownButtonFormField<String>(
               key: ValueKey('send-shortcut-${state.sendShortcut}'),

@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:space_admin_ui/space_admin_ui.dart' show validatedServerIcon;
 
 import 'event_controller.dart';
+import '../ui/space_appearance.dart';
 
 part 'preferences_events.dart';
 part 'preferences_state.dart';
@@ -24,6 +25,7 @@ class AppPreferences
           PreferencesLoaded() => _load(),
           PreferencesChanged() => _change(
             dark: event.dark,
+            effects: event.effects,
             palette: event.palette,
             language: event.language,
             sendShortcut: event.sendShortcut,
@@ -40,12 +42,14 @@ class AppPreferences
   Future<void> load() => sendRequest(PreferencesLoaded());
   Future<void> change({
     bool? dark,
+    bool? effects,
     String? palette,
     String? language,
     String? sendShortcut,
   }) => sendRequest(
     PreferencesChanged(
       dark: dark,
+      effects: effects,
       palette: palette,
       language: language,
       sendShortcut: sendShortcut,
@@ -56,7 +60,7 @@ class AppPreferences
   Future<void> cacheServerIcon(String origin, Object? value) =>
       sendRequest(ServerIconCached(origin, value));
 
-  bool dark = true;
+  bool dark = true, effects = true;
   String palette = 'gruvbox', error = '';
   String language = 'ru';
   String sendShortcut = 'enter';
@@ -86,6 +90,7 @@ class AppPreferences
       final data = await SharedPreferences.getInstance();
       if (_disposed) return;
       dark = data.getBool('space.ui.dark') ?? true;
+      effects = data.getBool('space.ui.effects') ?? true;
       final savedSend = data.getString('space.ui.sendShortcut');
       if (['enter', 'shiftEnter'].contains(savedSend)) {
         sendShortcut = savedSend!;
@@ -118,6 +123,7 @@ class AppPreferences
 
   Future<void> _change({
     bool? dark,
+    bool? effects,
     String? palette,
     String? language,
     String? sendShortcut,
@@ -130,6 +136,7 @@ class AppPreferences
       this.language = language;
     }
     if (dark != null) this.dark = dark;
+    if (effects != null) this.effects = effects;
     if (palette != null && ['gruvbox', 'ocean', 'iris'].contains(palette)) {
       this.palette = palette;
     }
@@ -154,6 +161,7 @@ class AppPreferences
   Future<void> _save() {
     final snapshot = (
       dark: dark,
+      effects: effects,
       palette: palette,
       language: language,
       sendShortcut: sendShortcut,
@@ -165,6 +173,7 @@ class AppPreferences
         final data = await SharedPreferences.getInstance();
         final results = await Future.wait([
           data.setBool('space.ui.dark', snapshot.dark),
+          data.setBool('space.ui.effects', snapshot.effects),
           data.setString('space.ui.palette', snapshot.palette),
           data.setString('space.ui.language', snapshot.language),
           data.setString('space.ui.sendShortcut', snapshot.sendShortcut),
@@ -289,31 +298,37 @@ class AppPreferences
         contentPadding: const EdgeInsets.all(16),
       ),
     );
-    return theme.copyWith(
-      textTheme: theme.textTheme.copyWith(
-        displayLarge: theme.textTheme.displayLarge?.copyWith(
-          fontFamily: 'Nunito',
-        ),
-        displayMedium: theme.textTheme.displayMedium?.copyWith(
-          fontFamily: 'Nunito',
-        ),
-        displaySmall: theme.textTheme.displaySmall?.copyWith(
-          fontFamily: 'Nunito',
-        ),
-        headlineLarge: theme.textTheme.headlineLarge?.copyWith(
-          fontFamily: 'Nunito',
-        ),
-        headlineMedium: theme.textTheme.headlineMedium?.copyWith(
-          fontFamily: 'Nunito',
-        ),
-        headlineSmall: theme.textTheme.headlineSmall?.copyWith(
-          fontFamily: 'Nunito',
-        ),
-        titleLarge: theme.textTheme.titleLarge?.copyWith(fontFamily: 'Nunito'),
-        titleMedium: theme.textTheme.titleMedium?.copyWith(
-          fontFamily: 'Nunito',
+    return quietSpaceTheme(
+      theme.copyWith(
+        textTheme: theme.textTheme.copyWith(
+          displayLarge: theme.textTheme.displayLarge?.copyWith(
+            fontFamily: 'Nunito',
+          ),
+          displayMedium: theme.textTheme.displayMedium?.copyWith(
+            fontFamily: 'Nunito',
+          ),
+          displaySmall: theme.textTheme.displaySmall?.copyWith(
+            fontFamily: 'Nunito',
+          ),
+          headlineLarge: theme.textTheme.headlineLarge?.copyWith(
+            fontFamily: 'Nunito',
+          ),
+          headlineMedium: theme.textTheme.headlineMedium?.copyWith(
+            fontFamily: 'Nunito',
+          ),
+          headlineSmall: theme.textTheme.headlineSmall?.copyWith(
+            fontFamily: 'Nunito',
+          ),
+          titleLarge: theme.textTheme.titleLarge?.copyWith(
+            fontFamily: 'Nunito',
+          ),
+          titleMedium: theme.textTheme.titleMedium?.copyWith(
+            fontFamily: 'Nunito',
+          ),
         ),
       ),
+      palette: palette,
+      effects: effects,
     );
   }
 

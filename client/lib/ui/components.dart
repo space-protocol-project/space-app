@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+
+import 'space_appearance.dart';
+import 'space_frame.dart';
+
 import 'package:space_admin_ui/space_admin_ui.dart'
     show spaceControls, SpacedControl;
 export 'package:space_admin_ui/space_admin_ui.dart' show spaceControls;
 
-const areaRadius = 20.0;
+const areaRadius = SpaceAppearance.radius;
 
 class RegionFrame extends StatelessWidget {
   const RegionFrame({super.key, required this.child});
@@ -47,7 +51,7 @@ class _SurfaceCardState extends State<SurfaceCard> {
     final colors = Theme.of(context).colorScheme;
     if (!widget.hoverBorder) {
       return Material(
-        color: widget.color ?? colors.surface,
+        color: widget.color ?? SpaceAppearance.of(context).surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(areaRadius),
           side: BorderSide(color: colors.outlineVariant),
@@ -64,7 +68,7 @@ class _SurfaceCardState extends State<SurfaceCard> {
           : const Duration(milliseconds: 220),
       curve: Curves.easeOutCubic,
       decoration: BoxDecoration(
-        color: widget.color ?? colors.surface,
+        color: widget.color ?? SpaceAppearance.of(context).surface,
         borderRadius: BorderRadius.circular(areaRadius),
         border: Border.all(
           color: hovered
@@ -100,7 +104,13 @@ class PageBody extends StatelessWidget {
   final List<Widget> children;
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
-    padding: const EdgeInsets.all(24),
+    primary: false,
+    padding: EdgeInsets.fromLTRB(
+      24,
+      24 + SpaceContentInsets.topOf(context),
+      24,
+      24,
+    ),
     child: Align(
       alignment: Alignment.topCenter,
       child: ConstrainedBox(

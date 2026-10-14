@@ -1210,4 +1210,10 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get homeTransferFailed =>
       'Не удалось открыть архив или завершить перенос.';
+
+  @override
+  String get glassEffects => 'Эффекты стекла';
+
+  @override
+  String get glassEffectsHelp => 'Размытие плавающих панелей и заголовка.';
 }

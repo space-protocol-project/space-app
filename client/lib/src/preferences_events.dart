@@ -9,11 +9,12 @@ final class PreferencesLoaded extends PreferencesCommand<void> {}
 final class PreferencesChanged extends PreferencesCommand<void> {
   PreferencesChanged({
     this.dark,
+    this.effects,
     this.palette,
     this.language,
     this.sendShortcut,
   });
-  final bool? dark;
+  final bool? dark, effects;
   final String? palette, language, sendShortcut;
 }
 

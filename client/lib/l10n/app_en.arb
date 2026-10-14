@@ -469,5 +469,7 @@
   "homeExported": "Space exported",
   "homeImported": "Space imported. You can now start the server.",
   "homeTransferring": "Transferring space",
-  "homeTransferFailed": "Could not open the archive or complete the transfer."
+  "homeTransferFailed": "Could not open the archive or complete the transfer.",
+  "glassEffects": "Glass effects",
+  "glassEffectsHelp": "Blur floating panels and the header."
 }

@@ -1101,6 +1101,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeTransferFailed => '无法打开存档或完成迁移。';
+
+  @override
+  String get glassEffects => '玻璃效果';
+
+  @override
+  String get glassEffectsHelp => '模糊浮动面板和标题。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1160,4 +1166,10 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get homeTransferFailed => '无法打开存档或完成迁移。';
+
+  @override
+  String get glassEffects => '玻璃效果';
+
+  @override
+  String get glassEffectsHelp => '模糊浮动面板和标题。';
 }
