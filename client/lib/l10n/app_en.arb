@@ -377,7 +377,7 @@
   "setupNext": "Next",
   "setupOwnerRequired": "Could not connect as owner. Open Go live and check the server status.",
   "setupUpdateRequired": "Update the home server before configuring its icon.",
-  "myDevice": "My device",
+  "myDevice": "Device",
   "myDeviceDescription": "Identities and keys on this device.",
   "myDeviceStorage": "Keys are in protected device storage.",
   "myDeviceAccessHelp": "Select an identity for QR, recovery and pairing.",

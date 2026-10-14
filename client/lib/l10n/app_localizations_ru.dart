@@ -987,7 +987,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Для настройки иконки сначала обновите домашний сервер.';
 
   @override
-  String get myDevice => 'Моё устройство';
+  String get myDevice => 'Устройство';
 
   @override
   String get myDeviceDescription => 'Идентичности и ключи этого устройства.';

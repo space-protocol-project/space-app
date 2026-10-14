@@ -377,7 +377,7 @@
   "setupNext": "下一步",
   "setupOwnerRequired": "无法以所有者身份连接。请打开上线并检查服务器状态。",
   "setupUpdateRequired": "请先更新家庭服务器，然后设置图标。",
-  "myDevice": "我的设备",
+  "myDevice": "设备",
   "myDeviceDescription": "此设备上的身份和密钥。",
   "myDeviceStorage": "密钥保存在设备安全存储中。",
   "myDeviceAccessHelp": "选择身份以使用二维码、恢复和配对。",

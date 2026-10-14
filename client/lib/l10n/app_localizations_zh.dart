@@ -889,7 +889,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get setupUpdateRequired => '请先更新家庭服务器，然后设置图标。';
 
   @override
-  String get myDevice => '我的设备';
+  String get myDevice => '设备';
 
   @override
   String get myDeviceDescription => '此设备上的身份和密钥。';

@@ -982,7 +982,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Update the home server before configuring its icon.';
 
   @override
-  String get myDevice => 'My device';
+  String get myDevice => 'Device';
 
   @override
   String get myDeviceDescription => 'Identities and keys on this device.';

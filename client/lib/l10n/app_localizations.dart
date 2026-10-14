@@ -1790,7 +1790,7 @@ abstract class AppLocalizations {
   /// No description provided for @myDevice.
   ///
   /// In ru, this message translates to:
-  /// **'Моё устройство'**
+  /// **'Устройство'**
   String get myDevice;
 
   /// No description provided for @myDeviceDescription.
