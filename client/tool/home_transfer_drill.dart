@@ -145,11 +145,13 @@ Future<Map<String, dynamic>> seedSpace(
     }
     await owner.close();
     owner = await SpaceSession.connect(space.discovery, ownerVault);
+    final recovery = await owner.recoveryPayload();
+    await owner.prepareRotation();
     return {
       'message': message.id,
       'owner': owner.principalId,
       'member': member.principalId,
-      'recovery': await owner.recoveryPayload(),
+      'recovery': recovery,
     };
   } finally {
     await member?.close();
@@ -203,6 +205,23 @@ Future<void> verifySpace(
             .connectionAddress !=
         'https://203.0.113.11:8443') {
       throw StateError('Новый адрес не сохранён');
+    }
+    final channel = remote.openConnection();
+    try {
+      final next = await finishRootRotation(
+        remote,
+        ownerVault,
+        AuthServiceClient(channel),
+      );
+      if (next == null ||
+          (await next.identity()).epoch != 3 ||
+          next.connectionAddress != remote.endpoint.toString()) {
+        throw StateError(
+          'Подготовленная ротация не продолжилась после переноса',
+        );
+      }
+    } finally {
+      await channel.shutdown();
     }
   } finally {
     await restored?.close();

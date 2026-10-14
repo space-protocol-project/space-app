@@ -334,7 +334,7 @@ class DeviceRecord {
           .toList(),
     );
     _requireDeviceSecrets(record);
-    localOrigin(record.connectionAddress);
+    if (record.endpoint.isNotEmpty) localOrigin(record.endpoint);
     return record;
   }
 }

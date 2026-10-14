@@ -11,9 +11,12 @@ import 'core.dart';
 import 'root_history.dart';
 import 'rpc_clients.dart';
 
-Future<String> _digest(DeviceRecord record) async => url64(
-  (await Sha256().hash(utf8.encode(jsonEncode(record.toJson())))).bytes,
-);
+Future<String> _digest(DeviceRecord record) async {
+  // Смена маршрута не меняет ключи и не отменяет подготовленную ротацию.
+  final identity = record.toJson()..remove('endpoint');
+  return url64((await Sha256().hash(utf8.encode(jsonEncode(identity)))).bytes);
+}
+
 List<int> _decode(String value) => base64Url.decode(base64Url.normalize(value));
 
 // До вызова commit серверу журнал должен быть записан и прочитан обратно.
@@ -146,6 +149,7 @@ Future<DeviceRecord?> finishRootRotation(
   }
   final next = DeviceRecord.fromJson(pending['next'] as Map<String, dynamic>);
   checkTrust(server, next);
+  next.endpoint = server.endpoint.toString();
   final identity = await next.identity();
   if (next.rootHistory.isEmpty || next.rootSeed.length != 32) {
     throw const LocalFailure(

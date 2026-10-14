@@ -7,6 +7,24 @@ import 'package:space_client/src/origin_binding.dart';
 
 void main() {
   test(
+    'Служебный слот vault не требует URL, но сетевой endpoint проверяется',
+    () {
+      final record = DeviceRecord(
+        origin: 'space-vault-drill:test',
+        serverId: 'srv_${'1' * 32}',
+        serverKey: url64(List.filled(32, 1)),
+        rootSeed: List.filled(32, 2),
+        deviceSeed: List.filled(32, 3),
+      );
+      expect(DeviceRecord.fromJson(record.toJson()).origin, record.origin);
+      record.endpoint = 'space-vault-drill:test';
+      expect(
+        () => DeviceRecord.fromJson(record.toJson()),
+        throwsA(isA<Exception>()),
+      );
+    },
+  );
+  test(
     'Смена адреса сохраняет идентичность только с подписью и прежним TLS',
     () async {
       final algorithm = Ed25519();
