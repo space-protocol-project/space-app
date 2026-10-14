@@ -121,7 +121,7 @@ function render() {
     { home: "Обзор", settings: "Управление", saved: "Сохранённое" }[view] ||
     channel;
   $("#info").hidden = true;
-  $(".sidebar").classList.remove("open");
+  setMobileMenu(false);
   if (view === "chat") renderChat();
   else if (view === "settings") renderSettings();
   else if (view === "saved")
@@ -252,10 +252,12 @@ const actions = {
     if (view === "settings") render();
   },
   info() {
+    setMobileMenu(false);
     $("#info").hidden = !$("#info").hidden;
   },
+  "menu-close"() { setMobileMenu(false); },
   menu() {
-    $(".sidebar").classList.toggle("open");
+    setMobileMenu(!$(".sidebar").classList.contains("open"));
   },
   close() {
     $("#modal").close();
@@ -386,7 +388,7 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.key === "Escape") {
     $("#info").hidden = true;
-    $(".sidebar").classList.remove("open");
+    setMobileMenu(false);
   }
 });
 applyTheme();
@@ -450,4 +452,41 @@ function bindFavoritePreviews() {
 }
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') $('.favorite-preview')?.remove();
+});
+
+function setMobileMenu(open) {
+  const compact = matchMedia('(max-width: 720px)').matches;
+  const showing = open && compact;
+  $('.sidebar').classList.toggle('open', showing);
+  document.body.classList.toggle('menu-open', showing);
+  $('.mobile-menu').setAttribute('aria-expanded', String(showing));
+  $('main').inert = showing;
+  $('.sidebar').inert = compact && !showing;
+  if (showing) $('.mobile-tools button').focus();
+  else if ($('.sidebar').contains(document.activeElement) && compact) $('.mobile-menu').focus();
+}
+matchMedia('(max-width: 720px)').addEventListener('change', () => setMobileMenu(false));
+let menuTouch;
+document.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1 || !matchMedia('(max-width: 720px)').matches || $('#modal').open) return;
+  const t = e.touches[0];
+  const open = $('.sidebar').classList.contains('open');
+  menuTouch = (open || t.clientX < 24) ? {x:t.clientX, y:t.clientY, open} : null;
+}, {passive:true});
+document.addEventListener('touchend', e => {
+  if (!menuTouch) return;
+  const t = e.changedTouches[0], dx=t.clientX-menuTouch.x, dy=t.clientY-menuTouch.y;
+  if (Math.abs(dx)>70 && Math.abs(dx)>Math.abs(dy)*1.5) {
+    if (!menuTouch.open && dx>0) setMobileMenu(true);
+    if (menuTouch.open && dx<0) setMobileMenu(false);
+  }
+  menuTouch=null;
+}, {passive:true});
+document.addEventListener('touchcancel', () => { menuTouch=null; }, {passive:true});
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Tab' || !document.body.classList.contains('menu-open') || $('#modal').open) return;
+  const buttons = [...$('.sidebar').querySelectorAll('button')].filter(b => b.getClientRects().length && !b.disabled);
+  const first=buttons[0], last=buttons[buttons.length-1];
+  if (e.shiftKey && document.activeElement===first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement===last) { e.preventDefault(); first.focus(); }
 });

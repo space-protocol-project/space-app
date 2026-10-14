@@ -35,8 +35,11 @@
           <div class="avatar me">В</div>
         </div>
       </nav>
+      <button class="mobile-backdrop" data-action="menu-close" aria-label="Закрыть меню"></button>
       <div class="sidebar-viewport">
-      <aside class="sidebar">
+      <aside class="sidebar" id="navigation">
+        <div class="mobile-tools"><img src="assets/logo.png" alt="Space"><strong>Space</strong><button data-action="menu-close" title="Закрыть меню" data-icon="close"></button></div>
+        <button class="nav-row mobile-only" data-action="add"><span data-icon="plus"></span>Добавить пространство</button>
         <div class="space-heading">
           <div>
             <strong>Моё пространство</strong><small><i></i> Здесь свои</small>
@@ -73,6 +76,7 @@
           <strong>Можно быть собой.</strong>
           <p>Место для разговоров,<br />идей и маленьких открытий.</p>
         </div>
+        <button class="nav-row mobile-only" data-action="theme"><span data-icon="sun"></span>Сменить тему</button>
         <div class="profile">
           <div class="avatar me">В</div>
           <div><strong>Виталий</strong><small>Личное пространство</small></div>
@@ -83,7 +87,7 @@
       <main>
         <header>
           <button
-            class="mobile-menu"
+            class="mobile-menu" aria-controls="navigation" aria-expanded="false"
             data-action="menu"
             title="Открыть меню"
             data-icon="menu"
