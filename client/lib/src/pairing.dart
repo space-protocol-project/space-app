@@ -3,18 +3,15 @@ import 'local_failure.dart';
 import 'dart:convert';
 
 import 'package:cryptography/cryptography.dart';
-import 'package:grpc/grpc.dart';
+
+import 'rpc_connection.dart';
 
 import 'core.dart';
 import 'root_history.dart';
-import 'generated/space/v1/space.pbgrpc.dart';
+import 'rpc_clients.dart';
 
-ClientChannel _channel(Discovery server) => ClientChannel(
-  server.origin.host,
-  port: server.grpcPort,
-  options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
-);
-final _deadline = CallOptions(timeout: const Duration(seconds: 10));
+RpcConnection _channel(Discovery server) => server.openConnection();
+final _deadline = RpcOptions(timeout: const Duration(seconds: 10));
 Future<Pairing> inspectPairing(Discovery server, String code) async {
   final channel = _channel(server);
   try {
@@ -32,7 +29,7 @@ class PendingPairing {
   final Discovery server;
   final List<int> seed;
   final CreatePairingResponse request;
-  final ClientChannel channel;
+  final RpcConnection channel;
   bool claimed = false;
   List<int>? proposedRoot;
   static Future<PendingPairing> start(

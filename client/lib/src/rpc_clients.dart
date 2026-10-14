@@ -1,4 +1,4 @@
-import 'package:grpc/grpc.dart' show CallOptions;
+export 'rpc_connection.dart' show RpcOptions;
 
 import 'rpc_connection.dart';
 import 'generated/space/v1/space.pb.dart';
@@ -10,7 +10,7 @@ class ChannelServiceClient {
   final RpcConnection connection;
   RpcStream<WatchChannelsResponse> watchChannels(
     WatchChannelsRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.server(
     specs.ChannelService.watchChannels,
     request,
@@ -18,7 +18,7 @@ class ChannelServiceClient {
   );
   Future<ListChannelsResponse> listChannels(
     ListChannelsRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.ChannelService.listChannels,
     request,
@@ -26,7 +26,7 @@ class ChannelServiceClient {
   );
   Future<CreateChannelResponse> createChannel(
     CreateChannelRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.ChannelService.createChannel,
     request,
@@ -34,7 +34,7 @@ class ChannelServiceClient {
   );
   Future<UpdateChannelResponse> updateChannel(
     UpdateChannelRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.ChannelService.updateChannel,
     request,
@@ -42,7 +42,7 @@ class ChannelServiceClient {
   );
   Future<DeleteChannelResponse> deleteChannel(
     DeleteChannelRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.ChannelService.deleteChannel,
     request,
@@ -50,7 +50,7 @@ class ChannelServiceClient {
   );
   Future<GetChannelAccessResponse> getChannelAccess(
     GetChannelAccessRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.ChannelService.getChannelAccess,
     request,
@@ -58,7 +58,7 @@ class ChannelServiceClient {
   );
   Future<UpdateChannelAccessResponse> updateChannelAccess(
     UpdateChannelAccessRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.ChannelService.updateChannelAccess,
     request,
@@ -66,7 +66,7 @@ class ChannelServiceClient {
   );
   Future<GetManifestResponse> getManifest(
     GetManifestRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.ChannelService.getManifest,
     request,
@@ -79,7 +79,7 @@ class ContentServiceClient {
   final RpcConnection connection;
   Future<CreateContentResponse> createContent(
     CreateContentRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.ContentService.createContent,
     request,
@@ -87,7 +87,7 @@ class ContentServiceClient {
   );
   Future<ListContentResponse> listContent(
     ListContentRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.ContentService.listContent,
     request,
@@ -100,7 +100,7 @@ class AuthServiceClient {
   final RpcConnection connection;
   Future<CreateRootRotationResponse> createRootRotation(
     CreateRootRotationRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AuthService.createRootRotation,
     request,
@@ -108,7 +108,7 @@ class AuthServiceClient {
   );
   Future<CompleteRootRotationResponse> completeRootRotation(
     CompleteRootRotationRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AuthService.completeRootRotation,
     request,
@@ -116,7 +116,7 @@ class AuthServiceClient {
   );
   Future<ProposePairingResponse> proposePairing(
     ProposePairingRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AuthService.proposePairing,
     request,
@@ -124,7 +124,7 @@ class AuthServiceClient {
   );
   Future<CreatePairingResponse> createPairing(
     CreatePairingRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AuthService.createPairing,
     request,
@@ -132,7 +132,7 @@ class AuthServiceClient {
   );
   Future<InspectPairingResponse> inspectPairing(
     InspectPairingRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AuthService.inspectPairing,
     request,
@@ -140,7 +140,7 @@ class AuthServiceClient {
   );
   Future<PollPairingResponse> pollPairing(
     PollPairingRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AuthService.pollPairing,
     request,
@@ -148,7 +148,7 @@ class AuthServiceClient {
   );
   Future<CancelPairingResponse> cancelPairing(
     CancelPairingRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AuthService.cancelPairing,
     request,
@@ -156,7 +156,7 @@ class AuthServiceClient {
   );
   Future<ClaimPairingResponse> claimPairing(
     ClaimPairingRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AuthService.claimPairing,
     request,
@@ -164,7 +164,7 @@ class AuthServiceClient {
   );
   Future<RevokeCurrentDeviceResponse> revokeCurrentDevice(
     RevokeCurrentDeviceRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AuthService.revokeCurrentDevice,
     request,
@@ -172,19 +172,17 @@ class AuthServiceClient {
   );
   Future<ListDevicesResponse> listDevices(
     ListDevicesRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AuthService.listDevices,
     request,
     options: options,
   );
-  Future<LogoutResponse> logout(
-    LogoutRequest request, {
-    CallOptions? options,
-  }) => connection.unary(specs.AuthService.logout, request, options: options);
+  Future<LogoutResponse> logout(LogoutRequest request, {RpcOptions? options}) =>
+      connection.unary(specs.AuthService.logout, request, options: options);
   Future<CreateChallengeResponse> createChallenge(
     CreateChallengeRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AuthService.createChallenge,
     request,
@@ -192,7 +190,7 @@ class AuthServiceClient {
   );
   Future<CompleteChallengeResponse> completeChallenge(
     CompleteChallengeRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AuthService.completeChallenge,
     request,
@@ -205,12 +203,12 @@ class SyncServiceClient {
   final RpcConnection connection;
   RpcStream<SubscribeResponse> subscribe(
     SubscribeRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) =>
       connection.server(specs.SyncService.subscribe, request, options: options);
   Future<ListEventsResponse> listEvents(
     ListEventsRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) =>
       connection.unary(specs.SyncService.listEvents, request, options: options);
 }
@@ -220,7 +218,7 @@ class AdminServiceClient {
   final RpcConnection connection;
   Future<ListMembersResponse> listMembers(
     ListMembersRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AdminService.listMembers,
     request,
@@ -228,7 +226,7 @@ class AdminServiceClient {
   );
   Future<UpdateMemberResponse> updateMember(
     UpdateMemberRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AdminService.updateMember,
     request,
@@ -236,7 +234,7 @@ class AdminServiceClient {
   );
   Future<CreateInviteResponse> createInvite(
     CreateInviteRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AdminService.createInvite,
     request,
@@ -244,7 +242,7 @@ class AdminServiceClient {
   );
   Future<ListInvitesResponse> listInvites(
     ListInvitesRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AdminService.listInvites,
     request,
@@ -252,7 +250,7 @@ class AdminServiceClient {
   );
   Future<RevokeInviteResponse> revokeInvite(
     RevokeInviteRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AdminService.revokeInvite,
     request,
@@ -260,7 +258,7 @@ class AdminServiceClient {
   );
   Future<GetSetupStatusResponse> getSetupStatus(
     GetSetupStatusRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AdminService.getSetupStatus,
     request,
@@ -268,7 +266,7 @@ class AdminServiceClient {
   );
   Future<ClaimOwnerResponse> claimOwner(
     ClaimOwnerRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AdminService.claimOwner,
     request,
@@ -276,7 +274,7 @@ class AdminServiceClient {
   );
   Future<GetSettingsResponse> getSettings(
     GetSettingsRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AdminService.getSettings,
     request,
@@ -284,7 +282,7 @@ class AdminServiceClient {
   );
   Future<UpdateSettingsResponse> updateSettings(
     UpdateSettingsRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.AdminService.updateSettings,
     request,
@@ -297,7 +295,7 @@ class MembershipServiceClient {
   final RpcConnection connection;
   Future<PreviewInviteResponse> previewInvite(
     PreviewInviteRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.MembershipService.previewInvite,
     request,
@@ -305,7 +303,7 @@ class MembershipServiceClient {
   );
   Future<AcceptInviteResponse> acceptInvite(
     AcceptInviteRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.MembershipService.acceptInvite,
     request,
@@ -313,7 +311,7 @@ class MembershipServiceClient {
   );
   Future<GetMembershipResponse> getMembership(
     GetMembershipRequest request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) => connection.unary(
     specs.MembershipService.getMembership,
     request,

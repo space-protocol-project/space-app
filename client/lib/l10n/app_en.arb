@@ -457,5 +457,6 @@
   "updatesHomeStart": "Start",
   "addFavorite": "Add to favorites",
   "removeFavorite": "Remove from favorites",
-  "favoriteMessages": "Favorite messages"
+  "favoriteMessages": "Favorite messages",
+  "failureConnectRequired": "This server must support ConnectRPC. Update the home runtime or contact the space owner."
 }

@@ -171,7 +171,6 @@ void main() {
         Uri.parse('http://127.0.0.1:8080'),
         'srv_test',
         List.filled(32, 1),
-        9090,
       );
       await controller.connect();
       await controller.selectChannel('team');
@@ -203,7 +202,6 @@ void main() {
         Uri.parse('http://127.0.0.1:8080'),
         'srv_test',
         List.filled(32, 1),
-        9090,
       );
       controller.preview = discovery;
       await controller.connect();

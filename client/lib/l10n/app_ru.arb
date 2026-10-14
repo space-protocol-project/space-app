@@ -457,5 +457,6 @@
   "updatesHomeStart": "Запустить",
   "addFavorite": "Добавить в избранное",
   "removeFavorite": "Удалить из избранного",
-  "favoriteMessages": "Избранные сообщения"
+  "favoriteMessages": "Избранные сообщения",
+  "failureConnectRequired": "Нужен сервер с поддержкой ConnectRPC. Обновите домашний runtime или обратитесь к владельцу пространства."
 }

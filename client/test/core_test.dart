@@ -49,7 +49,6 @@ void main() {
       localOrigin('http://127.0.0.1:8080'),
       'srv_test',
       List.filled(32, 1),
-      9090,
     );
     final record = DeviceRecord(
       origin: server.origin.toString(),
@@ -61,14 +60,14 @@ void main() {
     checkTrust(server, record);
     expect(
       () => checkTrust(
-        Discovery(server.origin, 'srv_changed', server.publicKey, 9090),
+        Discovery(server.origin, 'srv_changed', server.publicKey),
         record,
       ),
       throwsFormatException,
     );
     expect(
       () => checkTrust(
-        Discovery(server.origin, 'srv_test', List.filled(32, 4), 9090),
+        Discovery(server.origin, 'srv_test', List.filled(32, 4)),
         record,
       ),
       throwsFormatException,
@@ -81,7 +80,6 @@ void main() {
       localOrigin('http://127.0.0.1:8080'),
       'srv_test',
       List.filled(32, 1),
-      9090,
     );
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final hash = (await Sha256().hash(root)).bytes

@@ -33,49 +33,52 @@ void main() {
     TestWidgetsFlutterBinding.ensureInitialized();
   }
   test(
-    'Публичный v0.1.0 → собранный кандидат: миграции, ключи, сертификат и сообщения',
+    'Connect runtime → новый кандидат: ключи, сертификат, сообщения и восстановление',
     () async {
       final root = await Directory.systemTemp.createTemp('space-real-upgrade-');
       final platform = (await bundledHomeRelease()).platform;
-      final old = (await legacyHomeReleases()).singleWhere(
-        (release) =>
-            release.version == 'v0.1.0' && release.platform == platform,
-      );
       final archives =
           await Directory(
                 Platform.environment['SPACE_HOME_CANDIDATE_DIRECTORY']!,
               )
               .list()
-              .where(
-                (file) => file.path.endsWith('Space-home-${old.platform}.zip'),
-              )
+              .where((file) => file.path.endsWith('Space-home-$platform.zip'))
               .toList();
       expect(archives, hasLength(1));
       final archive = File(archives.single.path);
       final metadata = jsonDecode(
         await File(
-          '${Platform.environment['SPACE_HOME_CANDIDATE_DIRECTORY']}/${old.platform}.json',
+          '${Platform.environment['SPACE_HOME_CANDIDATE_DIRECTORY']}/$platform.json',
         ).readAsString(),
       ) as Map<String, dynamic>;
       expect(
         metadata['sha256'],
         (await crypto.sha256.bind(archive.openRead()).first).toString(),
       );
-      // v0.2.0 здесь — имя локального CI-кандидата, а не опубликованный выпуск.
+      // Версии относятся только к двум локальным CI-кандидатам.
       final candidate = HomeRelease.fromJson({
         ...metadata,
-        'version': 'v0.2.0',
-        'platform': old.platform,
+        'version': 'v0.3.1',
+        'platform': platform,
         'url':
-            'https://github.com/space-protocol-project/space-server/releases/download/v0.2.0/Space-home-${old.platform}.zip',
+            'https://github.com/space-protocol-project/space-server/releases/download/v0.3.1/Space-home-$platform.zip',
         'sha256': (await crypto.sha256.bind(archive.openRead()).first)
             .toString(),
         'bytes': await archive.length(),
       });
+      final baseline = HomeRelease.fromJson({
+        ...candidate.toJson(),
+        'version': 'v0.3.0',
+        'url': candidate.url.toString().replaceFirst('v0.3.1', 'v0.3.0'),
+      });
       final vault = _Vault();
       final original = HomeController(
         directory: () async => root,
-        release: () async => old,
+        release: () async => baseline,
+        download: (_, destination, progress) async {
+          await archive.copy(destination.path);
+          progress(1);
+        },
       );
       final updated = HomeController(
         directory: () async => root,
@@ -114,7 +117,7 @@ void main() {
         expect(original.error, isEmpty);
         final stillOld = await updated.start('203.0.113.10');
         expect(stillOld, isNotNull, reason: updated.error);
-        expect(updated.installedVersion, 'v0.1.0');
+        expect(updated.installedVersion, 'v0.3.0');
         expect(await updated.prepareUpdate(), true, reason: updated.error);
         expect(updated.running, true);
         await updated.stop();
@@ -122,7 +125,7 @@ void main() {
         await updated.performUpdate();
         expect(updated.error, isEmpty);
         expect(updated.pendingUpdate, false);
-        expect(updated.installedVersion, 'v0.2.0');
+        expect(updated.installedVersion, 'v0.3.1');
         final second = await updated.start('203.0.113.11');
         expect(second, isNotNull, reason: updated.error);
         expect(second!.link, first.link);
@@ -172,7 +175,7 @@ void main() {
         expect(updated.recoveryBlocked, false);
         await updated.performUpdate(recover: true);
         expect(updated.error, isEmpty);
-        expect(updated.installedVersion, 'v0.1.0');
+        expect(updated.installedVersion, 'v0.3.0');
         expect((await journal.read())!.step, HomeUpdateStep.completeRestored);
         final restored = await updated.start('203.0.113.12');
         expect(restored, isNotNull, reason: updated.error);

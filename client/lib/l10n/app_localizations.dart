@@ -2128,6 +2128,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Избранные сообщения'**
   String get favoriteMessages;
+
+  /// No description provided for @failureConnectRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нужен сервер с поддержкой ConnectRPC. Обновите домашний runtime или обратитесь к владельцу пространства.'**
+  String get failureConnectRequired;
 }
 
 class _AppLocalizationsDelegate

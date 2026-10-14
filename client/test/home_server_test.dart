@@ -63,7 +63,6 @@ void main() {
       Uri.parse(record.origin),
       record.serverId,
       List.filled(32, 1),
-      8443,
       tlsFingerprint: 'b' * 64,
     );
     expect(() => checkTrust(changed, restored), throwsFormatException);

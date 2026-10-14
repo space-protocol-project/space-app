@@ -1064,6 +1064,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get favoriteMessages => '收藏消息';
+
+  @override
+  String get failureConnectRequired => '服务器需要支持 ConnectRPC。请更新家庭运行环境或联系空间所有者。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1086,4 +1089,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get favoriteMessages => '收藏消息';
+
+  @override
+  String get failureConnectRequired => '服务器需要支持 ConnectRPC。请更新家庭运行环境或联系空间所有者。';
 }

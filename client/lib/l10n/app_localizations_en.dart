@@ -1164,4 +1164,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get favoriteMessages => 'Favorite messages';
+
+  @override
+  String get failureConnectRequired =>
+      'This server must support ConnectRPC. Update the home runtime or contact the space owner.';
 }

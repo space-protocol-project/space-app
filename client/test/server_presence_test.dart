@@ -55,7 +55,7 @@ void main() {
             'protocol_version': '0.1-experimental',
             'signing_algorithm': 'Ed25519',
             'manifest': '/api/v1/manifest',
-            'grpc_endpoint': '127.0.0.1:9090',
+            'connect_endpoint': '/',
           }),
         );
         await request.response.close();

@@ -1169,4 +1169,8 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get favoriteMessages => 'Избранные сообщения';
+
+  @override
+  String get failureConnectRequired =>
+      'Нужен сервер с поддержкой ConnectRPC. Обновите домашний runtime или обратитесь к владельцу пространства.';
 }

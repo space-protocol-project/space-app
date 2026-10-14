@@ -9,59 +9,41 @@ import 'package:protobuf/protobuf.dart';
 
 import 'rpc_http.dart';
 
+class RpcOptions {
+  const RpcOptions({this.timeout, this.metadata = const {}});
+  final Duration? timeout;
+  final Map<String, String> metadata;
+}
+
 class RpcConnection {
-  RpcConnection.grpc(ClientChannel channel)
-    : _grpc = channel,
-      _http = null,
-      _client = null;
   RpcConnection.connect(
     Uri origin,
     String fingerprint, {
     connect.Codec? codec,
     String? dialHost,
-  }) : _grpc = null,
-       _http = pinnedRpcClient(origin, fingerprint, dialHost: dialHost) {
+  }) : _http = pinnedRpcClient(origin, fingerprint, dialHost: dialHost) {
     _client = connect.Client(
       protocol.Transport(
         baseUrl: origin.toString(),
         codec: codec ?? const ProtoCodec(),
-        httpClient: rpcHttpClient(_http!),
+        httpClient: rpcHttpClient(_http),
       ),
     );
   }
-  final ClientChannel? _grpc;
-  final HttpClient? _http;
-  connect.Client? _client;
+  final HttpClient _http;
+  late final connect.Client _client;
   final _active = <RpcCall>{};
   bool _closed = false;
-  bool get usesConnect => _client != null;
-
-  ClientCall<I, O> _legacy<
-    I extends GeneratedMessage,
-    O extends GeneratedMessage
-  >(connect.Spec<I, O> spec, I request, CallOptions? options) {
-    final method = ClientMethod<I, O>(
-      spec.procedure,
-      (message) => message.writeToBuffer(),
-      (bytes) => spec.outputFactory()..mergeFromBuffer(bytes),
-    );
-    return _grpc!.createCall(
-      method,
-      Stream.value(request),
-      options ?? CallOptions(timeout: const Duration(seconds: 10)),
-    );
-  }
 
   Future<O> unary<I extends GeneratedMessage, O extends GeneratedMessage>(
     connect.Spec<I, O> spec,
     I request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) async {
     if (_closed) throw const GrpcError.unavailable('RPC-соединение закрыто');
-    if (_grpc != null) return ResponseFuture(_legacy(spec, request, options));
     final call = _begin(options, const Duration(seconds: 10));
     try {
-      return await _client!.unary(
+      return await _client.unary(
         spec,
         request,
         headers: call.headers,
@@ -77,17 +59,13 @@ class RpcConnection {
   RpcStream<O> server<I extends GeneratedMessage, O extends GeneratedMessage>(
     connect.Spec<I, O> spec,
     I request, {
-    CallOptions? options,
+    RpcOptions? options,
   }) {
     if (_closed) {
       return RpcStream(
         Stream.error(const GrpcError.unavailable('RPC-соединение закрыто')),
         () async {},
       );
-    }
-    if (_grpc != null) {
-      final stream = ResponseStream(_legacy(spec, request, options));
-      return RpcStream(stream, stream.cancel);
     }
     final call = _begin(options, const Duration(minutes: 11));
     return RpcStream(_messages(spec, request, call), () async => _finish(call));
@@ -99,7 +77,7 @@ class RpcConnection {
     RpcCall call,
   ) async* {
     try {
-      await for (final message in _client!.server(
+      await for (final message in _client.server(
         spec,
         request,
         headers: call.headers,
@@ -114,7 +92,7 @@ class RpcConnection {
     }
   }
 
-  RpcCall _begin(CallOptions? options, Duration defaultTimeout) {
+  RpcCall _begin(RpcOptions? options, Duration defaultTimeout) {
     final call = RpcCall(options, defaultTimeout);
     _active.add(call);
     return call;
@@ -131,13 +109,12 @@ class RpcConnection {
     for (final call in _active.toList()) {
       _finish(call);
     }
-    _http?.close(force: true);
-    await _grpc?.terminate();
+    _http.close(force: true);
   }
 }
 
 class RpcCall implements connect.AbortSignal {
-  RpcCall(CallOptions? options, Duration defaultTimeout) {
+  RpcCall(RpcOptions? options, Duration defaultTimeout) {
     final timeout = options?.timeout ?? defaultTimeout;
     deadline = DateTime.now().add(timeout);
     timer = Timer(

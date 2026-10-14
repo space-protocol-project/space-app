@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:cryptography/cryptography.dart';
-import 'package:grpc/grpc.dart';
+
 import 'package:fixnum/fixnum.dart';
 
 import 'core.dart';
@@ -21,7 +21,7 @@ Future<Map<String, dynamic>> prepareRootRotation(
   DeviceRecord current,
   RotationJournalVault vault,
   AuthServiceClient auth,
-  CallOptions options, {
+  RpcOptions options, {
   bool renew = false,
 }) async {
   if (current.rootSeed.length != 32) {
@@ -247,7 +247,7 @@ Future<DeviceRecord?> finishRootRotation(
       oldSignature: _decode(proof['old_signature'] as String),
       newSignature: _decode(proof['new_signature'] as String),
     ),
-    options: CallOptions(timeout: const Duration(seconds: 10)),
+    options: RpcOptions(timeout: const Duration(seconds: 10)),
   );
   if (url64(receipt.transcript) != proof['transcript'] ||
       url64(receipt.oldSignature) != proof['old_signature'] ||

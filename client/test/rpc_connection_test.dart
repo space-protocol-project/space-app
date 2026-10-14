@@ -106,7 +106,7 @@ void main() {
         try {
           final response = await ChannelServiceClient(connection).getManifest(
             GetManifestRequest(),
-            options: CallOptions(
+            options: RpcOptions(
               metadata: {'authorization': 'Bearer test-token'},
             ),
           );
@@ -138,7 +138,7 @@ void main() {
       await expectLater(
         ChannelServiceClient(connection).getManifest(
           GetManifestRequest(),
-          options: CallOptions(metadata: {'authorization': 'Bearer secret'}),
+          options: RpcOptions(metadata: {'authorization': 'Bearer secret'}),
         ),
         throwsA(isA<HandshakeException>()),
       );
@@ -174,7 +174,7 @@ void main() {
       await expectLater(
         ChannelServiceClient(connection).getManifest(
           GetManifestRequest(),
-          options: CallOptions(metadata: {'authorization': 'Bearer secret'}),
+          options: RpcOptions(metadata: {'authorization': 'Bearer secret'}),
         ),
         throwsA(isA<GrpcError>()),
       );
@@ -204,7 +204,7 @@ void main() {
       await expectLater(
         ChannelServiceClient(connection).getManifest(
           GetManifestRequest(),
-          options: CallOptions(timeout: const Duration(milliseconds: 100)),
+          options: RpcOptions(timeout: const Duration(milliseconds: 100)),
         ),
         throwsA(
           isA<GrpcError>().having(
@@ -282,36 +282,38 @@ void main() {
     },
   );
 
-  test('Discovery выбирает Connect только по известной поддержке, ошибки не включают fallback', () async {
-    for (final endpoint in [null, '/', 'https://evil.test/']) {
-      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
-      server.listen((request) async {
-        request.response.headers.contentType = ContentType.json;
-        request.response.write(
-          jsonEncode({
-            'protocol_version': '0.1-experimental',
-            'server_id': 'srv_${'a' * 32}',
-            'signing_algorithm': 'Ed25519',
-            'signing_public_key': base64Url.encode(List.filled(32, 1)),
-            'manifest': '/api/v1/manifest',
-            'grpc_endpoint': '127.0.0.1:9090',
-            'connect_endpoint': ?endpoint,
-          }),
-        );
-        await request.response.close();
-      });
-      if (endpoint == 'https://evil.test/') {
-        await expectLater(
-          discover('http://127.0.0.1:${server.port}'),
-          throwsA(isA<LocalFailure>()),
-        );
-      } else {
-        final discovery = await discover('http://127.0.0.1:${server.port}');
-        final connection = discovery.openConnection();
-        expect(connection.usesConnect, endpoint == '/');
-        await connection.terminate();
+  test(
+    'Discovery требует Connect: старый сервер и чужой endpoint отклоняются',
+    () async {
+      for (final endpoint in [null, '/', 'https://evil.test/']) {
+        final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+        server.listen((request) async {
+          request.response.headers.contentType = ContentType.json;
+          request.response.write(
+            jsonEncode({
+              'protocol_version': '0.1-experimental',
+              'server_id': 'srv_${'a' * 32}',
+              'signing_algorithm': 'Ed25519',
+              'signing_public_key': base64Url.encode(List.filled(32, 1)),
+              'manifest': '/api/v1/manifest',
+              'connect_endpoint': ?endpoint,
+            }),
+          );
+          await request.response.close();
+        });
+        if (endpoint != '/') {
+          await expectLater(
+            discover('http://127.0.0.1:${server.port}'),
+            throwsA(isA<LocalFailure>()),
+          );
+        } else {
+          final discovery = await discover('http://127.0.0.1:${server.port}');
+          final connection = discovery.openConnection();
+          expect(discovery.connectOrigin, discovery.origin);
+          await connection.terminate();
+        }
+        await server.close(force: true);
       }
-      await server.close(force: true);
-    }
-  });
+    },
+  );
 }

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cryptography/cryptography.dart';
-import 'package:grpc/grpc.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/root_rotation.dart';
 import 'package:space_client/src/key_vault.dart';
@@ -65,7 +64,7 @@ Future<void> main(List<String> args) async {
       signature: (await Ed25519().sign(signing, keyPair: device)).bytes,
     ),
   );
-  final options = CallOptions(
+  final options = RpcOptions(
     metadata: {'authorization': 'Bearer ${login.accessToken}'},
   );
   final pending = await prepareRootRotation(server, old, vault, auth, options);

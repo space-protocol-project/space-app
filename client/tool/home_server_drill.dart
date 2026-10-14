@@ -171,9 +171,6 @@ Future<void> main(List<String> args) async {
           ownerVault,
           setupCode: state['setup_code'] as String,
         );
-        if (discovery.connectOrigin != null && !owner.channel.usesConnect) {
-          throw StateError('Домашний владелец не перешёл на Connect');
-        }
         if (owner.role != 'owner' || !owner.canManageSpace) {
           throw StateError('Не назначен владелец');
         }
@@ -181,13 +178,9 @@ Future<void> main(List<String> args) async {
           discovery.origin,
           discovery.serverId,
           discovery.publicKey,
-          18843,
-          grpcHost: '127.0.0.1',
-          tlsCertificate: pem,
+          dialHost: '127.0.0.1',
           tlsFingerprint: fingerprint,
-          connectOrigin: discovery.connectOrigin == null
-              ? null
-              : discovery.origin,
+          connectOrigin: discovery.origin,
         );
         if (attempt == 0) {
           await Future<void>.delayed(const Duration(seconds: 1));
@@ -202,8 +195,7 @@ Future<void> main(List<String> args) async {
             remote.origin,
             remote.serverId,
             remote.publicKey,
-            remote.grpcPort,
-            grpcHost: remote.grpcHost,
+            dialHost: remote.dialHost,
             tlsFingerprint: '0' * 64,
             connectOrigin: remote.connectOrigin,
           );
@@ -215,8 +207,6 @@ Future<void> main(List<String> args) async {
             throw StateError('RPC принял неверный TLS-отпечаток');
           } on HandshakeException {
             // Connect отклоняет сертификат до отправки запроса.
-          } on GrpcError catch (error) {
-            if (error.code != StatusCode.unavailable) rethrow;
           }
           final settings =
               (await owner.adminRequest('/api/v1/space/settings'))['settings']
@@ -247,34 +237,11 @@ Future<void> main(List<String> args) async {
           if (preview.serverId != originalID) {
             throw StateError('Неверный сервер приглашения');
           }
-          final legacy = Discovery(
-            remote.origin,
-            remote.serverId,
-            remote.publicKey,
-            remote.grpcPort,
-            grpcHost: remote.grpcHost,
-            tlsCertificate: pem,
-            tlsFingerprint: fingerprint,
-          );
-          final legacyPreview = await SpaceSession.previewInvitation(
-            legacy,
-            invite['token'] as String,
-          );
-          if (legacyPreview.serverId != preview.serverId) {
-            throw StateError(
-              'Новый сервер несовместим с прежним gRPC-клиентом',
-            );
-          }
           friend = await SpaceSession.connect(
             remote,
             friendVault,
             invitationToken: invite['token'] as String,
           );
-          if (remote.connectOrigin != null && !friend.channel.usesConnect) {
-            throw StateError(
-              'Приглашённый участник не использует HTTPS Connect',
-            );
-          }
           messageID = (await friend.send(
             'Сохранённое сообщение домашнего сервера',
             'home-drill-message',
@@ -333,7 +300,7 @@ Future<void> main(List<String> args) async {
       }
     }
     stdout.writeln(
-      'Home: PostgreSQL, локальный владелец, HTTPS Connect/прежний gRPC, pin, приглашение, ACL потока, сообщение и повторный запуск проверены.',
+      'Home: PostgreSQL, локальный владелец, HTTPS Connect, pin, приглашение, ACL потока, сообщение и повторный запуск проверены.',
     );
   } finally {
     await directory.delete(recursive: true);

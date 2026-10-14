@@ -37,6 +37,7 @@ String localFailureText(
   LocalFailureCode.connectionFailed => context.strings.failureConnectionFailed,
   LocalFailureCode.tlsRejected => context.strings.failureTlsRejected,
   LocalFailureCode.protocolInvalid => context.strings.failureProtocolInvalid,
+  LocalFailureCode.connectRequired => context.strings.failureConnectRequired,
   LocalFailureCode.identityInvalid => context.strings.failureIdentityInvalid,
   LocalFailureCode.addressInvalid => context.strings.failureAddressInvalid,
   LocalFailureCode.operationFailed => context.strings.failureOperationFailed,

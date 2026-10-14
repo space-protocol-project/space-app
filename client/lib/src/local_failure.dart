@@ -30,6 +30,7 @@ enum LocalFailureCode {
   connectionFailed,
   tlsRejected,
   protocolInvalid,
+  connectRequired,
   identityInvalid,
   addressInvalid,
   operationFailed,

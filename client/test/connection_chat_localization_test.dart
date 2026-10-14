@@ -35,7 +35,6 @@ class _Controller extends ChatController {
       input.origin,
       'srv_${'a' * 32}',
       List.filled(32, 1),
-      8443,
       tlsFingerprint: input.tlsFingerprint,
     );
     fingerprint = 'b' * 64;

@@ -25,8 +25,8 @@ Future<void> main(List<String> arguments) async {
   var session = await SpaceSession.connect(server, vault);
   final principal = session.principalId;
   final key = newRequestKey();
-  final original = await session.send('Сообщение из Dart gRPC клиента', key);
-  final repeated = await session.send('Сообщение из Dart gRPC клиента', key);
+  final original = await session.send('Сообщение из Dart Connect клиента', key);
+  final repeated = await session.send('Сообщение из Dart Connect клиента', key);
   if (original.id != repeated.id || original.authorId != principal) {
     throw StateError('Idempotency или автор не совпали');
   }

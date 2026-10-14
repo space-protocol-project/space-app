@@ -457,5 +457,6 @@
   "updatesHomeStart": "启动",
   "addFavorite": "添加到收藏",
   "removeFavorite": "取消收藏",
-  "favoriteMessages": "收藏消息"
+  "favoriteMessages": "收藏消息",
+  "failureConnectRequired": "服务器需要支持 ConnectRPC。请更新家庭运行环境或联系空间所有者。"
 }

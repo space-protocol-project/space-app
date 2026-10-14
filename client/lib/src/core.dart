@@ -21,49 +21,18 @@ class Discovery {
   Discovery(
     this.origin,
     this.serverId,
-    this.publicKey,
-    this.grpcPort, {
-    this.grpcHost,
-    this.tlsCertificate = '',
+    this.publicKey, {
+    this.dialHost,
     this.tlsFingerprint = '',
-    this.localTransport = false,
-    this.connectOrigin,
-  });
-  final String? grpcHost;
-  final String tlsCertificate, tlsFingerprint;
-  final bool localTransport;
-  final Uri? connectOrigin;
-  RpcConnection openConnection() => connectOrigin == null
-      ? RpcConnection.grpc(openChannel())
-      : RpcConnection.connect(
-          connectOrigin!,
-          tlsFingerprint,
-          dialHost: grpcHost,
-        );
-  ClientChannel openChannel() => ClientChannel(
-    grpcHost ?? origin.host,
-    port: grpcPort,
-    options: ChannelOptions(
-      credentials: origin.scheme == 'https' && !localTransport
-          ? ChannelCredentials.secure(
-              authority: origin.host,
-              onBadCertificate: tlsFingerprint.isEmpty
-                  ? null
-                  : (certificate, authority) =>
-                        authority == origin.host &&
-                        certificateIsCurrent(certificate) &&
-                        certificateFingerprint(certificate) == tlsFingerprint,
-              certificates: tlsCertificate.isEmpty
-                  ? null
-                  : utf8.encode(tlsCertificate),
-            )
-          : const ChannelCredentials.insecure(),
-    ),
-  );
-  final Uri origin;
+    Uri? connectOrigin,
+  }) : connectOrigin = connectOrigin ?? origin;
+  final Uri origin, connectOrigin;
   final String serverId;
   final List<int> publicKey;
-  final int grpcPort;
+  final String? dialHost;
+  final String tlsFingerprint;
+  RpcConnection openConnection() =>
+      RpcConnection.connect(connectOrigin, tlsFingerprint, dialHost: dialHost);
   Future<String> fingerprint() async =>
       (await Sha256().hash(publicKey)).bytes
           .map((b) => b.toRadixString(16).padLeft(2, '0'))
@@ -151,12 +120,11 @@ bool certificateIsCurrent(X509Certificate certificate) {
       certificate.endValidity.isAfter(now);
 }
 
-Uri? discoveryConnectOrigin(Map<String, dynamic> data, Uri networkOrigin) {
-  if (!data.containsKey('connect_endpoint')) return null;
+Uri discoveryConnectOrigin(Map<String, dynamic> data, Uri networkOrigin) {
   if (data['connect_endpoint'] != '/') {
     throw const LocalFailure(
-      LocalFailureCode.protocolInvalid,
-      'Неизвестный Connect endpoint',
+      LocalFailureCode.connectRequired,
+      'Сервер не поддерживает ConnectRPC. Обновите домашний runtime.',
     );
   }
   return networkOrigin;
@@ -225,23 +193,11 @@ Future<Discovery> discover(
     final key = base64Url.decode(
       base64Url.normalize(data['signing_public_key'] as String),
     );
-    final endpoint = Uri.parse(
-      '${networkOrigin.scheme}://${data['grpc_endpoint']}',
-    );
     if (data['protocol_version'] != '0.1-experimental' ||
         data['signing_algorithm'] != 'Ed25519' ||
         data['manifest'] != '/api/v1/manifest' ||
         !RegExp(r'^srv_[0-9a-f]{32}$').hasMatch(id) ||
-        key.length != 32 ||
-        endpoint.host != networkOrigin.host ||
-        endpoint.userInfo.isNotEmpty ||
-        endpoint.path.isNotEmpty ||
-        endpoint.hasQuery ||
-        endpoint.hasFragment ||
-        !endpoint.hasPort ||
-        endpoint.port < 1 ||
-        (networkOrigin.scheme == 'https' &&
-            endpoint.port != networkOrigin.port)) {
+        key.length != 32) {
       throw const LocalFailure(
         LocalFailureCode.protocolInvalid,
         'Discovery несовместим с профилем Space',
@@ -251,11 +207,8 @@ Future<Discovery> discover(
       origin,
       id,
       key,
-      endpoint.port,
-      grpcHost: networkOrigin.host,
-      tlsCertificate: certificate?.pem ?? '',
+      dialHost: networkOrigin.host,
       tlsFingerprint: homeOrigin == null ? actualFingerprint : tlsFingerprint,
-      localTransport: homeOrigin != null,
       connectOrigin: discoveryConnectOrigin(data, networkOrigin),
     );
   } finally {
@@ -565,7 +518,7 @@ class SpaceSession
     await _ensureSession();
     final stream = ChannelServiceClient(channel).watchChannels(
       WatchChannelsRequest(includeArchived: true),
-      options: CallOptions(
+      options: RpcOptions(
         timeout: const Duration(minutes: 11),
         metadata: {'authorization': 'Bearer $_token'},
       ),
@@ -614,7 +567,7 @@ class SpaceSession
   Future<void>? _loginTask;
   @override
   String principalId = '';
-  CallOptions get _options => CallOptions(
+  RpcOptions get _options => RpcOptions(
     timeout: const Duration(seconds: 10),
     metadata: {'authorization': 'Bearer $_token'},
   );
@@ -830,7 +783,7 @@ class SpaceSession
     try {
       automatic = (await AdminServiceClient(setupChannel).getSetupStatus(
         GetSetupStatusRequest(),
-        options: CallOptions(timeout: const Duration(seconds: 10)),
+        options: RpcOptions(timeout: const Duration(seconds: 10)),
       )).firstLoginOwner;
     } finally {
       await setupChannel.shutdown();
@@ -872,7 +825,7 @@ class SpaceSession
     try {
       final manifest = await ChannelServiceClient(channel).getManifest(
         GetManifestRequest(),
-        options: CallOptions(timeout: const Duration(seconds: 10)),
+        options: RpcOptions(timeout: const Duration(seconds: 10)),
       );
       session.spaceTitle = manifest.title;
       session.serverIcon = manifest.hasIcon() ? manifest.icon : null;
@@ -1016,7 +969,7 @@ class SpaceSession
       request.administrative = pairing.administrative;
     }
     final auth = AuthServiceClient(channel);
-    final options = CallOptions(timeout: const Duration(seconds: 10));
+    final options = RpcOptions(timeout: const Duration(seconds: 10));
     final challenge = await auth.createChallenge(request, options: options);
     final checkedIdentity = await credentials.identity();
     final signing = await checkedSigningBytes(
@@ -1135,7 +1088,7 @@ class SpaceSession
     await _ensureSession();
     final stream = SyncServiceClient(channel).subscribe(
       SubscribeRequest(channelId: id, after: after),
-      options: CallOptions(
+      options: RpcOptions(
         timeout: const Duration(minutes: 11),
         metadata: {'authorization': 'Bearer $_token'},
       ),
@@ -1184,7 +1137,7 @@ class SpaceSession
     try {
       final result = await MembershipServiceClient(channel).previewInvite(
         PreviewInviteRequest(token: token),
-        options: CallOptions(timeout: const Duration(seconds: 10)),
+        options: RpcOptions(timeout: const Duration(seconds: 10)),
       );
       if (result.serverId != server.serverId ||
           !['reader', 'member'].contains(result.role)) {

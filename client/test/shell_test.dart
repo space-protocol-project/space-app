@@ -39,7 +39,6 @@ void main() {
         localOrigin('http://127.0.0.1:8080'),
         'srv_test',
         List.filled(32, 1),
-        9090,
       ),
     );
     await tester.pumpWidget(SpaceApp(controller: controller));
@@ -89,7 +88,6 @@ void main() {
         localOrigin('http://127.0.0.1:8080'),
         'srv_test',
         List.filled(32, 1),
-        9090,
       ),
     );
     await tester.pumpWidget(SpaceApp(controller: controller));
@@ -136,7 +134,6 @@ void main() {
       localOrigin('http://127.0.0.1:8080'),
       'srv_test',
       List.filled(32, 1),
-      9090,
     );
     controller.server(original);
     await tester.pumpWidget(SpaceApp(controller: controller));
@@ -165,7 +162,6 @@ void main() {
         localOrigin('http://127.0.0.1:8081'),
         'srv_other',
         List.filled(32, 2),
-        9091,
       ),
     );
     await tester.pumpAndSettle();
