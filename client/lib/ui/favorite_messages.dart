@@ -32,6 +32,8 @@ class _FavoriteMessagesState extends State<FavoriteMessages> {
   final markers = <String, GlobalKey>{};
   Timer? closing;
   String? selected;
+  // Возврат фокуса после закрытия не должен открывать карточку снова.
+  String? dismissedFocus;
   Rect anchor = Rect.zero;
   Content? get selectedMessage =>
       widget.messages.where((m) => m.id == selected).firstOrNull;
@@ -40,6 +42,7 @@ class _FavoriteMessagesState extends State<FavoriteMessages> {
     closing?.cancel();
     final box = markers[message.id]?.currentContext?.findRenderObject();
     if (box is! RenderBox || !box.hasSize) return;
+    dismissedFocus = null;
     anchor = box.localToGlobal(Offset.zero) & box.size;
     setState(() => selected = message.id);
     overlay.show();
@@ -55,9 +58,19 @@ class _FavoriteMessagesState extends State<FavoriteMessages> {
   void close() {
     closing?.cancel();
     if (!mounted) return;
+    dismissedFocus = selected ?? dismissedFocus;
     overlay.hide();
     setState(() => selected = null);
     widget.onPreviewChanged?.call(false);
+  }
+
+  void markerFocus(Content message, bool focused) {
+    if (focused) {
+      if (dismissedFocus != message.id) show(message);
+      return;
+    }
+    if (dismissedFocus == message.id) dismissedFocus = null;
+    hideLater();
   }
 
   void jump(Content message) {
@@ -123,7 +136,7 @@ class _FavoriteMessagesState extends State<FavoriteMessages> {
             key: markers.putIfAbsent(message.id, GlobalKey.new),
             onTap: () => jump(message),
             onLongPress: () => show(message),
-            onFocusChange: (focused) => focused ? show(message) : hideLater(),
+            onFocusChange: (focused) => markerFocus(message, focused),
             child: SizedBox(
               height: 15,
               child: Align(

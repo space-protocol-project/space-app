@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/chat_controller.dart';
 import 'package:space_client/src/chat_history.dart';
@@ -17,6 +18,68 @@ import 'channels_test.dart'
     show ChannelSession, ChannelVault, MemoryHistory, MemoryPositions, chat;
 
 void main() {
+  testWidgets('Избранное открывается долгим нажатием и доступно с клавиатуры', (
+    tester,
+  ) async {
+    var removed = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: FavoriteMessages(
+            messages: [
+              Content(
+                id: 'keyboard',
+                authorId: 'Мария',
+                text: 'Карточка с клавиатуры',
+              ),
+            ],
+            principalId: 'я',
+            onJump: (_) {},
+            onRemove: (_) => removed = true,
+          ),
+        ),
+      ),
+    );
+    final marker = find
+        .descendant(
+          of: find.byType(FavoriteMessages),
+          matching: find.byType(InkWell),
+        )
+        .first;
+    await tester.longPress(marker);
+    await tester.pumpAndSettle();
+    expect(find.text('Карточка с клавиатуры'), findsNWidgets(2));
+    for (var count = 0; count < 12; count++) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      if (Focus.of(tester.element(find.byIcon(Icons.bookmark)))
+          .hasPrimaryFocus) {
+        break;
+      }
+    }
+    expect(
+      Focus.of(tester.element(find.byIcon(Icons.bookmark))).hasPrimaryFocus,
+      true,
+    );
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.text('Карточка с клавиатуры'), findsNothing);
+    await tester.longPress(marker);
+    await tester.pumpAndSettle();
+    for (var count = 0; count < 12; count++) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      if (Focus.of(tester.element(find.byIcon(Icons.bookmark)))
+          .hasPrimaryFocus) {
+        break;
+      }
+    }
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(removed, true);
+    expect(tester.takeException(), isNull);
+  });
+
   for (final width in [390.0, 1100.0]) {
     testWidgets('Закладка появляется слева по центру чата на ширине $width', (
       tester,
