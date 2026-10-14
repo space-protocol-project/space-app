@@ -1,5 +1,4 @@
 import '../l10n/failure_strings.dart';
-import '../l10n/strings.dart';
 import '../src/local_failure.dart';
 
 import 'dart:async';
@@ -42,7 +41,9 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
   Future<void>? frameJob;
   int generation = 0;
   LocalFailureCode? error;
-  bool starting = false;
+  Future<void>? startJob;
+  bool get starting => startJob != null;
+  bool capturing = false;
   @override
   void initState() {
     super.initState();
@@ -64,9 +65,13 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
     } catch (_) {}
   }
 
-  Future<void> start([CameraDescription? choice]) async {
-    if (starting) return;
-    starting = true;
+  Future<void> start([CameraDescription? choice]) =>
+      startJob ??= _start(choice).whenComplete(() {
+        startJob = null;
+        if (mounted) setState(() {});
+      });
+
+  Future<void> _start(CameraDescription? choice) async {
     try {
       await stop();
       final token = generation;
@@ -109,10 +114,17 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
       if (mounted) {
         setState(() => error = LocalFailureCode.cameraUnavailable);
       }
-    } finally {
-      starting = false;
-      if (mounted) setState(() {});
     }
+  }
+
+  Future<void> resume() async {
+    await startJob;
+    if (!mounted ||
+        WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed ||
+        controller?.value.isInitialized == true) {
+      return;
+    }
+    await start(selected);
   }
 
   void _startFrameTimer(CameraController camera, int token) {
@@ -123,7 +135,27 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
     });
   }
 
-  Future<void> readFrame(CameraController camera, int token) async {
+  Future<void> captureManually() async {
+    if (capturing) return;
+    setState(() => capturing = true);
+    timer?.cancel();
+    await frameJob;
+    final camera = controller;
+    if (mounted && camera != null) {
+      final token = generation;
+      frameJob = readFrame(camera, token, manual: true);
+      await frameJob;
+      frameJob = null;
+      if (mounted && token == generation) _startFrameTimer(camera, token);
+    }
+    if (mounted) setState(() => capturing = false);
+  }
+
+  Future<void> readFrame(
+    CameraController camera,
+    int token, {
+    bool manual = false,
+  }) async {
     XFile? photo;
     try {
       photo = await camera.takePicture();
@@ -137,6 +169,8 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
         timer?.cancel();
         generation++;
         Navigator.of(context).pop(packet);
+      } else if (manual && mounted && token == generation) {
+        setState(() => error = LocalFailureCode.qrUnreadable);
       }
     } catch (_) {
       if (mounted && token == generation) {
@@ -163,6 +197,10 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(resume());
+      return;
+    }
     if (state != AppLifecycleState.resumed) {
       unawaited(stop());
       if (mounted) {
@@ -180,16 +218,16 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
 
   @override
   Widget build(BuildContext context) => RecoveryCameraView(
-    help: widget.spaceLink ? context.strings.spaceQrCamera : null,
     cameras: [for (final camera in cameras) camera.name],
     selected: selected?.name,
     starting: starting,
+    capturing: capturing,
+    onCapture: controller?.value.isInitialized == true
+        ? () => unawaited(captureManually())
+        : null,
     error: error == null ? null : localFailureText(context, error!),
     preview: controller?.value.isInitialized == true
-        ? AspectRatio(
-            aspectRatio: controller!.value.aspectRatio,
-            child: CameraPreview(controller!),
-          )
+        ? CameraPreview(controller!)
         : null,
     onSelect: (name) {
       if (name != null) {

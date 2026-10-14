@@ -301,6 +301,7 @@
   "cameraTitle": "扫描身份卡",
   "cameraHelp": "请将摄像头对准 Space 身份卡上的二维码。图像仅在此设备上处理。麦克风已关闭。",
   "cameraRestart": "重新启动摄像头",
+  "cameraCapture": "扫描二维码",
   "cameraLabel": "摄像头 {number} — {name}",
   "@cameraLabel": {
     "placeholders": {

@@ -301,6 +301,7 @@
   "cameraTitle": "Scan card",
   "cameraHelp": "Point the camera at a Space QR card. Frames are processed on this device. The microphone is off.",
   "cameraRestart": "Restart camera",
+  "cameraCapture": "Scan QR",
   "cameraLabel": "Camera {number} — {name}",
   "@cameraLabel": {
     "placeholders": {

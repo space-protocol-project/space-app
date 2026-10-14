@@ -38,6 +38,23 @@ Uint8List linkImage(String text, {bool jpeg = false}) {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  test('QR находится на крупном фото среди других элементов', () {
+    final link = 'https://203.0.113.10:8443#tls=${'b' * 64}';
+    final full = img.decodePng(linkImage(link))!;
+    final qr = img.copyResize(full, width: full.width ~/ 2);
+    final photo = img.Image(width: 900, height: 4000);
+    img.fill(photo, color: img.ColorRgb8(255, 255, 255));
+    img.fillRect(
+      photo,
+      x1: 0,
+      y1: 10,
+      x2: 899,
+      y2: 40,
+      color: img.ColorRgb8(30, 30, 30),
+    );
+    img.compositeImage(photo, qr, dstX: 330, dstY: 1200);
+    expect(spaceLinkFromImage(img.encodeJpg(photo, quality: 92)), link);
+  });
   test('QR PNG и JPEG сохраняет приглашение и отпечаток TLS', () {
     final link =
         'https://203.0.113.10:8443#invite=iv_${'a' * 43}&tls=${'b' * 64}';
@@ -63,8 +80,10 @@ void main() {
   test('Android и iOS не создают и не читают домашний сервер', () async {
     for (final platform in ['android', 'ios']) {
       expect(supportsHomePlatform(platform), isFalse);
-      final home = HomeController(hostingEnabled: false,
-        directory: () async => throw StateError('Доступ к файлам запрещён'));
+      final home = HomeController(
+        hostingEnabled: false,
+        directory: () async => throw StateError('Доступ к файлам запрещён'),
+      );
       await home.load();
       expect(await home.start('203.0.113.10'), isNull);
       expect(home.running, isFalse);

@@ -301,6 +301,7 @@
   "cameraTitle": "Сканировать карточку",
   "cameraHelp": "Наведите камеру на QR-карточку Space. Кадры обрабатываются на этом устройстве. Микрофон выключен.",
   "cameraRestart": "Включить снова",
+  "cameraCapture": "Считать QR",
   "cameraLabel": "Камера {number} — {name}",
   "@cameraLabel": {
     "placeholders": {

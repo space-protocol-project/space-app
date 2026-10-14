@@ -682,6 +682,9 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String get cameraRestart => '重新启动摄像头';
 
   @override
+  String get cameraCapture => '扫描二维码';
+
+  @override
   String cameraLabel(int number, String name) {
     return '摄像头 $number — $name';
   }

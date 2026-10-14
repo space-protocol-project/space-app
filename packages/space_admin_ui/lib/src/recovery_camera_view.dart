@@ -6,6 +6,8 @@ class RecoveryCameraView extends StatelessWidget {
   const RecoveryCameraView({
     super.key,
     this.help,
+    this.onCapture,
+    this.capturing = false,
     required this.cameras,
     required this.selected,
     required this.starting,
@@ -16,6 +18,8 @@ class RecoveryCameraView extends StatelessWidget {
     required this.onCancel,
   });
   final String? help;
+  final VoidCallback? onCapture;
+  final bool capturing;
   final List<String> cameras;
   final String? selected, error;
   final bool starting;
@@ -54,11 +58,10 @@ class RecoveryCameraView extends StatelessWidget {
                   ],
                   onChanged: starting ? null : onSelect,
                 ),
-              if (error != null)
-                Text(error!)
-              else if (preview != null)
+              if (error != null) Text(error!),
+              if (preview != null)
                 preview!
-              else
+              else if (starting)
                 const Padding(
                   padding: EdgeInsets.all(24),
                   child: CircularProgressIndicator(),
@@ -67,12 +70,63 @@ class RecoveryCameraView extends StatelessWidget {
           ),
         ),
       ),
+      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       actions: [
-        TextButton(
-          onPressed: starting ? null : onRestart,
-          child: Text(strings.cameraRestart),
+        SizedBox(
+          width: 560,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: FilledButton(
+                    key: const ValueKey('camera-capture'),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 12,
+                      ),
+                    ),
+                    onPressed: starting || capturing ? null : onCapture,
+                    child: Text(
+                      strings.cameraCapture,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 12,
+                      ),
+                    ),
+                    onPressed: starting ? null : onRestart,
+                    child: Text(
+                      strings.cameraRestart,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 12,
+                      ),
+                    ),
+                    onPressed: onCancel,
+                    child: Text(strings.cancel, textAlign: TextAlign.center),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-        TextButton(onPressed: onCancel, child: Text(strings.cancel)),
       ],
     );
   }

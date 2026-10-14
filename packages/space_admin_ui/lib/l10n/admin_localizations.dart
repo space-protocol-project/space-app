@@ -1396,6 +1396,12 @@ abstract class AdminLocalizations {
   /// **'Включить снова'**
   String get cameraRestart;
 
+  /// No description provided for @cameraCapture.
+  ///
+  /// In ru, this message translates to:
+  /// **'Считать QR'**
+  String get cameraCapture;
+
   /// No description provided for @cameraLabel.
   ///
   /// In ru, this message translates to:

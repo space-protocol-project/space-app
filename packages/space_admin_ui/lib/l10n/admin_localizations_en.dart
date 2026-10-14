@@ -724,6 +724,9 @@ class AdminLocalizationsEn extends AdminLocalizations {
   String get cameraRestart => 'Restart camera';
 
   @override
+  String get cameraCapture => 'Scan QR';
+
+  @override
   String cameraLabel(int number, String name) {
     return 'Camera $number — $name';
   }

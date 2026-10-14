@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
+import 'package:flutter_zxing/flutter_zxing.dart' as native;
 import 'package:zxing2/qrcode.dart' as zx;
 
 import 'core.dart';
@@ -30,6 +31,27 @@ String? spaceLinkFromImage(Uint8List bytes) {
 }
 
 String _readLinkQr(img.Image image) {
+  try {
+    return _readBasicQr(image);
+  } on zx.ReaderException {
+    final code = native.zx.readBarcode(
+      image.getBytes(order: img.ChannelOrder.rgb),
+      native.DecodeParams(
+        imageFormat: native.ImageFormat.rgb,
+        format: native.Format.qrCode,
+        width: image.width,
+        height: image.height,
+        tryHarder: true,
+        tryDownscale: true,
+        tryInverted: true,
+      ),
+    );
+    if (!code.isValid || code.text == null) throw const FormatException('QR');
+    return code.text!;
+  }
+}
+
+String _readBasicQr(img.Image image) {
   final pixels = Int32List(image.width * image.height);
   for (var y = 0; y < image.height; y++) {
     for (var x = 0; x < image.width; x++) {
@@ -50,11 +72,20 @@ String _readLinkQr(img.Image image) {
   try {
     return reader.decode(bitmap).text;
   } catch (_) {
-    return reader
-        .decode(
-          bitmap,
-          hints: zx.DecodeHints()..put(zx.DecodeHintType.pureBarcode, null),
-        )
-        .text;
+    try {
+      return reader
+          .decode(
+            bitmap,
+            hints: zx.DecodeHints()..put(zx.DecodeHintType.tryHarder, null),
+          )
+          .text;
+    } catch (_) {
+      return reader
+          .decode(
+            bitmap,
+            hints: zx.DecodeHints()..put(zx.DecodeHintType.pureBarcode, null),
+          )
+          .text;
+    }
   }
 }
