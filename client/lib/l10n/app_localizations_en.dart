@@ -1155,4 +1155,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updatesHomeStart => 'Start';
+
+  @override
+  String get addFavorite => 'Add to favorites';
+
+  @override
+  String get removeFavorite => 'Remove from favorites';
+
+  @override
+  String get favoriteMessages => 'Favorite messages';
 }

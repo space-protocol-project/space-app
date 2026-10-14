@@ -12,10 +12,14 @@ class MessageBubble extends StatelessWidget {
     this.grouped = false,
     this.sentAt,
     this.accepted = false,
+    this.favorite = false,
+    this.onToggleFavorite,
   });
   final String text, author;
   final bool mine, grouped, accepted;
   final DateTime? sentAt;
+  final bool favorite;
+  final VoidCallback? onToggleFavorite;
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +54,7 @@ class MessageBubble extends StatelessWidget {
                 maxWidth: box.maxWidth * (box.maxWidth < 500 ? .85 : .72),
               ),
               child: CustomPaint(
-                painter: _BubblePaint(
-                  mine,
-                  mine ? colors.primaryContainer : colors.surfaceContainerHigh,
-                ),
+                painter: _BubblePaint(mine, messageBubbleColor(colors, mine)),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 18,
@@ -74,12 +75,33 @@ class MessageBubble extends StatelessWidget {
                         const SizedBox(height: 4),
                       ],
                       MessageMarkdown(text: text),
-                      if (sentAt != null || accepted)
+                      if (sentAt != null ||
+                          accepted ||
+                          onToggleFavorite != null)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              if (onToggleFavorite != null)
+                                IconButton(
+                                  tooltip: favorite
+                                      ? context.strings.removeFavorite
+                                      : context.strings.addFavorite,
+                                  onPressed: onToggleFavorite,
+                                  visualDensity: VisualDensity.compact,
+                                  constraints: const BoxConstraints(
+                                    minWidth: 28,
+                                    minHeight: 28,
+                                  ),
+                                  padding: EdgeInsets.zero,
+                                  icon: Icon(
+                                    favorite
+                                        ? Icons.bookmark
+                                        : Icons.bookmark_border,
+                                    size: 16,
+                                  ),
+                                ),
                               if (sentAt != null)
                                 Tooltip(
                                   message:
@@ -120,6 +142,14 @@ class MessageBubble extends StatelessWidget {
     );
   }
 }
+
+Color messageBubbleColor(ColorScheme colors, bool mine) => Color.alphaBlend(
+  messageMarkerColor(colors, mine).withValues(alpha: .16),
+  colors.surface,
+);
+
+Color messageMarkerColor(ColorScheme colors, bool mine) =>
+    mine ? colors.primary : colors.secondary;
 
 class _BubblePaint extends CustomPainter {
   const _BubblePaint(this.mine, this.color);

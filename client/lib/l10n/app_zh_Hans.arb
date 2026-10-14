@@ -11,5 +11,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "addFavorite": "添加到收藏",
+  "removeFavorite": "取消收藏",
+  "favoriteMessages": "收藏消息"
 }

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 import '../src/chat_controller.dart';
 import 'message_bubble.dart';
+import 'favorite_messages.dart';
 
 class ChatView extends StatefulWidget {
   const ChatView({
@@ -103,11 +104,19 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
 
   Future<void> jumpToNew() async {
     if (jumping || !scroll.hasClients) return;
-    final c = widget.controller, startingScope = scope;
+    final c = widget.controller;
     final list = c.messages;
     final index = list.indexWhere((m) => m.id == c.readThrough) + 1;
     if (index >= list.length) return;
-    final id = list[index].id;
+    await jumpToMessage(list[index].id);
+  }
+
+  Future<void> jumpToMessage(String id) async {
+    if (jumping || !scroll.hasClients) return;
+    final list = widget.controller.messages;
+    final startingScope = scope;
+    final index = list.indexWhere((m) => m.id == id);
+    if (index < 0) return;
     jumping = true;
     var low = 0.0, high = scroll.position.maxScrollExtent;
     try {
@@ -201,6 +210,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final c = widget.controller;
     final colors = Theme.of(context).colorScheme;
+    final favorites = c.messages.where(c.isFavorite).toList();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (restoreScroll && scroll.hasClients) {
@@ -357,71 +367,102 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                     ),
                   ),
                 )
-              : ListView.builder(
-                  key: viewport,
-                  controller: scroll,
-                  padding: const EdgeInsets.all(24),
-                  itemCount: c.messages.length,
-                  itemBuilder: (context, index) {
-                    final message = c.messages[index];
-                    final mine = message.authorId == c.principalId;
-                    final author = mine
-                        ? context.strings.you
-                        : message.authorId.length > 16
-                        ? '${message.authorId.substring(0, 16)}…'
-                        : message.authorId;
-                    final boundary =
-                        c.messages.indexWhere((m) => m.id == entryReadThrough) +
-                        1;
-                    final grouped =
-                        index > 0 &&
-                        c.messages[index - 1].authorId == message.authorId &&
-                        index != boundary;
-                    return Padding(
-                      key: messageKeys.putIfAbsent(message.id, GlobalKey.new),
+              : Stack(
+                  children: [
+                    Padding(
                       padding: EdgeInsets.only(
-                        bottom:
-                            index + 1 < c.messages.length &&
-                                c.messages[index + 1].authorId ==
-                                    message.authorId
-                            ? 6
-                            : 18,
+                        left: favorites.isEmpty ? 0 : 36,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          if (index == boundary)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              child: Text(
-                                context.strings.newMessages,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: colors.primary,
-                                ),
-                              ),
+                      child: ListView.builder(
+                        key: viewport,
+                        controller: scroll,
+                        padding: const EdgeInsets.all(24),
+                        itemCount: c.messages.length,
+                        itemBuilder: (context, index) {
+                          final message = c.messages[index];
+                          final mine = message.authorId == c.principalId;
+                          final author = mine
+                              ? context.strings.you
+                              : message.authorId.length > 16
+                              ? '${message.authorId.substring(0, 16)}…'
+                              : message.authorId;
+                          final boundary =
+                              c.messages.indexWhere(
+                                (m) => m.id == entryReadThrough,
+                              ) +
+                              1;
+                          final grouped =
+                              index > 0 &&
+                              c.messages[index - 1].authorId ==
+                                  message.authorId &&
+                              index != boundary;
+                          return Padding(
+                            key: messageKeys.putIfAbsent(
+                              message.id,
+                              GlobalKey.new,
                             ),
-                          MessageBubble(
-                            text: message.text,
-                            author: author,
-                            mine: mine,
-                            grouped: grouped,
-                            sentAt:
-                                message.createdAtUnixMs > 0 &&
-                                    message.createdAtUnixMs.toInt() <=
-                                        8640000000000000
-                                ? DateTime.fromMillisecondsSinceEpoch(
-                                    message.createdAtUnixMs.toInt(),
-                                    isUtc: true,
-                                  ).toLocal()
-                                : null,
-                            accepted: mine,
-                          ),
-                        ],
+                            padding: EdgeInsets.only(
+                              bottom:
+                                  index + 1 < c.messages.length &&
+                                      c.messages[index + 1].authorId ==
+                                          message.authorId
+                                  ? 6
+                                  : 18,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                if (index == boundary)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                    child: Text(
+                                      context.strings.newMessages,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: colors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                MessageBubble(
+                                  text: message.text,
+                                  author: author,
+                                  mine: mine,
+                                  grouped: grouped,
+                                  sentAt:
+                                      message.createdAtUnixMs > 0 &&
+                                          message.createdAtUnixMs.toInt() <=
+                                              8640000000000000
+                                      ? DateTime.fromMillisecondsSinceEpoch(
+                                          message.createdAtUnixMs.toInt(),
+                                          isUtc: true,
+                                        ).toLocal()
+                                      : null,
+                                  accepted: mine,
+                                  favorite: c.isFavorite(message),
+                                  onToggleFavorite: () =>
+                                      unawaited(c.toggleFavorite(message)),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ),
+                    if (favorites.isNotEmpty)
+                      Positioned.fill(
+                        child: FavoriteMessages(
+                          messages: favorites,
+                          principalId: c.principalId,
+                          onJump: (message) =>
+                              unawaited(jumpToMessage(message.id)),
+                          onRemove: (message) =>
+                              unawaited(c.toggleFavorite(message)),
+                        ),
+                      ),
+                  ],
                 ),
         ),
         if (c.canRead && c.unreadCount(c.channelId) > 0)

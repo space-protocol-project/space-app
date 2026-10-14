@@ -2110,6 +2110,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Запустить'**
   String get updatesHomeStart;
+
+  /// No description provided for @addFavorite.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить в избранное'**
+  String get addFavorite;
+
+  /// No description provided for @removeFavorite.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить из избранного'**
+  String get removeFavorite;
+
+  /// No description provided for @favoriteMessages.
+  ///
+  /// In ru, this message translates to:
+  /// **'Избранные сообщения'**
+  String get favoriteMessages;
 }
 
 class _AppLocalizationsDelegate

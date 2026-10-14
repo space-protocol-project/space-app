@@ -1160,4 +1160,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get updatesHomeStart => 'Запустить';
+
+  @override
+  String get addFavorite => 'Добавить в избранное';
+
+  @override
+  String get removeFavorite => 'Удалить из избранного';
+
+  @override
+  String get favoriteMessages => 'Избранные сообщения';
 }

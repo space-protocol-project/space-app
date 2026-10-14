@@ -30,10 +30,14 @@ class ChatHistory {
   List<Channel> channels = [];
   Map<String, int> readSequences = {};
   final Map<String, CachedMessage> entries = {};
+  final Set<String> favorites = {};
   void prune(DateTime now) {
     final cutoff = now.subtract(historyRetention).millisecondsSinceEpoch;
-    entries.removeWhere((_, value) => value.retentionTime < cutoff);
+    entries.removeWhere(
+      (key, value) => value.retentionTime < cutoff && !favorites.contains(key),
+    );
     if (entries.length > 10000) trimHalf();
+    favorites.removeWhere((key) => !entries.containsKey(key));
   }
 
   void trimHalf() {
@@ -41,6 +45,7 @@ class ChatHistory {
       ..sort((a, b) => a.value.retentionTime.compareTo(b.value.retentionTime));
     for (final entry in sorted.take((sorted.length + 1) ~/ 2)) {
       entries.remove(entry.key);
+      favorites.remove(entry.key);
     }
   }
 
@@ -86,6 +91,7 @@ class ChatHistory {
     'selected': selected,
     'channels': channels.map((c) => c.toProto3Json()).toList(),
     'reads': readSequences,
+    'favorites': favorites.toList(),
     'messages': [
       for (final entry in entries.values)
         {'content': entry.content.toProto3Json(), 'received': entry.receivedAt},
@@ -119,6 +125,7 @@ class ChatHistory {
         received,
       );
     }
+    result.favorites.addAll(List<String>.from(data['favorites'] ?? const []));
     result.merge(const [], now);
     return result;
   }

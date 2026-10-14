@@ -1055,6 +1055,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get updatesHomeStart => '启动';
+
+  @override
+  String get addFavorite => '添加到收藏';
+
+  @override
+  String get removeFavorite => '取消收藏';
+
+  @override
+  String get favoriteMessages => '收藏消息';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1068,4 +1077,13 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String updatesPackage(String platform, String size) {
     return '$platform · $size MB';
   }
+
+  @override
+  String get addFavorite => '添加到收藏';
+
+  @override
+  String get removeFavorite => '取消收藏';
+
+  @override
+  String get favoriteMessages => '收藏消息';
 }

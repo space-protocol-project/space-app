@@ -40,7 +40,7 @@ flutter test --no-pub
 
 ## Публикация
 
-Текущий экспериментальный выпуск — [v0.2.2](https://github.com/space-protocol-project/space-app/releases/latest), опубликован 14 октября 2026 года. В приложении закреплён [домашний runtime v0.2.2](https://github.com/space-protocol-project/space-server/releases/tag/v0.2.2).
+Текущий экспериментальный выпуск — [v0.2.3](https://github.com/space-protocol-project/space-app/releases/latest), опубликован 14 октября 2026 года. В приложении закреплён [домашний runtime v0.2.2](https://github.com/space-protocol-project/space-server/releases/tag/v0.2.2).
 
 | Система | Скачать последнюю версию |
 | --- | --- |

@@ -454,5 +454,8 @@
   "updatesHomeTitle": "Home server",
   "updatesHomeResume": "The home server was running before the update. Start it again?",
   "updatesLater": "Later",
-  "updatesHomeStart": "Start"
+  "updatesHomeStart": "Start",
+  "addFavorite": "Add to favorites",
+  "removeFavorite": "Remove from favorites",
+  "favoriteMessages": "Favorite messages"
 }

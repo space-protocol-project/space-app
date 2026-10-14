@@ -454,5 +454,8 @@
   "updatesHomeTitle": "家庭服务器",
   "updatesHomeResume": "更新前家庭服务器正在运行。是否重新启动？",
   "updatesLater": "稍后",
-  "updatesHomeStart": "启动"
+  "updatesHomeStart": "启动",
+  "addFavorite": "添加到收藏",
+  "removeFavorite": "取消收藏",
+  "favoriteMessages": "收藏消息"
 }

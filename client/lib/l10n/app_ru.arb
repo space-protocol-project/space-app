@@ -454,5 +454,8 @@
   "updatesHomeTitle": "Домашний сервер",
   "updatesHomeResume": "Перед обновлением домашний сервер работал. Запустить его снова?",
   "updatesLater": "Позже",
-  "updatesHomeStart": "Запустить"
+  "updatesHomeStart": "Запустить",
+  "addFavorite": "Добавить в избранное",
+  "removeFavorite": "Удалить из избранного",
+  "favoriteMessages": "Избранные сообщения"
 }

@@ -242,6 +242,35 @@ class ChatController extends ChangeNotifier {
   String get draftScope =>
       '$knownOrigin|${preview?.serverId ?? _history?.serverId}|$principalId|$channelId';
 
+  bool isFavorite(Content message) =>
+      _historyOrigin == knownOrigin &&
+      _history?.favorites.contains('${message.channelId}/${message.id}') ==
+          true;
+
+  Future<void> toggleFavorite(Content message) async {
+    if (accessRemoved ||
+        !canRead ||
+        message.channelId != channelId ||
+        !messages.any((value) => value.id == message.id)) {
+      return;
+    }
+    _captureHistory();
+    final saved = _history;
+    if (saved == null || _historyOrigin != knownOrigin) return;
+    final key = '${message.channelId}/${message.id}';
+    saved.entries.putIfAbsent(
+      key,
+      () => CachedMessage(
+        Content()..mergeFromProto3Json(message.toProto3Json()),
+        now().millisecondsSinceEpoch,
+      ),
+    );
+    if (!saved.favorites.remove(key)) saved.favorites.add(key);
+    notifyListeners();
+    await flushHistory();
+    if (!_disposed) notifyListeners();
+  }
+
   Future<void> _loadPositions() async {
     final nav = navigation;
     _cursors.clear();
