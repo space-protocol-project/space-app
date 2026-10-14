@@ -251,8 +251,10 @@ class _HomePanelState extends State<HomePanel> {
             if (home.updateAvailable || home.pendingUpdate) ...[
               const SizedBox(height: 16),
               if (home.installedVersion.isNotEmpty &&
-                  home.availableVersion.isNotEmpty)
+                  home.availableVersion.isNotEmpty) ...[
                 Text('${home.installedVersion} → ${home.availableVersion}'),
+                const SizedBox(height: 12),
+              ],
               OutlinedButton.icon(
                 onPressed:
                     home.busy ||
