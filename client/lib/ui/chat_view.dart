@@ -122,7 +122,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       final end = row.localToGlobal(Offset(0, row.size.height)).dy;
       if (start >= top && end <= bottom) lastVisible = message.id;
     }
-    if (lastVisible != null) controller.markRead(lastVisible);
+    if (lastVisible != null && lastVisible != controller.state.readThrough) {
+      controller.markRead(lastVisible);
+    }
   }
 
   double visibleBottom(RenderBox history) {
@@ -319,7 +321,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     return KeyEventResult.handled;
   }
 
-  Widget _messageRow(BuildContext context, int index) {
+  Widget _messageRow(BuildContext context, int index, int boundary) {
     final controller = widget.controller;
     final view = widget.controller.state;
     final colors = Theme.of(context).colorScheme;
@@ -330,8 +332,6 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         : message.authorId.length > 16
         ? '${message.authorId.substring(0, 16)}…'
         : message.authorId;
-    final boundary =
-        view.messages.indexWhere((m) => m.id == entryReadThrough) + 1;
     final grouped =
         index > 0 &&
         view.messages[index - 1].authorId == message.authorId &&
@@ -481,6 +481,8 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     final controller = widget.controller;
     final view = controller.state;
     final favorites = view.messages.where(view.isFavorite).toList();
+    final boundary =
+        view.messages.indexWhere((m) => m.id == entryReadThrough) + 1;
     if (view.messages.isEmpty) {
       return Padding(
         padding: EdgeInsets.only(
@@ -508,7 +510,8 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                   composerHeight + 36,
                 ),
                 itemCount: view.messages.length,
-                itemBuilder: _messageRow,
+                itemBuilder: (context, index) =>
+                    _messageRow(context, index, boundary),
               ),
             ),
           ),
@@ -626,8 +629,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
             ),
           ),
         if (widget.showHeader) const Divider(height: 1),
-        if (view.channels.isNotEmpty &&
-            (widget.showHeader || MediaQuery.sizeOf(context).width < 760))
+        if (view.channels.isNotEmpty && widget.showHeader)
           _channelPicker(context),
         Expanded(child: _chatStack(context)),
       ],

@@ -151,7 +151,7 @@ void main() {
       tester.widget<TextField>(draft).controller!.text,
       'Черновик на устройстве\nВторая строка',
     );
-    await binding.watchPerformance(() async {
+    Future<void> scrollHistory() async {
       final history = find.descendant(
         of: find.byType(ChatView),
         matching: find.byType(ListView),
@@ -164,7 +164,21 @@ void main() {
         );
         await tester.pumpAndSettle();
       }
-    }, reportKey: 'history_scroll');
+    }
+
+    await binding.watchPerformance(scrollHistory, reportKey: 'history_scroll');
+    if (const bool.fromEnvironment('SPACE_PROFILE_WIDGETS')) {
+      debugProfileBuildsEnabled = true;
+      debugProfileLayoutsEnabled = true;
+      debugProfilePaintsEnabled = true;
+      try {
+        await binding.traceAction(scrollHistory, streams: ['Dart']);
+      } finally {
+        debugProfileBuildsEnabled = false;
+        debugProfileLayoutsEnabled = false;
+        debugProfilePaintsEnabled = false;
+      }
+    }
     final history = find.descendant(
       of: find.byType(ChatView),
       matching: find.byType(ListView),
@@ -198,38 +212,46 @@ void main() {
     preferences.dispose();
   });
 
-  testWidgets('Физическая камера возвращает кадр для QR', (tester) async {
-    final cameras = await availableCameras();
-    expect(cameras, isNotEmpty);
-    final camera = CameraController(
-      cameras.first,
-      ResolutionPreset.low,
-      enableAudio: false,
-      imageFormatGroup: ImageFormatGroup.yuv420,
-    );
-    try {
-      await camera.initialize().timeout(const Duration(seconds: 45));
-      expect(camera.value.isInitialized, true);
-      expect(camera.value.previewSize, isNotNull);
-      final frame = Completer<Size>();
-      await camera.startImageStream((image) {
-        if (!frame.isCompleted) {
-          frame.complete(Size(image.width.toDouble(), image.height.toDouble()));
-        }
-      });
-      final size = await frame.future.timeout(const Duration(seconds: 15));
-      await camera.stopImageStream();
-      expect(size.width, greaterThan(0));
-      expect(size.height, greaterThan(0));
-      binding.reportData ??= {};
-      binding.reportData!['camera_count'] = cameras.length;
-      binding.reportData!['camera_preview_width'] =
-          camera.value.previewSize!.width;
-    } finally {
-      await camera.dispose().timeout(
-        const Duration(seconds: 5),
-        onTimeout: () {},
+  testWidgets(
+    'Физическая камера возвращает кадр для QR',
+    (tester) async {
+      final cameras = await availableCameras();
+      expect(cameras, isNotEmpty);
+      final camera = CameraController(
+        cameras.first,
+        ResolutionPreset.low,
+        enableAudio: false,
+        imageFormatGroup: ImageFormatGroup.yuv420,
       );
-    }
-  }, skip: !Platform.isAndroid);
+      try {
+        await camera.initialize().timeout(const Duration(seconds: 45));
+        expect(camera.value.isInitialized, true);
+        expect(camera.value.previewSize, isNotNull);
+        final frame = Completer<Size>();
+        await camera.startImageStream((image) {
+          if (!frame.isCompleted) {
+            frame.complete(
+              Size(image.width.toDouble(), image.height.toDouble()),
+            );
+          }
+        });
+        final size = await frame.future.timeout(const Duration(seconds: 15));
+        await camera.stopImageStream();
+        expect(size.width, greaterThan(0));
+        expect(size.height, greaterThan(0));
+        binding.reportData ??= {};
+        binding.reportData!['camera_count'] = cameras.length;
+        binding.reportData!['camera_preview_width'] =
+            camera.value.previewSize!.width;
+      } finally {
+        await camera.dispose().timeout(
+          const Duration(seconds: 5),
+          onTimeout: () {},
+        );
+      }
+    },
+    skip:
+        !Platform.isAndroid ||
+        !const bool.fromEnvironment('SPACE_TEST_CAMERA', defaultValue: true),
+  );
 }

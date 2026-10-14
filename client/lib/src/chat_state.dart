@@ -30,45 +30,50 @@ final class ChatState {
     this.sendStatus = MessageSendStatus.idle,
   });
 
-  factory ChatState.fromController(ChatController controller) => ChatState(
-    busy: controller.busy,
-    connected: controller.connected,
-    reconnecting: controller.reconnecting,
-    accessRemoved: controller.accessRemoved,
-    canRead: controller.canRead,
-    canWrite: controller.canWrite,
-    error: controller.error,
-    cacheError: controller.cacheError,
-    fingerprint: controller.fingerprint,
-    cursor: controller.cursor,
-    origin: controller.knownOrigin,
-    principalId: controller.principalId,
-    channelId: controller.channelId,
-    spaceTitle: controller.spaceTitle,
-    chatTitle: controller.chatTitle,
-    readThrough: controller.readThrough,
-    failureCode: controller.failureCode,
-    failureRetry: controller.failureRetry,
-    invitationRole: controller.invitationRole,
-    preview: controller.preview,
-    serverIcon: controller.serverIcon?.deepCopy()?..freeze(),
-    messages: List.unmodifiable(
-      controller.messages.map((m) => m.deepCopy()..freeze()),
-    ),
-    channels: List.unmodifiable(
-      controller.channels.map((ch) => ch.deepCopy()..freeze()),
-    ),
-    favorites: Set.unmodifiable(
-      controller.messages
-          .where(controller.isFavorite)
-          .map((m) => '${m.channelId}/${m.id}'),
-    ),
-    unreadCounts: Map.unmodifiable({
-      for (final ch in controller.channels)
-        ch.id: controller.unreadCount(ch.id),
-    }),
-    sendStatus: controller.sendStatus,
-  );
+  factory ChatState.fromController(ChatController controller) {
+    final messages = controller.messages;
+    final channels = controller.channels;
+    final previous = controller.state;
+    return ChatState(
+      busy: controller.busy,
+      connected: controller.connected,
+      reconnecting: controller.reconnecting,
+      accessRemoved: controller.accessRemoved,
+      canRead: controller.canRead,
+      canWrite: controller.canWrite,
+      error: controller.error,
+      cacheError: controller.cacheError,
+      fingerprint: controller.fingerprint,
+      cursor: controller.cursor,
+      origin: controller.knownOrigin,
+      principalId: controller.principalId,
+      channelId: controller.channelId,
+      spaceTitle: controller.spaceTitle,
+      chatTitle: controller.chatTitle,
+      readThrough: controller.readThrough,
+      failureCode: controller.failureCode,
+      failureRetry: controller.failureRetry,
+      invitationRole: controller.invitationRole,
+      preview: controller.preview,
+      serverIcon: controller.serverIcon?.deepCopy()?..freeze(),
+      messages: listEquals(messages, previous.messages)
+          ? previous.messages
+          : List.unmodifiable(messages.map((m) => m.deepCopy()..freeze())),
+      channels: listEquals(channels, previous.channels)
+          ? previous.channels
+          : List.unmodifiable(channels.map((ch) => ch.deepCopy()..freeze())),
+      favorites: Set.unmodifiable(
+        messages
+            .where(controller.isFavorite)
+            .map((m) => '${m.channelId}/${m.id}'),
+      ),
+      unreadCounts: Map.unmodifiable({
+        for (final ch in controller.channels)
+          ch.id: controller.unreadCount(ch.id),
+      }),
+      sendStatus: controller.sendStatus,
+    );
+  }
 
   final bool busy,
       connected,

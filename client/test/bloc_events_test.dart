@@ -86,6 +86,8 @@ void main() {
     expect(() => before.messages.clear(), throwsUnsupportedError);
     await controller.toggleFavorite(message);
     expect(controller.state.isFavorite(message), true);
+    expect(identical(controller.state.messages, before.messages), true);
+    expect(identical(controller.state.channels, before.channels), true);
     expect(before.isFavorite(message), false);
     expect(recorder.events.whereType<ChatConnected>(), hasLength(1));
     expect(recorder.events.whereType<ChatFavoriteToggled>(), hasLength(1));

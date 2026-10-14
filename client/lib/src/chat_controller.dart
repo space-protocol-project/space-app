@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show VoidCallback;
+import 'package:flutter/foundation.dart' show VoidCallback, listEquals;
 import 'package:grpc/grpc.dart';
 
 import 'channel_positions.dart';
@@ -186,11 +186,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
           .toList();
       _history!.merge(const [], now());
       if (!connected) {
-        _historyTimer?.cancel();
-        _historyTimer = Timer(
-          const Duration(milliseconds: 500),
-          () => unawaited(_flushHistory()),
-        );
+        _queueHistoryFlush();
       }
     }
     if (!connected || session == null || origin == null || accessRemoved) {
@@ -224,6 +220,10 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     saved.selected = channelId;
     saved.readSequences = Map.of(_readSequences);
     saved.merge(_messages.values, now());
+    _queueHistoryFlush();
+  }
+
+  void _queueHistoryFlush() {
     _historyTimer?.cancel();
     _historyTimer = Timer(
       const Duration(milliseconds: 500),
@@ -465,10 +465,10 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     if (sequence > 0) _readSequences[channelId] = sequence;
     if (_history != null) {
       _history!.readSequences = {..._history!.readSequences, ..._readSequences};
-      unawaited(_flushHistory());
+      _queueHistoryFlush();
     }
     _queuePositions();
-    _update();
+    publishState();
   }
 
   final IdentityVault vault;
@@ -1303,6 +1303,11 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     unawaited(_savePositions());
     _stopSubscription();
     unawaited(_session?.close());
+    try {
+      await _flushHistory().timeout(const Duration(seconds: 3));
+    } on TimeoutException {
+      cacheError = 'История не сохранена';
+    }
     await super.close();
   }
 }

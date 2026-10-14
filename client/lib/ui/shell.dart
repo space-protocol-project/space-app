@@ -34,6 +34,7 @@ import 'space_appearance.dart';
 import 'space_frame.dart';
 import 'space_popup.dart';
 import 'measure_size.dart';
+import 'retained_indexed_stack.dart';
 
 enum Section {
   overview(Icons.home_outlined),
@@ -888,10 +889,20 @@ class _SpaceShellState extends State<SpaceShell> {
           leading: const Icon(Icons.forum_outlined, size: 20),
           title: Text(context.strings.chats),
           onTap: () => select(Section.chat),
+          trailing: controller.channels.isEmpty
+              ? null
+              : IconButton(
+                  tooltip: context.strings.refreshChat,
+                  onPressed: controller.busy
+                      ? null
+                      : () {
+                          controller.selectChannel(controller.channelId);
+                          select(Section.chat);
+                        },
+                  icon: const Icon(Icons.refresh, size: 20),
+                ),
         ),
-        for (final channel in controller.channels.where(
-          (channel) => !channel.archived,
-        ))
+        for (final channel in controller.channels)
           ListTile(
             dense: true,
             shape: RoundedRectangleBorder(
@@ -1430,7 +1441,7 @@ class _SpaceShellState extends State<SpaceShell> {
       ],
     ),
   );
-  Widget pages() => IndexedStack(
+  Widget pages() => RetainedIndexedStack(
     index: selected.index,
     children: [
       for (final section in Section.values)
@@ -1689,7 +1700,7 @@ class _SpaceShellState extends State<SpaceShell> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Expanded(
-                        child: IndexedStack(
+                        child: RetainedIndexedStack(
                           index: _workspacePageIndex,
                           children: [
                             Dashboard(
