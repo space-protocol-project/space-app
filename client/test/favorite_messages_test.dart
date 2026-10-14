@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -159,6 +160,10 @@ void main() {
     expect(find.text('Важное сообщение'), findsNWidgets(2));
     await tester.tap(find.text('Важное сообщение').first);
     expect(jumped, isTrue);
+    await mouse.moveTo(const Offset(700, 100));
+    await tester.pumpAndSettle();
+    await mouse.moveTo(tester.getCenter(marker));
+    await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.bookmark));
     expect(removed, isTrue);
     await mouse.moveTo(const Offset(700, 100));
@@ -167,6 +172,79 @@ void main() {
     expect(find.text('Важное сообщение'), findsNothing);
     await mouse.removePointer();
   });
+
+  testWidgets(
+    'Карточка переключается между маркерами и переживает обновление списка',
+    (tester) async {
+      final semantics = tester.ensureSemantics();
+      var messages = [
+        Content(id: '1', text: 'Первое'),
+        Content(id: '2', text: 'Второе'),
+      ];
+      late StateSetter change;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: StatefulBuilder(
+              builder: (context, setState) {
+                change = setState;
+                return FavoriteMessages(
+                  messages: messages,
+                  principalId: 'я',
+                  onJump: (_) {},
+                  onRemove: (message) => change(
+                    () => messages = messages
+                        .where((m) => m.id != message.id)
+                        .toList(),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await mouse.addPointer(location: const Offset(700, 100));
+      for (var i = 0; i < 10; i++) {
+        final markers = find.descendant(
+          of: find.byType(FavoriteMessages),
+          matching: find.byType(InkWell),
+        );
+        await mouse.moveTo(tester.getCenter(markers.at(i % 2)));
+        await tester.pumpAndSettle();
+        expect(find.text(i.isEven ? 'Первое' : 'Второе'), findsNWidgets(2));
+        expect(find.text(i.isEven ? 'Второе' : 'Первое'), findsNothing);
+        expect(tester.takeException(), isNull);
+      }
+      change(
+        () => messages = [
+          Content(id: '2', text: 'Второе обновлено'),
+          Content(id: '1', text: 'Первое'),
+        ],
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await mouse.moveTo(const Offset(700, 100));
+      await tester.pumpAndSettle();
+      final first = find
+          .descendant(
+            of: find.byType(FavoriteMessages),
+            matching: find.byType(InkWell),
+          )
+          .first;
+      await mouse.moveTo(tester.getCenter(first));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.bookmark));
+      await tester.pumpAndSettle();
+      expect(messages.length, 1);
+      expect(tester.takeException(), isNull);
+      change(() => messages = []);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await mouse.removePointer();
+      semantics.dispose();
+    },
+  );
 
   test('Цвета своих и чужих сообщений различаются во всех палитрах', () {
     final preferences = AppPreferences();

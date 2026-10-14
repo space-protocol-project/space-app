@@ -85,7 +85,7 @@ ThemeData quietSpaceTheme(
       : base.colorScheme.primary;
   final appearance = SpaceAppearance(
     effects: effects,
-    background: tone(0xFF202222, 0xFFE8E5DB),
+    background: tone(0xFF1D2021, 0xFFE8E5DB),
     sidebar: tone(0xFF252625, 0xFFEEECE3),
     main: tone(0xFF2B2B29, 0xFFF7F5ED),
     surface: tone(0xFF343430, 0xFFE9E5D9),
@@ -168,11 +168,15 @@ class GlassSurface extends StatelessWidget {
     this.radius = 24,
     this.effects = true,
     this.blur = 12,
+    this.showBorder = true,
+    this.color,
   });
   final Widget child;
   final double radius;
   final bool effects;
   final double blur;
+  final bool showBorder;
+  final Color? color;
   @override
   Widget build(BuildContext context) {
     final appearance = SpaceAppearance.of(context);
@@ -182,7 +186,9 @@ class GlassSurface extends StatelessWidget {
         !MediaQuery.disableAnimationsOf(context);
     final surface = DecoratedBox(
       decoration: BoxDecoration(
-        color: enabled ? appearance.glass : appearance.surface,
+        color: enabled
+            ? color ?? appearance.glass
+            : color?.withValues(alpha: 1) ?? appearance.surface,
         gradient: enabled
             ? LinearGradient(
                 colors: [
@@ -192,9 +198,12 @@ class GlassSurface extends StatelessWidget {
               )
             : null,
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: .14),
-        ),
+        border: showBorder
+            ? Border.all(
+                color: Theme.of(context).colorScheme.onSurface
+                    .withValues(alpha: .14),
+              )
+            : null,
       ),
       child: const SizedBox.expand(),
     );

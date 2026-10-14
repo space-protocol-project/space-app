@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../l10n/strings.dart';
 import '../src/generated/space/v1/space.pb.dart';
 import 'message_bubble.dart';
+import 'space_appearance.dart';
 
 class FavoriteMessages extends StatefulWidget {
   const FavoriteMessages({
@@ -26,11 +27,72 @@ class FavoriteMessages extends StatefulWidget {
 }
 
 class _FavoriteMessagesState extends State<FavoriteMessages> {
+  // Одна карточка на всю полосу: портал не переезжает между маркерами.
+  final overlay = OverlayPortalController();
+  final markers = <String, GlobalKey>{};
+  Timer? closing;
   String? selected;
-  void previewChanged(String id, bool visible) {
-    if (!visible && selected != id) return;
-    setState(() => selected = visible ? id : null);
-    widget.onPreviewChanged?.call(visible);
+  Rect anchor = Rect.zero;
+  Content? get selectedMessage =>
+      widget.messages.where((m) => m.id == selected).firstOrNull;
+
+  void show(Content message) {
+    closing?.cancel();
+    final box = markers[message.id]?.currentContext?.findRenderObject();
+    if (box is! RenderBox || !box.hasSize) return;
+    anchor = box.localToGlobal(Offset.zero) & box.size;
+    setState(() => selected = message.id);
+    overlay.show();
+    widget.onPreviewChanged?.call(true);
+  }
+
+  void keepOpen() => closing?.cancel();
+  void hideLater() {
+    closing?.cancel();
+    closing = Timer(const Duration(milliseconds: 150), close);
+  }
+
+  void close() {
+    closing?.cancel();
+    if (!mounted) return;
+    overlay.hide();
+    setState(() => selected = null);
+    widget.onPreviewChanged?.call(false);
+  }
+
+  void jump(Content message) {
+    close();
+    widget.onJump(message);
+  }
+
+  void remove(Content message) {
+    close();
+    widget.onRemove(message);
+  }
+
+  KeyEventResult closeOnEscape(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent ||
+        event.logicalKey != LogicalKeyboardKey.escape) {
+      return KeyEventResult.ignored;
+    }
+    close();
+    return KeyEventResult.handled;
+  }
+
+  @override
+  void didUpdateWidget(covariant FavoriteMessages oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (selected != null && selectedMessage == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && selectedMessage == null) close();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    closing?.cancel();
+    super.dispose();
   }
 
   double markerWidth(int index) {
@@ -44,202 +106,37 @@ class _FavoriteMessagesState extends State<FavoriteMessages> {
     };
   }
 
-  @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) => Align(
-      alignment: Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: constraints.maxHeight * .65),
-        child: SizedBox(
-          width: 44,
-          child: SingleChildScrollView(
-            primary: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (final (index, message) in widget.messages.indexed)
-                  _FavoriteMarker(
-                    key: ValueKey(message.id),
-                    message: message,
-                    mine: message.authorId == widget.principalId,
-                    width: markerWidth(index),
-                    selected: selected,
-                    onPreviewChanged: (visible) =>
-                        previewChanged(message.id, visible),
-                    onJump: () => widget.onJump(message),
-                    onRemove: () => widget.onRemove(message),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
-class _FavoriteMarker extends StatefulWidget {
-  const _FavoriteMarker({
-    super.key,
-    required this.message,
-    required this.mine,
-    required this.onJump,
-    required this.onRemove,
-    required this.width,
-    required this.selected,
-    required this.onPreviewChanged,
-  });
-  final Content message;
-  final bool mine;
-  final VoidCallback onJump, onRemove;
-  final double width;
-  final String? selected;
-  final ValueChanged<bool> onPreviewChanged;
-  @override
-  State<_FavoriteMarker> createState() => _FavoriteMarkerState();
-}
-
-class _FavoriteMarkerState extends State<_FavoriteMarker> {
-  final overlay = OverlayPortalController();
-  final link = LayerLink();
-  final markerKey = GlobalKey();
-  Timer? closing;
-  void show() {
-    closing?.cancel();
-    if (overlay.isShowing) return;
-    overlay.show();
-    widget.onPreviewChanged(true);
-    setState(() {});
-  }
-
-  void hide() {
-    closing?.cancel();
-    closing = Timer(const Duration(milliseconds: 150), () {
-      if (!mounted) return;
-      overlay.hide();
-      widget.onPreviewChanged(false);
-      setState(() {});
-    });
-  }
-
-  @override
-  void didUpdateWidget(covariant _FavoriteMarker oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.selected != widget.message.id && overlay.isShowing) {
-      overlay.hide();
-    }
-  }
-
-  @override
-  void dispose() {
-    closing?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final author = widget.mine ? context.strings.you : widget.message.authorId;
-    return CompositedTransformTarget(
-      link: link,
-      child: OverlayPortal(
-        controller: overlay,
-        overlayChildBuilder: (context) => Positioned.fill(
-          child: CustomSingleChildLayout(
-            delegate: _PreviewPlacement(markerRect()),
-            child: MouseRegion(
-              onEnter: (_) => show(),
-              onExit: (_) => hide(),
-              child: Focus(
-                onFocusChange: (focused) => focused ? show() : hide(),
-                onKeyEvent: closeOnEscape,
-                child: SizedBox(
-                  width: (MediaQuery.sizeOf(context).width - 110).clamp(
-                    160,
-                    480,
-                  ),
-                  child: Material(
-                    elevation: 8,
-                    color: messageBubbleColor(colors, widget.mine),
-                    borderRadius: BorderRadius.circular(20),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(18),
-                      onTap: jump,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 8, 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    previewLines.firstOrNull ?? author,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                                IconButton(
-                                  tooltip: context.strings.removeFavorite,
-                                  onPressed: remove,
-                                  icon: const Icon(Icons.bookmark, size: 18),
-                                ),
-                              ],
-                            ),
-                            Flexible(
-                              child: Text(
-                                previewExcerpt,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: colors.onSurfaceVariant,
-                                  height: 1.65,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        child: MouseRegion(
-          key: markerKey,
-          onEnter: (_) => show(),
-          onExit: (_) => hide(),
-          child: Semantics(
-            label:
-                '${context.strings.favoriteMessages}: $author. ${widget.message.text}',
-            button: true,
-            child: Focus(
-              onKeyEvent: closeOnEscape,
-              child: InkWell(
-                onTap: jump,
-                onLongPress: show,
-                onFocusChange: (focused) => focused ? show() : hide(),
-                child: SizedBox(
-                  height: 15,
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: AnimatedContainer(
-                      duration: MediaQuery.disableAnimationsOf(context)
-                          ? Duration.zero
-                          : const Duration(milliseconds: 180),
-                      width: widget.width,
-                      height: 3,
-                      decoration: BoxDecoration(
-                        color: messageMarkerColor(colors, widget.mine),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
+  Widget marker(BuildContext context, int index) {
+    final message = widget.messages[index];
+    final author = message.authorId == widget.principalId
+        ? context.strings.you
+        : message.authorId;
+    return MouseRegion(
+      onEnter: (_) => show(message),
+      onExit: (_) => hideLater(),
+      child: Semantics(
+        label: '${context.strings.favoriteMessages}: $author. ${message.text}',
+        button: true,
+        child: Focus(
+          onKeyEvent: closeOnEscape,
+          child: InkWell(
+            key: markers.putIfAbsent(message.id, GlobalKey.new),
+            onTap: () => jump(message),
+            onLongPress: () => show(message),
+            onFocusChange: (focused) => focused ? show(message) : hideLater(),
+            child: SizedBox(
+              height: 15,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: AnimatedContainer(
+                  duration: MediaQuery.disableAnimationsOf(context)
+                      ? Duration.zero
+                      : const Duration(milliseconds: 180),
+                  width: markerWidth(index),
+                  height: 3,
+                  color: messageMarkerColor(
+                    Theme.of(context).colorScheme,
+                    message.authorId == widget.principalId,
                   ),
                 ),
               ),
@@ -250,40 +147,140 @@ class _FavoriteMarkerState extends State<_FavoriteMarker> {
     );
   }
 
-  List<String> get previewLines => widget.message.text
-      .split('\n')
-      .where((line) => line.trim().isNotEmpty)
-      .toList();
-  String get previewExcerpt => previewLines.length > 1
-      ? previewLines.skip(1).join('\n')
-      : widget.message.text;
-
-  void jump() {
-    overlay.hide();
-    widget.onPreviewChanged(false);
-    widget.onJump();
+  Widget preview(BuildContext context) {
+    final message = selectedMessage;
+    if (message == null) return const SizedBox.shrink();
+    return Positioned.fill(
+      child: CustomSingleChildLayout(
+        delegate: _PreviewPlacement(anchor),
+        child: MouseRegion(
+          onEnter: (_) => keepOpen(),
+          onExit: (_) => hideLater(),
+          child: Focus(
+            onKeyEvent: closeOnEscape,
+            onFocusChange: (focused) => focused ? keepOpen() : hideLater(),
+            child: _FavoriteCard(
+              message: message,
+              mine: message.authorId == widget.principalId,
+              onJump: () => jump(message),
+              onRemove: () => remove(message),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
-  void remove() {
-    overlay.hide();
-    widget.onPreviewChanged(false);
-    widget.onRemove();
-  }
+  @override
+  Widget build(BuildContext context) => OverlayPortal(
+    controller: overlay,
+    overlayChildBuilder: preview,
+    child: LayoutBuilder(
+      builder: (context, constraints) => Align(
+        alignment: Alignment.centerLeft,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: constraints.maxHeight * .65),
+          child: SizedBox(
+            width: 44,
+            child: SingleChildScrollView(
+              primary: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (var i = 0; i < widget.messages.length; i++)
+                    marker(context, i),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
 
-  KeyEventResult closeOnEscape(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent ||
-        event.logicalKey != LogicalKeyboardKey.escape) {
-      return KeyEventResult.ignored;
-    }
-    overlay.hide();
-    widget.onPreviewChanged(false);
-    return KeyEventResult.handled;
-  }
-
-  Rect markerRect() {
-    final box = markerKey.currentContext?.findRenderObject();
-    if (box is! RenderBox) return Rect.zero;
-    return box.localToGlobal(Offset.zero) & box.size;
+class _FavoriteCard extends StatelessWidget {
+  const _FavoriteCard({
+    required this.message,
+    required this.mine,
+    required this.onJump,
+    required this.onRemove,
+  });
+  final Content message;
+  final bool mine;
+  final VoidCallback onJump, onRemove;
+  @override
+  Widget build(BuildContext context) {
+    final lines = message.text
+        .split('\n')
+        .where((line) => line.trim().isNotEmpty)
+        .toList();
+    final title = lines.firstOrNull ?? message.authorId;
+    final excerpt = lines.length > 1 ? lines.skip(1).join('\n') : message.text;
+    final colors = Theme.of(context).colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: .10),
+            blurRadius: 28,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: GlassSurface(
+        radius: 20,
+        color: Color.alphaBlend(
+          messageMarkerColor(colors, mine).withValues(alpha: .15),
+          SpaceAppearance.of(context).glass,
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: onJump,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 8, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: context.strings.removeFavorite,
+                        onPressed: onRemove,
+                        icon: const Icon(Icons.bookmark, size: 18),
+                      ),
+                    ],
+                  ),
+                  Flexible(
+                    child: Text(
+                      excerpt,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colors.onSurfaceVariant,
+                        height: 1.65,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
