@@ -1,3 +1,10 @@
+import 'package:path_provider/path_provider.dart';
+
+import 'mls/client.dart';
+import 'mls/local_store.dart';
+import 'mls/native.dart';
+import 'mls/channel_pin.dart';
+import 'secure_vault.dart';
 import 'local_failure.dart';
 
 import 'dart:convert';
@@ -12,6 +19,8 @@ import 'package:protobuf/protobuf.dart' show GeneratedMessage;
 
 import 'rpc_clients.dart';
 import 'root_history.dart';
+import 'root_adoption.dart';
+import 'root_device_proof.dart';
 import 'origin_binding.dart';
 import 'rpc_connection.dart';
 import 'root_rotation.dart' as rotation;
@@ -264,7 +273,9 @@ class DeviceRecord {
     this.rootHistory = const [],
     this.tlsFingerprint = '',
     this.endpoint = '',
-  });
+    Map<String, String>? mlsChannels,
+    this.mlsIdentity,
+  }) : mlsChannels = {...?mlsChannels};
   final String origin, serverId, serverKey;
   final String tlsFingerprint;
   String endpoint;
@@ -276,6 +287,8 @@ class DeviceRecord {
   final bool administrative;
   String grantId;
   final List<Map<String, dynamic>> rootHistory;
+  final Map<String, String> mlsChannels;
+  Map<String, dynamic>? mlsIdentity;
   Future<RootIdentity> identity() async {
     final public = rootSeed.isEmpty
         ? rootPublicKey
@@ -300,6 +313,8 @@ class DeviceRecord {
     'recoveryGrantId': recoveryGrantId,
     'administrative': administrative,
     'rootHistory': rootHistory,
+    'mlsChannels': mlsChannels,
+    'mlsIdentity': ?mlsIdentity,
   };
   static DeviceRecord fromJson(Map<String, dynamic> data) {
     if (data['v'] != 1 && data['v'] != 2 && data['v'] != 3) {
@@ -332,6 +347,10 @@ class DeviceRecord {
       rootHistory: (data['rootHistory'] as List? ?? [])
           .map((v) => Map<String, dynamic>.from(v as Map))
           .toList(),
+      mlsChannels: Map<String, String>.from(data['mlsChannels'] as Map? ?? {}),
+      mlsIdentity: data['mlsIdentity'] == null
+          ? null
+          : Map<String, dynamic>.from(data['mlsIdentity'] as Map),
     );
     _requireDeviceSecrets(record);
     if (record.endpoint.isNotEmpty) localOrigin(record.endpoint);
@@ -442,7 +461,11 @@ abstract interface class AdministrativeDeviceControl {
 }
 
 abstract interface class RootRotationControl {
-  Future<void> prepareRotation({bool renew = false});
+  Future<List<DeviceGrant>> previewRotationDevices();
+  Future<void> prepareRotation({
+    bool renew = false,
+    List<DeviceGrant>? retainedDevices,
+  });
 }
 
 abstract interface class ServerIconPresentation {
@@ -493,6 +516,94 @@ class SpaceSession
         ChannelUpdates,
         SpaceAdministration {
   SpaceSession._(this.server, this.record, this.vault, this.channel);
+  Future<MlsClient>? _mlsClient;
+  String _mlsGrant = '';
+  Future<MlsClient> mlsClient() {
+    if (_mlsGrant != record.grantId) {
+      _mlsClient = null;
+      _mlsGrant = record.grantId;
+    }
+    return _mlsClient ??= _openMlsClient();
+  }
+
+  Future<MlsClient> _openMlsClient() async {
+    final engine = NativeMlsEngine();
+    if (!engine.available) {
+      throw StateError('В сборке нет нативного модуля MLS');
+    }
+    final public = await (await Ed25519().newKeyPairFromSeed(record.deviceSeed))
+        .extractPublicKey();
+    final identity = await record.identity();
+    final directory = await getApplicationSupportDirectory();
+    final authenticationGrant = record.grantId;
+    final scope =
+        record.mlsIdentity ??
+        {
+          'server_id': server.serverId,
+          'principal_id': identity.principalId,
+          'grant_id': record.grantId,
+          'public_key': public.bytes,
+        };
+    if (scope['server_id'] != server.serverId ||
+        scope['principal_id'] != identity.principalId) {
+      throw StateError(
+        'Идентичность MLS принадлежит другому пространству или участнику',
+      );
+    }
+    record.mlsIdentity = scope;
+    await vault.save(record);
+    final local = MlsLocalStore(
+      storage: const PlatformKeyStorage(),
+      engine: engine,
+      scope: scope,
+      deviceSeed: record.deviceSeed,
+      requireExisting: scope['grant_id'] != authenticationGrant,
+      lockDirectory: Directory.fromUri(directory.uri.resolve('mls-locks/')),
+    );
+    return MlsClient(
+      local: local,
+      connection: channel,
+      options: () => mlsOptions(expectedGrant: authenticationGrant),
+      pinChannel: (id, group) => _pinMlsChannel(id, group),
+      attachmentsEnabled: () => attachmentsEnabled,
+    );
+  }
+
+  Future<RpcOptions> mlsOptions({required String expectedGrant}) async {
+    await _ensureSession();
+    if (record.grantId != expectedGrant) {
+      throw StateError(
+        'Ключ устройства изменился. Переподключитесь к закрытому каналу.',
+      );
+    }
+    return _options;
+  }
+
+  Future<void> _pinMlsChannel(String id, List<int> group) async {
+    final pin = base64Encode(group);
+    final existing = record.mlsChannels[id];
+    if (existing != null && existing != pin) {
+      throw StateError('Режим защиты канала изменился');
+    }
+    if (existing == pin) return;
+    record.mlsChannels[id] = pin;
+    try {
+      await vault.save(record);
+    } catch (_) {
+      record.mlsChannels.remove(id);
+      rethrow;
+    }
+  }
+
+  Future<void> _pinMlsCatalog(List<Channel> channels) async {
+    for (final channel in channels) {
+      requirePinnedMlsChannel(record.mlsChannels, channel);
+      if (channel.mlsGroupId.isNotEmpty) {
+        await _pinMlsChannel(channel.id, channel.mlsGroupId);
+      }
+    }
+  }
+
   final Discovery server;
   DeviceRecord record;
   final IdentityVault vault;
@@ -502,6 +613,7 @@ class SpaceSession
   String spaceTitle = '';
   @override
   bool attachmentsEnabled = false;
+  bool mlsSupported = false;
   @override
   ServerIcon? serverIcon;
   @override
@@ -551,6 +663,8 @@ class SpaceSession
       ListChannelsRequest(includeArchived: true),
       options: _options,
     );
+    await _pinMlsCatalog(result.channels);
+    mlsSupported = manifest.mlsSupported;
     _applyCatalog(
       result.channels,
       manifest.title,
@@ -611,6 +725,9 @@ class SpaceSession
       options: RpcOptions(
         timeout: const Duration(minutes: 11),
         metadata: {'authorization': 'Bearer $_token'},
+        onUnauthenticated: () {
+          _expiresAt = 0;
+        },
       ),
     );
     try {
@@ -641,6 +758,7 @@ class SpaceSession
             'Некорректный снимок каталога',
           );
         }
+        await _pinMlsCatalog(frame.channels);
         _applyCatalog(
           frame.channels,
           frame.spaceTitle,
@@ -662,6 +780,9 @@ class SpaceSession
   RpcOptions get _options => RpcOptions(
     timeout: const Duration(seconds: 10),
     metadata: {'authorization': 'Bearer $_token'},
+    onUnauthenticated: () {
+      _expiresAt = 0;
+    },
   );
 
   bool _needsOwnerSetup = false;
@@ -999,6 +1120,8 @@ class SpaceSession
           deviceSeed: record.deviceSeed,
           rootPublicKey: record.rootPublicKey,
           rootHistory: record.rootHistory,
+          mlsChannels: record.mlsChannels,
+          mlsIdentity: record.mlsIdentity,
           administrative: true,
         );
       }
@@ -1054,13 +1177,13 @@ class SpaceSession
     DeviceRecord? authority,
     Pairing? pairing,
   }) async {
-    final credentials = authority ?? record;
+    var credentials = authority ?? record;
     final algorithm = Ed25519();
     final root = credentials.rootSeed.isEmpty
         ? null
         : await algorithm.newKeyPairFromSeed(credentials.rootSeed);
     final device = await algorithm.newKeyPairFromSeed(credentials.deviceSeed);
-    final rootPublic = root == null
+    var rootPublic = root == null
         ? credentials.rootPublicKey
         : (await root.extractPublicKey()).bytes;
     final devicePublic =
@@ -1096,6 +1219,8 @@ class SpaceSession
     final auth = AuthServiceClient(channel);
     final options = RpcOptions(timeout: const Duration(seconds: 10));
     final challenge = await auth.createChallenge(request, options: options);
+    credentials = await _adoptLoginCredentials(purpose, credentials, challenge);
+    rootPublic = (await credentials.identity()).publicKey;
     final checkedIdentity = await credentials.identity();
     final signing = await checkedSigningBytes(
       challenge,
@@ -1134,6 +1259,19 @@ class SpaceSession
       grantId,
     );
     return result;
+  }
+
+  Future<DeviceRecord> _adoptLoginCredentials(
+    String purpose,
+    DeviceRecord credentials,
+    CreateChallengeResponse challenge,
+  ) async {
+    if (purpose != 'auth.login') return credentials;
+    final updated = await adoptRetainedRoot(credentials, challenge);
+    if (identical(updated, credentials)) return credentials;
+    await vault.save(updated);
+    record = updated;
+    return updated;
   }
 
   Future<KeyPair> _authorizationKey(
@@ -1222,7 +1360,7 @@ class SpaceSession
   Future<List<Content>> messages() async {
     await _ensureSession();
     final id = selectedChannelId;
-    if (!canRead) return [];
+    if (!canRead || selectedChannel?.mlsGroupId.isNotEmpty == true) return [];
     final result = <Content>[];
     var cursor = '';
     for (var page = 0; page < 11; page++) {
@@ -1401,6 +1539,9 @@ class SpaceSession
       options: RpcOptions(
         timeout: const Duration(minutes: 11),
         metadata: {'authorization': 'Bearer $_token'},
+        onUnauthenticated: () {
+          _expiresAt = 0;
+        },
       ),
     );
     try {
@@ -1535,6 +1676,8 @@ class SpaceSession
       rootSeed: credentials.rootSeed,
       deviceSeed: record.deviceSeed,
       rootHistory: credentials.rootHistory,
+      mlsChannels: credentials.mlsChannels,
+      mlsIdentity: credentials.mlsIdentity,
       administrative: true,
     );
     final result = await _authorize('device.register', authority: signer);
@@ -1559,7 +1702,21 @@ class SpaceSession
   }
 
   @override
-  Future<void> prepareRotation({bool renew = false}) async {
+  Future<List<DeviceGrant>> previewRotationDevices() async {
+    await _ensureSession();
+    return verifiedRetainedDevices(
+      server,
+      record,
+      AuthServiceClient(channel),
+      _options,
+    );
+  }
+
+  @override
+  Future<void> prepareRotation({
+    bool renew = false,
+    List<DeviceGrant>? retainedDevices,
+  }) async {
     await _ensureSession();
     if (vault is! RotationJournalVault) {
       throw const LocalFailure(
@@ -1574,6 +1731,7 @@ class SpaceSession
       AuthServiceClient(channel),
       _options,
       renew: renew,
+      retainedDevices: retainedDevices,
     );
   }
 

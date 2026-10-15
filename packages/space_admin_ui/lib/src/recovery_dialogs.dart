@@ -16,6 +16,7 @@ Future<bool> confirmRecoveryAction(
             AdminLocalizations.of(context) ??
             lookupAdminLocalizations(const Locale('ru'));
         return AlertDialog(
+          scrollable: true,
           title: Text(strings.recoveryConfirm),
           content: Text(textBuilder?.call(context) ?? text),
           actions: [

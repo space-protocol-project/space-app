@@ -816,3 +816,90 @@ extension type MembershipServiceClient (connect.Transport _transport) {
     );
   }
 }
+/// Сервер доставляет непрозрачные MLS-пакеты. Состав проверяется клиентами.
+extension type MlsServiceClient (connect.Transport _transport) {
+  Future<spacev1space.RegisterMlsDeviceResponse> registerMlsDevice(
+    spacev1space.RegisterMlsDeviceRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.MlsService.registerMlsDevice,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1space.ListMlsDevicesResponse> listMlsDevices(
+    spacev1space.ListMlsDevicesRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.MlsService.listMlsDevices,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1space.GetMlsChannelResponse> getMlsChannel(
+    spacev1space.GetMlsChannelRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.MlsService.getMlsChannel,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1space.PublishMlsResponse> publishMls(
+    spacev1space.PublishMlsRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.MlsService.publishMls,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1space.ListMlsEnvelopesResponse> listMlsEnvelopes(
+    spacev1space.ListMlsEnvelopesRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.MlsService.listMlsEnvelopes,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+}

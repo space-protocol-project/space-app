@@ -1,5 +1,7 @@
 # flutter_secure_storage_windows
 
+Локальное исправление Space: запись `.secure` выполняется через временный зашифрованный файл, FlushFileBuffers и атомарную замену с MOVEFILE_WRITE_THROUGH. Ошибка не обрезает прежний файл. Проверка: `tools/check_secure_storage.ps1` в корне Space.
+
 This is the platform-specific implementation of `flutter_secure_storage` for Windows.
 
 ## Features

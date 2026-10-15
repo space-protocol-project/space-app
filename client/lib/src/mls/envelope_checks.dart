@@ -1,0 +1,53 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
+
+import '../rpc_clients.dart';
+
+// Служебные поля сервера не подтверждают доставку другого ciphertext.
+void requireMlsAcknowledgement(
+  PublishMlsRequest request,
+  MlsEnvelope envelope,
+  Map<String, dynamic> scope,
+) {
+  if (envelope.sequence.toInt() <= 0 ||
+      envelope.authorGrantId != scope['grant_id'] ||
+      envelope.authorId != scope['principal_id'] ||
+      envelope.kind != request.kind ||
+      envelope.epoch != request.expectedEpoch ||
+      base64Encode(envelope.requestId) != base64Encode(request.requestId) ||
+      base64Encode(envelope.ciphertext) != base64Encode(request.ciphertext) ||
+      envelope.addedGrantId != request.addGrantId ||
+      envelope.removedGrantId != request.removeGrantId ||
+      envelope.newManagerGrantId != request.newManagerGrantId ||
+      base64Encode(envelope.welcome) != base64Encode(request.welcome)) {
+    throw StateError('Подтверждение сервера не соответствует MLS-запросу');
+  }
+}
+
+String mlsReceipt(MlsEnvelope envelope) => sha256
+    .convert(
+      utf8.encode(
+        jsonEncode([
+          envelope.sequence.toString(),
+          envelope.epoch.toString(),
+          envelope.kind,
+          envelope.authorId,
+          envelope.authorGrantId,
+          base64Encode(envelope.requestId),
+          base64Encode(envelope.ciphertext),
+          envelope.addedGrantId,
+          envelope.removedGrantId,
+          envelope.newManagerGrantId,
+        ]),
+      ),
+    )
+    .toString();
+
+void requireMlsSequence(Map<String, dynamic> channel, MlsEnvelope envelope) {
+  final previous = channel['cursor'] as int;
+  final next = envelope.sequence.toInt();
+  if (next <= previous || (channel['joined'] == true && next != previous + 1)) {
+    throw StateError('Нарушен порядок событий MLS');
+  }
+}

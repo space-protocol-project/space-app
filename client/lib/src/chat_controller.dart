@@ -136,10 +136,14 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   Future<void> refreshChannels() => sendRequest(ChatChannelsRefreshed());
   Future<bool> send(String text, {List<String> attachments = const []}) =>
       sendRequest(ChatMessageSent(text, List.unmodifiable(attachments)));
+  SpaceSession? get mlsSession =>
+      _session is SpaceSession ? _session as SpaceSession : null;
+  bool get encryptedChannel =>
+      channels.any((c) => c.id == channelId && c.mlsGroupId.isNotEmpty);
   MemberProfile? get memberProfile =>
       connected && _session is MemberProfile ? _session as MemberProfile : null;
   AttachmentSession? get attachmentSession =>
-      attachmentsEnabled && _session is AttachmentSession
+      !encryptedChannel && attachmentsEnabled && _session is AttachmentSession
       ? _session as AttachmentSession
       : null;
   bool get attachmentsEnabled =>
@@ -726,7 +730,9 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       if (session is ChannelUpdates) {
         unawaited(_watchCatalog(session, ++_catalogGeneration));
       }
-      if (canRead) unawaited(_watch(session, ++_generation));
+      if (canRead && !encryptedChannel) {
+        unawaited(_watch(session, ++_generation));
+      }
     } catch (e) {
       await _rejectAccess(e);
       error = _explain(e);
@@ -842,7 +848,9 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       }
       connected = true;
       await _savePositions();
-      if (canRead) unawaited(_watch(session, ++_generation));
+      if (canRead && !encryptedChannel) {
+        unawaited(_watch(session, ++_generation));
+      }
     } catch (e) {
       _messages.clear();
       error = _explain(e);

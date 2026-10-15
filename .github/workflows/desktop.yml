@@ -4,9 +4,9 @@ on:
   push:
     branches: [main]
     tags: ['v*']
-    paths: ['client/**', 'packages/**', 'packaging/**', 'Changelog.md', '.github/workflows/desktop.yml']
+    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_secure_storage.ps1', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
   pull_request:
-    paths: ['client/**', 'packages/**', 'packaging/**', 'Changelog.md', '.github/workflows/desktop.yml']
+    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_secure_storage.ps1', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
 permissions:
   contents: read
 concurrency:
@@ -28,6 +28,10 @@ jobs:
     uses: space-protocol-project/space-server/.github/workflows/server.yml@main
     with:
       app_ref: ${{ github.sha }}
+  verify-mls:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: validate
+    uses: ./.github/workflows/mls.yml
   desktop:
     needs: validate
     strategy:
@@ -61,6 +65,10 @@ jobs:
       - name: Зависимости приложения
         working-directory: client
         run: flutter pub get
+      - name: Атомарная запись защищённого состояния Windows
+        if: matrix.target == 'windows'
+        shell: pwsh
+        run: ./tools/check_secure_storage.ps1
       - name: Эталонные изображения Windows
         if: matrix.target == 'windows'
         working-directory: client
@@ -173,7 +181,7 @@ jobs:
           if-no-files-found: error
   publish:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    needs: [validate, desktop, android, verify-release]
+    needs: [validate, desktop, android, verify-release, verify-mls]
     runs-on: ubuntu-latest
     permissions:
       contents: write

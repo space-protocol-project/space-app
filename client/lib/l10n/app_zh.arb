@@ -227,11 +227,12 @@
   "recoveryConnectionDenied": "密钥已保存，但服务器拒绝连接。请检查身份卡是否被撤销、访问是否被阻止以及聊天是否可用。",
   "recoveryRestored": "身份已通过新设备恢复。请检查设备列表并撤销丢失的设备。",
   "rotationRenewConfirm": "使用相同的已保存新密钥更新过期请求？如果服务器已完成更换，请完成已保存的更换操作。",
-  "rotationConfirm": "更换根密钥？您的标识符、权限和历史记录会保留。旧设备和身份卡将失去访问权限。新密钥会先保存到受保护的日志。更换后务必保存新身份卡。",
+  "rotationDevicesReview": "请检查将保留访问权限的设备。如果有不认识的设备，请取消并先撤销其权限。",
+  "rotationConfirm": "更换根密钥？您的 ID、权限、历史记录和已验证的有效设备将保留，访问期限不会延长。旧会话和恢复卡将失效。新密钥将先保存到受保护的日志中。更换后请保存新的恢复卡。",
   "rotationServerRequired": "请先检查原服务器地址",
   "rotationNotPending": "此服务器没有已保存的密钥更换操作。",
   "rotationReconnect": "新密钥已保存。请检查服务器是否可用并重新连接。",
-  "rotationCompleted": "根密钥已更换，原标识符已保留。请保存新身份卡；旧身份卡和设备已无法使用。",
+  "rotationCompleted": "根密钥已更换，ID 和已验证的设备已保留。请保存新的恢复卡；旧卡已失效。",
   "recoveryRevokeCard": "撤销恢复密钥？身份卡及所有通过它连接的设备将无法使用。请先确保有其他访问方式。",
   "recoveryRevokeDevice": "撤销此设备？其会话和订阅将结束。",
   "recoveryRevoked": "已在服务器上撤销权限。",
@@ -510,5 +511,35 @@
   "nicknameInvalid": "请使用最多40个字符，不含换行。",
   "nicknameFailed": "无法更新个人资料，请检查连接。",
   "retryProfile": "重试",
-  "messageUnavailable": "消息不可用"
+  "messageUnavailable": "消息不可用",
+  "mlsTitle": "私密频道 · MLS",
+  "mlsExperimental": "实验性端到端加密",
+  "mlsCreate": "创建私密频道",
+  "mlsChannelId": "频道标识",
+  "mlsChannelTitle": "频道名称",
+  "mlsDeviceCode": "此设备的验证码",
+  "mlsDevices": "频道设备",
+  "mlsVerify": "验证设备",
+  "mlsTrust": "验证码一致",
+  "mlsVerifyHint": "请通过独立渠道与另一台设备核对验证码。服务器不能证明密钥可信。",
+  "mlsInvite": "邀请",
+  "mlsRemove": "移除设备",
+  "mlsRetry": "刷新并重试发送",
+  "mlsWaiting": "此设备尚未获邀或访问已被撤销。请将验证码提供给频道所有者。",
+  "mlsInput": "有什么新消息？",
+  "mlsSend": "发送",
+  "mlsAttach": "添加文件",
+  "mlsFiles": "频道文件",
+  "mlsUnavailable": "消息不可用",
+  "mlsCancel": "取消",
+  "mlsTransfer": "移交管理权",
+  "mlsTransferTitle": "移交频道管理权？",
+  "mlsTransferHint": "设备 {device} 将能够邀请和移除成员。你仍可访问消息和文件。",
+  "@mlsTransferHint": {
+    "placeholders": {
+      "device": {
+        "type": "String"
+      }
+    }
+  }
 }

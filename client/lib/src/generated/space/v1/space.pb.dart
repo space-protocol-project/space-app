@@ -10,7 +10,6 @@
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
-import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -243,6 +242,14 @@ class DeviceGrant extends $pb.GeneratedMessage {
     $core.bool? revoked,
     $core.String? parentGrantId,
     $core.bool? recovery,
+    $fixnum.Int64? authEpoch,
+    $core.String? signatureKind,
+    $core.List<$core.int>? registrationTranscript,
+    $core.List<$core.int>? signature,
+    $core.List<$core.int>? parentTranscript,
+    $core.List<$core.int>? parentSignature,
+    RetentionProof? retentionProof,
+    $core.bool? retainable,
   }) {
     final result = DeviceGrant._();
     if (id != null) result.id = id;
@@ -252,6 +259,15 @@ class DeviceGrant extends $pb.GeneratedMessage {
     if (revoked != null) result.revoked = revoked;
     if (parentGrantId != null) result.parentGrantId = parentGrantId;
     if (recovery != null) result.recovery = recovery;
+    if (authEpoch != null) result.authEpoch = authEpoch;
+    if (signatureKind != null) result.signatureKind = signatureKind;
+    if (registrationTranscript != null)
+      result.registrationTranscript = registrationTranscript;
+    if (signature != null) result.signature = signature;
+    if (parentTranscript != null) result.parentTranscript = parentTranscript;
+    if (parentSignature != null) result.parentSignature = parentSignature;
+    if (retentionProof != null) result.retentionProof = retentionProof;
+    if (retainable != null) result.retainable = retainable;
     return result;
   }
 
@@ -276,6 +292,19 @@ class DeviceGrant extends $pb.GeneratedMessage {
     ..aOB(5, _omitFieldNames ? '' : 'revoked')
     ..aOS(6, _omitFieldNames ? '' : 'parentGrantId')
     ..aOB(7, _omitFieldNames ? '' : 'recovery')
+    ..aInt64(8, _omitFieldNames ? '' : 'authEpoch')
+    ..aOS(9, _omitFieldNames ? '' : 'signatureKind')
+    ..a<$core.List<$core.int>>(
+        10, _omitFieldNames ? '' : 'registrationTranscript', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        11, _omitFieldNames ? '' : 'signature', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        12, _omitFieldNames ? '' : 'parentTranscript', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        13, _omitFieldNames ? '' : 'parentSignature', $pb.PbFieldType.OY)
+    ..aOM<RetentionProof>(14, _omitFieldNames ? '' : 'retentionProof',
+        subBuilder: RetentionProof.$_createMessage)
+    ..aOB(15, _omitFieldNames ? '' : 'retainable')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -356,6 +385,200 @@ class DeviceGrant extends $pb.GeneratedMessage {
   $core.bool hasRecovery() => $_has(6);
   @$pb.TagNumber(7)
   void clearRecovery() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $fixnum.Int64 get authEpoch => $_getI64(7);
+  @$pb.TagNumber(8)
+  set authEpoch($fixnum.Int64 value) => $_setInt64(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasAuthEpoch() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearAuthEpoch() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.String get signatureKind => $_getSZ(8);
+  @$pb.TagNumber(9)
+  set signatureKind($core.String value) => $_setString(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasSignatureKind() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearSignatureKind() => $_clearField(9);
+
+  @$pb.TagNumber(10)
+  $core.List<$core.int> get registrationTranscript => $_getN(9);
+  @$pb.TagNumber(10)
+  set registrationTranscript($core.List<$core.int> value) =>
+      $_setBytes(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasRegistrationTranscript() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearRegistrationTranscript() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $core.List<$core.int> get signature => $_getN(10);
+  @$pb.TagNumber(11)
+  set signature($core.List<$core.int> value) => $_setBytes(10, value);
+  @$pb.TagNumber(11)
+  $core.bool hasSignature() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearSignature() => $_clearField(11);
+
+  @$pb.TagNumber(12)
+  $core.List<$core.int> get parentTranscript => $_getN(11);
+  @$pb.TagNumber(12)
+  set parentTranscript($core.List<$core.int> value) => $_setBytes(11, value);
+  @$pb.TagNumber(12)
+  $core.bool hasParentTranscript() => $_has(11);
+  @$pb.TagNumber(12)
+  void clearParentTranscript() => $_clearField(12);
+
+  @$pb.TagNumber(13)
+  $core.List<$core.int> get parentSignature => $_getN(12);
+  @$pb.TagNumber(13)
+  set parentSignature($core.List<$core.int> value) => $_setBytes(12, value);
+  @$pb.TagNumber(13)
+  $core.bool hasParentSignature() => $_has(12);
+  @$pb.TagNumber(13)
+  void clearParentSignature() => $_clearField(13);
+
+  @$pb.TagNumber(14)
+  RetentionProof get retentionProof => $_getN(13);
+  @$pb.TagNumber(14)
+  set retentionProof(RetentionProof value) => $_setField(14, value);
+  @$pb.TagNumber(14)
+  $core.bool hasRetentionProof() => $_has(13);
+  @$pb.TagNumber(14)
+  void clearRetentionProof() => $_clearField(14);
+  @$pb.TagNumber(14)
+  RetentionProof ensureRetentionProof() => $_ensure(13);
+
+  @$pb.TagNumber(15)
+  $core.bool get retainable => $_getBF(14);
+  @$pb.TagNumber(15)
+  set retainable($core.bool value) => $_setBool(14, value);
+  @$pb.TagNumber(15)
+  $core.bool hasRetainable() => $_has(14);
+  @$pb.TagNumber(15)
+  void clearRetainable() => $_clearField(15);
+}
+
+class RetentionProof extends $pb.GeneratedMessage {
+  factory RetentionProof({
+    $core.String? grantId,
+    $core.List<$core.int>? publicKey,
+    $core.Iterable<$core.String>? scopes,
+    $fixnum.Int64? expiresAt,
+    $core.int? index,
+    $core.int? count,
+    $core.Iterable<$core.List<$core.int>>? siblings,
+  }) {
+    final result = RetentionProof._();
+    if (grantId != null) result.grantId = grantId;
+    if (publicKey != null) result.publicKey = publicKey;
+    if (scopes != null) result.scopes.addAll(scopes);
+    if (expiresAt != null) result.expiresAt = expiresAt;
+    if (index != null) result.index = index;
+    if (count != null) result.count = count;
+    if (siblings != null) result.siblings.addAll(siblings);
+    return result;
+  }
+
+  RetentionProof._();
+
+  factory RetentionProof.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      RetentionProof()..mergeFromBuffer(data, registry);
+  factory RetentionProof.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      RetentionProof()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'RetentionProof',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: RetentionProof.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'grantId')
+    ..a<$core.List<$core.int>>(
+        2, _omitFieldNames ? '' : 'publicKey', $pb.PbFieldType.OY)
+    ..pPS(3, _omitFieldNames ? '' : 'scopes')
+    ..aInt64(4, _omitFieldNames ? '' : 'expiresAt')
+    ..aI(5, _omitFieldNames ? '' : 'index', fieldType: $pb.PbFieldType.OU3)
+    ..aI(6, _omitFieldNames ? '' : 'count', fieldType: $pb.PbFieldType.OU3)
+    ..p<$core.List<$core.int>>(
+        7, _omitFieldNames ? '' : 'siblings', $pb.PbFieldType.PY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RetentionProof clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RetentionProof copyWith(void Function(RetentionProof) updates) =>
+      super.copyWith((message) => updates(message as RetentionProof))
+          as RetentionProof;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use RetentionProof() / RetentionProof.new instead')
+  static RetentionProof create() => RetentionProof._();
+  static $pb.GeneratedMessage $_createMessage() => RetentionProof._();
+  @$core.override
+  RetentionProof createEmptyInstance() => RetentionProof._();
+  @$core.pragma('dart2js:noInline')
+  static RetentionProof getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<RetentionProof>(
+          RetentionProof.$_createMessage);
+  static RetentionProof? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get grantId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set grantId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasGrantId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearGrantId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get publicKey => $_getN(1);
+  @$pb.TagNumber(2)
+  set publicKey($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasPublicKey() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearPublicKey() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $pb.PbList<$core.String> get scopes => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get expiresAt => $_getI64(3);
+  @$pb.TagNumber(4)
+  set expiresAt($fixnum.Int64 value) => $_setInt64(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasExpiresAt() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearExpiresAt() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.int get index => $_getIZ(4);
+  @$pb.TagNumber(5)
+  set index($core.int value) => $_setUnsignedInt32(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasIndex() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearIndex() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.int get count => $_getIZ(5);
+  @$pb.TagNumber(6)
+  set count($core.int value) => $_setUnsignedInt32(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasCount() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearCount() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $pb.PbList<$core.List<$core.int>> get siblings => $_getList(6);
 }
 
 class ListDevicesResponse extends $pb.GeneratedMessage {
@@ -3867,10 +4090,14 @@ class CreateChallengeResponse extends $pb.GeneratedMessage {
   factory CreateChallengeResponse({
     $core.String? challengeId,
     $core.List<$core.int>? transcript,
+    $core.Iterable<RootHistoryProof>? rootHistory,
+    RetentionProof? retentionProof,
   }) {
     final result = CreateChallengeResponse._();
     if (challengeId != null) result.challengeId = challengeId;
     if (transcript != null) result.transcript = transcript;
+    if (rootHistory != null) result.rootHistory.addAll(rootHistory);
+    if (retentionProof != null) result.retentionProof = retentionProof;
     return result;
   }
 
@@ -3890,6 +4117,10 @@ class CreateChallengeResponse extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'challengeId')
     ..a<$core.List<$core.int>>(
         2, _omitFieldNames ? '' : 'transcript', $pb.PbFieldType.OY)
+    ..pPM<RootHistoryProof>(3, _omitFieldNames ? '' : 'rootHistory',
+        subBuilder: RootHistoryProof.$_createMessage)
+    ..aOM<RetentionProof>(4, _omitFieldNames ? '' : 'retentionProof',
+        subBuilder: RetentionProof.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -3934,6 +4165,20 @@ class CreateChallengeResponse extends $pb.GeneratedMessage {
   $core.bool hasTranscript() => $_has(1);
   @$pb.TagNumber(2)
   void clearTranscript() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $pb.PbList<RootHistoryProof> get rootHistory => $_getList(2);
+
+  @$pb.TagNumber(4)
+  RetentionProof get retentionProof => $_getN(3);
+  @$pb.TagNumber(4)
+  set retentionProof(RetentionProof value) => $_setField(4, value);
+  @$pb.TagNumber(4)
+  $core.bool hasRetentionProof() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearRetentionProof() => $_clearField(4);
+  @$pb.TagNumber(4)
+  RetentionProof ensureRetentionProof() => $_ensure(3);
 }
 
 class CompleteChallengeRequest extends $pb.GeneratedMessage {
@@ -4383,6 +4628,7 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     $core.String? title,
     ServerIcon? icon,
     $core.bool? attachmentsEnabled,
+    $core.bool? mlsSupported,
   }) {
     final result = GetManifestResponse._();
     if (protocolVersion != null) result.protocolVersion = protocolVersion;
@@ -4392,6 +4638,7 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     if (icon != null) result.icon = icon;
     if (attachmentsEnabled != null)
       result.attachmentsEnabled = attachmentsEnabled;
+    if (mlsSupported != null) result.mlsSupported = mlsSupported;
     return result;
   }
 
@@ -4416,6 +4663,7 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     ..aOM<ServerIcon>(5, _omitFieldNames ? '' : 'icon',
         subBuilder: ServerIcon.$_createMessage)
     ..aOB(6, _omitFieldNames ? '' : 'attachmentsEnabled')
+    ..aOB(7, _omitFieldNames ? '' : 'mlsSupported')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -4490,6 +4738,15 @@ class GetManifestResponse extends $pb.GeneratedMessage {
   $core.bool hasAttachmentsEnabled() => $_has(5);
   @$pb.TagNumber(6)
   void clearAttachmentsEnabled() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.bool get mlsSupported => $_getBF(6);
+  @$pb.TagNumber(7)
+  set mlsSupported($core.bool value) => $_setBool(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasMlsSupported() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearMlsSupported() => $_clearField(7);
 }
 
 class Channel extends $pb.GeneratedMessage {
@@ -4503,6 +4760,7 @@ class Channel extends $pb.GeneratedMessage {
     ChannelPermissions? permissions,
     $core.bool? publicPreview,
     $fixnum.Int64? latestMessageSequence,
+    $core.List<$core.int>? mlsGroupId,
   }) {
     final result = Channel._();
     if (id != null) result.id = id;
@@ -4515,6 +4773,7 @@ class Channel extends $pb.GeneratedMessage {
     if (publicPreview != null) result.publicPreview = publicPreview;
     if (latestMessageSequence != null)
       result.latestMessageSequence = latestMessageSequence;
+    if (mlsGroupId != null) result.mlsGroupId = mlsGroupId;
     return result;
   }
 
@@ -4542,6 +4801,8 @@ class Channel extends $pb.GeneratedMessage {
         subBuilder: ChannelPermissions.$_createMessage)
     ..aOB(8, _omitFieldNames ? '' : 'publicPreview')
     ..aInt64(9, _omitFieldNames ? '' : 'latestMessageSequence')
+    ..a<$core.List<$core.int>>(
+        10, _omitFieldNames ? '' : 'mlsGroupId', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -4641,6 +4902,15 @@ class Channel extends $pb.GeneratedMessage {
   $core.bool hasLatestMessageSequence() => $_has(8);
   @$pb.TagNumber(9)
   void clearLatestMessageSequence() => $_clearField(9);
+
+  @$pb.TagNumber(10)
+  $core.List<$core.int> get mlsGroupId => $_getN(9);
+  @$pb.TagNumber(10)
+  set mlsGroupId($core.List<$core.int> value) => $_setBytes(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasMlsGroupId() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearMlsGroupId() => $_clearField(10);
 }
 
 /// write требует read, read и manage требуют visible.
@@ -4940,6 +5210,7 @@ class CreateChannelRequest extends $pb.GeneratedMessage {
     $core.String? viewType,
     $core.int? position,
     $core.bool? publicPreview,
+    $core.List<$core.int>? mlsGroupId,
   }) {
     final result = CreateChannelRequest._();
     if (channelId != null) result.channelId = channelId;
@@ -4947,6 +5218,7 @@ class CreateChannelRequest extends $pb.GeneratedMessage {
     if (viewType != null) result.viewType = viewType;
     if (position != null) result.position = position;
     if (publicPreview != null) result.publicPreview = publicPreview;
+    if (mlsGroupId != null) result.mlsGroupId = mlsGroupId;
     return result;
   }
 
@@ -4968,6 +5240,8 @@ class CreateChannelRequest extends $pb.GeneratedMessage {
     ..aOS(3, _omitFieldNames ? '' : 'viewType')
     ..aI(4, _omitFieldNames ? '' : 'position')
     ..aOB(5, _omitFieldNames ? '' : 'publicPreview')
+    ..a<$core.List<$core.int>>(
+        6, _omitFieldNames ? '' : 'mlsGroupId', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -5037,6 +5311,15 @@ class CreateChannelRequest extends $pb.GeneratedMessage {
   $core.bool hasPublicPreview() => $_has(4);
   @$pb.TagNumber(5)
   void clearPublicPreview() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.List<$core.int> get mlsGroupId => $_getN(5);
+  @$pb.TagNumber(6)
+  set mlsGroupId($core.List<$core.int> value) => $_setBytes(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasMlsGroupId() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearMlsGroupId() => $_clearField(6);
 }
 
 class UpdateChannelRequest extends $pb.GeneratedMessage {
@@ -6431,6 +6714,8 @@ class CreateRootRotationRequest extends $pb.GeneratedMessage {
     $core.List<$core.int>? newRootPublicKey,
     $core.List<$core.int>? newDevicePublicKey,
     $core.String? profile,
+    $core.Iterable<$core.String>? retainedGrantIds,
+    $core.List<$core.int>? retainedDevicesHash,
   }) {
     final result = CreateRootRotationRequest._();
     if (operationId != null) result.operationId = operationId;
@@ -6439,6 +6724,10 @@ class CreateRootRotationRequest extends $pb.GeneratedMessage {
     if (newDevicePublicKey != null)
       result.newDevicePublicKey = newDevicePublicKey;
     if (profile != null) result.profile = profile;
+    if (retainedGrantIds != null)
+      result.retainedGrantIds.addAll(retainedGrantIds);
+    if (retainedDevicesHash != null)
+      result.retainedDevicesHash = retainedDevicesHash;
     return result;
   }
 
@@ -6462,6 +6751,9 @@ class CreateRootRotationRequest extends $pb.GeneratedMessage {
     ..a<$core.List<$core.int>>(
         4, _omitFieldNames ? '' : 'newDevicePublicKey', $pb.PbFieldType.OY)
     ..aOS(5, _omitFieldNames ? '' : 'profile')
+    ..pPS(6, _omitFieldNames ? '' : 'retainedGrantIds')
+    ..a<$core.List<$core.int>>(
+        7, _omitFieldNames ? '' : 'retainedDevicesHash', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6534,6 +6826,18 @@ class CreateRootRotationRequest extends $pb.GeneratedMessage {
   $core.bool hasProfile() => $_has(4);
   @$pb.TagNumber(5)
   void clearProfile() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $pb.PbList<$core.String> get retainedGrantIds => $_getList(5);
+
+  @$pb.TagNumber(7)
+  $core.List<$core.int> get retainedDevicesHash => $_getN(6);
+  @$pb.TagNumber(7)
+  set retainedDevicesHash($core.List<$core.int> value) => $_setBytes(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasRetainedDevicesHash() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearRetainedDevicesHash() => $_clearField(7);
 }
 
 class CreateRootRotationResponse extends $pb.GeneratedMessage {
@@ -7341,6 +7645,7 @@ class BeginUploadRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? byteSize,
     $core.List<$core.int>? sha256,
     $core.String? idempotencyKey,
+    $core.bool? encrypted,
   }) {
     final result = BeginUploadRequest._();
     if (channelId != null) result.channelId = channelId;
@@ -7348,6 +7653,7 @@ class BeginUploadRequest extends $pb.GeneratedMessage {
     if (byteSize != null) result.byteSize = byteSize;
     if (sha256 != null) result.sha256 = sha256;
     if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
+    if (encrypted != null) result.encrypted = encrypted;
     return result;
   }
 
@@ -7370,6 +7676,7 @@ class BeginUploadRequest extends $pb.GeneratedMessage {
     ..a<$core.List<$core.int>>(
         4, _omitFieldNames ? '' : 'sha256', $pb.PbFieldType.OY)
     ..aOS(5, _omitFieldNames ? '' : 'idempotencyKey')
+    ..aOB(6, _omitFieldNames ? '' : 'encrypted')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -7438,6 +7745,15 @@ class BeginUploadRequest extends $pb.GeneratedMessage {
   $core.bool hasIdempotencyKey() => $_has(4);
   @$pb.TagNumber(5)
   void clearIdempotencyKey() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.bool get encrypted => $_getBF(5);
+  @$pb.TagNumber(6)
+  set encrypted($core.bool value) => $_setBool(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasEncrypted() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearEncrypted() => $_clearField(6);
 }
 
 class BeginUploadResponse extends $pb.GeneratedMessage {
@@ -8340,244 +8656,1068 @@ class ListChannelAssetsResponse extends $pb.GeneratedMessage {
   $pb.PbMap<$core.String, $core.String> get authors => $_getMap(2);
 }
 
-/// Экспериментальный контракт первого локального прототипа.
-class ChannelServiceApi {
-  final $pb.RpcClient _client;
+class MlsDevice extends $pb.GeneratedMessage {
+  factory MlsDevice({
+    $core.String? grantId,
+    $core.String? principalId,
+    $core.List<$core.int>? binding,
+    $core.List<$core.int>? keyPackage,
+  }) {
+    final result = MlsDevice._();
+    if (grantId != null) result.grantId = grantId;
+    if (principalId != null) result.principalId = principalId;
+    if (binding != null) result.binding = binding;
+    if (keyPackage != null) result.keyPackage = keyPackage;
+    return result;
+  }
 
-  ChannelServiceApi(this._client);
+  MlsDevice._();
 
-  $async.Future<WatchChannelsResponse> watchChannels(
-          $pb.ClientContext? ctx, WatchChannelsRequest request) =>
-      _client.invoke<WatchChannelsResponse>(ctx, 'ChannelService',
-          'WatchChannels', request, WatchChannelsResponse());
-  $async.Future<ListChannelsResponse> listChannels(
-          $pb.ClientContext? ctx, ListChannelsRequest request) =>
-      _client.invoke<ListChannelsResponse>(ctx, 'ChannelService',
-          'ListChannels', request, ListChannelsResponse());
-  $async.Future<CreateChannelResponse> createChannel(
-          $pb.ClientContext? ctx, CreateChannelRequest request) =>
-      _client.invoke<CreateChannelResponse>(ctx, 'ChannelService',
-          'CreateChannel', request, CreateChannelResponse());
-  $async.Future<UpdateChannelResponse> updateChannel(
-          $pb.ClientContext? ctx, UpdateChannelRequest request) =>
-      _client.invoke<UpdateChannelResponse>(ctx, 'ChannelService',
-          'UpdateChannel', request, UpdateChannelResponse());
-  $async.Future<DeleteChannelResponse> deleteChannel(
-          $pb.ClientContext? ctx, DeleteChannelRequest request) =>
-      _client.invoke<DeleteChannelResponse>(ctx, 'ChannelService',
-          'DeleteChannel', request, DeleteChannelResponse());
-  $async.Future<GetChannelAccessResponse> getChannelAccess(
-          $pb.ClientContext? ctx, GetChannelAccessRequest request) =>
-      _client.invoke<GetChannelAccessResponse>(ctx, 'ChannelService',
-          'GetChannelAccess', request, GetChannelAccessResponse());
-  $async.Future<UpdateChannelAccessResponse> updateChannelAccess(
-          $pb.ClientContext? ctx, UpdateChannelAccessRequest request) =>
-      _client.invoke<UpdateChannelAccessResponse>(ctx, 'ChannelService',
-          'UpdateChannelAccess', request, UpdateChannelAccessResponse());
-  $async.Future<GetManifestResponse> getManifest(
-          $pb.ClientContext? ctx, GetManifestRequest request) =>
-      _client.invoke<GetManifestResponse>(
-          ctx, 'ChannelService', 'GetManifest', request, GetManifestResponse());
+  factory MlsDevice.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      MlsDevice()..mergeFromBuffer(data, registry);
+  factory MlsDevice.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      MlsDevice()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'MlsDevice',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: MlsDevice.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'grantId')
+    ..aOS(2, _omitFieldNames ? '' : 'principalId')
+    ..a<$core.List<$core.int>>(
+        3, _omitFieldNames ? '' : 'binding', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        4, _omitFieldNames ? '' : 'keyPackage', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MlsDevice clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MlsDevice copyWith(void Function(MlsDevice) updates) =>
+      super.copyWith((message) => updates(message as MlsDevice)) as MlsDevice;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use MlsDevice() / MlsDevice.new instead')
+  static MlsDevice create() => MlsDevice._();
+  static $pb.GeneratedMessage $_createMessage() => MlsDevice._();
+  @$core.override
+  MlsDevice createEmptyInstance() => MlsDevice._();
+  @$core.pragma('dart2js:noInline')
+  static MlsDevice getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<MlsDevice>(MlsDevice.$_createMessage);
+  static MlsDevice? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get grantId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set grantId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasGrantId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearGrantId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get principalId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set principalId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasPrincipalId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearPrincipalId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get binding => $_getN(2);
+  @$pb.TagNumber(3)
+  set binding($core.List<$core.int> value) => $_setBytes(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasBinding() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearBinding() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.List<$core.int> get keyPackage => $_getN(3);
+  @$pb.TagNumber(4)
+  set keyPackage($core.List<$core.int> value) => $_setBytes(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasKeyPackage() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearKeyPackage() => $_clearField(4);
 }
 
-class ContentServiceApi {
-  final $pb.RpcClient _client;
+class RegisterMlsDeviceRequest extends $pb.GeneratedMessage {
+  factory RegisterMlsDeviceRequest({
+    $core.List<$core.int>? binding,
+    $core.List<$core.int>? keyPackage,
+  }) {
+    final result = RegisterMlsDeviceRequest._();
+    if (binding != null) result.binding = binding;
+    if (keyPackage != null) result.keyPackage = keyPackage;
+    return result;
+  }
 
-  ContentServiceApi(this._client);
+  RegisterMlsDeviceRequest._();
 
-  $async.Future<UpdateContentResponse> updateContent(
-          $pb.ClientContext? ctx, UpdateContentRequest request) =>
-      _client.invoke<UpdateContentResponse>(ctx, 'ContentService',
-          'UpdateContent', request, UpdateContentResponse());
-  $async.Future<DeleteContentResponse> deleteContent(
-          $pb.ClientContext? ctx, DeleteContentRequest request) =>
-      _client.invoke<DeleteContentResponse>(ctx, 'ContentService',
-          'DeleteContent', request, DeleteContentResponse());
-  $async.Future<CreateContentResponse> createContent(
-          $pb.ClientContext? ctx, CreateContentRequest request) =>
-      _client.invoke<CreateContentResponse>(ctx, 'ContentService',
-          'CreateContent', request, CreateContentResponse());
-  $async.Future<ListContentResponse> listContent(
-          $pb.ClientContext? ctx, ListContentRequest request) =>
-      _client.invoke<ListContentResponse>(
-          ctx, 'ContentService', 'ListContent', request, ListContentResponse());
+  factory RegisterMlsDeviceRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      RegisterMlsDeviceRequest()..mergeFromBuffer(data, registry);
+  factory RegisterMlsDeviceRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      RegisterMlsDeviceRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'RegisterMlsDeviceRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: RegisterMlsDeviceRequest.$_createMessage)
+    ..a<$core.List<$core.int>>(
+        1, _omitFieldNames ? '' : 'binding', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        2, _omitFieldNames ? '' : 'keyPackage', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RegisterMlsDeviceRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RegisterMlsDeviceRequest copyWith(
+          void Function(RegisterMlsDeviceRequest) updates) =>
+      super.copyWith((message) => updates(message as RegisterMlsDeviceRequest))
+          as RegisterMlsDeviceRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RegisterMlsDeviceRequest() / RegisterMlsDeviceRequest.new instead')
+  static RegisterMlsDeviceRequest create() => RegisterMlsDeviceRequest._();
+  static $pb.GeneratedMessage $_createMessage() => RegisterMlsDeviceRequest._();
+  @$core.override
+  RegisterMlsDeviceRequest createEmptyInstance() =>
+      RegisterMlsDeviceRequest._();
+  @$core.pragma('dart2js:noInline')
+  static RegisterMlsDeviceRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<RegisterMlsDeviceRequest>(
+          RegisterMlsDeviceRequest.$_createMessage);
+  static RegisterMlsDeviceRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.List<$core.int> get binding => $_getN(0);
+  @$pb.TagNumber(1)
+  set binding($core.List<$core.int> value) => $_setBytes(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasBinding() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearBinding() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get keyPackage => $_getN(1);
+  @$pb.TagNumber(2)
+  set keyPackage($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasKeyPackage() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearKeyPackage() => $_clearField(2);
 }
 
-/// Файлы передаются ограниченными частями; права проверяются на каждой операции.
-class AssetServiceApi {
-  final $pb.RpcClient _client;
+class RegisterMlsDeviceResponse extends $pb.GeneratedMessage {
+  factory RegisterMlsDeviceResponse({
+    MlsDevice? device,
+  }) {
+    final result = RegisterMlsDeviceResponse._();
+    if (device != null) result.device = device;
+    return result;
+  }
 
-  AssetServiceApi(this._client);
+  RegisterMlsDeviceResponse._();
 
-  $async.Future<BeginUploadResponse> beginUpload(
-          $pb.ClientContext? ctx, BeginUploadRequest request) =>
-      _client.invoke<BeginUploadResponse>(
-          ctx, 'AssetService', 'BeginUpload', request, BeginUploadResponse());
-  $async.Future<UploadChunkResponse> uploadChunk(
-          $pb.ClientContext? ctx, UploadChunkRequest request) =>
-      _client.invoke<UploadChunkResponse>(
-          ctx, 'AssetService', 'UploadChunk', request, UploadChunkResponse());
-  $async.Future<CompleteUploadResponse> completeUpload(
-          $pb.ClientContext? ctx, CompleteUploadRequest request) =>
-      _client.invoke<CompleteUploadResponse>(ctx, 'AssetService',
-          'CompleteUpload', request, CompleteUploadResponse());
-  $async.Future<CancelUploadResponse> cancelUpload(
-          $pb.ClientContext? ctx, CancelUploadRequest request) =>
-      _client.invoke<CancelUploadResponse>(
-          ctx, 'AssetService', 'CancelUpload', request, CancelUploadResponse());
-  $async.Future<DownloadChunkResponse> downloadChunk(
-          $pb.ClientContext? ctx, DownloadChunkRequest request) =>
-      _client.invoke<DownloadChunkResponse>(ctx, 'AssetService',
-          'DownloadChunk', request, DownloadChunkResponse());
-  $async.Future<ListMyAssetsResponse> listMyAssets(
-          $pb.ClientContext? ctx, ListMyAssetsRequest request) =>
-      _client.invoke<ListMyAssetsResponse>(
-          ctx, 'AssetService', 'ListMyAssets', request, ListMyAssetsResponse());
-  $async.Future<ListChannelAssetsResponse> listChannelAssets(
-          $pb.ClientContext? ctx, ListChannelAssetsRequest request) =>
-      _client.invoke<ListChannelAssetsResponse>(ctx, 'AssetService',
-          'ListChannelAssets', request, ListChannelAssetsResponse());
+  factory RegisterMlsDeviceResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      RegisterMlsDeviceResponse()..mergeFromBuffer(data, registry);
+  factory RegisterMlsDeviceResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      RegisterMlsDeviceResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'RegisterMlsDeviceResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: RegisterMlsDeviceResponse.$_createMessage)
+    ..aOM<MlsDevice>(1, _omitFieldNames ? '' : 'device',
+        subBuilder: MlsDevice.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RegisterMlsDeviceResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RegisterMlsDeviceResponse copyWith(
+          void Function(RegisterMlsDeviceResponse) updates) =>
+      super.copyWith((message) => updates(message as RegisterMlsDeviceResponse))
+          as RegisterMlsDeviceResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RegisterMlsDeviceResponse() / RegisterMlsDeviceResponse.new instead')
+  static RegisterMlsDeviceResponse create() => RegisterMlsDeviceResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      RegisterMlsDeviceResponse._();
+  @$core.override
+  RegisterMlsDeviceResponse createEmptyInstance() =>
+      RegisterMlsDeviceResponse._();
+  @$core.pragma('dart2js:noInline')
+  static RegisterMlsDeviceResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<RegisterMlsDeviceResponse>(
+          RegisterMlsDeviceResponse.$_createMessage);
+  static RegisterMlsDeviceResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  MlsDevice get device => $_getN(0);
+  @$pb.TagNumber(1)
+  set device(MlsDevice value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasDevice() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDevice() => $_clearField(1);
+  @$pb.TagNumber(1)
+  MlsDevice ensureDevice() => $_ensure(0);
 }
 
-class AuthServiceApi {
-  final $pb.RpcClient _client;
+class ListMlsDevicesRequest extends $pb.GeneratedMessage {
+  factory ListMlsDevicesRequest({
+    $core.String? channelId,
+    $core.String? after,
+  }) {
+    final result = ListMlsDevicesRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (after != null) result.after = after;
+    return result;
+  }
 
-  AuthServiceApi(this._client);
+  ListMlsDevicesRequest._();
 
-  /// Экспериментальный API; требует поддержки stable principal у клиента.
-  $async.Future<CreateRootRotationResponse> createRootRotation(
-          $pb.ClientContext? ctx, CreateRootRotationRequest request) =>
-      _client.invoke<CreateRootRotationResponse>(ctx, 'AuthService',
-          'CreateRootRotation', request, CreateRootRotationResponse());
-  $async.Future<CompleteRootRotationResponse> completeRootRotation(
-          $pb.ClientContext? ctx, CompleteRootRotationRequest request) =>
-      _client.invoke<CompleteRootRotationResponse>(ctx, 'AuthService',
-          'CompleteRootRotation', request, CompleteRootRotationResponse());
-  $async.Future<ProposePairingResponse> proposePairing(
-          $pb.ClientContext? ctx, ProposePairingRequest request) =>
-      _client.invoke<ProposePairingResponse>(ctx, 'AuthService',
-          'ProposePairing', request, ProposePairingResponse());
-  $async.Future<CreatePairingResponse> createPairing(
-          $pb.ClientContext? ctx, CreatePairingRequest request) =>
-      _client.invoke<CreatePairingResponse>(ctx, 'AuthService', 'CreatePairing',
-          request, CreatePairingResponse());
-  $async.Future<InspectPairingResponse> inspectPairing(
-          $pb.ClientContext? ctx, InspectPairingRequest request) =>
-      _client.invoke<InspectPairingResponse>(ctx, 'AuthService',
-          'InspectPairing', request, InspectPairingResponse());
-  $async.Future<PollPairingResponse> pollPairing(
-          $pb.ClientContext? ctx, PollPairingRequest request) =>
-      _client.invoke<PollPairingResponse>(
-          ctx, 'AuthService', 'PollPairing', request, PollPairingResponse());
-  $async.Future<CancelPairingResponse> cancelPairing(
-          $pb.ClientContext? ctx, CancelPairingRequest request) =>
-      _client.invoke<CancelPairingResponse>(ctx, 'AuthService', 'CancelPairing',
-          request, CancelPairingResponse());
-  $async.Future<ClaimPairingResponse> claimPairing(
-          $pb.ClientContext? ctx, ClaimPairingRequest request) =>
-      _client.invoke<ClaimPairingResponse>(
-          ctx, 'AuthService', 'ClaimPairing', request, ClaimPairingResponse());
-  $async.Future<RevokeCurrentDeviceResponse> revokeCurrentDevice(
-          $pb.ClientContext? ctx, RevokeCurrentDeviceRequest request) =>
-      _client.invoke<RevokeCurrentDeviceResponse>(ctx, 'AuthService',
-          'RevokeCurrentDevice', request, RevokeCurrentDeviceResponse());
-  $async.Future<ListDevicesResponse> listDevices(
-          $pb.ClientContext? ctx, ListDevicesRequest request) =>
-      _client.invoke<ListDevicesResponse>(
-          ctx, 'AuthService', 'ListDevices', request, ListDevicesResponse());
-  $async.Future<LogoutResponse> logout(
-          $pb.ClientContext? ctx, LogoutRequest request) =>
-      _client.invoke<LogoutResponse>(
-          ctx, 'AuthService', 'Logout', request, LogoutResponse());
-  $async.Future<CreateChallengeResponse> createChallenge(
-          $pb.ClientContext? ctx, CreateChallengeRequest request) =>
-      _client.invoke<CreateChallengeResponse>(ctx, 'AuthService',
-          'CreateChallenge', request, CreateChallengeResponse());
-  $async.Future<CompleteChallengeResponse> completeChallenge(
-          $pb.ClientContext? ctx, CompleteChallengeRequest request) =>
-      _client.invoke<CompleteChallengeResponse>(ctx, 'AuthService',
-          'CompleteChallenge', request, CompleteChallengeResponse());
+  factory ListMlsDevicesRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListMlsDevicesRequest()..mergeFromBuffer(data, registry);
+  factory ListMlsDevicesRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListMlsDevicesRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListMlsDevicesRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListMlsDevicesRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'after')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListMlsDevicesRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListMlsDevicesRequest copyWith(
+          void Function(ListMlsDevicesRequest) updates) =>
+      super.copyWith((message) => updates(message as ListMlsDevicesRequest))
+          as ListMlsDevicesRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListMlsDevicesRequest() / ListMlsDevicesRequest.new instead')
+  static ListMlsDevicesRequest create() => ListMlsDevicesRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ListMlsDevicesRequest._();
+  @$core.override
+  ListMlsDevicesRequest createEmptyInstance() => ListMlsDevicesRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ListMlsDevicesRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListMlsDevicesRequest>(
+          ListMlsDevicesRequest.$_createMessage);
+  static ListMlsDevicesRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get after => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set after($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasAfter() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAfter() => $_clearField(2);
 }
 
-class SyncServiceApi {
-  final $pb.RpcClient _client;
+class ListMlsDevicesResponse extends $pb.GeneratedMessage {
+  factory ListMlsDevicesResponse({
+    $core.Iterable<MlsDevice>? devices,
+    $core.String? nextCursor,
+  }) {
+    final result = ListMlsDevicesResponse._();
+    if (devices != null) result.devices.addAll(devices);
+    if (nextCursor != null) result.nextCursor = nextCursor;
+    return result;
+  }
 
-  SyncServiceApi(this._client);
+  ListMlsDevicesResponse._();
 
-  $async.Future<SubscribeResponse> subscribe(
-          $pb.ClientContext? ctx, SubscribeRequest request) =>
-      _client.invoke<SubscribeResponse>(
-          ctx, 'SyncService', 'Subscribe', request, SubscribeResponse());
-  $async.Future<ListEventsResponse> listEvents(
-          $pb.ClientContext? ctx, ListEventsRequest request) =>
-      _client.invoke<ListEventsResponse>(
-          ctx, 'SyncService', 'ListEvents', request, ListEventsResponse());
+  factory ListMlsDevicesResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListMlsDevicesResponse()..mergeFromBuffer(data, registry);
+  factory ListMlsDevicesResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListMlsDevicesResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListMlsDevicesResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListMlsDevicesResponse.$_createMessage)
+    ..pPM<MlsDevice>(1, _omitFieldNames ? '' : 'devices',
+        subBuilder: MlsDevice.$_createMessage)
+    ..aOS(2, _omitFieldNames ? '' : 'nextCursor')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListMlsDevicesResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListMlsDevicesResponse copyWith(
+          void Function(ListMlsDevicesResponse) updates) =>
+      super.copyWith((message) => updates(message as ListMlsDevicesResponse))
+          as ListMlsDevicesResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListMlsDevicesResponse() / ListMlsDevicesResponse.new instead')
+  static ListMlsDevicesResponse create() => ListMlsDevicesResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ListMlsDevicesResponse._();
+  @$core.override
+  ListMlsDevicesResponse createEmptyInstance() => ListMlsDevicesResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ListMlsDevicesResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListMlsDevicesResponse>(
+          ListMlsDevicesResponse.$_createMessage);
+  static ListMlsDevicesResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<MlsDevice> get devices => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $core.String get nextCursor => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set nextCursor($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasNextCursor() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearNextCursor() => $_clearField(2);
 }
 
-class AdminServiceApi {
-  final $pb.RpcClient _client;
+class GetMlsChannelRequest extends $pb.GeneratedMessage {
+  factory GetMlsChannelRequest({
+    $core.String? channelId,
+  }) {
+    final result = GetMlsChannelRequest._();
+    if (channelId != null) result.channelId = channelId;
+    return result;
+  }
 
-  AdminServiceApi(this._client);
+  GetMlsChannelRequest._();
 
-  $async.Future<ListMembersResponse> listMembers(
-          $pb.ClientContext? ctx, ListMembersRequest request) =>
-      _client.invoke<ListMembersResponse>(
-          ctx, 'AdminService', 'ListMembers', request, ListMembersResponse());
-  $async.Future<UpdateMemberResponse> updateMember(
-          $pb.ClientContext? ctx, UpdateMemberRequest request) =>
-      _client.invoke<UpdateMemberResponse>(
-          ctx, 'AdminService', 'UpdateMember', request, UpdateMemberResponse());
-  $async.Future<CreateInviteResponse> createInvite(
-          $pb.ClientContext? ctx, CreateInviteRequest request) =>
-      _client.invoke<CreateInviteResponse>(
-          ctx, 'AdminService', 'CreateInvite', request, CreateInviteResponse());
-  $async.Future<ListInvitesResponse> listInvites(
-          $pb.ClientContext? ctx, ListInvitesRequest request) =>
-      _client.invoke<ListInvitesResponse>(
-          ctx, 'AdminService', 'ListInvites', request, ListInvitesResponse());
-  $async.Future<RevokeInviteResponse> revokeInvite(
-          $pb.ClientContext? ctx, RevokeInviteRequest request) =>
-      _client.invoke<RevokeInviteResponse>(
-          ctx, 'AdminService', 'RevokeInvite', request, RevokeInviteResponse());
-  $async.Future<GetSetupStatusResponse> getSetupStatus(
-          $pb.ClientContext? ctx, GetSetupStatusRequest request) =>
-      _client.invoke<GetSetupStatusResponse>(ctx, 'AdminService',
-          'GetSetupStatus', request, GetSetupStatusResponse());
-  $async.Future<ClaimOwnerResponse> claimOwner(
-          $pb.ClientContext? ctx, ClaimOwnerRequest request) =>
-      _client.invoke<ClaimOwnerResponse>(
-          ctx, 'AdminService', 'ClaimOwner', request, ClaimOwnerResponse());
-  $async.Future<GetSettingsResponse> getSettings(
-          $pb.ClientContext? ctx, GetSettingsRequest request) =>
-      _client.invoke<GetSettingsResponse>(
-          ctx, 'AdminService', 'GetSettings', request, GetSettingsResponse());
-  $async.Future<UpdateSettingsResponse> updateSettings(
-          $pb.ClientContext? ctx, UpdateSettingsRequest request) =>
-      _client.invoke<UpdateSettingsResponse>(ctx, 'AdminService',
-          'UpdateSettings', request, UpdateSettingsResponse());
+  factory GetMlsChannelRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetMlsChannelRequest()..mergeFromBuffer(data, registry);
+  factory GetMlsChannelRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetMlsChannelRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetMlsChannelRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetMlsChannelRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetMlsChannelRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetMlsChannelRequest copyWith(void Function(GetMlsChannelRequest) updates) =>
+      super.copyWith((message) => updates(message as GetMlsChannelRequest))
+          as GetMlsChannelRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetMlsChannelRequest() / GetMlsChannelRequest.new instead')
+  static GetMlsChannelRequest create() => GetMlsChannelRequest._();
+  static $pb.GeneratedMessage $_createMessage() => GetMlsChannelRequest._();
+  @$core.override
+  GetMlsChannelRequest createEmptyInstance() => GetMlsChannelRequest._();
+  @$core.pragma('dart2js:noInline')
+  static GetMlsChannelRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetMlsChannelRequest>(
+          GetMlsChannelRequest.$_createMessage);
+  static GetMlsChannelRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
 }
 
-class MembershipServiceApi {
-  final $pb.RpcClient _client;
+class GetMlsChannelResponse extends $pb.GeneratedMessage {
+  factory GetMlsChannelResponse({
+    $core.List<$core.int>? groupId,
+    $fixnum.Int64? epoch,
+    $core.Iterable<MlsDevice>? devices,
+  }) {
+    final result = GetMlsChannelResponse._();
+    if (groupId != null) result.groupId = groupId;
+    if (epoch != null) result.epoch = epoch;
+    if (devices != null) result.devices.addAll(devices);
+    return result;
+  }
 
-  MembershipServiceApi(this._client);
+  GetMlsChannelResponse._();
 
-  $async.Future<UpdateProfileResponse> updateProfile(
-          $pb.ClientContext? ctx, UpdateProfileRequest request) =>
-      _client.invoke<UpdateProfileResponse>(ctx, 'MembershipService',
-          'UpdateProfile', request, UpdateProfileResponse());
-  $async.Future<PreviewInviteResponse> previewInvite(
-          $pb.ClientContext? ctx, PreviewInviteRequest request) =>
-      _client.invoke<PreviewInviteResponse>(ctx, 'MembershipService',
-          'PreviewInvite', request, PreviewInviteResponse());
-  $async.Future<AcceptInviteResponse> acceptInvite(
-          $pb.ClientContext? ctx, AcceptInviteRequest request) =>
-      _client.invoke<AcceptInviteResponse>(ctx, 'MembershipService',
-          'AcceptInvite', request, AcceptInviteResponse());
-  $async.Future<GetMembershipResponse> getMembership(
-          $pb.ClientContext? ctx, GetMembershipRequest request) =>
-      _client.invoke<GetMembershipResponse>(ctx, 'MembershipService',
-          'GetMembership', request, GetMembershipResponse());
+  factory GetMlsChannelResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetMlsChannelResponse()..mergeFromBuffer(data, registry);
+  factory GetMlsChannelResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetMlsChannelResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetMlsChannelResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetMlsChannelResponse.$_createMessage)
+    ..a<$core.List<$core.int>>(
+        1, _omitFieldNames ? '' : 'groupId', $pb.PbFieldType.OY)
+    ..aInt64(2, _omitFieldNames ? '' : 'epoch')
+    ..pPM<MlsDevice>(3, _omitFieldNames ? '' : 'devices',
+        subBuilder: MlsDevice.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetMlsChannelResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetMlsChannelResponse copyWith(
+          void Function(GetMlsChannelResponse) updates) =>
+      super.copyWith((message) => updates(message as GetMlsChannelResponse))
+          as GetMlsChannelResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetMlsChannelResponse() / GetMlsChannelResponse.new instead')
+  static GetMlsChannelResponse create() => GetMlsChannelResponse._();
+  static $pb.GeneratedMessage $_createMessage() => GetMlsChannelResponse._();
+  @$core.override
+  GetMlsChannelResponse createEmptyInstance() => GetMlsChannelResponse._();
+  @$core.pragma('dart2js:noInline')
+  static GetMlsChannelResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetMlsChannelResponse>(
+          GetMlsChannelResponse.$_createMessage);
+  static GetMlsChannelResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.List<$core.int> get groupId => $_getN(0);
+  @$pb.TagNumber(1)
+  set groupId($core.List<$core.int> value) => $_setBytes(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasGroupId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearGroupId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get epoch => $_getI64(1);
+  @$pb.TagNumber(2)
+  set epoch($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasEpoch() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearEpoch() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $pb.PbList<MlsDevice> get devices => $_getList(2);
+}
+
+class PublishMlsRequest extends $pb.GeneratedMessage {
+  factory PublishMlsRequest({
+    $core.String? channelId,
+    $core.List<$core.int>? requestId,
+    $fixnum.Int64? expectedEpoch,
+    $core.String? kind,
+    $core.List<$core.int>? ciphertext,
+    $core.String? addGrantId,
+    $core.String? removeGrantId,
+    $core.List<$core.int>? welcome,
+    $core.Iterable<$core.String>? attachmentIds,
+    $core.String? newManagerGrantId,
+  }) {
+    final result = PublishMlsRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (requestId != null) result.requestId = requestId;
+    if (expectedEpoch != null) result.expectedEpoch = expectedEpoch;
+    if (kind != null) result.kind = kind;
+    if (ciphertext != null) result.ciphertext = ciphertext;
+    if (addGrantId != null) result.addGrantId = addGrantId;
+    if (removeGrantId != null) result.removeGrantId = removeGrantId;
+    if (welcome != null) result.welcome = welcome;
+    if (attachmentIds != null) result.attachmentIds.addAll(attachmentIds);
+    if (newManagerGrantId != null) result.newManagerGrantId = newManagerGrantId;
+    return result;
+  }
+
+  PublishMlsRequest._();
+
+  factory PublishMlsRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      PublishMlsRequest()..mergeFromBuffer(data, registry);
+  factory PublishMlsRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      PublishMlsRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'PublishMlsRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: PublishMlsRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..a<$core.List<$core.int>>(
+        2, _omitFieldNames ? '' : 'requestId', $pb.PbFieldType.OY)
+    ..aInt64(3, _omitFieldNames ? '' : 'expectedEpoch')
+    ..aOS(4, _omitFieldNames ? '' : 'kind')
+    ..a<$core.List<$core.int>>(
+        5, _omitFieldNames ? '' : 'ciphertext', $pb.PbFieldType.OY)
+    ..aOS(6, _omitFieldNames ? '' : 'addGrantId')
+    ..aOS(7, _omitFieldNames ? '' : 'removeGrantId')
+    ..a<$core.List<$core.int>>(
+        8, _omitFieldNames ? '' : 'welcome', $pb.PbFieldType.OY)
+    ..pPS(9, _omitFieldNames ? '' : 'attachmentIds')
+    ..aOS(10, _omitFieldNames ? '' : 'newManagerGrantId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PublishMlsRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PublishMlsRequest copyWith(void Function(PublishMlsRequest) updates) =>
+      super.copyWith((message) => updates(message as PublishMlsRequest))
+          as PublishMlsRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use PublishMlsRequest() / PublishMlsRequest.new instead')
+  static PublishMlsRequest create() => PublishMlsRequest._();
+  static $pb.GeneratedMessage $_createMessage() => PublishMlsRequest._();
+  @$core.override
+  PublishMlsRequest createEmptyInstance() => PublishMlsRequest._();
+  @$core.pragma('dart2js:noInline')
+  static PublishMlsRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PublishMlsRequest>(
+          PublishMlsRequest.$_createMessage);
+  static PublishMlsRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get requestId => $_getN(1);
+  @$pb.TagNumber(2)
+  set requestId($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasRequestId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRequestId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get expectedEpoch => $_getI64(2);
+  @$pb.TagNumber(3)
+  set expectedEpoch($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasExpectedEpoch() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearExpectedEpoch() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get kind => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set kind($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasKind() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearKind() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.List<$core.int> get ciphertext => $_getN(4);
+  @$pb.TagNumber(5)
+  set ciphertext($core.List<$core.int> value) => $_setBytes(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasCiphertext() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearCiphertext() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get addGrantId => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set addGrantId($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasAddGrantId() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearAddGrantId() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.String get removeGrantId => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set removeGrantId($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasRemoveGrantId() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearRemoveGrantId() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.List<$core.int> get welcome => $_getN(7);
+  @$pb.TagNumber(8)
+  set welcome($core.List<$core.int> value) => $_setBytes(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasWelcome() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearWelcome() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $pb.PbList<$core.String> get attachmentIds => $_getList(8);
+
+  @$pb.TagNumber(10)
+  $core.String get newManagerGrantId => $_getSZ(9);
+  @$pb.TagNumber(10)
+  set newManagerGrantId($core.String value) => $_setString(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasNewManagerGrantId() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearNewManagerGrantId() => $_clearField(10);
+}
+
+class MlsEnvelope extends $pb.GeneratedMessage {
+  factory MlsEnvelope({
+    $fixnum.Int64? sequence,
+    $core.List<$core.int>? requestId,
+    $fixnum.Int64? epoch,
+    $core.String? kind,
+    $core.List<$core.int>? ciphertext,
+    $core.String? authorGrantId,
+    $core.String? authorId,
+    $fixnum.Int64? createdAtUnixMs,
+    $core.String? addedGrantId,
+    $core.String? removedGrantId,
+    $core.List<$core.int>? welcome,
+    $core.Iterable<MlsDevice>? roster,
+    $core.String? newManagerGrantId,
+  }) {
+    final result = MlsEnvelope._();
+    if (sequence != null) result.sequence = sequence;
+    if (requestId != null) result.requestId = requestId;
+    if (epoch != null) result.epoch = epoch;
+    if (kind != null) result.kind = kind;
+    if (ciphertext != null) result.ciphertext = ciphertext;
+    if (authorGrantId != null) result.authorGrantId = authorGrantId;
+    if (authorId != null) result.authorId = authorId;
+    if (createdAtUnixMs != null) result.createdAtUnixMs = createdAtUnixMs;
+    if (addedGrantId != null) result.addedGrantId = addedGrantId;
+    if (removedGrantId != null) result.removedGrantId = removedGrantId;
+    if (welcome != null) result.welcome = welcome;
+    if (roster != null) result.roster.addAll(roster);
+    if (newManagerGrantId != null) result.newManagerGrantId = newManagerGrantId;
+    return result;
+  }
+
+  MlsEnvelope._();
+
+  factory MlsEnvelope.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      MlsEnvelope()..mergeFromBuffer(data, registry);
+  factory MlsEnvelope.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      MlsEnvelope()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'MlsEnvelope',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: MlsEnvelope.$_createMessage)
+    ..aInt64(1, _omitFieldNames ? '' : 'sequence')
+    ..a<$core.List<$core.int>>(
+        2, _omitFieldNames ? '' : 'requestId', $pb.PbFieldType.OY)
+    ..aInt64(3, _omitFieldNames ? '' : 'epoch')
+    ..aOS(4, _omitFieldNames ? '' : 'kind')
+    ..a<$core.List<$core.int>>(
+        5, _omitFieldNames ? '' : 'ciphertext', $pb.PbFieldType.OY)
+    ..aOS(6, _omitFieldNames ? '' : 'authorGrantId')
+    ..aOS(7, _omitFieldNames ? '' : 'authorId')
+    ..aInt64(8, _omitFieldNames ? '' : 'createdAtUnixMs')
+    ..aOS(9, _omitFieldNames ? '' : 'addedGrantId')
+    ..aOS(10, _omitFieldNames ? '' : 'removedGrantId')
+    ..a<$core.List<$core.int>>(
+        11, _omitFieldNames ? '' : 'welcome', $pb.PbFieldType.OY)
+    ..pPM<MlsDevice>(12, _omitFieldNames ? '' : 'roster',
+        subBuilder: MlsDevice.$_createMessage)
+    ..aOS(13, _omitFieldNames ? '' : 'newManagerGrantId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MlsEnvelope clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MlsEnvelope copyWith(void Function(MlsEnvelope) updates) =>
+      super.copyWith((message) => updates(message as MlsEnvelope))
+          as MlsEnvelope;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use MlsEnvelope() / MlsEnvelope.new instead')
+  static MlsEnvelope create() => MlsEnvelope._();
+  static $pb.GeneratedMessage $_createMessage() => MlsEnvelope._();
+  @$core.override
+  MlsEnvelope createEmptyInstance() => MlsEnvelope._();
+  @$core.pragma('dart2js:noInline')
+  static MlsEnvelope getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MlsEnvelope>(
+          MlsEnvelope.$_createMessage);
+  static MlsEnvelope? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $fixnum.Int64 get sequence => $_getI64(0);
+  @$pb.TagNumber(1)
+  set sequence($fixnum.Int64 value) => $_setInt64(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasSequence() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearSequence() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get requestId => $_getN(1);
+  @$pb.TagNumber(2)
+  set requestId($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasRequestId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRequestId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get epoch => $_getI64(2);
+  @$pb.TagNumber(3)
+  set epoch($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasEpoch() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearEpoch() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get kind => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set kind($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasKind() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearKind() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.List<$core.int> get ciphertext => $_getN(4);
+  @$pb.TagNumber(5)
+  set ciphertext($core.List<$core.int> value) => $_setBytes(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasCiphertext() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearCiphertext() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get authorGrantId => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set authorGrantId($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasAuthorGrantId() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearAuthorGrantId() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.String get authorId => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set authorId($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasAuthorId() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearAuthorId() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $fixnum.Int64 get createdAtUnixMs => $_getI64(7);
+  @$pb.TagNumber(8)
+  set createdAtUnixMs($fixnum.Int64 value) => $_setInt64(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasCreatedAtUnixMs() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearCreatedAtUnixMs() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.String get addedGrantId => $_getSZ(8);
+  @$pb.TagNumber(9)
+  set addedGrantId($core.String value) => $_setString(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasAddedGrantId() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearAddedGrantId() => $_clearField(9);
+
+  @$pb.TagNumber(10)
+  $core.String get removedGrantId => $_getSZ(9);
+  @$pb.TagNumber(10)
+  set removedGrantId($core.String value) => $_setString(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasRemovedGrantId() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearRemovedGrantId() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $core.List<$core.int> get welcome => $_getN(10);
+  @$pb.TagNumber(11)
+  set welcome($core.List<$core.int> value) => $_setBytes(10, value);
+  @$pb.TagNumber(11)
+  $core.bool hasWelcome() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearWelcome() => $_clearField(11);
+
+  @$pb.TagNumber(12)
+  $pb.PbList<MlsDevice> get roster => $_getList(11);
+
+  @$pb.TagNumber(13)
+  $core.String get newManagerGrantId => $_getSZ(12);
+  @$pb.TagNumber(13)
+  set newManagerGrantId($core.String value) => $_setString(12, value);
+  @$pb.TagNumber(13)
+  $core.bool hasNewManagerGrantId() => $_has(12);
+  @$pb.TagNumber(13)
+  void clearNewManagerGrantId() => $_clearField(13);
+}
+
+class PublishMlsResponse extends $pb.GeneratedMessage {
+  factory PublishMlsResponse({
+    MlsEnvelope? envelope,
+  }) {
+    final result = PublishMlsResponse._();
+    if (envelope != null) result.envelope = envelope;
+    return result;
+  }
+
+  PublishMlsResponse._();
+
+  factory PublishMlsResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      PublishMlsResponse()..mergeFromBuffer(data, registry);
+  factory PublishMlsResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      PublishMlsResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'PublishMlsResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: PublishMlsResponse.$_createMessage)
+    ..aOM<MlsEnvelope>(1, _omitFieldNames ? '' : 'envelope',
+        subBuilder: MlsEnvelope.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PublishMlsResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PublishMlsResponse copyWith(void Function(PublishMlsResponse) updates) =>
+      super.copyWith((message) => updates(message as PublishMlsResponse))
+          as PublishMlsResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use PublishMlsResponse() / PublishMlsResponse.new instead')
+  static PublishMlsResponse create() => PublishMlsResponse._();
+  static $pb.GeneratedMessage $_createMessage() => PublishMlsResponse._();
+  @$core.override
+  PublishMlsResponse createEmptyInstance() => PublishMlsResponse._();
+  @$core.pragma('dart2js:noInline')
+  static PublishMlsResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<PublishMlsResponse>(
+          PublishMlsResponse.$_createMessage);
+  static PublishMlsResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  MlsEnvelope get envelope => $_getN(0);
+  @$pb.TagNumber(1)
+  set envelope(MlsEnvelope value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasEnvelope() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearEnvelope() => $_clearField(1);
+  @$pb.TagNumber(1)
+  MlsEnvelope ensureEnvelope() => $_ensure(0);
+}
+
+class ListMlsEnvelopesRequest extends $pb.GeneratedMessage {
+  factory ListMlsEnvelopesRequest({
+    $core.String? channelId,
+    $fixnum.Int64? afterSequence,
+  }) {
+    final result = ListMlsEnvelopesRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (afterSequence != null) result.afterSequence = afterSequence;
+    return result;
+  }
+
+  ListMlsEnvelopesRequest._();
+
+  factory ListMlsEnvelopesRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListMlsEnvelopesRequest()..mergeFromBuffer(data, registry);
+  factory ListMlsEnvelopesRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListMlsEnvelopesRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListMlsEnvelopesRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListMlsEnvelopesRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aInt64(2, _omitFieldNames ? '' : 'afterSequence')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListMlsEnvelopesRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListMlsEnvelopesRequest copyWith(
+          void Function(ListMlsEnvelopesRequest) updates) =>
+      super.copyWith((message) => updates(message as ListMlsEnvelopesRequest))
+          as ListMlsEnvelopesRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListMlsEnvelopesRequest() / ListMlsEnvelopesRequest.new instead')
+  static ListMlsEnvelopesRequest create() => ListMlsEnvelopesRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ListMlsEnvelopesRequest._();
+  @$core.override
+  ListMlsEnvelopesRequest createEmptyInstance() => ListMlsEnvelopesRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ListMlsEnvelopesRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListMlsEnvelopesRequest>(
+          ListMlsEnvelopesRequest.$_createMessage);
+  static ListMlsEnvelopesRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get afterSequence => $_getI64(1);
+  @$pb.TagNumber(2)
+  set afterSequence($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasAfterSequence() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAfterSequence() => $_clearField(2);
+}
+
+class ListMlsEnvelopesResponse extends $pb.GeneratedMessage {
+  factory ListMlsEnvelopesResponse({
+    $core.Iterable<MlsEnvelope>? envelopes,
+    $fixnum.Int64? nextSequence,
+  }) {
+    final result = ListMlsEnvelopesResponse._();
+    if (envelopes != null) result.envelopes.addAll(envelopes);
+    if (nextSequence != null) result.nextSequence = nextSequence;
+    return result;
+  }
+
+  ListMlsEnvelopesResponse._();
+
+  factory ListMlsEnvelopesResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListMlsEnvelopesResponse()..mergeFromBuffer(data, registry);
+  factory ListMlsEnvelopesResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListMlsEnvelopesResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListMlsEnvelopesResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListMlsEnvelopesResponse.$_createMessage)
+    ..pPM<MlsEnvelope>(1, _omitFieldNames ? '' : 'envelopes',
+        subBuilder: MlsEnvelope.$_createMessage)
+    ..aInt64(2, _omitFieldNames ? '' : 'nextSequence')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListMlsEnvelopesResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListMlsEnvelopesResponse copyWith(
+          void Function(ListMlsEnvelopesResponse) updates) =>
+      super.copyWith((message) => updates(message as ListMlsEnvelopesResponse))
+          as ListMlsEnvelopesResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListMlsEnvelopesResponse() / ListMlsEnvelopesResponse.new instead')
+  static ListMlsEnvelopesResponse create() => ListMlsEnvelopesResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ListMlsEnvelopesResponse._();
+  @$core.override
+  ListMlsEnvelopesResponse createEmptyInstance() =>
+      ListMlsEnvelopesResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ListMlsEnvelopesResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListMlsEnvelopesResponse>(
+          ListMlsEnvelopesResponse.$_createMessage);
+  static ListMlsEnvelopesResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<MlsEnvelope> get envelopes => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get nextSequence => $_getI64(1);
+  @$pb.TagNumber(2)
+  set nextSequence($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasNextSequence() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearNextSequence() => $_clearField(2);
 }
 
 const $core.bool _omitFieldNames =

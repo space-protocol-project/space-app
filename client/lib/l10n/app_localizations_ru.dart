@@ -587,8 +587,12 @@ class AppLocalizationsRu extends AppLocalizations {
       'Обновить истёкший запрос с теми же сохранёнными новыми ключами? Если сервер уже завершил переход, используйте завершение сохранённой смены.';
 
   @override
+  String get rotationDevicesReview =>
+      'Проверьте устройства, которым будет сохранён доступ. Если устройство неизвестно, отмените операцию и сначала отзовите его разрешение.';
+
+  @override
   String get rotationConfirm =>
-      'Сменить корневой ключ? Ваш ID, права и история сохранятся. Прежние устройства и карточки потеряют доступ. Новый секрет сначала сохраняется в защищённый журнал. После перехода обязательно сохраните новую карточку.';
+      'Сменить корневой ключ? ID, права, история и подтверждённые действующие устройства сохранятся без продления доступа. Старые сеансы и карточки восстановления перестанут действовать. Новый секрет сначала сохраняется в защищённый журнал. После перехода сохраните новую карточку.';
 
   @override
   String get rotationServerRequired =>
@@ -604,7 +608,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get rotationCompleted =>
-      'Корневой ключ сменён, прежний ID сохранён. Сохраните новую карточку; старые карточки и устройства больше не работают.';
+      'Корневой ключ сменён, ID и подтверждённые устройства сохранены. Сохраните новую карточку; прежние карточки больше не действуют.';
 
   @override
   String get recoveryRevokeCard =>
@@ -1340,4 +1344,77 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get messageUnavailable => 'Сообщение недоступно';
+
+  @override
+  String get mlsTitle => 'Закрытый канал · MLS';
+
+  @override
+  String get mlsExperimental => 'Экспериментальный режим E2EE';
+
+  @override
+  String get mlsCreate => 'Создать закрытый канал';
+
+  @override
+  String get mlsChannelId => 'Идентификатор канала';
+
+  @override
+  String get mlsChannelTitle => 'Название канала';
+
+  @override
+  String get mlsDeviceCode => 'Код этого устройства';
+
+  @override
+  String get mlsDevices => 'Устройства канала';
+
+  @override
+  String get mlsVerify => 'Проверить устройство';
+
+  @override
+  String get mlsTrust => 'Код совпадает';
+
+  @override
+  String get mlsVerifyHint =>
+      'Сверьте этот код на другом устройстве по независимому каналу. Сервер не подтверждает подлинность ключа.';
+
+  @override
+  String get mlsInvite => 'Пригласить';
+
+  @override
+  String get mlsRemove => 'Исключить устройство';
+
+  @override
+  String get mlsRetry => 'Обновить и повторить отправку';
+
+  @override
+  String get mlsWaiting =>
+      'Это устройство ещё не приглашено в канал или доступ отозван. Передайте его код владельцу канала.';
+
+  @override
+  String get mlsInput => 'Что у вас нового?';
+
+  @override
+  String get mlsSend => 'Отправить';
+
+  @override
+  String get mlsAttach => 'Прикрепить файл';
+
+  @override
+  String get mlsFiles => 'Файлы канала';
+
+  @override
+  String get mlsUnavailable => 'Сообщение недоступно';
+
+  @override
+  String get mlsCancel => 'Отмена';
+
+  @override
+  String get mlsTransfer => 'Передать управление';
+
+  @override
+  String get mlsTransferTitle => 'Передать управление каналом?';
+
+  @override
+  String mlsTransferHint(String device) {
+    return 'Устройство $device сможет приглашать и исключать участников. Ваш доступ к переписке и файлам сохранится.';
+  }
 }

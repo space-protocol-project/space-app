@@ -559,8 +559,11 @@ class AppLocalizationsZh extends AppLocalizations {
       '使用相同的已保存新密钥更新过期请求？如果服务器已完成更换，请完成已保存的更换操作。';
 
   @override
+  String get rotationDevicesReview => '请检查将保留访问权限的设备。如果有不认识的设备，请取消并先撤销其权限。';
+
+  @override
   String get rotationConfirm =>
-      '更换根密钥？您的标识符、权限和历史记录会保留。旧设备和身份卡将失去访问权限。新密钥会先保存到受保护的日志。更换后务必保存新身份卡。';
+      '更换根密钥？您的 ID、权限、历史记录和已验证的有效设备将保留，访问期限不会延长。旧会话和恢复卡将失效。新密钥将先保存到受保护的日志中。更换后请保存新的恢复卡。';
 
   @override
   String get rotationServerRequired => '请先检查原服务器地址';
@@ -572,7 +575,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get rotationReconnect => '新密钥已保存。请检查服务器是否可用并重新连接。';
 
   @override
-  String get rotationCompleted => '根密钥已更换，原标识符已保留。请保存新身份卡；旧身份卡和设备已无法使用。';
+  String get rotationCompleted => '根密钥已更换，ID 和已验证的设备已保留。请保存新的恢复卡；旧卡已失效。';
 
   @override
   String get recoveryRevokeCard => '撤销恢复密钥？身份卡及所有通过它连接的设备将无法使用。请先确保有其他访问方式。';
@@ -1224,6 +1227,77 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get messageUnavailable => '消息不可用';
+
+  @override
+  String get mlsTitle => '私密频道 · MLS';
+
+  @override
+  String get mlsExperimental => '实验性端到端加密';
+
+  @override
+  String get mlsCreate => '创建私密频道';
+
+  @override
+  String get mlsChannelId => '频道标识';
+
+  @override
+  String get mlsChannelTitle => '频道名称';
+
+  @override
+  String get mlsDeviceCode => '此设备的验证码';
+
+  @override
+  String get mlsDevices => '频道设备';
+
+  @override
+  String get mlsVerify => '验证设备';
+
+  @override
+  String get mlsTrust => '验证码一致';
+
+  @override
+  String get mlsVerifyHint => '请通过独立渠道与另一台设备核对验证码。服务器不能证明密钥可信。';
+
+  @override
+  String get mlsInvite => '邀请';
+
+  @override
+  String get mlsRemove => '移除设备';
+
+  @override
+  String get mlsRetry => '刷新并重试发送';
+
+  @override
+  String get mlsWaiting => '此设备尚未获邀或访问已被撤销。请将验证码提供给频道所有者。';
+
+  @override
+  String get mlsInput => '有什么新消息？';
+
+  @override
+  String get mlsSend => '发送';
+
+  @override
+  String get mlsAttach => '添加文件';
+
+  @override
+  String get mlsFiles => '频道文件';
+
+  @override
+  String get mlsUnavailable => '消息不可用';
+
+  @override
+  String get mlsCancel => '取消';
+
+  @override
+  String get mlsTransfer => '移交管理权';
+
+  @override
+  String get mlsTransferTitle => '移交频道管理权？';
+
+  @override
+  String mlsTransferHint(String device) {
+    return '设备 $device 将能够邀请和移除成员。你仍可访问消息和文件。';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1289,4 +1363,75 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get glassEffectsHelp => '模糊浮动面板和标题。';
+
+  @override
+  String get mlsTitle => '私密频道 · MLS';
+
+  @override
+  String get mlsExperimental => '实验性端到端加密';
+
+  @override
+  String get mlsCreate => '创建私密频道';
+
+  @override
+  String get mlsChannelId => '频道标识';
+
+  @override
+  String get mlsChannelTitle => '频道名称';
+
+  @override
+  String get mlsDeviceCode => '此设备的验证码';
+
+  @override
+  String get mlsDevices => '频道设备';
+
+  @override
+  String get mlsVerify => '验证设备';
+
+  @override
+  String get mlsTrust => '验证码一致';
+
+  @override
+  String get mlsVerifyHint => '请通过独立渠道与另一台设备核对验证码。服务器不能证明密钥可信。';
+
+  @override
+  String get mlsInvite => '邀请';
+
+  @override
+  String get mlsRemove => '移除设备';
+
+  @override
+  String get mlsRetry => '刷新并重试发送';
+
+  @override
+  String get mlsWaiting => '此设备尚未获邀或访问已被撤销。请将验证码提供给频道所有者。';
+
+  @override
+  String get mlsInput => '有什么新消息？';
+
+  @override
+  String get mlsSend => '发送';
+
+  @override
+  String get mlsAttach => '添加文件';
+
+  @override
+  String get mlsFiles => '频道文件';
+
+  @override
+  String get mlsUnavailable => '消息不可用';
+
+  @override
+  String get mlsCancel => '取消';
+
+  @override
+  String get mlsTransfer => '移交管理权';
+
+  @override
+  String get mlsTransferTitle => '移交频道管理权？';
+
+  @override
+  String mlsTransferHint(String device) {
+    return '设备 $device 将能够邀请和移除成员。你仍可访问消息和文件。';
+  }
 }

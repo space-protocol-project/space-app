@@ -1151,10 +1151,16 @@ abstract class AppLocalizations {
   /// **'Обновить истёкший запрос с теми же сохранёнными новыми ключами? Если сервер уже завершил переход, используйте завершение сохранённой смены.'**
   String get rotationRenewConfirm;
 
+  /// No description provided for @rotationDevicesReview.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверьте устройства, которым будет сохранён доступ. Если устройство неизвестно, отмените операцию и сначала отзовите его разрешение.'**
+  String get rotationDevicesReview;
+
   /// No description provided for @rotationConfirm.
   ///
   /// In ru, this message translates to:
-  /// **'Сменить корневой ключ? Ваш ID, права и история сохранятся. Прежние устройства и карточки потеряют доступ. Новый секрет сначала сохраняется в защищённый журнал. После перехода обязательно сохраните новую карточку.'**
+  /// **'Сменить корневой ключ? ID, права, история и подтверждённые действующие устройства сохранятся без продления доступа. Старые сеансы и карточки восстановления перестанут действовать. Новый секрет сначала сохраняется в защищённый журнал. После перехода сохраните новую карточку.'**
   String get rotationConfirm;
 
   /// No description provided for @rotationServerRequired.
@@ -1178,7 +1184,7 @@ abstract class AppLocalizations {
   /// No description provided for @rotationCompleted.
   ///
   /// In ru, this message translates to:
-  /// **'Корневой ключ сменён, прежний ID сохранён. Сохраните новую карточку; старые карточки и устройства больше не работают.'**
+  /// **'Корневой ключ сменён, ID и подтверждённые устройства сохранены. Сохраните новую карточку; прежние карточки больше не действуют.'**
   String get rotationCompleted;
 
   /// No description provided for @recoveryRevokeCard.
@@ -2446,6 +2452,144 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Сообщение недоступно'**
   String get messageUnavailable;
+
+  /// No description provided for @mlsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрытый канал · MLS'**
+  String get mlsTitle;
+
+  /// No description provided for @mlsExperimental.
+  ///
+  /// In ru, this message translates to:
+  /// **'Экспериментальный режим E2EE'**
+  String get mlsExperimental;
+
+  /// No description provided for @mlsCreate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать закрытый канал'**
+  String get mlsCreate;
+
+  /// No description provided for @mlsChannelId.
+  ///
+  /// In ru, this message translates to:
+  /// **'Идентификатор канала'**
+  String get mlsChannelId;
+
+  /// No description provided for @mlsChannelTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название канала'**
+  String get mlsChannelTitle;
+
+  /// No description provided for @mlsDeviceCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код этого устройства'**
+  String get mlsDeviceCode;
+
+  /// No description provided for @mlsDevices.
+  ///
+  /// In ru, this message translates to:
+  /// **'Устройства канала'**
+  String get mlsDevices;
+
+  /// No description provided for @mlsVerify.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверить устройство'**
+  String get mlsVerify;
+
+  /// No description provided for @mlsTrust.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код совпадает'**
+  String get mlsTrust;
+
+  /// No description provided for @mlsVerifyHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сверьте этот код на другом устройстве по независимому каналу. Сервер не подтверждает подлинность ключа.'**
+  String get mlsVerifyHint;
+
+  /// No description provided for @mlsInvite.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пригласить'**
+  String get mlsInvite;
+
+  /// No description provided for @mlsRemove.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исключить устройство'**
+  String get mlsRemove;
+
+  /// No description provided for @mlsRetry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить и повторить отправку'**
+  String get mlsRetry;
+
+  /// No description provided for @mlsWaiting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это устройство ещё не приглашено в канал или доступ отозван. Передайте его код владельцу канала.'**
+  String get mlsWaiting;
+
+  /// No description provided for @mlsInput.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что у вас нового?'**
+  String get mlsInput;
+
+  /// No description provided for @mlsSend.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправить'**
+  String get mlsSend;
+
+  /// No description provided for @mlsAttach.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прикрепить файл'**
+  String get mlsAttach;
+
+  /// No description provided for @mlsFiles.
+  ///
+  /// In ru, this message translates to:
+  /// **'Файлы канала'**
+  String get mlsFiles;
+
+  /// No description provided for @mlsUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщение недоступно'**
+  String get mlsUnavailable;
+
+  /// No description provided for @mlsCancel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отмена'**
+  String get mlsCancel;
+
+  /// No description provided for @mlsTransfer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Передать управление'**
+  String get mlsTransfer;
+
+  /// No description provided for @mlsTransferTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Передать управление каналом?'**
+  String get mlsTransferTitle;
+
+  /// No description provided for @mlsTransferHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Устройство {device} сможет приглашать и исключать участников. Ваш доступ к переписке и файлам сохранится.'**
+  String mlsTransferHint(String device);
 }
 
 class _AppLocalizationsDelegate

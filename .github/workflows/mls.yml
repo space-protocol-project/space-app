@@ -1,0 +1,57 @@
+name: Проверки экспериментального MLS
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['native/**', 'packages/space_mls_native/**', 'tools/check_mls_advisories*', 'tools/collect_mls_notices.py', '.github/workflows/mls.yml']
+  pull_request:
+    paths: ['native/**', 'packages/space_mls_native/**', 'tools/check_mls_advisories*', 'tools/collect_mls_notices.py', '.github/workflows/mls.yml']
+permissions:
+  contents: read
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025, macos-15]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: native/space_mls
+    steps:
+      - uses: actions/checkout@v4
+      - name: Установка закреплённого Rust
+        run: rustup toolchain install 1.99.0 --profile minimal --component clippy --component rustfmt
+      - name: Форматирование
+        run: cargo fmt --check
+      - name: Анализ
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: Формат и анализ моста Flutter
+        run: |
+          cargo fmt --manifest-path ../space_mls_bridge/Cargo.toml --check
+          cargo clippy --locked --manifest-path ../space_mls_bridge/Cargo.toml --all-targets -- -D warnings
+      - name: Закрытый канал, сообщения и вложения
+        run: cargo test --locked
+      - uses: actions/setup-python@v5
+        if: matrix.os == 'ubuntu-24.04'
+        with:
+          python-version: '3.12'
+      - name: Известные уязвимости активных зависимостей
+        if: matrix.os == 'ubuntu-24.04'
+        run: |
+          python -m unittest discover -s ../../tools -p 'check_mls_advisories_test.py'
+          python ../../tools/check_mls_advisories.py
+  android:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: native/space_mls
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust для Android ARM64
+        run: rustup toolchain install 1.99.0 --profile minimal --target aarch64-linux-android
+      - name: Проверка сборки ядра для Android
+        run: |
+          cargo check --locked --target aarch64-linux-android
+          cargo check --locked --manifest-path ../space_mls_bridge/Cargo.toml --target aarch64-linux-android

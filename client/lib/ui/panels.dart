@@ -1,3 +1,5 @@
+import 'mls_create.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../l10n/strings.dart';
@@ -83,6 +85,14 @@ class OverviewPanel extends StatelessWidget {
           MemberProfileCard(
             key: ValueKey(('profile', controller)),
             controller: controller,
+          ),
+          const SizedBox(height: 24),
+        ],
+        if (controller.mlsSession?.mlsSupported == true &&
+            controller.administration != null) ...[
+          CreateMlsChannelButton(
+            session: controller.mlsSession!,
+            created: openChannel,
           ),
           const SizedBox(height: 24),
         ],

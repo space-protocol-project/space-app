@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <direct.h>
 #include <bcrypt.h>
+#include "atomic_secure_file.h"
 
 // For getPlatformVersion; remove unless needed for your plugin implementation.
 #include <VersionHelpers.h>
@@ -413,7 +414,7 @@ namespace flutter_secure_storage_windows
           encryptionKey = GetEncryptionKey();
       BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO authInfo{};
       BCRYPT_AUTH_TAG_LENGTHS_STRUCT authTagLengths{};
-      std::basic_ofstream<BYTE> fs;
+      SecureFilePart parts[3]{};
       std::wstring appSupportPath;
       std::string error;
 
@@ -491,15 +492,13 @@ namespace flutter_secure_storage_windows
       if (!PathExists(appSupportPath)) {
           MakePath(appSupportPath);
       }
-      fs = std::basic_ofstream<BYTE>(appSupportPath + L"\\" + std::wstring(key.begin(), key.end()) + L".secure", std::ios::binary | std::ios::trunc);
-      if (!fs) {
-          error = "Failed to open output stream";
+      parts[0] = {iv, NONCE_SIZE};
+      parts[1] = {authInfo.pbTag, authInfo.cbTag};
+      parts[2] = {ciphertext, ciphertextSize};
+      if (!WriteSecureFileAtomically(appSupportPath + L"\\" + std::wstring(key.begin(), key.end()) + L".secure", parts, 3)) {
+          error = "Failed to atomically replace secure record";
           goto err;
       }
-      fs.write(iv, NONCE_SIZE);
-      fs.write(authInfo.pbTag, authInfo.cbTag);
-      fs.write(ciphertext, ciphertextSize);
-      fs.close();
       HeapFree(GetProcessHeap(), 0, iv);
       HeapFree(GetProcessHeap(), 0, encryptionKey);
       HeapFree(GetProcessHeap(), 0, authInfo.pbNonce);

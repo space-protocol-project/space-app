@@ -366,3 +366,43 @@ abstract final class MembershipService {
     spacev1space.GetMembershipResponse.new,
   );
 }
+/// Сервер доставляет непрозрачные MLS-пакеты. Состав проверяется клиентами.
+abstract final class MlsService {
+  /// Fully-qualified name of the MlsService service.
+  static const name = 'space.v1.MlsService';
+
+  static const registerMlsDevice = connect.Spec(
+    '/$name/RegisterMlsDevice',
+    connect.StreamType.unary,
+    spacev1space.RegisterMlsDeviceRequest.new,
+    spacev1space.RegisterMlsDeviceResponse.new,
+  );
+
+  static const listMlsDevices = connect.Spec(
+    '/$name/ListMlsDevices',
+    connect.StreamType.unary,
+    spacev1space.ListMlsDevicesRequest.new,
+    spacev1space.ListMlsDevicesResponse.new,
+  );
+
+  static const getMlsChannel = connect.Spec(
+    '/$name/GetMlsChannel',
+    connect.StreamType.unary,
+    spacev1space.GetMlsChannelRequest.new,
+    spacev1space.GetMlsChannelResponse.new,
+  );
+
+  static const publishMls = connect.Spec(
+    '/$name/PublishMls',
+    connect.StreamType.unary,
+    spacev1space.PublishMlsRequest.new,
+    spacev1space.PublishMlsResponse.new,
+  );
+
+  static const listMlsEnvelopes = connect.Spec(
+    '/$name/ListMlsEnvelopes',
+    connect.StreamType.unary,
+    spacev1space.ListMlsEnvelopesRequest.new,
+    spacev1space.ListMlsEnvelopesResponse.new,
+  );
+}

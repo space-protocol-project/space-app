@@ -227,11 +227,12 @@
   "recoveryConnectionDenied": "Keys saved, but the server denied the connection. Check whether the card was revoked, access blocked or chat unavailable.",
   "recoveryRestored": "Identity restored with a new device. Check the device list and revoke lost devices.",
   "rotationRenewConfirm": "Renew the expired request using the same saved new keys? If the server already completed rotation, finish the saved rotation instead.",
-  "rotationConfirm": "Rotate the root key? Your ID, permissions and history stay unchanged. Old devices and cards lose access. The new secret is first saved in a protected journal. Save a new card after rotation.",
+  "rotationDevicesReview": "Review the devices that will keep access. If a device is unfamiliar, cancel and revoke its permission first.",
+  "rotationConfirm": "Change the root key? Your ID, permissions, history and verified active devices will remain, without extending their access. Old sessions and recovery cards will be revoked. The new secret is saved in a protected journal first. Save a new recovery card after the change.",
   "rotationServerRequired": "First check the original server address",
   "rotationNotPending": "No saved key rotation for this server.",
   "rotationReconnect": "New key saved. Check server availability and reconnect.",
-  "rotationCompleted": "Root key rotated; your ID is preserved. Save a new card. Old cards and devices no longer work.",
+  "rotationCompleted": "Root key changed. Your ID and verified devices are preserved. Save a new recovery card; old cards no longer work.",
   "recoveryRevokeCard": "Revoke the recovery key? The card and all devices connected through it will stop working. Make sure you have another access method.",
   "recoveryRevokeDevice": "Revoke this device? Its sessions and subscriptions will end.",
   "recoveryRevoked": "Permission revoked on the server.",
@@ -510,5 +511,35 @@
   "nicknameInvalid": "Use up to 40 characters without line breaks.",
   "nicknameFailed": "Could not update your profile. Check your connection.",
   "retryProfile": "Retry",
-  "messageUnavailable": "Message unavailable"
+  "messageUnavailable": "Message unavailable",
+  "mlsTitle": "Private channel · MLS",
+  "mlsExperimental": "Experimental E2EE",
+  "mlsCreate": "Create private channel",
+  "mlsChannelId": "Channel ID",
+  "mlsChannelTitle": "Channel title",
+  "mlsDeviceCode": "This device’s code",
+  "mlsDevices": "Channel devices",
+  "mlsVerify": "Verify device",
+  "mlsTrust": "Codes match",
+  "mlsVerifyHint": "Compare this code on the other device through an independent channel. The server does not establish trust in this key.",
+  "mlsInvite": "Invite",
+  "mlsRemove": "Remove device",
+  "mlsRetry": "Refresh and retry delivery",
+  "mlsWaiting": "This device has not been invited or access was revoked. Share its code with the channel owner.",
+  "mlsInput": "What’s new?",
+  "mlsSend": "Send",
+  "mlsAttach": "Attach file",
+  "mlsFiles": "Channel files",
+  "mlsUnavailable": "Message unavailable",
+  "mlsCancel": "Cancel",
+  "mlsTransfer": "Transfer management",
+  "mlsTransferTitle": "Transfer channel management?",
+  "mlsTransferHint": "Device {device} will be able to invite and remove members. You will keep access to messages and files.",
+  "@mlsTransferHint": {
+    "placeholders": {
+      "device": {
+        "type": "String"
+      }
+    }
+  }
 }

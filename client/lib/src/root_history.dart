@@ -124,7 +124,12 @@ Future<void> _verifyRotationSignatures(
   List<int> newRoot,
 ) async {
   for (final role in ['old', 'new']) {
-    final signed = [...utf8.encode('space/root.rotate/$role/v1\u0000'), ...raw];
+    final signed = [
+      ...utf8.encode(
+        'space/root.rotate/$role/v${(jsonDecode(utf8.decode(raw)) as Map)["v"]}\u0000',
+      ),
+      ...raw,
+    ];
     final signature = Signature(
       _bytes(proof['${role}_signature'], 64),
       publicKey: SimplePublicKey(
@@ -156,9 +161,16 @@ bool _validRotationTranscript(
     (k) => t[k] is int && (t[k] as int) > 0 && (t[k] as int) < 9007199254740991,
   );
   return !(!numbers ||
-      fields.join(',') != rotationFields ||
+      fields.join(',') !=
+          (t['v'] == 2
+              ? rotationFields.replaceFirst(
+                  'purpose,scopes',
+                  'purpose,retained_devices_hash,scopes',
+                )
+              : rotationFields) ||
       canonical != text ||
-      t['v'] != 1 ||
+      (t['v'] != 1 && t['v'] != 2) ||
+      (t['v'] == 2 && _bytes(t['retained_devices_hash'], 32).length != 32) ||
       t['purpose'] != 'identity.root.rotate' ||
       t['auth_epoch'] != index + 1 ||
       t['principal_id'] != principal ||

@@ -1,7 +1,8 @@
 param(
     [string]$DatabaseUrl = $env:SPACE_TEST_DATABASE_URL,
     [string]$PostgresBin = $env:SPACE_TEST_POSTGRES_BIN,
-    [string]$OutputDirectory = $env:TEMP
+    [string]$OutputDirectory = $env:TEMP,
+    [ValidateSet("attachments","mls")][string]$Scenario="attachments"
 )
 
 $ErrorActionPreference = 'Stop'
@@ -47,6 +48,7 @@ $created = $false
 $server = $null
 $previousDatabase = $env:SPACE_DATABASE_URL
 $previousOrigin = $env:SPACE_ATTACHMENTS_TEST_ORIGIN
+$previousMlsOrigin=$env:SPACE_MLS_TEST_ORIGIN
 try {
     & $psql $DatabaseUrl -X -q -v ON_ERROR_STOP=1 -c "CREATE SCHEMA $schema"
     if ($LASTEXITCODE -ne 0) { throw 'Не удалось создать отдельную тестовую схему.' }
@@ -69,12 +71,13 @@ try {
         throw 'Discovery не соответствует отдельной тестовой базе. Проверка остановлена.'
     }
     $env:SPACE_ATTACHMENTS_TEST_ORIGIN = $origin
+    if($Scenario -eq "mls"){$env:SPACE_MLS_TEST_ORIGIN=$origin}
     Push-Location (Join-Path $appRoot 'client')
     try {
-        flutter test test/live/attachments_server_test.dart --reporter expanded
-        if ($LASTEXITCODE -ne 0) { throw 'Сквозная проверка вложений завершилась ошибкой.' }
+        if($Scenario -eq "mls"){flutter test test/live/mls_server_test.dart --reporter expanded}else{flutter test test/live/attachments_server_test.dart --reporter expanded}
+        if ($LASTEXITCODE -ne 0) { throw "Сквозная проверка $Scenario завершилась ошибкой." }
     } finally { Pop-Location }
-    Write-Output "Сквозная проверка v0.3 пройдена. Журналы: $work"
+    Write-Output "Сквозная проверка $Scenario пройдена. Журналы: $work"
 } finally {
     if ($null -ne $server -and !$server.HasExited) {
         $server.Kill()
@@ -82,6 +85,7 @@ try {
     }
     $env:SPACE_DATABASE_URL = $previousDatabase
     $env:SPACE_ATTACHMENTS_TEST_ORIGIN = $previousOrigin
+    $env:SPACE_MLS_TEST_ORIGIN=$previousMlsOrigin
     if ($created -and $schema -match '^space_v03_[0-9a-f]{32}$') {
         & $psql $DatabaseUrl -X -q -v ON_ERROR_STOP=1 -c "SET client_min_messages=warning; DROP SCHEMA $schema CASCADE"
         if ($LASTEXITCODE -ne 0) { Write-Warning 'Не удалось удалить собственную тестовую схему.' }

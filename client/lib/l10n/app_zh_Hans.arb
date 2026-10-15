@@ -28,5 +28,35 @@
   "homeTransferring": "正在迁移空间",
   "homeTransferFailed": "无法打开存档或完成迁移。",
   "glassEffects": "玻璃效果",
-  "glassEffectsHelp": "模糊浮动面板和标题。"
+  "glassEffectsHelp": "模糊浮动面板和标题。",
+  "mlsTitle": "私密频道 · MLS",
+  "mlsExperimental": "实验性端到端加密",
+  "mlsCreate": "创建私密频道",
+  "mlsChannelId": "频道标识",
+  "mlsChannelTitle": "频道名称",
+  "mlsDeviceCode": "此设备的验证码",
+  "mlsDevices": "频道设备",
+  "mlsVerify": "验证设备",
+  "mlsTrust": "验证码一致",
+  "mlsVerifyHint": "请通过独立渠道与另一台设备核对验证码。服务器不能证明密钥可信。",
+  "mlsInvite": "邀请",
+  "mlsRemove": "移除设备",
+  "mlsRetry": "刷新并重试发送",
+  "mlsWaiting": "此设备尚未获邀或访问已被撤销。请将验证码提供给频道所有者。",
+  "mlsInput": "有什么新消息？",
+  "mlsSend": "发送",
+  "mlsAttach": "添加文件",
+  "mlsFiles": "频道文件",
+  "mlsUnavailable": "消息不可用",
+  "mlsCancel": "取消",
+  "mlsTransfer": "移交管理权",
+  "mlsTransferTitle": "移交频道管理权？",
+  "mlsTransferHint": "设备 {device} 将能够邀请和移除成员。你仍可访问消息和文件。",
+  "@mlsTransferHint": {
+    "placeholders": {
+      "device": {
+        "type": "String"
+      }
+    }
+  }
 }

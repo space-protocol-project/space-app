@@ -1,0 +1,9 @@
+name: space_mls_native
+description: Нативное ядро MLS для клиента Space.
+version: 0.1.0
+publish_to: none
+environment:
+  sdk: ^3.13.5
+dependencies:
+  hooks: 2.0.2
+  code_assets: 1.2.1

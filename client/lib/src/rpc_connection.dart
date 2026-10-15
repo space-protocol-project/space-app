@@ -10,7 +10,12 @@ import 'package:protobuf/protobuf.dart';
 import 'rpc_http.dart';
 
 class RpcOptions {
-  const RpcOptions({this.timeout, this.metadata = const {}});
+  const RpcOptions({
+    this.timeout,
+    this.metadata = const {},
+    this.onUnauthenticated,
+  });
+  final void Function()? onUnauthenticated;
   final Duration? timeout;
   final Map<String, String> metadata;
 }
@@ -50,7 +55,11 @@ class RpcConnection {
         signal: call,
       );
     } on connect.ConnectException catch (error) {
-      throw rpcError(error);
+      final converted = rpcError(error);
+      if (converted is GrpcError && converted.code == StatusCode.unauthenticated) {
+        options?.onUnauthenticated?.call();
+      }
+      throw converted;
     } finally {
       _finish(call);
     }

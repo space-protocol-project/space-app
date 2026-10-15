@@ -98,10 +98,15 @@ Future<connect.HttpResponse> sendRpcRequest(
   copyRequestHeaders(request, input.header);
   if (input.body != null) await request.addStream(input.body!);
   final response = await withSignal(request.close(), input.signal);
+  final streaming =
+      input.header
+          .get('content-type')
+          ?.any((value) => value.startsWith('application/connect+')) ??
+      false;
   return connect.HttpResponse(
     response.statusCode,
     responseHeaders(response),
-    responseBytes(response, input.signal),
+    responseBytes(response, input.signal, framed: streaming),
     connect.Headers(),
   );
 }
@@ -124,14 +129,67 @@ connect.Headers responseHeaders(HttpClientResponse response) {
 
 Stream<Uint8List> responseBytes(
   HttpClientResponse response,
-  connect.AbortSignal? signal,
-) async* {
+  connect.AbortSignal? signal, {
+  bool framed = false,
+}) async* {
   final iterator = StreamIterator(response);
+  final limit = RpcBodyLimit(framed: framed);
   try {
     while (await withSignal(iterator.moveNext(), signal)) {
+      limit.add(iterator.current);
       yield Uint8List.fromList(iterator.current);
     }
   } finally {
     await iterator.cancel();
+  }
+}
+
+// Ограничиваем unary целиком, а поток — по кадрам, до накопления тела декодером.
+class RpcBodyLimit {
+  RpcBodyLimit({required this.framed});
+  final bool framed;
+  static const maxBytes = 8 * 1024 * 1024;
+  final _header = Uint8List(5);
+  int _headerLength = 0;
+  int _remaining = 0;
+  int _received = 0;
+
+  void add(List<int> bytes) {
+    if (framed) {
+      _frames(bytes);
+    } else {
+      _received += bytes.length;
+      _check(_received);
+    }
+  }
+
+  void _frames(List<int> bytes) {
+    var offset = 0;
+    while (offset < bytes.length) {
+      if (_remaining > 0) {
+        final count = _remaining.clamp(0, bytes.length - offset);
+        offset += count;
+        _remaining -= count;
+        continue;
+      }
+      final count = (5 - _headerLength).clamp(0, bytes.length - offset);
+      _header.setRange(_headerLength, _headerLength + count, bytes, offset);
+      _headerLength += count;
+      offset += count;
+      if (_headerLength == 5) {
+        _remaining = ByteData.sublistView(_header).getUint32(1);
+        _check(_remaining);
+        _headerLength = 0;
+      }
+    }
+  }
+
+  void _check(int size) {
+    if (size > maxBytes) {
+      throw connect.ConnectException(
+        connect.Code.resourceExhausted,
+        'Ответ RPC слишком большой',
+      );
+    }
   }
 }

@@ -10,6 +10,9 @@ import 'src/desktop_window.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   LicenseRegistry.addLicense(() async* {
+    yield LicenseEntryWithLineBreaks([
+      'Space MLS — Rust',
+    ], await rootBundle.loadString('assets/legal/mls-NOTICES.txt'));
     for (final entry in {
       'Nunito': 'Nunito',
       'Nunito Sans': 'NunitoSans',

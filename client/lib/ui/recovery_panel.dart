@@ -321,14 +321,28 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     }
     final manager = widget.controller.deviceManagement;
     if (manager is! RootRotationControl) return;
+    final rotationManager = manager as RootRotationControl;
+    final retained = await rotationManager.previewRotationDevices();
     if (!await confirm(
       (strings) =>
-          renew ? strings.rotationRenewConfirm : strings.rotationConfirm,
+          '${renew ? strings.rotationRenewConfirm : strings.rotationConfirm}'
+          '${_rotationDeviceSummary(retained, strings)}',
     )) {
       return;
     }
-    await (manager as RootRotationControl).prepareRotation(renew: renew);
+    await rotationManager.prepareRotation(
+      renew: renew,
+      retainedDevices: retained,
+    );
     await finishRotation();
+  }
+
+  String _rotationDeviceSummary(
+    List<DeviceGrant> retained,
+    AppLocalizations strings,
+  ) {
+    if (retained.isEmpty) return '';
+    return '\n\n${strings.rotationDevicesReview}\n\n${retained.map((d) => [d.id, url64(d.publicKey), d.scopes.join(', '), DateTime.fromMillisecondsSinceEpoch(d.expiresAt.toInt() * 1000).toLocal().toString()].join('\n')).join('\n\n')}';
   }
 
   Future<void> finishRotation() async {

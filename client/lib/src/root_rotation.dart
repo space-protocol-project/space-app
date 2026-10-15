@@ -9,11 +9,16 @@ import 'package:fixnum/fixnum.dart';
 
 import 'core.dart';
 import 'root_history.dart';
+import 'root_retention.dart';
+import 'root_device_proof.dart';
 import 'rpc_clients.dart';
 
 Future<String> _digest(DeviceRecord record) async {
   // Смена маршрута не меняет ключи и не отменяет подготовленную ротацию.
-  final identity = record.toJson()..remove('endpoint');
+  final identity = record.toJson()
+    ..remove('endpoint')
+    ..remove('mlsChannels')
+    ..remove('mlsIdentity');
   return url64((await Sha256().hash(utf8.encode(jsonEncode(identity)))).bytes);
 }
 
@@ -27,6 +32,7 @@ Future<Map<String, dynamic>> prepareRootRotation(
   AuthServiceClient auth,
   RpcOptions options, {
   bool renew = false,
+  List<DeviceGrant>? retainedDevices,
 }) async {
   if (current.rootSeed.length != 32) {
     throw const LocalFailure(
@@ -71,17 +77,23 @@ Future<Map<String, dynamic>> prepareRootRotation(
           : await algorithm.newKeyPairFromSeed(saved.deviceSeed);
   final public = (await newRoot.extractPublicKey()).bytes;
   final devicePublic = (await device.extractPublicKey()).bytes;
-  final operation = saved == null
-      ? 'ro_${url64(List<int>.generate(32, (_) => Random.secure().nextInt(256)))}'
-      : (jsonDecode(
-              utf8.decode(
-                _decode(saved.rootHistory.last['transcript'] as String),
-              ),
-            ) as Map<String, dynamic>)['operation_id']
-            as String;
+  final operation = _rotationOperation(saved);
+  final retained = await verifiedRetainedDevices(
+    server,
+    current,
+    auth,
+    options,
+  );
+  final retentionHash = retained.isEmpty
+      ? <int>[]
+      : await retainedDevicesHash(retained);
+  await _checkReviewedDevices(retainedDevices, retentionHash);
+  final version = retained.isEmpty ? 1 : 2;
   final challenge = await auth.createRootRotation(
     CreateRootRotationRequest(
-      profile: 'root-rotation-v1',
+      profile: 'root-rotation-v$version',
+      retainedGrantIds: retained.map((d) => d.id),
+      retainedDevicesHash: retentionHash,
       operationId: operation,
       expectedAuthEpoch: Int64(identity.epoch),
       newRootPublicKey: public,
@@ -100,29 +112,29 @@ Future<Map<String, dynamic>> prepareRootRotation(
     public,
     devicePublic,
   );
-  final proof = <String, dynamic>{'transcript': url64(challenge.transcript)};
-  for (final role in ['old', 'new']) {
-    final signed = [
-      ...utf8.encode('space/root.rotate/$role/v1\u0000'),
-      ...challenge.transcript,
-    ];
-    proof['${role}_signature'] = url64(
-      (await algorithm.sign(
-        signed,
-        keyPair: role == 'old' ? oldRoot : newRoot,
-      )).bytes,
-    );
+  if (t['v'] != version ||
+      (t['retained_devices_hash'] ?? '') != url64(retentionHash)) {
+    invalidRetention();
   }
+  final proof = await _signedRotationProof(
+    challenge,
+    version,
+    oldRoot,
+    newRoot,
+  );
   final next = DeviceRecord(
     origin: current.origin,
     endpoint: current.endpoint,
     serverId: current.serverId,
     serverKey: current.serverKey,
+    tlsFingerprint: current.tlsFingerprint,
     rootSeed: await newRoot.extractPrivateKeyBytes(),
     deviceSeed: await device.extractPrivateKeyBytes(),
     rootPublicKey: public,
     administrative: current.administrative,
     rootHistory: [...current.rootHistory, proof],
+    mlsChannels: current.mlsChannels,
+    mlsIdentity: current.mlsIdentity,
   );
   await _verifyPreparedRotation(next, identity, public);
   final pending = <String, dynamic>{
@@ -204,6 +216,8 @@ Future<DeviceRecord?> finishRootRotation(
     );
   }
   next.grantId = receipt.grantId;
+  next.mlsChannels.addAll(current?.mlsChannels ?? {});
+  next.mlsIdentity ??= current?.mlsIdentity;
   // Если запись или очистка завершатся ошибкой, журнал остаётся для повторного commit.
   await vault.save(next);
   await vault.clearRotation(next.origin);
@@ -274,6 +288,9 @@ Future<void> _verifyPreparedRotation(
         jsonEncode({
           'v': 2,
           'origin': next.origin,
+          'endpoint': next.connectionAddress,
+          if (next.tlsFingerprint.isNotEmpty)
+            'tls_fingerprint': next.tlsFingerprint,
           'server_id': next.serverId,
           'server_key': next.serverKey,
           'root_public_key': url64(public),
@@ -319,4 +336,47 @@ Future<void> _validateSavedRotation(
       'Сохранённая ротация относится к другой записи',
     );
   }
+}
+
+Future<Map<String, dynamic>> _signedRotationProof(
+  CreateRootRotationResponse challenge,
+  int version,
+  KeyPair oldRoot,
+  KeyPair newRoot,
+) async {
+  final algorithm = Ed25519();
+  final proof = <String, dynamic>{'transcript': url64(challenge.transcript)};
+  for (final role in ['old', 'new']) {
+    final signed = [
+      ...utf8.encode('space/root.rotate/$role/v$version\u0000'),
+      ...challenge.transcript,
+    ];
+    proof['${role}_signature'] = url64(
+      (await algorithm.sign(
+        signed,
+        keyPair: role == 'old' ? oldRoot : newRoot,
+      )).bytes,
+    );
+  }
+  return proof;
+}
+
+String _rotationOperation(DeviceRecord? saved) {
+  return saved == null
+      ? 'ro_${url64(List<int>.generate(32, (_) => Random.secure().nextInt(256)))}'
+      : (jsonDecode(
+              utf8.decode(
+                _decode(saved.rootHistory.last['transcript'] as String),
+              ),
+            ) as Map<String, dynamic>)['operation_id']
+            as String;
+}
+
+Future<void> _checkReviewedDevices(
+  List<DeviceGrant>? reviewed,
+  List<int> currentHash,
+) async {
+  if (reviewed == null) return;
+  final hash = reviewed.isEmpty ? <int>[] : await retainedDevicesHash(reviewed);
+  if (url64(hash) != url64(currentHash)) invalidRetention();
 }

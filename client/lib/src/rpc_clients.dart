@@ -403,3 +403,45 @@ class AssetServiceClient {
     options: options,
   );
 }
+
+class MlsServiceClient {
+  const MlsServiceClient(this.connection);
+  final RpcConnection connection;
+  Future<RegisterMlsDeviceResponse> registerMlsDevice(
+    RegisterMlsDeviceRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.MlsService.registerMlsDevice,
+    request,
+    options: options,
+  );
+  Future<ListMlsDevicesResponse> listMlsDevices(
+    ListMlsDevicesRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.MlsService.listMlsDevices,
+    request,
+    options: options,
+  );
+  Future<GetMlsChannelResponse> getMlsChannel(
+    GetMlsChannelRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.MlsService.getMlsChannel,
+    request,
+    options: options,
+  );
+  Future<PublishMlsResponse> publishMls(
+    PublishMlsRequest request, {
+    RpcOptions? options,
+  }) =>
+      connection.unary(specs.MlsService.publishMls, request, options: options);
+  Future<ListMlsEnvelopesResponse> listMlsEnvelopes(
+    ListMlsEnvelopesRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.MlsService.listMlsEnvelopes,
+    request,
+    options: options,
+  );
+}

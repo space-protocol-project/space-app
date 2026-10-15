@@ -583,8 +583,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Renew the expired request using the same saved new keys? If the server already completed rotation, finish the saved rotation instead.';
 
   @override
+  String get rotationDevicesReview =>
+      'Review the devices that will keep access. If a device is unfamiliar, cancel and revoke its permission first.';
+
+  @override
   String get rotationConfirm =>
-      'Rotate the root key? Your ID, permissions and history stay unchanged. Old devices and cards lose access. The new secret is first saved in a protected journal. Save a new card after rotation.';
+      'Change the root key? Your ID, permissions, history and verified active devices will remain, without extending their access. Old sessions and recovery cards will be revoked. The new secret is saved in a protected journal first. Save a new recovery card after the change.';
 
   @override
   String get rotationServerRequired =>
@@ -599,7 +603,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rotationCompleted =>
-      'Root key rotated; your ID is preserved. Save a new card. Old cards and devices no longer work.';
+      'Root key changed. Your ID and verified devices are preserved. Save a new recovery card; old cards no longer work.';
 
   @override
   String get recoveryRevokeCard =>
@@ -1333,4 +1337,77 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get messageUnavailable => 'Message unavailable';
+
+  @override
+  String get mlsTitle => 'Private channel · MLS';
+
+  @override
+  String get mlsExperimental => 'Experimental E2EE';
+
+  @override
+  String get mlsCreate => 'Create private channel';
+
+  @override
+  String get mlsChannelId => 'Channel ID';
+
+  @override
+  String get mlsChannelTitle => 'Channel title';
+
+  @override
+  String get mlsDeviceCode => 'This device’s code';
+
+  @override
+  String get mlsDevices => 'Channel devices';
+
+  @override
+  String get mlsVerify => 'Verify device';
+
+  @override
+  String get mlsTrust => 'Codes match';
+
+  @override
+  String get mlsVerifyHint =>
+      'Compare this code on the other device through an independent channel. The server does not establish trust in this key.';
+
+  @override
+  String get mlsInvite => 'Invite';
+
+  @override
+  String get mlsRemove => 'Remove device';
+
+  @override
+  String get mlsRetry => 'Refresh and retry delivery';
+
+  @override
+  String get mlsWaiting =>
+      'This device has not been invited or access was revoked. Share its code with the channel owner.';
+
+  @override
+  String get mlsInput => 'What’s new?';
+
+  @override
+  String get mlsSend => 'Send';
+
+  @override
+  String get mlsAttach => 'Attach file';
+
+  @override
+  String get mlsFiles => 'Channel files';
+
+  @override
+  String get mlsUnavailable => 'Message unavailable';
+
+  @override
+  String get mlsCancel => 'Cancel';
+
+  @override
+  String get mlsTransfer => 'Transfer management';
+
+  @override
+  String get mlsTransferTitle => 'Transfer channel management?';
+
+  @override
+  String mlsTransferHint(String device) {
+    return 'Device $device will be able to invite and remove members. You will keep access to messages and files.';
+  }
 }

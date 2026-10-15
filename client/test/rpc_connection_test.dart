@@ -11,6 +11,7 @@ import 'package:space_client/src/core.dart';
 import 'package:space_client/src/local_failure.dart';
 import 'package:space_client/src/rpc_clients.dart';
 import 'package:space_client/src/rpc_connection.dart';
+import 'package:space_client/src/rpc_http.dart';
 
 final certificateFile = File('test/fixtures/rpc-tls/server.crt');
 final keyFile = File('test/fixtures/rpc-tls/server.key');
@@ -43,6 +44,58 @@ Uint8List envelope(List<int> message, {int flags = 0}) {
 }
 
 void main() {
+  test(
+    'RPC ограничивает unary и каждый кадр, включая раздробленный заголовок',
+    () {
+      final unary = RpcBodyLimit(framed: false);
+      unary.add(Uint8List(RpcBodyLimit.maxBytes));
+      expect(() => unary.add([0]), throwsA(isA<Exception>()));
+      final framed = RpcBodyLimit(framed: true);
+      final header = Uint8List(5);
+      ByteData.sublistView(header).setUint32(1, RpcBodyLimit.maxBytes + 1);
+      framed.add(header.sublist(0, 2));
+      expect(() => framed.add(header.sublist(2)), throwsA(isA<Exception>()));
+      final valid = RpcBodyLimit(framed: true);
+      // Общий размер потока может превышать предел отдельного кадра.
+      for (var i = 0; i < 3; i++) {
+        valid.add(envelope(Uint8List(RpcBodyLimit.maxBytes)));
+      }
+      valid.add(envelope([]));
+      valid.add(envelope([1]));
+    },
+  );
+
+  test('Настоящий HTTP: чрезмерный ответ останавливается до Protobuf-декодирования', () async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    server.listen((request) async {
+      await request.drain<void>();
+      request.response.headers.contentType = ContentType.parse(
+        'application/proto',
+      );
+      request.response.add(Uint8List(RpcBodyLimit.maxBytes + 1));
+      await request.response.close();
+    });
+    final connection = RpcConnection.connect(
+      Uri.parse('http://127.0.0.1:${server.port}'),
+      '',
+    );
+    try {
+      await expectLater(
+        ChannelServiceClient(connection).getManifest(GetManifestRequest()),
+        throwsA(
+          isA<GrpcError>().having(
+            (error) => error.code,
+            'Код',
+            StatusCode.resourceExhausted,
+          ),
+        ),
+      );
+    } finally {
+      await connection.terminate();
+      await server.close(force: true);
+    }
+  });
+
   test('Истёкший сертификат отклоняется даже при правильном pin', () async {
     final expired = File('test/fixtures/rpc-tls/expired.crt');
     final context = SecurityContext()

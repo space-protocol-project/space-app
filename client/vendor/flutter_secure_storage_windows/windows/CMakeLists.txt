@@ -20,6 +20,7 @@ set(PLUGIN_NAME "flutter_secure_storage_windows_plugin")
 list(APPEND PLUGIN_SOURCES
   "flutter_secure_storage_windows_plugin.cpp"
   "flutter_secure_storage_windows_plugin.h"
+  "atomic_secure_file.h"
 )
 
 # Define the plugin library target. Its name must not be changed (see comment

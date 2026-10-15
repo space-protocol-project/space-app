@@ -180,6 +180,22 @@ class HomeUpdateJournal {
   Future<void> _write(HomeUpdateRecord record) async {
     final temporary = File('${file.path}.tmp');
     await temporary.writeAsString(jsonEncode(record.toJson()), flush: true);
-    await temporary.rename(file.path);
+    await _replace(temporary);
+  }
+
+  Future<void> _replace(File temporary) async {
+    for (var attempt = 0; ; attempt++) {
+      try {
+        await temporary.rename(file.path);
+        return;
+      } on FileSystemException catch (error) {
+        final code = error.osError?.errorCode;
+        if (!Platform.isWindows || attempt >= 5 || (code != 5 && code != 32)) {
+          rethrow;
+        }
+        // Файл может кратковременно удерживаться другим процессом Windows.
+        await Future<void>.delayed(Duration(milliseconds: 25 << attempt));
+      }
+    }
   }
 }

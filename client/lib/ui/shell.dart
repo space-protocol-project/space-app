@@ -1,3 +1,4 @@
+import 'mls_channel.dart';
 import '../src/message_summary.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -1518,6 +1519,35 @@ class _SpaceShellState extends State<SpaceShell> {
             },
             openChat: () => select(Section.chat),
           ),
+          Section.chat when controller.encryptedChannel =>
+            controller.mlsSession == null
+                ? const Center(
+                    child: Text(
+                      'Подключитесь к пространству для открытия закрытого канала',
+                    ),
+                  )
+                : MlsChannelView(
+                    key: ValueKey((
+                      'mls',
+                      controller.mlsSession!.server.serverId,
+                      controller.channelId,
+                    )),
+                    session: controller.mlsSession!,
+                    channelId: controller.channelId,
+                    groupId: controller.channels
+                        .firstWhere((c) => c.id == controller.channelId)
+                        .mlsGroupId,
+                    attachmentsEnabled:
+                        controller.mlsSession!.attachmentsEnabled,
+                    canWrite: controller.canWrite,
+                    active:
+                        selected == Section.chat &&
+                        !dashboard &&
+                        !applicationSettings &&
+                        !devicePage &&
+                        !serverList &&
+                        !drawerOpen,
+                  ),
           Section.chat => ChatView(
             key: const ValueKey('live-chat'),
             controller: controller,
