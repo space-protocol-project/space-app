@@ -248,6 +248,8 @@ class MlsClient {
     'epoch': 0,
     'last_self_update': DateTime.now().millisecondsSinceEpoch,
     'cursor': 0,
+    'revocation_pending': false,
+    'revoked_devices': <dynamic>[],
     'messages': <dynamic>[],
     'managers': <dynamic>[],
     'roster': <dynamic>[],

@@ -16,6 +16,7 @@ import 'package:space_client/src/rpc_clients.dart'
         DeviceGrant,
         PublishMlsRequest,
         ListMlsEnvelopesRequest,
+        ListMlsDevicesResponse,
         UpdateMemberRequest;
 import 'package:space_client/src/root_rotation.dart' as rotation;
 import 'package:space_client/src/pairing.dart';
@@ -324,6 +325,32 @@ void main() {
         throwsA(isA<GrpcError>()),
       );
       await member.revoke();
+      await expectLater(c.maintainChannels(force: true), throwsStateError);
+      final lyingDirectory = RpcFaultProxy(c.connection)
+        ..mutate = (_, response) {
+          if (response is ListMlsDevicesResponse) {
+            return ListMlsDevicesResponse(
+              devices: [...response.devices, deviceB],
+              nextCursor: response.nextCursor,
+            );
+          }
+          return response;
+        };
+      final deceived = MlsClient(
+        local: c.local,
+        connection: lyingDirectory,
+        options: c.options,
+      );
+      await expectLater(
+        deceived.maintainChannels(force: true),
+        throwsStateError,
+      );
+      final stopped = await c.local.read();
+      await expectLater(
+        c.send('private', 'Не шифровать до Remove'),
+        throwsStateError,
+      );
+      expect(await c.local.read(), stopped);
       await a.maintainChannels(force: true);
       expect(
         (((await a.local.read())['channels'] as Map)['private']

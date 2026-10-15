@@ -24,11 +24,15 @@ extension MlsMaintenance on MlsClient {
   Future<void> _maintainChannels() async {
     final channels = (await local.read())['channels'] as Map;
     Object? failure;
+    Set<String>? active;
     for (final entry in channels.entries) {
       final channel = entry.value as Map;
       if (channel['joined'] != true) continue;
       try {
-        await _maintainChannel(entry.key as String, channel);
+        active ??= (await devices(entry.key as String))
+            .map((device) => device.grantId)
+            .toSet();
+        await _maintainChannel(entry.key as String, channel, active);
       } catch (error) {
         failure ??= error;
       }
@@ -36,7 +40,11 @@ extension MlsMaintenance on MlsClient {
     if (failure != null) throw failure;
   }
 
-  Future<void> _maintainChannel(String id, Map channel) async {
+  Future<void> _maintainChannel(
+    String id,
+    Map channel,
+    Set<String> active,
+  ) async {
     final view = await _refresh(
       id,
       base64Decode(channel['group_id'] as String),
@@ -45,11 +53,7 @@ extension MlsMaintenance on MlsClient {
     if (view.untrusted.isNotEmpty) {
       throw StateError('Сначала сверьте коды новых устройств канала');
     }
-    if ((_channel(await local.read(), id)['managers'] as List).contains(
-      local.scope['grant_id'],
-    )) {
-      await _removeInvalidDevices(id);
-    }
+    await _removeInvalidDevices(id, active);
     final updated = _channel(await local.read(), id);
     final previous = updated['last_self_update'] as int? ?? 0;
     if ((updated['outbox'] as List).isEmpty &&
@@ -60,17 +64,38 @@ extension MlsMaintenance on MlsClient {
     await _retryRebasedMessage(id);
   }
 
-  Future<void> _removeInvalidDevices(String id) async {
-    final active = (await devices(id)).map((device) => device.grantId).toSet();
+  Future<void> _removeInvalidDevices(String id, Set<String> active) async {
     // Собственное отсутствие означает неполный/недостоверный список.
     if (!active.contains(local.scope['grant_id'])) {
       throw StateError('Сервер не подтвердил действующее устройство MLS');
     }
-    final roster = (_channel(await local.read(), id)['roster'] as List)
-        .cast<Map>();
-    for (final binding in roster) {
+    final previous = _channel(await local.read(), id);
+    final remembered = (previous['revoked_devices'] as List? ?? []).toSet();
+    final roster = (previous['roster'] as List).cast<Map>();
+    final invalid = roster
+        .where(
+          (binding) =>
+              remembered.contains((binding['device'] as Map)['grant_id']) ||
+              !active.contains((binding['device'] as Map)['grant_id']),
+        )
+        .toList();
+    await local.change((document) {
+      final channel = _channel(document, id);
+      channel['revocation_pending'] = invalid.isNotEmpty;
+      channel['revoked_devices'] = {
+        ...remembered,
+        ...invalid.map((binding) => (binding['device'] as Map)['grant_id']),
+      }.toList();
+    });
+    final channel = _channel(await local.read(), id);
+    if (invalid.isNotEmpty &&
+        !(channel['managers'] as List).contains(local.scope['grant_id'])) {
+      throw StateError(
+        'Отозванное устройство ещё не исключено. Ожидается управляющее устройство канала.',
+      );
+    }
+    for (final binding in invalid) {
       final scope = binding['device'] as Map;
-      if (active.contains(scope['grant_id'])) continue;
       await remove(
         id,
         MlsDevice(
@@ -80,6 +105,9 @@ extension MlsMaintenance on MlsClient {
         ),
       );
     }
+    await local.change((document) {
+      _channel(document, id)['revocation_pending'] = false;
+    });
   }
 
   Future<void> selfUpdate(String id) => _serial(() => _selfUpdate(id));

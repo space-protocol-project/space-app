@@ -450,6 +450,7 @@ class _MlsConversationState extends State<_MlsConversation> {
             enabled:
                 !state.busy &&
                 !state.recoveryRequired &&
+                state.data?.channel['revocation_pending'] != true &&
                 !submitting &&
                 state.data?.joined == true &&
                 widget.canWrite,
@@ -474,6 +475,7 @@ class _MlsConversationState extends State<_MlsConversation> {
               onPressed:
                   state.busy ||
                       state.recoveryRequired ||
+                      state.data?.channel['revocation_pending'] == true ||
                       submitting ||
                       state.data?.joined != true ||
                       !widget.canWrite

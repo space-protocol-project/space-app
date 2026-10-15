@@ -39,6 +39,11 @@ extension MlsDelivery on MlsClient {
     final id = messageId ?? mlsId();
     final document = await local.read();
     final channel = _channel(document, channelId);
+    if (channel['revocation_pending'] == true) {
+      throw StateError(
+        'Сначала дождитесь исключения отозванных устройств из канала',
+      );
+    }
     final retries = _retries(channel);
     if (retries.isNotEmpty &&
         jsonEncode((retries.first as Map)['message']['id']) != jsonEncode(id)) {
@@ -81,6 +86,11 @@ extension MlsDelivery on MlsClient {
     }
     final channel = _channel(document, channelId);
     _requireManager(channel);
+    if ((channel['revoked_devices'] as List? ?? []).contains(peer.grantId)) {
+      throw StateError(
+        'Для возвращения в канал зарегистрируйте новое устройство',
+      );
+    }
     if ((channel['roster'] as List).any(
       (binding) => (binding['device'] as Map)['grant_id'] == peer.grantId,
     )) {
