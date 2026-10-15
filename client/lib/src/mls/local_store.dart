@@ -8,6 +8,15 @@ import 'package:crypto/crypto.dart';
 import '../key_vault.dart';
 import 'native.dart';
 
+class MlsRecoveryRequired extends StateError {
+  MlsRecoveryRequired()
+    : super(
+        'Обнаружен откат или незавершённая запись MLS. Отправка остановлена. '
+        'Сохраните архив истории, подключите новое устройство и попросите '
+        'управляющего исключить прежнее устройство и пригласить новое.',
+      );
+}
+
 // Вся запись, включая checkpoint, историю и исходящие пакеты, сохраняется
 // одним защищённым значением ОС. Открытые SharedPreferences не используются.
 class MlsLocalStore {
@@ -29,6 +38,29 @@ class MlsLocalStore {
 
   String get storageKey =>
       'space.mls.v1.${sha256.convert(utf8.encode(jsonEncode([scope['server_id'], scope['principal_id'], scope['grant_id']])))}';
+
+  File? get _witness => lockDirectory == null
+      ? null
+      : File.fromUri(lockDirectory!.uri.resolve('$storageKey.witness'));
+
+  Future<void> _verify(String? raw) async {
+    final witness = _witness;
+    if (witness == null) return;
+    final enabled = await storage.read(key: '$storageKey.rollback-enabled');
+    final saved = await witness.exists() ? await witness.readAsString() : null;
+    if (raw == null && saved == null && enabled == null) return;
+    if (raw != null && saved == sha256.convert(utf8.encode(raw)).toString()) {
+      return;
+    }
+    // Однократное включение защиты для состояния прежней версии.
+    if (enabled == null &&
+        saved == null &&
+        raw != null &&
+        (jsonDecode(raw) as Map)['rollback_guard'] == null) {
+      return;
+    }
+    throw MlsRecoveryRequired();
+  }
 
   Future<T> _serial<T>(Future<T> Function() operation) async {
     final previous = _tails[storageKey] ?? Future.value();
@@ -69,6 +101,7 @@ class MlsLocalStore {
 
   Future<Map<String, dynamic>> _load() async {
     final raw = await storage.read(key: storageKey);
+    await _verify(raw);
     if (raw != null) {
       final document = jsonDecode(raw) as Map<String, dynamic>;
       if (document['v'] != 1 ||
@@ -78,7 +111,7 @@ class MlsLocalStore {
       return document;
     }
     if (requireExisting) {
-      throw StateError('Не найдено сохранённое состояние MLS до смены root');
+      throw MlsRecoveryRequired();
     }
     final random = Random.secure();
     final key = List.generate(32, (_) => random.nextInt(256));
@@ -134,10 +167,53 @@ class MlsLocalStore {
       });
 
   Future<void> _save(Map<String, dynamic> document) async {
+    if (_witness != null) document['rollback_guard'] = 1;
     final encoded = jsonEncode(document);
+    if (utf8.encode(encoded).length > 32 * 1024 * 1024) {
+      throw StateError('Хранилище MLS заполнено. Сохраните архив истории.');
+    }
+    // Сначала свидетель: сбой между записями блокирует старый ratchet,
+    // а не разрешает повторно использовать уже выданный ключ сообщения.
+    if (_witness != null &&
+        await storage.read(key: '$storageKey.rollback-enabled') == null) {
+      await storage.write(key: '$storageKey.rollback-enabled', value: '1');
+    }
+    await _witness?.writeAsString(
+      sha256.convert(utf8.encode(encoded)).toString(),
+      flush: true,
+    );
     await storage.write(key: storageKey, value: encoded);
     if (await storage.read(key: storageKey) != encoded) {
       throw StateError('Не удалось подтвердить сохранение состояния MLS');
     }
   }
+
+  // Этот путь не открывает snapshot и не позволяет возобновить ratchet.
+  // Архив содержит только уже расшифрованную историю и ключи её файлов.
+  Future<Map<String, dynamic>> historyArchive() => _serial(() async {
+    final raw = await storage.read(key: storageKey);
+    if (raw == null) throw StateError('История MLS не найдена');
+    final document = jsonDecode(raw) as Map;
+    if (document['v'] != 1 ||
+        jsonEncode(document['scope']) != jsonEncode(scope)) {
+      throw StateError('Архив принадлежит другому устройству');
+    }
+    return {
+      'v': 1,
+      'server_id': scope['server_id'],
+      'principal_id': scope['principal_id'],
+      'previous_grant_id': scope['grant_id'],
+      'channels': [
+        for (final entry in (document['channels'] as Map).entries)
+          {
+            'id': entry.key,
+            'group_id': (entry.value as Map)['group_id'],
+            'messages': [
+              ...?(entry.value as Map)['archived_messages'] as List?,
+              ...(entry.value as Map)['messages'] as List,
+            ],
+          },
+      ],
+    };
+  });
 }

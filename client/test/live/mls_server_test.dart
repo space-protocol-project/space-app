@@ -23,8 +23,10 @@ import 'package:space_client/src/mls/client.dart';
 import 'package:space_client/src/mls/files.dart';
 import 'package:space_client/src/mls/local_store.dart';
 import 'package:space_client/src/mls/native.dart';
+import 'package:space_client/src/mls/history_archive.dart';
 
 import '../mls_native_test.dart' show MemoryMlsStorage;
+import '../support/rpc_fault_proxy.dart';
 
 class _Identity implements RotationJournalVault {
   Map<String, dynamic>? pending;
@@ -150,6 +152,12 @@ void main() {
       await c.trust(deviceB);
       view = await c.refresh('private', group);
       expect(view.joined, isTrue);
+      await b.selfUpdate('private');
+      await a.refresh('private', group);
+      await c.refresh('private', group);
+      final codeA = await a.groupCode('private');
+      expect(await b.groupCode('private'), codeA);
+      expect(await c.groupCode('private'), codeA);
       expect(
         view.messages,
         isEmpty,
@@ -214,6 +222,7 @@ void main() {
         a.transfer('private', deviceC),
         throwsA(isA<GrpcError>()),
       );
+      await a.cancelTransfer('private');
       await a.send('private', 'Отказ передачи не блокирует переписку');
       await admin.updateMember(
         UpdateMemberRequest(
@@ -295,7 +304,52 @@ void main() {
       await b.transfer('private', deviceA);
       await a.refresh('private', group);
       await c.refresh('private', group);
-      await a.remove('private', deviceB);
+      final failing = RpcFaultProxy(a.connection)
+        ..beforeRequest = (request) {
+          if (request is PublishMlsRequest) {
+            throw const GrpcError.unavailable('Обрыв до доставки');
+          }
+        };
+      final interrupted = MlsClient(
+        local: a.local,
+        connection: failing,
+        options: a.options,
+      );
+      await a.local.change((document) {
+        ((document['channels'] as Map)['private'] as Map)['last_self_update'] =
+            0;
+      });
+      await expectLater(
+        interrupted.send('private', 'Очередь пережила отзыв'),
+        throwsA(isA<GrpcError>()),
+      );
+      await member.revoke();
+      await a.maintainChannels(force: true);
+      expect(
+        (((await a.local.read())['channels'] as Map)['private']
+            as Map)['outbox'],
+        isEmpty,
+      );
+      expect(
+        (await a.refresh('private', group)).messages.where(
+          (entry) =>
+              (entry['message'] as Map)['text'] == 'Очередь пережила отзыв',
+        ),
+        hasLength(1),
+      );
+      expect(
+        (((await a.local.read())['channels'] as Map)['private']
+                as Map)['roster']
+            as List,
+        isNot(
+          contains(
+            predicate(
+              (dynamic item) =>
+                  (item['device'] as Map)['grant_id'] == deviceB.grantId,
+            ),
+          ),
+        ),
+      );
       await c.refresh('private', group);
       await expectLater(
         b.refresh('private', group),
@@ -303,7 +357,7 @@ void main() {
           isA<GrpcError>().having(
             (e) => e.code,
             'code',
-            StatusCode.permissionDenied,
+            anyOf(StatusCode.permissionDenied, StatusCode.unauthenticated),
           ),
         ),
       );
@@ -519,6 +573,68 @@ void main() {
         ((await a.refresh('retention', group)).messages.last['message']
             as Map)['text'],
         'Устройства сохранили доступ',
+      );
+      final archive = await MlsHistoryArchive.seal(
+        await a.local.historyArchive(),
+        'надёжный пароль архива',
+      );
+      final restoredKey = await Ed25519().newKeyPair();
+      final restoredRecord = DeviceRecord.fromJson({
+        ...owner.record.toJson(),
+        'grantId': '',
+        'deviceSeed': url64(await restoredKey.extractPrivateKeyBytes()),
+        'mlsIdentity': null,
+        'mlsChannels': <String, String>{},
+      });
+      final restored = await SpaceSession.connect(
+        server,
+        _Identity(),
+        restoredRecord: restoredRecord,
+      );
+      addTearDown(restored.close);
+      final d = await client(restored, MemoryMlsStorage());
+      await d.initialize();
+      final freshBefore = await d.local.read();
+      await d.importHistory(
+        await MlsHistoryArchive.open(archive, 'надёжный пароль архива'),
+      );
+      final freshAfter = await d.local.read();
+      expect(freshAfter['snapshot'], freshBefore['snapshot']);
+      expect(freshAfter['revision'], freshBefore['revision']);
+      expect(
+        mlsFingerprint(await d.ownBinding()),
+        isNot(mlsFingerprint(await a.ownBinding())),
+      );
+      final available = await a.devices('retention');
+      for (final device in available) {
+        await d.trust(device);
+      }
+      final deviceD = available.firstWhere(
+        (device) => device.grantId == restored.record.grantId,
+      );
+      await a.trust(deviceD);
+      await a.invite('retention', deviceD);
+      final restoredView = await d.refresh('retention', group);
+      expect(restoredView.joined, isTrue);
+      expect(
+        restoredView.messages.any(
+          (entry) =>
+              (entry['message'] as Map)['text'] ==
+              'Устройства сохранили доступ',
+        ),
+        isTrue,
+      );
+      expect(
+        await MlsFiles(
+          d,
+        ).download(group, (oldMessage['id'] as List).cast<int>(), descriptor),
+        bytes,
+      );
+      await d.send('retention', 'Свежий leaf после восстановления');
+      expect(
+        ((await a.refresh('retention', group)).messages.last['message']
+            as Map)['text'],
+        'Свежий leaf после восстановления',
       );
     },
     skip: origin == null,

@@ -550,16 +550,20 @@ class SpaceSession
         'Идентичность MLS принадлежит другому пространству или участнику',
       );
     }
-    record.mlsIdentity = scope;
-    await vault.save(record);
+    final requireExisting = record.mlsIdentity != null;
     final local = MlsLocalStore(
       storage: mls_platform.secureStorage(),
       engine: engine,
       scope: scope,
       deviceSeed: record.deviceSeed,
-      requireExisting: scope['grant_id'] != authenticationGrant,
+      requireExisting:
+          requireExisting || scope['grant_id'] != authenticationGrant,
       lockDirectory: lockDirectory,
     );
+    // Не создаём новый ratchet, если запись ранее существовавшего устройства пропала.
+    if (!requireExisting) await local.read();
+    record.mlsIdentity = scope;
+    await vault.save(record);
     return MlsClient(
       local: local,
       connection: channel,
@@ -1755,6 +1759,16 @@ class SpaceSession
       }
     }
     await _authorize('device.revoke', target: grant, authority: authority);
+    if (record.mlsIdentity != null) {
+      try {
+        await (await mlsClient()).maintainChannels(force: true);
+      } catch (_) {
+        throw StateError(
+          'Устройство отозвано. Исключение из закрытых каналов '
+          'ожидает подключения управляющего устройства и доставки Commit.',
+        );
+      }
+    }
   }
 
   @override

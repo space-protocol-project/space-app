@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
@@ -12,6 +13,8 @@ import 'envelope_checks.dart';
 
 part 'delivery.dart';
 part 'receive.dart';
+part 'recovery.dart';
+part 'maintenance.dart';
 
 List<int> mlsId() => List.generate(16, (_) => Random.secure().nextInt(256));
 String mlsFingerprint(Map<String, dynamic> binding) => sha256
@@ -31,13 +34,21 @@ String mlsFingerprint(Map<String, dynamic> binding) => sha256
 Map<String, dynamic> mlsBinding(MlsDevice device) =>
     jsonDecode(utf8.decode(device.binding)) as Map<String, dynamic>;
 
+List<Map<String, dynamic>> mergeMlsHistory(Iterable<dynamic> items) => {
+  for (final item in items)
+    jsonEncode([item['grant_id'], item['message']['id']]):
+        Map<String, dynamic>.from(item as Map),
+}.values.toList();
+
 class MlsChannelData {
   MlsChannelData(this.channel, {this.untrusted = const []});
   final Map<String, dynamic> channel;
   final List<MlsDevice> untrusted;
   bool get joined => channel['joined'] == true;
-  List<Map<String, dynamic>> get messages =>
-      (channel['messages'] as List).cast<Map<String, dynamic>>();
+  List<Map<String, dynamic>> get messages => mergeMlsHistory([
+    ...?channel['archived_messages'] as List?,
+    ...channel['messages'] as List,
+  ]);
 }
 
 class MlsClient {
@@ -55,9 +66,29 @@ class MlsClient {
   final bool Function()? attachmentsEnabled;
   bool get filesAllowed => attachmentsEnabled?.call() ?? true;
   bool _registered = false;
+  Future<void>? _maintenance;
+  DateTime? _maintainedAt;
+  final _operationZone = Object();
+  Future<void> _tail = Future.value();
+
+  Future<T> _serial<T>(Future<T> Function() operation) async {
+    if (Zone.current[_operationZone] == this) return operation();
+    final previous = _tail;
+    final done = Completer<void>();
+    _tail = done.future;
+    await previous;
+    try {
+      return await runZoned(operation, zoneValues: {_operationZone: this});
+    } finally {
+      done.complete();
+    }
+  }
+
   MlsServiceClient get rpc => MlsServiceClient(connection);
 
-  Future<void> initialize() async {
+  Future<void> initialize() => _serial(_initialize);
+
+  Future<void> _initialize() async {
     if (_registered) return;
     final package = await local.update('key_package', {});
     final document = await local.read();
@@ -94,6 +125,11 @@ class MlsClient {
         options: await options(),
       );
       result.addAll(page.devices);
+      if (result.length > 4096 ||
+          page.nextCursor.isNotEmpty &&
+              (page.devices.isEmpty || page.nextCursor.compareTo(after) <= 0)) {
+        throw StateError('Некорректная страница устройств MLS');
+      }
       after = page.nextCursor;
     } while (after.isNotEmpty);
     return result;
@@ -152,11 +188,25 @@ class MlsClient {
     }
   }
 
-  Future<MlsChannelData> refresh(String channelId, List<int> groupId) async {
+  Future<MlsChannelData> refresh(String channelId, List<int> groupId) =>
+      _serial(() => _refresh(channelId, groupId));
+
+  Future<MlsChannelData> _refresh(
+    String channelId,
+    List<int> groupId, {
+    bool maintain = true,
+  }) async {
     await initialize();
     _checkGroupContext(channelId, groupId);
     await _ensureLocalChannel(channelId, groupId);
-    await _flush(channelId);
+    try {
+      await _flush(channelId);
+    } on GrpcError catch (error) {
+      if (error.code != StatusCode.aborted &&
+          error.code != StatusCode.failedPrecondition) {
+        rethrow;
+      }
+    }
     final document = await local.read();
     final channel = _channel(document, channelId);
     final page = await rpc.listMlsEnvelopes(
@@ -166,6 +216,7 @@ class MlsClient {
       ),
       options: await options(),
     );
+    requireMlsPage(channel, page);
     for (final envelope in page.envelopes) {
       final unknown = await _receive(channelId, envelope);
       if (unknown.isNotEmpty) {
@@ -175,7 +226,10 @@ class MlsClient {
         );
       }
     }
-    await _retryRebasedMessage(channelId);
+    if (maintain) {
+      await maintainChannels();
+      await _retryRebasedMessage(channelId);
+    }
     return MlsChannelData(_channel(await local.read(), channelId));
   }
 
@@ -192,6 +246,7 @@ class MlsClient {
     'group_id': base64Encode(group),
     'joined': false,
     'epoch': 0,
+    'last_self_update': DateTime.now().millisecondsSinceEpoch,
     'cursor': 0,
     'messages': <dynamic>[],
     'managers': <dynamic>[],

@@ -69,6 +69,12 @@ fn operate(request: &Request, device: &mut Device) -> Result<Value> {
 fn group_operation(request: &Request, device: &mut Device) -> Result<Value> {
     let mut group = ClosedChannel::restore(device, &bytes(&request.args, "group_id")?)?;
     match request.op.as_str() {
+        "group_code" => Ok(json!({"epoch":group.epoch(),
+            "authenticator":STANDARD.encode(group.epoch_authenticator())})),
+        "self_update" => {
+            let commit = group.self_update(device)?;
+            Ok(json!({"commit":STANDARD.encode(commit),"epoch":group.epoch()}))
+        }
         "invite" => invite(request, device, &mut group),
         "confirm_commit" => {
             group.confirm_commit(device)?;
@@ -123,6 +129,9 @@ fn apply_commit(
     device: &mut Device,
     group: &mut ClosedChannel,
 ) -> Result<Value> {
+    // Состояние этого вызова — отдельный кандидат. При отказе Commit
+    // исходный snapshot с pending Commit остаётся неизменным.
+    group.discard_pending_commit(device)?;
     group.apply_commit(
         device,
         &bytes(&request.args, "commit")?,

@@ -4,6 +4,28 @@ import 'package:space_client/src/mls/envelope_checks.dart';
 import 'package:space_client/src/rpc_clients.dart';
 
 void main() {
+  test('Дубликаты, перестановка и пропуск отклоняют страницу до применения первого события', () {
+    final channel = <String, dynamic>{'cursor': 0, 'joined': true};
+    MlsEnvelope event(int sequence) =>
+        MlsEnvelope(sequence: Int64(sequence), kind: 'application');
+    for (final sequences in [
+      [1, 1],
+      [2, 1],
+      [1, 3],
+    ]) {
+      expect(
+        () => requireMlsPage(
+          channel,
+          ListMlsEnvelopesResponse(
+            envelopes: sequences.map(event),
+            nextSequence: Int64(sequences.last),
+          ),
+        ),
+        throwsStateError,
+      );
+      expect(channel['cursor'], 0);
+    }
+  });
   final request = PublishMlsRequest(
     requestId: List.filled(16, 1),
     kind: 'application',

@@ -51,3 +51,30 @@ void requireMlsSequence(Map<String, dynamic> channel, MlsEnvelope envelope) {
     throw StateError('Нарушен порядок событий MLS');
   }
 }
+
+void requireMlsPage(
+  Map<String, dynamic> channel,
+  ListMlsEnvelopesResponse page,
+) {
+  if (page.envelopes.length > 20 ||
+      page.writeToBuffer().length > 2 * 1024 * 1024 + 8192) {
+    throw StateError('Превышен предел страницы MLS');
+  }
+  final next = Map<String, dynamic>.from(channel);
+  for (final envelope in page.envelopes) {
+    requireMlsSequence(next, envelope);
+    if (!const {
+      'commit',
+      'update',
+      'application',
+      'transfer',
+    }.contains(envelope.kind)) {
+      throw StateError('Неизвестный тип MLS-пакета');
+    }
+    next['cursor'] = envelope.sequence.toInt();
+    next['joined'] = true;
+  }
+  if (page.nextSequence.toInt() != next['cursor']) {
+    throw StateError('Курсор страницы MLS не совпадает с событиями');
+  }
+}

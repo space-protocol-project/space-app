@@ -13,17 +13,19 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 def dependencies():
     packages = set()
-    for target in TARGETS:
+    graphs = [("space_mls_bridge", target) for target in TARGETS]
+    graphs.append(("mls_interop", "x86_64-unknown-linux-gnu"))
+    for crate, target in graphs:
         output = subprocess.check_output(
             ["cargo", "tree", "--locked", "--target", target, "--prefix", "none",
              "--format", "{p}", "-e", "normal,build,dev"],
-            cwd=ROOT / "native" / "space_mls_bridge", text=True,
+            cwd=ROOT / "native" / crate, text=True,
         )
         for line in output.splitlines():
             match = re.fullmatch(r"([\w-]+) v([\w.+-]+)(?: \(proc-macro\))?(?: \(\*\))?", line)
             if match:
                 packages.add(match.groups())
-            elif not line.startswith(("space_mls v", "space_mls_bridge v")):
+            elif not line.startswith(("space_mls v", "space_mls_bridge v", "space_mls_interop v")):
                 raise RuntimeError("Неизвестный формат Rust-зависимости: " + line)
     if not packages:
         raise RuntimeError("Не удалось определить Rust-зависимости")

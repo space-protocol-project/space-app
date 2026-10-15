@@ -110,7 +110,12 @@ void main() {
       Future<void> openConfirmation() async {
         await tester.tap(find.byTooltip('Устройства канала'));
         await tester.pumpAndSettle();
-        await tester.tap(find.byType(PopupMenuButton<String>));
+        await tester.tap(
+          find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.byType(PopupMenuButton<String>),
+          ),
+        );
         await tester.pumpAndSettle();
         await tester.tap(find.text('Передать управление'));
         await tester.pumpAndSettle();

@@ -74,8 +74,10 @@ Future<T> withSignal<T>(Future<T> result, connect.AbortSignal? signal) =>
     ? result
     : Future.any([signal.future.then<T>((error) => throw error), result]);
 
-connect.HttpClient rpcHttpClient(HttpClient client) =>
-    (input) => sendRpcRequest(client, input);
+connect.HttpClient rpcHttpClient(HttpClient client) {
+  final budget = RpcSubscriptionBudget();
+  return (input) => sendRpcRequest(client, input, budget: budget);
+}
 
 Future<HttpClientRequest> openRpcRequest(
   HttpClient client,
@@ -90,23 +92,25 @@ Future<HttpClientRequest> openRpcRequest(
 
 Future<connect.HttpResponse> sendRpcRequest(
   HttpClient client,
-  connect.HttpRequest input,
-) async {
+  connect.HttpRequest input, {
+  RpcSubscriptionBudget? budget,
+}) async {
+  final streaming =
+      input.header
+          .get('content-type')
+          ?.any((value) => value.startsWith('application/connect+')) ??
+      false;
+  if (streaming) budget?.start();
   final request = await openRpcRequest(client, input);
   request.followRedirects = false;
   request.headers.removeAll(HttpHeaders.acceptEncodingHeader);
   copyRequestHeaders(request, input.header);
   if (input.body != null) await request.addStream(input.body!);
   final response = await withSignal(request.close(), input.signal);
-  final streaming =
-      input.header
-          .get('content-type')
-          ?.any((value) => value.startsWith('application/connect+')) ??
-      false;
   return connect.HttpResponse(
     response.statusCode,
     responseHeaders(response),
-    responseBytes(response, input.signal, framed: streaming),
+    responseBytes(response, input.signal, framed: streaming, budget: budget),
     connect.Headers(),
   );
 }
@@ -131,12 +135,14 @@ Stream<Uint8List> responseBytes(
   HttpClientResponse response,
   connect.AbortSignal? signal, {
   bool framed = false,
+  RpcSubscriptionBudget? budget,
 }) async* {
   final iterator = StreamIterator(response);
   final limit = RpcBodyLimit(framed: framed);
   try {
     while (await withSignal(iterator.moveNext(), signal)) {
       limit.add(iterator.current);
+      if (framed) budget?.add(iterator.current.length);
       yield Uint8List.fromList(iterator.current);
     }
   } finally {
@@ -146,16 +152,24 @@ Stream<Uint8List> responseBytes(
 
 // Ограничиваем unary целиком, а поток — по кадрам, до накопления тела декодером.
 class RpcBodyLimit {
-  RpcBodyLimit({required this.framed});
+  RpcBodyLimit({
+    required this.framed,
+    this.streamBytes = 64 * 1024 * 1024,
+    this.streamFrames = 4096,
+  });
   final bool framed;
+  final int streamBytes, streamFrames;
   static const maxBytes = 8 * 1024 * 1024;
   final _header = Uint8List(5);
   int _headerLength = 0;
   int _remaining = 0;
   int _received = 0;
+  int _framesReceived = 0;
 
   void add(List<int> bytes) {
     if (framed) {
+      _received += bytes.length;
+      if (_received > streamBytes) _exhausted();
       _frames(bytes);
     } else {
       _received += bytes.length;
@@ -177,6 +191,7 @@ class RpcBodyLimit {
       _headerLength += count;
       offset += count;
       if (_headerLength == 5) {
+        if (++_framesReceived > streamFrames) _exhausted();
         _remaining = ByteData.sublistView(_header).getUint32(1);
         _check(_remaining);
         _headerLength = 0;
@@ -191,5 +206,43 @@ class RpcBodyLimit {
         'Ответ RPC слишком большой',
       );
     }
+  }
+}
+
+Never _exhausted() => throw connect.ConnectException(
+  connect.Code.resourceExhausted,
+  'Исчерпан бюджет подписки. Повторите позже.',
+);
+
+// Общий бюджет соединения переживает автоматические переподключения подписки.
+class RpcSubscriptionBudget {
+  RpcSubscriptionBudget({
+    this.maxBytes = 256 * 1024 * 1024,
+    this.maxStarts = 60,
+    DateTime Function()? now,
+  }) : now = now ?? DateTime.now;
+  final int maxBytes, maxStarts;
+  final DateTime Function() now;
+  DateTime? _window;
+  int _bytes = 0, _starts = 0;
+  void _reset() {
+    final current = now();
+    if (_window == null ||
+        current.difference(_window!) >= const Duration(minutes: 15)) {
+      _window = current;
+      _bytes = 0;
+      _starts = 0;
+    }
+  }
+
+  void start() {
+    _reset();
+    if (++_starts > maxStarts) _exhausted();
+  }
+
+  void add(int bytes) {
+    _reset();
+    _bytes += bytes;
+    if (_bytes > maxBytes) _exhausted();
   }
 }

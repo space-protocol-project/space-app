@@ -22,7 +22,7 @@ extension MlsReceive on MlsClient {
       });
       return [];
     }
-    if (envelope.kind == 'commit') {
+    if (envelope.kind == 'commit' || envelope.kind == 'update') {
       return _receiveCommit(channelId, envelope, document, channel);
     }
     if (!channel['joined'] || envelope.epoch.toInt() != channel['epoch']) {
@@ -59,6 +59,39 @@ extension MlsReceive on MlsClient {
     if (unknown.isNotEmpty) return unknown;
     final roster = envelope.roster.map(mlsBinding).toList();
     final joining = channel['joined'] != true;
+    final args = _commitArgs(channel, envelope, roster, joining);
+    await local.update(
+      joining ? 'join' : 'apply_commit',
+      args,
+      change: (document, result) {
+        final channel = _channel(document, id);
+        _confirmWelcome(joining, channel, result, envelope);
+        channel['joined'] = true;
+        if (joining) {
+          channel['last_self_update'] = DateTime.now().millisecondsSinceEpoch;
+        }
+        channel['epoch'] = result['epoch'];
+        channel['roster'] = roster;
+        channel['cursor'] = envelope.sequence.toInt();
+        if (!joining) {
+          _rebaseApplications(channel);
+          (channel['outbox'] as List).clear();
+        }
+      },
+    );
+    if (joining) {
+      _registered = false;
+      await initialize();
+    }
+    return [];
+  }
+
+  Map<String, dynamic> _commitArgs(
+    Map<String, dynamic> channel,
+    MlsEnvelope envelope,
+    List<Map<String, dynamic>> roster,
+    bool joining,
+  ) {
     final committer =
         (joining
                 ? roster
@@ -73,6 +106,7 @@ extension MlsReceive on MlsClient {
       throw StateError('Нет подтверждённого автора Commit');
     }
     if (!joining &&
+        envelope.kind != 'update' &&
         !(channel['managers'] as List).contains(envelope.authorGrantId)) {
       throw StateError('Устройство не уполномочено менять состав канала');
     }
@@ -85,29 +119,17 @@ extension MlsReceive on MlsClient {
       'group_id': channel['group_id'],
       'roster': roster,
     };
+    if (envelope.kind == 'update' &&
+        (joining || jsonEncode(roster) != jsonEncode(channel['roster']))) {
+      throw StateError('Self-update не может менять состав группы');
+    }
     if (joining) {
       args['welcome'] = base64Encode(envelope.welcome);
     } else {
       args['committer'] = committer;
       args['commit'] = base64Encode(envelope.ciphertext);
     }
-    await local.update(
-      joining ? 'join' : 'apply_commit',
-      args,
-      change: (document, result) {
-        final channel = _channel(document, id);
-        _confirmWelcome(joining, channel, result, envelope);
-        channel['joined'] = true;
-        channel['epoch'] = result['epoch'];
-        channel['roster'] = roster;
-        channel['cursor'] = envelope.sequence.toInt();
-      },
-    );
-    if (joining) {
-      _registered = false;
-      await initialize();
-    }
-    return [];
+    return args;
   }
 
   void _checkSender(String sender, MlsEnvelope envelope) {

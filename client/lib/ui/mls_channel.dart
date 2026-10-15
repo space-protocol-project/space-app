@@ -1,4 +1,5 @@
 import 'mls_files.dart';
+import 'mls_recovery.dart';
 import '../src/rpc_clients.dart' show MlsDevice;
 
 import 'dart:async';
@@ -138,10 +139,16 @@ class _MlsConversationState extends State<_MlsConversation> {
   Future<void> safely(Future<void> Function() action) async {
     try {
       await action();
-    } catch (_) {
+    } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Не удалось выполнить действие MLS')),
+        SnackBar(
+          content: Text(
+            error is StateError
+                ? error.message.toString()
+                : 'Не удалось выполнить действие MLS',
+          ),
+        ),
       );
     }
   }
@@ -383,6 +390,8 @@ class _MlsConversationState extends State<_MlsConversation> {
               style: Theme.of(context).textTheme.labelSmall,
             ),
             const SizedBox(height: 6),
+            if (item['archived'] == true)
+              Text('Из архива', style: Theme.of(context).textTheme.labelSmall),
             if ((message['text'] as String).isNotEmpty)
               SelectableText(message['text'] as String),
             if (widget.attachmentsEnabled)
@@ -440,6 +449,7 @@ class _MlsConversationState extends State<_MlsConversation> {
             maxLines: null,
             enabled:
                 !state.busy &&
+                !state.recoveryRequired &&
                 !submitting &&
                 state.data?.joined == true &&
                 widget.canWrite,
@@ -453,7 +463,9 @@ class _MlsConversationState extends State<_MlsConversation> {
           children: [
             if (widget.attachmentsEnabled)
               IconButton(
-                onPressed: state.busy ? null : pickFiles,
+                onPressed: state.busy || state.recoveryRequired
+                    ? null
+                    : pickFiles,
                 tooltip: context.strings.mlsAttach,
                 icon: const Icon(Icons.add),
               ),
@@ -461,6 +473,7 @@ class _MlsConversationState extends State<_MlsConversation> {
             IconButton.filled(
               onPressed:
                   state.busy ||
+                      state.recoveryRequired ||
                       submitting ||
                       state.data?.joined != true ||
                       !widget.canWrite
@@ -594,6 +607,57 @@ class _MlsConversationState extends State<_MlsConversation> {
                 const Icon(Icons.lock_outline),
                 const SizedBox(width: 8),
                 Expanded(child: Text(context.strings.mlsTitle)),
+                PopupMenuButton<String>(
+                  tooltip: 'Защита и история',
+                  onSelected: (action) => safely(() async {
+                    if (action == 'code') {
+                      await showMlsGroupCode(
+                        context,
+                        widget.client,
+                        widget.channelId,
+                      );
+                    } else if (action == 'update') {
+                      await widget.client.selfUpdate(widget.channelId);
+                    } else if (action == 'cancel-transfer') {
+                      await widget.client.cancelTransfer(widget.channelId);
+                    } else {
+                      await manageMlsArchive(
+                        context,
+                        widget.client,
+                        exporting: action == 'export',
+                      );
+                    }
+                    if (mounted) controller.add(MlsRefresh());
+                  }),
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'cancel-transfer',
+                      child: Text('Отменить ожидающую передачу управления'),
+                    ),
+                    PopupMenuItem(
+                      value: 'code',
+                      enabled:
+                          state.data?.joined == true && state.error.isEmpty,
+                      child: const Text('Код группы'),
+                    ),
+                    PopupMenuItem(
+                      value: 'update',
+                      enabled:
+                          state.data?.joined == true &&
+                          !state.busy &&
+                          state.error.isEmpty,
+                      child: const Text('Обновить ключи'),
+                    ),
+                    const PopupMenuItem(
+                      value: 'export',
+                      child: Text('Сохранить архив истории'),
+                    ),
+                    const PopupMenuItem(
+                      value: 'import',
+                      child: Text('Восстановить архив истории'),
+                    ),
+                  ],
+                ),
                 if (widget.attachmentsEnabled)
                   IconButton(
                     onPressed: showFiles,

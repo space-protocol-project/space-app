@@ -225,6 +225,24 @@ impl ClosedChannel {
         self.group.epoch().as_u64()
     }
 
+    pub fn epoch_authenticator(&self) -> &[u8] {
+        self.group.epoch_authenticator().as_slice()
+    }
+
+    pub fn self_update(&mut self, device: &mut Device) -> Result<Vec<u8>> {
+        self.require_owner(device)?;
+        let (commit, _, _) = self
+            .group
+            .self_update(
+                &device.provider,
+                &device.signer,
+                LeafNodeParameters::default(),
+            )
+            .map_err(|_| Error::Mls)?
+            .into_messages();
+        commit.tls_serialize_detached().map_err(|_| Error::Mls)
+    }
+
     pub fn members(&self) -> Vec<TrustedDevice> {
         self.group
             .members()

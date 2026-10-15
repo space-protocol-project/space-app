@@ -45,6 +45,51 @@ Uint8List envelope(List<int> message, {int flags = 0}) {
 
 void main() {
   test(
+    'Настоящий HTTP-поток останавливается после бюджета валидных кадров',
+    () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      server.listen((request) async {
+        await request.drain<void>();
+        request.response.headers.contentType = ContentType.parse(
+          'application/connect+proto',
+        );
+        request.response.done.ignore();
+        final frame = envelope(
+          SubscribeResponse(heartbeat: true).writeToBuffer(),
+        );
+        for (var i = 0; i < 4097; i++) {
+          request.response.add(frame);
+        }
+        try {
+          await request.response.close();
+        } on SocketException {
+          /* Клиент оборвал поток. */
+        }
+      });
+      final connection = RpcConnection.connect(
+        Uri.parse('http://127.0.0.1:${server.port}'),
+        '',
+      );
+      try {
+        await expectLater(
+          SyncServiceClient(connection)
+              .subscribe(SubscribeRequest(channelId: 'general'))
+              .drain<void>(),
+          throwsA(
+            isA<GrpcError>().having(
+              (error) => error.code,
+              'budget',
+              StatusCode.resourceExhausted,
+            ),
+          ),
+        );
+      } finally {
+        await connection.terminate();
+        await server.close(force: true);
+      }
+    },
+  );
+  test(
     'RPC ограничивает unary и каждый кадр, включая раздробленный заголовок',
     () {
       final unary = RpcBodyLimit(framed: false);

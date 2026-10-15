@@ -8,6 +8,7 @@ import 'package:grpc/grpc.dart';
 import '../rpc_clients.dart';
 import 'client.dart';
 import 'files.dart';
+import 'local_store.dart';
 
 sealed class MlsEvent {}
 
@@ -46,8 +47,10 @@ class MlsState {
     this.error = '',
     this.data,
     this.sent = 0,
+    this.recoveryRequired = false,
   });
   final bool busy;
+  final bool recoveryRequired;
   final String error;
   final MlsChannelData? data;
   final int sent;
@@ -72,6 +75,7 @@ class MlsController extends Bloc<MlsEvent, MlsState> {
           data: state.data,
           sent: state.sent,
           error: state.error,
+          recoveryRequired: state.recoveryRequired,
         ),
       );
     }
@@ -92,6 +96,7 @@ class MlsController extends Bloc<MlsEvent, MlsState> {
           data: cached ?? state.data,
           sent: sent,
           error: _explain(error),
+          recoveryRequired: error is MlsRecoveryRequired,
         ),
       );
     } finally {

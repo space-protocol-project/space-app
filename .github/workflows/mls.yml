@@ -4,12 +4,28 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['native/**', 'packages/space_mls_native/**', 'tools/check_mls_advisories*', 'tools/collect_mls_notices.py', '.github/workflows/mls.yml']
+    paths: ['native/**', 'packages/space_mls_native/**', 'client/lib/src/mls/**', 'client/lib/src/rpc_*.dart', 'client/test/mls*', 'client/test/rpc*', 'client/test/support/rpc_fault_proxy.dart', 'tools/check_mls_advisories*', 'tools/collect_mls_notices.py', '.github/workflows/mls.yml']
   pull_request:
-    paths: ['native/**', 'packages/space_mls_native/**', 'tools/check_mls_advisories*', 'tools/collect_mls_notices.py', '.github/workflows/mls.yml']
+    paths: ['native/**', 'packages/space_mls_native/**', 'client/lib/src/mls/**', 'client/lib/src/rpc_*.dart', 'client/test/mls*', 'client/test/rpc*', 'client/test/support/rpc_fault_proxy.dart', 'tools/check_mls_advisories*', 'tools/collect_mls_notices.py', '.github/workflows/mls.yml']
 permissions:
   contents: read
 jobs:
+  hostile-server:
+    name: Недоверенный сервер, откат и бюджеты
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.7'
+          channel: stable
+      - name: Rust для нативного моста
+        run: rustup toolchain install 1.99.0 --profile minimal
+      - name: Отрицательные сценарии с настоящим MLS и HTTP
+        working-directory: client
+        run: |
+          flutter pub get
+          flutter test test/mls_hostile_server_test.dart test/mls_envelope_checks_test.dart test/mls_recovery_test.dart test/rpc_budget_test.dart test/rpc_connection_test.dart
   native:
     strategy:
       fail-fast: false
@@ -33,6 +49,9 @@ jobs:
           cargo clippy --locked --manifest-path ../space_mls_bridge/Cargo.toml --all-targets -- -D warnings
       - name: Закрытый канал, сообщения и вложения
         run: cargo test --locked
+      - name: Совместимость с mls-rs
+        if: matrix.os == 'ubuntu-24.04'
+        run: cargo test --locked --manifest-path ../mls_interop/Cargo.toml
       - uses: actions/setup-python@v5
         if: matrix.os == 'ubuntu-24.04'
         with:

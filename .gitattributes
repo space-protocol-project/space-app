@@ -1,0 +1,2 @@
+# Пробел перед пустой строкой контекста — часть формата unified diff.
+docs/upstream/*.patch whitespace=-blank-at-eol
