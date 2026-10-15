@@ -1191,6 +1191,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get refreshFiles => '刷新附件';
+
+  @override
+  String get filesLoadFailed => '无法加载附件，请尝试刷新列表。';
+
+  @override
+  String get filesServerUpdateRequired => '请更新服务器以使用附件列表。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

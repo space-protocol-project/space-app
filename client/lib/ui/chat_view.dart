@@ -708,6 +708,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         return _build(context);
       }
       return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(child: _build(context)),
           SizedBox(
@@ -722,7 +723,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: ChannelFilesPanel(
-                    key: ValueKey(widget.controller.draftScope),
+                    key: ValueKey((widget.controller.draftScope, session)),
                     revision: Object.hashAll(
                       widget.controller.state.messages.map(
                         (m) =>

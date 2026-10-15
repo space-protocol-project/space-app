@@ -499,5 +499,7 @@
   "optionalNickname": "Ник (необязательно)",
   "channelFiles": "Вложения чата",
   "allFileAuthors": "Все участники",
-  "refreshFiles": "Обновить вложения"
+  "refreshFiles": "Обновить вложения",
+  "filesLoadFailed": "Не удалось загрузить вложения. Попробуйте обновить список.",
+  "filesServerUpdateRequired": "Для списка вложений нужна актуальная версия сервера."
 }

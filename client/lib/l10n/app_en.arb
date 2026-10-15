@@ -499,5 +499,7 @@
   "optionalNickname": "Nickname (optional)",
   "channelFiles": "Chat attachments",
   "allFileAuthors": "All participants",
-  "refreshFiles": "Refresh attachments"
+  "refreshFiles": "Refresh attachments",
+  "filesLoadFailed": "Could not load attachments. Try refreshing the list.",
+  "filesServerUpdateRequired": "Update the server to use the attachment list."
 }

@@ -118,90 +118,89 @@ class _ChannelFilesPanelState extends State<ChannelFilesPanel> {
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => BlocBuilder<ChannelFilesController, ChannelFilesState>(
-    bloc: files,
-    builder: (context, state) => Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
+  Widget build(BuildContext context) =>
+      BlocBuilder<ChannelFilesController, ChannelFilesState>(
+        bloc: files,
+        builder: (context, state) => ListView(
+          shrinkWrap: true,
+          padding: EdgeInsets.zero,
           children: [
-            Expanded(
-              child: Text(
-                context.strings.channelFiles,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-            IconButton(
-              tooltip: context.strings.refreshFiles,
-              onPressed: state.busy
-                  ? null
-                  : () => files.selectAuthor(state.author),
-              icon: const Icon(Icons.refresh),
-            ),
-          ],
-        ),
-        DropdownButton<String>(
-          isExpanded: true,
-          value: state.author,
-          items: [
-            DropdownMenuItem(
-              value: '',
-              child: Text(context.strings.allFileAuthors),
-            ),
-            for (final id in {
-              ...state.authors.keys,
-              if (state.author.isNotEmpty) state.author,
-            }.toList()..sort())
-              DropdownMenuItem(
-                value: id,
-                child: Text(
-                  authorLabel(id, state.authors),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-          ],
-          onChanged: (id) {
-            if (id != null) files.selectAuthor(id);
-          },
-        ),
-        const SizedBox(height: 12),
-        Expanded(
-          child: ListView(
-            children: [
-              for (var i = 0; i < state.files.length; i++) ...[
-                if (i == 0 || date(state.files[i]) != date(state.files[i - 1]))
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: Text(date(state.files[i])),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    context.strings.channelFiles,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
-                Text(
-                  authorLabel(state.files[i].authorId, state.authors),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelSmall,
                 ),
-                AttachmentCard(asset: state.files[i], session: widget.session),
-                const Divider(height: 20),
+                IconButton(
+                  tooltip: context.strings.refreshFiles,
+                  onPressed: state.busy
+                      ? null
+                      : () => files.selectAuthor(state.author),
+                  icon: const Icon(Icons.refresh),
+                ),
               ],
-              if (state.files.isEmpty && !state.busy && state.error.isEmpty)
-                Text(context.strings.noFilesInChannel),
-              if (state.error.isNotEmpty) Text(state.error),
-              if (state.busy)
-                const Center(child: CircularProgressIndicator())
-              else if (state.more)
-                TextButton(
-                  onPressed: files.load,
-                  child: Text(context.strings.loadMoreFiles),
+            ),
+            DropdownButton<String>(
+              isExpanded: true,
+              value: state.author,
+              items: [
+                DropdownMenuItem(
+                  value: '',
+                  child: Text(context.strings.allFileAuthors),
                 ),
+                for (final id in {
+                  ...state.authors.keys,
+                  if (state.author.isNotEmpty) state.author,
+                }.toList()..sort())
+                  DropdownMenuItem(
+                    value: id,
+                    child: Text(
+                      authorLabel(id, state.authors),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+              ],
+              onChanged: (id) {
+                if (id != null) files.selectAuthor(id);
+              },
+            ),
+            const SizedBox(height: 12),
+            for (var i = 0; i < state.files.length; i++) ...[
+              if (i == 0 || date(state.files[i]) != date(state.files[i - 1]))
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(date(state.files[i])),
+                ),
+              Text(
+                authorLabel(state.files[i].authorId, state.authors),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+              AttachmentCard(asset: state.files[i], session: widget.session),
+              const Divider(height: 20),
             ],
-          ),
+            if (state.files.isEmpty && !state.busy && state.error.isEmpty)
+              Text(context.strings.noFilesInChannel),
+            if (state.error.isNotEmpty)
+              Text(
+                state.error.contains('HTTP 415')
+                    ? context.strings.filesServerUpdateRequired
+                    : context.strings.filesLoadFailed,
+              ),
+            if (state.busy)
+              const Center(child: CircularProgressIndicator())
+            else if (state.more && state.error.isEmpty)
+              TextButton(
+                onPressed: files.load,
+                child: Text(context.strings.loadMoreFiles),
+              ),
+          ],
         ),
-      ],
-    ),
-  );
+      );
 
   String date(Asset asset) => MaterialLocalizations.of(context)
       .formatMediumDate(

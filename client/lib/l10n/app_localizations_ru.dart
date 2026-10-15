@@ -1302,4 +1302,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get refreshFiles => 'Обновить вложения';
+
+  @override
+  String get filesLoadFailed =>
+      'Не удалось загрузить вложения. Попробуйте обновить список.';
+
+  @override
+  String get filesServerUpdateRequired =>
+      'Для списка вложений нужна актуальная версия сервера.';
 }

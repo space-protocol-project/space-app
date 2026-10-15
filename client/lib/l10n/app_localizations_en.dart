@@ -1296,4 +1296,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get refreshFiles => 'Refresh attachments';
+
+  @override
+  String get filesLoadFailed =>
+      'Could not load attachments. Try refreshing the list.';
+
+  @override
+  String get filesServerUpdateRequired =>
+      'Update the server to use the attachment list.';
 }

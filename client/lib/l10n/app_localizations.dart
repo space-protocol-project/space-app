@@ -2380,6 +2380,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Обновить вложения'**
   String get refreshFiles;
+
+  /// No description provided for @filesLoadFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить вложения. Попробуйте обновить список.'**
+  String get filesLoadFailed;
+
+  /// No description provided for @filesServerUpdateRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для списка вложений нужна актуальная версия сервера.'**
+  String get filesServerUpdateRequired;
 }
 
 class _AppLocalizationsDelegate

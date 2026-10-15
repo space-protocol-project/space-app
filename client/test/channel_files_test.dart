@@ -57,6 +57,63 @@ void main() {
     expect(files.state.more, false);
   });
 
+  testWidgets('Панель растёт до границы, затем прокручивается', (tester) async {
+    Future<double> height(int count) async {
+      final session = ChannelSession();
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Align(
+              alignment: Alignment.topRight,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxHeight: 360,
+                  maxWidth: 280,
+                ),
+                child: ChannelFilesPanel(
+                  key: ObjectKey(session),
+                  session: session,
+                  channel: 'chat',
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      session.replies.single.complete(
+        ListChannelAssetsResponse(
+          assets: List.generate(
+            count,
+            (i) => Asset(id: '$i', authorId: 'alice', name: 'file-$i.txt'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      return tester.getSize(find.byType(ChannelFilesPanel)).height;
+    }
+
+    final empty = await height(0);
+    final single = await height(1);
+    final many = await height(20);
+    expect(empty, lessThan(single));
+    expect(single, lessThan(many));
+    expect(many, 360);
+    final list = find.descendant(
+      of: find.byType(ChannelFilesPanel),
+      matching: find.byType(ListView),
+    );
+    await tester.drag(list, const Offset(0, -250));
+    await tester.pumpAndSettle();
+    final scrollable = tester.state<ScrollableState>(
+      find.descendant(of: list, matching: find.byType(Scrollable)).first,
+    );
+    expect(scrollable.position.pixels, greaterThan(0));
+  });
+
   for (final width in [280.0, 480.0]) {
     testWidgets('Панель вложений и фильтр на ширине $width', (tester) async {
       final session = ChannelSession();

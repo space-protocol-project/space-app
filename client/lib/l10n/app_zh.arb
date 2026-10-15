@@ -499,5 +499,7 @@
   "optionalNickname": "昵称（可选）",
   "channelFiles": "聊天附件",
   "allFileAuthors": "所有成员",
-  "refreshFiles": "刷新附件"
+  "refreshFiles": "刷新附件",
+  "filesLoadFailed": "无法加载附件，请尝试刷新列表。",
+  "filesServerUpdateRequired": "请更新服务器以使用附件列表。"
 }
