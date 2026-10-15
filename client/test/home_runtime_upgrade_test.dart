@@ -11,8 +11,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/home_controller.dart';
 import 'package:space_client/src/home_runtime.dart';
+
 import 'package:space_client/src/home_update_journal.dart';
 import 'package:space_client/src/local_failure.dart';
+
+import 'support/historical_home_runtime.dart';
 
 class _Binding extends AutomatedTestWidgetsFlutterBinding {
   @override
@@ -77,10 +80,7 @@ void main() {
         'bytes': await archive.length(),
       });
       final vault = _Vault();
-      final original = HomeController(
-        directory: () async => root,
-        release: () async => baseline,
-      );
+      final original = HistoricalHomeRuntime(root, baseline);
       final updated = HomeController(
         directory: () async => root,
         release: () async => candidate,
@@ -91,10 +91,10 @@ void main() {
       );
       SpaceSession? session;
       try {
-        final first = await original.start('203.0.113.10');
-        expect(first, isNotNull, reason: original.error);
+        await original.prepare();
+        final first = await original.start();
         final discovery = await discover(
-          first!.localOrigin,
+          first.localOrigin,
           homeOrigin: first.publicOrigin,
           tlsFingerprint: first.tlsFingerprint,
         );
@@ -104,6 +104,8 @@ void main() {
           setupCode: first.setupCode,
         );
         final principal = session.principalId;
+        final historicalVault = _Vault();
+        await historicalVault.save(session.record);
         await session.send('Сообщение до обновления', 'upgrade-check-1');
         // Подписка остаётся открытой и приостановленной после первого кадра.
         final iterator = StreamIterator(session.subscribe(''));
@@ -115,12 +117,12 @@ void main() {
         await iterator.cancel();
         session = null;
         await original.stop();
-        expect(original.error, isEmpty);
         final stillOld = await updated.start('203.0.113.10');
-        expect(stillOld, isNotNull, reason: updated.error);
+        expect(stillOld, isNull);
+        expect(updated.error, contains('Обновите runtime'));
         expect(updated.installedVersion, baseline.version);
         expect(await updated.prepareUpdate(), true, reason: updated.error);
-        expect(updated.running, true);
+        expect(updated.running, false);
         await updated.stop();
         expect(updated.error, isEmpty);
         await updated.performUpdate();
@@ -129,7 +131,8 @@ void main() {
         expect(updated.installedVersion, 'v0.3.1');
         final second = await updated.start('203.0.113.11');
         expect(second, isNotNull, reason: updated.error);
-        expect(second!.link, first.link);
+        expect(second!.publicOrigin, first.publicOrigin);
+        expect(second.tlsFingerprint, first.tlsFingerprint);
         final next = await discover(
           second.localOrigin,
           homeOrigin: second.publicOrigin,
@@ -179,16 +182,26 @@ void main() {
         expect(updated.error, isEmpty);
         expect(updated.installedVersion, baseline.version);
         expect((await journal.read())!.step, HomeUpdateStep.completeRestored);
-        final restored = await updated.start('203.0.113.12');
-        expect(restored, isNotNull, reason: updated.error);
-        expect(restored!.link, first.link);
+        expect(await updated.start('203.0.113.12'), isNull);
+        expect(updated.error, contains('Обновите runtime'));
+        final restored = await original.start();
+        expect(restored.publicOrigin, first.publicOrigin);
+        expect(restored.tlsFingerprint, first.tlsFingerprint);
         final restoredDiscovery = await discover(
           restored.localOrigin,
           homeOrigin: restored.publicOrigin,
           tlsFingerprint: restored.tlsFingerprint,
         );
         expect(restoredDiscovery.serverId, discovery.serverId);
-        session = await SpaceSession.connect(restoredDiscovery, vault);
+        // Новый профиль не должен принимать откат объявления адресов.
+        expect(
+          () => checkTrust(restoredDiscovery, vault.record!),
+          throwsFormatException,
+        );
+        session = await SpaceSession.connect(
+          restoredDiscovery,
+          historicalVault,
+        );
         expect(session.principalId, principal);
         expect(session.role, 'owner');
         expect(
@@ -202,7 +215,6 @@ void main() {
         await updated.stop();
         await original.stop();
         updated.dispose();
-        original.dispose();
         await removeUpgradeDirectory(root);
       }
     },
