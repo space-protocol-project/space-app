@@ -99,6 +99,53 @@ abstract final class ContentService {
     spacev1space.ListContentResponse.new,
   );
 }
+/// Файлы передаются ограниченными частями; права проверяются на каждой операции.
+abstract final class AssetService {
+  /// Fully-qualified name of the AssetService service.
+  static const name = 'space.v1.AssetService';
+
+  static const beginUpload = connect.Spec(
+    '/$name/BeginUpload',
+    connect.StreamType.unary,
+    spacev1space.BeginUploadRequest.new,
+    spacev1space.BeginUploadResponse.new,
+  );
+
+  static const uploadChunk = connect.Spec(
+    '/$name/UploadChunk',
+    connect.StreamType.unary,
+    spacev1space.UploadChunkRequest.new,
+    spacev1space.UploadChunkResponse.new,
+  );
+
+  static const completeUpload = connect.Spec(
+    '/$name/CompleteUpload',
+    connect.StreamType.unary,
+    spacev1space.CompleteUploadRequest.new,
+    spacev1space.CompleteUploadResponse.new,
+  );
+
+  static const cancelUpload = connect.Spec(
+    '/$name/CancelUpload',
+    connect.StreamType.unary,
+    spacev1space.CancelUploadRequest.new,
+    spacev1space.CancelUploadResponse.new,
+  );
+
+  static const downloadChunk = connect.Spec(
+    '/$name/DownloadChunk',
+    connect.StreamType.unary,
+    spacev1space.DownloadChunkRequest.new,
+    spacev1space.DownloadChunkResponse.new,
+  );
+
+  static const listMyAssets = connect.Spec(
+    '/$name/ListMyAssets',
+    connect.StreamType.unary,
+    spacev1space.ListMyAssetsRequest.new,
+    spacev1space.ListMyAssetsResponse.new,
+  );
+}
 abstract final class AuthService {
   /// Fully-qualified name of the AuthService service.
   static const name = 'space.v1.AuthService';
@@ -283,6 +330,13 @@ abstract final class AdminService {
 abstract final class MembershipService {
   /// Fully-qualified name of the MembershipService service.
   static const name = 'space.v1.MembershipService';
+
+  static const updateProfile = connect.Spec(
+    '/$name/UpdateProfile',
+    connect.StreamType.unary,
+    spacev1space.UpdateProfileRequest.new,
+    spacev1space.UpdateProfileResponse.new,
+  );
 
   static const previewInvite = connect.Spec(
     '/$name/PreviewInvite',

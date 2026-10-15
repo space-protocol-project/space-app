@@ -1,3 +1,8 @@
+import 'package:desktop_drop/desktop_drop.dart';
+
+import '../src/attachments.dart';
+import 'attachment_widgets.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'dart:async';
@@ -39,6 +44,10 @@ class ChatView extends StatefulWidget {
 }
 
 class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
+  final queues = <String, AttachmentQueue>{};
+  AttachmentQueue get attachmentQueue =>
+      queues.putIfAbsent(scope, AttachmentQueue.new);
+  bool draggingFiles = false;
   final draft = TextEditingController();
   final draftFocus = FocusNode();
   final scroll = ScrollController();
@@ -243,6 +252,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    for (final queue in queues.values) {
+      unawaited(queue.close());
+    }
     draft.dispose();
     draftFocus.dispose();
     scroll.dispose();
@@ -253,24 +265,41 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     final text = draft.text;
     final restoreFocus = draftFocus.hasFocus;
     final target = widget.controller, startingScope = scope;
-    final sent = await target.send(text);
+    final queue = attachmentQueue;
+    final session = target.attachmentSession;
+    if (queue.state.busy || target.busy) return;
+    final ids = queue.state.files.isEmpty
+        ? <String>[]
+        : session == null
+        ? null
+        : await queue.upload(session, target.channelId);
+    if (ids == null ||
+        !mounted ||
+        scope != startingScope ||
+        !identical(target, widget.controller)) {
+      return;
+    }
+    final sent = await target.send(text, attachments: ids);
+    if (sent) queue.clear();
     if (!mounted) return;
     if (sent) _clearSentDraft(text, startingScope, target);
-    if (restoreFocus) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted &&
-            widget.active &&
-            foreground &&
-            scope == startingScope &&
-            identical(widget.controller, target) &&
-            target.connected &&
-            target.canWrite &&
-            !target.busy &&
-            ModalRoute.of(context)?.isCurrent != false) {
-          draftFocus.requestFocus();
-        }
-      });
-    }
+    if (restoreFocus) _restoreDraftFocus(startingScope, target);
+  }
+
+  void _restoreDraftFocus(String startingScope, ChatController target) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted &&
+          widget.active &&
+          foreground &&
+          scope == startingScope &&
+          identical(widget.controller, target) &&
+          target.connected &&
+          target.canWrite &&
+          !target.busy &&
+          ModalRoute.of(context)?.isCurrent != false) {
+        draftFocus.requestFocus();
+      }
+    });
   }
 
   void _clearSentDraft(
@@ -360,6 +389,19 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
             ),
           MessageBubble(
             text: message.text,
+            attachments: message.deleted
+                ? null
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (final asset in message.attachments)
+                        AttachmentCard(
+                          key: ValueKey(asset.id),
+                          asset: asset,
+                          session: controller.attachmentSession,
+                        ),
+                    ],
+                  ),
             edited: message.updatedAtUnixMs > 0,
             deleted: message.deleted,
             actions: controller.canChangeMessage(message)
@@ -591,7 +633,45 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) => BlocBuilder<ChatController, ChatState>(
     bloc: widget.controller,
-    builder: (context, state) => _build(context),
+    builder: (context, state) => DropTarget(
+      enable:
+          state.connected &&
+          state.canWrite &&
+          !state.busy &&
+          widget.controller.attachmentSession != null,
+      onDragEntered: (_) => setState(() => draggingFiles = true),
+      onDragExited: (_) => setState(() => draggingFiles = false),
+      onDragDone: (details) {
+        setState(() => draggingFiles = false);
+        attachmentQueue.add(
+          AttachmentFilesAdded(
+            details.files.whereType<DropItemFile>().toList(),
+          ),
+        );
+      },
+      child: Stack(
+        children: [
+          _build(context),
+          if (draggingFiles)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: ColoredBox(
+                  color: Theme.of(context).colorScheme.primary
+                      .withValues(alpha: .15),
+                  child: Center(
+                    child: Card(
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: Text(context.strings.dropFilesHere),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    ),
   );
 
   Widget _build(BuildContext context) {
@@ -664,6 +744,23 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                 ),
               ),
             ),
+          ),
+        if (widget.controller.attachmentSession != null)
+          AttachmentComposer(
+            queue: attachmentQueue,
+            session: widget.controller.attachmentSession,
+            canRead: view.connected && view.canRead,
+            enabled: view.connected && view.canWrite && !view.busy,
+            openFiles: () {
+              final session = widget.controller.attachmentSession;
+              if (session != null) {
+                showDialog<void>(
+                  context: context,
+                  builder: (_) =>
+                      MyFilesDialog(session: session, channel: view.channelId),
+                );
+              }
+            },
           ),
         if (view.sendStatus != MessageSendStatus.idle)
           Padding(

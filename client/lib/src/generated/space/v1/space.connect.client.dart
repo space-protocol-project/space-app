@@ -214,6 +214,110 @@ extension type ContentServiceClient (connect.Transport _transport) {
     );
   }
 }
+/// Файлы передаются ограниченными частями; права проверяются на каждой операции.
+extension type AssetServiceClient (connect.Transport _transport) {
+  Future<spacev1space.BeginUploadResponse> beginUpload(
+    spacev1space.BeginUploadRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.AssetService.beginUpload,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1space.UploadChunkResponse> uploadChunk(
+    spacev1space.UploadChunkRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.AssetService.uploadChunk,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1space.CompleteUploadResponse> completeUpload(
+    spacev1space.CompleteUploadRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.AssetService.completeUpload,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1space.CancelUploadResponse> cancelUpload(
+    spacev1space.CancelUploadRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.AssetService.cancelUpload,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1space.DownloadChunkResponse> downloadChunk(
+    spacev1space.DownloadChunkRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.AssetService.downloadChunk,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1space.ListMyAssetsResponse> listMyAssets(
+    spacev1space.ListMyAssetsRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.AssetService.listMyAssets,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+}
 extension type AuthServiceClient (connect.Transport _transport) {
   /// Экспериментальный API; требует поддержки stable principal у клиента.
   Future<spacev1space.CreateRootRotationResponse> createRootRotation(
@@ -627,6 +731,23 @@ extension type AdminServiceClient (connect.Transport _transport) {
   }
 }
 extension type MembershipServiceClient (connect.Transport _transport) {
+  Future<spacev1space.UpdateProfileResponse> updateProfile(
+    spacev1space.UpdateProfileRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.MembershipService.updateProfile,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
   Future<spacev1space.PreviewInviteResponse> previewInvite(
     spacev1space.PreviewInviteRequest input, {
     connect.Headers? headers,

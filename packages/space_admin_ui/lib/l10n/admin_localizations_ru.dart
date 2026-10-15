@@ -784,4 +784,23 @@ class AdminLocalizationsRu extends AdminLocalizations {
 
   @override
   String get channelDeleted => 'Канал удалён.';
+
+  @override
+  String get storageTitle => 'Хранилище файлов';
+
+  @override
+  String get storageTotal => 'Общий лимит сервера, МиБ';
+
+  @override
+  String get storageMember => 'Личный лимит каждого участника, МиБ';
+
+  @override
+  String get storageHelp =>
+      '0 запрещает новые загрузки. Уже загруженные файлы сохраняются. Незавершённые загрузки тоже занимают место.';
+
+  @override
+  String get storagePersonal => 'Личный лимит, МиБ';
+
+  @override
+  String get storageInherited => 'Пусто — стандартный лимит';
 }

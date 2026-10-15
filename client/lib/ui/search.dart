@@ -1,3 +1,4 @@
+import '../src/message_summary.dart';
 import '../l10n/strings.dart';
 
 import 'package:flutter/material.dart';
@@ -73,7 +74,10 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
     final contents = term.isEmpty
         ? <Content>[]
         : widget.messages
-              .where((message) => message.text.toLowerCase().contains(term))
+              .where(
+                (message) =>
+                    messageSummary(message).toLowerCase().contains(term),
+              )
               .take(20)
               .toList();
     return ListView(
@@ -96,7 +100,7 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
           ListTile(
             leading: const Icon(Icons.chat_bubble_outline),
             title: Text(
-              message.text,
+              messageSummary(message),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),

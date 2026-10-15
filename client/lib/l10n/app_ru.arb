@@ -10,7 +10,6 @@
   "cancelMessageChange": "Отмена",
   "messageText": "Текст сообщения",
   "messageTextInvalid": "Введите текст длиной до 4096 байт.",
-
   "interfaceScale": "Масштаб интерфейса",
   "@@locale": "ru",
   "overview": "Обзор",
@@ -486,5 +485,16 @@
   "homeTransferring": "Перенос пространства",
   "homeTransferFailed": "Не удалось открыть архив или завершить перенос.",
   "glassEffects": "Эффекты стекла",
-  "glassEffectsHelp": "Размытие плавающих панелей и заголовка."
+  "glassEffectsHelp": "Размытие плавающих панелей и заголовка.",
+  "attachFiles": "Прикрепить файлы",
+  "myFiles": "Мои файлы",
+  "removeFile": "Убрать файл",
+  "cancelUpload": "Отмена",
+  "downloadFile": "Скачать файл",
+  "downloadFailed": "Не удалось скачать файл",
+  "noFilesInChannel": "В этом канале пока нет ваших файлов",
+  "loadMoreFiles": "Загрузить ещё",
+  "closeFiles": "Закрыть",
+  "dropFilesHere": "Отпустите файлы, чтобы прикрепить",
+  "optionalNickname": "Ник (необязательно)"
 }

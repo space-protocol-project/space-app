@@ -449,10 +449,31 @@ abstract interface class ServerIconPresentation {
   ServerIcon? get serverIcon;
 }
 
+abstract interface class MemberProfile {
+  Future<void> setNickname(String nickname);
+}
+
+abstract interface class AttachmentSession {
+  Future<BeginUploadResponse> beginUpload(BeginUploadRequest request);
+  Future<UploadChunkResponse> uploadChunk(UploadChunkRequest request);
+  Future<CompleteUploadResponse> completeUpload(CompleteUploadRequest request);
+  Future<CancelUploadResponse> cancelUpload(CancelUploadRequest request);
+  Future<DownloadChunkResponse> downloadChunk(DownloadChunkRequest request);
+  Future<ListMyAssetsResponse> listMyAssets(ListMyAssetsRequest request);
+  Future<Content> sendAttachments(
+    String channelId,
+    String text,
+    String key,
+    List<String> ids,
+  );
+}
+
 class SpaceSession
     implements
         LiveSession,
         MessageChanges,
+        MemberProfile,
+        AttachmentSession,
         SpacePresentation,
         ServerIconPresentation,
         SpaceAccess,
@@ -1218,6 +1239,77 @@ class SpaceSession
     await _ensureSession();
     final result = await ContentServiceClient(channel).createContent(
       CreateContentRequest(channelId: id, text: text, idempotencyKey: key),
+      options: _options,
+    );
+    return result.content;
+  }
+
+  @override
+  Future<void> setNickname(String nickname) async {
+    await _ensureSession();
+    await MembershipServiceClient(channel).updateProfile(
+      UpdateProfileRequest(nickname: nickname),
+      options: _options,
+    );
+  }
+
+  @override
+  Future<BeginUploadResponse> beginUpload(BeginUploadRequest request) async {
+    await _ensureSession();
+    return AssetServiceClient(channel).beginUpload(request, options: _options);
+  }
+
+  @override
+  Future<UploadChunkResponse> uploadChunk(UploadChunkRequest request) async {
+    await _ensureSession();
+    return AssetServiceClient(channel).uploadChunk(request, options: _options);
+  }
+
+  @override
+  Future<CompleteUploadResponse> completeUpload(
+    CompleteUploadRequest request,
+  ) async {
+    await _ensureSession();
+    return AssetServiceClient(channel)
+        .completeUpload(request, options: _options);
+  }
+
+  @override
+  Future<CancelUploadResponse> cancelUpload(CancelUploadRequest request) async {
+    await _ensureSession();
+    return AssetServiceClient(channel).cancelUpload(request, options: _options);
+  }
+
+  @override
+  Future<DownloadChunkResponse> downloadChunk(
+    DownloadChunkRequest request,
+  ) async {
+    await _ensureSession();
+    return AssetServiceClient(channel)
+        .downloadChunk(request, options: _options);
+  }
+
+  @override
+  Future<ListMyAssetsResponse> listMyAssets(ListMyAssetsRequest request) async {
+    await _ensureSession();
+    return AssetServiceClient(channel).listMyAssets(request, options: _options);
+  }
+
+  @override
+  Future<Content> sendAttachments(
+    String channelId,
+    String text,
+    String key,
+    List<String> ids,
+  ) async {
+    await _ensureSession();
+    final result = await ContentServiceClient(channel).createContent(
+      CreateContentRequest(
+        channelId: channelId,
+        text: text,
+        idempotencyKey: key,
+        attachmentIds: ids,
+      ),
       options: _options,
     );
     return result.content;

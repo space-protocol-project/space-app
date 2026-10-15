@@ -1260,4 +1260,37 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get glassEffectsHelp => 'Размытие плавающих панелей и заголовка.';
+
+  @override
+  String get attachFiles => 'Прикрепить файлы';
+
+  @override
+  String get myFiles => 'Мои файлы';
+
+  @override
+  String get removeFile => 'Убрать файл';
+
+  @override
+  String get cancelUpload => 'Отмена';
+
+  @override
+  String get downloadFile => 'Скачать файл';
+
+  @override
+  String get downloadFailed => 'Не удалось скачать файл';
+
+  @override
+  String get noFilesInChannel => 'В этом канале пока нет ваших файлов';
+
+  @override
+  String get loadMoreFiles => 'Загрузить ещё';
+
+  @override
+  String get closeFiles => 'Закрыть';
+
+  @override
+  String get dropFilesHere => 'Отпустите файлы, чтобы прикрепить';
+
+  @override
+  String get optionalNickname => 'Ник (необязательно)';
 }

@@ -37,9 +37,11 @@ final class ChatConnected extends ChatEvent<void> {
     this.restoredRecord,
     this.pairingId = '',
     this.setupCode = '',
+    this.nickname,
   });
   final DeviceRecord? restoredRecord;
   final String pairingId, setupCode;
+  final String? nickname;
 }
 
 final class ChatChannelSelected extends ChatEvent<void> {
@@ -50,8 +52,9 @@ final class ChatChannelSelected extends ChatEvent<void> {
 final class ChatChannelsRefreshed extends ChatEvent<void> {}
 
 final class ChatMessageSent extends ChatEvent<bool> {
-  ChatMessageSent(this.text);
+  ChatMessageSent(this.text, [this.attachments = const []]);
   final String text;
+  final List<String> attachments;
 }
 
 final class ChatDeviceRevoked extends ChatEvent<void> {}

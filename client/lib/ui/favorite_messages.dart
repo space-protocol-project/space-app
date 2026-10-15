@@ -1,3 +1,5 @@
+import '../src/message_summary.dart';
+
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -145,7 +147,8 @@ class _FavoriteMessagesState extends State<FavoriteMessages> {
       onEnter: (_) => show(message),
       onExit: (_) => hideLater(),
       child: Semantics(
-        label: '${context.strings.favoriteMessages}: $author. ${message.text}',
+        label:
+            '${context.strings.favoriteMessages}: $author. ${messageSummary(message)}',
         button: true,
         child: Focus(
           onKeyEvent: closeOnEscape,
@@ -237,12 +240,14 @@ class _FavoriteCard extends StatelessWidget {
   final VoidCallback onJump, onRemove;
   @override
   Widget build(BuildContext context) {
-    final lines = message.text
+    final lines = messageSummary(message)
         .split('\n')
         .where((line) => line.trim().isNotEmpty)
         .toList();
     final title = lines.firstOrNull ?? message.authorId;
-    final excerpt = lines.length > 1 ? lines.skip(1).join('\n') : message.text;
+    final excerpt = lines.length > 1
+        ? lines.skip(1).join('\n')
+        : messageSummary(message);
     final colors = Theme.of(context).colorScheme;
     return DecoratedBox(
       decoration: BoxDecoration(

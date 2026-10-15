@@ -47,6 +47,7 @@ class _Controller extends ChatController {
     DeviceRecord? restoredRecord,
     String pairingId = '',
     String setupCode = '',
+    String? nickname,
   }) async {
     connected = true;
     publishState();

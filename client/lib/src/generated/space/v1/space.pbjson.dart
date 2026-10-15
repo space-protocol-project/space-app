@@ -325,6 +325,39 @@ const ProposePairingResponse$json = {
 final $typed_data.Uint8List proposePairingResponseDescriptor =
     $convert.base64Decode('ChZQcm9wb3NlUGFpcmluZ1Jlc3BvbnNl');
 
+@$core.Deprecated('Use updateProfileRequestDescriptor instead')
+const UpdateProfileRequest$json = {
+  '1': 'UpdateProfileRequest',
+  '2': [
+    {'1': 'nickname', '3': 1, '4': 1, '5': 9, '10': 'nickname'},
+  ],
+};
+
+/// Descriptor for `UpdateProfileRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List updateProfileRequestDescriptor =
+    $convert.base64Decode(
+        'ChRVcGRhdGVQcm9maWxlUmVxdWVzdBIaCghuaWNrbmFtZRgBIAEoCVIIbmlja25hbWU=');
+
+@$core.Deprecated('Use updateProfileResponseDescriptor instead')
+const UpdateProfileResponse$json = {
+  '1': 'UpdateProfileResponse',
+  '2': [
+    {
+      '1': 'member',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Member',
+      '10': 'member'
+    },
+  ],
+};
+
+/// Descriptor for `UpdateProfileResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List updateProfileResponseDescriptor = $convert.base64Decode(
+    'ChVVcGRhdGVQcm9maWxlUmVzcG9uc2USKAoGbWVtYmVyGAEgASgLMhAuc3BhY2UudjEuTWVtYm'
+    'VyUgZtZW1iZXI=');
+
 @$core.Deprecated('Use memberDescriptor instead')
 const Member$json = {
   '1': 'Member',
@@ -333,6 +366,19 @@ const Member$json = {
     {'1': 'role', '3': 2, '4': 1, '5': 9, '10': 'role'},
     {'1': 'blocked', '3': 3, '4': 1, '5': 8, '10': 'blocked'},
     {'1': 'revision', '3': 4, '4': 1, '5': 3, '10': 'revision'},
+    {
+      '1': 'storage_limit_bytes',
+      '3': 5,
+      '4': 1,
+      '5': 3,
+      '9': 0,
+      '10': 'storageLimitBytes',
+      '17': true
+    },
+    {'1': 'nickname', '3': 6, '4': 1, '5': 9, '10': 'nickname'},
+  ],
+  '8': [
+    {'1': '_storage_limit_bytes'},
   ],
 };
 
@@ -340,7 +386,8 @@ const Member$json = {
 final $typed_data.Uint8List memberDescriptor = $convert.base64Decode(
     'CgZNZW1iZXISIQoMcHJpbmNpcGFsX2lkGAEgASgJUgtwcmluY2lwYWxJZBISCgRyb2xlGAIgAS'
     'gJUgRyb2xlEhgKB2Jsb2NrZWQYAyABKAhSB2Jsb2NrZWQSGgoIcmV2aXNpb24YBCABKANSCHJl'
-    'dmlzaW9u');
+    'dmlzaW9uEjMKE3N0b3JhZ2VfbGltaXRfYnl0ZXMYBSABKANIAFIRc3RvcmFnZUxpbWl0Qnl0ZX'
+    'OIAQESGgoIbmlja25hbWUYBiABKAlSCG5pY2tuYW1lQhYKFF9zdG9yYWdlX2xpbWl0X2J5dGVz');
 
 @$core.Deprecated('Use listMembersRequestDescriptor instead')
 const ListMembersRequest$json = {
@@ -389,6 +436,25 @@ const UpdateMemberRequest$json = {
       '5': 3,
       '10': 'expectedRevision'
     },
+    {
+      '1': 'storage_limit_bytes',
+      '3': 5,
+      '4': 1,
+      '5': 3,
+      '9': 0,
+      '10': 'storageLimitBytes',
+      '17': true
+    },
+    {
+      '1': 'reset_storage_limit',
+      '3': 6,
+      '4': 1,
+      '5': 8,
+      '10': 'resetStorageLimit'
+    },
+  ],
+  '8': [
+    {'1': '_storage_limit_bytes'},
   ],
 };
 
@@ -396,7 +462,9 @@ const UpdateMemberRequest$json = {
 final $typed_data.Uint8List updateMemberRequestDescriptor = $convert.base64Decode(
     'ChNVcGRhdGVNZW1iZXJSZXF1ZXN0EiEKDHByaW5jaXBhbF9pZBgBIAEoCVILcHJpbmNpcGFsSW'
     'QSEgoEcm9sZRgCIAEoCVIEcm9sZRIYCgdibG9ja2VkGAMgASgIUgdibG9ja2VkEisKEWV4cGVj'
-    'dGVkX3JldmlzaW9uGAQgASgDUhBleHBlY3RlZFJldmlzaW9u');
+    'dGVkX3JldmlzaW9uGAQgASgDUhBleHBlY3RlZFJldmlzaW9uEjMKE3N0b3JhZ2VfbGltaXRfYn'
+    'l0ZXMYBSABKANIAFIRc3RvcmFnZUxpbWl0Qnl0ZXOIAQESLgoTcmVzZXRfc3RvcmFnZV9saW1p'
+    'dBgGIAEoCFIRcmVzZXRTdG9yYWdlTGltaXRCFgoUX3N0b3JhZ2VfbGltaXRfYnl0ZXM=');
 
 @$core.Deprecated('Use updateMemberResponseDescriptor instead')
 const UpdateMemberResponse$json = {
@@ -764,6 +832,28 @@ const SpaceSettings$json = {
       '6': '.space.v1.ServerIcon',
       '10': 'icon'
     },
+    {
+      '1': 'storage_limit_bytes',
+      '3': 7,
+      '4': 1,
+      '5': 3,
+      '9': 0,
+      '10': 'storageLimitBytes',
+      '17': true
+    },
+    {
+      '1': 'member_storage_limit_bytes',
+      '3': 8,
+      '4': 1,
+      '5': 3,
+      '9': 1,
+      '10': 'memberStorageLimitBytes',
+      '17': true
+    },
+  ],
+  '8': [
+    {'1': '_storage_limit_bytes'},
+    {'1': '_member_storage_limit_bytes'},
   ],
 };
 
@@ -772,7 +862,11 @@ final $typed_data.Uint8List spaceSettingsDescriptor = $convert.base64Decode(
     'Cg1TcGFjZVNldHRpbmdzEhQKBXRpdGxlGAEgASgJUgV0aXRsZRIdCgpjaGF0X3RpdGxlGAIgAS'
     'gJUgljaGF0VGl0bGUSIQoMY2hhdF9lbmFibGVkGAMgASgIUgtjaGF0RW5hYmxlZBIvChNyZWdp'
     'c3RyYXRpb25fcG9saWN5GAQgASgJUhJyZWdpc3RyYXRpb25Qb2xpY3kSGgoIcmV2aXNpb24YBS'
-    'ABKANSCHJldmlzaW9uEigKBGljb24YBiABKAsyFC5zcGFjZS52MS5TZXJ2ZXJJY29uUgRpY29u');
+    'ABKANSCHJldmlzaW9uEigKBGljb24YBiABKAsyFC5zcGFjZS52MS5TZXJ2ZXJJY29uUgRpY29u'
+    'EjMKE3N0b3JhZ2VfbGltaXRfYnl0ZXMYByABKANIAFIRc3RvcmFnZUxpbWl0Qnl0ZXOIAQESQA'
+    'oabWVtYmVyX3N0b3JhZ2VfbGltaXRfYnl0ZXMYCCABKANIAVIXbWVtYmVyU3RvcmFnZUxpbWl0'
+    'Qnl0ZXOIAQFCFgoUX3N0b3JhZ2VfbGltaXRfYnl0ZXNCHQobX21lbWJlcl9zdG9yYWdlX2xpbW'
+    'l0X2J5dGVz');
 
 @$core.Deprecated('Use updateSettingsRequestDescriptor instead')
 const UpdateSettingsRequest$json = {
@@ -803,6 +897,28 @@ const UpdateSettingsRequest$json = {
       '6': '.space.v1.ServerIcon',
       '10': 'icon'
     },
+    {
+      '1': 'storage_limit_bytes',
+      '3': 7,
+      '4': 1,
+      '5': 3,
+      '9': 0,
+      '10': 'storageLimitBytes',
+      '17': true
+    },
+    {
+      '1': 'member_storage_limit_bytes',
+      '3': 8,
+      '4': 1,
+      '5': 3,
+      '9': 1,
+      '10': 'memberStorageLimitBytes',
+      '17': true
+    },
+  ],
+  '8': [
+    {'1': '_storage_limit_bytes'},
+    {'1': '_member_storage_limit_bytes'},
   ],
 };
 
@@ -812,7 +928,10 @@ final $typed_data.Uint8List updateSettingsRequestDescriptor = $convert.base64Dec
     'l0bGUYAiABKAlSCWNoYXRUaXRsZRIhCgxjaGF0X2VuYWJsZWQYAyABKAhSC2NoYXRFbmFibGVk'
     'Ei8KE3JlZ2lzdHJhdGlvbl9wb2xpY3kYBCABKAlSEnJlZ2lzdHJhdGlvblBvbGljeRIrChFleH'
     'BlY3RlZF9yZXZpc2lvbhgFIAEoA1IQZXhwZWN0ZWRSZXZpc2lvbhIoCgRpY29uGAYgASgLMhQu'
-    'c3BhY2UudjEuU2VydmVySWNvblIEaWNvbg==');
+    'c3BhY2UudjEuU2VydmVySWNvblIEaWNvbhIzChNzdG9yYWdlX2xpbWl0X2J5dGVzGAcgASgDSA'
+    'BSEXN0b3JhZ2VMaW1pdEJ5dGVziAEBEkAKGm1lbWJlcl9zdG9yYWdlX2xpbWl0X2J5dGVzGAgg'
+    'ASgDSAFSF21lbWJlclN0b3JhZ2VMaW1pdEJ5dGVziAEBQhYKFF9zdG9yYWdlX2xpbWl0X2J5dG'
+    'VzQh0KG19tZW1iZXJfc3RvcmFnZV9saW1pdF9ieXRlcw==');
 
 @$core.Deprecated('Use subscribeRequestDescriptor instead')
 const SubscribeRequest$json = {
@@ -1365,6 +1484,14 @@ const Content$json = {
       '10': 'updatedAtUnixMs'
     },
     {'1': 'deleted', '3': 9, '4': 1, '5': 8, '10': 'deleted'},
+    {
+      '1': 'attachments',
+      '3': 10,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.Asset',
+      '10': 'attachments'
+    },
   ],
 };
 
@@ -1374,8 +1501,8 @@ final $typed_data.Uint8List contentDescriptor = $convert.base64Decode(
     'QSEgoEdGV4dBgDIAEoCVIEdGV4dBIbCglhdXRob3JfaWQYBCABKAlSCGF1dGhvcklkEhoKCHNl'
     'cXVlbmNlGAUgASgDUghzZXF1ZW5jZRIrChJjcmVhdGVkX2F0X3VuaXhfbXMYBiABKANSD2NyZW'
     'F0ZWRBdFVuaXhNcxIaCghyZXZpc2lvbhgHIAEoA1IIcmV2aXNpb24SKwoSdXBkYXRlZF9hdF91'
-    'bml4X21zGAggASgDUg91cGRhdGVkQXRVbml4TXMSGAoHZGVsZXRlZBgJIAEoCFIHZGVsZXRlZA'
-    '==');
+    'bml4X21zGAggASgDUg91cGRhdGVkQXRVbml4TXMSGAoHZGVsZXRlZBgJIAEoCFIHZGVsZXRlZB'
+    'IxCgthdHRhY2htZW50cxgKIAMoCzIPLnNwYWNlLnYxLkFzc2V0UgthdHRhY2htZW50cw==');
 
 @$core.Deprecated('Use updateContentRequestDescriptor instead')
 const UpdateContentRequest$json = {
@@ -1469,6 +1596,7 @@ const CreateContentRequest$json = {
     {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
     {'1': 'text', '3': 2, '4': 1, '5': 9, '10': 'text'},
     {'1': 'idempotency_key', '3': 3, '4': 1, '5': 9, '10': 'idempotencyKey'},
+    {'1': 'attachment_ids', '3': 4, '4': 3, '5': 9, '10': 'attachmentIds'},
   ],
 };
 
@@ -1476,7 +1604,7 @@ const CreateContentRequest$json = {
 final $typed_data.Uint8List createContentRequestDescriptor = $convert.base64Decode(
     'ChRDcmVhdGVDb250ZW50UmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSWQSEg'
     'oEdGV4dBgCIAEoCVIEdGV4dBInCg9pZGVtcG90ZW5jeV9rZXkYAyABKAlSDmlkZW1wb3RlbmN5'
-    'S2V5');
+    'S2V5EiUKDmF0dGFjaG1lbnRfaWRzGAQgAygJUg1hdHRhY2htZW50SWRz');
 
 @$core.Deprecated('Use createContentResponseDescriptor instead')
 const CreateContentResponse$json = {
@@ -1712,6 +1840,233 @@ final $typed_data.Uint8List watchChannelsResponseDescriptor = $convert.base64Dec
     'gFIAEoCVIIc2VydmVySWQSKAoEaWNvbhgGIAEoCzIULnNwYWNlLnYxLlNlcnZlckljb25SBGlj'
     'b24=');
 
+@$core.Deprecated('Use assetDescriptor instead')
+const Asset$json = {
+  '1': 'Asset',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    {'1': 'channel_id', '3': 2, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'author_id', '3': 3, '4': 1, '5': 9, '10': 'authorId'},
+    {'1': 'name', '3': 4, '4': 1, '5': 9, '10': 'name'},
+    {'1': 'byte_size', '3': 5, '4': 1, '5': 3, '10': 'byteSize'},
+    {'1': 'sha256', '3': 6, '4': 1, '5': 12, '10': 'sha256'},
+    {'1': 'media_type', '3': 7, '4': 1, '5': 9, '10': 'mediaType'},
+    {
+      '1': 'created_at_unix_ms',
+      '3': 8,
+      '4': 1,
+      '5': 3,
+      '10': 'createdAtUnixMs'
+    },
+    {'1': 'storage_group', '3': 9, '4': 1, '5': 9, '10': 'storageGroup'},
+  ],
+};
+
+/// Descriptor for `Asset`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List assetDescriptor = $convert.base64Decode(
+    'CgVBc3NldBIOCgJpZBgBIAEoCVICaWQSHQoKY2hhbm5lbF9pZBgCIAEoCVIJY2hhbm5lbElkEh'
+    'sKCWF1dGhvcl9pZBgDIAEoCVIIYXV0aG9ySWQSEgoEbmFtZRgEIAEoCVIEbmFtZRIbCglieXRl'
+    'X3NpemUYBSABKANSCGJ5dGVTaXplEhYKBnNoYTI1NhgGIAEoDFIGc2hhMjU2Eh0KCm1lZGlhX3'
+    'R5cGUYByABKAlSCW1lZGlhVHlwZRIrChJjcmVhdGVkX2F0X3VuaXhfbXMYCCABKANSD2NyZWF0'
+    'ZWRBdFVuaXhNcxIjCg1zdG9yYWdlX2dyb3VwGAkgASgJUgxzdG9yYWdlR3JvdXA=');
+
+@$core.Deprecated('Use beginUploadRequestDescriptor instead')
+const BeginUploadRequest$json = {
+  '1': 'BeginUploadRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
+    {'1': 'byte_size', '3': 3, '4': 1, '5': 3, '10': 'byteSize'},
+    {'1': 'sha256', '3': 4, '4': 1, '5': 12, '10': 'sha256'},
+    {'1': 'idempotency_key', '3': 5, '4': 1, '5': 9, '10': 'idempotencyKey'},
+  ],
+};
+
+/// Descriptor for `BeginUploadRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List beginUploadRequestDescriptor = $convert.base64Decode(
+    'ChJCZWdpblVwbG9hZFJlcXVlc3QSHQoKY2hhbm5lbF9pZBgBIAEoCVIJY2hhbm5lbElkEhIKBG'
+    '5hbWUYAiABKAlSBG5hbWUSGwoJYnl0ZV9zaXplGAMgASgDUghieXRlU2l6ZRIWCgZzaGEyNTYY'
+    'BCABKAxSBnNoYTI1NhInCg9pZGVtcG90ZW5jeV9rZXkYBSABKAlSDmlkZW1wb3RlbmN5S2V5');
+
+@$core.Deprecated('Use beginUploadResponseDescriptor instead')
+const BeginUploadResponse$json = {
+  '1': 'BeginUploadResponse',
+  '2': [
+    {
+      '1': 'asset',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Asset',
+      '10': 'asset'
+    },
+    {'1': 'received_bytes', '3': 2, '4': 1, '5': 3, '10': 'receivedBytes'},
+    {'1': 'chunk_size', '3': 3, '4': 1, '5': 5, '10': 'chunkSize'},
+  ],
+};
+
+/// Descriptor for `BeginUploadResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List beginUploadResponseDescriptor = $convert.base64Decode(
+    'ChNCZWdpblVwbG9hZFJlc3BvbnNlEiUKBWFzc2V0GAEgASgLMg8uc3BhY2UudjEuQXNzZXRSBW'
+    'Fzc2V0EiUKDnJlY2VpdmVkX2J5dGVzGAIgASgDUg1yZWNlaXZlZEJ5dGVzEh0KCmNodW5rX3Np'
+    'emUYAyABKAVSCWNodW5rU2l6ZQ==');
+
+@$core.Deprecated('Use uploadChunkRequestDescriptor instead')
+const UploadChunkRequest$json = {
+  '1': 'UploadChunkRequest',
+  '2': [
+    {'1': 'asset_id', '3': 1, '4': 1, '5': 9, '10': 'assetId'},
+    {'1': 'offset', '3': 2, '4': 1, '5': 3, '10': 'offset'},
+    {'1': 'data', '3': 3, '4': 1, '5': 12, '10': 'data'},
+  ],
+};
+
+/// Descriptor for `UploadChunkRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List uploadChunkRequestDescriptor = $convert.base64Decode(
+    'ChJVcGxvYWRDaHVua1JlcXVlc3QSGQoIYXNzZXRfaWQYASABKAlSB2Fzc2V0SWQSFgoGb2Zmc2'
+    'V0GAIgASgDUgZvZmZzZXQSEgoEZGF0YRgDIAEoDFIEZGF0YQ==');
+
+@$core.Deprecated('Use uploadChunkResponseDescriptor instead')
+const UploadChunkResponse$json = {
+  '1': 'UploadChunkResponse',
+  '2': [
+    {'1': 'received_bytes', '3': 1, '4': 1, '5': 3, '10': 'receivedBytes'},
+  ],
+};
+
+/// Descriptor for `UploadChunkResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List uploadChunkResponseDescriptor = $convert.base64Decode(
+    'ChNVcGxvYWRDaHVua1Jlc3BvbnNlEiUKDnJlY2VpdmVkX2J5dGVzGAEgASgDUg1yZWNlaXZlZE'
+    'J5dGVz');
+
+@$core.Deprecated('Use completeUploadRequestDescriptor instead')
+const CompleteUploadRequest$json = {
+  '1': 'CompleteUploadRequest',
+  '2': [
+    {'1': 'asset_id', '3': 1, '4': 1, '5': 9, '10': 'assetId'},
+  ],
+};
+
+/// Descriptor for `CompleteUploadRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List completeUploadRequestDescriptor =
+    $convert.base64Decode(
+        'ChVDb21wbGV0ZVVwbG9hZFJlcXVlc3QSGQoIYXNzZXRfaWQYASABKAlSB2Fzc2V0SWQ=');
+
+@$core.Deprecated('Use completeUploadResponseDescriptor instead')
+const CompleteUploadResponse$json = {
+  '1': 'CompleteUploadResponse',
+  '2': [
+    {
+      '1': 'asset',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Asset',
+      '10': 'asset'
+    },
+  ],
+};
+
+/// Descriptor for `CompleteUploadResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List completeUploadResponseDescriptor =
+    $convert.base64Decode(
+        'ChZDb21wbGV0ZVVwbG9hZFJlc3BvbnNlEiUKBWFzc2V0GAEgASgLMg8uc3BhY2UudjEuQXNzZX'
+        'RSBWFzc2V0');
+
+@$core.Deprecated('Use cancelUploadRequestDescriptor instead')
+const CancelUploadRequest$json = {
+  '1': 'CancelUploadRequest',
+  '2': [
+    {'1': 'asset_id', '3': 1, '4': 1, '5': 9, '10': 'assetId'},
+  ],
+};
+
+/// Descriptor for `CancelUploadRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List cancelUploadRequestDescriptor =
+    $convert.base64Decode(
+        'ChNDYW5jZWxVcGxvYWRSZXF1ZXN0EhkKCGFzc2V0X2lkGAEgASgJUgdhc3NldElk');
+
+@$core.Deprecated('Use cancelUploadResponseDescriptor instead')
+const CancelUploadResponse$json = {
+  '1': 'CancelUploadResponse',
+};
+
+/// Descriptor for `CancelUploadResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List cancelUploadResponseDescriptor =
+    $convert.base64Decode('ChRDYW5jZWxVcGxvYWRSZXNwb25zZQ==');
+
+@$core.Deprecated('Use downloadChunkRequestDescriptor instead')
+const DownloadChunkRequest$json = {
+  '1': 'DownloadChunkRequest',
+  '2': [
+    {'1': 'asset_id', '3': 1, '4': 1, '5': 9, '10': 'assetId'},
+    {'1': 'offset', '3': 2, '4': 1, '5': 3, '10': 'offset'},
+  ],
+};
+
+/// Descriptor for `DownloadChunkRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List downloadChunkRequestDescriptor = $convert.base64Decode(
+    'ChREb3dubG9hZENodW5rUmVxdWVzdBIZCghhc3NldF9pZBgBIAEoCVIHYXNzZXRJZBIWCgZvZm'
+    'ZzZXQYAiABKANSBm9mZnNldA==');
+
+@$core.Deprecated('Use downloadChunkResponseDescriptor instead')
+const DownloadChunkResponse$json = {
+  '1': 'DownloadChunkResponse',
+  '2': [
+    {
+      '1': 'asset',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Asset',
+      '10': 'asset'
+    },
+    {'1': 'data', '3': 2, '4': 1, '5': 12, '10': 'data'},
+    {'1': 'next_offset', '3': 3, '4': 1, '5': 3, '10': 'nextOffset'},
+  ],
+};
+
+/// Descriptor for `DownloadChunkResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List downloadChunkResponseDescriptor = $convert.base64Decode(
+    'ChVEb3dubG9hZENodW5rUmVzcG9uc2USJQoFYXNzZXQYASABKAsyDy5zcGFjZS52MS5Bc3NldF'
+    'IFYXNzZXQSEgoEZGF0YRgCIAEoDFIEZGF0YRIfCgtuZXh0X29mZnNldBgDIAEoA1IKbmV4dE9m'
+    'ZnNldA==');
+
+@$core.Deprecated('Use listMyAssetsRequestDescriptor instead')
+const ListMyAssetsRequest$json = {
+  '1': 'ListMyAssetsRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'after', '3': 2, '4': 1, '5': 9, '10': 'after'},
+  ],
+};
+
+/// Descriptor for `ListMyAssetsRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listMyAssetsRequestDescriptor = $convert.base64Decode(
+    'ChNMaXN0TXlBc3NldHNSZXF1ZXN0Eh0KCmNoYW5uZWxfaWQYASABKAlSCWNoYW5uZWxJZBIUCg'
+    'VhZnRlchgCIAEoCVIFYWZ0ZXI=');
+
+@$core.Deprecated('Use listMyAssetsResponseDescriptor instead')
+const ListMyAssetsResponse$json = {
+  '1': 'ListMyAssetsResponse',
+  '2': [
+    {
+      '1': 'assets',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.Asset',
+      '10': 'assets'
+    },
+    {'1': 'next_cursor', '3': 2, '4': 1, '5': 9, '10': 'nextCursor'},
+  ],
+};
+
+/// Descriptor for `ListMyAssetsResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listMyAssetsResponseDescriptor = $convert.base64Decode(
+    'ChRMaXN0TXlBc3NldHNSZXNwb25zZRInCgZhc3NldHMYASADKAsyDy5zcGFjZS52MS5Bc3NldF'
+    'IGYXNzZXRzEh8KC25leHRfY3Vyc29yGAIgASgJUgpuZXh0Q3Vyc29y');
+
 const $core.Map<$core.String, $core.dynamic> ChannelServiceBase$json = {
   '1': 'ChannelService',
   '2': [
@@ -1850,6 +2205,7 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
   '.space.v1.UpdateContentRequest': UpdateContentRequest$json,
   '.space.v1.UpdateContentResponse': UpdateContentResponse$json,
   '.space.v1.Content': Content$json,
+  '.space.v1.Asset': Asset$json,
   '.space.v1.DeleteContentRequest': DeleteContentRequest$json,
   '.space.v1.DeleteContentResponse': DeleteContentResponse$json,
   '.space.v1.CreateContentRequest': CreateContentRequest$json,
@@ -1870,6 +2226,72 @@ final $typed_data.Uint8List contentServiceDescriptor = $convert.base64Decode(
     'hhbm5lbHMve2NoYW5uZWxfaWR9L2NvbnRlbnQSeQoLTGlzdENvbnRlbnQSHC5zcGFjZS52MS5M'
     'aXN0Q29udGVudFJlcXVlc3QaHS5zcGFjZS52MS5MaXN0Q29udGVudFJlc3BvbnNlIi2C0+STAi'
     'cSJS9hcGkvdjEvY2hhbm5lbHMve2NoYW5uZWxfaWR9L2NvbnRlbnQ=');
+
+const $core.Map<$core.String, $core.dynamic> AssetServiceBase$json = {
+  '1': 'AssetService',
+  '2': [
+    {
+      '1': 'BeginUpload',
+      '2': '.space.v1.BeginUploadRequest',
+      '3': '.space.v1.BeginUploadResponse'
+    },
+    {
+      '1': 'UploadChunk',
+      '2': '.space.v1.UploadChunkRequest',
+      '3': '.space.v1.UploadChunkResponse'
+    },
+    {
+      '1': 'CompleteUpload',
+      '2': '.space.v1.CompleteUploadRequest',
+      '3': '.space.v1.CompleteUploadResponse'
+    },
+    {
+      '1': 'CancelUpload',
+      '2': '.space.v1.CancelUploadRequest',
+      '3': '.space.v1.CancelUploadResponse'
+    },
+    {
+      '1': 'DownloadChunk',
+      '2': '.space.v1.DownloadChunkRequest',
+      '3': '.space.v1.DownloadChunkResponse'
+    },
+    {
+      '1': 'ListMyAssets',
+      '2': '.space.v1.ListMyAssetsRequest',
+      '3': '.space.v1.ListMyAssetsResponse'
+    },
+  ],
+};
+
+@$core.Deprecated('Use assetServiceDescriptor instead')
+const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
+    AssetServiceBase$messageJson = {
+  '.space.v1.BeginUploadRequest': BeginUploadRequest$json,
+  '.space.v1.BeginUploadResponse': BeginUploadResponse$json,
+  '.space.v1.Asset': Asset$json,
+  '.space.v1.UploadChunkRequest': UploadChunkRequest$json,
+  '.space.v1.UploadChunkResponse': UploadChunkResponse$json,
+  '.space.v1.CompleteUploadRequest': CompleteUploadRequest$json,
+  '.space.v1.CompleteUploadResponse': CompleteUploadResponse$json,
+  '.space.v1.CancelUploadRequest': CancelUploadRequest$json,
+  '.space.v1.CancelUploadResponse': CancelUploadResponse$json,
+  '.space.v1.DownloadChunkRequest': DownloadChunkRequest$json,
+  '.space.v1.DownloadChunkResponse': DownloadChunkResponse$json,
+  '.space.v1.ListMyAssetsRequest': ListMyAssetsRequest$json,
+  '.space.v1.ListMyAssetsResponse': ListMyAssetsResponse$json,
+};
+
+/// Descriptor for `AssetService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
+final $typed_data.Uint8List assetServiceDescriptor = $convert.base64Decode(
+    'CgxBc3NldFNlcnZpY2USSgoLQmVnaW5VcGxvYWQSHC5zcGFjZS52MS5CZWdpblVwbG9hZFJlcX'
+    'Vlc3QaHS5zcGFjZS52MS5CZWdpblVwbG9hZFJlc3BvbnNlEkoKC1VwbG9hZENodW5rEhwuc3Bh'
+    'Y2UudjEuVXBsb2FkQ2h1bmtSZXF1ZXN0Gh0uc3BhY2UudjEuVXBsb2FkQ2h1bmtSZXNwb25zZR'
+    'JTCg5Db21wbGV0ZVVwbG9hZBIfLnNwYWNlLnYxLkNvbXBsZXRlVXBsb2FkUmVxdWVzdBogLnNw'
+    'YWNlLnYxLkNvbXBsZXRlVXBsb2FkUmVzcG9uc2USTQoMQ2FuY2VsVXBsb2FkEh0uc3BhY2Uudj'
+    'EuQ2FuY2VsVXBsb2FkUmVxdWVzdBoeLnNwYWNlLnYxLkNhbmNlbFVwbG9hZFJlc3BvbnNlElAK'
+    'DURvd25sb2FkQ2h1bmsSHi5zcGFjZS52MS5Eb3dubG9hZENodW5rUmVxdWVzdBofLnNwYWNlLn'
+    'YxLkRvd25sb2FkQ2h1bmtSZXNwb25zZRJNCgxMaXN0TXlBc3NldHMSHS5zcGFjZS52MS5MaXN0'
+    'TXlBc3NldHNSZXF1ZXN0Gh4uc3BhY2UudjEuTGlzdE15QXNzZXRzUmVzcG9uc2U=');
 
 const $core.Map<$core.String, $core.dynamic> AuthServiceBase$json = {
   '1': 'AuthService',
@@ -2048,6 +2470,7 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
   '.space.v1.SubscribeResponse': SubscribeResponse$json,
   '.space.v1.Event': Event$json,
   '.space.v1.Content': Content$json,
+  '.space.v1.Asset': Asset$json,
   '.space.v1.ListEventsRequest': ListEventsRequest$json,
   '.space.v1.ListEventsResponse': ListEventsResponse$json,
 };
@@ -2174,6 +2597,11 @@ const $core.Map<$core.String, $core.dynamic> MembershipServiceBase$json = {
   '1': 'MembershipService',
   '2': [
     {
+      '1': 'UpdateProfile',
+      '2': '.space.v1.UpdateProfileRequest',
+      '3': '.space.v1.UpdateProfileResponse'
+    },
+    {
       '1': 'PreviewInvite',
       '2': '.space.v1.PreviewInviteRequest',
       '3': '.space.v1.PreviewInviteResponse',
@@ -2197,21 +2625,25 @@ const $core.Map<$core.String, $core.dynamic> MembershipServiceBase$json = {
 @$core.Deprecated('Use membershipServiceDescriptor instead')
 const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
     MembershipServiceBase$messageJson = {
+  '.space.v1.UpdateProfileRequest': UpdateProfileRequest$json,
+  '.space.v1.UpdateProfileResponse': UpdateProfileResponse$json,
+  '.space.v1.Member': Member$json,
   '.space.v1.PreviewInviteRequest': PreviewInviteRequest$json,
   '.space.v1.PreviewInviteResponse': PreviewInviteResponse$json,
   '.space.v1.AcceptInviteRequest': AcceptInviteRequest$json,
   '.space.v1.AcceptInviteResponse': AcceptInviteResponse$json,
-  '.space.v1.Member': Member$json,
   '.space.v1.GetMembershipRequest': GetMembershipRequest$json,
   '.space.v1.GetMembershipResponse': GetMembershipResponse$json,
 };
 
 /// Descriptor for `MembershipService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
 final $typed_data.Uint8List membershipServiceDescriptor = $convert.base64Decode(
-    'ChFNZW1iZXJzaGlwU2VydmljZRJ/Cg1QcmV2aWV3SW52aXRlEh4uc3BhY2UudjEuUHJldmlld0'
-    'ludml0ZVJlcXVlc3QaHy5zcGFjZS52MS5QcmV2aWV3SW52aXRlUmVzcG9uc2UiLYLT5JMCJzoB'
-    'KiIiL2FwaS92MS9tZW1iZXJzaGlwL2ludml0ZXMvcHJldmlldxJ7CgxBY2NlcHRJbnZpdGUSHS'
-    '5zcGFjZS52MS5BY2NlcHRJbnZpdGVSZXF1ZXN0Gh4uc3BhY2UudjEuQWNjZXB0SW52aXRlUmVz'
-    'cG9uc2UiLILT5JMCJjoBKiIhL2FwaS92MS9tZW1iZXJzaGlwL2ludml0ZXMvYWNjZXB0EmwKDU'
-    'dldE1lbWJlcnNoaXASHi5zcGFjZS52MS5HZXRNZW1iZXJzaGlwUmVxdWVzdBofLnNwYWNlLnYx'
-    'LkdldE1lbWJlcnNoaXBSZXNwb25zZSIagtPkkwIUEhIvYXBpL3YxL21lbWJlcnNoaXA=');
+    'ChFNZW1iZXJzaGlwU2VydmljZRJQCg1VcGRhdGVQcm9maWxlEh4uc3BhY2UudjEuVXBkYXRlUH'
+    'JvZmlsZVJlcXVlc3QaHy5zcGFjZS52MS5VcGRhdGVQcm9maWxlUmVzcG9uc2USfwoNUHJldmll'
+    'd0ludml0ZRIeLnNwYWNlLnYxLlByZXZpZXdJbnZpdGVSZXF1ZXN0Gh8uc3BhY2UudjEuUHJldm'
+    'lld0ludml0ZVJlc3BvbnNlIi2C0+STAic6ASoiIi9hcGkvdjEvbWVtYmVyc2hpcC9pbnZpdGVz'
+    'L3ByZXZpZXcSewoMQWNjZXB0SW52aXRlEh0uc3BhY2UudjEuQWNjZXB0SW52aXRlUmVxdWVzdB'
+    'oeLnNwYWNlLnYxLkFjY2VwdEludml0ZVJlc3BvbnNlIiyC0+STAiY6ASoiIS9hcGkvdjEvbWVt'
+    'YmVyc2hpcC9pbnZpdGVzL2FjY2VwdBJsCg1HZXRNZW1iZXJzaGlwEh4uc3BhY2UudjEuR2V0TW'
+    'VtYmVyc2hpcFJlcXVlc3QaHy5zcGFjZS52MS5HZXRNZW1iZXJzaGlwUmVzcG9uc2UiGoLT5JMC'
+    'FBISL2FwaS92MS9tZW1iZXJzaGlw');

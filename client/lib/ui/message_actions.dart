@@ -65,7 +65,8 @@ class _MessageDialogState extends State<_MessageDialog> {
 
   Future<void> save() async {
     if (!widget.deleting &&
-        (text.text.trim().isEmpty || utf8.encode(text.text).length > 4096)) {
+        ((text.text.trim().isEmpty && widget.message.attachments.isEmpty) ||
+            utf8.encode(text.text).length > 4096)) {
       setState(() => error = context.strings.messageTextInvalid);
       return;
     }

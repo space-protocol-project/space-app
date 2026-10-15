@@ -1503,6 +1503,42 @@ abstract class AdminLocalizations {
   /// In ru, this message translates to:
   /// **'Канал удалён.'**
   String get channelDeleted;
+
+  /// No description provided for @storageTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хранилище файлов'**
+  String get storageTitle;
+
+  /// No description provided for @storageTotal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Общий лимит сервера, МиБ'**
+  String get storageTotal;
+
+  /// No description provided for @storageMember.
+  ///
+  /// In ru, this message translates to:
+  /// **'Личный лимит каждого участника, МиБ'**
+  String get storageMember;
+
+  /// No description provided for @storageHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'0 запрещает новые загрузки. Уже загруженные файлы сохраняются. Незавершённые загрузки тоже занимают место.'**
+  String get storageHelp;
+
+  /// No description provided for @storagePersonal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Личный лимит, МиБ'**
+  String get storagePersonal;
+
+  /// No description provided for @storageInherited.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пусто — стандартный лимит'**
+  String get storageInherited;
 }
 
 class _AdminLocalizationsDelegate

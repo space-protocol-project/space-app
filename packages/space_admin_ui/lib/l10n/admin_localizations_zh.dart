@@ -739,4 +739,22 @@ class AdminLocalizationsZh extends AdminLocalizations {
 
   @override
   String get channelDeleted => '频道已删除。';
+
+  @override
+  String get storageTitle => '文件存储';
+
+  @override
+  String get storageTotal => '服务器存储上限（MiB）';
+
+  @override
+  String get storageMember => '每位成员的默认上限（MiB）';
+
+  @override
+  String get storageHelp => '0 表示禁止新上传。已有文件会保留。未完成的上传也占用额度。';
+
+  @override
+  String get storagePersonal => '个人上限（MiB）';
+
+  @override
+  String get storageInherited => '留空则使用默认上限';
 }

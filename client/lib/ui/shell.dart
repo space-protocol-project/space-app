@@ -1,3 +1,5 @@
+import '../src/message_summary.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:space_admin_ui/space_admin_ui.dart' show ServerIconView;
 
@@ -185,7 +187,7 @@ class _SpaceShellState extends State<SpaceShell> {
                               final message = messages[index];
                               return ListTile(
                                 title: Text(
-                                  message.text,
+                                  messageSummary(message),
                                   maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
                                 ),

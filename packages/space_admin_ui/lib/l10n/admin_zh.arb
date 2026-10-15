@@ -335,5 +335,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "storageTitle": "文件存储",
+  "storageTotal": "服务器存储上限（MiB）",
+  "storageMember": "每位成员的默认上限（MiB）",
+  "storageHelp": "0 表示禁止新上传。已有文件会保留。未完成的上传也占用额度。",
+  "storagePersonal": "个人上限（MiB）",
+  "storageInherited": "留空则使用默认上限"
 }

@@ -2296,6 +2296,72 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Размытие плавающих панелей и заголовка.'**
   String get glassEffectsHelp;
+
+  /// No description provided for @attachFiles.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прикрепить файлы'**
+  String get attachFiles;
+
+  /// No description provided for @myFiles.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мои файлы'**
+  String get myFiles;
+
+  /// No description provided for @removeFile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Убрать файл'**
+  String get removeFile;
+
+  /// No description provided for @cancelUpload.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отмена'**
+  String get cancelUpload;
+
+  /// No description provided for @downloadFile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скачать файл'**
+  String get downloadFile;
+
+  /// No description provided for @downloadFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось скачать файл'**
+  String get downloadFailed;
+
+  /// No description provided for @noFilesInChannel.
+  ///
+  /// In ru, this message translates to:
+  /// **'В этом канале пока нет ваших файлов'**
+  String get noFilesInChannel;
+
+  /// No description provided for @loadMoreFiles.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загрузить ещё'**
+  String get loadMoreFiles;
+
+  /// No description provided for @closeFiles.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть'**
+  String get closeFiles;
+
+  /// No description provided for @dropFilesHere.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отпустите файлы, чтобы прикрепить'**
+  String get dropFilesHere;
+
+  /// No description provided for @optionalNickname.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ник (необязательно)'**
+  String get optionalNickname;
 }
 
 class _AppLocalizationsDelegate

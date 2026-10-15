@@ -10,7 +10,6 @@
   "cancelMessageChange": "Cancel",
   "messageText": "Message text",
   "messageTextInvalid": "Enter text up to 4096 bytes.",
-
   "interfaceScale": "Interface scale",
   "@@locale": "en",
   "overview": "Overview",
@@ -486,5 +485,16 @@
   "homeTransferring": "Transferring space",
   "homeTransferFailed": "Could not open the archive or complete the transfer.",
   "glassEffects": "Glass effects",
-  "glassEffectsHelp": "Blur floating panels and the header."
+  "glassEffectsHelp": "Blur floating panels and the header.",
+  "attachFiles": "Attach files",
+  "myFiles": "My files",
+  "removeFile": "Remove file",
+  "cancelUpload": "Cancel",
+  "downloadFile": "Download file",
+  "downloadFailed": "Could not download the file",
+  "noFilesInChannel": "You have no files in this channel yet",
+  "loadMoreFiles": "Load more",
+  "closeFiles": "Close",
+  "dropFilesHere": "Drop files to attach",
+  "optionalNickname": "Nickname (optional)"
 }

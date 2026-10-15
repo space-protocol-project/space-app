@@ -783,4 +783,23 @@ class AdminLocalizationsEn extends AdminLocalizations {
 
   @override
   String get channelDeleted => 'Channel deleted.';
+
+  @override
+  String get storageTitle => 'File storage';
+
+  @override
+  String get storageTotal => 'Server storage limit, MiB';
+
+  @override
+  String get storageMember => 'Default member limit, MiB';
+
+  @override
+  String get storageHelp =>
+      '0 disables new uploads. Existing files are kept. Pending uploads also count towards the limit.';
+
+  @override
+  String get storagePersonal => 'Personal limit, MiB';
+
+  @override
+  String get storageInherited => 'Empty uses the default limit';
 }

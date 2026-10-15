@@ -335,5 +335,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "storageTitle": "File storage",
+  "storageTotal": "Server storage limit, MiB",
+  "storageMember": "Default member limit, MiB",
+  "storageHelp": "0 disables new uploads. Existing files are kept. Pending uploads also count towards the limit.",
+  "storagePersonal": "Personal limit, MiB",
+  "storageInherited": "Empty uses the default limit"
 }

@@ -29,6 +29,7 @@ class ConnectionPanel extends StatefulWidget {
 
 class _ConnectionPanelState extends State<ConnectionPanel> {
   final invitation = TextEditingController();
+  final nickname = TextEditingController();
   late final TextEditingController address = TextEditingController(
     text: widget.origin,
   );
@@ -36,11 +37,12 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
   void dispose() {
     address.dispose();
     invitation.dispose();
+    nickname.dispose();
     super.dispose();
   }
 
   Future<void> connect() async {
-    await widget.controller.connect();
+    await widget.controller.connect(nickname: nickname.text);
     if (widget.controller.connected && mounted) {
       await widget.onConnected(widget.controller.preview!.origin.toString());
     }
@@ -143,6 +145,15 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
               decoration: InputDecoration(
                 labelText: context.strings.serverAddress,
                 hintText: 'http://127.0.0.1:8080',
+              ),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: nickname,
+              maxLength: 40,
+              enabled: !view.busy && !view.connected,
+              decoration: InputDecoration(
+                labelText: context.strings.optionalNickname,
               ),
             ),
             const SizedBox(height: 14),

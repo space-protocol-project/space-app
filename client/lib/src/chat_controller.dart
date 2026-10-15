@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart' show VoidCallback, listEquals;
@@ -76,6 +77,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
           restoredRecord: event.restoredRecord,
           pairingId: event.pairingId,
           setupCode: event.setupCode,
+          nickname: event.nickname,
         ),
       ),
     );
@@ -86,7 +88,8 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       (event, _) => handleRequest(event, _refreshChannels),
     );
     on<ChatMessageSent>(
-      (event, _) => handleRequest(event, () => _send(event.text)),
+      (event, _) =>
+          handleRequest(event, () => _send(event.text, event.attachments)),
     );
     on<ChatMessageChanged>(
       (event, _) =>
@@ -120,16 +123,21 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     DeviceRecord? restoredRecord,
     String pairingId = '',
     String setupCode = '',
+    String? nickname,
   }) => sendRequest(
     ChatConnected(
       restoredRecord: restoredRecord,
       pairingId: pairingId,
       setupCode: setupCode,
+      nickname: nickname,
     ),
   );
   Future<void> selectChannel(String id) => sendRequest(ChatChannelSelected(id));
   Future<void> refreshChannels() => sendRequest(ChatChannelsRefreshed());
-  Future<bool> send(String text) => sendRequest(ChatMessageSent(text));
+  Future<bool> send(String text, {List<String> attachments = const []}) =>
+      sendRequest(ChatMessageSent(text, List.unmodifiable(attachments)));
+  AttachmentSession? get attachmentSession =>
+      _session is AttachmentSession ? _session as AttachmentSession : null;
   Future<bool> updateMessage(Content message, String text) =>
       sendRequest(ChatMessageChanged(message, text));
   Future<bool> deleteMessage(Content message) =>
@@ -646,6 +654,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     DeviceRecord? restoredRecord,
     String pairingId = '',
     String setupCode = '',
+    String? nickname,
   }) async {
     final server = preview;
     if (busy || server == null) return;
@@ -677,6 +686,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
         return;
       }
       _session = session;
+      await _applyNickname(session, nickname);
       _sessionOrigin = server.origin.toString();
       _sessionServerId = server.serverId;
       _invitationToken = '';
@@ -709,6 +719,13 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     } finally {
       busy = false;
       _update();
+    }
+  }
+
+  Future<void> _applyNickname(LiveSession session, String? nickname) async {
+    if (nickname == null || nickname.trim().isEmpty) return;
+    if (session is MemberProfile) {
+      await (session as MemberProfile).setNickname(nickname.trim());
     }
   }
 
@@ -1250,17 +1267,18 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     }
   }
 
-  Future<bool> _send(String text) async {
+  Future<bool> _send(String text, List<String> attachments) async {
     final session = _session;
     if (busy ||
         !connected ||
         !canWrite ||
         session == null ||
-        text.trim().isEmpty) {
+        (text.trim().isEmpty && attachments.isEmpty)) {
       return false;
     }
-    if (_pendingText != text || _pendingKey.isEmpty) {
-      _pendingText = text;
+    final requestText = jsonEncode([text, attachments]);
+    if (_pendingText != requestText || _pendingKey.isEmpty) {
+      _pendingText = requestText;
       _pendingKey = newRequestKey();
     }
     final startingChannel = channelId;
@@ -1269,7 +1287,14 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     error = '';
     _update();
     try {
-      final content = await session.send(text, _pendingKey);
+      final content = attachments.isEmpty
+          ? await session.send(text, _pendingKey)
+          : await (session as AttachmentSession).sendAttachments(
+              startingChannel,
+              text,
+              _pendingKey,
+              attachments,
+            );
       if (!identical(_session, session) || channelId != startingChannel) {
         sendStatus = MessageSendStatus.idle;
         return false;

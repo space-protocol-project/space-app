@@ -1,3 +1,4 @@
+import 'src/storage_limits.dart';
 export 'src/server_icon.dart';
 export 'src/control_spacing.dart';
 export 'src/content_insets.dart';
@@ -80,6 +81,8 @@ class _AdminPageState extends State<AdminPage> {
   final title = TextEditingController(),
       chat = TextEditingController(),
       code = TextEditingController();
+  final storage = TextEditingController(),
+      memberStorage = TextEditingController();
   Future<void> run(Future<void> Function() action) async {
     if (busy) return;
     setState(() => busy = true);
@@ -152,6 +155,15 @@ class _AdminPageState extends State<AdminPage> {
     chat.text = settings!['chatTitle'] as String;
     enabled = settings!['chatEnabled'] == true;
     policy = settings!['registrationPolicy'] as String;
+    storage.text =
+        ((int.tryParse('${settings!['storageLimitBytes']}') ?? 1073741824) ~/
+                1048576)
+            .toString();
+    memberStorage.text =
+        ((int.tryParse('${settings!['memberStorageLimitBytes']}') ??
+                    1073741824) ~/
+                1048576)
+            .toString();
     statusKey = 'settingsLoaded';
   }
 
@@ -168,6 +180,9 @@ class _AdminPageState extends State<AdminPage> {
         'chatEnabled': enabled,
         'registrationPolicy': policy,
         'expectedRevision': settings!['revision'],
+        'storageLimitBytes': storageLimitBytes(storage.text).toString(),
+        'memberStorageLimitBytes': storageLimitBytes(memberStorage.text)
+            .toString(),
         if (iconDirty) 'icon': serverIcon,
       },
     );
@@ -185,6 +200,8 @@ class _AdminPageState extends State<AdminPage> {
     title.dispose();
     chat.dispose();
     code.dispose();
+    storage.dispose();
+    memberStorage.dispose();
     super.dispose();
   }
 
@@ -375,6 +392,11 @@ class _AdminPageState extends State<AdminPage> {
                     decoration: InputDecoration(labelText: strings.spaceName),
                   ),
                   const SizedBox(height: 12),
+                  StorageLimits(
+                    total: storage,
+                    member: memberStorage,
+                    enabled: !busy,
+                  ),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
                     value: enabled,

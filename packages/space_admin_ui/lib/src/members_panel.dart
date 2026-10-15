@@ -1,3 +1,4 @@
+import 'storage_limits.dart';
 import 'content_insets.dart';
 
 import 'dart:async';
@@ -11,6 +12,24 @@ import 'package:space_api/space_api.dart';
 
 import 'channels_panel.dart';
 import '../l10n/admin_localizations.dart';
+
+Map<String, dynamic> memberStorageChange(
+  Map<String, dynamic> original,
+  Map<String, dynamic> draft,
+) {
+  final value = '${draft['storageMiB'] ?? ''}'.trim();
+  if (value.isNotEmpty) {
+    return {'storageLimitBytes': storageLimitBytes(value).toString()};
+  }
+  return original.containsKey('storageLimitBytes')
+      ? {'resetStorageLimit': true}
+      : {};
+}
+
+String memberStorageMiB(Map<String, dynamic> member) {
+  final value = int.tryParse('${member['storageLimitBytes']}');
+  return value == null ? '' : (value ~/ 1048576).toString();
+}
 
 String memberRoleLabel(String role, [AdminLocalizations? translations]) {
   final strings = translations ?? lookupAdminLocalizations(const Locale('ru'));
@@ -102,7 +121,7 @@ class _MembersPanelState extends State<MembersPanel> {
         members.add(m);
       else
         members[index] = m;
-      drafts.putIfAbsent(id, () => Map<String, dynamic>.from(m));
+      drafts.putIfAbsent(id, () => {...m, 'storageMiB': memberStorageMiB(m)});
     }
     cursor = data['nextCursor'] as String? ?? '';
     statusKey = 'membersLoaded';
@@ -151,12 +170,13 @@ class _MembersPanelState extends State<MembersPanel> {
           'role': proposal['role'],
           'blocked': proposal['blocked'] ?? false,
           'expectedRevision': proposal['revision'],
+          ...memberStorageChange(m, proposal),
         },
       );
       if (!mounted) return;
       final saved = Map<String, dynamic>.from(result['member'] as Map);
       members[members.indexWhere((v) => v['principalId'] == id)] = saved;
-      drafts[id] = Map<String, dynamic>.from(saved);
+      drafts[id] = {...saved, 'storageMiB': memberStorageMiB(saved)};
       statusKey = 'memberSaved';
     });
   }
@@ -184,6 +204,13 @@ class _MembersPanelState extends State<MembersPanel> {
               ),
             ),
             const SizedBox(height: 12),
+            if ((m['nickname'] as String? ?? '').isNotEmpty)
+              Text(
+                m['nickname'] as String,
+                style: Theme.of(context).textTheme.titleMedium,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             SelectableText(
               id,
               style: const TextStyle(
@@ -205,6 +232,16 @@ class _MembersPanelState extends State<MembersPanel> {
                 ),
               ),
             if (widget.owner && m['role'] != 'owner' && editing == id) ...[
+              TextFormField(
+                key: ValueKey('storage-$id-${m["revision"]}'),
+                initialValue: memberStorageMiB(m),
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: strings.storagePersonal,
+                  helperText: strings.storageInherited,
+                ),
+                onChanged: (value) => draft['storageMiB'] = value,
+              ),
               const SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 isExpanded: true,
@@ -259,7 +296,7 @@ class _MembersPanelState extends State<MembersPanel> {
     final filtered = members
         .where(
           (m) =>
-              '${m['principalId']} ${m['role']} ${memberRoleLabel(m['role'] as String, strings)} ${m['blocked'] == true ? strings.memberBlocked : ''}'
+              '${m['nickname'] ?? ''} ${m['principalId']} ${m['role']} ${memberRoleLabel(m['role'] as String, strings)} ${m['blocked'] == true ? strings.memberBlocked : ''}'
                   .toLowerCase()
                   .contains(query),
         )

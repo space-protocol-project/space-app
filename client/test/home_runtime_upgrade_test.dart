@@ -1,4 +1,4 @@
-// Сквозная проверка выполняется только на одноразовом CI runner.
+// Сквозная проверка использует отдельный временный каталог: CI или явный локальный запуск.
 import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
@@ -36,7 +36,8 @@ void main() {
     'Connect runtime → новый кандидат: ключи, сертификат, сообщения и восстановление',
     () async {
       final root = await Directory.systemTemp.createTemp('space-real-upgrade-');
-      final platform = (await bundledHomeRelease()).platform;
+      final baseline = await bundledHomeRelease();
+      final platform = baseline.platform;
       final archives =
           await Directory(
                 Platform.environment['SPACE_HOME_CANDIDATE_DIRECTORY']!,
@@ -55,7 +56,7 @@ void main() {
         metadata['sha256'],
         (await crypto.sha256.bind(archive.openRead()).first).toString(),
       );
-      // Версии относятся только к двум локальным CI-кандидатам.
+      // Кандидат локальный; исходный runtime скачивается из закреплённого опубликованного выпуска.
       final candidate = HomeRelease.fromJson({
         ...metadata,
         'version': 'v0.3.1',
@@ -66,19 +67,10 @@ void main() {
             .toString(),
         'bytes': await archive.length(),
       });
-      final baseline = HomeRelease.fromJson({
-        ...candidate.toJson(),
-        'version': 'v0.3.0',
-        'url': candidate.url.toString().replaceFirst('v0.3.1', 'v0.3.0'),
-      });
       final vault = _Vault();
       final original = HomeController(
         directory: () async => root,
         release: () async => baseline,
-        download: (_, destination, progress) async {
-          await archive.copy(destination.path);
-          progress(1);
-        },
       );
       final updated = HomeController(
         directory: () async => root,
@@ -117,7 +109,7 @@ void main() {
         expect(original.error, isEmpty);
         final stillOld = await updated.start('203.0.113.10');
         expect(stillOld, isNotNull, reason: updated.error);
-        expect(updated.installedVersion, 'v0.3.0');
+        expect(updated.installedVersion, baseline.version);
         expect(await updated.prepareUpdate(), true, reason: updated.error);
         expect(updated.running, true);
         await updated.stop();
@@ -175,7 +167,7 @@ void main() {
         expect(updated.recoveryBlocked, false);
         await updated.performUpdate(recover: true);
         expect(updated.error, isEmpty);
-        expect(updated.installedVersion, 'v0.3.0');
+        expect(updated.installedVersion, baseline.version);
         expect((await journal.read())!.step, HomeUpdateStep.completeRestored);
         final restored = await updated.start('203.0.113.12');
         expect(restored, isNotNull, reason: updated.error);
@@ -201,10 +193,23 @@ void main() {
         await original.stop();
         updated.dispose();
         original.dispose();
-        await root.delete(recursive: true);
+        await removeUpgradeDirectory(root);
       }
     },
     skip: !enabled,
     timeout: const Timeout(Duration(minutes: 15)),
   );
+}
+
+Future<void> removeUpgradeDirectory(Directory root) async {
+  final parent = await root.parent.resolveSymbolicLinks();
+  final temporary = await Directory.systemTemp.resolveSymbolicLinks();
+  if (parent != temporary ||
+      !root.path
+          .split(Platform.pathSeparator)
+          .last
+          .startsWith('space-real-upgrade-')) {
+    throw StateError('Недопустимый каталог очистки проверки обновления');
+  }
+  await root.delete(recursive: true);
 }

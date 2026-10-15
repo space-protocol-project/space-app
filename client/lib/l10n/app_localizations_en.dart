@@ -1254,4 +1254,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get glassEffectsHelp => 'Blur floating panels and the header.';
+
+  @override
+  String get attachFiles => 'Attach files';
+
+  @override
+  String get myFiles => 'My files';
+
+  @override
+  String get removeFile => 'Remove file';
+
+  @override
+  String get cancelUpload => 'Cancel';
+
+  @override
+  String get downloadFile => 'Download file';
+
+  @override
+  String get downloadFailed => 'Could not download the file';
+
+  @override
+  String get noFilesInChannel => 'You have no files in this channel yet';
+
+  @override
+  String get loadMoreFiles => 'Load more';
+
+  @override
+  String get closeFiles => 'Close';
+
+  @override
+  String get dropFilesHere => 'Drop files to attach';
+
+  @override
+  String get optionalNickname => 'Nickname (optional)';
 }

@@ -1149,6 +1149,39 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get glassEffectsHelp => '模糊浮动面板和标题。';
+
+  @override
+  String get attachFiles => '添加文件';
+
+  @override
+  String get myFiles => '我的文件';
+
+  @override
+  String get removeFile => '移除文件';
+
+  @override
+  String get cancelUpload => '取消';
+
+  @override
+  String get downloadFile => '下载文件';
+
+  @override
+  String get downloadFailed => '无法下载文件';
+
+  @override
+  String get noFilesInChannel => '此频道暂无您上传的文件';
+
+  @override
+  String get loadMoreFiles => '加载更多';
+
+  @override
+  String get closeFiles => '关闭';
+
+  @override
+  String get dropFilesHere => '松开文件以添加附件';
+
+  @override
+  String get optionalNickname => '昵称（可选）';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

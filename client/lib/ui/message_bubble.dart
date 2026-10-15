@@ -16,6 +16,7 @@ class MessageBubble extends StatelessWidget {
     this.favorite = false,
     this.onToggleFavorite,
     this.actions,
+    this.attachments,
     this.edited = false,
     this.deleted = false,
   });
@@ -23,7 +24,7 @@ class MessageBubble extends StatelessWidget {
   final bool mine, grouped, accepted;
   final DateTime? sentAt;
   final bool favorite, edited, deleted;
-  final Widget? actions;
+  final Widget? actions, attachments;
   final VoidCallback? onToggleFavorite;
 
   @override
@@ -89,6 +90,7 @@ class MessageBubble extends StatelessWidget {
                         )
                       else
                         MessageMarkdown(text: text),
+                      if (!deleted) ?attachments,
                       if (sentAt != null ||
                           accepted ||
                           onToggleFavorite != null ||

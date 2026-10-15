@@ -1361,18 +1361,142 @@ class ProposePairingResponse extends $pb.GeneratedMessage {
   static ProposePairingResponse? _defaultInstance;
 }
 
+class UpdateProfileRequest extends $pb.GeneratedMessage {
+  factory UpdateProfileRequest({
+    $core.String? nickname,
+  }) {
+    final result = UpdateProfileRequest._();
+    if (nickname != null) result.nickname = nickname;
+    return result;
+  }
+
+  UpdateProfileRequest._();
+
+  factory UpdateProfileRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateProfileRequest()..mergeFromBuffer(data, registry);
+  factory UpdateProfileRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateProfileRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UpdateProfileRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: UpdateProfileRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'nickname')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateProfileRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateProfileRequest copyWith(void Function(UpdateProfileRequest) updates) =>
+      super.copyWith((message) => updates(message as UpdateProfileRequest))
+          as UpdateProfileRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use UpdateProfileRequest() / UpdateProfileRequest.new instead')
+  static UpdateProfileRequest create() => UpdateProfileRequest._();
+  static $pb.GeneratedMessage $_createMessage() => UpdateProfileRequest._();
+  @$core.override
+  UpdateProfileRequest createEmptyInstance() => UpdateProfileRequest._();
+  @$core.pragma('dart2js:noInline')
+  static UpdateProfileRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UpdateProfileRequest>(
+          UpdateProfileRequest.$_createMessage);
+  static UpdateProfileRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get nickname => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set nickname($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasNickname() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearNickname() => $_clearField(1);
+}
+
+class UpdateProfileResponse extends $pb.GeneratedMessage {
+  factory UpdateProfileResponse({
+    Member? member,
+  }) {
+    final result = UpdateProfileResponse._();
+    if (member != null) result.member = member;
+    return result;
+  }
+
+  UpdateProfileResponse._();
+
+  factory UpdateProfileResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateProfileResponse()..mergeFromBuffer(data, registry);
+  factory UpdateProfileResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateProfileResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UpdateProfileResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: UpdateProfileResponse.$_createMessage)
+    ..aOM<Member>(1, _omitFieldNames ? '' : 'member',
+        subBuilder: Member.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateProfileResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateProfileResponse copyWith(
+          void Function(UpdateProfileResponse) updates) =>
+      super.copyWith((message) => updates(message as UpdateProfileResponse))
+          as UpdateProfileResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use UpdateProfileResponse() / UpdateProfileResponse.new instead')
+  static UpdateProfileResponse create() => UpdateProfileResponse._();
+  static $pb.GeneratedMessage $_createMessage() => UpdateProfileResponse._();
+  @$core.override
+  UpdateProfileResponse createEmptyInstance() => UpdateProfileResponse._();
+  @$core.pragma('dart2js:noInline')
+  static UpdateProfileResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UpdateProfileResponse>(
+          UpdateProfileResponse.$_createMessage);
+  static UpdateProfileResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Member get member => $_getN(0);
+  @$pb.TagNumber(1)
+  set member(Member value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasMember() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMember() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Member ensureMember() => $_ensure(0);
+}
+
 class Member extends $pb.GeneratedMessage {
   factory Member({
     $core.String? principalId,
     $core.String? role,
     $core.bool? blocked,
     $fixnum.Int64? revision,
+    $fixnum.Int64? storageLimitBytes,
+    $core.String? nickname,
   }) {
     final result = Member._();
     if (principalId != null) result.principalId = principalId;
     if (role != null) result.role = role;
     if (blocked != null) result.blocked = blocked;
     if (revision != null) result.revision = revision;
+    if (storageLimitBytes != null) result.storageLimitBytes = storageLimitBytes;
+    if (nickname != null) result.nickname = nickname;
     return result;
   }
 
@@ -1393,6 +1517,8 @@ class Member extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'role')
     ..aOB(3, _omitFieldNames ? '' : 'blocked')
     ..aInt64(4, _omitFieldNames ? '' : 'revision')
+    ..aInt64(5, _omitFieldNames ? '' : 'storageLimitBytes')
+    ..aOS(6, _omitFieldNames ? '' : 'nickname')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1450,6 +1576,24 @@ class Member extends $pb.GeneratedMessage {
   $core.bool hasRevision() => $_has(3);
   @$pb.TagNumber(4)
   void clearRevision() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get storageLimitBytes => $_getI64(4);
+  @$pb.TagNumber(5)
+  set storageLimitBytes($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasStorageLimitBytes() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearStorageLimitBytes() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get nickname => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set nickname($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasNickname() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearNickname() => $_clearField(6);
 }
 
 class ListMembersRequest extends $pb.GeneratedMessage {
@@ -1580,12 +1724,16 @@ class UpdateMemberRequest extends $pb.GeneratedMessage {
     $core.String? role,
     $core.bool? blocked,
     $fixnum.Int64? expectedRevision,
+    $fixnum.Int64? storageLimitBytes,
+    $core.bool? resetStorageLimit,
   }) {
     final result = UpdateMemberRequest._();
     if (principalId != null) result.principalId = principalId;
     if (role != null) result.role = role;
     if (blocked != null) result.blocked = blocked;
     if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    if (storageLimitBytes != null) result.storageLimitBytes = storageLimitBytes;
+    if (resetStorageLimit != null) result.resetStorageLimit = resetStorageLimit;
     return result;
   }
 
@@ -1606,6 +1754,8 @@ class UpdateMemberRequest extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'role')
     ..aOB(3, _omitFieldNames ? '' : 'blocked')
     ..aInt64(4, _omitFieldNames ? '' : 'expectedRevision')
+    ..aInt64(5, _omitFieldNames ? '' : 'storageLimitBytes')
+    ..aOB(6, _omitFieldNames ? '' : 'resetStorageLimit')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1666,6 +1816,24 @@ class UpdateMemberRequest extends $pb.GeneratedMessage {
   $core.bool hasExpectedRevision() => $_has(3);
   @$pb.TagNumber(4)
   void clearExpectedRevision() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get storageLimitBytes => $_getI64(4);
+  @$pb.TagNumber(5)
+  set storageLimitBytes($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasStorageLimitBytes() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearStorageLimitBytes() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.bool get resetStorageLimit => $_getBF(5);
+  @$pb.TagNumber(6)
+  set resetStorageLimit($core.bool value) => $_setBool(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasResetStorageLimit() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearResetStorageLimit() => $_clearField(6);
 }
 
 class UpdateMemberResponse extends $pb.GeneratedMessage {
@@ -3080,6 +3248,8 @@ class SpaceSettings extends $pb.GeneratedMessage {
     $core.String? registrationPolicy,
     $fixnum.Int64? revision,
     ServerIcon? icon,
+    $fixnum.Int64? storageLimitBytes,
+    $fixnum.Int64? memberStorageLimitBytes,
   }) {
     final result = SpaceSettings._();
     if (title != null) result.title = title;
@@ -3089,6 +3259,9 @@ class SpaceSettings extends $pb.GeneratedMessage {
       result.registrationPolicy = registrationPolicy;
     if (revision != null) result.revision = revision;
     if (icon != null) result.icon = icon;
+    if (storageLimitBytes != null) result.storageLimitBytes = storageLimitBytes;
+    if (memberStorageLimitBytes != null)
+      result.memberStorageLimitBytes = memberStorageLimitBytes;
     return result;
   }
 
@@ -3112,6 +3285,8 @@ class SpaceSettings extends $pb.GeneratedMessage {
     ..aInt64(5, _omitFieldNames ? '' : 'revision')
     ..aOM<ServerIcon>(6, _omitFieldNames ? '' : 'icon',
         subBuilder: ServerIcon.$_createMessage)
+    ..aInt64(7, _omitFieldNames ? '' : 'storageLimitBytes')
+    ..aInt64(8, _omitFieldNames ? '' : 'memberStorageLimitBytes')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -3191,6 +3366,24 @@ class SpaceSettings extends $pb.GeneratedMessage {
   void clearIcon() => $_clearField(6);
   @$pb.TagNumber(6)
   ServerIcon ensureIcon() => $_ensure(5);
+
+  @$pb.TagNumber(7)
+  $fixnum.Int64 get storageLimitBytes => $_getI64(6);
+  @$pb.TagNumber(7)
+  set storageLimitBytes($fixnum.Int64 value) => $_setInt64(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasStorageLimitBytes() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearStorageLimitBytes() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $fixnum.Int64 get memberStorageLimitBytes => $_getI64(7);
+  @$pb.TagNumber(8)
+  set memberStorageLimitBytes($fixnum.Int64 value) => $_setInt64(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasMemberStorageLimitBytes() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearMemberStorageLimitBytes() => $_clearField(8);
 }
 
 class UpdateSettingsRequest extends $pb.GeneratedMessage {
@@ -3201,6 +3394,8 @@ class UpdateSettingsRequest extends $pb.GeneratedMessage {
     $core.String? registrationPolicy,
     $fixnum.Int64? expectedRevision,
     ServerIcon? icon,
+    $fixnum.Int64? storageLimitBytes,
+    $fixnum.Int64? memberStorageLimitBytes,
   }) {
     final result = UpdateSettingsRequest._();
     if (title != null) result.title = title;
@@ -3210,6 +3405,9 @@ class UpdateSettingsRequest extends $pb.GeneratedMessage {
       result.registrationPolicy = registrationPolicy;
     if (expectedRevision != null) result.expectedRevision = expectedRevision;
     if (icon != null) result.icon = icon;
+    if (storageLimitBytes != null) result.storageLimitBytes = storageLimitBytes;
+    if (memberStorageLimitBytes != null)
+      result.memberStorageLimitBytes = memberStorageLimitBytes;
     return result;
   }
 
@@ -3233,6 +3431,8 @@ class UpdateSettingsRequest extends $pb.GeneratedMessage {
     ..aInt64(5, _omitFieldNames ? '' : 'expectedRevision')
     ..aOM<ServerIcon>(6, _omitFieldNames ? '' : 'icon',
         subBuilder: ServerIcon.$_createMessage)
+    ..aInt64(7, _omitFieldNames ? '' : 'storageLimitBytes')
+    ..aInt64(8, _omitFieldNames ? '' : 'memberStorageLimitBytes')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -3314,6 +3514,24 @@ class UpdateSettingsRequest extends $pb.GeneratedMessage {
   void clearIcon() => $_clearField(6);
   @$pb.TagNumber(6)
   ServerIcon ensureIcon() => $_ensure(5);
+
+  @$pb.TagNumber(7)
+  $fixnum.Int64 get storageLimitBytes => $_getI64(6);
+  @$pb.TagNumber(7)
+  set storageLimitBytes($fixnum.Int64 value) => $_setInt64(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasStorageLimitBytes() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearStorageLimitBytes() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $fixnum.Int64 get memberStorageLimitBytes => $_getI64(7);
+  @$pb.TagNumber(8)
+  set memberStorageLimitBytes($fixnum.Int64 value) => $_setInt64(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasMemberStorageLimitBytes() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearMemberStorageLimitBytes() => $_clearField(8);
 }
 
 class SubscribeRequest extends $pb.GeneratedMessage {
@@ -5434,6 +5652,7 @@ class Content extends $pb.GeneratedMessage {
     $fixnum.Int64? revision,
     $fixnum.Int64? updatedAtUnixMs,
     $core.bool? deleted,
+    $core.Iterable<Asset>? attachments,
   }) {
     final result = Content._();
     if (id != null) result.id = id;
@@ -5445,6 +5664,7 @@ class Content extends $pb.GeneratedMessage {
     if (revision != null) result.revision = revision;
     if (updatedAtUnixMs != null) result.updatedAtUnixMs = updatedAtUnixMs;
     if (deleted != null) result.deleted = deleted;
+    if (attachments != null) result.attachments.addAll(attachments);
     return result;
   }
 
@@ -5470,6 +5690,8 @@ class Content extends $pb.GeneratedMessage {
     ..aInt64(7, _omitFieldNames ? '' : 'revision')
     ..aInt64(8, _omitFieldNames ? '' : 'updatedAtUnixMs')
     ..aOB(9, _omitFieldNames ? '' : 'deleted')
+    ..pPM<Asset>(10, _omitFieldNames ? '' : 'attachments',
+        subBuilder: Asset.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -5573,6 +5795,9 @@ class Content extends $pb.GeneratedMessage {
   $core.bool hasDeleted() => $_has(8);
   @$pb.TagNumber(9)
   void clearDeleted() => $_clearField(9);
+
+  @$pb.TagNumber(10)
+  $pb.PbList<Asset> get attachments => $_getList(9);
 }
 
 class UpdateContentRequest extends $pb.GeneratedMessage {
@@ -5880,11 +6105,13 @@ class CreateContentRequest extends $pb.GeneratedMessage {
     $core.String? channelId,
     $core.String? text,
     $core.String? idempotencyKey,
+    $core.Iterable<$core.String>? attachmentIds,
   }) {
     final result = CreateContentRequest._();
     if (channelId != null) result.channelId = channelId;
     if (text != null) result.text = text;
     if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
+    if (attachmentIds != null) result.attachmentIds.addAll(attachmentIds);
     return result;
   }
 
@@ -5904,6 +6131,7 @@ class CreateContentRequest extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'channelId')
     ..aOS(2, _omitFieldNames ? '' : 'text')
     ..aOS(3, _omitFieldNames ? '' : 'idempotencyKey')
+    ..pPS(4, _omitFieldNames ? '' : 'attachmentIds')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -5955,6 +6183,9 @@ class CreateContentRequest extends $pb.GeneratedMessage {
   $core.bool hasIdempotencyKey() => $_has(2);
   @$pb.TagNumber(3)
   void clearIdempotencyKey() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $pb.PbList<$core.String> get attachmentIds => $_getList(3);
 }
 
 class CreateContentResponse extends $pb.GeneratedMessage {
@@ -6898,6 +7129,1003 @@ class WatchChannelsResponse extends $pb.GeneratedMessage {
   ServerIcon ensureIcon() => $_ensure(5);
 }
 
+class Asset extends $pb.GeneratedMessage {
+  factory Asset({
+    $core.String? id,
+    $core.String? channelId,
+    $core.String? authorId,
+    $core.String? name,
+    $fixnum.Int64? byteSize,
+    $core.List<$core.int>? sha256,
+    $core.String? mediaType,
+    $fixnum.Int64? createdAtUnixMs,
+    $core.String? storageGroup,
+  }) {
+    final result = Asset._();
+    if (id != null) result.id = id;
+    if (channelId != null) result.channelId = channelId;
+    if (authorId != null) result.authorId = authorId;
+    if (name != null) result.name = name;
+    if (byteSize != null) result.byteSize = byteSize;
+    if (sha256 != null) result.sha256 = sha256;
+    if (mediaType != null) result.mediaType = mediaType;
+    if (createdAtUnixMs != null) result.createdAtUnixMs = createdAtUnixMs;
+    if (storageGroup != null) result.storageGroup = storageGroup;
+    return result;
+  }
+
+  Asset._();
+
+  factory Asset.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      Asset()..mergeFromBuffer(data, registry);
+  factory Asset.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      Asset()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'Asset',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: Asset.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'id')
+    ..aOS(2, _omitFieldNames ? '' : 'channelId')
+    ..aOS(3, _omitFieldNames ? '' : 'authorId')
+    ..aOS(4, _omitFieldNames ? '' : 'name')
+    ..aInt64(5, _omitFieldNames ? '' : 'byteSize')
+    ..a<$core.List<$core.int>>(
+        6, _omitFieldNames ? '' : 'sha256', $pb.PbFieldType.OY)
+    ..aOS(7, _omitFieldNames ? '' : 'mediaType')
+    ..aInt64(8, _omitFieldNames ? '' : 'createdAtUnixMs')
+    ..aOS(9, _omitFieldNames ? '' : 'storageGroup')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  Asset clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  Asset copyWith(void Function(Asset) updates) =>
+      super.copyWith((message) => updates(message as Asset)) as Asset;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Asset() / Asset.new instead')
+  static Asset create() => Asset._();
+  static $pb.GeneratedMessage $_createMessage() => Asset._();
+  @$core.override
+  Asset createEmptyInstance() => Asset._();
+  @$core.pragma('dart2js:noInline')
+  static Asset getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Asset>(Asset.$_createMessage);
+  static Asset? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get channelId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set channelId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasChannelId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearChannelId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get authorId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set authorId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAuthorId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAuthorId() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get name => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set name($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasName() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearName() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get byteSize => $_getI64(4);
+  @$pb.TagNumber(5)
+  set byteSize($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasByteSize() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearByteSize() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.List<$core.int> get sha256 => $_getN(5);
+  @$pb.TagNumber(6)
+  set sha256($core.List<$core.int> value) => $_setBytes(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasSha256() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearSha256() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.String get mediaType => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set mediaType($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasMediaType() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearMediaType() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $fixnum.Int64 get createdAtUnixMs => $_getI64(7);
+  @$pb.TagNumber(8)
+  set createdAtUnixMs($fixnum.Int64 value) => $_setInt64(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasCreatedAtUnixMs() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearCreatedAtUnixMs() => $_clearField(8);
+
+  /// Серверная группа хранения: principal_id/YYYY/MM/DD, дата UTC.
+  @$pb.TagNumber(9)
+  $core.String get storageGroup => $_getSZ(8);
+  @$pb.TagNumber(9)
+  set storageGroup($core.String value) => $_setString(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasStorageGroup() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearStorageGroup() => $_clearField(9);
+}
+
+class BeginUploadRequest extends $pb.GeneratedMessage {
+  factory BeginUploadRequest({
+    $core.String? channelId,
+    $core.String? name,
+    $fixnum.Int64? byteSize,
+    $core.List<$core.int>? sha256,
+    $core.String? idempotencyKey,
+  }) {
+    final result = BeginUploadRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (name != null) result.name = name;
+    if (byteSize != null) result.byteSize = byteSize;
+    if (sha256 != null) result.sha256 = sha256;
+    if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
+    return result;
+  }
+
+  BeginUploadRequest._();
+
+  factory BeginUploadRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      BeginUploadRequest()..mergeFromBuffer(data, registry);
+  factory BeginUploadRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      BeginUploadRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'BeginUploadRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: BeginUploadRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'name')
+    ..aInt64(3, _omitFieldNames ? '' : 'byteSize')
+    ..a<$core.List<$core.int>>(
+        4, _omitFieldNames ? '' : 'sha256', $pb.PbFieldType.OY)
+    ..aOS(5, _omitFieldNames ? '' : 'idempotencyKey')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BeginUploadRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BeginUploadRequest copyWith(void Function(BeginUploadRequest) updates) =>
+      super.copyWith((message) => updates(message as BeginUploadRequest))
+          as BeginUploadRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use BeginUploadRequest() / BeginUploadRequest.new instead')
+  static BeginUploadRequest create() => BeginUploadRequest._();
+  static $pb.GeneratedMessage $_createMessage() => BeginUploadRequest._();
+  @$core.override
+  BeginUploadRequest createEmptyInstance() => BeginUploadRequest._();
+  @$core.pragma('dart2js:noInline')
+  static BeginUploadRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<BeginUploadRequest>(
+          BeginUploadRequest.$_createMessage);
+  static BeginUploadRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get name => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set name($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearName() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get byteSize => $_getI64(2);
+  @$pb.TagNumber(3)
+  set byteSize($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasByteSize() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearByteSize() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.List<$core.int> get sha256 => $_getN(3);
+  @$pb.TagNumber(4)
+  set sha256($core.List<$core.int> value) => $_setBytes(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasSha256() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearSha256() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get idempotencyKey => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set idempotencyKey($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasIdempotencyKey() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearIdempotencyKey() => $_clearField(5);
+}
+
+class BeginUploadResponse extends $pb.GeneratedMessage {
+  factory BeginUploadResponse({
+    Asset? asset,
+    $fixnum.Int64? receivedBytes,
+    $core.int? chunkSize,
+  }) {
+    final result = BeginUploadResponse._();
+    if (asset != null) result.asset = asset;
+    if (receivedBytes != null) result.receivedBytes = receivedBytes;
+    if (chunkSize != null) result.chunkSize = chunkSize;
+    return result;
+  }
+
+  BeginUploadResponse._();
+
+  factory BeginUploadResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      BeginUploadResponse()..mergeFromBuffer(data, registry);
+  factory BeginUploadResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      BeginUploadResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'BeginUploadResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: BeginUploadResponse.$_createMessage)
+    ..aOM<Asset>(1, _omitFieldNames ? '' : 'asset',
+        subBuilder: Asset.$_createMessage)
+    ..aInt64(2, _omitFieldNames ? '' : 'receivedBytes')
+    ..aI(3, _omitFieldNames ? '' : 'chunkSize')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BeginUploadResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BeginUploadResponse copyWith(void Function(BeginUploadResponse) updates) =>
+      super.copyWith((message) => updates(message as BeginUploadResponse))
+          as BeginUploadResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use BeginUploadResponse() / BeginUploadResponse.new instead')
+  static BeginUploadResponse create() => BeginUploadResponse._();
+  static $pb.GeneratedMessage $_createMessage() => BeginUploadResponse._();
+  @$core.override
+  BeginUploadResponse createEmptyInstance() => BeginUploadResponse._();
+  @$core.pragma('dart2js:noInline')
+  static BeginUploadResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<BeginUploadResponse>(
+          BeginUploadResponse.$_createMessage);
+  static BeginUploadResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Asset get asset => $_getN(0);
+  @$pb.TagNumber(1)
+  set asset(Asset value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasAsset() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearAsset() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Asset ensureAsset() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get receivedBytes => $_getI64(1);
+  @$pb.TagNumber(2)
+  set receivedBytes($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasReceivedBytes() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearReceivedBytes() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.int get chunkSize => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set chunkSize($core.int value) => $_setSignedInt32(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasChunkSize() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearChunkSize() => $_clearField(3);
+}
+
+class UploadChunkRequest extends $pb.GeneratedMessage {
+  factory UploadChunkRequest({
+    $core.String? assetId,
+    $fixnum.Int64? offset,
+    $core.List<$core.int>? data,
+  }) {
+    final result = UploadChunkRequest._();
+    if (assetId != null) result.assetId = assetId;
+    if (offset != null) result.offset = offset;
+    if (data != null) result.data = data;
+    return result;
+  }
+
+  UploadChunkRequest._();
+
+  factory UploadChunkRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UploadChunkRequest()..mergeFromBuffer(data, registry);
+  factory UploadChunkRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UploadChunkRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UploadChunkRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: UploadChunkRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'assetId')
+    ..aInt64(2, _omitFieldNames ? '' : 'offset')
+    ..a<$core.List<$core.int>>(
+        3, _omitFieldNames ? '' : 'data', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UploadChunkRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UploadChunkRequest copyWith(void Function(UploadChunkRequest) updates) =>
+      super.copyWith((message) => updates(message as UploadChunkRequest))
+          as UploadChunkRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use UploadChunkRequest() / UploadChunkRequest.new instead')
+  static UploadChunkRequest create() => UploadChunkRequest._();
+  static $pb.GeneratedMessage $_createMessage() => UploadChunkRequest._();
+  @$core.override
+  UploadChunkRequest createEmptyInstance() => UploadChunkRequest._();
+  @$core.pragma('dart2js:noInline')
+  static UploadChunkRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UploadChunkRequest>(
+          UploadChunkRequest.$_createMessage);
+  static UploadChunkRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get assetId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set assetId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasAssetId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearAssetId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get offset => $_getI64(1);
+  @$pb.TagNumber(2)
+  set offset($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasOffset() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearOffset() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get data => $_getN(2);
+  @$pb.TagNumber(3)
+  set data($core.List<$core.int> value) => $_setBytes(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasData() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearData() => $_clearField(3);
+}
+
+class UploadChunkResponse extends $pb.GeneratedMessage {
+  factory UploadChunkResponse({
+    $fixnum.Int64? receivedBytes,
+  }) {
+    final result = UploadChunkResponse._();
+    if (receivedBytes != null) result.receivedBytes = receivedBytes;
+    return result;
+  }
+
+  UploadChunkResponse._();
+
+  factory UploadChunkResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UploadChunkResponse()..mergeFromBuffer(data, registry);
+  factory UploadChunkResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UploadChunkResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UploadChunkResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: UploadChunkResponse.$_createMessage)
+    ..aInt64(1, _omitFieldNames ? '' : 'receivedBytes')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UploadChunkResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UploadChunkResponse copyWith(void Function(UploadChunkResponse) updates) =>
+      super.copyWith((message) => updates(message as UploadChunkResponse))
+          as UploadChunkResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use UploadChunkResponse() / UploadChunkResponse.new instead')
+  static UploadChunkResponse create() => UploadChunkResponse._();
+  static $pb.GeneratedMessage $_createMessage() => UploadChunkResponse._();
+  @$core.override
+  UploadChunkResponse createEmptyInstance() => UploadChunkResponse._();
+  @$core.pragma('dart2js:noInline')
+  static UploadChunkResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UploadChunkResponse>(
+          UploadChunkResponse.$_createMessage);
+  static UploadChunkResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $fixnum.Int64 get receivedBytes => $_getI64(0);
+  @$pb.TagNumber(1)
+  set receivedBytes($fixnum.Int64 value) => $_setInt64(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasReceivedBytes() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearReceivedBytes() => $_clearField(1);
+}
+
+class CompleteUploadRequest extends $pb.GeneratedMessage {
+  factory CompleteUploadRequest({
+    $core.String? assetId,
+  }) {
+    final result = CompleteUploadRequest._();
+    if (assetId != null) result.assetId = assetId;
+    return result;
+  }
+
+  CompleteUploadRequest._();
+
+  factory CompleteUploadRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CompleteUploadRequest()..mergeFromBuffer(data, registry);
+  factory CompleteUploadRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CompleteUploadRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CompleteUploadRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: CompleteUploadRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'assetId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CompleteUploadRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CompleteUploadRequest copyWith(
+          void Function(CompleteUploadRequest) updates) =>
+      super.copyWith((message) => updates(message as CompleteUploadRequest))
+          as CompleteUploadRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CompleteUploadRequest() / CompleteUploadRequest.new instead')
+  static CompleteUploadRequest create() => CompleteUploadRequest._();
+  static $pb.GeneratedMessage $_createMessage() => CompleteUploadRequest._();
+  @$core.override
+  CompleteUploadRequest createEmptyInstance() => CompleteUploadRequest._();
+  @$core.pragma('dart2js:noInline')
+  static CompleteUploadRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CompleteUploadRequest>(
+          CompleteUploadRequest.$_createMessage);
+  static CompleteUploadRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get assetId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set assetId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasAssetId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearAssetId() => $_clearField(1);
+}
+
+class CompleteUploadResponse extends $pb.GeneratedMessage {
+  factory CompleteUploadResponse({
+    Asset? asset,
+  }) {
+    final result = CompleteUploadResponse._();
+    if (asset != null) result.asset = asset;
+    return result;
+  }
+
+  CompleteUploadResponse._();
+
+  factory CompleteUploadResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CompleteUploadResponse()..mergeFromBuffer(data, registry);
+  factory CompleteUploadResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CompleteUploadResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CompleteUploadResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: CompleteUploadResponse.$_createMessage)
+    ..aOM<Asset>(1, _omitFieldNames ? '' : 'asset',
+        subBuilder: Asset.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CompleteUploadResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CompleteUploadResponse copyWith(
+          void Function(CompleteUploadResponse) updates) =>
+      super.copyWith((message) => updates(message as CompleteUploadResponse))
+          as CompleteUploadResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CompleteUploadResponse() / CompleteUploadResponse.new instead')
+  static CompleteUploadResponse create() => CompleteUploadResponse._();
+  static $pb.GeneratedMessage $_createMessage() => CompleteUploadResponse._();
+  @$core.override
+  CompleteUploadResponse createEmptyInstance() => CompleteUploadResponse._();
+  @$core.pragma('dart2js:noInline')
+  static CompleteUploadResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CompleteUploadResponse>(
+          CompleteUploadResponse.$_createMessage);
+  static CompleteUploadResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Asset get asset => $_getN(0);
+  @$pb.TagNumber(1)
+  set asset(Asset value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasAsset() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearAsset() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Asset ensureAsset() => $_ensure(0);
+}
+
+class CancelUploadRequest extends $pb.GeneratedMessage {
+  factory CancelUploadRequest({
+    $core.String? assetId,
+  }) {
+    final result = CancelUploadRequest._();
+    if (assetId != null) result.assetId = assetId;
+    return result;
+  }
+
+  CancelUploadRequest._();
+
+  factory CancelUploadRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CancelUploadRequest()..mergeFromBuffer(data, registry);
+  factory CancelUploadRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CancelUploadRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CancelUploadRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: CancelUploadRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'assetId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CancelUploadRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CancelUploadRequest copyWith(void Function(CancelUploadRequest) updates) =>
+      super.copyWith((message) => updates(message as CancelUploadRequest))
+          as CancelUploadRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use CancelUploadRequest() / CancelUploadRequest.new instead')
+  static CancelUploadRequest create() => CancelUploadRequest._();
+  static $pb.GeneratedMessage $_createMessage() => CancelUploadRequest._();
+  @$core.override
+  CancelUploadRequest createEmptyInstance() => CancelUploadRequest._();
+  @$core.pragma('dart2js:noInline')
+  static CancelUploadRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CancelUploadRequest>(
+          CancelUploadRequest.$_createMessage);
+  static CancelUploadRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get assetId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set assetId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasAssetId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearAssetId() => $_clearField(1);
+}
+
+class CancelUploadResponse extends $pb.GeneratedMessage {
+  factory CancelUploadResponse() => CancelUploadResponse._();
+
+  CancelUploadResponse._();
+
+  factory CancelUploadResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CancelUploadResponse()..mergeFromBuffer(data, registry);
+  factory CancelUploadResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CancelUploadResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CancelUploadResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: CancelUploadResponse.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CancelUploadResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CancelUploadResponse copyWith(void Function(CancelUploadResponse) updates) =>
+      super.copyWith((message) => updates(message as CancelUploadResponse))
+          as CancelUploadResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CancelUploadResponse() / CancelUploadResponse.new instead')
+  static CancelUploadResponse create() => CancelUploadResponse._();
+  static $pb.GeneratedMessage $_createMessage() => CancelUploadResponse._();
+  @$core.override
+  CancelUploadResponse createEmptyInstance() => CancelUploadResponse._();
+  @$core.pragma('dart2js:noInline')
+  static CancelUploadResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CancelUploadResponse>(
+          CancelUploadResponse.$_createMessage);
+  static CancelUploadResponse? _defaultInstance;
+}
+
+class DownloadChunkRequest extends $pb.GeneratedMessage {
+  factory DownloadChunkRequest({
+    $core.String? assetId,
+    $fixnum.Int64? offset,
+  }) {
+    final result = DownloadChunkRequest._();
+    if (assetId != null) result.assetId = assetId;
+    if (offset != null) result.offset = offset;
+    return result;
+  }
+
+  DownloadChunkRequest._();
+
+  factory DownloadChunkRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DownloadChunkRequest()..mergeFromBuffer(data, registry);
+  factory DownloadChunkRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DownloadChunkRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'DownloadChunkRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: DownloadChunkRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'assetId')
+    ..aInt64(2, _omitFieldNames ? '' : 'offset')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DownloadChunkRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DownloadChunkRequest copyWith(void Function(DownloadChunkRequest) updates) =>
+      super.copyWith((message) => updates(message as DownloadChunkRequest))
+          as DownloadChunkRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadChunkRequest() / DownloadChunkRequest.new instead')
+  static DownloadChunkRequest create() => DownloadChunkRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadChunkRequest._();
+  @$core.override
+  DownloadChunkRequest createEmptyInstance() => DownloadChunkRequest._();
+  @$core.pragma('dart2js:noInline')
+  static DownloadChunkRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DownloadChunkRequest>(
+          DownloadChunkRequest.$_createMessage);
+  static DownloadChunkRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get assetId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set assetId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasAssetId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearAssetId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get offset => $_getI64(1);
+  @$pb.TagNumber(2)
+  set offset($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasOffset() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearOffset() => $_clearField(2);
+}
+
+class DownloadChunkResponse extends $pb.GeneratedMessage {
+  factory DownloadChunkResponse({
+    Asset? asset,
+    $core.List<$core.int>? data,
+    $fixnum.Int64? nextOffset,
+  }) {
+    final result = DownloadChunkResponse._();
+    if (asset != null) result.asset = asset;
+    if (data != null) result.data = data;
+    if (nextOffset != null) result.nextOffset = nextOffset;
+    return result;
+  }
+
+  DownloadChunkResponse._();
+
+  factory DownloadChunkResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DownloadChunkResponse()..mergeFromBuffer(data, registry);
+  factory DownloadChunkResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DownloadChunkResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'DownloadChunkResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: DownloadChunkResponse.$_createMessage)
+    ..aOM<Asset>(1, _omitFieldNames ? '' : 'asset',
+        subBuilder: Asset.$_createMessage)
+    ..a<$core.List<$core.int>>(
+        2, _omitFieldNames ? '' : 'data', $pb.PbFieldType.OY)
+    ..aInt64(3, _omitFieldNames ? '' : 'nextOffset')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DownloadChunkResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DownloadChunkResponse copyWith(
+          void Function(DownloadChunkResponse) updates) =>
+      super.copyWith((message) => updates(message as DownloadChunkResponse))
+          as DownloadChunkResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadChunkResponse() / DownloadChunkResponse.new instead')
+  static DownloadChunkResponse create() => DownloadChunkResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadChunkResponse._();
+  @$core.override
+  DownloadChunkResponse createEmptyInstance() => DownloadChunkResponse._();
+  @$core.pragma('dart2js:noInline')
+  static DownloadChunkResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DownloadChunkResponse>(
+          DownloadChunkResponse.$_createMessage);
+  static DownloadChunkResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Asset get asset => $_getN(0);
+  @$pb.TagNumber(1)
+  set asset(Asset value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasAsset() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearAsset() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Asset ensureAsset() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get data => $_getN(1);
+  @$pb.TagNumber(2)
+  set data($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasData() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearData() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get nextOffset => $_getI64(2);
+  @$pb.TagNumber(3)
+  set nextOffset($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasNextOffset() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearNextOffset() => $_clearField(3);
+}
+
+class ListMyAssetsRequest extends $pb.GeneratedMessage {
+  factory ListMyAssetsRequest({
+    $core.String? channelId,
+    $core.String? after,
+  }) {
+    final result = ListMyAssetsRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (after != null) result.after = after;
+    return result;
+  }
+
+  ListMyAssetsRequest._();
+
+  factory ListMyAssetsRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListMyAssetsRequest()..mergeFromBuffer(data, registry);
+  factory ListMyAssetsRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListMyAssetsRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListMyAssetsRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListMyAssetsRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'after')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListMyAssetsRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListMyAssetsRequest copyWith(void Function(ListMyAssetsRequest) updates) =>
+      super.copyWith((message) => updates(message as ListMyAssetsRequest))
+          as ListMyAssetsRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use ListMyAssetsRequest() / ListMyAssetsRequest.new instead')
+  static ListMyAssetsRequest create() => ListMyAssetsRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ListMyAssetsRequest._();
+  @$core.override
+  ListMyAssetsRequest createEmptyInstance() => ListMyAssetsRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ListMyAssetsRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListMyAssetsRequest>(
+          ListMyAssetsRequest.$_createMessage);
+  static ListMyAssetsRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get after => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set after($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasAfter() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAfter() => $_clearField(2);
+}
+
+class ListMyAssetsResponse extends $pb.GeneratedMessage {
+  factory ListMyAssetsResponse({
+    $core.Iterable<Asset>? assets,
+    $core.String? nextCursor,
+  }) {
+    final result = ListMyAssetsResponse._();
+    if (assets != null) result.assets.addAll(assets);
+    if (nextCursor != null) result.nextCursor = nextCursor;
+    return result;
+  }
+
+  ListMyAssetsResponse._();
+
+  factory ListMyAssetsResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListMyAssetsResponse()..mergeFromBuffer(data, registry);
+  factory ListMyAssetsResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListMyAssetsResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListMyAssetsResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListMyAssetsResponse.$_createMessage)
+    ..pPM<Asset>(1, _omitFieldNames ? '' : 'assets',
+        subBuilder: Asset.$_createMessage)
+    ..aOS(2, _omitFieldNames ? '' : 'nextCursor')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListMyAssetsResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListMyAssetsResponse copyWith(void Function(ListMyAssetsResponse) updates) =>
+      super.copyWith((message) => updates(message as ListMyAssetsResponse))
+          as ListMyAssetsResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListMyAssetsResponse() / ListMyAssetsResponse.new instead')
+  static ListMyAssetsResponse create() => ListMyAssetsResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ListMyAssetsResponse._();
+  @$core.override
+  ListMyAssetsResponse createEmptyInstance() => ListMyAssetsResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ListMyAssetsResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListMyAssetsResponse>(
+          ListMyAssetsResponse.$_createMessage);
+  static ListMyAssetsResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<Asset> get assets => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $core.String get nextCursor => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set nextCursor($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasNextCursor() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearNextCursor() => $_clearField(2);
+}
+
 /// Экспериментальный контракт первого локального прототипа.
 class ChannelServiceApi {
   final $pb.RpcClient _client;
@@ -6959,6 +8187,38 @@ class ContentServiceApi {
           $pb.ClientContext? ctx, ListContentRequest request) =>
       _client.invoke<ListContentResponse>(
           ctx, 'ContentService', 'ListContent', request, ListContentResponse());
+}
+
+/// Файлы передаются ограниченными частями; права проверяются на каждой операции.
+class AssetServiceApi {
+  final $pb.RpcClient _client;
+
+  AssetServiceApi(this._client);
+
+  $async.Future<BeginUploadResponse> beginUpload(
+          $pb.ClientContext? ctx, BeginUploadRequest request) =>
+      _client.invoke<BeginUploadResponse>(
+          ctx, 'AssetService', 'BeginUpload', request, BeginUploadResponse());
+  $async.Future<UploadChunkResponse> uploadChunk(
+          $pb.ClientContext? ctx, UploadChunkRequest request) =>
+      _client.invoke<UploadChunkResponse>(
+          ctx, 'AssetService', 'UploadChunk', request, UploadChunkResponse());
+  $async.Future<CompleteUploadResponse> completeUpload(
+          $pb.ClientContext? ctx, CompleteUploadRequest request) =>
+      _client.invoke<CompleteUploadResponse>(ctx, 'AssetService',
+          'CompleteUpload', request, CompleteUploadResponse());
+  $async.Future<CancelUploadResponse> cancelUpload(
+          $pb.ClientContext? ctx, CancelUploadRequest request) =>
+      _client.invoke<CancelUploadResponse>(
+          ctx, 'AssetService', 'CancelUpload', request, CancelUploadResponse());
+  $async.Future<DownloadChunkResponse> downloadChunk(
+          $pb.ClientContext? ctx, DownloadChunkRequest request) =>
+      _client.invoke<DownloadChunkResponse>(ctx, 'AssetService',
+          'DownloadChunk', request, DownloadChunkResponse());
+  $async.Future<ListMyAssetsResponse> listMyAssets(
+          $pb.ClientContext? ctx, ListMyAssetsRequest request) =>
+      _client.invoke<ListMyAssetsResponse>(
+          ctx, 'AssetService', 'ListMyAssets', request, ListMyAssetsResponse());
 }
 
 class AuthServiceApi {
@@ -7084,6 +8344,10 @@ class MembershipServiceApi {
 
   MembershipServiceApi(this._client);
 
+  $async.Future<UpdateProfileResponse> updateProfile(
+          $pb.ClientContext? ctx, UpdateProfileRequest request) =>
+      _client.invoke<UpdateProfileResponse>(ctx, 'MembershipService',
+          'UpdateProfile', request, UpdateProfileResponse());
   $async.Future<PreviewInviteResponse> previewInvite(
           $pb.ClientContext? ctx, PreviewInviteRequest request) =>
       _client.invoke<PreviewInviteResponse>(ctx, 'MembershipService',

@@ -307,6 +307,14 @@ class AdminServiceClient {
 }
 
 class MembershipServiceClient {
+  Future<UpdateProfileResponse> updateProfile(
+    UpdateProfileRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.MembershipService.updateProfile,
+    request,
+    options: options,
+  );
   const MembershipServiceClient(this.connection);
   final RpcConnection connection;
   Future<PreviewInviteResponse> previewInvite(
@@ -330,6 +338,59 @@ class MembershipServiceClient {
     RpcOptions? options,
   }) => connection.unary(
     specs.MembershipService.getMembership,
+    request,
+    options: options,
+  );
+}
+
+class AssetServiceClient {
+  const AssetServiceClient(this.connection);
+  final RpcConnection connection;
+  Future<BeginUploadResponse> beginUpload(
+    BeginUploadRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.AssetService.beginUpload,
+    request,
+    options: options,
+  );
+  Future<UploadChunkResponse> uploadChunk(
+    UploadChunkRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.AssetService.uploadChunk,
+    request,
+    options: options,
+  );
+  Future<CompleteUploadResponse> completeUpload(
+    CompleteUploadRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.AssetService.completeUpload,
+    request,
+    options: options,
+  );
+  Future<CancelUploadResponse> cancelUpload(
+    CancelUploadRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.AssetService.cancelUpload,
+    request,
+    options: options,
+  );
+  Future<DownloadChunkResponse> downloadChunk(
+    DownloadChunkRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.AssetService.downloadChunk,
+    request,
+    options: options,
+  );
+  Future<ListMyAssetsResponse> listMyAssets(
+    ListMyAssetsRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.AssetService.listMyAssets,
     request,
     options: options,
   );
