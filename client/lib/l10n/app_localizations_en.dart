@@ -1286,7 +1286,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dropFilesHere => 'Drop files to attach';
 
   @override
-  String get optionalNickname => 'Nickname (optional)';
+  String get optionalNickname => 'Name (optional)';
 
   @override
   String get channelFiles => 'Chat attachments';
@@ -1304,4 +1304,33 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get filesServerUpdateRequired =>
       'Update the server to use the attachment list.';
+
+  @override
+  String get serverNickname => 'Your name in this space';
+
+  @override
+  String get nicknameUniqueHelp =>
+      'Your name must be unique on this server. Case is ignored. Leave blank to remove it.';
+
+  @override
+  String get saveNickname => 'Save name';
+
+  @override
+  String get nicknameSaved => 'Name saved';
+
+  @override
+  String get nicknameTaken => 'This name is taken. Choose another.';
+
+  @override
+  String get nicknameInvalid => 'Use up to 40 characters without line breaks.';
+
+  @override
+  String get nicknameFailed =>
+      'Could not update your profile. Check your connection.';
+
+  @override
+  String get retryProfile => 'Retry';
+
+  @override
+  String get messageUnavailable => 'Message unavailable';
 }

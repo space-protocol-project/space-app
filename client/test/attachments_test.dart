@@ -71,6 +71,11 @@ class FilesSession implements AttachmentSession {
   }
 
   @override
+  Future<ListMyAssetsResponse> listMyAssets(
+    ListMyAssetsRequest request,
+  ) async => ListMyAssetsResponse();
+
+  @override
   Future<ListChannelAssetsResponse> listChannelAssets(
     ListChannelAssetsRequest request,
   ) async => ListChannelAssetsResponse();

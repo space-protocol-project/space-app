@@ -1181,7 +1181,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dropFilesHere => '松开文件以添加附件';
 
   @override
-  String get optionalNickname => '昵称（可选）';
+  String get optionalNickname => '名字（可选）';
 
   @override
   String get channelFiles => '聊天附件';
@@ -1197,6 +1197,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get filesServerUpdateRequired => '请更新服务器以使用附件列表。';
+
+  @override
+  String get serverNickname => '您在此空间中的名字';
+
+  @override
+  String get nicknameUniqueHelp => '名字在此服务器上必须唯一，不区分大小写。留空可移除名字。';
+
+  @override
+  String get saveNickname => '保存名字';
+
+  @override
+  String get nicknameSaved => '名字已保存';
+
+  @override
+  String get nicknameTaken => '此名字已被使用，请选择其他名字。';
+
+  @override
+  String get nicknameInvalid => '请使用最多40个字符，不含换行。';
+
+  @override
+  String get nicknameFailed => '无法更新个人资料，请检查连接。';
+
+  @override
+  String get retryProfile => '重试';
+
+  @override
+  String get messageUnavailable => '消息不可用';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

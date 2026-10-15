@@ -28,6 +28,8 @@ import 'server_inbox.dart';
 import 'home_panel.dart';
 import 'space_setup_wizard.dart';
 import 'chat_view.dart';
+import 'attachment_widgets.dart';
+import 'channel_files.dart';
 import 'connection_panel.dart';
 import 'panels.dart';
 import 'search.dart';
@@ -952,6 +954,64 @@ class _SpaceShellState extends State<SpaceShell> {
       ],
     ),
   );
+  List<Widget> fileNavigation() {
+    if (!controller.attachmentsEnabled) return [];
+    final enabled =
+        controller.connected &&
+        controller.canRead &&
+        controller.attachmentSession != null;
+    return [
+      ListTile(
+        key: const ValueKey('sidebar-my-files'),
+        leading: const Icon(Icons.folder_outlined),
+        title: Text(context.strings.myFiles),
+        enabled: enabled,
+        onTap: () => showFiles(mine: true),
+      ),
+      ListTile(
+        key: const ValueKey('sidebar-channel-files'),
+        leading: const Icon(Icons.folder_shared_outlined),
+        title: Text(context.strings.channelFiles),
+        enabled: enabled,
+        onTap: () => showFiles(mine: false),
+      ),
+    ];
+  }
+
+  Future<void> showFiles({required bool mine}) async {
+    final session = controller.attachmentSession;
+    final channel = controller.channelId;
+    if (session == null || !controller.connected || !controller.canRead) return;
+    closeNavigation();
+    await showDialog<void>(
+      context: context,
+      builder: (context) => BlocListener<ChatController, ChatState>(
+        bloc: controller,
+        listener: (context, state) {
+          if (!controller.attachmentsEnabled &&
+              ModalRoute.of(context)?.isCurrent == true) {
+            Navigator.pop(context);
+          }
+        },
+        child: mine
+            ? MyFilesDialog(session: session, channel: channel)
+            : AlertDialog(
+                content: SizedBox(
+                  width: 480,
+                  height: MediaQuery.sizeOf(context).height * .7,
+                  child: ChannelFilesPanel(session: session, channel: channel),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(context.strings.closeFiles),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+
   Widget sidebar() => SizedBox(
     width: SpaceAppearance.sidebarWidth,
     child: Material(
@@ -1019,6 +1079,7 @@ class _SpaceShellState extends State<SpaceShell> {
             title: Text(context.strings.favoriteMessages),
             onTap: showFavorites,
           ),
+          ...fileNavigation(),
         ],
       ),
     ),
@@ -1107,6 +1168,7 @@ class _SpaceShellState extends State<SpaceShell> {
             title: Text(context.strings.favoriteMessages),
             onTap: showFavorites,
           ),
+          ...fileNavigation(),
           ListTile(
             leading: const Icon(Icons.settings_suggest_outlined),
             title: Text(context.strings.manageSpace),

@@ -38,6 +38,13 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    final attachments = find.widgetWithText(
+      SwitchListTile,
+      'Разрешить вложения файлов',
+    );
+    await tester.ensureVisible(attachments);
+    await tester.tap(attachments);
+    await tester.pumpAndSettle();
     final name = find.widgetWithText(TextField, 'Название пространства');
     await tester.ensureVisible(name);
     await tester.enterText(name, 'Мой 未保存 draft');
@@ -52,10 +59,14 @@ void main() {
     }
     locale.value = const Locale('en');
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Save settings'));
+    await tester.ensureVisible(
+      find.widgetWithText(FilledButton, 'Save settings'),
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Save settings'));
     await tester.pumpAndSettle();
     expect(api.saved!['title'], 'Мой 未保存 draft');
+    expect(api.saved!['attachmentsEnabled'], false);
     expect(api.saved!['chatTitle'], 'Общий чат');
     expect(api.saved!['registrationPolicy'], 'closed');
     expect(api.saved!['expectedRevision'], '1');

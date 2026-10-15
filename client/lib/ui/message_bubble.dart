@@ -27,6 +27,11 @@ class MessageBubble extends StatelessWidget {
   final Widget? actions, attachments;
   final VoidCallback? onToggleFavorite;
 
+  String displayText(BuildContext context) =>
+      text.isEmpty && attachments == null
+      ? context.strings.messageUnavailable
+      : text;
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -89,7 +94,7 @@ class MessageBubble extends StatelessWidget {
                           ),
                         )
                       else
-                        MessageMarkdown(text: text),
+                        MessageMarkdown(text: displayText(context)),
                       if (!deleted) ?attachments,
                       if (sentAt != null ||
                           accepted ||

@@ -8,6 +8,8 @@ String localFailureText(
   BuildContext context,
   LocalFailureCode code,
 ) => switch (code) {
+  LocalFailureCode.nicknameTaken => context.strings.nicknameTaken,
+  LocalFailureCode.nicknameInvalid => context.strings.nicknameInvalid,
   LocalFailureCode.cameraDenied => context.strings.failureCameraDenied,
   LocalFailureCode.cameraUnavailable =>
     context.strings.failureCameraUnavailable,

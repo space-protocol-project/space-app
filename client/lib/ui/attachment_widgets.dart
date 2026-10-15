@@ -4,35 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:file_saver/file_saver.dart';
+import 'package:grpc/grpc.dart';
 
 import '../src/attachments.dart';
 import '../src/core.dart';
 import '../src/rpc_clients.dart';
 
+String filesLoadErrorText(BuildContext context, String error) =>
+    error.contains('HTTP 415') ||
+        error.contains('code: ${StatusCode.unimplemented},')
+    ? context.strings.filesServerUpdateRequired
+    : context.strings.filesLoadFailed;
+
 class AttachmentComposer extends StatelessWidget {
-  const AttachmentComposer({
-    super.key,
-    required this.queue,
-    required this.enabled,
-    required this.openFiles,
-    this.openChannelFiles,
-    this.session,
-    this.canRead = true,
-  });
+  const AttachmentComposer({super.key, required this.queue, this.session});
   final AttachmentQueue queue;
   final AttachmentSession? session;
-  final bool canRead;
-  final bool enabled;
-  final VoidCallback openFiles;
-  final VoidCallback? openChannelFiles;
-  Widget channelFilesButton(BuildContext context) {
-    if (openChannelFiles == null) return const SizedBox.shrink();
-    return IconButton(
-      tooltip: context.strings.channelFiles,
-      onPressed: canRead ? openChannelFiles : null,
-      icon: const Icon(Icons.folder_shared_outlined),
-    );
-  }
 
   @override
   Widget build(BuildContext context) =>
@@ -41,36 +28,19 @@ class AttachmentComposer extends StatelessWidget {
         builder: (context, state) => Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              children: [
-                IconButton(
-                  tooltip: context.strings.attachFiles,
-                  onPressed: enabled && !state.busy
-                      ? () async {
-                          final files = await openFilesPicker();
-                          await queue.add(AttachmentFilesAdded(files));
-                        }
-                      : null,
-                  icon: const Icon(Icons.attach_file),
-                ),
-                Text('${state.files.length}/5'),
-                const Spacer(),
-                channelFilesButton(context),
-                TextButton.icon(
-                  onPressed: state.busy
-                      ? queue.cancel
-                      : canRead
-                      ? openFiles
-                      : null,
-                  icon: Icon(state.busy ? Icons.close : Icons.folder_outlined),
-                  label: Text(
-                    state.busy
-                        ? context.strings.cancelUpload
-                        : context.strings.myFiles,
-                  ),
-                ),
-              ],
-            ),
+            if (state.files.isNotEmpty || state.busy)
+              Row(
+                children: [
+                  Text('${state.files.length}/5'),
+                  const Spacer(),
+                  if (state.busy)
+                    TextButton.icon(
+                      onPressed: queue.cancel,
+                      icon: const Icon(Icons.close),
+                      label: Text(context.strings.cancelUpload),
+                    ),
+                ],
+              ),
             if (state.files.isNotEmpty)
               ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 76),
@@ -105,6 +75,34 @@ class AttachmentComposer extends StatelessWidget {
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
           ],
+        ),
+      );
+}
+
+class AttachFileButton extends StatelessWidget {
+  const AttachFileButton({
+    super.key,
+    required this.queue,
+    required this.enabled,
+  });
+  final AttachmentQueue queue;
+  final bool enabled;
+  @override
+  Widget build(BuildContext context) =>
+      BlocBuilder<AttachmentQueue, AttachmentState>(
+        bloc: queue,
+        builder: (context, state) => IconButton(
+          key: const ValueKey('attach-file-button'),
+          tooltip: context.strings.attachFiles,
+          icon: const Icon(Icons.add),
+          onPressed: enabled && !state.busy
+              ? () async {
+                  final selected = await openFilesPicker();
+                  if (!queue.isClosed) {
+                    await queue.add(AttachmentFilesAdded(selected));
+                  }
+                }
+              : null,
         ),
       );
 }
@@ -241,10 +239,16 @@ class _MyFilesDialogState extends State<MyFilesDialog> {
           ],
           if (files.isEmpty && !busy && error.isEmpty)
             Text(context.strings.noFilesInChannel),
-          if (error.isNotEmpty) Text(error),
+          if (error.isNotEmpty) ...[
+            Text(filesLoadErrorText(context, error)),
+            TextButton(
+              onPressed: busy ? null : load,
+              child: Text(context.strings.refreshFiles),
+            ),
+          ],
           if (busy)
             const Center(child: CircularProgressIndicator())
-          else if (more)
+          else if (more && error.isEmpty)
             TextButton(
               onPressed: load,
               child: Text(context.strings.loadMoreFiles),

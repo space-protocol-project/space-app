@@ -802,4 +802,11 @@ class AdminLocalizationsEn extends AdminLocalizations {
 
   @override
   String get storageInherited => 'Empty uses the default limit';
+
+  @override
+  String get attachmentsEnabled => 'Allow file attachments';
+
+  @override
+  String get attachmentsEnabledHelp =>
+      'When disabled, members cannot attach or download files. File features are hidden for this space.';
 }

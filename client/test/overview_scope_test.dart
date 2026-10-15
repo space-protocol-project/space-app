@@ -8,9 +8,17 @@ import 'package:space_client/ui/panels.dart';
 
 import 'channels_test.dart' show chat;
 import 'shell_test.dart' show TestController;
+import 'member_profile_test.dart' show ProfileSession;
+
+import 'package:space_client/src/core.dart' show MemberProfile;
 
 class OverviewController extends TestController {
-  OverviewController(this.name, this.channel);
+  OverviewController(this.name, this.channel) {
+    profile.nickname = '$channel-ник';
+  }
+  final profile = ProfileSession();
+  @override
+  MemberProfile? get memberProfile => profile;
   final String name, channel;
   @override
   String get spaceTitle => name;
@@ -60,6 +68,14 @@ void main() {
       await show(first);
       await tester.pumpAndSettle();
       expect(find.text('Первое пространство'), findsOneWidget);
+      expect(find.text('Свое имя в этом пространстве'), findsOneWidget);
+      expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('member-nickname')))
+            .controller!
+            .text,
+        'first-ник',
+      );
       expect(find.text('https://first.test'), findsOneWidget);
       expect(find.text('Мой домашний сервер'), findsNothing);
       expect(find.text('Выйти в эфир'), findsNothing);
@@ -71,6 +87,13 @@ void main() {
       await show(second);
       await tester.pumpAndSettle();
       expect(find.text('Первое пространство'), findsNothing);
+      expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('member-nickname')))
+            .controller!
+            .text,
+        'second-ник',
+      );
       expect(find.text('Чат first'), findsNothing);
       final channel = find.byKey(const ValueKey('overview-channel-second'));
       await tester.ensureVisible(channel);

@@ -3250,6 +3250,7 @@ class SpaceSettings extends $pb.GeneratedMessage {
     ServerIcon? icon,
     $fixnum.Int64? storageLimitBytes,
     $fixnum.Int64? memberStorageLimitBytes,
+    $core.bool? attachmentsEnabled,
   }) {
     final result = SpaceSettings._();
     if (title != null) result.title = title;
@@ -3262,6 +3263,8 @@ class SpaceSettings extends $pb.GeneratedMessage {
     if (storageLimitBytes != null) result.storageLimitBytes = storageLimitBytes;
     if (memberStorageLimitBytes != null)
       result.memberStorageLimitBytes = memberStorageLimitBytes;
+    if (attachmentsEnabled != null)
+      result.attachmentsEnabled = attachmentsEnabled;
     return result;
   }
 
@@ -3287,6 +3290,7 @@ class SpaceSettings extends $pb.GeneratedMessage {
         subBuilder: ServerIcon.$_createMessage)
     ..aInt64(7, _omitFieldNames ? '' : 'storageLimitBytes')
     ..aInt64(8, _omitFieldNames ? '' : 'memberStorageLimitBytes')
+    ..aOB(9, _omitFieldNames ? '' : 'attachmentsEnabled')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -3384,6 +3388,15 @@ class SpaceSettings extends $pb.GeneratedMessage {
   $core.bool hasMemberStorageLimitBytes() => $_has(7);
   @$pb.TagNumber(8)
   void clearMemberStorageLimitBytes() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.bool get attachmentsEnabled => $_getBF(8);
+  @$pb.TagNumber(9)
+  set attachmentsEnabled($core.bool value) => $_setBool(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasAttachmentsEnabled() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearAttachmentsEnabled() => $_clearField(9);
 }
 
 class UpdateSettingsRequest extends $pb.GeneratedMessage {
@@ -3396,6 +3409,7 @@ class UpdateSettingsRequest extends $pb.GeneratedMessage {
     ServerIcon? icon,
     $fixnum.Int64? storageLimitBytes,
     $fixnum.Int64? memberStorageLimitBytes,
+    $core.bool? attachmentsEnabled,
   }) {
     final result = UpdateSettingsRequest._();
     if (title != null) result.title = title;
@@ -3408,6 +3422,8 @@ class UpdateSettingsRequest extends $pb.GeneratedMessage {
     if (storageLimitBytes != null) result.storageLimitBytes = storageLimitBytes;
     if (memberStorageLimitBytes != null)
       result.memberStorageLimitBytes = memberStorageLimitBytes;
+    if (attachmentsEnabled != null)
+      result.attachmentsEnabled = attachmentsEnabled;
     return result;
   }
 
@@ -3433,6 +3449,7 @@ class UpdateSettingsRequest extends $pb.GeneratedMessage {
         subBuilder: ServerIcon.$_createMessage)
     ..aInt64(7, _omitFieldNames ? '' : 'storageLimitBytes')
     ..aInt64(8, _omitFieldNames ? '' : 'memberStorageLimitBytes')
+    ..aOB(9, _omitFieldNames ? '' : 'attachmentsEnabled')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -3532,6 +3549,15 @@ class UpdateSettingsRequest extends $pb.GeneratedMessage {
   $core.bool hasMemberStorageLimitBytes() => $_has(7);
   @$pb.TagNumber(8)
   void clearMemberStorageLimitBytes() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.bool get attachmentsEnabled => $_getBF(8);
+  @$pb.TagNumber(9)
+  set attachmentsEnabled($core.bool value) => $_setBool(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasAttachmentsEnabled() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearAttachmentsEnabled() => $_clearField(9);
 }
 
 class SubscribeRequest extends $pb.GeneratedMessage {
@@ -4356,6 +4382,7 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     $core.Iterable<Channel>? channels,
     $core.String? title,
     ServerIcon? icon,
+    $core.bool? attachmentsEnabled,
   }) {
     final result = GetManifestResponse._();
     if (protocolVersion != null) result.protocolVersion = protocolVersion;
@@ -4363,6 +4390,8 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     if (channels != null) result.channels.addAll(channels);
     if (title != null) result.title = title;
     if (icon != null) result.icon = icon;
+    if (attachmentsEnabled != null)
+      result.attachmentsEnabled = attachmentsEnabled;
     return result;
   }
 
@@ -4386,6 +4415,7 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     ..aOS(4, _omitFieldNames ? '' : 'title')
     ..aOM<ServerIcon>(5, _omitFieldNames ? '' : 'icon',
         subBuilder: ServerIcon.$_createMessage)
+    ..aOB(6, _omitFieldNames ? '' : 'attachmentsEnabled')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -4451,6 +4481,15 @@ class GetManifestResponse extends $pb.GeneratedMessage {
   void clearIcon() => $_clearField(5);
   @$pb.TagNumber(5)
   ServerIcon ensureIcon() => $_ensure(4);
+
+  @$pb.TagNumber(6)
+  $core.bool get attachmentsEnabled => $_getBF(5);
+  @$pb.TagNumber(6)
+  set attachmentsEnabled($core.bool value) => $_setBool(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasAttachmentsEnabled() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearAttachmentsEnabled() => $_clearField(6);
 }
 
 class Channel extends $pb.GeneratedMessage {
@@ -7020,6 +7059,7 @@ class WatchChannelsResponse extends $pb.GeneratedMessage {
     $core.bool? heartbeat,
     $core.String? serverId,
     ServerIcon? icon,
+    $core.bool? attachmentsEnabled,
   }) {
     final result = WatchChannelsResponse._();
     if (channels != null) result.channels.addAll(channels);
@@ -7028,6 +7068,8 @@ class WatchChannelsResponse extends $pb.GeneratedMessage {
     if (heartbeat != null) result.heartbeat = heartbeat;
     if (serverId != null) result.serverId = serverId;
     if (icon != null) result.icon = icon;
+    if (attachmentsEnabled != null)
+      result.attachmentsEnabled = attachmentsEnabled;
     return result;
   }
 
@@ -7052,6 +7094,7 @@ class WatchChannelsResponse extends $pb.GeneratedMessage {
     ..aOS(5, _omitFieldNames ? '' : 'serverId')
     ..aOM<ServerIcon>(6, _omitFieldNames ? '' : 'icon',
         subBuilder: ServerIcon.$_createMessage)
+    ..aOB(7, _omitFieldNames ? '' : 'attachmentsEnabled')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -7127,6 +7170,15 @@ class WatchChannelsResponse extends $pb.GeneratedMessage {
   void clearIcon() => $_clearField(6);
   @$pb.TagNumber(6)
   ServerIcon ensureIcon() => $_ensure(5);
+
+  @$pb.TagNumber(7)
+  $core.bool get attachmentsEnabled => $_getBF(6);
+  @$pb.TagNumber(7)
+  set attachmentsEnabled($core.bool value) => $_setBool(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasAttachmentsEnabled() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearAttachmentsEnabled() => $_clearField(7);
 }
 
 class Asset extends $pb.GeneratedMessage {

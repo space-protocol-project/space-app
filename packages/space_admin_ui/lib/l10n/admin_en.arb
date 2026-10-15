@@ -341,5 +341,7 @@
   "storageMember": "Default member limit, MiB",
   "storageHelp": "0 disables new uploads. Existing files are kept. Pending uploads also count towards the limit.",
   "storagePersonal": "Personal limit, MiB",
-  "storageInherited": "Empty uses the default limit"
+  "storageInherited": "Empty uses the default limit",
+  "attachmentsEnabled": "Allow file attachments",
+  "attachmentsEnabledHelp": "When disabled, members cannot attach or download files. File features are hidden for this space."
 }

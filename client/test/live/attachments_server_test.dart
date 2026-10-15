@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:file_selector/file_selector.dart';
@@ -38,6 +39,21 @@ void main() {
       final member = await SpaceSession.connect(discovery, memberVault);
       addTearDown(member.close);
       await member.setNickname('Участник v0.3');
+      expect(await member.getNickname(), 'Участник v0.3');
+      await expectLater(
+        owner.setNickname('  УЧАСТНИК V0.3  '),
+        throwsA(
+          isA<GrpcError>().having(
+            (e) => e.code,
+            'code',
+            StatusCode.alreadyExists,
+          ),
+        ),
+      );
+      await member.setNickname('Новое имя');
+      expect(await member.getNickname(), 'Новое имя');
+      await member.setNickname('Участник v0.3');
+
       final members = await owner.adminRequest('/api/v1/space/members');
       expect(
         (members['members'] as List).any(
@@ -47,6 +63,57 @@ void main() {
         ),
         isTrue,
       );
+
+      final initialPolicy = Completer<void>(),
+          disabledPolicy = Completer<void>(),
+          enabledPolicy = Completer<void>();
+      final policies = member.watchChannelChanges().listen((_) {
+        if (!initialPolicy.isCompleted) initialPolicy.complete();
+        if (!member.attachmentsEnabled && !disabledPolicy.isCompleted) {
+          disabledPolicy.complete();
+        }
+        if (disabledPolicy.isCompleted &&
+            member.attachmentsEnabled &&
+            !enabledPolicy.isCompleted) {
+          enabledPolicy.complete();
+        }
+      });
+      addTearDown(policies.cancel);
+      await initialPolicy.future.timeout(const Duration(seconds: 5));
+      Future<void> setFiles(bool enabled) async {
+        final response = await owner.adminRequest('/api/v1/space/settings');
+        final settings = Map<String, dynamic>.from(response['settings'] as Map);
+        await owner.adminRequest(
+          '/api/v1/space/settings',
+          method: 'PATCH',
+          body: {
+            'title': settings['title'],
+            'chatTitle': settings['chatTitle'],
+            'chatEnabled': settings['chatEnabled'],
+            'registrationPolicy': settings['registrationPolicy'],
+            'expectedRevision': settings['revision'],
+            'attachmentsEnabled': enabled,
+          },
+        );
+      }
+
+      await setFiles(false);
+      await disabledPolicy.future.timeout(const Duration(seconds: 5));
+      expect(member.attachmentsEnabled, isFalse);
+      await expectLater(
+        member.listMyAssets(ListMyAssetsRequest(channelId: 'general')),
+        throwsA(
+          isA<GrpcError>().having(
+            (e) => e.code,
+            'code',
+            StatusCode.permissionDenied,
+          ),
+        ),
+      );
+      await setFiles(true);
+      await enabledPolicy.future.timeout(const Duration(seconds: 5));
+      expect(member.attachmentsEnabled, isTrue);
+      await policies.cancel();
 
       final queue = AttachmentQueue();
       addTearDown(queue.close);

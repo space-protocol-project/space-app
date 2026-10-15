@@ -496,10 +496,19 @@
   "loadMoreFiles": "Load more",
   "closeFiles": "Close",
   "dropFilesHere": "Drop files to attach",
-  "optionalNickname": "Nickname (optional)",
+  "optionalNickname": "Name (optional)",
   "channelFiles": "Chat attachments",
   "allFileAuthors": "All participants",
   "refreshFiles": "Refresh attachments",
   "filesLoadFailed": "Could not load attachments. Try refreshing the list.",
-  "filesServerUpdateRequired": "Update the server to use the attachment list."
+  "filesServerUpdateRequired": "Update the server to use the attachment list.",
+  "serverNickname": "Your name in this space",
+  "nicknameUniqueHelp": "Your name must be unique on this server. Case is ignored. Leave blank to remove it.",
+  "saveNickname": "Save name",
+  "nicknameSaved": "Name saved",
+  "nicknameTaken": "This name is taken. Choose another.",
+  "nicknameInvalid": "Use up to 40 characters without line breaks.",
+  "nicknameFailed": "Could not update your profile. Check your connection.",
+  "retryProfile": "Retry",
+  "messageUnavailable": "Message unavailable"
 }

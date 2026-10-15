@@ -28,9 +28,7 @@ class TestController extends ChatController {
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
-  testWidgets('Поле сообщения и отправка центрированы при нескольких строках', (
-    tester,
-  ) async {
+  testWidgets('Текст сообщения выше отдельного ряда кнопок', (tester) async {
     tester.view.physicalSize = const Size(1440, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -55,8 +53,8 @@ void main() {
     await tester.pumpAndSettle();
     final send = find.byTooltip('Отправить');
     expect(
-      tester.getRect(field).center.dy,
-      closeTo(tester.getRect(send).center.dy, .5),
+      tester.getRect(field).bottom,
+      lessThanOrEqualTo(tester.getRect(send).top),
     );
     expect(
       tester.widget<TextField>(field).decoration!.border,
@@ -76,6 +74,19 @@ void main() {
                   BorderRadius.circular(24),
         );
     expect((composer.decoration as BoxDecoration).color, isNotNull);
+    final surface = find.ancestor(
+      of: field,
+      matching: find.byType(GlassSurface),
+    );
+    expect(tester.getSize(surface).height, greaterThanOrEqualTo(130));
+    await tester.enterText(field, List.filled(30, 'Строка').join('\n'));
+    await tester.pumpAndSettle();
+    expect(tester.getSize(surface).height, lessThanOrEqualTo(900 / 3 + .5));
+    final scrolling = tester.state<ScrollableState>(
+      find.descendant(of: field, matching: find.byType(Scrollable)).first,
+    );
+    expect(scrolling.position.maxScrollExtent, greaterThan(0));
+
     expect(find.text('Space'), findsNothing);
     await tester.pumpWidget(const SizedBox());
     controller.dispose();

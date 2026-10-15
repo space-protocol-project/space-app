@@ -85,18 +85,14 @@ void main() {
         final rows = find.descendant(
           of: find.byType(ChatView),
           matching: find.byWidgetPredicate(
-            (widget) => widget is Padding && widget.key is GlobalKey,
+            (widget) => widget is MessageBubble && widget.key is GlobalKey,
           ),
         );
         final visible = <int>[];
         for (final row in rows.evaluate()) {
           final rect = tester.getRect(find.byWidget(row.widget));
           if (rect.top < top || rect.bottom > bottom) continue;
-          final bubble = find.descendant(
-            of: find.byWidget(row.widget),
-            matching: find.byType(MessageBubble),
-          );
-          final text = tester.widget<MessageBubble>(bubble).text;
+          final text = (row.widget as MessageBubble).text;
           visible.add(
             int.parse(RegExp(r'Сообщение (\d+):').firstMatch(text)!.group(1)!),
           );

@@ -66,7 +66,10 @@ class _AdminPageState extends State<AdminPage> {
   Map<String, dynamic>? identity, settings, serverIcon;
   bool iconDirty = false, iconLoading = false;
   bool confirming = false;
-  bool busy = false, initialized = true, enabled = true;
+  bool busy = false,
+      initialized = true,
+      enabled = true,
+      attachmentsEnabled = true;
   String status = '', policy = 'open';
   String? statusKey;
   String get localizedStatus => switch (statusKey) {
@@ -154,6 +157,7 @@ class _AdminPageState extends State<AdminPage> {
     title.text = settings!['title'] as String;
     chat.text = settings!['chatTitle'] as String;
     enabled = settings!['chatEnabled'] == true;
+    attachmentsEnabled = settings!['attachmentsEnabled'] != false;
     policy = settings!['registrationPolicy'] as String;
     storage.text =
         ((int.tryParse('${settings!['storageLimitBytes']}') ?? 1073741824) ~/
@@ -178,6 +182,7 @@ class _AdminPageState extends State<AdminPage> {
         'title': title.text.trim(),
         'chatTitle': chat.text.trim(),
         'chatEnabled': enabled,
+        'attachmentsEnabled': attachmentsEnabled,
         'registrationPolicy': policy,
         'expectedRevision': settings!['revision'],
         'storageLimitBytes': storageLimitBytes(storage.text).toString(),
@@ -392,6 +397,15 @@ class _AdminPageState extends State<AdminPage> {
                     decoration: InputDecoration(labelText: strings.spaceName),
                   ),
                   const SizedBox(height: 12),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(strings.attachmentsEnabled),
+                    subtitle: Text(strings.attachmentsEnabledHelp),
+                    value: attachmentsEnabled,
+                    onChanged: busy
+                        ? null
+                        : (value) => setState(() => attachmentsEnabled = value),
+                  ),
                   StorageLimits(
                     total: storage,
                     member: memberStorage,

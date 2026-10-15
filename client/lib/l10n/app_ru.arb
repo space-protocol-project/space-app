@@ -496,10 +496,19 @@
   "loadMoreFiles": "Загрузить ещё",
   "closeFiles": "Закрыть",
   "dropFilesHere": "Отпустите файлы, чтобы прикрепить",
-  "optionalNickname": "Ник (необязательно)",
+  "optionalNickname": "Имя (необязательно)",
   "channelFiles": "Вложения чата",
   "allFileAuthors": "Все участники",
   "refreshFiles": "Обновить вложения",
   "filesLoadFailed": "Не удалось загрузить вложения. Попробуйте обновить список.",
-  "filesServerUpdateRequired": "Для списка вложений нужна актуальная версия сервера."
+  "filesServerUpdateRequired": "Для списка вложений нужна актуальная версия сервера.",
+  "serverNickname": "Свое имя в этом пространстве",
+  "nicknameUniqueHelp": "Имя должно быть уникальным на сервере. Регистр не учитывается. Пустое поле убирает имя.",
+  "saveNickname": "Сохранить имя",
+  "nicknameSaved": "Имя сохранено",
+  "nicknameTaken": "Это имя уже занято. Выберите другое.",
+  "nicknameInvalid": "Используйте до 40 символов без переносов строк.",
+  "nicknameFailed": "Не удалось изменить профиль. Проверьте подключение.",
+  "retryProfile": "Повторить",
+  "messageUnavailable": "Сообщение недоступно"
 }

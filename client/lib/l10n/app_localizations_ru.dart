@@ -1292,7 +1292,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dropFilesHere => 'Отпустите файлы, чтобы прикрепить';
 
   @override
-  String get optionalNickname => 'Ник (необязательно)';
+  String get optionalNickname => 'Имя (необязательно)';
 
   @override
   String get channelFiles => 'Вложения чата';
@@ -1310,4 +1310,34 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get filesServerUpdateRequired =>
       'Для списка вложений нужна актуальная версия сервера.';
+
+  @override
+  String get serverNickname => 'Свое имя в этом пространстве';
+
+  @override
+  String get nicknameUniqueHelp =>
+      'Имя должно быть уникальным на сервере. Регистр не учитывается. Пустое поле убирает имя.';
+
+  @override
+  String get saveNickname => 'Сохранить имя';
+
+  @override
+  String get nicknameSaved => 'Имя сохранено';
+
+  @override
+  String get nicknameTaken => 'Это имя уже занято. Выберите другое.';
+
+  @override
+  String get nicknameInvalid =>
+      'Используйте до 40 символов без переносов строк.';
+
+  @override
+  String get nicknameFailed =>
+      'Не удалось изменить профиль. Проверьте подключение.';
+
+  @override
+  String get retryProfile => 'Повторить';
+
+  @override
+  String get messageUnavailable => 'Сообщение недоступно';
 }

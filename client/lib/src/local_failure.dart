@@ -34,6 +34,8 @@ enum LocalFailureCode {
   identityInvalid,
   addressInvalid,
   operationFailed,
+  nicknameTaken,
+  nicknameInvalid,
   conflict,
   cardCorrupt,
   passwordInvalid,

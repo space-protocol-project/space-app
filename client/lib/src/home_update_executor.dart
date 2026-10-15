@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'home_installation.dart';
 import 'home_runtime.dart';
+import 'home_runtime_cleanup.dart';
 import 'home_update_journal.dart';
 import 'local_failure.dart';
 import 'home_storage.dart';
@@ -237,6 +238,7 @@ class HomeUpdateExecutor {
       await journal.advance(record.id, HomeUpdateStep.activating);
       await installation.activate(source, target);
       await journal.advance(record.id, HomeUpdateStep.completeUpdated);
+      await HomeRuntimeCleanup(root).run();
     } catch (problem) {
       await recover(retryPreparation: false);
       final step = (await journal.read())?.step;
@@ -282,6 +284,7 @@ class HomeUpdateExecutor {
         await journal.advance(record.id, HomeUpdateStep.activating);
         await installation.activate(record.source, record.target);
         await journal.advance(record.id, HomeUpdateStep.completeUpdated);
+        await HomeRuntimeCleanup(root).run();
         return;
       } catch (_) {
         record = await journal.advance(record.id, HomeUpdateStep.restoring);

@@ -2360,7 +2360,7 @@ abstract class AppLocalizations {
   /// No description provided for @optionalNickname.
   ///
   /// In ru, this message translates to:
-  /// **'Ник (необязательно)'**
+  /// **'Имя (необязательно)'**
   String get optionalNickname;
 
   /// No description provided for @channelFiles.
@@ -2392,6 +2392,60 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Для списка вложений нужна актуальная версия сервера.'**
   String get filesServerUpdateRequired;
+
+  /// No description provided for @serverNickname.
+  ///
+  /// In ru, this message translates to:
+  /// **'Свое имя в этом пространстве'**
+  String get serverNickname;
+
+  /// No description provided for @nicknameUniqueHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Имя должно быть уникальным на сервере. Регистр не учитывается. Пустое поле убирает имя.'**
+  String get nicknameUniqueHelp;
+
+  /// No description provided for @saveNickname.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить имя'**
+  String get saveNickname;
+
+  /// No description provided for @nicknameSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Имя сохранено'**
+  String get nicknameSaved;
+
+  /// No description provided for @nicknameTaken.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это имя уже занято. Выберите другое.'**
+  String get nicknameTaken;
+
+  /// No description provided for @nicknameInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Используйте до 40 символов без переносов строк.'**
+  String get nicknameInvalid;
+
+  /// No description provided for @nicknameFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось изменить профиль. Проверьте подключение.'**
+  String get nicknameFailed;
+
+  /// No description provided for @retryProfile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторить'**
+  String get retryProfile;
+
+  /// No description provided for @messageUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщение недоступно'**
+  String get messageUnavailable;
 }
 
 class _AppLocalizationsDelegate

@@ -136,8 +136,15 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   Future<void> refreshChannels() => sendRequest(ChatChannelsRefreshed());
   Future<bool> send(String text, {List<String> attachments = const []}) =>
       sendRequest(ChatMessageSent(text, List.unmodifiable(attachments)));
+  MemberProfile? get memberProfile =>
+      connected && _session is MemberProfile ? _session as MemberProfile : null;
   AttachmentSession? get attachmentSession =>
-      _session is AttachmentSession ? _session as AttachmentSession : null;
+      attachmentsEnabled && _session is AttachmentSession
+      ? _session as AttachmentSession
+      : null;
+  bool get attachmentsEnabled =>
+      _session is! AttachmentPolicy ||
+      (_session as AttachmentPolicy).attachmentsEnabled;
   Future<bool> updateMessage(Content message, String text) =>
       sendRequest(ChatMessageChanged(message, text));
   Future<bool> deleteMessage(Content message) =>
@@ -529,10 +536,17 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     final live = connected && !reconnecting
         ? _messages
         : const <String, Content>{};
-    return {
+    final result = {
       ...{for (final m in saved) m.id: m},
       ...live,
     }.values.toList()..sort((a, b) => a.sequence.compareTo(b.sequence));
+    if (attachmentsEnabled) return result;
+    return result.map((message) {
+      if (message.attachments.isEmpty) return message;
+      return Content()
+        ..mergeFromMessage(message)
+        ..attachments.clear();
+    }).toList();
   }
 
   String _invitationToken = '', invitationRole = '';
@@ -725,7 +739,23 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   Future<void> _applyNickname(LiveSession session, String? nickname) async {
     if (nickname == null || nickname.trim().isEmpty) return;
     if (session is MemberProfile) {
-      await (session as MemberProfile).setNickname(nickname.trim());
+      try {
+        await (session as MemberProfile).setNickname(nickname.trim());
+      } on GrpcError catch (error) {
+        if (error.code == StatusCode.alreadyExists) {
+          throw const LocalFailure(
+            LocalFailureCode.nicknameTaken,
+            'Это имя уже занято',
+          );
+        }
+        if (error.code == StatusCode.invalidArgument) {
+          throw const LocalFailure(
+            LocalFailureCode.nicknameInvalid,
+            'Недопустимое имя',
+          );
+        }
+        rethrow;
+      }
     }
   }
 

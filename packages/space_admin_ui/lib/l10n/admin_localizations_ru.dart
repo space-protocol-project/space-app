@@ -803,4 +803,11 @@ class AdminLocalizationsRu extends AdminLocalizations {
 
   @override
   String get storageInherited => 'Пусто — стандартный лимит';
+
+  @override
+  String get attachmentsEnabled => 'Разрешить вложения файлов';
+
+  @override
+  String get attachmentsEnabledHelp =>
+      'Если выключено, участники не могут прикреплять и скачивать файлы. Файловые функции скрываются в приложении этого пространства.';
 }

@@ -186,11 +186,7 @@ class _ChannelFilesPanelState extends State<ChannelFilesPanel> {
             if (state.files.isEmpty && !state.busy && state.error.isEmpty)
               Text(context.strings.noFilesInChannel),
             if (state.error.isNotEmpty)
-              Text(
-                state.error.contains('HTTP 415')
-                    ? context.strings.filesServerUpdateRequired
-                    : context.strings.filesLoadFailed,
-              ),
+              Text(filesLoadErrorText(context, state.error)),
             if (state.busy)
               const Center(child: CircularProgressIndicator())
             else if (state.more && state.error.isEmpty)

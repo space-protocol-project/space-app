@@ -450,7 +450,12 @@ abstract interface class ServerIconPresentation {
 }
 
 abstract interface class MemberProfile {
+  Future<String> getNickname();
   Future<void> setNickname(String nickname);
+}
+
+abstract interface class AttachmentPolicy {
+  bool get attachmentsEnabled;
 }
 
 abstract interface class AttachmentSession {
@@ -477,6 +482,7 @@ class SpaceSession
         MessageChanges,
         MemberProfile,
         AttachmentSession,
+        AttachmentPolicy,
         SpacePresentation,
         ServerIconPresentation,
         SpaceAccess,
@@ -494,6 +500,8 @@ class SpaceSession
   String _token = '';
   @override
   String spaceTitle = '';
+  @override
+  bool attachmentsEnabled = false;
   @override
   ServerIcon? serverIcon;
   @override
@@ -547,11 +555,20 @@ class SpaceSession
       result.channels,
       manifest.title,
       manifest.hasIcon() ? manifest.icon : null,
+      manifest.attachmentsEnabled,
     );
   }
 
-  void _applyCatalog(List<Channel> channels, String title, [ServerIcon? icon]) {
+  void _applyCatalog(
+    List<Channel> channels,
+    String title, [
+    ServerIcon? icon,
+    bool? attachmentsEnabled,
+  ]) {
     if (icon != null) serverIcon = icon;
+    if (attachmentsEnabled != null) {
+      this.attachmentsEnabled = attachmentsEnabled;
+    }
     final seen = <String>{};
     for (final c in channels) {
       if (!RegExp(r'^[a-z][a-z0-9_-]{0,63}$').hasMatch(c.id) ||
@@ -608,6 +625,7 @@ class SpaceSession
           if (frame.channels.isNotEmpty ||
               frame.spaceTitle.isNotEmpty ||
               frame.hasIcon() ||
+              frame.attachmentsEnabled ||
               frame.role.isNotEmpty) {
             throw const LocalFailure(
               LocalFailureCode.protocolInvalid,
@@ -627,6 +645,7 @@ class SpaceSession
           frame.channels,
           frame.spaceTitle,
           frame.hasIcon() ? frame.icon : null,
+          frame.attachmentsEnabled,
         );
         role = frame.role;
         yield null;
@@ -1245,6 +1264,14 @@ class SpaceSession
       options: _options,
     );
     return result.content;
+  }
+
+  @override
+  Future<String> getNickname() async {
+    await _ensureSession();
+    final result = await MembershipServiceClient(channel)
+        .getMembership(GetMembershipRequest(), options: _options);
+    return result.member.nickname;
   }
 
   @override

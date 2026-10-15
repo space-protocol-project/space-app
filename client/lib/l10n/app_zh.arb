@@ -496,10 +496,19 @@
   "loadMoreFiles": "加载更多",
   "closeFiles": "关闭",
   "dropFilesHere": "松开文件以添加附件",
-  "optionalNickname": "昵称（可选）",
+  "optionalNickname": "名字（可选）",
   "channelFiles": "聊天附件",
   "allFileAuthors": "所有成员",
   "refreshFiles": "刷新附件",
   "filesLoadFailed": "无法加载附件，请尝试刷新列表。",
-  "filesServerUpdateRequired": "请更新服务器以使用附件列表。"
+  "filesServerUpdateRequired": "请更新服务器以使用附件列表。",
+  "serverNickname": "您在此空间中的名字",
+  "nicknameUniqueHelp": "名字在此服务器上必须唯一，不区分大小写。留空可移除名字。",
+  "saveNickname": "保存名字",
+  "nicknameSaved": "名字已保存",
+  "nicknameTaken": "此名字已被使用，请选择其他名字。",
+  "nicknameInvalid": "请使用最多40个字符，不含换行。",
+  "nicknameFailed": "无法更新个人资料，请检查连接。",
+  "retryProfile": "重试",
+  "messageUnavailable": "消息不可用"
 }

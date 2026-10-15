@@ -269,10 +269,8 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     final queue = attachmentQueue;
     final session = target.attachmentSession;
     if (queue.state.busy || target.busy) return;
-    final ids = queue.state.files.isEmpty
+    final ids = session == null || queue.state.files.isEmpty
         ? <String>[]
-        : session == null
-        ? null
         : await queue.upload(session, target.channelId);
     if (ids == null ||
         !mounted ||
@@ -281,7 +279,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       return;
     }
     final sent = await target.send(text, attachments: ids);
-    if (sent) queue.clear();
+    if (sent && session != null) queue.clear();
     if (!mounted) return;
     if (sent) _clearSentDraft(text, startingScope, target);
     if (restoreFocus) _restoreDraftFocus(startingScope, target);
@@ -368,7 +366,6 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         view.messages[index - 1].authorId == message.authorId &&
         index != boundary;
     return Padding(
-      key: messageKeys.putIfAbsent(message.id, GlobalKey.new),
       padding: EdgeInsets.only(
         bottom:
             index + 1 < view.messages.length &&
@@ -389,8 +386,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
               ),
             ),
           MessageBubble(
+            key: messageKeys.putIfAbsent(message.id, GlobalKey.new),
             text: message.text,
-            attachments: message.deleted
+            attachments: message.deleted || !controller.attachmentsEnabled
                 ? null
                 : Column(
                     mainAxisSize: MainAxisSize.min,
@@ -675,30 +673,6 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     ),
   );
 
-  void showChannelFiles() {
-    final session = widget.controller.attachmentSession;
-    if (session == null) return;
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: SizedBox(
-          width: 480,
-          height: MediaQuery.sizeOf(context).height * .7,
-          child: ChannelFilesPanel(
-            session: session,
-            channel: widget.controller.channelId,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.strings.closeFiles),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _withFiles(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
       final session = widget.controller.attachmentSession;
@@ -815,21 +789,8 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
           ),
         if (widget.controller.attachmentSession != null)
           AttachmentComposer(
-            openChannelFiles: showChannelFiles,
             queue: attachmentQueue,
             session: widget.controller.attachmentSession,
-            canRead: view.connected && view.canRead,
-            enabled: view.connected && view.canWrite && !view.busy,
-            openFiles: () {
-              final session = widget.controller.attachmentSession;
-              if (session != null) {
-                showDialog<void>(
-                  context: context,
-                  builder: (_) =>
-                      MyFilesDialog(session: session, channel: view.channelId),
-                );
-              }
-            },
           ),
         if (view.sendStatus != MessageSendStatus.idle)
           Padding(
@@ -842,58 +803,72 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
               MessageSendStatus.idle => '',
             }, style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant)),
           ),
-        Flexible(
-          child: GlassSurface(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Focus(
-                      canRequestFocus: false,
-                      onKeyEvent: _draftKeyEvent,
-                      child: TextField(
-                        key: const ValueKey('chat-draft'),
-                        focusNode: draftFocus,
-                        controller: draft,
-                        enabled: view.connected && view.canWrite && !view.busy,
-                        minLines: 2,
-                        maxLines: null,
-                        maxLength: 1024,
-                        decoration: InputDecoration(
-                          hintText: view.connected && !view.canWrite
-                              ? context.strings.cannotSend
-                              : context.strings.messageHint,
-                          counterText: '',
-                          filled: false,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 14,
-                          ),
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  IconButton.filled(
-                    onPressed: view.connected && view.canWrite && !view.busy
-                        ? send
-                        : null,
-                    tooltip: context.strings.sendMessage,
-                    style: IconButton.styleFrom(
-                      foregroundColor: colors.onPrimary,
-                    ),
-                    icon: const Icon(Icons.arrow_upward),
-                  ),
-                ],
-              ),
-            ),
+        Flexible(child: _inputSurface(context)),
+      ],
+    );
+  }
+
+  Widget _inputSurface(BuildContext context) => GlassSurface(
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(12, 6, 12, 14),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(child: _draftField(context)),
+          _composerButtons(context),
+        ],
+      ),
+    ),
+  );
+
+  Widget _draftField(BuildContext context) {
+    final view = widget.controller.state;
+    return Focus(
+      canRequestFocus: false,
+      onKeyEvent: _draftKeyEvent,
+      child: TextField(
+        key: const ValueKey('chat-draft'),
+        focusNode: draftFocus,
+        controller: draft,
+        enabled: view.connected && view.canWrite && !view.busy,
+        minLines: 3,
+        maxLines: null,
+        maxLength: 1024,
+        decoration: InputDecoration(
+          hintText: view.connected && !view.canWrite
+              ? context.strings.cannotSend
+              : context.strings.messageHint,
+          counterText: '',
+          filled: false,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
           ),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+        ),
+      ),
+    );
+  }
+
+  Widget _composerButtons(BuildContext context) {
+    final view = widget.controller.state;
+    final enabled = view.connected && view.canWrite && !view.busy;
+    return Row(
+      key: const ValueKey('composer-actions'),
+      children: [
+        if (widget.controller.attachmentSession != null)
+          AttachFileButton(queue: attachmentQueue, enabled: enabled),
+        const Spacer(),
+        IconButton.filled(
+          onPressed: enabled ? send : null,
+          tooltip: context.strings.sendMessage,
+          style: IconButton.styleFrom(
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          ),
+          icon: const Icon(Icons.arrow_upward),
         ),
       ],
     );

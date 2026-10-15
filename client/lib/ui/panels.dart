@@ -12,6 +12,7 @@ import '../src/app_updates.dart';
 import 'components.dart';
 import 'app_updates_view.dart';
 import 'shortcut_settings.dart';
+import 'member_profile.dart';
 
 class OverviewPanel extends StatelessWidget {
   const OverviewPanel({
@@ -78,6 +79,13 @@ class OverviewPanel extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
+        if (controller.memberProfile != null) ...[
+          MemberProfileCard(
+            key: ValueKey(('profile', controller)),
+            controller: controller,
+          ),
+          const SizedBox(height: 24),
+        ],
         AdaptiveCards(
           children: [
             metric(context.strings.dashboardChannels, channels.length),
@@ -199,7 +207,6 @@ class SettingsPanel extends StatelessWidget {
               ],
               onChanged: (value) => preferences.change(uiScale: value),
             ),
-            const Divider(),
             const SizedBox(height: 16),
             Text(context.strings.myColors),
             const SizedBox(height: 14),

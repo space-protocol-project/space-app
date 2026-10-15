@@ -1539,6 +1539,18 @@ abstract class AdminLocalizations {
   /// In ru, this message translates to:
   /// **'Пусто — стандартный лимит'**
   String get storageInherited;
+
+  /// No description provided for @attachmentsEnabled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разрешить вложения файлов'**
+  String get attachmentsEnabled;
+
+  /// No description provided for @attachmentsEnabledHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Если выключено, участники не могут прикреплять и скачивать файлы. Файловые функции скрываются в приложении этого пространства.'**
+  String get attachmentsEnabledHelp;
 }
 
 class _AdminLocalizationsDelegate

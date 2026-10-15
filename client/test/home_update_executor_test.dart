@@ -120,6 +120,26 @@ void main() {
   });
   tearDown(() => root.delete(recursive: true));
 
+  test('После подтверждённого обновления удаляются лишние runtime', () async {
+    final obsolete = release('v0.0.1');
+    await installed(installation, obsolete);
+    await executor.update(release('v0.1.0'), release('v0.2.0'));
+    expect(await installation.runtime(obsolete).exists(), false);
+    expect(await installation.runtime(release('v0.1.0')).exists(), true);
+    expect(await installation.runtime(release('v0.2.0')).exists(), true);
+  });
+
+  test('После неудачного обновления runtime не удаляются', () async {
+    final obsolete = release('v0.0.1');
+    await installed(installation, obsolete);
+    migrationFails = true;
+    await expectLater(
+      executor.update(release('v0.1.0'), release('v0.2.0')),
+      throwsA(isA<LocalFailure>()),
+    );
+    expect(await installation.runtime(obsolete).exists(), true);
+  });
+
   test('Продолжение прерванной подготовки повторяет обновление, не создавая цикл ошибок', () async {
     await HomeUpdateJournal(root).begin(release('v0.1.0'), release('v0.2.0'));
     await executor.recover();

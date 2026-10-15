@@ -757,4 +757,10 @@ class AdminLocalizationsZh extends AdminLocalizations {
 
   @override
   String get storageInherited => '留空则使用默认上限';
+
+  @override
+  String get attachmentsEnabled => '允许文件附件';
+
+  @override
+  String get attachmentsEnabledHelp => '关闭后，成员无法附加或下载文件，此空间的文件功能将被隐藏。';
 }
