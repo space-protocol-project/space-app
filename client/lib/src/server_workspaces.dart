@@ -143,6 +143,7 @@ class ServerWorkspaces
       await controller.inspect(
         record.connectionAddress,
         tlsFingerprint: record.tlsFingerprint,
+        savedRecord: record,
       );
       if (_disposed || !identical(_controllers[origin], controller)) return;
       if (controller.preview != null) {

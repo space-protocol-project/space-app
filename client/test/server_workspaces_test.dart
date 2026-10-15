@@ -24,6 +24,7 @@ class InspectCounter extends ChatController {
     String invitationToken = '',
     String? homeOrigin,
     String tlsFingerprint = '',
+    DeviceRecord? savedRecord,
   }) async {
     inspections++;
   }

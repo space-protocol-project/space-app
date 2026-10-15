@@ -20,6 +20,19 @@ class NativeAdminGateway extends SpaceGateway {
       ? (session as SpaceSession).server.tlsFingerprint
       : '';
   @override
+  String invitationLink(String token) {
+    if (session is! SpaceSession) return super.invitationLink(token);
+    final server = (session as SpaceSession).server;
+    return spaceEndpointLink(
+      server.endpoint,
+      server.tlsFingerprint,
+      server.serverId,
+      server.announcement?.endpoints ?? const [],
+      invitationToken: token,
+    );
+  }
+
+  @override
   Future<Map<String, dynamic>> call(
     String path, {
     String token = '',

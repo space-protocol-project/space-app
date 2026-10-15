@@ -1417,4 +1417,52 @@ class AppLocalizationsRu extends AppLocalizations {
   String mlsTransferHint(String device) {
     return 'Устройство $device сможет приглашать и исключать участников. Ваш доступ к переписке и файлам сохранится.';
   }
+
+  @override
+  String get homeExternalHost => 'Внешний адрес (IPv4, IPv6 или домен)';
+
+  @override
+  String get homeExternalPort => 'Внешний порт';
+
+  @override
+  String get homeAddAddress => 'Добавить адрес';
+
+  @override
+  String get homeRemoveAddress => 'Удалить адрес';
+
+  @override
+  String get homeListenPort => 'Локальный порт';
+
+  @override
+  String get homeListenInterfaces => 'Сеть';
+
+  @override
+  String get homeNetworkHelp =>
+      'Внешний порт может отличаться от локального. Изменения применятся при следующем запуске сервера.';
+
+  @override
+  String get homeSaveAddresses => 'Сохранить настройки';
+
+  @override
+  String get homeNetworkInvalid =>
+      'Проверьте адреса и порты (1–65535). Адреса не должны повторяться.';
+
+  @override
+  String get homeAddressLabel => 'Адрес';
+
+  @override
+  String get homePrimaryAddress => 'Основной адрес';
+
+  @override
+  String get homeBackupAddress => 'Запасной адрес';
+
+  @override
+  String get homeConnectionAddresses => 'Подключение участников';
+
+  @override
+  String get homeAddressHelp =>
+      'Домен, IPv4 или IPv6 — без https:// и скобок. Запасной адрес поможет, если основной недоступен.';
+
+  @override
+  String get homeLocalSettings => 'На этом компьютере';
 }

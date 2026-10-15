@@ -1,3 +1,5 @@
+import 'server_endpoints.dart';
+
 import 'dart:convert';
 
 import 'package:cryptography/cryptography.dart';
@@ -20,10 +22,20 @@ Future<Uri> verifiedIdentityOrigin(
         origin.path.isNotEmpty ||
         origin.hasQuery ||
         origin.hasFragment ||
-        discovery['network_origin'] != endpoint.toString() ||
+        (discovery['endpoints'] == null &&
+            discovery['network_origin'] != endpoint.toString()) ||
         discovery['tls_fingerprint'] != fingerprint ||
         !RegExp(r'^[0-9a-f]{64}$').hasMatch(fingerprint)) {
       throw const FormatException();
+    }
+    if (discovery['endpoints'] != null) {
+      await EndpointAnnouncement.verify(
+        discovery,
+        endpoint,
+        fingerprint,
+        serverKey,
+      );
+      return origin;
     }
     final signature = base64Url.decode(
       base64Url.normalize(discovery['origin_signature'] as String),

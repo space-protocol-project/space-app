@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
-import 'package:file_selector/file_selector.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:fixnum/fixnum.dart';
 
 import '../rpc_clients.dart';

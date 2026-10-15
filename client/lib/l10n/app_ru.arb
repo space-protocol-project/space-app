@@ -541,5 +541,20 @@
         "type": "String"
       }
     }
-  }
+  },
+  "homeExternalHost": "Внешний адрес (IPv4, IPv6 или домен)",
+  "homeExternalPort": "Внешний порт",
+  "homeAddAddress": "Добавить адрес",
+  "homeRemoveAddress": "Удалить адрес",
+  "homeListenPort": "Локальный порт",
+  "homeListenInterfaces": "Сеть",
+  "homeNetworkHelp": "Внешний порт может отличаться от локального. Изменения применятся при следующем запуске сервера.",
+  "homeSaveAddresses": "Сохранить настройки",
+  "homeNetworkInvalid": "Проверьте адреса и порты (1–65535). Адреса не должны повторяться.",
+  "homeAddressLabel": "Адрес",
+  "homePrimaryAddress": "Основной адрес",
+  "homeBackupAddress": "Запасной адрес",
+  "homeConnectionAddresses": "Подключение участников",
+  "homeAddressHelp": "Домен, IPv4 или IPv6 — без https:// и скобок. Запасной адрес поможет, если основной недоступен.",
+  "homeLocalSettings": "На этом компьютере"
 }

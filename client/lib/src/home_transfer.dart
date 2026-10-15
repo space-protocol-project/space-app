@@ -40,6 +40,7 @@ class HomeTransfer {
   }
 
   Future<Directory> importFrom(String source, {String publicIP = ''}) async {
+    publicIP = publicIP.trim().toLowerCase();
     await _requireEmptyDestination();
     final imported = Directory('${root.path}/transferred');
     if (!await imported.exists()) {

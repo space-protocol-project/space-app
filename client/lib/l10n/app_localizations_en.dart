@@ -1410,4 +1410,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String mlsTransferHint(String device) {
     return 'Device $device will be able to invite and remove members. You will keep access to messages and files.';
   }
+
+  @override
+  String get homeExternalHost => 'External address (IPv4, IPv6 or domain)';
+
+  @override
+  String get homeExternalPort => 'External port';
+
+  @override
+  String get homeAddAddress => 'Add address';
+
+  @override
+  String get homeRemoveAddress => 'Remove address';
+
+  @override
+  String get homeListenPort => 'Local port';
+
+  @override
+  String get homeListenInterfaces => 'Network';
+
+  @override
+  String get homeNetworkHelp =>
+      'External and local ports may differ. Changes apply the next time the server starts.';
+
+  @override
+  String get homeSaveAddresses => 'Save settings';
+
+  @override
+  String get homeNetworkInvalid =>
+      'Check addresses and ports (1–65535). Addresses must be unique.';
+
+  @override
+  String get homeAddressLabel => 'Address';
+
+  @override
+  String get homePrimaryAddress => 'Primary address';
+
+  @override
+  String get homeBackupAddress => 'Backup address';
+
+  @override
+  String get homeConnectionAddresses => 'Participant connections';
+
+  @override
+  String get homeAddressHelp =>
+      'Domain, IPv4 or IPv6, without https:// or brackets. A backup address helps when the primary is unavailable.';
+
+  @override
+  String get homeLocalSettings => 'On this computer';
 }

@@ -16,6 +16,16 @@ class SpaceGateway {
     : _client = client ?? http.Client();
   final Uri origin;
   String get tlsFingerprint => '';
+  String invitationLink(String token) => origin
+      .replace(
+        fragment: Uri(
+          queryParameters: {
+            'invite': token,
+            if (tlsFingerprint.isNotEmpty) 'tls': tlsFingerprint,
+          },
+        ).query,
+      )
+      .toString();
   final http.Client _client;
   Future<Map<String, dynamic>> call(
     String path, {

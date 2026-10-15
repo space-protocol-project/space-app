@@ -170,6 +170,7 @@ Future<void> verifySpace(
     local.origin,
     local.serverId,
     local.publicKey,
+    announcement: local.announcement,
     tlsFingerprint: local.tlsFingerprint,
     dialHost: '127.0.0.1',
     connectOrigin: local.endpoint,

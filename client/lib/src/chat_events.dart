@@ -27,9 +27,11 @@ final class ChatInspected extends ChatEvent<void> {
     this.invitationToken = '',
     this.homeOrigin,
     this.tlsFingerprint = '',
+    this.savedRecord,
   });
   final String address, invitationToken, tlsFingerprint;
   final String? homeOrigin;
+  final DeviceRecord? savedRecord;
 }
 
 final class ChatConnected extends ChatEvent<void> {

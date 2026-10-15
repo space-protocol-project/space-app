@@ -1,3 +1,5 @@
+import 'home_network_editor.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'home_operation_progress.dart';
@@ -34,6 +36,7 @@ class HomePanel extends StatefulWidget {
 
 class _HomePanelState extends State<HomePanel> {
   late final address = TextEditingController(text: widget.home.ip);
+  final networkEditor = GlobalKey<HomeNetworkEditorState>();
   bool detecting = false;
   bool detectionFailed = false;
   bool updateAction = false;
@@ -152,7 +155,7 @@ class _HomePanelState extends State<HomePanel> {
         ? await widget.home.importData(path, publicIP: publicIP)
         : await widget.home.exportData(path);
     if (!importing && wasRunning && mounted) {
-      await widget.onStart(address.text);
+      await startWithNetwork();
     }
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -255,6 +258,13 @@ class _HomePanelState extends State<HomePanel> {
     super.dispose();
   }
 
+  Future<void> startWithNetwork() async {
+    if (address.text.trim().isEmpty) await detect();
+    if (!mounted || !(await networkEditor.currentState!.save())) return;
+    if (!mounted) return;
+    await widget.onStart(address.text);
+  }
+
   Future<void> detect() async {
     setState(() {
       detecting = true;
@@ -283,76 +293,63 @@ class _HomePanelState extends State<HomePanel> {
       final home = widget.home;
       return SingleChildScrollView(
         padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.sensors),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    context.strings.homeTitle,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                Row(
+                  children: [
+                    const Icon(Icons.sensors),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        context.strings.homeTitle,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: context.strings.close,
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  tooltip: context.strings.close,
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
+                const SizedBox(height: 16),
+                Text(
+                  view.ip.isEmpty
+                      ? context.strings.homeFirstSetup
+                      : context.strings.homeReuse,
                 ),
+                const SizedBox(height: 20),
+                HomeNetworkEditor(
+                  key: networkEditor,
+                  home: home,
+                  address: address,
+                  onDetect: detect,
+                  enabled: !view.running && !view.busy && !detecting,
+                ),
+                if (detectionFailed) Text(context.strings.homeIPFailed),
+                const SizedBox(height: 28),
+                if (view.busy && view.error.isEmpty) ...[
+                  HomeOperationProgress(home: home),
+                  const SizedBox(height: 16),
+                ],
+                if (!view.busy && view.phase != HomePhase.idle) ...[
+                  Text(view.phase.label(context)),
+                  const SizedBox(height: 16),
+                ],
+                ..._failureDetails(context, view),
+                _powerControl(context, view),
+                ..._transferControls(view),
+                ..._updateControls(context, view),
+                ..._connectionDetails(context, view),
               ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              view.ip.isEmpty
-                  ? context.strings.homeFirstSetup
-                  : context.strings.homeReuse,
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: address,
-              enabled: view.ip.isEmpty && !view.busy && !detecting,
-              decoration: InputDecoration(
-                labelText: context.strings.homeIP,
-                hintText: context.strings.homeIPHint,
-              ),
-            ),
-            if (view.ip.isEmpty) ...[
-              const SizedBox(height: 16),
-              TextButton.icon(
-                onPressed: view.busy || detecting ? null : detect,
-                icon: const Icon(Icons.public),
-                label: Text(
-                  detecting
-                      ? context.strings.detectingIP
-                      : context.strings.detectIP,
-                ),
-              ),
-              Text(
-                context.strings.homeIPPrivacy,
-                style: TextStyle(fontSize: 12),
-              ),
-            ],
-            if (detectionFailed) Text(context.strings.homeIPFailed),
-            const SizedBox(height: 20),
-            Text(context.strings.homePortHelp),
-            const SizedBox(height: 20),
-            if (view.busy && view.error.isEmpty) ...[
-              HomeOperationProgress(home: home),
-              const SizedBox(height: 16),
-            ],
-            if (!view.busy && view.phase != HomePhase.idle) ...[
-              Text(view.phase.label(context)),
-              const SizedBox(height: 16),
-            ],
-            ..._failureDetails(context, view),
-            _powerControl(context, view),
-            ..._transferControls(view),
-            ..._updateControls(context, view),
-            ..._connectionDetails(context, view),
-          ],
+          ),
         ),
       );
     },
@@ -476,7 +473,7 @@ class _HomePanelState extends State<HomePanel> {
                 if (view.running) {
                   await widget.onStop();
                 } else {
-                  await widget.onStart(address.text);
+                  await startWithNetwork();
                 }
               },
         icon: view.running ? Icons.power_settings_new : Icons.sensors,

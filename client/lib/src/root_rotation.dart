@@ -17,6 +17,9 @@ Future<String> _digest(DeviceRecord record) async {
   // Смена маршрута не меняет ключи и не отменяет подготовленную ротацию.
   final identity = record.toJson()
     ..remove('endpoint')
+    ..remove('endpoints')
+    ..remove('endpointRevision')
+    ..remove('endpointDigest')
     ..remove('mlsChannels')
     ..remove('mlsIdentity');
   return url64((await Sha256().hash(utf8.encode(jsonEncode(identity)))).bytes);
@@ -125,6 +128,9 @@ Future<Map<String, dynamic>> prepareRootRotation(
   final next = DeviceRecord(
     origin: current.origin,
     endpoint: current.endpoint,
+    endpoints: current.endpoints,
+    endpointRevision: current.endpointRevision,
+    endpointDigest: current.endpointDigest,
     serverId: current.serverId,
     serverKey: current.serverKey,
     tlsFingerprint: current.tlsFingerprint,
@@ -161,7 +167,7 @@ Future<DeviceRecord?> finishRootRotation(
   }
   final next = DeviceRecord.fromJson(pending['next'] as Map<String, dynamic>);
   checkTrust(server, next);
-  next.endpoint = server.endpoint.toString();
+  rememberServerRoute(next, server);
   final identity = await next.identity();
   if (next.rootHistory.isEmpty || next.rootSeed.length != 32) {
     throw const LocalFailure(

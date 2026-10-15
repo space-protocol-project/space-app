@@ -476,6 +476,7 @@ class _AdminPageState extends State<AdminPage> {
                   call: call,
                   origin: identity!['origin'] as String,
                   tlsFingerprint: api?.tlsFingerprint ?? '',
+                  linkBuilder: api?.invitationLink,
                 ),
               ],
               if (identity != null && widget.revokeDevice != null) ...[

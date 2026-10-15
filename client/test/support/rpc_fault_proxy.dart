@@ -37,6 +37,12 @@ class RpcFaultProxy implements RpcConnection {
   }
 
   @override
+  void recoverRouteWith(Future<void> Function() recover) =>
+      target.recoverRouteWith(recover);
+  @override
+  void replaceRoute(Uri origin, String fingerprint, {String? dialHost}) =>
+      target.replaceRoute(origin, fingerprint, dialHost: dialHost);
+  @override
   Future<void> shutdown() => target.shutdown();
   @override
   Future<void> terminate() => target.terminate();

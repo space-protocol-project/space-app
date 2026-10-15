@@ -58,5 +58,20 @@
         "type": "String"
       }
     }
-  }
+  },
+  "homeExternalHost": "外部地址（IPv4、IPv6 或域名）",
+  "homeExternalPort": "外部端口",
+  "homeAddAddress": "添加地址",
+  "homeRemoveAddress": "删除地址",
+  "homeListenPort": "本地端口",
+  "homeListenInterfaces": "网络",
+  "homeNetworkHelp": "外部端口可与本地端口不同。更改将在下次启动服务器时生效。",
+  "homeSaveAddresses": "保存设置",
+  "homeNetworkInvalid": "请检查地址和端口（1–65535）。地址不能重复。",
+  "homeAddressLabel": "地址",
+  "homePrimaryAddress": "主要地址",
+  "homeBackupAddress": "备用地址",
+  "homeConnectionAddresses": "成员连接",
+  "homeAddressHelp": "请输入域名、IPv4 或 IPv6，不含 https:// 和方括号。主要地址不可用时可使用备用地址。",
+  "homeLocalSettings": "此计算机"
 }

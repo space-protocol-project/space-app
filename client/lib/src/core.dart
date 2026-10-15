@@ -1,3 +1,7 @@
+export 'endpoint_connection.dart';
+export 'server_endpoints.dart';
+import 'server_endpoints.dart';
+import 'endpoint_connection.dart';
 import 'mls/client.dart';
 import 'mls/local_store.dart';
 import 'mls/native.dart';
@@ -34,11 +38,13 @@ class Discovery {
     this.publicKey, {
     this.dialHost,
     this.tlsFingerprint = '',
+    this.announcement,
     Uri? connectOrigin,
     Uri? endpoint,
   }) : connectOrigin = connectOrigin ?? origin,
        endpoint = endpoint ?? origin;
   final Uri origin, connectOrigin, endpoint;
+  final EndpointAnnouncement? announcement;
   final String serverId;
   final List<int> publicKey;
   final String? dialHost;
@@ -56,8 +62,12 @@ class ConnectionInput {
     this.origin,
     this.invitationToken, [
     this.tlsFingerprint = '',
+    this.endpoints = const [],
+    this.serverId = '',
   ]);
   final String tlsFingerprint;
+  final List<ServerEndpoint> endpoints;
+  final String serverId;
   final Uri origin;
   final String invitationToken;
 }
@@ -66,10 +76,17 @@ ConnectionInput parseConnectionInput(
   String address, {
   String invitationToken = '',
 }) {
+  if (address.length > 16384) {
+    throw const FormatException('Слишком длинная ссылка');
+  }
   final uri = Uri.parse(address.trim());
   var token = invitationToken.trim();
   if (uri.hasFragment) {
     final fields = Uri.splitQueryString(uri.fragment);
+    if (Uri(query: uri.fragment).queryParametersAll.values
+        .any((v) => v.length != 1)) {
+      throw const FormatException('Повторные поля приглашения');
+    }
     _validateInvitationFields(fields);
     if (fields.containsKey('invite') &&
         token.isNotEmpty &&
@@ -90,13 +107,29 @@ ConnectionInput parseConnectionInput(
       localOrigin(uri.replace(path: '').removeFragment().toString()),
       token,
       fields['tls'] ?? '',
+      fields['addresses'] == null
+          ? const []
+          : parseEndpoints(
+              jsonDecode(
+                utf8.decode(
+                  base64Url.decode(base64Url.normalize(fields['addresses']!)),
+                ),
+              ),
+            ),
+      fields['server'] ?? '',
     );
   }
   return ConnectionInput(localOrigin(address), token);
 }
 
 void _validateInvitationFields(Map<String, String> fields) {
-  if (fields.keys.any((key) => !['invite', 'tls'].contains(key)) ||
+  if ((fields.containsKey('addresses') &&
+          (!fields.containsKey('tls') || !fields.containsKey('server'))) ||
+      (fields.containsKey('server') &&
+          !RegExp(r'^srv_[0-9a-f]{32}$').hasMatch(fields['server']!)) ||
+      fields.keys.any(
+        (key) => !['invite', 'tls', 'server', 'addresses'].contains(key),
+      ) ||
       (!fields.containsKey('invite') && !fields.containsKey('tls')) ||
       (fields.containsKey('tls') &&
           !RegExp(r'^[0-9a-f]{64}$').hasMatch(fields['tls']!)) ||
@@ -118,7 +151,8 @@ Uri localOrigin(String input) {
       uri.path.isNotEmpty ||
       uri.hasQuery ||
       uri.hasFragment ||
-      uri.port < 1) {
+      uri.port < 1 ||
+      uri.port > 65535) {
     throw const LocalFailure(
       LocalFailureCode.addressInvalid,
       'Нужен HTTPS адрес сервера или локальный HTTP адрес',
@@ -146,10 +180,41 @@ Uri discoveryConnectOrigin(Map<String, dynamic> data, Uri networkOrigin) {
   return networkOrigin;
 }
 
+bool _acceptDiscoveryCertificate(X509Certificate certificate, String pin) =>
+    certificateIsCurrent(certificate) &&
+    (pin.isEmpty || certificateFingerprint(certificate) == pin);
+
+HttpClient _discoveryClient(
+  Uri networkOrigin,
+  String tlsFingerprint,
+  Future<void>? cancelled,
+  String? dialAddress,
+) {
+  final client = HttpClient()..connectionTimeout = const Duration(seconds: 5);
+  cancelled?.then((_) => client.close(force: true));
+  client.findProxy = (_) => 'DIRECT';
+  if (dialAddress != null) {
+    client.connectionFactory = (uri, proxyHost, proxyPort) =>
+        SecureSocket.startConnect(
+          dialAddress,
+          uri.port,
+          onBadCertificate: (certificate) =>
+              _acceptDiscoveryCertificate(certificate, tlsFingerprint),
+        );
+  }
+  client.badCertificateCallback = (certificate, host, port) =>
+      host == networkOrigin.host &&
+      port == networkOrigin.port &&
+      _acceptDiscoveryCertificate(certificate, tlsFingerprint);
+  return client;
+}
+
 Future<Discovery> discover(
   String input, {
   String tlsFingerprint = '',
   String? homeOrigin,
+  Future<void>? cancelled,
+  String? dialAddress,
 }) async {
   final networkOrigin = localOrigin(input);
   final origin = homeOrigin == null ? networkOrigin : localOrigin(homeOrigin);
@@ -162,14 +227,12 @@ Future<Discovery> discover(
       'Недопустимый локальный маршрут домашнего сервера',
     );
   }
-  final client = HttpClient()..connectionTimeout = const Duration(seconds: 5);
-  // Первый сертификат проверяется пользователем вместе с ключом сервера до входа.
-  client.badCertificateCallback = (certificate, host, port) =>
-      host == networkOrigin.host &&
-      port == networkOrigin.port &&
-      certificateIsCurrent(certificate) &&
-      (tlsFingerprint.isEmpty ||
-          certificateFingerprint(certificate) == tlsFingerprint);
+  final client = _discoveryClient(
+    networkOrigin,
+    tlsFingerprint,
+    cancelled,
+    dialAddress,
+  );
   try {
     final request = await client
         .getUrl(networkOrigin.resolve('/.well-known/space-protocol'))
@@ -211,6 +274,7 @@ Future<Discovery> discover(
       homeOrigin,
       tlsFingerprint,
       actualFingerprint,
+      dialAddress,
     );
   } finally {
     client.close(force: true);
@@ -224,6 +288,7 @@ Future<Discovery> _discoveryFromBytes(
   String? homeOrigin,
   String tlsFingerprint,
   String actualFingerprint,
+  String? dialAddress,
 ) async {
   final data = jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
   final id = data['server_id'] as String;
@@ -251,10 +316,13 @@ Future<Discovery> _discoveryFromBytes(
     identityOrigin,
     id,
     key,
-    dialHost: networkOrigin.host,
+    dialHost: dialAddress ?? networkOrigin.host,
     tlsFingerprint: fingerprint,
     connectOrigin: discoveryConnectOrigin(data, networkOrigin),
     endpoint: origin,
+    announcement: data['endpoints'] == null
+        ? null
+        : await EndpointAnnouncement.verify(data, origin, fingerprint, key),
   );
 }
 
@@ -273,12 +341,18 @@ class DeviceRecord {
     this.rootHistory = const [],
     this.tlsFingerprint = '',
     this.endpoint = '',
+    this.endpoints = const [],
+    this.endpointRevision = 0,
+    this.endpointDigest = '',
     Map<String, String>? mlsChannels,
     this.mlsIdentity,
   }) : mlsChannels = {...?mlsChannels};
   final String origin, serverId, serverKey;
   final String tlsFingerprint;
   String endpoint;
+  List<ServerEndpoint> endpoints;
+  int endpointRevision;
+  String endpointDigest;
   String get connectionAddress => endpoint.isEmpty ? origin : endpoint;
   final List<int> rootSeed, deviceSeed;
   final List<int> rootPublicKey;
@@ -305,6 +379,9 @@ class DeviceRecord {
     'serverKey': serverKey,
     'tlsFingerprint': tlsFingerprint,
     'endpoint': endpoint,
+    'endpoints': endpoints.map((e) => e.toJson()).toList(),
+    'endpointRevision': endpointRevision,
+    'endpointDigest': endpointDigest,
     'rootSeed': url64(rootSeed),
     'deviceSeed': url64(deviceSeed),
     'grantId': grantId,
@@ -354,7 +431,23 @@ class DeviceRecord {
     );
     _requireDeviceSecrets(record);
     if (record.endpoint.isNotEmpty) localOrigin(record.endpoint);
+    _readEndpointState(record, data);
     return record;
+  }
+}
+
+void _readEndpointState(DeviceRecord record, Map<String, dynamic> data) {
+  record.endpoints = (data['endpoints'] as List? ?? []).isEmpty
+      ? const []
+      : parseEndpoints(data['endpoints']);
+  record.endpointRevision = data['endpointRevision'] as int? ?? 0;
+  record.endpointDigest = data['endpointDigest'] as String? ?? '';
+  if (record.endpointRevision < 0 ||
+      record.endpointRevision > maxEndpointRevision ||
+      (record.endpointRevision > 0 &&
+          (record.endpoints.isEmpty ||
+              !RegExp(r'^[0-9a-f]{64}$').hasMatch(record.endpointDigest)))) {
+    throw const FormatException('Повреждена сохранённая версия адресов');
   }
 }
 
@@ -386,6 +479,14 @@ abstract interface class RotationJournalVault implements IdentityVault {
 }
 
 void checkTrust(Discovery server, DeviceRecord record) {
+  final announcement = server.announcement;
+  if (record.endpointRevision > 0 &&
+      (announcement == null ||
+          announcement.revision < record.endpointRevision ||
+          (announcement.revision == record.endpointRevision &&
+              announcement.digest != record.endpointDigest))) {
+    throw const FormatException('Откат или подмена списка адресов');
+  }
   if (record.origin != server.origin.toString() ||
       record.serverId != server.serverId ||
       record.serverKey != url64(server.publicKey) ||
@@ -608,7 +709,7 @@ class SpaceSession
     }
   }
 
-  final Discovery server;
+  Discovery server;
   DeviceRecord record;
   final IdentityVault vault;
   final RpcConnection channel;
@@ -1039,6 +1140,7 @@ class SpaceSession
     );
     final channel = server.openConnection();
     final session = SpaceSession._(server, record, vault, channel);
+    channel.recoverRouteWith(session._refreshNetworkRoute);
     try {
       final manifest = await ChannelServiceClient(channel).getManifest(
         GetManifestRequest(),
@@ -1117,6 +1219,9 @@ class SpaceSession
         record = DeviceRecord(
           origin: record.origin,
           endpoint: record.endpoint,
+          endpoints: record.endpoints,
+          endpointRevision: record.endpointRevision,
+          endpointDigest: record.endpointDigest,
           serverId: record.serverId,
           serverKey: record.serverKey,
           tlsFingerprint: record.tlsFingerprint,
@@ -1144,7 +1249,7 @@ class SpaceSession
       );
       await vault.save(record);
     }
-    record.endpoint = server.endpoint.toString();
+    rememberServerRoute(record, server);
     await vault.save(record);
     return record;
   }
@@ -1152,6 +1257,27 @@ class SpaceSession
   @override
   Future<void> login() =>
       _loginTask ??= _login().whenComplete(() => _loginTask = null);
+  Future<void> _refreshNetworkRoute() async {
+    if (record.endpointRevision > 0 && server.connectOrigin.scheme == 'https') {
+      final next = await discoverConnection(
+        parseConnectionInput(record.connectionAddress),
+        record: record,
+      );
+      checkTrust(next, record);
+      rememberServerRoute(record, next);
+      await vault.save(record);
+      if (next.endpoint != server.endpoint ||
+          next.dialHost != server.dialHost) {
+        channel.replaceRoute(
+          next.connectOrigin,
+          next.tlsFingerprint,
+          dialHost: next.dialHost,
+        );
+      }
+      server = next;
+    }
+  }
+
   Future<void> _login() async {
     final result = await _authorize('auth.login');
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
@@ -1675,6 +1801,10 @@ class SpaceSession
     final signer = DeviceRecord(
       origin: record.origin,
       endpoint: record.endpoint,
+      endpoints: record.endpoints,
+      endpointRevision: record.endpointRevision,
+      endpointDigest: record.endpointDigest,
+      tlsFingerprint: record.tlsFingerprint,
       serverId: record.serverId,
       serverKey: record.serverKey,
       rootSeed: credentials.rootSeed,
@@ -1788,6 +1918,9 @@ class SpaceSession
       'v': record.rootHistory.isEmpty ? 1 : 2,
       'origin': record.origin,
       'endpoint': record.connectionAddress,
+      'endpoints': record.endpoints.map((e) => e.toJson()).toList(),
+      'endpoint_revision': record.endpointRevision,
+      'endpoint_digest': record.endpointDigest,
       'server_id': record.serverId,
       'server_key': record.serverKey,
       if (record.tlsFingerprint.isNotEmpty)
@@ -1967,6 +2100,11 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
   final record = DeviceRecord(
     origin: origin,
     endpoint: endpoint,
+    endpoints: (payload['endpoints'] as List? ?? []).isEmpty
+        ? const []
+        : parseEndpoints(payload['endpoints']),
+    endpointRevision: payload['endpoint_revision'] as int? ?? 0,
+    endpointDigest: payload['endpoint_digest'] as String? ?? '',
     serverId: serverId,
     serverKey: serverKey,
     tlsFingerprint: tlsFingerprint,
@@ -1979,7 +2117,7 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
     rootHistory: history,
   );
   await record.identity();
-  return record;
+  return DeviceRecord.fromJson(record.toJson());
 }
 
 List<Map<String, dynamic>> _recoveryHistory(Map<String, dynamic> payload) {

@@ -1,3 +1,8 @@
+import 'home_network.dart';
+import 'server_endpoints.dart';
+import 'endpoint_connection.dart';
+export 'server_endpoints.dart';
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -37,13 +42,18 @@ class HomeServerState {
     this.localOrigin,
     this.publicOrigin,
     this.setupCode,
-    this.tlsFingerprint,
+    this.tlsFingerprint, {
+    this.serverId = '',
+    this.endpoints = const [],
+  });
+  final String localOrigin, publicOrigin, setupCode, tlsFingerprint, serverId;
+  final List<ServerEndpoint> endpoints;
+  String get link => spaceEndpointLink(
+    Uri.parse(publicOrigin),
+    tlsFingerprint,
+    serverId,
+    endpoints,
   );
-  final String localOrigin, publicOrigin, setupCode, tlsFingerprint;
-  String get link =>
-      Uri.parse(publicOrigin)
-          .replace(fragment: 'tls=$tlsFingerprint')
-          .toString();
 }
 
 Future<Directory> homeDirectory() async =>
@@ -62,6 +72,9 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
       (event, emit) => event.runAndComplete(() => emit(event.state)),
     );
     on<HomeLoaded>((event, _) => handleRequest(event, _load));
+    on<HomeNetworkSaved>(
+      (event, _) => handleRequest(event, () => _saveNetwork(event)),
+    );
     on<HomeIPDetected>((event, _) => handleRequest(event, _detectIP));
     on<HomeUpdatePrepared>((event, _) => handleRequest(event, _prepareUpdate));
     on<HomeUpdateRequested>(
@@ -97,6 +110,11 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
   Future<bool> importData(String path, {String publicIP = ''}) =>
       sendRequest(HomeImportRequested(path, publicIP));
 
+  Future<bool> configureNetwork(
+    List<ServerEndpoint> endpoints, {
+    String listenHost = '::',
+    int listenPort = 8443,
+  }) => sendRequest(HomeNetworkSaved(endpoints, listenHost, listenPort));
   Future<void> load() => sendRequest(HomeLoaded());
   Future<String> detectIP() => sendRequest(HomeIPDetected());
   Future<bool> prepareUpdate() => sendRequest(HomeUpdatePrepared());
@@ -120,6 +138,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
   Future<void>? _unlocking;
   bool busy = false, running = false, _disposed = false;
   String ip = '', error = '';
+  HomeNetwork? network;
   String installedVersion = '', availableVersion = '';
   String availableReleaseNotes = '';
   HomeSpaceReport? spaceReport;
@@ -219,12 +238,8 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     try {
       final root = await _directory();
       await _loadRecovery(root);
-      final config = File('${root.path}/config.json');
-      if (await config.exists()) {
-        final data =
-            jsonDecode(await config.readAsString()) as Map<String, dynamic>;
-        ip = data['ip'] as String;
-      }
+      network = await HomeNetwork.read(root);
+      ip = network?.endpoints.first.host ?? '';
       final offered = await release();
       availableVersion = offered.version;
       availableReleaseNotes = offered.releaseNotes;
@@ -470,30 +485,50 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
   }
 
   Future<void> _prepareConfiguration(Directory root, String address) async {
-    final config = File('${root.path}/config.json');
-    // Повторный запуск читает прежнюю конфигурацию, а не создаёт новый сервер.
-    if (await config.exists()) {
-      ip =
-          (jsonDecode(await config.readAsString())
-                  as Map<String, dynamic>)['ip']
-              as String;
-    } else {
-      var candidate = address.trim();
-      if (candidate.isEmpty) {
-        phase = HomePhase.detectingIP;
-        _update();
-        candidate = await _detectIP();
-      }
-      if (!isPublicHomeIPv4(candidate)) {
-        throw const FormatException('Нужен статический публичный IPv4');
-      }
-      final pending = File('${config.path}.tmp');
-      await pending.writeAsString(
-        jsonEncode({'ip': candidate, 'port': 8443}),
-        flush: true,
-      );
-      await pending.rename(config.path);
-      ip = candidate;
+    network = await HomeNetwork.read(root);
+    if (network == null) {
+      final host = address.trim().isEmpty ? await _detectIP() : address.trim();
+      network = HomeNetwork([ServerEndpoint.parse(host, 8443)]);
+      await network!.write(root);
+    }
+    ip = network!.endpoints.first.host;
+  }
+
+  Future<bool> _saveNetwork(HomeNetworkSaved event) async {
+    if (busy || running || _disposed || !supported) return false;
+    busy = true;
+    error = '';
+    _update();
+    RandomAccessFile? lock;
+    try {
+      final root = await _directory();
+      lock = await File('${root.path}/process.lock')
+          .open(mode: FileMode.append);
+      await lock.lock(FileLock.exclusive);
+      await HomeUpdateJournal(root).requireSettled();
+      final previous = await HomeNetwork.read(root);
+      final next = previous == null
+          ? HomeNetwork(
+              event.endpoints,
+              listenHost: event.listenHost,
+              listenPort: event.listenPort,
+            )
+          : previous.changed(
+              event.endpoints,
+              event.listenHost,
+              event.listenPort,
+            );
+      await next.write(root);
+      network = next;
+      ip = next.endpoints.first.host;
+      return true;
+    } catch (problem) {
+      error = problem.toString();
+      return false;
+    } finally {
+      await lock?.close();
+      busy = false;
+      _update();
     }
   }
 
@@ -555,6 +590,12 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
       await HomeUpdateJournal(root).requireSettled();
       await _prepareConfiguration(root, address);
       final runtime = await _install(root);
+      final capabilities = await runHomeTool(runtime, ['-runtime-info']);
+      if (capabilities['endpointSetVersion'] != 1) {
+        throw const FormatException(
+          'Обновите runtime: требуется поддержка нескольких адресов пространства',
+        );
+      }
       if (_disposed) {
         throw const FormatException('Запуск отменён при закрытии приложения');
       }
@@ -579,7 +620,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
         '-grpc',
         '127.0.0.1:$grpcPort',
         '-https',
-        '0.0.0.0:8443',
+        '${network!.listenHost.contains(':') ? '[${network!.listenHost}]' : network!.listenHost}:${network!.listenPort}',
         '-managed',
       ], mode: ProcessStartMode.normal);
       _process = process;
@@ -596,6 +637,8 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
         result['public_origin'] as String,
         result['setup_code'] as String,
         crypto.sha256.convert(der).toString(),
+        serverId: result['server_id'] as String? ?? '',
+        endpoints: network!.endpoints,
       );
       running = true;
       phase = HomePhase.running;

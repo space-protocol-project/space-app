@@ -44,6 +44,49 @@ Uint8List envelope(List<int> message, {int flags = 0}) {
 }
 
 void main() {
+  test('Смена адреса не сбрасывает общий бюджет подписок', () async {
+    var requests = 0;
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    server.listen((request) async {
+      requests++;
+      await request.drain<void>();
+      request.response.headers.contentType = ContentType.parse(
+        'application/connect+proto',
+      );
+      request.response.add(
+        envelope(SubscribeResponse(heartbeat: true).writeToBuffer()),
+      );
+      request.response.add(envelope(utf8.encode('{}'), flags: 2));
+      await request.response.close();
+    });
+    final origin = Uri.parse('http://127.0.0.1:${server.port}');
+    final connection = RpcConnection.connect(origin, '');
+    try {
+      for (var i = 0; i < 60; i++) {
+        connection.replaceRoute(origin, '');
+        await SyncServiceClient(connection)
+            .subscribe(SubscribeRequest(channelId: 'general'))
+            .drain<void>();
+      }
+      connection.replaceRoute(origin, '');
+      await expectLater(
+        SyncServiceClient(connection)
+            .subscribe(SubscribeRequest(channelId: 'general'))
+            .drain<void>(),
+        throwsA(
+          isA<GrpcError>().having(
+            (e) => e.code,
+            'Бюджет',
+            StatusCode.resourceExhausted,
+          ),
+        ),
+      );
+      expect(requests, 60);
+    } finally {
+      await connection.terminate();
+      await server.close(force: true);
+    }
+  });
   test(
     'Настоящий HTTP-поток останавливается после бюджета валидных кадров',
     () async {

@@ -74,8 +74,11 @@ Future<T> withSignal<T>(Future<T> result, connect.AbortSignal? signal) =>
     ? result
     : Future.any([signal.future.then<T>((error) => throw error), result]);
 
-connect.HttpClient rpcHttpClient(HttpClient client) {
-  final budget = RpcSubscriptionBudget();
+connect.HttpClient rpcHttpClient(
+  HttpClient client, {
+  RpcSubscriptionBudget? budget,
+}) {
+  budget ??= RpcSubscriptionBudget();
   return (input) => sendRpcRequest(client, input, budget: budget);
 }
 

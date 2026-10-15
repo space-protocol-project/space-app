@@ -26,19 +26,63 @@ class RpcConnection {
     String fingerprint, {
     connect.Codec? codec,
     String? dialHost,
-  }) : _http = pinnedRpcClient(origin, fingerprint, dialHost: dialHost) {
+  }) : _codec = codec ?? const ProtoCodec(),
+       _http = pinnedRpcClient(origin, fingerprint, dialHost: dialHost) {
     _client = connect.Client(
       protocol.Transport(
         baseUrl: origin.toString(),
-        codec: codec ?? const ProtoCodec(),
-        httpClient: rpcHttpClient(_http),
+        codec: _codec,
+        httpClient: rpcHttpClient(_http, budget: _budget),
       ),
     );
   }
-  final HttpClient _http;
-  late final connect.Client _client;
+  final connect.Codec _codec;
+  HttpClient _http;
+  final _budget = RpcSubscriptionBudget();
+  Future<void> Function()? _routeRecovery;
+  Future<void>? _recovering;
+  bool _routeFailed = false;
+
+  void recoverRouteWith(Future<void> Function() recover) =>
+      _routeRecovery = recover;
+
+  Future<void> _recoverRoute() async {
+    if (!_routeFailed || _routeRecovery == null) return;
+    await (_recovering ??= _routeRecovery!()
+        .then((_) => _routeFailed = false)
+        .whenComplete(() => _recovering = null));
+  }
+
+  void _rememberFailure(Object error) {
+    if (error is HttpException ||
+        error is SocketException ||
+        error is HandshakeException ||
+        error is TimeoutException ||
+        (error is GrpcError &&
+            [
+              StatusCode.unavailable,
+              StatusCode.deadlineExceeded,
+            ].contains(error.code))) {
+      _routeFailed = true;
+    }
+  }
+
+  late connect.Client _client;
   final _active = <RpcCall>{};
   bool _closed = false;
+
+  void replaceRoute(Uri origin, String fingerprint, {String? dialHost}) {
+    if (_closed) throw StateError('RPC-соединение закрыто');
+    _http.close(force: true);
+    _http = pinnedRpcClient(origin, fingerprint, dialHost: dialHost);
+    _client = connect.Client(
+      protocol.Transport(
+        baseUrl: origin.toString(),
+        codec: _codec,
+        httpClient: rpcHttpClient(_http, budget: _budget),
+      ),
+    );
+  }
 
   Future<O> unary<I extends GeneratedMessage, O extends GeneratedMessage>(
     connect.Spec<I, O> spec,
@@ -46,6 +90,7 @@ class RpcConnection {
     RpcOptions? options,
   }) async {
     if (_closed) throw const GrpcError.unavailable('RPC-соединение закрыто');
+    await _recoverRoute();
     final call = _begin(options, const Duration(seconds: 10));
     try {
       return await _client.unary(
@@ -56,10 +101,15 @@ class RpcConnection {
       );
     } on connect.ConnectException catch (error) {
       final converted = rpcError(error);
-      if (converted is GrpcError && converted.code == StatusCode.unauthenticated) {
+      _rememberFailure(converted);
+      if (converted is GrpcError &&
+          converted.code == StatusCode.unauthenticated) {
         options?.onUnauthenticated?.call();
       }
       throw converted;
+    } catch (error) {
+      _rememberFailure(error);
+      rethrow;
     } finally {
       _finish(call);
     }
@@ -86,6 +136,7 @@ class RpcConnection {
     RpcCall call,
   ) async* {
     try {
+      await _recoverRoute();
       await for (final message in _client.server(
         spec,
         request,
@@ -95,7 +146,12 @@ class RpcConnection {
         yield message;
       }
     } on connect.ConnectException catch (error) {
-      throw rpcError(error);
+      final converted = rpcError(error);
+      _rememberFailure(converted);
+      throw converted;
+    } catch (error) {
+      _rememberFailure(error);
+      rethrow;
     } finally {
       _finish(call);
     }
@@ -160,6 +216,10 @@ class RpcStream<T> extends StreamView<T> {
 
 Object rpcError(connect.ConnectException error) {
   final cause = error.cause;
-  if (cause is HandshakeException || cause is SocketException) return cause!;
+  if (cause is HandshakeException ||
+      cause is SocketException ||
+      cause is HttpException) {
+    return cause!;
+  }
   return GrpcError.custom(error.code.value, error.message);
 }

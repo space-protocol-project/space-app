@@ -140,7 +140,7 @@ void main() {
           ),
         );
         if (locale.languageCode == 'ru') {
-          await tester.enterText(find.byType(TextField), ip);
+          await tester.enterText(find.byType(TextField).first, ip);
         }
         final strings = lookupAppLocalizations(locale);
         home.busy = true;
@@ -158,7 +158,10 @@ void main() {
           closeTo(.05 + .55 * .37, .00001),
         );
         expect(
-          tester.widget<TextField>(find.byType(TextField)).controller!.text,
+          tester
+              .widget<TextField>(find.byType(TextField).first)
+              .controller!
+              .text,
           ip,
         );
         home.ip = ip;
@@ -169,7 +172,10 @@ void main() {
         home.publishState();
         await tester.pumpAndSettle();
         expect(find.text(state.link), findsOneWidget);
-        expect(tester.widget<SpaceLinkQr>(find.byType(SpaceLinkQr)).link, state.link);
+        expect(
+          tester.widget<SpaceLinkQr>(find.byType(SpaceLinkQr)).link,
+          state.link,
+        );
         await tester.ensureVisible(find.text(strings.stopHome));
         await tester.tap(find.text(strings.stopHome));
         await tester.pumpAndSettle();

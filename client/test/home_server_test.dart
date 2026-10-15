@@ -11,6 +11,15 @@ import 'package:space_client/src/home_controller.dart';
 import 'package:space_client/src/home_runtime.dart';
 import 'package:space_client/ui/home_panel.dart';
 
+class _Home extends HomeController {
+  @override
+  Future<bool> configureNetwork(
+    List<ServerEndpoint> endpoints, {
+    String listenHost = '::',
+    int listenPort = 8443,
+  }) async => true;
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   test('В приложение включены проверяемые выпуски для трёх платформ', () async {
@@ -120,7 +129,7 @@ void main() {
   testWidgets(
     'Выйти в эфир → Отключиться → Выйти в эфир; ссылка остаётся прежней',
     (tester) async {
-      final home = HomeController();
+      final home = _Home();
       home.ip = '203.0.113.10';
       addTearDown(home.dispose);
       var launches = 0;
@@ -151,6 +160,7 @@ void main() {
           ),
         ),
       );
+      await tester.ensureVisible(find.text('Выйти в эфир'));
       await tester.tap(find.text('Выйти в эфир'));
       await tester.pumpAndSettle();
       expect(find.text('Отключиться'), findsOneWidget);

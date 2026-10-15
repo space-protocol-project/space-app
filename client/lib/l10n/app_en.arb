@@ -541,5 +541,20 @@
         "type": "String"
       }
     }
-  }
+  },
+  "homeExternalHost": "External address (IPv4, IPv6 or domain)",
+  "homeExternalPort": "External port",
+  "homeAddAddress": "Add address",
+  "homeRemoveAddress": "Remove address",
+  "homeListenPort": "Local port",
+  "homeListenInterfaces": "Network",
+  "homeNetworkHelp": "External and local ports may differ. Changes apply the next time the server starts.",
+  "homeSaveAddresses": "Save settings",
+  "homeNetworkInvalid": "Check addresses and ports (1–65535). Addresses must be unique.",
+  "homeAddressLabel": "Address",
+  "homePrimaryAddress": "Primary address",
+  "homeBackupAddress": "Backup address",
+  "homeConnectionAddresses": "Participant connections",
+  "homeAddressHelp": "Domain, IPv4 or IPv6, without https:// or brackets. A backup address helps when the primary is unavailable.",
+  "homeLocalSettings": "On this computer"
 }

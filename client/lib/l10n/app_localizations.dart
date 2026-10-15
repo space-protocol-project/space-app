@@ -2590,6 +2590,96 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Устройство {device} сможет приглашать и исключать участников. Ваш доступ к переписке и файлам сохранится.'**
   String mlsTransferHint(String device);
+
+  /// No description provided for @homeExternalHost.
+  ///
+  /// In ru, this message translates to:
+  /// **'Внешний адрес (IPv4, IPv6 или домен)'**
+  String get homeExternalHost;
+
+  /// No description provided for @homeExternalPort.
+  ///
+  /// In ru, this message translates to:
+  /// **'Внешний порт'**
+  String get homeExternalPort;
+
+  /// No description provided for @homeAddAddress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить адрес'**
+  String get homeAddAddress;
+
+  /// No description provided for @homeRemoveAddress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить адрес'**
+  String get homeRemoveAddress;
+
+  /// No description provided for @homeListenPort.
+  ///
+  /// In ru, this message translates to:
+  /// **'Локальный порт'**
+  String get homeListenPort;
+
+  /// No description provided for @homeListenInterfaces.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сеть'**
+  String get homeListenInterfaces;
+
+  /// No description provided for @homeNetworkHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Внешний порт может отличаться от локального. Изменения применятся при следующем запуске сервера.'**
+  String get homeNetworkHelp;
+
+  /// No description provided for @homeSaveAddresses.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить настройки'**
+  String get homeSaveAddresses;
+
+  /// No description provided for @homeNetworkInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверьте адреса и порты (1–65535). Адреса не должны повторяться.'**
+  String get homeNetworkInvalid;
+
+  /// No description provided for @homeAddressLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес'**
+  String get homeAddressLabel;
+
+  /// No description provided for @homePrimaryAddress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Основной адрес'**
+  String get homePrimaryAddress;
+
+  /// No description provided for @homeBackupAddress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запасной адрес'**
+  String get homeBackupAddress;
+
+  /// No description provided for @homeConnectionAddresses.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключение участников'**
+  String get homeConnectionAddresses;
+
+  /// No description provided for @homeAddressHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Домен, IPv4 или IPv6 — без https:// и скобок. Запасной адрес поможет, если основной недоступен.'**
+  String get homeAddressHelp;
+
+  /// No description provided for @homeLocalSettings.
+  ///
+  /// In ru, this message translates to:
+  /// **'На этом компьютере'**
+  String get homeLocalSettings;
 }
 
 class _AppLocalizationsDelegate

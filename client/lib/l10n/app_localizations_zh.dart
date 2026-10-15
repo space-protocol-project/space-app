@@ -1298,6 +1298,52 @@ class AppLocalizationsZh extends AppLocalizations {
   String mlsTransferHint(String device) {
     return '设备 $device 将能够邀请和移除成员。你仍可访问消息和文件。';
   }
+
+  @override
+  String get homeExternalHost => '外部地址（IPv4、IPv6 或域名）';
+
+  @override
+  String get homeExternalPort => '外部端口';
+
+  @override
+  String get homeAddAddress => '添加地址';
+
+  @override
+  String get homeRemoveAddress => '删除地址';
+
+  @override
+  String get homeListenPort => '本地端口';
+
+  @override
+  String get homeListenInterfaces => '网络';
+
+  @override
+  String get homeNetworkHelp => '外部端口可与本地端口不同。更改将在下次启动服务器时生效。';
+
+  @override
+  String get homeSaveAddresses => '保存设置';
+
+  @override
+  String get homeNetworkInvalid => '请检查地址和端口（1–65535）。地址不能重复。';
+
+  @override
+  String get homeAddressLabel => '地址';
+
+  @override
+  String get homePrimaryAddress => '主要地址';
+
+  @override
+  String get homeBackupAddress => '备用地址';
+
+  @override
+  String get homeConnectionAddresses => '成员连接';
+
+  @override
+  String get homeAddressHelp =>
+      '请输入域名、IPv4 或 IPv6，不含 https:// 和方括号。主要地址不可用时可使用备用地址。';
+
+  @override
+  String get homeLocalSettings => '此计算机';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1434,4 +1480,50 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String mlsTransferHint(String device) {
     return '设备 $device 将能够邀请和移除成员。你仍可访问消息和文件。';
   }
+
+  @override
+  String get homeExternalHost => '外部地址（IPv4、IPv6 或域名）';
+
+  @override
+  String get homeExternalPort => '外部端口';
+
+  @override
+  String get homeAddAddress => '添加地址';
+
+  @override
+  String get homeRemoveAddress => '删除地址';
+
+  @override
+  String get homeListenPort => '本地端口';
+
+  @override
+  String get homeListenInterfaces => '网络';
+
+  @override
+  String get homeNetworkHelp => '外部端口可与本地端口不同。更改将在下次启动服务器时生效。';
+
+  @override
+  String get homeSaveAddresses => '保存设置';
+
+  @override
+  String get homeNetworkInvalid => '请检查地址和端口（1–65535）。地址不能重复。';
+
+  @override
+  String get homeAddressLabel => '地址';
+
+  @override
+  String get homePrimaryAddress => '主要地址';
+
+  @override
+  String get homeBackupAddress => '备用地址';
+
+  @override
+  String get homeConnectionAddresses => '成员连接';
+
+  @override
+  String get homeAddressHelp =>
+      '请输入域名、IPv4 或 IPv6，不含 https:// 和方括号。主要地址不可用时可使用备用地址。';
+
+  @override
+  String get homeLocalSettings => '此计算机';
 }

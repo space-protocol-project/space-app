@@ -1,4 +1,8 @@
 // Сквозная проверка выполняется только на одноразовых runner с отдельной базой.
+import 'home_endpoints_drill.dart' as endpoints_drill;
+import 'home_vault.dart';
+export 'home_vault.dart';
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -6,17 +10,6 @@ import 'dart:io';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:grpc/grpc.dart';
 import 'package:space_client/src/core.dart';
-
-class HomeVault implements IdentityVault {
-  Map<String, dynamic>? data;
-  @override
-  Future<DeviceRecord?> load(String origin) async =>
-      data == null ? null : DeviceRecord.fromJson(data!);
-  @override
-  Future<void> save(DeviceRecord record) async {
-    data = record.toJson();
-  }
-}
 
 Future<void> expectAccessDenied(
   Future<void> Function() action,
@@ -178,6 +171,7 @@ Future<void> main(List<String> args) async {
           discovery.origin,
           discovery.serverId,
           discovery.publicKey,
+          announcement: discovery.announcement,
           dialHost: '127.0.0.1',
           tlsFingerprint: fingerprint,
           connectOrigin: discovery.origin,
@@ -305,6 +299,7 @@ Future<void> main(List<String> args) async {
   } finally {
     await directory.delete(recursive: true);
   }
+  await endpoints_drill.main(args);
 }
 
 Future<void> expectAccessDeniedAfterStop() async {

@@ -269,9 +269,9 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     final endpoint = preview != null && preview.serverId == record.serverId
         ? preview.endpoint.toString()
         : record.connectionAddress;
-    final server = await discover(
-      endpoint,
-      tlsFingerprint: record.tlsFingerprint,
+    final server = await discoverConnection(
+      parseConnectionInput(endpoint),
+      record: record,
     );
     checkTrust(server, record);
     final existing = await widget.controller.vault.load(record.origin);
@@ -295,7 +295,11 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     }
     stage(4);
     await target.disconnect();
-    await target.inspect(endpoint, tlsFingerprint: record.tlsFingerprint);
+    await target.inspect(
+      server.endpoint.toString(),
+      tlsFingerprint: record.tlsFingerprint,
+      savedRecord: record,
+    );
     await target.connect(restoredRecord: record);
     if (!target.connected) {
       throw RecoveryOperationError('recoveryConnectionDenied');

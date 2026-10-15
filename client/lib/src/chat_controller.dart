@@ -67,6 +67,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
           invitationToken: event.invitationToken,
           homeOrigin: event.homeOrigin,
           tlsFingerprint: event.tlsFingerprint,
+          savedRecord: event.savedRecord,
         ),
       ),
     );
@@ -111,12 +112,14 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     String invitationToken = '',
     String? homeOrigin,
     String tlsFingerprint = '',
+    DeviceRecord? savedRecord,
   }) => sendRequest(
     ChatInspected(
       address,
       invitationToken: invitationToken,
       homeOrigin: homeOrigin,
       tlsFingerprint: tlsFingerprint,
+      savedRecord: savedRecord,
     ),
   );
   Future<void> connect({
@@ -630,6 +633,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     String invitationToken = '',
     String? homeOrigin,
     String tlsFingerprint = '',
+    DeviceRecord? savedRecord,
   }) async {
     if (busy) return;
     busy = true;
@@ -643,12 +647,12 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
         address,
         invitationToken: invitationToken,
       );
-      final server = await discover(
-        input.origin.toString(),
+      final known = savedRecord ?? await vault.load(input.origin.toString());
+      final server = await discoverConnection(
+        input,
+        record: known,
         homeOrigin: homeOrigin,
-        tlsFingerprint: input.tlsFingerprint.isEmpty
-            ? tlsFingerprint
-            : input.tlsFingerprint,
+        tlsFingerprint: tlsFingerprint,
       );
       final saved = await vault.load(server.origin.toString());
       if (saved != null) checkTrust(server, saved);

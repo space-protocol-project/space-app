@@ -44,3 +44,14 @@ final class HomeImportRequested extends HomeEvent<bool> {
   HomeImportRequested(this.path, this.publicIP);
   final String path, publicIP;
 }
+
+final class HomeNetworkSaved extends HomeEvent<bool> {
+  HomeNetworkSaved(
+    List<ServerEndpoint> endpoints,
+    this.listenHost,
+    this.listenPort,
+  ) : endpoints = List.unmodifiable(endpoints);
+  final List<ServerEndpoint> endpoints;
+  final String listenHost;
+  final int listenPort;
+}

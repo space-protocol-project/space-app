@@ -24,6 +24,7 @@ class _Controller extends ChatController {
     String invitationToken = '',
     String? homeOrigin,
     String tlsFingerprint = '',
+    DeviceRecord? savedRecord,
   }) async {
     inspectedAddress = address;
     final input = parseConnectionInput(

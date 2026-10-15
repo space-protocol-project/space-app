@@ -8,6 +8,7 @@ final class HomeState {
     this.recoveryBlocked = false,
     this.updateAvailable = false,
     this.ip = '',
+    this.network,
     this.error = '',
     this.installedVersion = '',
     this.availableVersion = '',
@@ -29,6 +30,7 @@ final class HomeState {
     recoveryBlocked: controller.recoveryBlocked,
     updateAvailable: controller.updateAvailable,
     ip: controller.ip,
+    network: controller.network,
     error: controller.error,
     installedVersion: controller.installedVersion,
     availableVersion: controller.availableVersion,
@@ -50,6 +52,7 @@ final class HomeState {
       availableVersion,
       availableReleaseNotes,
       recoverySummary;
+  final HomeNetwork? network;
   final HomePhase phase;
   final double progress, operationProgress;
   final Duration elapsed;

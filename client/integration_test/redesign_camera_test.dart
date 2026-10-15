@@ -108,6 +108,7 @@ class QrController extends TestController {
     String invitationToken = '',
     String? homeOrigin,
     String tlsFingerprint = '',
+    DeviceRecord? savedRecord,
   }) async {
     parseConnectionInput(address);
     scanned = address;
