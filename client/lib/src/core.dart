@@ -1,10 +1,10 @@
-import 'package:path_provider/path_provider.dart';
-
 import 'mls/client.dart';
 import 'mls/local_store.dart';
 import 'mls/native.dart';
 import 'mls/channel_pin.dart';
-import 'secure_vault.dart';
+import 'mls/platform_stub.dart'
+    if (dart.library.ui) 'mls/platform_flutter.dart'
+    as mls_platform;
 import 'local_failure.dart';
 
 import 'dart:convert';
@@ -534,7 +534,7 @@ class SpaceSession
     final public = await (await Ed25519().newKeyPairFromSeed(record.deviceSeed))
         .extractPublicKey();
     final identity = await record.identity();
-    final directory = await getApplicationSupportDirectory();
+    final lockDirectory = await mls_platform.lockDirectory();
     final authenticationGrant = record.grantId;
     final scope =
         record.mlsIdentity ??
@@ -553,12 +553,12 @@ class SpaceSession
     record.mlsIdentity = scope;
     await vault.save(record);
     final local = MlsLocalStore(
-      storage: const PlatformKeyStorage(),
+      storage: mls_platform.secureStorage(),
       engine: engine,
       scope: scope,
       deviceSeed: record.deviceSeed,
       requireExisting: scope['grant_id'] != authenticationGrant,
-      lockDirectory: Directory.fromUri(directory.uri.resolve('mls-locks/')),
+      lockDirectory: lockDirectory,
     );
     return MlsClient(
       local: local,
