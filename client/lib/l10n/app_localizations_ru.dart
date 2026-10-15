@@ -1293,4 +1293,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get optionalNickname => 'Ник (необязательно)';
+
+  @override
+  String get channelFiles => 'Вложения чата';
+
+  @override
+  String get allFileAuthors => 'Все участники';
+
+  @override
+  String get refreshFiles => 'Обновить вложения';
 }

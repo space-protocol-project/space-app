@@ -460,6 +460,9 @@ abstract interface class AttachmentSession {
   Future<CancelUploadResponse> cancelUpload(CancelUploadRequest request);
   Future<DownloadChunkResponse> downloadChunk(DownloadChunkRequest request);
   Future<ListMyAssetsResponse> listMyAssets(ListMyAssetsRequest request);
+  Future<ListChannelAssetsResponse> listChannelAssets(
+    ListChannelAssetsRequest request,
+  );
   Future<Content> sendAttachments(
     String channelId,
     String text,
@@ -1287,6 +1290,15 @@ class SpaceSession
     await _ensureSession();
     return AssetServiceClient(channel)
         .downloadChunk(request, options: _options);
+  }
+
+  @override
+  Future<ListChannelAssetsResponse> listChannelAssets(
+    ListChannelAssetsRequest request,
+  ) async {
+    await _ensureSession();
+    return AssetServiceClient(channel)
+        .listChannelAssets(request, options: _options);
   }
 
   @override

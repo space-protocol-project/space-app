@@ -496,5 +496,8 @@
   "loadMoreFiles": "Load more",
   "closeFiles": "Close",
   "dropFilesHere": "Drop files to attach",
-  "optionalNickname": "Nickname (optional)"
+  "optionalNickname": "Nickname (optional)",
+  "channelFiles": "Chat attachments",
+  "allFileAuthors": "All participants",
+  "refreshFiles": "Refresh attachments"
 }

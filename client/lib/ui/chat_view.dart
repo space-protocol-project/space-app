@@ -2,6 +2,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 
 import '../src/attachments.dart';
 import 'attachment_widgets.dart';
+import 'channel_files.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -651,7 +652,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       },
       child: Stack(
         children: [
-          _build(context),
+          _withFiles(context),
           if (draggingFiles)
             Positioned.fill(
               child: IgnorePointer(
@@ -672,6 +673,72 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         ],
       ),
     ),
+  );
+
+  void showChannelFiles() {
+    final session = widget.controller.attachmentSession;
+    if (session == null) return;
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: SizedBox(
+          width: 480,
+          height: MediaQuery.sizeOf(context).height * .7,
+          child: ChannelFilesPanel(
+            session: session,
+            channel: widget.controller.channelId,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(context.strings.closeFiles),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _withFiles(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final session = widget.controller.attachmentSession;
+      if (constraints.maxWidth < 1080 ||
+          session == null ||
+          !widget.controller.canRead) {
+        return _build(context);
+      }
+      return Row(
+        children: [
+          Expanded(child: _build(context)),
+          SizedBox(
+            width: 320,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(8, widget.topInset + 16, 16, 16),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: ChannelFilesPanel(
+                    key: ValueKey(widget.controller.draftScope),
+                    revision: Object.hashAll(
+                      widget.controller.state.messages.map(
+                        (m) =>
+                            Object.hash(m.id, m.deleted, m.attachments.length),
+                      ),
+                    ),
+                    session: session,
+                    channel: widget.controller.channelId,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    },
   );
 
   Widget _build(BuildContext context) {
@@ -747,6 +814,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
           ),
         if (widget.controller.attachmentSession != null)
           AttachmentComposer(
+            openChannelFiles: showChannelFiles,
             queue: attachmentQueue,
             session: widget.controller.attachmentSession,
             canRead: view.connected && view.canRead,

@@ -386,6 +386,14 @@ class AssetServiceClient {
     request,
     options: options,
   );
+  Future<ListChannelAssetsResponse> listChannelAssets(
+    ListChannelAssetsRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.AssetService.listChannelAssets,
+    request,
+    options: options,
+  );
   Future<ListMyAssetsResponse> listMyAssets(
     ListMyAssetsRequest request, {
     RpcOptions? options,

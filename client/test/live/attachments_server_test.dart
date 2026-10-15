@@ -90,6 +90,18 @@ void main() {
       );
       expect(await downloadAttachment(member, sent.attachments.single), bytes);
 
+      final channelFiles = await member.listChannelAssets(
+        ListChannelAssetsRequest(channelId: 'general'),
+      );
+      expect(channelFiles.assets.single.id, ids.single);
+      expect(channelFiles.authors.containsKey(owner.principalId), isTrue);
+      final ownFiles = await member.listChannelAssets(
+        ListChannelAssetsRequest(
+          channelId: 'general',
+          authorId: member.principalId,
+        ),
+      );
+      expect(ownFiles.assets, isEmpty);
       final id = member.principalId;
       await member.close();
       final restored = await SpaceSession.connect(discovery, memberVault);

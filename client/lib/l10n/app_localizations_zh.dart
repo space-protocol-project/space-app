@@ -1182,6 +1182,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get optionalNickname => '昵称（可选）';
+
+  @override
+  String get channelFiles => '聊天附件';
+
+  @override
+  String get allFileAuthors => '所有成员';
+
+  @override
+  String get refreshFiles => '刷新附件';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

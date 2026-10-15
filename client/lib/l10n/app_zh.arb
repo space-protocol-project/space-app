@@ -496,5 +496,8 @@
   "loadMoreFiles": "加载更多",
   "closeFiles": "关闭",
   "dropFilesHere": "松开文件以添加附件",
-  "optionalNickname": "昵称（可选）"
+  "optionalNickname": "昵称（可选）",
+  "channelFiles": "聊天附件",
+  "allFileAuthors": "所有成员",
+  "refreshFiles": "刷新附件"
 }

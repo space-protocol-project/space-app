@@ -2067,6 +2067,65 @@ final $typed_data.Uint8List listMyAssetsResponseDescriptor = $convert.base64Deco
     'ChRMaXN0TXlBc3NldHNSZXNwb25zZRInCgZhc3NldHMYASADKAsyDy5zcGFjZS52MS5Bc3NldF'
     'IGYXNzZXRzEh8KC25leHRfY3Vyc29yGAIgASgJUgpuZXh0Q3Vyc29y');
 
+@$core.Deprecated('Use listChannelAssetsRequestDescriptor instead')
+const ListChannelAssetsRequest$json = {
+  '1': 'ListChannelAssetsRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'after', '3': 2, '4': 1, '5': 9, '10': 'after'},
+    {'1': 'author_id', '3': 3, '4': 1, '5': 9, '10': 'authorId'},
+  ],
+};
+
+/// Descriptor for `ListChannelAssetsRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listChannelAssetsRequestDescriptor =
+    $convert.base64Decode(
+        'ChhMaXN0Q2hhbm5lbEFzc2V0c1JlcXVlc3QSHQoKY2hhbm5lbF9pZBgBIAEoCVIJY2hhbm5lbE'
+        'lkEhQKBWFmdGVyGAIgASgJUgVhZnRlchIbCglhdXRob3JfaWQYAyABKAlSCGF1dGhvcklk');
+
+@$core.Deprecated('Use listChannelAssetsResponseDescriptor instead')
+const ListChannelAssetsResponse$json = {
+  '1': 'ListChannelAssetsResponse',
+  '2': [
+    {
+      '1': 'assets',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.Asset',
+      '10': 'assets'
+    },
+    {'1': 'next_cursor', '3': 2, '4': 1, '5': 9, '10': 'nextCursor'},
+    {
+      '1': 'authors',
+      '3': 3,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.ListChannelAssetsResponse.AuthorsEntry',
+      '10': 'authors'
+    },
+  ],
+  '3': [ListChannelAssetsResponse_AuthorsEntry$json],
+};
+
+@$core.Deprecated('Use listChannelAssetsResponseDescriptor instead')
+const ListChannelAssetsResponse_AuthorsEntry$json = {
+  '1': 'AuthorsEntry',
+  '2': [
+    {'1': 'key', '3': 1, '4': 1, '5': 9, '10': 'key'},
+    {'1': 'value', '3': 2, '4': 1, '5': 9, '10': 'value'},
+  ],
+  '7': {'7': true},
+};
+
+/// Descriptor for `ListChannelAssetsResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listChannelAssetsResponseDescriptor = $convert.base64Decode(
+    'ChlMaXN0Q2hhbm5lbEFzc2V0c1Jlc3BvbnNlEicKBmFzc2V0cxgBIAMoCzIPLnNwYWNlLnYxLk'
+    'Fzc2V0UgZhc3NldHMSHwoLbmV4dF9jdXJzb3IYAiABKAlSCm5leHRDdXJzb3ISSgoHYXV0aG9y'
+    'cxgDIAMoCzIwLnNwYWNlLnYxLkxpc3RDaGFubmVsQXNzZXRzUmVzcG9uc2UuQXV0aG9yc0VudH'
+    'J5UgdhdXRob3JzGjoKDEF1dGhvcnNFbnRyeRIQCgNrZXkYASABKAlSA2tleRIUCgV2YWx1ZRgC'
+    'IAEoCVIFdmFsdWU6AjgB');
+
 const $core.Map<$core.String, $core.dynamic> ChannelServiceBase$json = {
   '1': 'ChannelService',
   '2': [
@@ -2260,6 +2319,11 @@ const $core.Map<$core.String, $core.dynamic> AssetServiceBase$json = {
       '2': '.space.v1.ListMyAssetsRequest',
       '3': '.space.v1.ListMyAssetsResponse'
     },
+    {
+      '1': 'ListChannelAssets',
+      '2': '.space.v1.ListChannelAssetsRequest',
+      '3': '.space.v1.ListChannelAssetsResponse'
+    },
   ],
 };
 
@@ -2279,6 +2343,10 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
   '.space.v1.DownloadChunkResponse': DownloadChunkResponse$json,
   '.space.v1.ListMyAssetsRequest': ListMyAssetsRequest$json,
   '.space.v1.ListMyAssetsResponse': ListMyAssetsResponse$json,
+  '.space.v1.ListChannelAssetsRequest': ListChannelAssetsRequest$json,
+  '.space.v1.ListChannelAssetsResponse': ListChannelAssetsResponse$json,
+  '.space.v1.ListChannelAssetsResponse.AuthorsEntry':
+      ListChannelAssetsResponse_AuthorsEntry$json,
 };
 
 /// Descriptor for `AssetService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
@@ -2291,7 +2359,9 @@ final $typed_data.Uint8List assetServiceDescriptor = $convert.base64Decode(
     'EuQ2FuY2VsVXBsb2FkUmVxdWVzdBoeLnNwYWNlLnYxLkNhbmNlbFVwbG9hZFJlc3BvbnNlElAK'
     'DURvd25sb2FkQ2h1bmsSHi5zcGFjZS52MS5Eb3dubG9hZENodW5rUmVxdWVzdBofLnNwYWNlLn'
     'YxLkRvd25sb2FkQ2h1bmtSZXNwb25zZRJNCgxMaXN0TXlBc3NldHMSHS5zcGFjZS52MS5MaXN0'
-    'TXlBc3NldHNSZXF1ZXN0Gh4uc3BhY2UudjEuTGlzdE15QXNzZXRzUmVzcG9uc2U=');
+    'TXlBc3NldHNSZXF1ZXN0Gh4uc3BhY2UudjEuTGlzdE15QXNzZXRzUmVzcG9uc2USXAoRTGlzdE'
+    'NoYW5uZWxBc3NldHMSIi5zcGFjZS52MS5MaXN0Q2hhbm5lbEFzc2V0c1JlcXVlc3QaIy5zcGFj'
+    'ZS52MS5MaXN0Q2hhbm5lbEFzc2V0c1Jlc3BvbnNl');
 
 const $core.Map<$core.String, $core.dynamic> AuthServiceBase$json = {
   '1': 'AuthService',

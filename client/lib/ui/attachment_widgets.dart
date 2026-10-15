@@ -15,6 +15,7 @@ class AttachmentComposer extends StatelessWidget {
     required this.queue,
     required this.enabled,
     required this.openFiles,
+    this.openChannelFiles,
     this.session,
     this.canRead = true,
   });
@@ -23,6 +24,16 @@ class AttachmentComposer extends StatelessWidget {
   final bool canRead;
   final bool enabled;
   final VoidCallback openFiles;
+  final VoidCallback? openChannelFiles;
+  Widget channelFilesButton(BuildContext context) {
+    if (openChannelFiles == null) return const SizedBox.shrink();
+    return IconButton(
+      tooltip: context.strings.channelFiles,
+      onPressed: canRead ? openChannelFiles : null,
+      icon: const Icon(Icons.folder_shared_outlined),
+    );
+  }
+
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<AttachmentQueue, AttachmentState>(
@@ -44,6 +55,7 @@ class AttachmentComposer extends StatelessWidget {
                 ),
                 Text('${state.files.length}/5'),
                 const Spacer(),
+                channelFilesButton(context),
                 TextButton.icon(
                   onPressed: state.busy
                       ? queue.cancel

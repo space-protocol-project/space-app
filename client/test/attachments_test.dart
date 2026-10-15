@@ -71,6 +71,11 @@ class FilesSession implements AttachmentSession {
   }
 
   @override
+  Future<ListChannelAssetsResponse> listChannelAssets(
+    ListChannelAssetsRequest request,
+  ) async => ListChannelAssetsResponse();
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 

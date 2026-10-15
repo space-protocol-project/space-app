@@ -1287,4 +1287,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get optionalNickname => 'Nickname (optional)';
+
+  @override
+  String get channelFiles => 'Chat attachments';
+
+  @override
+  String get allFileAuthors => 'All participants';
+
+  @override
+  String get refreshFiles => 'Refresh attachments';
 }

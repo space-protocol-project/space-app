@@ -8126,6 +8126,168 @@ class ListMyAssetsResponse extends $pb.GeneratedMessage {
   void clearNextCursor() => $_clearField(2);
 }
 
+class ListChannelAssetsRequest extends $pb.GeneratedMessage {
+  factory ListChannelAssetsRequest({
+    $core.String? channelId,
+    $core.String? after,
+    $core.String? authorId,
+  }) {
+    final result = ListChannelAssetsRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (after != null) result.after = after;
+    if (authorId != null) result.authorId = authorId;
+    return result;
+  }
+
+  ListChannelAssetsRequest._();
+
+  factory ListChannelAssetsRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListChannelAssetsRequest()..mergeFromBuffer(data, registry);
+  factory ListChannelAssetsRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListChannelAssetsRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListChannelAssetsRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListChannelAssetsRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'after')
+    ..aOS(3, _omitFieldNames ? '' : 'authorId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListChannelAssetsRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListChannelAssetsRequest copyWith(
+          void Function(ListChannelAssetsRequest) updates) =>
+      super.copyWith((message) => updates(message as ListChannelAssetsRequest))
+          as ListChannelAssetsRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListChannelAssetsRequest() / ListChannelAssetsRequest.new instead')
+  static ListChannelAssetsRequest create() => ListChannelAssetsRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ListChannelAssetsRequest._();
+  @$core.override
+  ListChannelAssetsRequest createEmptyInstance() =>
+      ListChannelAssetsRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ListChannelAssetsRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListChannelAssetsRequest>(
+          ListChannelAssetsRequest.$_createMessage);
+  static ListChannelAssetsRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get after => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set after($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasAfter() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAfter() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get authorId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set authorId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAuthorId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAuthorId() => $_clearField(3);
+}
+
+class ListChannelAssetsResponse extends $pb.GeneratedMessage {
+  factory ListChannelAssetsResponse({
+    $core.Iterable<Asset>? assets,
+    $core.String? nextCursor,
+    $core.Iterable<$core.MapEntry<$core.String, $core.String>>? authors,
+  }) {
+    final result = ListChannelAssetsResponse._();
+    if (assets != null) result.assets.addAll(assets);
+    if (nextCursor != null) result.nextCursor = nextCursor;
+    if (authors != null) result.authors.addEntries(authors);
+    return result;
+  }
+
+  ListChannelAssetsResponse._();
+
+  factory ListChannelAssetsResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListChannelAssetsResponse()..mergeFromBuffer(data, registry);
+  factory ListChannelAssetsResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListChannelAssetsResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListChannelAssetsResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListChannelAssetsResponse.$_createMessage)
+    ..pPM<Asset>(1, _omitFieldNames ? '' : 'assets',
+        subBuilder: Asset.$_createMessage)
+    ..aOS(2, _omitFieldNames ? '' : 'nextCursor')
+    ..m<$core.String, $core.String>(3, _omitFieldNames ? '' : 'authors',
+        entryClassName: 'ListChannelAssetsResponse.AuthorsEntry',
+        keyFieldType: $pb.PbFieldType.OS,
+        valueFieldType: $pb.PbFieldType.OS,
+        packageName: const $pb.PackageName('space.v1'))
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListChannelAssetsResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListChannelAssetsResponse copyWith(
+          void Function(ListChannelAssetsResponse) updates) =>
+      super.copyWith((message) => updates(message as ListChannelAssetsResponse))
+          as ListChannelAssetsResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListChannelAssetsResponse() / ListChannelAssetsResponse.new instead')
+  static ListChannelAssetsResponse create() => ListChannelAssetsResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ListChannelAssetsResponse._();
+  @$core.override
+  ListChannelAssetsResponse createEmptyInstance() =>
+      ListChannelAssetsResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ListChannelAssetsResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListChannelAssetsResponse>(
+          ListChannelAssetsResponse.$_createMessage);
+  static ListChannelAssetsResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<Asset> get assets => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $core.String get nextCursor => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set nextCursor($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasNextCursor() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearNextCursor() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $pb.PbMap<$core.String, $core.String> get authors => $_getMap(2);
+}
+
 /// Экспериментальный контракт первого локального прототипа.
 class ChannelServiceApi {
   final $pb.RpcClient _client;
@@ -8219,6 +8381,10 @@ class AssetServiceApi {
           $pb.ClientContext? ctx, ListMyAssetsRequest request) =>
       _client.invoke<ListMyAssetsResponse>(
           ctx, 'AssetService', 'ListMyAssets', request, ListMyAssetsResponse());
+  $async.Future<ListChannelAssetsResponse> listChannelAssets(
+          $pb.ClientContext? ctx, ListChannelAssetsRequest request) =>
+      _client.invoke<ListChannelAssetsResponse>(ctx, 'AssetService',
+          'ListChannelAssets', request, ListChannelAssetsResponse());
 }
 
 class AuthServiceApi {

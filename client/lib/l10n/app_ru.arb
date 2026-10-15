@@ -496,5 +496,8 @@
   "loadMoreFiles": "Загрузить ещё",
   "closeFiles": "Закрыть",
   "dropFilesHere": "Отпустите файлы, чтобы прикрепить",
-  "optionalNickname": "Ник (необязательно)"
+  "optionalNickname": "Ник (необязательно)",
+  "channelFiles": "Вложения чата",
+  "allFileAuthors": "Все участники",
+  "refreshFiles": "Обновить вложения"
 }

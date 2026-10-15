@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:space_client/app.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/ui/attachment_widgets.dart';
+import 'package:space_client/ui/channel_files.dart';
 
 import 'attachments_test.dart' show FilesSession;
 import 'shell_test.dart' show TestController;
@@ -18,7 +19,7 @@ class FilesController extends TestController {
 }
 
 void main() {
-  for (final width in [390.0, 1100.0]) {
+  for (final width in [390.0, 1100.0, 1500.0]) {
     testWidgets('Перетаскивание файлов и форма на ширине $width', (
       tester,
     ) async {
@@ -48,6 +49,10 @@ void main() {
         await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
       }
       await tester.pumpAndSettle();
+      expect(
+        find.byType(ChannelFilesPanel),
+        width >= 1500 ? findsOneWidget : findsNothing,
+      );
       final target = tester.widget<DropTarget>(find.byType(DropTarget));
       expect(target.enable, isTrue);
       target.onDragDone!(

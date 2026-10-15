@@ -145,6 +145,13 @@ abstract final class AssetService {
     spacev1space.ListMyAssetsRequest.new,
     spacev1space.ListMyAssetsResponse.new,
   );
+
+  static const listChannelAssets = connect.Spec(
+    '/$name/ListChannelAssets',
+    connect.StreamType.unary,
+    spacev1space.ListChannelAssetsRequest.new,
+    spacev1space.ListChannelAssetsResponse.new,
+  );
 }
 abstract final class AuthService {
   /// Fully-qualified name of the AuthService service.

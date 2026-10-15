@@ -317,6 +317,23 @@ extension type AssetServiceClient (connect.Transport _transport) {
       onTrailer: onTrailer,
     );
   }
+
+  Future<spacev1space.ListChannelAssetsResponse> listChannelAssets(
+    spacev1space.ListChannelAssetsRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.AssetService.listChannelAssets,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
 }
 extension type AuthServiceClient (connect.Transport _transport) {
   /// Экспериментальный API; требует поддержки stable principal у клиента.

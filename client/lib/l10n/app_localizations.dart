@@ -2362,6 +2362,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Ник (необязательно)'**
   String get optionalNickname;
+
+  /// No description provided for @channelFiles.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вложения чата'**
+  String get channelFiles;
+
+  /// No description provided for @allFileAuthors.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все участники'**
+  String get allFileAuthors;
+
+  /// No description provided for @refreshFiles.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить вложения'**
+  String get refreshFiles;
 }
 
 class _AppLocalizationsDelegate
