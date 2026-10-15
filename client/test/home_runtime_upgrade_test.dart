@@ -4,6 +4,9 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:crypto/crypto.dart' as crypto;
+import 'package:fixnum/fixnum.dart';
+import 'package:space_client/src/attachments.dart';
+import 'package:space_client/src/rpc_clients.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/home_controller.dart';
@@ -36,8 +39,14 @@ void main() {
     'Connect runtime → новый кандидат: ключи, сертификат, сообщения и восстановление',
     () async {
       final root = await Directory.systemTemp.createTemp('space-real-upgrade-');
-      final baseline = await bundledHomeRelease();
-      final platform = baseline.platform;
+      final platform = (await bundledHomeRelease()).platform;
+      final historical = jsonDecode(
+        await File('test/fixtures/runtime-v0.2.5.json').readAsString(),
+      ) as Map<String, dynamic>;
+      final baseline = HomeRelease.fromJson(
+        Map<String, dynamic>.from(historical[platform] as Map),
+      );
+      expect(baseline.version, 'v0.2.5');
       final archives =
           await Directory(
                 Platform.environment['SPACE_HOME_CANDIDATE_DIRECTORY']!,
@@ -137,6 +146,7 @@ void main() {
           true,
         );
         expect(session.serverIcon, isNotNull);
+        await verifyUpgradedFiles(session);
         await session.close();
         session = null;
         await updated.stop();
@@ -212,4 +222,40 @@ Future<void> removeUpgradeDirectory(Directory root) async {
     throw StateError('Недопустимый каталог очистки проверки обновления');
   }
   await root.delete(recursive: true);
+}
+
+Future<void> verifyUpgradedFiles(SpaceSession session) async {
+  final bytes = [1, 2, 3, 4, 5];
+  final upload = await session.beginUpload(
+    BeginUploadRequest(
+      channelId: 'general',
+      name: 'после-обновления.bin',
+      byteSize: Int64(bytes.length),
+      sha256: crypto.sha256.convert(bytes).bytes,
+      idempotencyKey: 'upgrade-file',
+    ),
+  );
+  await session.uploadChunk(
+    UploadChunkRequest(assetId: upload.asset.id, data: bytes),
+  );
+  final complete = await session.completeUpload(
+    CompleteUploadRequest(assetId: upload.asset.id),
+  );
+  final sent = await session.sendAttachments(
+    'general',
+    'Файл после обновления',
+    'upgrade-file-message',
+    [complete.asset.id],
+  );
+  expect(await downloadAttachment(session, sent.attachments.single), bytes);
+  await session.setNickname('Владелец после обновления');
+  final result = await session.adminRequest('/api/v1/space/members');
+  expect(
+    (result['members'] as List).any(
+      (m) =>
+          m['principalId'] == session.principalId &&
+          m['nickname'] == 'Владелец после обновления',
+    ),
+    true,
+  );
 }
