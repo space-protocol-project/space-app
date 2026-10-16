@@ -183,7 +183,6 @@ class _MembersPanelState extends State<MembersPanel> {
 
   Widget editor(Map<String, dynamic> m) {
     final id = m['principalId'] as String;
-    final draft = drafts[id]!;
     return Card.outlined(
       key: ValueKey('member-card-$id'),
       margin: EdgeInsets.zero,
@@ -221,63 +220,9 @@ class _MembersPanelState extends State<MembersPanel> {
             Text(
               '${memberRoleLabel(m['role'] as String, strings)}${m['blocked'] == true ? strings.memberBlockedSuffix : ''}',
             ),
-            if (widget.owner && m['role'] != 'owner')
-              TextButton(
-                key: ValueKey('edit-member-$id'),
-                onPressed: busy
-                    ? null
-                    : () => setState(() => editing = editing == id ? null : id),
-                child: Text(
-                  editing == id ? strings.memberCollapse : strings.memberEdit,
-                ),
-              ),
-            if (widget.owner && m['role'] != 'owner' && editing == id) ...[
-              TextFormField(
-                key: ValueKey('storage-$id-${m["revision"]}'),
-                initialValue: memberStorageMiB(m),
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: strings.storagePersonal,
-                  helperText: strings.storageInherited,
-                ),
-                onChanged: (value) => draft['storageMiB'] = value,
-              ),
-              const SizedBox(height: 10),
-              DropdownButtonFormField<String>(
-                isExpanded: true,
-                key: ValueKey('role-$id-${m['revision']}'),
-                initialValue: draft['role'] as String,
-                decoration: InputDecoration(labelText: strings.memberRole),
-                items: [
-                  for (final role in ['reader', 'member', 'admin'])
-                    DropdownMenuItem(
-                      value: role,
-                      child: Text(
-                        memberRoleLabel(role, strings),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                ],
-                onChanged: busy
-                    ? null
-                    : (v) => setState(() => draft['role'] = v),
-              ),
-              SwitchListTile(
-                key: ValueKey('blocked-$id'),
-                contentPadding: EdgeInsets.zero,
-                title: Text(strings.memberBlock),
-                value: draft['blocked'] == true,
-                onChanged: busy
-                    ? null
-                    : (v) => setState(() => draft['blocked'] = v),
-              ),
-              OutlinedButton(
-                key: ValueKey('save-member-$id'),
-                onPressed: busy ? null : () => save(m),
-                child: Text(strings.memberSave),
-              ),
-            ],
+            if (widget.owner && m['role'] != 'owner') _editMemberButton(id),
+            if (widget.owner && m['role'] != 'owner' && editing == id)
+              ..._memberForm(m),
           ],
         ),
       ),
@@ -378,4 +323,60 @@ class _MembersPanelState extends State<MembersPanel> {
       ),
     );
   }
+
+  List<Widget> _memberForm(Map<String, dynamic> m) {
+    final id = m['principalId'] as String;
+    final draft = drafts[id]!;
+    return [
+      TextFormField(
+        key: ValueKey('storage-$id-${m["revision"]}'),
+        initialValue: memberStorageMiB(m),
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          labelText: strings.storagePersonal,
+          helperText: strings.storageInherited,
+        ),
+        onChanged: (value) => draft['storageMiB'] = value,
+      ),
+      const SizedBox(height: 10),
+      DropdownButtonFormField<String>(
+        isExpanded: true,
+        key: ValueKey('role-$id-${m['revision']}'),
+        initialValue: draft['role'] as String,
+        decoration: InputDecoration(labelText: strings.memberRole),
+        items: [
+          for (final role in ['reader', 'member', 'admin'])
+            DropdownMenuItem(
+              value: role,
+              child: Text(
+                memberRoleLabel(role, strings),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+        ],
+        onChanged: busy ? null : (v) => setState(() => draft['role'] = v),
+      ),
+      SwitchListTile(
+        key: ValueKey('blocked-$id'),
+        contentPadding: EdgeInsets.zero,
+        title: Text(strings.memberBlock),
+        value: draft['blocked'] == true,
+        onChanged: busy ? null : (v) => setState(() => draft['blocked'] = v),
+      ),
+      OutlinedButton(
+        key: ValueKey('save-member-$id'),
+        onPressed: busy ? null : () => save(m),
+        child: Text(strings.memberSave),
+      ),
+    ];
+  }
+
+  Widget _editMemberButton(String id) => TextButton(
+    key: ValueKey('edit-member-$id'),
+    onPressed: busy
+        ? null
+        : () => setState(() => editing = editing == id ? null : id),
+    child: Text(editing == id ? strings.memberCollapse : strings.memberEdit),
+  );
 }

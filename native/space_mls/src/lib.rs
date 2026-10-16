@@ -51,6 +51,17 @@ pub struct Message {
     pub files: Vec<FileDescriptor>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub manager: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reaction: Option<Reaction>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Reaction {
+    pub message_id: [u8; 16],
+    pub grant_id: String,
+    pub emoji: String,
+    pub active: bool,
 }
 
 impl Message {
@@ -61,6 +72,7 @@ impl Message {
             text,
             files,
             manager: None,
+            reaction: None,
         };
         message.validate()?;
         Ok(message)
@@ -69,6 +81,23 @@ impl Message {
     fn validate(&self) -> Result<()> {
         if self.version != 1 || self.text.len() > MAX_TEXT_SIZE || self.files.len() > MAX_FILES {
             return Err(Error::InvalidInput);
+        }
+        if let Some(reaction) = &self.reaction {
+            return if self.manager.is_none()
+                && self.text.is_empty()
+                && self.files.is_empty()
+                && !reaction.grant_id.is_empty()
+                && reaction.grant_id.len() <= 128
+                && reaction.grant_id.is_ascii()
+                && !reaction.grant_id.chars().any(char::is_control)
+                && include_str!("emoji.txt")
+                    .lines()
+                    .any(|emoji| emoji == reaction.emoji)
+            {
+                Ok(())
+            } else {
+                Err(Error::InvalidInput)
+            };
         }
         if let Some(manager) = &self.manager {
             return if !manager.is_empty()

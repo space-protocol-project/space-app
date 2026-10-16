@@ -142,47 +142,10 @@ class _ChannelFilesPanelState extends State<ChannelFilesPanel> {
                 ),
               ],
             ),
-            DropdownButton<String>(
-              isExpanded: true,
-              value: state.author,
-              items: [
-                DropdownMenuItem(
-                  value: '',
-                  child: Text(context.strings.allFileAuthors),
-                ),
-                for (final id in {
-                  ...state.authors.keys,
-                  if (state.author.isNotEmpty) state.author,
-                }.toList()..sort())
-                  DropdownMenuItem(
-                    value: id,
-                    child: Text(
-                      authorLabel(id, state.authors),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-              ],
-              onChanged: (id) {
-                if (id != null) files.selectAuthor(id);
-              },
-            ),
+            _authorPicker(context, state),
             const SizedBox(height: 12),
-            for (var i = 0; i < state.files.length; i++) ...[
-              if (i == 0 || date(state.files[i]) != date(state.files[i - 1]))
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Text(date(state.files[i])),
-                ),
-              Text(
-                authorLabel(state.files[i].authorId, state.authors),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelSmall,
-              ),
-              AttachmentCard(asset: state.files[i], session: widget.session),
-              const Divider(height: 20),
-            ],
+            for (var i = 0; i < state.files.length; i++)
+              ..._fileEntry(context, state, i),
             if (state.files.isEmpty && !state.busy && state.error.isEmpty)
               Text(context.strings.noFilesInChannel),
             if (state.error.isNotEmpty)
@@ -203,4 +166,50 @@ class _ChannelFilesPanelState extends State<ChannelFilesPanel> {
         DateTime.fromMillisecondsSinceEpoch(asset.createdAtUnixMs.toInt())
             .toLocal(),
       );
+  Widget _authorPicker(BuildContext context, ChannelFilesState state) =>
+      DropdownButton<String>(
+        isExpanded: true,
+        value: state.author,
+        items: [
+          DropdownMenuItem(
+            value: '',
+            child: Text(context.strings.allFileAuthors),
+          ),
+          for (final id in {
+            ...state.authors.keys,
+            if (state.author.isNotEmpty) state.author,
+          }.toList()..sort())
+            DropdownMenuItem(
+              value: id,
+              child: Text(
+                authorLabel(id, state.authors),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+        ],
+        onChanged: (id) {
+          if (id != null) files.selectAuthor(id);
+        },
+      );
+
+  List<Widget> _fileEntry(
+    BuildContext context,
+    ChannelFilesState state,
+    int i,
+  ) => [
+    if (i == 0 || date(state.files[i]) != date(state.files[i - 1]))
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Text(date(state.files[i])),
+      ),
+    Text(
+      authorLabel(state.files[i].authorId, state.authors),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: Theme.of(context).textTheme.labelSmall,
+    ),
+    AttachmentCard(asset: state.files[i], session: widget.session),
+    const Divider(height: 20),
+  ];
 }

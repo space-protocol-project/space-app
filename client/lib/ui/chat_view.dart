@@ -1,3 +1,7 @@
+import 'emoji_picker.dart';
+import 'message_reactions.dart';
+import 'message_context_menu.dart';
+
 import 'package:desktop_drop/desktop_drop.dart';
 
 import '../src/attachments.dart';
@@ -185,32 +189,8 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     final index = list.indexWhere((m) => m.id == id);
     if (index < 0) return;
     jumping = true;
-    var low = 0.0, high = scroll.position.maxScrollExtent;
     try {
-      for (
-        var attempt = 0;
-        attempt < 24 && mounted && scope == startingScope;
-        attempt++
-      ) {
-        final target = messageKeys[id]?.currentContext;
-        if (target != null && target.mounted) {
-          await revealTarget(target, startingScope);
-          break;
-        }
-        final visible = _visibleMessageIndices([
-          for (final message in list) message.id,
-        ]);
-        if (visible.isEmpty) break;
-        if (index < visible.first) {
-          high = scroll.offset;
-        } else {
-          low = scroll.offset;
-        }
-        final next = (low + high) / 2;
-        if ((next - scroll.offset).abs() < 1) break;
-        scroll.jumpTo(next);
-        await WidgetsBinding.instance.endOfFrame;
-      }
+      await _seekMessage(id, index, list, startingScope);
     } finally {
       _finishMessageJump(startingScope);
     }
@@ -455,47 +435,32 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                 style: TextStyle(fontSize: 12, color: colors.primary),
               ),
             ),
-          MessageBubble(
-            key: messageKeys.putIfAbsent(message.id, GlobalKey.new),
-            text: message.text,
-            attachments: message.deleted || !controller.attachmentsEnabled
-                ? null
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (final asset in message.attachments)
-                        AttachmentCard(
-                          key: ValueKey(asset.id),
-                          asset: asset,
-                          session: controller.attachmentSession,
-                        ),
-                    ],
-                  ),
-            edited: message.updatedAtUnixMs > 0,
-            deleted: message.deleted,
-            actions: controller.canChangeMessage(message)
-                ? MessageActions(
-                    controller: controller,
-                    message: message,
-                    onEdit: () => startEditing(message),
+          MessageContextMenu(
+            text: message.deleted ? '' : message.text,
+            onReact: controller.canReact && !message.deleted
+                ? (emoji) => unawaited(
+                    controller.setReaction(
+                      message,
+                      emoji,
+                      !message.reactions.any(
+                        (r) =>
+                            r.emoji == emoji &&
+                            r.principalIds.contains(view.principalId),
+                      ),
+                    ),
                   )
                 : null,
-            author: author,
-            mine: mine,
-            grouped: grouped,
-            sentAt:
-                message.createdAtUnixMs > 0 &&
-                    message.createdAtUnixMs.toInt() <= 8640000000000000
-                ? DateTime.fromMillisecondsSinceEpoch(
-                    message.createdAtUnixMs.toInt(),
-                    isUtc: true,
-                  ).toLocal()
+            onEdit: controller.canChangeMessage(message)
+                ? () => startEditing(message)
                 : null,
-            accepted: mine,
+            onDelete: controller.canChangeMessage(message)
+                ? () => confirmDeleteMessage(context, controller, message)
+                : null,
             favorite: view.isFavorite(message),
-            onToggleFavorite: message.deleted
+            onFavorite: message.deleted
                 ? null
                 : () => unawaited(controller.toggleFavorite(message)),
+            child: _bubble(context, message, author, mine, grouped),
           ),
         ],
       ),
@@ -565,21 +530,13 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                 Icon(Icons.forum_outlined, size: 64, color: colors.primary),
                 const SizedBox(height: 20),
                 Text(
-                  view.connected && !view.canRead
-                      ? context.strings.noMessageAccess
-                      : view.connected
-                      ? context.strings.startConversation
-                      : context.strings.conversationStarts,
+                  _emptyTitle(context, view),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  view.connected && !view.canRead
-                      ? context.strings.contactOwner
-                      : view.connected
-                      ? context.strings.emptyChat
-                      : context.strings.connectChatHelp,
+                  _emptyDescription(context, view),
                   textAlign: TextAlign.center,
                   style: TextStyle(color: colors.onSurfaceVariant, height: 1.6),
                 ),
@@ -957,6 +914,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       children: [
         if (editing == null && widget.controller.attachmentSession != null)
           AttachFileButton(queue: attachmentQueue, enabled: enabled),
+        EmojiButton(controller: draft, enabled: enabled),
         const Spacer(),
         IconButton.filled(
           onPressed: enabled ? send : null,
@@ -970,5 +928,106 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         ),
       ],
     );
+  }
+
+  Widget _bubble(
+    BuildContext context,
+    Content message,
+    String author,
+    bool mine,
+    bool grouped,
+  ) {
+    final controller = widget.controller;
+    final view = controller.state;
+    return MessageBubble(
+      key: messageKeys.putIfAbsent(message.id, GlobalKey.new),
+      text: message.text,
+      attachments: message.deleted || !controller.attachmentsEnabled
+          ? null
+          : MessageAttachments(
+              assets: message.attachments,
+              session: controller.attachmentSession,
+            ),
+      reactions: MessageReactionBar(
+        reactions: message.reactions,
+        principalId: view.principalId,
+        onSet: controller.canReact && !message.deleted
+            ? (emoji, active) =>
+                  unawaited(controller.setReaction(message, emoji, active))
+            : null,
+      ),
+      edited: message.updatedAtUnixMs > 0,
+      deleted: message.deleted,
+      actions: controller.canChangeMessage(message)
+          ? MessageActions(
+              controller: controller,
+              message: message,
+              onEdit: () => startEditing(message),
+            )
+          : null,
+      author: author,
+      mine: mine,
+      grouped: grouped,
+      sentAt:
+          message.createdAtUnixMs > 0 &&
+              message.createdAtUnixMs.toInt() <= 8640000000000000
+          ? DateTime.fromMillisecondsSinceEpoch(
+              message.createdAtUnixMs.toInt(),
+              isUtc: true,
+            ).toLocal()
+          : null,
+      accepted: mine,
+      favorite: view.isFavorite(message),
+      onToggleFavorite: message.deleted
+          ? null
+          : () => unawaited(controller.toggleFavorite(message)),
+    );
+  }
+
+  String _emptyTitle(BuildContext context, ChatState view) =>
+      view.connected && !view.canRead
+      ? context.strings.noMessageAccess
+      : view.connected
+      ? context.strings.startConversation
+      : context.strings.conversationStarts;
+
+  String _emptyDescription(BuildContext context, ChatState view) =>
+      view.connected && !view.canRead
+      ? context.strings.contactOwner
+      : view.connected
+      ? context.strings.emptyChat
+      : context.strings.connectChatHelp;
+
+  Future<void> _seekMessage(
+    String id,
+    int index,
+    List<Content> list,
+    String startingScope,
+  ) async {
+    var low = 0.0, high = scroll.position.maxScrollExtent;
+    for (
+      var attempt = 0;
+      attempt < 24 && mounted && scope == startingScope;
+      attempt++
+    ) {
+      final target = messageKeys[id]?.currentContext;
+      if (target != null && target.mounted) {
+        await revealTarget(target, startingScope);
+        break;
+      }
+      final visible = _visibleMessageIndices([
+        for (final message in list) message.id,
+      ]);
+      if (visible.isEmpty) break;
+      if (index < visible.first) {
+        high = scroll.offset;
+      } else {
+        low = scroll.offset;
+      }
+      final next = (low + high) / 2;
+      if ((next - scroll.offset).abs() < 1) break;
+      scroll.jumpTo(next);
+      await WidgetsBinding.instance.endOfFrame;
+    }
   }
 }

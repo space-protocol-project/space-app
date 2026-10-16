@@ -1,3 +1,5 @@
+import 'message_context_menu.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -21,9 +23,21 @@ class MessageMarkdown extends StatelessWidget {
       color: colors.onSurface,
     );
     if (!_markdownSyntax.hasMatch(text)) {
-      return SelectionArea(child: Text(text, style: paragraph));
+      return SelectionArea(
+        contextMenuBuilder: MessageContextMenu.contains(context)
+            ? (_, _) => const SizedBox.shrink()
+            : (_, state) => AdaptiveTextSelectionToolbar.selectableRegion(
+                selectableRegionState: state,
+              ),
+        child: Text(text, style: paragraph),
+      );
     }
     return SelectionArea(
+      contextMenuBuilder: MessageContextMenu.contains(context)
+          ? (_, _) => const SizedBox.shrink()
+          : (_, state) => AdaptiveTextSelectionToolbar.selectableRegion(
+              selectableRegionState: state,
+            ),
       child: MarkdownBody(
         data: text,
         selectable: false,

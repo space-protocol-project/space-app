@@ -13,6 +13,9 @@ Future<void> main() async {
     yield LicenseEntryWithLineBreaks([
       'Space MLS — Rust',
     ], await rootBundle.loadString('assets/legal/mls-NOTICES.txt'));
+    yield LicenseEntryWithLineBreaks([
+      'Unicode Emoji / CLDR',
+    ], await rootBundle.loadString('assets/emoji/UNICODE-LICENSE.txt'));
     for (final entry in {
       'Nunito': 'Nunito',
       'Nunito Sans': 'NunitoSans',

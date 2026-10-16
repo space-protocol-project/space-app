@@ -139,43 +139,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
             const SizedBox(height: 16),
             _qrActions(view),
             const SizedBox(height: 20),
-            TextField(
-              controller: address,
-              enabled: !view.busy && !view.connected,
-              decoration: InputDecoration(
-                labelText: context.strings.serverAddress,
-                hintText: 'http://127.0.0.1:8080',
-              ),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: nickname,
-              maxLength: 40,
-              enabled: !view.busy && !view.connected,
-              decoration: InputDecoration(
-                labelText: context.strings.optionalNickname,
-              ),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: invitation,
-              enabled: !view.busy && !view.connected,
-              decoration: InputDecoration(
-                labelText: context.strings.optionalInvite,
-                hintText: 'iv_…',
-              ),
-            ),
-            const SizedBox(height: 14),
-            FilledButton.tonalIcon(
-              onPressed: view.busy || view.connected
-                  ? null
-                  : () => controller.inspect(
-                      address.text,
-                      invitationToken: invitation.text,
-                    ),
-              icon: const Icon(Icons.search),
-              label: Text(context.strings.checkServer),
-            ),
+            ..._addressFields(context, view),
             if (view.busy) ...[
               const SizedBox(height: 18),
               const LinearProgressIndicator(),
@@ -187,58 +151,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             ],
-            if (view.preview != null) ...[
-              const SizedBox(height: 24),
-              Text(
-                context.strings.verifyTrust,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 10),
-              SelectableText(view.preview!.endpoint.toString()),
-              const SizedBox(height: 10),
-              Text(context.strings.serverKeyFingerprint),
-              const SizedBox(height: 6),
-              SelectableText(
-                view.fingerprint,
-                style: const TextStyle(fontSize: 12),
-              ),
-              const SizedBox(height: 16),
-              if (view.preview!.tlsFingerprint.isNotEmpty) ...[
-                Text(context.strings.tlsCertificateFingerprint),
-                const SizedBox(height: 6),
-                SelectableText(
-                  view.preview!.tlsFingerprint,
-                  style: const TextStyle(fontSize: 12),
-                ),
-                const SizedBox(height: 16),
-              ],
-              Text(context.strings.firstTrustHelp),
-              const SizedBox(height: 20),
-              if (view.initialSetup) ...[
-                Text(
-                  context.strings.initialServerSetupTitle,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                Text(context.strings.initialServerSetupHelp),
-                const SizedBox(height: 20),
-              ],
-              if (view.invitationRole.isNotEmpty)
-                Text(
-                  view.invitationRole == 'reader'
-                      ? context.strings.readerInvitation
-                      : context.strings.memberInvitation,
-                ),
-              FilledButton(
-                onPressed: view.busy || view.connected ? null : connect,
-                child: Text(context.strings.trustAndConnect),
-              ),
-              if (!view.initialSetup)
-                PairingStartPanel(
-                  controller: controller,
-                  onConnected: widget.onConnected,
-                ),
-            ],
+            if (view.preview != null) ..._trustDetails(context, view),
             if (view.connected) ...[
               const SizedBox(height: 18),
               OutlinedButton(
@@ -263,4 +176,99 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
       );
     },
   );
+  List<Widget> _trustDetails(BuildContext context, ChatState view) {
+    final controller = widget.controller;
+    return [
+      const SizedBox(height: 24),
+      Text(
+        context.strings.verifyTrust,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      const SizedBox(height: 10),
+      SelectableText(view.preview!.endpoint.toString()),
+      const SizedBox(height: 10),
+      Text(context.strings.serverKeyFingerprint),
+      const SizedBox(height: 6),
+      SelectableText(view.fingerprint, style: const TextStyle(fontSize: 12)),
+      const SizedBox(height: 16),
+      if (view.preview!.tlsFingerprint.isNotEmpty) ...[
+        Text(context.strings.tlsCertificateFingerprint),
+        const SizedBox(height: 6),
+        SelectableText(
+          view.preview!.tlsFingerprint,
+          style: const TextStyle(fontSize: 12),
+        ),
+        const SizedBox(height: 16),
+      ],
+      Text(context.strings.firstTrustHelp),
+      const SizedBox(height: 20),
+      if (view.initialSetup) ...[
+        Text(
+          context.strings.initialServerSetupTitle,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        Text(context.strings.initialServerSetupHelp),
+        const SizedBox(height: 20),
+      ],
+      if (view.invitationRole.isNotEmpty)
+        Text(
+          view.invitationRole == 'reader'
+              ? context.strings.readerInvitation
+              : context.strings.memberInvitation,
+        ),
+      FilledButton(
+        onPressed: view.busy || view.connected ? null : connect,
+        child: Text(context.strings.trustAndConnect),
+      ),
+      if (!view.initialSetup)
+        PairingStartPanel(
+          controller: controller,
+          onConnected: widget.onConnected,
+        ),
+    ];
+  }
+
+  List<Widget> _addressFields(BuildContext context, ChatState view) {
+    final controller = widget.controller;
+    return [
+      TextField(
+        controller: address,
+        enabled: !view.busy && !view.connected,
+        decoration: InputDecoration(
+          labelText: context.strings.serverAddress,
+          hintText: 'http://127.0.0.1:8080',
+        ),
+      ),
+      const SizedBox(height: 14),
+      TextField(
+        controller: nickname,
+        maxLength: 40,
+        enabled: !view.busy && !view.connected,
+        decoration: InputDecoration(
+          labelText: context.strings.optionalNickname,
+        ),
+      ),
+      const SizedBox(height: 14),
+      TextField(
+        controller: invitation,
+        enabled: !view.busy && !view.connected,
+        decoration: InputDecoration(
+          labelText: context.strings.optionalInvite,
+          hintText: 'iv_…',
+        ),
+      ),
+      const SizedBox(height: 14),
+      FilledButton.tonalIcon(
+        onPressed: view.busy || view.connected
+            ? null
+            : () => controller.inspect(
+                address.text,
+                invitationToken: invitation.text,
+              ),
+        icon: const Icon(Icons.search),
+        label: Text(context.strings.checkServer),
+      ),
+    ];
+  }
 }

@@ -327,129 +327,8 @@ class _AdminPageState extends State<AdminPage> {
                 child: Text(strings.managementIntro),
               ),
               const SizedBox(height: 20),
-              if (identity == null)
-                card([
-                  Text(strings.deviceIdentity, style: TextStyle(fontSize: 20)),
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.autoConnect
-                        ? strings.currentConnection
-                        : strings.currentSession,
-                  ),
-                  const SizedBox(height: 16),
-                  button(strings.connectManagement, () => signIn(false)),
-                ]),
-              if (identity != null && !initialized)
-                card([
-                  Text(strings.claimOwner, style: TextStyle(fontSize: 20)),
-                  Text(strings.setupHelp),
-                  const SizedBox(height: 16),
-                  TextField(
-                    scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
-                    controller: code,
-                    obscureText: true,
-                    decoration: InputDecoration(labelText: strings.setupCode),
-                  ),
-                  const SizedBox(height: 16),
-                  button(strings.confirmOwner, _claimOwner),
-                ]),
-              if (identity != null &&
-                  widget.authorizeDevice != null &&
-                  (['owner', 'admin'].contains(identity!['role']) ||
-                      !initialized) &&
-                  identity!['administrative'] != true)
-                card([
-                  Text(strings.authorizeTitle, style: TextStyle(fontSize: 20)),
-                  Text(strings.authorizeHelp),
-                  button(strings.authorizeDevice, _authorizeDevice),
-                ]),
-              if (settings != null)
-                card([
-                  Text(
-                    strings.settingsRevision('${settings!['revision']}'),
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  const SizedBox(height: 20),
-                  if (settings!.containsKey('icon')) ...[
-                    ServerIconPicker(
-                      value: serverIcon,
-                      disabled: busy,
-                      onChanged: (value) => setState(() {
-                        serverIcon = value;
-                        iconDirty = true;
-                      }),
-                      onPending: (value) => setState(() => iconLoading = value),
-                    ),
-                    const SizedBox(height: 20),
-                  ] else ...[
-                    Text(
-                      strings.serverIconTitle,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(strings.serverIconUpgrade),
-                    const SizedBox(height: 20),
-                  ],
-                  TextField(
-                    scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
-                    controller: title,
-                    maxLength: 80,
-                    decoration: InputDecoration(labelText: strings.spaceName),
-                  ),
-                  const SizedBox(height: 12),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(strings.attachmentsEnabled),
-                    subtitle: Text(strings.attachmentsEnabledHelp),
-                    value: attachmentsEnabled,
-                    onChanged: busy
-                        ? null
-                        : (value) => setState(() => attachmentsEnabled = value),
-                  ),
-                  StorageLimits(
-                    total: storage,
-                    member: memberStorage,
-                    enabled: !busy,
-                  ),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    value: enabled,
-                    onChanged: busy ? null : (v) => setState(() => enabled = v),
-                    title: Text(strings.chatsEnabled),
-                    subtitle: Text(strings.chatsHelp),
-                  ),
-                  DropdownButtonFormField<String>(
-                    isExpanded: true,
-                    key: ValueKey(policy),
-                    initialValue: policy,
-                    decoration: InputDecoration(
-                      labelText: strings.registration,
-                    ),
-                    items: [
-                      DropdownMenuItem(
-                        value: 'open',
-                        child: Text(strings.registrationOpen),
-                      ),
-                      DropdownMenuItem(
-                        value: 'closed',
-                        child: Text(strings.registrationClosed),
-                      ),
-                    ],
-                    onChanged: busy ? null : (v) => setState(() => policy = v!),
-                  ),
-                  const SizedBox(height: 20),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      button(strings.saveSettings, save),
-                      OutlinedButton(
-                        onPressed: busy ? null : () => run(load),
-                        child: Text(strings.reloadSettings),
-                      ),
-                    ],
-                  ),
-                ]),
+              ..._identityCards(),
+              if (settings != null) _spaceSettings(),
               if (settings != null) ...[
                 const SizedBox(height: 20),
                 ChannelsPanel(
@@ -505,4 +384,118 @@ class _AdminPageState extends State<AdminPage> {
       ),
     ),
   );
+  Widget _spaceSettings() => card([
+    Text(
+      strings.settingsRevision('${settings!['revision']}'),
+      style: const TextStyle(fontSize: 20),
+    ),
+    const SizedBox(height: 20),
+    if (settings!.containsKey('icon')) ...[
+      ServerIconPicker(
+        value: serverIcon,
+        disabled: busy,
+        onChanged: (value) => setState(() {
+          serverIcon = value;
+          iconDirty = true;
+        }),
+        onPending: (value) => setState(() => iconLoading = value),
+      ),
+      const SizedBox(height: 20),
+    ] else ...[
+      Text(
+        strings.serverIconTitle,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      const SizedBox(height: 8),
+      Text(strings.serverIconUpgrade),
+      const SizedBox(height: 20),
+    ],
+    TextField(
+      scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
+      controller: title,
+      maxLength: 80,
+      decoration: InputDecoration(labelText: strings.spaceName),
+    ),
+    const SizedBox(height: 12),
+    SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(strings.attachmentsEnabled),
+      subtitle: Text(strings.attachmentsEnabledHelp),
+      value: attachmentsEnabled,
+      onChanged: busy
+          ? null
+          : (value) => setState(() => attachmentsEnabled = value),
+    ),
+    StorageLimits(total: storage, member: memberStorage, enabled: !busy),
+    SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      value: enabled,
+      onChanged: busy ? null : (v) => setState(() => enabled = v),
+      title: Text(strings.chatsEnabled),
+      subtitle: Text(strings.chatsHelp),
+    ),
+    DropdownButtonFormField<String>(
+      isExpanded: true,
+      key: ValueKey(policy),
+      initialValue: policy,
+      decoration: InputDecoration(labelText: strings.registration),
+      items: [
+        DropdownMenuItem(value: 'open', child: Text(strings.registrationOpen)),
+        DropdownMenuItem(
+          value: 'closed',
+          child: Text(strings.registrationClosed),
+        ),
+      ],
+      onChanged: busy ? null : (v) => setState(() => policy = v!),
+    ),
+    const SizedBox(height: 20),
+    Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: [
+        button(strings.saveSettings, save),
+        OutlinedButton(
+          onPressed: busy ? null : () => run(load),
+          child: Text(strings.reloadSettings),
+        ),
+      ],
+    ),
+  ]);
+  List<Widget> _identityCards() => [
+    if (identity == null)
+      card([
+        Text(strings.deviceIdentity, style: TextStyle(fontSize: 20)),
+        const SizedBox(height: 12),
+        Text(
+          widget.autoConnect
+              ? strings.currentConnection
+              : strings.currentSession,
+        ),
+        const SizedBox(height: 16),
+        button(strings.connectManagement, () => signIn(false)),
+      ]),
+    if (identity != null && !initialized)
+      card([
+        Text(strings.claimOwner, style: TextStyle(fontSize: 20)),
+        Text(strings.setupHelp),
+        const SizedBox(height: 16),
+        TextField(
+          scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
+          controller: code,
+          obscureText: true,
+          decoration: InputDecoration(labelText: strings.setupCode),
+        ),
+        const SizedBox(height: 16),
+        button(strings.confirmOwner, _claimOwner),
+      ]),
+    if (identity != null &&
+        widget.authorizeDevice != null &&
+        (['owner', 'admin'].contains(identity!['role']) || !initialized) &&
+        identity!['administrative'] != true)
+      card([
+        Text(strings.authorizeTitle, style: TextStyle(fontSize: 20)),
+        Text(strings.authorizeHelp),
+        button(strings.authorizeDevice, _authorizeDevice),
+      ]),
+  ];
 }

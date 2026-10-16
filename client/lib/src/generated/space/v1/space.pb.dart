@@ -10,6 +10,7 @@
 // ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
+import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
@@ -5975,6 +5976,7 @@ class Content extends $pb.GeneratedMessage {
     $fixnum.Int64? updatedAtUnixMs,
     $core.bool? deleted,
     $core.Iterable<Asset>? attachments,
+    $core.Iterable<Reaction>? reactions,
   }) {
     final result = Content._();
     if (id != null) result.id = id;
@@ -5987,6 +5989,7 @@ class Content extends $pb.GeneratedMessage {
     if (updatedAtUnixMs != null) result.updatedAtUnixMs = updatedAtUnixMs;
     if (deleted != null) result.deleted = deleted;
     if (attachments != null) result.attachments.addAll(attachments);
+    if (reactions != null) result.reactions.addAll(reactions);
     return result;
   }
 
@@ -6014,6 +6017,8 @@ class Content extends $pb.GeneratedMessage {
     ..aOB(9, _omitFieldNames ? '' : 'deleted')
     ..pPM<Asset>(10, _omitFieldNames ? '' : 'attachments',
         subBuilder: Asset.$_createMessage)
+    ..pPM<Reaction>(11, _omitFieldNames ? '' : 'reactions',
+        subBuilder: Reaction.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6120,6 +6125,9 @@ class Content extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(10)
   $pb.PbList<Asset> get attachments => $_getList(9);
+
+  @$pb.TagNumber(11)
+  $pb.PbList<Reaction> get reactions => $_getList(10);
 }
 
 class UpdateContentRequest extends $pb.GeneratedMessage {
@@ -9718,6 +9726,506 @@ class ListMlsEnvelopesResponse extends $pb.GeneratedMessage {
   $core.bool hasNextSequence() => $_has(1);
   @$pb.TagNumber(2)
   void clearNextSequence() => $_clearField(2);
+}
+
+/// Один участник учитывается один раз, независимо от числа устройств.
+class Reaction extends $pb.GeneratedMessage {
+  factory Reaction({
+    $core.String? emoji,
+    $core.Iterable<$core.String>? principalIds,
+  }) {
+    final result = Reaction._();
+    if (emoji != null) result.emoji = emoji;
+    if (principalIds != null) result.principalIds.addAll(principalIds);
+    return result;
+  }
+
+  Reaction._();
+
+  factory Reaction.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      Reaction()..mergeFromBuffer(data, registry);
+  factory Reaction.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      Reaction()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'Reaction',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: Reaction.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'emoji')
+    ..pPS(2, _omitFieldNames ? '' : 'principalIds')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  Reaction clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  Reaction copyWith(void Function(Reaction) updates) =>
+      super.copyWith((message) => updates(message as Reaction)) as Reaction;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Reaction() / Reaction.new instead')
+  static Reaction create() => Reaction._();
+  static $pb.GeneratedMessage $_createMessage() => Reaction._();
+  @$core.override
+  Reaction createEmptyInstance() => Reaction._();
+  @$core.pragma('dart2js:noInline')
+  static Reaction getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Reaction>(Reaction.$_createMessage);
+  static Reaction? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get emoji => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set emoji($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasEmoji() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearEmoji() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $pb.PbList<$core.String> get principalIds => $_getList(1);
+}
+
+class SetReactionRequest extends $pb.GeneratedMessage {
+  factory SetReactionRequest({
+    $core.String? channelId,
+    $core.String? id,
+    $core.String? emoji,
+    $core.bool? active,
+    $fixnum.Int64? expectedRevision,
+  }) {
+    final result = SetReactionRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (id != null) result.id = id;
+    if (emoji != null) result.emoji = emoji;
+    if (active != null) result.active = active;
+    if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    return result;
+  }
+
+  SetReactionRequest._();
+
+  factory SetReactionRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetReactionRequest()..mergeFromBuffer(data, registry);
+  factory SetReactionRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetReactionRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'SetReactionRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: SetReactionRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'id')
+    ..aOS(3, _omitFieldNames ? '' : 'emoji')
+    ..aOB(4, _omitFieldNames ? '' : 'active')
+    ..aInt64(5, _omitFieldNames ? '' : 'expectedRevision')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetReactionRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetReactionRequest copyWith(void Function(SetReactionRequest) updates) =>
+      super.copyWith((message) => updates(message as SetReactionRequest))
+          as SetReactionRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use SetReactionRequest() / SetReactionRequest.new instead')
+  static SetReactionRequest create() => SetReactionRequest._();
+  static $pb.GeneratedMessage $_createMessage() => SetReactionRequest._();
+  @$core.override
+  SetReactionRequest createEmptyInstance() => SetReactionRequest._();
+  @$core.pragma('dart2js:noInline')
+  static SetReactionRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SetReactionRequest>(
+          SetReactionRequest.$_createMessage);
+  static SetReactionRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get id => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set id($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get emoji => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set emoji($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasEmoji() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearEmoji() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get active => $_getBF(3);
+  @$pb.TagNumber(4)
+  set active($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasActive() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearActive() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get expectedRevision => $_getI64(4);
+  @$pb.TagNumber(5)
+  set expectedRevision($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasExpectedRevision() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearExpectedRevision() => $_clearField(5);
+}
+
+class SetReactionResponse extends $pb.GeneratedMessage {
+  factory SetReactionResponse({
+    Content? content,
+  }) {
+    final result = SetReactionResponse._();
+    if (content != null) result.content = content;
+    return result;
+  }
+
+  SetReactionResponse._();
+
+  factory SetReactionResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetReactionResponse()..mergeFromBuffer(data, registry);
+  factory SetReactionResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetReactionResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'SetReactionResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: SetReactionResponse.$_createMessage)
+    ..aOM<Content>(1, _omitFieldNames ? '' : 'content',
+        subBuilder: Content.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetReactionResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetReactionResponse copyWith(void Function(SetReactionResponse) updates) =>
+      super.copyWith((message) => updates(message as SetReactionResponse))
+          as SetReactionResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use SetReactionResponse() / SetReactionResponse.new instead')
+  static SetReactionResponse create() => SetReactionResponse._();
+  static $pb.GeneratedMessage $_createMessage() => SetReactionResponse._();
+  @$core.override
+  SetReactionResponse createEmptyInstance() => SetReactionResponse._();
+  @$core.pragma('dart2js:noInline')
+  static SetReactionResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SetReactionResponse>(
+          SetReactionResponse.$_createMessage);
+  static SetReactionResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Content get content => $_getN(0);
+  @$pb.TagNumber(1)
+  set content(Content value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasContent() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearContent() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Content ensureContent() => $_ensure(0);
+}
+
+/// Экспериментальный контракт первого локального прототипа.
+class ChannelServiceApi {
+  final $pb.RpcClient _client;
+
+  ChannelServiceApi(this._client);
+
+  $async.Future<WatchChannelsResponse> watchChannels(
+          $pb.ClientContext? ctx, WatchChannelsRequest request) =>
+      _client.invoke<WatchChannelsResponse>(ctx, 'ChannelService',
+          'WatchChannels', request, WatchChannelsResponse());
+  $async.Future<ListChannelsResponse> listChannels(
+          $pb.ClientContext? ctx, ListChannelsRequest request) =>
+      _client.invoke<ListChannelsResponse>(ctx, 'ChannelService',
+          'ListChannels', request, ListChannelsResponse());
+  $async.Future<CreateChannelResponse> createChannel(
+          $pb.ClientContext? ctx, CreateChannelRequest request) =>
+      _client.invoke<CreateChannelResponse>(ctx, 'ChannelService',
+          'CreateChannel', request, CreateChannelResponse());
+  $async.Future<UpdateChannelResponse> updateChannel(
+          $pb.ClientContext? ctx, UpdateChannelRequest request) =>
+      _client.invoke<UpdateChannelResponse>(ctx, 'ChannelService',
+          'UpdateChannel', request, UpdateChannelResponse());
+  $async.Future<DeleteChannelResponse> deleteChannel(
+          $pb.ClientContext? ctx, DeleteChannelRequest request) =>
+      _client.invoke<DeleteChannelResponse>(ctx, 'ChannelService',
+          'DeleteChannel', request, DeleteChannelResponse());
+  $async.Future<GetChannelAccessResponse> getChannelAccess(
+          $pb.ClientContext? ctx, GetChannelAccessRequest request) =>
+      _client.invoke<GetChannelAccessResponse>(ctx, 'ChannelService',
+          'GetChannelAccess', request, GetChannelAccessResponse());
+  $async.Future<UpdateChannelAccessResponse> updateChannelAccess(
+          $pb.ClientContext? ctx, UpdateChannelAccessRequest request) =>
+      _client.invoke<UpdateChannelAccessResponse>(ctx, 'ChannelService',
+          'UpdateChannelAccess', request, UpdateChannelAccessResponse());
+  $async.Future<GetManifestResponse> getManifest(
+          $pb.ClientContext? ctx, GetManifestRequest request) =>
+      _client.invoke<GetManifestResponse>(
+          ctx, 'ChannelService', 'GetManifest', request, GetManifestResponse());
+}
+
+class ContentServiceApi {
+  final $pb.RpcClient _client;
+
+  ContentServiceApi(this._client);
+
+  $async.Future<SetReactionResponse> setReaction(
+          $pb.ClientContext? ctx, SetReactionRequest request) =>
+      _client.invoke<SetReactionResponse>(
+          ctx, 'ContentService', 'SetReaction', request, SetReactionResponse());
+  $async.Future<UpdateContentResponse> updateContent(
+          $pb.ClientContext? ctx, UpdateContentRequest request) =>
+      _client.invoke<UpdateContentResponse>(ctx, 'ContentService',
+          'UpdateContent', request, UpdateContentResponse());
+  $async.Future<DeleteContentResponse> deleteContent(
+          $pb.ClientContext? ctx, DeleteContentRequest request) =>
+      _client.invoke<DeleteContentResponse>(ctx, 'ContentService',
+          'DeleteContent', request, DeleteContentResponse());
+  $async.Future<CreateContentResponse> createContent(
+          $pb.ClientContext? ctx, CreateContentRequest request) =>
+      _client.invoke<CreateContentResponse>(ctx, 'ContentService',
+          'CreateContent', request, CreateContentResponse());
+  $async.Future<ListContentResponse> listContent(
+          $pb.ClientContext? ctx, ListContentRequest request) =>
+      _client.invoke<ListContentResponse>(
+          ctx, 'ContentService', 'ListContent', request, ListContentResponse());
+}
+
+/// Файлы передаются ограниченными частями; права проверяются на каждой операции.
+class AssetServiceApi {
+  final $pb.RpcClient _client;
+
+  AssetServiceApi(this._client);
+
+  $async.Future<BeginUploadResponse> beginUpload(
+          $pb.ClientContext? ctx, BeginUploadRequest request) =>
+      _client.invoke<BeginUploadResponse>(
+          ctx, 'AssetService', 'BeginUpload', request, BeginUploadResponse());
+  $async.Future<UploadChunkResponse> uploadChunk(
+          $pb.ClientContext? ctx, UploadChunkRequest request) =>
+      _client.invoke<UploadChunkResponse>(
+          ctx, 'AssetService', 'UploadChunk', request, UploadChunkResponse());
+  $async.Future<CompleteUploadResponse> completeUpload(
+          $pb.ClientContext? ctx, CompleteUploadRequest request) =>
+      _client.invoke<CompleteUploadResponse>(ctx, 'AssetService',
+          'CompleteUpload', request, CompleteUploadResponse());
+  $async.Future<CancelUploadResponse> cancelUpload(
+          $pb.ClientContext? ctx, CancelUploadRequest request) =>
+      _client.invoke<CancelUploadResponse>(
+          ctx, 'AssetService', 'CancelUpload', request, CancelUploadResponse());
+  $async.Future<DownloadChunkResponse> downloadChunk(
+          $pb.ClientContext? ctx, DownloadChunkRequest request) =>
+      _client.invoke<DownloadChunkResponse>(ctx, 'AssetService',
+          'DownloadChunk', request, DownloadChunkResponse());
+  $async.Future<ListMyAssetsResponse> listMyAssets(
+          $pb.ClientContext? ctx, ListMyAssetsRequest request) =>
+      _client.invoke<ListMyAssetsResponse>(
+          ctx, 'AssetService', 'ListMyAssets', request, ListMyAssetsResponse());
+  $async.Future<ListChannelAssetsResponse> listChannelAssets(
+          $pb.ClientContext? ctx, ListChannelAssetsRequest request) =>
+      _client.invoke<ListChannelAssetsResponse>(ctx, 'AssetService',
+          'ListChannelAssets', request, ListChannelAssetsResponse());
+}
+
+class AuthServiceApi {
+  final $pb.RpcClient _client;
+
+  AuthServiceApi(this._client);
+
+  /// Экспериментальный API; требует поддержки stable principal у клиента.
+  $async.Future<CreateRootRotationResponse> createRootRotation(
+          $pb.ClientContext? ctx, CreateRootRotationRequest request) =>
+      _client.invoke<CreateRootRotationResponse>(ctx, 'AuthService',
+          'CreateRootRotation', request, CreateRootRotationResponse());
+  $async.Future<CompleteRootRotationResponse> completeRootRotation(
+          $pb.ClientContext? ctx, CompleteRootRotationRequest request) =>
+      _client.invoke<CompleteRootRotationResponse>(ctx, 'AuthService',
+          'CompleteRootRotation', request, CompleteRootRotationResponse());
+  $async.Future<ProposePairingResponse> proposePairing(
+          $pb.ClientContext? ctx, ProposePairingRequest request) =>
+      _client.invoke<ProposePairingResponse>(ctx, 'AuthService',
+          'ProposePairing', request, ProposePairingResponse());
+  $async.Future<CreatePairingResponse> createPairing(
+          $pb.ClientContext? ctx, CreatePairingRequest request) =>
+      _client.invoke<CreatePairingResponse>(ctx, 'AuthService', 'CreatePairing',
+          request, CreatePairingResponse());
+  $async.Future<InspectPairingResponse> inspectPairing(
+          $pb.ClientContext? ctx, InspectPairingRequest request) =>
+      _client.invoke<InspectPairingResponse>(ctx, 'AuthService',
+          'InspectPairing', request, InspectPairingResponse());
+  $async.Future<PollPairingResponse> pollPairing(
+          $pb.ClientContext? ctx, PollPairingRequest request) =>
+      _client.invoke<PollPairingResponse>(
+          ctx, 'AuthService', 'PollPairing', request, PollPairingResponse());
+  $async.Future<CancelPairingResponse> cancelPairing(
+          $pb.ClientContext? ctx, CancelPairingRequest request) =>
+      _client.invoke<CancelPairingResponse>(ctx, 'AuthService', 'CancelPairing',
+          request, CancelPairingResponse());
+  $async.Future<ClaimPairingResponse> claimPairing(
+          $pb.ClientContext? ctx, ClaimPairingRequest request) =>
+      _client.invoke<ClaimPairingResponse>(
+          ctx, 'AuthService', 'ClaimPairing', request, ClaimPairingResponse());
+  $async.Future<RevokeCurrentDeviceResponse> revokeCurrentDevice(
+          $pb.ClientContext? ctx, RevokeCurrentDeviceRequest request) =>
+      _client.invoke<RevokeCurrentDeviceResponse>(ctx, 'AuthService',
+          'RevokeCurrentDevice', request, RevokeCurrentDeviceResponse());
+  $async.Future<ListDevicesResponse> listDevices(
+          $pb.ClientContext? ctx, ListDevicesRequest request) =>
+      _client.invoke<ListDevicesResponse>(
+          ctx, 'AuthService', 'ListDevices', request, ListDevicesResponse());
+  $async.Future<LogoutResponse> logout(
+          $pb.ClientContext? ctx, LogoutRequest request) =>
+      _client.invoke<LogoutResponse>(
+          ctx, 'AuthService', 'Logout', request, LogoutResponse());
+  $async.Future<CreateChallengeResponse> createChallenge(
+          $pb.ClientContext? ctx, CreateChallengeRequest request) =>
+      _client.invoke<CreateChallengeResponse>(ctx, 'AuthService',
+          'CreateChallenge', request, CreateChallengeResponse());
+  $async.Future<CompleteChallengeResponse> completeChallenge(
+          $pb.ClientContext? ctx, CompleteChallengeRequest request) =>
+      _client.invoke<CompleteChallengeResponse>(ctx, 'AuthService',
+          'CompleteChallenge', request, CompleteChallengeResponse());
+}
+
+class SyncServiceApi {
+  final $pb.RpcClient _client;
+
+  SyncServiceApi(this._client);
+
+  $async.Future<SubscribeResponse> subscribe(
+          $pb.ClientContext? ctx, SubscribeRequest request) =>
+      _client.invoke<SubscribeResponse>(
+          ctx, 'SyncService', 'Subscribe', request, SubscribeResponse());
+  $async.Future<ListEventsResponse> listEvents(
+          $pb.ClientContext? ctx, ListEventsRequest request) =>
+      _client.invoke<ListEventsResponse>(
+          ctx, 'SyncService', 'ListEvents', request, ListEventsResponse());
+}
+
+class AdminServiceApi {
+  final $pb.RpcClient _client;
+
+  AdminServiceApi(this._client);
+
+  $async.Future<ListMembersResponse> listMembers(
+          $pb.ClientContext? ctx, ListMembersRequest request) =>
+      _client.invoke<ListMembersResponse>(
+          ctx, 'AdminService', 'ListMembers', request, ListMembersResponse());
+  $async.Future<UpdateMemberResponse> updateMember(
+          $pb.ClientContext? ctx, UpdateMemberRequest request) =>
+      _client.invoke<UpdateMemberResponse>(
+          ctx, 'AdminService', 'UpdateMember', request, UpdateMemberResponse());
+  $async.Future<CreateInviteResponse> createInvite(
+          $pb.ClientContext? ctx, CreateInviteRequest request) =>
+      _client.invoke<CreateInviteResponse>(
+          ctx, 'AdminService', 'CreateInvite', request, CreateInviteResponse());
+  $async.Future<ListInvitesResponse> listInvites(
+          $pb.ClientContext? ctx, ListInvitesRequest request) =>
+      _client.invoke<ListInvitesResponse>(
+          ctx, 'AdminService', 'ListInvites', request, ListInvitesResponse());
+  $async.Future<RevokeInviteResponse> revokeInvite(
+          $pb.ClientContext? ctx, RevokeInviteRequest request) =>
+      _client.invoke<RevokeInviteResponse>(
+          ctx, 'AdminService', 'RevokeInvite', request, RevokeInviteResponse());
+  $async.Future<GetSetupStatusResponse> getSetupStatus(
+          $pb.ClientContext? ctx, GetSetupStatusRequest request) =>
+      _client.invoke<GetSetupStatusResponse>(ctx, 'AdminService',
+          'GetSetupStatus', request, GetSetupStatusResponse());
+  $async.Future<ClaimOwnerResponse> claimOwner(
+          $pb.ClientContext? ctx, ClaimOwnerRequest request) =>
+      _client.invoke<ClaimOwnerResponse>(
+          ctx, 'AdminService', 'ClaimOwner', request, ClaimOwnerResponse());
+  $async.Future<GetSettingsResponse> getSettings(
+          $pb.ClientContext? ctx, GetSettingsRequest request) =>
+      _client.invoke<GetSettingsResponse>(
+          ctx, 'AdminService', 'GetSettings', request, GetSettingsResponse());
+  $async.Future<UpdateSettingsResponse> updateSettings(
+          $pb.ClientContext? ctx, UpdateSettingsRequest request) =>
+      _client.invoke<UpdateSettingsResponse>(ctx, 'AdminService',
+          'UpdateSettings', request, UpdateSettingsResponse());
+}
+
+class MembershipServiceApi {
+  final $pb.RpcClient _client;
+
+  MembershipServiceApi(this._client);
+
+  $async.Future<UpdateProfileResponse> updateProfile(
+          $pb.ClientContext? ctx, UpdateProfileRequest request) =>
+      _client.invoke<UpdateProfileResponse>(ctx, 'MembershipService',
+          'UpdateProfile', request, UpdateProfileResponse());
+  $async.Future<PreviewInviteResponse> previewInvite(
+          $pb.ClientContext? ctx, PreviewInviteRequest request) =>
+      _client.invoke<PreviewInviteResponse>(ctx, 'MembershipService',
+          'PreviewInvite', request, PreviewInviteResponse());
+  $async.Future<AcceptInviteResponse> acceptInvite(
+          $pb.ClientContext? ctx, AcceptInviteRequest request) =>
+      _client.invoke<AcceptInviteResponse>(ctx, 'MembershipService',
+          'AcceptInvite', request, AcceptInviteResponse());
+  $async.Future<GetMembershipResponse> getMembership(
+          $pb.ClientContext? ctx, GetMembershipRequest request) =>
+      _client.invoke<GetMembershipResponse>(ctx, 'MembershipService',
+          'GetMembership', request, GetMembershipResponse());
+}
+
+/// Сервер доставляет непрозрачные MLS-пакеты. Состав проверяется клиентами.
+class MlsServiceApi {
+  final $pb.RpcClient _client;
+
+  MlsServiceApi(this._client);
+
+  $async.Future<RegisterMlsDeviceResponse> registerMlsDevice(
+          $pb.ClientContext? ctx, RegisterMlsDeviceRequest request) =>
+      _client.invoke<RegisterMlsDeviceResponse>(ctx, 'MlsService',
+          'RegisterMlsDevice', request, RegisterMlsDeviceResponse());
+  $async.Future<ListMlsDevicesResponse> listMlsDevices(
+          $pb.ClientContext? ctx, ListMlsDevicesRequest request) =>
+      _client.invoke<ListMlsDevicesResponse>(ctx, 'MlsService',
+          'ListMlsDevices', request, ListMlsDevicesResponse());
+  $async.Future<GetMlsChannelResponse> getMlsChannel(
+          $pb.ClientContext? ctx, GetMlsChannelRequest request) =>
+      _client.invoke<GetMlsChannelResponse>(
+          ctx, 'MlsService', 'GetMlsChannel', request, GetMlsChannelResponse());
+  $async.Future<PublishMlsResponse> publishMls(
+          $pb.ClientContext? ctx, PublishMlsRequest request) =>
+      _client.invoke<PublishMlsResponse>(
+          ctx, 'MlsService', 'PublishMls', request, PublishMlsResponse());
+  $async.Future<ListMlsEnvelopesResponse> listMlsEnvelopes(
+          $pb.ClientContext? ctx, ListMlsEnvelopesRequest request) =>
+      _client.invoke<ListMlsEnvelopesResponse>(ctx, 'MlsService',
+          'ListMlsEnvelopes', request, ListMlsEnvelopesResponse());
 }
 
 const $core.bool _omitFieldNames =

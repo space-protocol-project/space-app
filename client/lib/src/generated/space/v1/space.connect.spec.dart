@@ -71,6 +71,13 @@ abstract final class ContentService {
   /// Fully-qualified name of the ContentService service.
   static const name = 'space.v1.ContentService';
 
+  static const setReaction = connect.Spec(
+    '/$name/SetReaction',
+    connect.StreamType.unary,
+    spacev1space.SetReactionRequest.new,
+    spacev1space.SetReactionResponse.new,
+  );
+
   static const updateContent = connect.Spec(
     '/$name/UpdateContent',
     connect.StreamType.unary,

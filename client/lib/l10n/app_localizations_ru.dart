@@ -1619,4 +1619,55 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get homeDiagAutomaticIPFailed =>
       'Не удалось обновить публичный IPv4. Проверьте подключение к интернету.';
+
+  @override
+  String get emojiPicker => 'Эмодзи';
+
+  @override
+  String get emojiSearch => 'Поиск эмодзи';
+
+  @override
+  String get emojiRecent => 'Недавние';
+
+  @override
+  String get emojiAll => 'Все';
+
+  @override
+  String get addReaction => 'Добавить реакцию';
+
+  @override
+  String get reactionParticipants => 'Кто отреагировал';
+
+  @override
+  String get copyMessage => 'Скопировать';
+
+  @override
+  String get messageCopied => 'Скопировано';
+
+  @override
+  String get emojiFaces => 'Лица и эмоции';
+
+  @override
+  String get emojiPeople => 'Люди и жесты';
+
+  @override
+  String get emojiNature => 'Животные и природа';
+
+  @override
+  String get emojiFood => 'Еда и напитки';
+
+  @override
+  String get emojiTravel => 'Путешествия и места';
+
+  @override
+  String get emojiActivities => 'Занятия';
+
+  @override
+  String get emojiObjects => 'Предметы';
+
+  @override
+  String get emojiSymbols => 'Символы';
+
+  @override
+  String get emojiFlags => 'Флаги';
 }

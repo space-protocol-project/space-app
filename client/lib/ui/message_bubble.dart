@@ -16,6 +16,7 @@ class MessageBubble extends StatelessWidget {
     this.favorite = false,
     this.onToggleFavorite,
     this.actions,
+    this.reactions,
     this.attachments,
     this.edited = false,
     this.deleted = false,
@@ -24,7 +25,7 @@ class MessageBubble extends StatelessWidget {
   final bool mine, grouped, accepted;
   final DateTime? sentAt;
   final bool favorite, edited, deleted;
-  final Widget? actions, attachments;
+  final Widget? actions, attachments, reactions;
   final VoidCallback? onToggleFavorite;
 
   String displayText(BuildContext context) =>
@@ -74,98 +75,7 @@ class MessageBubble extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (!mine && !grouped) ...[
-                        Text(
-                          author,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: colors.secondary,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                      ],
-                      if (deleted)
-                        Text(
-                          context.strings.messageDeleted,
-                          style: TextStyle(
-                            fontStyle: FontStyle.italic,
-                            color: colors.onSurfaceVariant,
-                          ),
-                        )
-                      else
-                        MessageMarkdown(text: displayText(context)),
-                      if (!deleted) ?attachments,
-                      if (sentAt != null ||
-                          accepted ||
-                          onToggleFavorite != null ||
-                          actions != null ||
-                          edited)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ?actions,
-                              if (edited && !deleted) ...[
-                                Text(
-                                  context.strings.messageEdited,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: colors.onSurfaceVariant,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                              ],
-                              if (onToggleFavorite != null)
-                                IconButton(
-                                  tooltip: favorite
-                                      ? context.strings.removeFavorite
-                                      : context.strings.addFavorite,
-                                  onPressed: onToggleFavorite,
-                                  visualDensity: VisualDensity.compact,
-                                  constraints: const BoxConstraints(
-                                    minWidth: 28,
-                                    minHeight: 28,
-                                  ),
-                                  padding: EdgeInsets.zero,
-                                  icon: Icon(
-                                    favorite
-                                        ? Icons.bookmark
-                                        : Icons.bookmark_border,
-                                    size: 16,
-                                  ),
-                                ),
-                              if (sentAt != null)
-                                Tooltip(
-                                  message:
-                                      '${MaterialLocalizations.of(context).formatFullDate(sentAt!)} ${MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(sentAt!))}',
-                                  child: Text(
-                                    MaterialLocalizations.of(context)
-                                        .formatTimeOfDay(
-                                          TimeOfDay.fromDateTime(sentAt!),
-                                        ),
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: colors.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ),
-                              if (accepted) ...[
-                                const SizedBox(width: 6),
-                                Tooltip(
-                                  message: context.strings.messageAccepted,
-                                  child: Icon(
-                                    Icons.check,
-                                    size: 14,
-                                    color: colors.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                    ],
+                    children: _content(context),
                   ),
                 ),
               ),
@@ -187,6 +97,94 @@ class MessageBubble extends StatelessWidget {
       bottomRight: Radius.circular(mine ? 6 : 24),
     ),
   );
+  Widget _metadata(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ?actions,
+          if (edited && !deleted) ...[
+            Text(
+              context.strings.messageEdited,
+              style: TextStyle(fontSize: 11, color: colors.onSurfaceVariant),
+            ),
+            const SizedBox(width: 6),
+          ],
+          if (onToggleFavorite != null)
+            IconButton(
+              tooltip: favorite
+                  ? context.strings.removeFavorite
+                  : context.strings.addFavorite,
+              onPressed: onToggleFavorite,
+              visualDensity: VisualDensity.compact,
+              constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                favorite ? Icons.bookmark : Icons.bookmark_border,
+                size: 16,
+              ),
+            ),
+          if (sentAt != null)
+            Tooltip(
+              message:
+                  '${MaterialLocalizations.of(context).formatFullDate(sentAt!)} ${MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(sentAt!))}',
+              child: Text(
+                MaterialLocalizations.of(context)
+                    .formatTimeOfDay(TimeOfDay.fromDateTime(sentAt!)),
+                style: TextStyle(fontSize: 11, color: colors.onSurfaceVariant),
+              ),
+            ),
+          if (accepted) ...[
+            const SizedBox(width: 6),
+            Tooltip(
+              message: context.strings.messageAccepted,
+              child: Icon(
+                Icons.check,
+                size: 14,
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _content(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return [
+      if (!mine && !grouped) ...[
+        Text(
+          author,
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: colors.secondary,
+          ),
+        ),
+        const SizedBox(height: 4),
+      ],
+      if (deleted)
+        Text(
+          context.strings.messageDeleted,
+          style: TextStyle(
+            fontStyle: FontStyle.italic,
+            color: colors.onSurfaceVariant,
+          ),
+        )
+      else
+        MessageMarkdown(text: displayText(context)),
+      if (!deleted) ?attachments,
+      if (!deleted) ?reactions,
+      if (sentAt != null ||
+          accepted ||
+          onToggleFavorite != null ||
+          actions != null ||
+          edited)
+        _metadata(context),
+    ];
+  }
 }
 
 Color messageBubbleColor(ColorScheme colors, bool mine) => Color.alphaBlend(

@@ -41,6 +41,13 @@ class MlsTransfer extends MlsEvent {
   final MlsDevice device;
 }
 
+class MlsReact extends MlsEvent {
+  MlsReact(this.target, this.emoji, this.active);
+  final Map<String, dynamic> target;
+  final String emoji;
+  final bool active;
+}
+
 class MlsState {
   const MlsState({
     this.busy = false,
@@ -147,6 +154,13 @@ class MlsController extends Bloc<MlsEvent, MlsState> {
         await client.remove(channelId, event.device);
       case MlsTransfer():
         await client.transfer(channelId, event.device);
+      case MlsReact():
+        await client.setReaction(
+          channelId,
+          event.target,
+          event.emoji,
+          event.active,
+        );
       case MlsSend():
         await MlsFiles(client)
             .send(channelId, groupId, event.text, event.files);

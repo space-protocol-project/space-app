@@ -157,6 +157,7 @@ extension MlsReceive on MlsClient {
         (binding) => (binding['device'] as Map)['grant_id'],
       );
       if (!authorized ||
+          message['reaction'] != null ||
           manager == null ||
           manager != envelope.newManagerGrantId ||
           !members.contains(manager)) {

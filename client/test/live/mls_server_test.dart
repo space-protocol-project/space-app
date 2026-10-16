@@ -15,6 +15,7 @@ import 'package:space_client/src/rpc_clients.dart'
         ListDevicesRequest,
         DeviceGrant,
         PublishMlsRequest,
+        PublishMlsResponse,
         ListMlsEnvelopesRequest,
         ListMlsDevicesResponse,
         UpdateMemberRequest;
@@ -181,8 +182,58 @@ void main() {
             .download(group, (message['id'] as List).cast<int>(), descriptor),
         bytes,
       );
+      await c.setReaction('private', item, '👍', true);
+      await a.refresh('private', group);
       b = await client(member, storageB);
       view = await b.refresh('private', group);
+      expect((view.messages.last['reactions'] as List).single.emoji, '👍');
+      expect((view.messages.last['reactions'] as List).single.principalIds, [
+        third.principalId,
+      ]);
+      final cForReactionRestart = await client(third, storageC);
+      final restoredReactions = await cForReactionRestart.refresh(
+        'private',
+        group,
+      );
+      expect(
+        (restoredReactions.messages.last['reactions'] as List).single.emoji,
+        '👍',
+      );
+      final reactionProxy = RpcFaultProxy(cForReactionRestart.connection);
+      reactionProxy.mutate = (_, response) {
+        if (response is PublishMlsResponse) {
+          throw const GrpcError.unavailable('Потеря подтверждения реакции');
+        }
+        return response;
+      };
+      final interruptedReaction = MlsClient(
+        local: cForReactionRestart.local,
+        connection: reactionProxy,
+        options: cForReactionRestart.options,
+      );
+      await expectLater(
+        interruptedReaction.setReaction(
+          'private',
+          restoredReactions.messages.last,
+          '👍',
+          false,
+        ),
+        throwsA(isA<GrpcError>()),
+      );
+      expect(
+        ((await interruptedReaction.local.read())['channels']
+            as Map)['private']['outbox'],
+        hasLength(1),
+      );
+      final resumedReaction = await client(third, storageC);
+      await resumedReaction.refresh('private', group);
+      expect(
+        ((await resumedReaction.local.read())['channels']
+            as Map)['private']['outbox'],
+        isEmpty,
+      );
+      view = await b.refresh('private', group);
+      expect(view.messages.last['reactions'], isEmpty);
       expect(view.messages, hasLength(2));
       await b.send('private', 'После перезапуска');
       view = await a.refresh('private', group);

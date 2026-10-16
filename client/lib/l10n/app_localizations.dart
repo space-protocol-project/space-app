@@ -2926,6 +2926,108 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не удалось обновить публичный IPv4. Проверьте подключение к интернету.'**
   String get homeDiagAutomaticIPFailed;
+
+  /// No description provided for @emojiPicker.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эмодзи'**
+  String get emojiPicker;
+
+  /// No description provided for @emojiSearch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поиск эмодзи'**
+  String get emojiSearch;
+
+  /// No description provided for @emojiRecent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Недавние'**
+  String get emojiRecent;
+
+  /// No description provided for @emojiAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все'**
+  String get emojiAll;
+
+  /// No description provided for @addReaction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить реакцию'**
+  String get addReaction;
+
+  /// No description provided for @reactionParticipants.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кто отреагировал'**
+  String get reactionParticipants;
+
+  /// No description provided for @copyMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировать'**
+  String get copyMessage;
+
+  /// No description provided for @messageCopied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировано'**
+  String get messageCopied;
+
+  /// No description provided for @emojiFaces.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лица и эмоции'**
+  String get emojiFaces;
+
+  /// No description provided for @emojiPeople.
+  ///
+  /// In ru, this message translates to:
+  /// **'Люди и жесты'**
+  String get emojiPeople;
+
+  /// No description provided for @emojiNature.
+  ///
+  /// In ru, this message translates to:
+  /// **'Животные и природа'**
+  String get emojiNature;
+
+  /// No description provided for @emojiFood.
+  ///
+  /// In ru, this message translates to:
+  /// **'Еда и напитки'**
+  String get emojiFood;
+
+  /// No description provided for @emojiTravel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Путешествия и места'**
+  String get emojiTravel;
+
+  /// No description provided for @emojiActivities.
+  ///
+  /// In ru, this message translates to:
+  /// **'Занятия'**
+  String get emojiActivities;
+
+  /// No description provided for @emojiObjects.
+  ///
+  /// In ru, this message translates to:
+  /// **'Предметы'**
+  String get emojiObjects;
+
+  /// No description provided for @emojiSymbols.
+  ///
+  /// In ru, this message translates to:
+  /// **'Символы'**
+  String get emojiSymbols;
+
+  /// No description provided for @emojiFlags.
+  ///
+  /// In ru, this message translates to:
+  /// **'Флаги'**
+  String get emojiFlags;
 }
 
 class _AppLocalizationsDelegate

@@ -51,14 +51,24 @@ class HomeRelease {
     if (b < 0) return false;
     final pre = version.substring(a + 1).split('.'),
         old = previousVersion.substring(b + 1).split('.');
-    for (var i = 0; i < pre.length && i < old.length; i++) {
-      if (pre[i] == old[i]) continue;
-      final number = int.tryParse(pre[i]), previous = int.tryParse(old[i]);
-      if (number != null && previous != null) return number > previous;
-      if (number != null || previous != null) return number == null;
-      return pre[i].compareTo(old[i]) > 0;
+    return _comparePrerelease(pre, old) > 0;
+  }
+
+  static int _comparePrerelease(List<String> left, List<String> right) {
+    for (var i = 0; i < left.length && i < right.length; i++) {
+      final comparison = _compareIdentifier(left[i], right[i]);
+      if (comparison != 0) return comparison;
     }
-    return pre.length > old.length;
+    return left.length.compareTo(right.length);
+  }
+
+  static int _compareIdentifier(String left, String right) {
+    if (left == right) return 0;
+    final number = int.tryParse(left), previous = int.tryParse(right);
+    if (number != null && previous != null) return number.compareTo(previous);
+    if (number != null) return -1;
+    if (previous != null) return 1;
+    return left.compareTo(right);
   }
 
   Map<String, dynamic> toJson() => {

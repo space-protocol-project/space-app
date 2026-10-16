@@ -60,46 +60,8 @@ class _DevicePanelState extends State<DevicePanel> {
                     Text(context.strings.myDeviceStorage),
                     const SizedBox(height: 16),
                     Text(context.strings.myDeviceAccessHelp),
-                    if (entries.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      DropdownButtonFormField<String>(
-                        key: ValueKey('device-identity-$origin'),
-                        initialValue: origin,
-                        isExpanded: true,
-                        decoration: InputDecoration(
-                          labelText: context.strings.deviceIdentityChoice,
-                        ),
-                        items: [
-                          for (final entry in entries.entries)
-                            DropdownMenuItem(
-                              value: entry.key,
-                              child: Text(
-                                entry.value.spaceTitle.isEmpty
-                                    ? entry.key
-                                    : entry.value.spaceTitle,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                        ],
-                        onChanged: (value) => setState(() => selected = value),
-                      ),
-                      if (!controller.connected) ...[
-                        const SizedBox(height: 20),
-                        OutlinedButton.icon(
-                          onPressed: controller.busy
-                              ? null
-                              : () => widget.workspaces.reconnect(origin!),
-                          icon: const Icon(Icons.link),
-                          label: Text(context.strings.deviceConnectIdentity),
-                        ),
-                      ],
-                      if (controller.principalId.isNotEmpty) ...[
-                        const SizedBox(height: 16),
-                        SelectableText(controller.principalId),
-                        SelectableText(controller.fingerprint),
-                      ],
-                      if (controller.error.isNotEmpty) Text(controller.error),
-                    ],
+                    if (entries.isNotEmpty)
+                      ..._identityDetails(context, entries, origin, controller),
                   ],
                 ),
               ),
@@ -118,4 +80,51 @@ class _DevicePanelState extends State<DevicePanel> {
           );
         },
       );
+  List<Widget> _identityDetails(
+    BuildContext context,
+    Map<String, ChatController> entries,
+    String? origin,
+    ChatController controller,
+  ) {
+    return [
+      const SizedBox(height: 16),
+      DropdownButtonFormField<String>(
+        key: ValueKey('device-identity-$origin'),
+        initialValue: origin,
+        isExpanded: true,
+        decoration: InputDecoration(
+          labelText: context.strings.deviceIdentityChoice,
+        ),
+        items: [
+          for (final entry in entries.entries)
+            DropdownMenuItem(
+              value: entry.key,
+              child: Text(
+                entry.value.spaceTitle.isEmpty
+                    ? entry.key
+                    : entry.value.spaceTitle,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+        ],
+        onChanged: (value) => setState(() => selected = value),
+      ),
+      if (!controller.connected) ...[
+        const SizedBox(height: 20),
+        OutlinedButton.icon(
+          onPressed: controller.busy
+              ? null
+              : () => widget.workspaces.reconnect(origin!),
+          icon: const Icon(Icons.link),
+          label: Text(context.strings.deviceConnectIdentity),
+        ),
+      ],
+      if (controller.principalId.isNotEmpty) ...[
+        const SizedBox(height: 16),
+        SelectableText(controller.principalId),
+        SelectableText(controller.fingerprint),
+      ],
+      if (controller.error.isNotEmpty) Text(controller.error),
+    ];
+  }
 }

@@ -285,67 +285,9 @@ class _InvitesPanelState extends State<InvitesPanel> {
             onPressed: busy ? null : () => run(create),
             child: Text(strings.inviteCreate),
           ),
-          if (token.isNotEmpty) ...[
-            const Divider(height: 28),
-            Text(strings.inviteCode),
-            SelectableText(token, key: const ValueKey('issued-invite-token')),
-            const SizedBox(height: 12),
-            Text(strings.inviteLink),
-            SelectableText(link, key: const ValueKey('issued-invite-link')),
-            Text(strings.inviteLinkHelp),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                OutlinedButton(
-                  onPressed: busy ? null : () => run(() => copy(token)),
-                  child: Text(strings.inviteCopyCode),
-                ),
-                OutlinedButton(
-                  onPressed: busy ? null : () => run(() => copy(link)),
-                  child: Text(strings.inviteCopyLink),
-                ),
-                TextButton(
-                  onPressed: busy
-                      ? null
-                      : () => setState(() {
-                          token = '';
-                          issuedId = '';
-                        }),
-                  child: Text(strings.inviteHide),
-                ),
-              ],
-            ),
-          ],
+          if (token.isNotEmpty) ..._issuedInvitation(),
           const Divider(height: 28),
-          for (final invite in invites)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    '${memberRoleLabel(invite['role'] as String, strings)} · ${state(invite)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    strings.inviteExpiry(
-                      expiry(invite),
-                      (invite['uses'] as num? ?? 0).toInt(),
-                      (invite['maxUses'] as num).toInt(),
-                    ),
-                  ),
-                  if (active(invite))
-                    OutlinedButton(
-                      key: ValueKey('revoke-${invite['id']}'),
-                      onPressed: busy ? null : () => revoke(invite),
-                      child: Text(strings.inviteRevoke),
-                    ),
-                  const Divider(),
-                ],
-              ),
-            ),
+          for (final invite in invites) _invitationEntry(invite),
           if (invites.isEmpty && !busy) Text(strings.invitesEmpty),
           if (cursor.isNotEmpty)
             OutlinedButton(
@@ -366,6 +308,68 @@ class _InvitesPanelState extends State<InvitesPanel> {
           ),
         ],
       ),
+    ),
+  );
+  List<Widget> _issuedInvitation() {
+    return [
+      const Divider(height: 28),
+      Text(strings.inviteCode),
+      SelectableText(token, key: const ValueKey('issued-invite-token')),
+      const SizedBox(height: 12),
+      Text(strings.inviteLink),
+      SelectableText(link, key: const ValueKey('issued-invite-link')),
+      Text(strings.inviteLinkHelp),
+      const SizedBox(height: 12),
+      Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        children: [
+          OutlinedButton(
+            onPressed: busy ? null : () => run(() => copy(token)),
+            child: Text(strings.inviteCopyCode),
+          ),
+          OutlinedButton(
+            onPressed: busy ? null : () => run(() => copy(link)),
+            child: Text(strings.inviteCopyLink),
+          ),
+          TextButton(
+            onPressed: busy
+                ? null
+                : () => setState(() {
+                    token = '';
+                    issuedId = '';
+                  }),
+            child: Text(strings.inviteHide),
+          ),
+        ],
+      ),
+    ];
+  }
+
+  Widget _invitationEntry(Map<String, dynamic> invite) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          '${memberRoleLabel(invite['role'] as String, strings)} · ${state(invite)}',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Text(
+          strings.inviteExpiry(
+            expiry(invite),
+            (invite['uses'] as num? ?? 0).toInt(),
+            (invite['maxUses'] as num).toInt(),
+          ),
+        ),
+        if (active(invite))
+          OutlinedButton(
+            key: ValueKey('revoke-${invite['id']}'),
+            onPressed: busy ? null : () => revoke(invite),
+            child: Text(strings.inviteRevoke),
+          ),
+        const Divider(),
+      ],
     ),
   );
 }

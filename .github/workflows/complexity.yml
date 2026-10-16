@@ -1,0 +1,40 @@
+name: Когнитивная сложность Dart
+on:
+  workflow_call:
+  pull_request:
+    paths: ['client/**', 'packages/**', 'tools/check_complexity*', 'tools/prepare_complexity.py', 'tools/complexity/**', '.github/workflows/complexity.yml']
+  push:
+    branches: [main]
+    paths: ['client/**', 'packages/**', 'tools/check_complexity*', 'tools/prepare_complexity.py', 'tools/complexity/**', '.github/workflows/complexity.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cognitive:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Закреплённый Neovim 0.11.5
+        shell: bash
+        run: |
+          mkdir -p .local/neovim
+          curl --fail --location --retry 3 https://github.com/neovim/neovim/releases/download/v0.11.5/nvim-linux-x86_64.tar.gz -o .local/neovim/nvim.tar.gz
+          echo 'b2f91117be5b5ea39edd7297156dc2a4a8df4add6c95a90809a8df19e7ab6f52  .local/neovim/nvim.tar.gz' | sha256sum --check
+          tar -xzf .local/neovim/nvim.tar.gz -C .local/neovim
+          echo "$PWD/.local/neovim/nvim-linux-x86_64/bin" >> "$GITHUB_PATH"
+      - name: Закреплённые исходники анализатора и парсера
+        run: python tools/prepare_complexity.py
+      - name: Проверка самого профиля и защиты от неполного разбора
+        run: python -m unittest discover -s tools -p 'check_complexity_test.py'
+      - name: Максимум COG 15 во всём рукописном Dart
+        run: python tools/check_complexity.py --report .local/complexity/report.json
+      - name: Отчёт сложности
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Dart-cognitive-complexity
+          path: .local/complexity/report.json
+          if-no-files-found: ignore

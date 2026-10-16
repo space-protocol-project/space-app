@@ -236,8 +236,9 @@ class AttachmentQueue extends Cubit<AttachmentState> {
 
 Future<Uint8List> downloadAttachment(
   AttachmentSession session,
-  Asset asset,
-) async {
+  Asset asset, {
+  bool Function()? cancelled,
+}) async {
   final size = asset.byteSize.toInt();
   if (size < 1 || size > maxAttachmentSize) {
     throw StateError('Недопустимый размер файла');
@@ -245,6 +246,7 @@ Future<Uint8List> downloadAttachment(
   final bytes = BytesBuilder(copy: false);
   var offset = 0;
   while (offset < size) {
+    if (cancelled?.call() == true) throw StateError('Загрузка отменена');
     final reply = await session.downloadChunk(
       DownloadChunkRequest(assetId: asset.id, offset: Int64(offset)),
     );
@@ -259,6 +261,7 @@ Future<Uint8List> downloadAttachment(
     bytes.add(reply.data);
     offset = end;
   }
+  if (cancelled?.call() == true) throw StateError('Загрузка отменена');
   final result = bytes.takeBytes();
   final digest = crypto.sha256.convert(result).bytes;
   if (digest.length != asset.sha256.length ||

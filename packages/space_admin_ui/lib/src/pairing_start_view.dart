@@ -45,46 +45,7 @@ class PairingStartView extends StatelessWidget {
             icon: const Icon(Icons.devices),
             label: Text(strings.pairingStart),
           ),
-        if (code.isNotEmpty) ...[
-          Text(strings.pairingInstructions),
-          const SizedBox(height: 10),
-          SelectableText(
-            code,
-            style: const TextStyle(fontFamily: 'JetBrains Mono'),
-          ),
-          TextButton.icon(
-            onPressed: () => Clipboard.setData(ClipboardData(text: code)),
-            icon: const Icon(Icons.copy),
-            label: Text(strings.pairingCopy),
-          ),
-          if (!signatureVerified && error.isEmpty) Text(strings.pairingWaiting),
-          if (!signatureVerified && verification.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Text(strings.pairingCheckBeforeSign),
-            SelectableText(
-              verification,
-              style: Theme.of(context).textTheme.titleLarge
-                  ?.copyWith(fontFamily: 'JetBrains Mono'),
-            ),
-          ],
-          if (signatureVerified) ...[
-            const SizedBox(height: 12),
-            Text(strings.pairingVerified),
-            SelectableText(
-              verification,
-              style: Theme.of(context).textTheme.titleLarge
-                  ?.copyWith(fontFamily: 'JetBrains Mono'),
-            ),
-            FilledButton(
-              onPressed: busy ? null : onAccept,
-              child: Text(strings.pairingAccept),
-            ),
-          ],
-          TextButton(
-            onPressed: busy ? null : onCancel,
-            child: Text(strings.pairingCancel),
-          ),
-        ],
+        if (code.isNotEmpty) ..._pairingDetails(context, strings),
         if (busy) const LinearProgressIndicator(),
         if (error.isNotEmpty)
           Text(
@@ -93,5 +54,51 @@ class PairingStartView extends StatelessWidget {
           ),
       ],
     );
+  }
+
+  List<Widget> _pairingDetails(
+    BuildContext context,
+    AdminLocalizations strings,
+  ) {
+    return [
+      Text(strings.pairingInstructions),
+      const SizedBox(height: 10),
+      SelectableText(
+        code,
+        style: const TextStyle(fontFamily: 'JetBrains Mono'),
+      ),
+      TextButton.icon(
+        onPressed: () => Clipboard.setData(ClipboardData(text: code)),
+        icon: const Icon(Icons.copy),
+        label: Text(strings.pairingCopy),
+      ),
+      if (!signatureVerified && error.isEmpty) Text(strings.pairingWaiting),
+      if (!signatureVerified && verification.isNotEmpty) ...[
+        const SizedBox(height: 12),
+        Text(strings.pairingCheckBeforeSign),
+        SelectableText(
+          verification,
+          style: Theme.of(context).textTheme.titleLarge
+              ?.copyWith(fontFamily: 'JetBrains Mono'),
+        ),
+      ],
+      if (signatureVerified) ...[
+        const SizedBox(height: 12),
+        Text(strings.pairingVerified),
+        SelectableText(
+          verification,
+          style: Theme.of(context).textTheme.titleLarge
+              ?.copyWith(fontFamily: 'JetBrains Mono'),
+        ),
+        FilledButton(
+          onPressed: busy ? null : onAccept,
+          child: Text(strings.pairingAccept),
+        ),
+      ],
+      TextButton(
+        onPressed: busy ? null : onCancel,
+        child: Text(strings.pairingCancel),
+      ),
+    ];
   }
 }

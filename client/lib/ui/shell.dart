@@ -1,3 +1,4 @@
+import '../src/generated/space/v1/space.pb.dart' show Channel;
 import 'mls_channel.dart';
 import '../src/message_summary.dart';
 
@@ -907,51 +908,7 @@ class _SpaceShellState extends State<SpaceShell> {
                   icon: const Icon(Icons.refresh, size: 20),
                 ),
         ),
-        for (final channel in controller.channels)
-          ListTile(
-            dense: true,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            selected:
-                selected == Section.chat && controller.channelId == channel.id,
-            leading: Icon(
-              channel.archived
-                  ? Icons.archive_outlined
-                  : !channel.permissions.read
-                  ? Icons.lock_outline
-                  : Icons.tag,
-              size: 18,
-            ),
-            title: Text(channel.title, overflow: TextOverflow.ellipsis),
-            trailing: controller.unreadCount(channel.id) > 0
-                ? Tooltip(
-                    message: context.strings.unreadCount(
-                      controller.unreadCount(channel.id),
-                    ),
-                    child: Badge(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      textColor: Theme.of(context).colorScheme.onPrimary,
-                      label: Text(
-                        controller.unreadCount(channel.id) > 99
-                            ? '99+'
-                            : '${controller.unreadCount(channel.id)}',
-                      ),
-                    ),
-                  )
-                : null,
-            subtitle: channel.archived
-                ? Text(context.strings.archived)
-                : !channel.permissions.read
-                ? Text(context.strings.noReadAccess)
-                : null,
-            onTap: controller.busy
-                ? null
-                : () {
-                    controller.selectChannel(channel.id);
-                    select(Section.chat);
-                  },
-          ),
+        for (final channel in controller.channels) _channelTile(channel),
       ],
     ),
   );
@@ -1042,39 +999,7 @@ class _SpaceShellState extends State<SpaceShell> {
             Section.chat,
             Section.settings,
           ])
-            if (section == Section.chat)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: chatGroup(),
-              )
-            else
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: ListTile(
-                  dense: true,
-                  minTileHeight: 48,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  selected: !applicationSettings && selected == section,
-                  selectedTileColor: Theme.of(context)
-                      .colorScheme
-                      .primaryContainer,
-                  leading: Icon(section.icon, size: 20),
-                  title: Text(
-                    section == Section.chat
-                        ? controller.channels.isEmpty
-                              ? chatLabel
-                              : context.strings.chats
-                        : section.localized(context),
-                  ),
-                  onTap:
-                      section == Section.settings &&
-                          (controller.busy || controller.administration == null)
-                      ? null
-                      : () => select(section),
-                ),
-              ),
+            _sidebarSection(section),
           ListTile(
             leading: const Icon(Icons.bookmark_border),
             title: Text(context.strings.favoriteMessages),
@@ -1233,50 +1158,7 @@ class _SpaceShellState extends State<SpaceShell> {
                 ),
                 const SizedBox(height: 16),
                 for (final origin in widget.preferences.origins)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      horizontalTitleGap: 12,
-                      minLeadingWidth: 24,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      tileColor: Theme.of(context)
-                          .colorScheme
-                          .surfaceContainerHighest
-                          .withValues(alpha: .35),
-                      enabled:
-                          presence.online(origin) == true ||
-                          workspaces[origin]?.hasOfflineHistory == true,
-                      leading: Icon(
-                        presence.online(origin) == true
-                            ? Icons.cloud_done_outlined
-                            : Icons.dns_outlined,
-                      ),
-                      title: Text(
-                        workspaces[origin]?.spaceTitle.isNotEmpty == true
-                            ? workspaces[origin]!.spaceTitle
-                            : Uri.parse(origin).authority,
-                        maxLines: 1,
-                        softWrap: false,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      subtitle: Text(
-                        origin,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      onTap:
-                          (presence.online(origin) == true ||
-                              workspaces[origin]?.hasOfflineHistory == true)
-                          ? () => openSpace(origin)
-                          : null,
-                    ),
-                  ),
+                  _recentSpace(origin),
               ],
             ),
           ),
@@ -1989,6 +1871,113 @@ class _SpaceShellState extends State<SpaceShell> {
           child: LayoutBuilder(builder: _responsiveShell),
         ),
       ),
+    ),
+  );
+  Widget _channelTile(Channel channel) => ListTile(
+    dense: true,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    selected: selected == Section.chat && controller.channelId == channel.id,
+    leading: Icon(
+      channel.archived
+          ? Icons.archive_outlined
+          : !channel.permissions.read
+          ? Icons.lock_outline
+          : Icons.tag,
+      size: 18,
+    ),
+    title: Text(channel.title, overflow: TextOverflow.ellipsis),
+    trailing: controller.unreadCount(channel.id) > 0
+        ? Tooltip(
+            message: context.strings.unreadCount(
+              controller.unreadCount(channel.id),
+            ),
+            child: Badge(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              textColor: Theme.of(context).colorScheme.onPrimary,
+              label: Text(
+                controller.unreadCount(channel.id) > 99
+                    ? '99+'
+                    : '${controller.unreadCount(channel.id)}',
+              ),
+            ),
+          )
+        : null,
+    subtitle: channel.archived
+        ? Text(context.strings.archived)
+        : !channel.permissions.read
+        ? Text(context.strings.noReadAccess)
+        : null,
+    onTap: controller.busy
+        ? null
+        : () {
+            controller.selectChannel(channel.id);
+            select(Section.chat);
+          },
+  );
+
+  Widget _sidebarSection(Section section) {
+    if (section == Section.chat) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: chatGroup(),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: ListTile(
+        dense: true,
+        minTileHeight: 48,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        selected: !applicationSettings && selected == section,
+        selectedTileColor: Theme.of(context).colorScheme.primaryContainer,
+        leading: Icon(section.icon, size: 20),
+        title: Text(
+          section == Section.chat
+              ? controller.channels.isEmpty
+                    ? chatLabel
+                    : context.strings.chats
+              : section.localized(context),
+        ),
+        onTap:
+            section == Section.settings &&
+                (controller.busy || controller.administration == null)
+            ? null
+            : () => select(section),
+      ),
+    );
+  }
+
+  Widget _recentSpace(String origin) => Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      horizontalTitleGap: 12,
+      minLeadingWidth: 24,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      tileColor: Theme.of(context).colorScheme.surfaceContainerHighest
+          .withValues(alpha: .35),
+      enabled:
+          presence.online(origin) == true ||
+          workspaces[origin]?.hasOfflineHistory == true,
+      leading: Icon(
+        presence.online(origin) == true
+            ? Icons.cloud_done_outlined
+            : Icons.dns_outlined,
+      ),
+      title: Text(
+        workspaces[origin]?.spaceTitle.isNotEmpty == true
+            ? workspaces[origin]!.spaceTitle
+            : Uri.parse(origin).authority,
+        maxLines: 1,
+        softWrap: false,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Text(origin, maxLines: 1, overflow: TextOverflow.ellipsis),
+      onTap:
+          (presence.online(origin) == true ||
+              workspaces[origin]?.hasOfflineHistory == true)
+          ? () => openSpace(origin)
+          : null,
     ),
   );
 }

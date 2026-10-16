@@ -82,56 +82,7 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
                 ),
                 const SizedBox(height: 16),
                 _updateActions(context, view),
-                if (view.downloading) ...[
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 32,
-                        height: 32,
-                        child: CircularProgressIndicator(
-                          value: view.downloadedBytes / view.package!.size,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        '${(100 * view.downloadedBytes / view.package!.size).floor()}%',
-                      ),
-                    ],
-                  ),
-                ],
-                if (view.installing || view.installFailed) ...[
-                  const SizedBox(height: 16),
-                  Text(
-                    view.installFailed
-                        ? context.strings.updatesInstallFailed
-                        : context.strings.updatesPreparing,
-                  ),
-                ],
-                if (view.downloadFailed || view.downloadedPackage != null) ...[
-                  const SizedBox(height: 16),
-                  Text(
-                    view.downloadFailed
-                        ? context.strings.updatesDownloadFailed
-                        : context.strings.updatesDownloaded,
-                  ),
-                ],
-                if (message.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  Text(message, key: const ValueKey('app-update-status')),
-                ],
-                if (view.status == AppUpdateStatus.available) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    view.package == null
-                        ? context.strings.updatesPackageUnavailable
-                        : context.strings.updatesPackage(
-                            updates.platform,
-                            (view.package!.size / (1024 * 1024))
-                                .toStringAsFixed(1),
-                          ),
-                  ),
-                ],
+                ..._updateFeedback(context, view, message),
                 if (view.release?.notes.isNotEmpty == true)
                   ExpansionTile(
                     tilePadding: EdgeInsets.zero,
@@ -208,4 +159,61 @@ class _AppUpdatesViewState extends State<AppUpdatesView> {
         ),
     ],
   );
+  List<Widget> _updateFeedback(
+    BuildContext context,
+    AppUpdateState view,
+    String message,
+  ) => [
+    if (view.downloading) ..._downloadProgress(context, view),
+    if (view.installing || view.installFailed) ...[
+      const SizedBox(height: 16),
+      Text(
+        view.installFailed
+            ? context.strings.updatesInstallFailed
+            : context.strings.updatesPreparing,
+      ),
+    ],
+    if (view.downloadFailed || view.downloadedPackage != null) ...[
+      const SizedBox(height: 16),
+      Text(
+        view.downloadFailed
+            ? context.strings.updatesDownloadFailed
+            : context.strings.updatesDownloaded,
+      ),
+    ],
+    if (message.isNotEmpty) ...[
+      const SizedBox(height: 16),
+      Text(message, key: const ValueKey('app-update-status')),
+    ],
+    if (view.status == AppUpdateStatus.available) ...[
+      const SizedBox(height: 12),
+      Text(
+        view.package == null
+            ? context.strings.updatesPackageUnavailable
+            : context.strings.updatesPackage(
+                updates.platform,
+                (view.package!.size / (1024 * 1024)).toStringAsFixed(1),
+              ),
+      ),
+    ],
+  ];
+
+  List<Widget> _downloadProgress(BuildContext context, AppUpdateState view) {
+    return [
+      const SizedBox(height: 16),
+      Row(
+        children: [
+          SizedBox(
+            width: 32,
+            height: 32,
+            child: CircularProgressIndicator(
+              value: view.downloadedBytes / view.package!.size,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text('${(100 * view.downloadedBytes / view.package!.size).floor()}%'),
+        ],
+      ),
+    ];
+  }
 }

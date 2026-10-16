@@ -1475,6 +1475,57 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeDiagAutomaticIPFailed => '无法更新公网 IPv4 地址，请检查网络连接。';
+
+  @override
+  String get emojiPicker => '表情';
+
+  @override
+  String get emojiSearch => '搜索表情';
+
+  @override
+  String get emojiRecent => '最近使用';
+
+  @override
+  String get emojiAll => '全部';
+
+  @override
+  String get addReaction => '添加回应';
+
+  @override
+  String get reactionParticipants => '回应者';
+
+  @override
+  String get copyMessage => '复制';
+
+  @override
+  String get messageCopied => '已复制';
+
+  @override
+  String get emojiFaces => '表情与情感';
+
+  @override
+  String get emojiPeople => '人物与手势';
+
+  @override
+  String get emojiNature => '动物与自然';
+
+  @override
+  String get emojiFood => '食物与饮料';
+
+  @override
+  String get emojiTravel => '旅行与地点';
+
+  @override
+  String get emojiActivities => '活动';
+
+  @override
+  String get emojiObjects => '物品';
+
+  @override
+  String get emojiSymbols => '符号';
+
+  @override
+  String get emojiFlags => '旗帜';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1782,4 +1833,55 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get homeDiagAutomaticIPFailed => '无法更新公网 IPv4 地址，请检查网络连接。';
+
+  @override
+  String get emojiPicker => '表情';
+
+  @override
+  String get emojiSearch => '搜索表情';
+
+  @override
+  String get emojiRecent => '最近使用';
+
+  @override
+  String get emojiAll => '全部';
+
+  @override
+  String get addReaction => '添加回应';
+
+  @override
+  String get reactionParticipants => '回应者';
+
+  @override
+  String get copyMessage => '复制';
+
+  @override
+  String get messageCopied => '已复制';
+
+  @override
+  String get emojiFaces => '表情与情感';
+
+  @override
+  String get emojiPeople => '人物与手势';
+
+  @override
+  String get emojiNature => '动物与自然';
+
+  @override
+  String get emojiFood => '食物与饮料';
+
+  @override
+  String get emojiTravel => '旅行与地点';
+
+  @override
+  String get emojiActivities => '活动';
+
+  @override
+  String get emojiObjects => '物品';
+
+  @override
+  String get emojiSymbols => '符号';
+
+  @override
+  String get emojiFlags => '旗帜';
 }

@@ -1,7 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'space_link_qr.dart';
+
 import 'package:space_admin_ui/space_admin_ui.dart';
 
 import '../l10n/strings.dart';
@@ -109,79 +110,9 @@ class _SpaceSetupWizardState extends State<SpaceSetupWizard> {
                 Text('${step + 1} / 3'),
                 if (widget.existing) Text(s.setupExisting),
                 const SizedBox(height: 20),
-                if (step == 0) ...[
-                  TextField(
-                    controller: title,
-                    maxLength: 80,
-                    onChanged: (_) => setState(() {}),
-                    decoration: InputDecoration(labelText: s.setupSpaceName),
-                  ),
-                  const SizedBox(height: 16),
-                  ServerIconPicker(
-                    value: icon,
-                    disabled: busy,
-                    onChanged: (value) => setState(() => icon = value),
-                    onPending: (value) => setState(() => iconLoading = value),
-                  ),
-                ],
-                if (step == 1) ...[
-                  Text(
-                    s.setupResources,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  CheckboxListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(s.chat),
-                    value: chat,
-                    onChanged: busy
-                        ? null
-                        : (value) => setState(() => chat = value!),
-                  ),
-                  for (final label in [s.forum, s.feed, s.rooms])
-                    CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(label),
-                      subtitle: Text(s.setupComingSoon),
-                      value: false,
-                      onChanged: null,
-                    ),
-                  Text(s.setupInternetHelp),
-                ],
-                if (step == 2) ...[
-                  Text(
-                    s.setupReady,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 16),
-                  Center(
-                    child: SizedBox(
-                      width: 240,
-                      height: 240,
-                      child: CustomPaint(painter: LinkQrPainter(link)),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  SelectableText(link),
-                  Text(s.setupInviteHelp),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      OutlinedButton.icon(
-                        onPressed: () =>
-                            Clipboard.setData(ClipboardData(text: link)),
-                        icon: const Icon(Icons.copy),
-                        label: Text(s.copyLink),
-                      ),
-                      FilledButton.icon(
-                        onPressed: widget.manage,
-                        icon: const Icon(Icons.tune),
-                        label: Text(s.manageSpace),
-                      ),
-                    ],
-                  ),
-                ],
+                if (step == 0) ..._identityStep(context),
+                if (step == 1) ..._resourcesStep(context),
+                if (step == 2) ..._invitationStep(context),
                 if (error.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
@@ -197,33 +128,113 @@ class _SpaceSetupWizardState extends State<SpaceSetupWizard> {
                   const LinearProgressIndicator(),
                   Text(s.setupWorking),
                 ],
-                if (step < 2) ...[
-                  const SizedBox(height: 20),
-                  Wrap(
-                    alignment: WrapAlignment.end,
-                    spacing: 12,
-                    runSpacing: 8,
-                    children: [
-                      if (step > 0)
-                        TextButton(
-                          onPressed: busy ? null : () => setState(() => step--),
-                          child: Text(s.setupBack),
-                        ),
-                      FilledButton(
-                        onPressed:
-                            busy || iconLoading || title.text.trim().isEmpty
-                            ? null
-                            : next,
-                        child: Text(step == 0 ? s.setupNext : s.createOwnSpace),
-                      ),
-                    ],
-                  ),
-                ],
+                if (step < 2) ..._stepActions(context),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  List<Widget> _identityStep(BuildContext context) {
+    final s = context.strings;
+    return [
+      TextField(
+        controller: title,
+        maxLength: 80,
+        onChanged: (_) => setState(() {}),
+        decoration: InputDecoration(labelText: s.setupSpaceName),
+      ),
+      const SizedBox(height: 16),
+      ServerIconPicker(
+        value: icon,
+        disabled: busy,
+        onChanged: (value) => setState(() => icon = value),
+        onPending: (value) => setState(() => iconLoading = value),
+      ),
+    ];
+  }
+
+  List<Widget> _resourcesStep(BuildContext context) {
+    final s = context.strings;
+    return [
+      Text(s.setupResources, style: Theme.of(context).textTheme.titleMedium),
+      CheckboxListTile(
+        contentPadding: EdgeInsets.zero,
+        title: Text(s.chat),
+        value: chat,
+        onChanged: busy ? null : (value) => setState(() => chat = value!),
+      ),
+      for (final label in [s.forum, s.feed, s.rooms])
+        CheckboxListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(label),
+          subtitle: Text(s.setupComingSoon),
+          value: false,
+          onChanged: null,
+        ),
+      Text(s.setupInternetHelp),
+    ];
+  }
+
+  List<Widget> _invitationStep(BuildContext context) {
+    final s = context.strings;
+    return [
+      Text(s.setupReady, style: Theme.of(context).textTheme.titleMedium),
+      const SizedBox(height: 16),
+      Center(
+        child: SizedBox(
+          width: 240,
+          height: 240,
+          child: CustomPaint(painter: LinkQrPainter(link)),
+        ),
+      ),
+      const SizedBox(height: 16),
+      SelectableText(link),
+      Text(s.setupInviteHelp),
+      const SizedBox(height: 16),
+      Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        children: [
+          OutlinedButton.icon(
+            onPressed: () => Clipboard.setData(ClipboardData(text: link)),
+            icon: const Icon(Icons.copy),
+            label: Text(s.copyLink),
+          ),
+          FilledButton.icon(
+            onPressed: widget.manage,
+            icon: const Icon(Icons.tune),
+            label: Text(s.manageSpace),
+          ),
+        ],
+      ),
+    ];
+  }
+
+  List<Widget> _stepActions(BuildContext context) {
+    final s = context.strings;
+    return [
+      const SizedBox(height: 20),
+      Wrap(
+        alignment: WrapAlignment.end,
+        spacing: 12,
+        runSpacing: 8,
+        children: [
+          if (step > 0)
+            TextButton(
+              onPressed: busy ? null : () => setState(() => step--),
+              child: Text(s.setupBack),
+            ),
+          FilledButton(
+            onPressed: busy || iconLoading || title.text.trim().isEmpty
+                ? null
+                : next,
+            child: Text(step == 0 ? s.setupNext : s.createOwnSpace),
+          ),
+        ],
+      ),
+    ];
   }
 }

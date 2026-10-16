@@ -100,3 +100,11 @@ final class ChatMessageChanged extends ChatEvent<bool> {
   final Content message;
   final String? text;
 }
+
+final class ChatReactionSet extends ChatEvent<bool> {
+  ChatReactionSet(Content message, this.emoji, this.active)
+    : message = message.deepCopy()..freeze();
+  final Content message;
+  final String emoji;
+  final bool active;
+}

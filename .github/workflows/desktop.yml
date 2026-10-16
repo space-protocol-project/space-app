@@ -13,7 +13,10 @@ concurrency:
   group: desktop-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
   validate:
+    needs: complexity
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -105,7 +108,7 @@ jobs:
         if: matrix.target == 'linux'
         run: |
           bash packaging/build-linux.sh
-          (cd dist && sha256sum *.run > SHA256SUMS-linux-x64.txt)
+          (cd dist && sha256sum -- *.run > SHA256SUMS-linux-x64.txt)
       - uses: actions/upload-artifact@v4
         with:
           name: Space-${{ matrix.target }}

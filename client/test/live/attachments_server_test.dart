@@ -169,6 +169,16 @@ void main() {
         ),
       );
       expect(ownFiles.assets, isEmpty);
+      final reacting = await member.setReaction(sent, '❤️', true);
+      expect(reacting.reactions.single.principalIds, [member.principalId]);
+      final synchronized = await owner
+          .subscribe(event.cursor)
+          .firstWhere(
+            (frame) =>
+                frame.hasEvent() && frame.event.content.reactions.isNotEmpty,
+          )
+          .timeout(const Duration(seconds: 15));
+      expect(synchronized.event.content.reactions.single.emoji, '❤️');
       final id = member.principalId;
       await member.close();
       final restored = await SpaceSession.connect(discovery, memberVault);
@@ -178,11 +188,14 @@ void main() {
         (m) => m.id == sent.id,
       );
       expect(saved.attachments.single.id, ids.single);
+      expect(saved.reactions.single.emoji, '❤️');
       expect(
         await downloadAttachment(restored, saved.attachments.single),
         bytes,
       );
-      await owner.deleteMessage(sent);
+      final withoutReaction = await restored.setReaction(saved, '❤️', false);
+      expect(withoutReaction.reactions, isEmpty);
+      await owner.deleteMessage(withoutReaction);
       await expectLater(
         restored.downloadChunk(DownloadChunkRequest(assetId: ids.single)),
         throwsA(

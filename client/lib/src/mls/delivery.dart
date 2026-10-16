@@ -35,6 +35,7 @@ extension MlsDelivery on MlsClient {
     List<Map<String, dynamic>> files = const [],
     List<String> assetIds = const [],
     List<int>? messageId,
+    Map<String, dynamic>? reaction,
   }) async {
     final id = messageId ?? mlsId();
     final document = await local.read();
@@ -52,7 +53,13 @@ extension MlsDelivery on MlsClient {
     if ((channel['outbox'] as List).any((item) => !_filePaused(item as Map))) {
       throw StateError('Сначала завершите предыдущую отправку');
     }
-    final message = {'version': 1, 'id': id, 'text': text, 'files': files};
+    final message = {
+      'version': 1,
+      'id': id,
+      'text': text,
+      'files': files,
+      'reaction': ?reaction,
+    };
     await local.update(
       'encrypt',
       {'group_id': channel['group_id'], 'message': message},
@@ -76,6 +83,24 @@ extension MlsDelivery on MlsClient {
     );
     await _flush(channelId);
   }
+
+  Future<void> setReaction(
+    String channelId,
+    Map<String, dynamic> target,
+    String emoji,
+    bool active,
+  ) => _serial(
+    () => _send(
+      channelId,
+      '',
+      reaction: {
+        'message_id': (target['message'] as Map)['id'],
+        'grant_id': target['grant_id'],
+        'emoji': emoji,
+        'active': active,
+      },
+    ),
+  );
 
   Future<void> invite(String channelId, MlsDevice peer) =>
       _serial(() => _invite(channelId, peer));
@@ -354,6 +379,9 @@ extension MlsDelivery on MlsClient {
         id,
         message['text'] as String,
         messageId: (message['id'] as List).cast<int>(),
+        reaction: message['reaction'] == null
+            ? null
+            : Map<String, dynamic>.from(message['reaction'] as Map),
         files: (message['files'] as List).cast<Map<String, dynamic>>(),
         assetIds: (retry['asset_ids'] as List).cast<String>(),
       );

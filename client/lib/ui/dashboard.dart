@@ -1,3 +1,5 @@
+import '../src/generated/space/v1/space.pb.dart' show Channel;
+
 import 'package:flutter/material.dart';
 
 import '../l10n/strings.dart';
@@ -67,56 +69,7 @@ class Dashboard extends StatelessWidget {
       title: context.strings.dashboardTitle,
       description: context.strings.dashboardDescription,
       children: [
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            if (MediaQuery.sizeOf(context).width < 760)
-              IntrinsicWidth(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    FilledButton.icon(
-                      onPressed: addSpace,
-                      icon: const Icon(Icons.add),
-                      label: Text(context.strings.addSpace),
-                    ),
-                    if (createOwnSpace != null) ...[
-                      const SizedBox(height: 16),
-                      FilledButton.icon(
-                        onPressed: homeBusy ? null : createOwnSpace,
-                        icon: const Icon(Icons.add_home_outlined),
-                        label: Text(context.strings.createOwnSpace),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            OutlinedButton.icon(
-              onPressed: () {
-                workspaces.refresh();
-                presence.check();
-              },
-              icon: const Icon(Icons.refresh),
-              label: Text(context.strings.dashboardRefresh),
-            ),
-            if (importSpace != null)
-              OutlinedButton.icon(
-                key: const ValueKey('import-space-entry'),
-                onPressed: homeBusy ? null : importSpace,
-                icon: const Icon(Icons.file_download_outlined),
-                label: Text(context.strings.homeImport),
-              ),
-            if (MediaQuery.sizeOf(context).width < 760 && homeDetails != null)
-              OutlinedButton.icon(
-                key: const ValueKey('home-server-details'),
-                onPressed: homeDetails,
-                icon: const Icon(Icons.sensors),
-                label: Text(context.strings.goLive),
-              ),
-          ],
-        ),
+        _actions(context),
         const SizedBox(height: 24),
         _DashboardMetrics(
           servers: entries.length,
@@ -174,6 +127,59 @@ class Dashboard extends StatelessWidget {
             );
           },
         ),
+      ],
+    );
+  }
+
+  Widget _actions(BuildContext context) {
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: [
+        if (MediaQuery.sizeOf(context).width < 760)
+          IntrinsicWidth(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FilledButton.icon(
+                  onPressed: addSpace,
+                  icon: const Icon(Icons.add),
+                  label: Text(context.strings.addSpace),
+                ),
+                if (createOwnSpace != null) ...[
+                  const SizedBox(height: 16),
+                  FilledButton.icon(
+                    onPressed: homeBusy ? null : createOwnSpace,
+                    icon: const Icon(Icons.add_home_outlined),
+                    label: Text(context.strings.createOwnSpace),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        OutlinedButton.icon(
+          onPressed: () {
+            workspaces.refresh();
+            presence.check();
+          },
+          icon: const Icon(Icons.refresh),
+          label: Text(context.strings.dashboardRefresh),
+        ),
+        if (importSpace != null)
+          OutlinedButton.icon(
+            key: const ValueKey('import-space-entry'),
+            onPressed: homeBusy ? null : importSpace,
+            icon: const Icon(Icons.file_download_outlined),
+            label: Text(context.strings.homeImport),
+          ),
+        if (MediaQuery.sizeOf(context).width < 760 && homeDetails != null)
+          OutlinedButton.icon(
+            key: const ValueKey('home-server-details'),
+            onPressed: homeDetails,
+            icon: const Icon(Icons.sensors),
+            label: Text(context.strings.goLive),
+          ),
       ],
     );
   }
@@ -248,18 +254,7 @@ class _SpaceOverviewCard extends StatelessWidget {
             runSpacing: 8,
             children: [
               for (final channel in controller.channels)
-                ActionChip(
-                  avatar: Icon(
-                    channel.permissions.read ? Icons.tag : Icons.lock_outline,
-                    size: 16,
-                  ),
-                  label: Text(
-                    '${channel.title}${controller.unreadCount(channel.id) > 0 ? ' · ${controller.unreadCount(channel.id)}' : ''}',
-                  ),
-                  onPressed: controller.busy
-                      ? null
-                      : () => openChannel(channel.id),
-                ),
+                _channelChip(context, channel),
             ],
           ),
         const SizedBox(height: 16),
@@ -273,6 +268,16 @@ class _SpaceOverviewCard extends StatelessWidget {
         ),
       ],
     ),
+  );
+  Widget _channelChip(BuildContext context, Channel channel) => ActionChip(
+    avatar: Icon(
+      channel.permissions.read ? Icons.tag : Icons.lock_outline,
+      size: 16,
+    ),
+    label: Text(
+      '${channel.title}${controller.unreadCount(channel.id) > 0 ? ' · ${controller.unreadCount(channel.id)}' : ''}',
+    ),
+    onPressed: controller.busy ? null : () => openChannel(channel.id),
   );
 }
 

@@ -85,6 +85,14 @@ class ContentServiceClient {
     request,
     options: options,
   );
+  Future<SetReactionResponse> setReaction(
+    SetReactionRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.ContentService.setReaction,
+    request,
+    options: options,
+  );
   Future<UpdateContentResponse> updateContent(
     UpdateContentRequest request, {
     RpcOptions? options,

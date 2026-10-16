@@ -453,43 +453,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
             ],
             onChanged: busy ? null : (v) => setState(() => subject = v!),
           ),
-          if (subject == 'principal') ...[
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              key: ValueKey('member-$principal-${members.length}'),
-              initialValue: members.any((m) => m['principalId'] == principal)
-                  ? principal
-                  : null,
-              isExpanded: true,
-              decoration: InputDecoration(
-                labelText: strings.channelSelectMember,
-              ),
-              items: [
-                for (final m in members.where(
-                  (v) => ['member', 'reader'].contains(v['role']),
-                ))
-                  DropdownMenuItem(
-                    value: m['principalId'] as String,
-                    child: Text(
-                      '${m['principalId']}${m['blocked'] == true ? strings.channelBlockedSuffix : ''}',
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-              ],
-              onChanged: busy
-                  ? null
-                  : (v) => setState(() {
-                      principal = v;
-                      manualPrincipal.clear();
-                    }),
-            ),
-            if (memberCursor.isNotEmpty)
-              action(
-                strings.channelMoreMembers,
-                () => loadMembers(append: true),
-              ),
-            field(manualPrincipal, strings.channelPrincipalId),
-          ],
+          if (subject == 'principal') ..._individualRule(),
           const SizedBox(height: 16),
           Wrap(
             spacing: 12,
@@ -505,85 +469,120 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
   );
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => BlocBuilder<AdminOperations, AdminOperationState>(
-    bloc: operations,
-    builder: (context, state) => Card(
-      color: Theme.of(context).colorScheme.surface,
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              crossAxisAlignment: WrapCrossAlignment.center,
+  Widget build(BuildContext context) =>
+      BlocBuilder<AdminOperations, AdminOperationState>(
+        bloc: operations,
+        builder: (context, state) => Card(
+          color: Theme.of(context).colorScheme.surface,
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(strings.channelsTitle, style: TextStyle(fontSize: 20)),
-                action(strings.channelsReload, load),
-              ],
-            ),
-            const SizedBox(height: 16),
-            for (final c in channels) ...[
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(c['title'] as String),
-                subtitle: Text(
-                  '${c['id']}${c['archived'] == true ? strings.channelArchivedSuffix : ''}',
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(strings.channelsTitle, style: TextStyle(fontSize: 20)),
+                    action(strings.channelsReload, load),
+                  ],
                 ),
-                trailing: Icon(
-                  selected?['id'] == c['id']
-                      ? Icons.expand_less
-                      : Icons.expand_more,
-                ),
-                onTap: busy
-                    ? null
-                    : () {
-                        if (selected?['id'] == c['id']) {
-                          setState(() => selected = null);
-                        } else {
-                          run(() => choose(c));
-                        }
-                      },
-              ),
-              if (selected?['id'] == c['id']) channelEditor(),
-            ],
-            if (channels.isEmpty && !busy) Text(strings.channelsEmpty),
-            ExpansionTile(
-              tilePadding: EdgeInsets.zero,
-              title: Text(strings.channelCreateSection),
-              children: [
-                field(
-                  newTitle,
-                  strings.channelNewTitle,
-                  key: const ValueKey('new-channel-title'),
-                ),
-                field(newOrder, strings.channelNewOrder, number: true),
-                Text(strings.channelDefaults),
                 const SizedBox(height: 16),
-                action(strings.channelCreate, create, primary: true),
-                const SizedBox(height: 24),
+                for (final c in channels) ..._channelEntry(c),
+                if (channels.isEmpty && !busy) Text(strings.channelsEmpty),
+                ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  title: Text(strings.channelCreateSection),
+                  children: [
+                    field(
+                      newTitle,
+                      strings.channelNewTitle,
+                      key: const ValueKey('new-channel-title'),
+                    ),
+                    field(newOrder, strings.channelNewOrder, number: true),
+                    Text(strings.channelDefaults),
+                    const SizedBox(height: 16),
+                    action(strings.channelCreate, create, primary: true),
+                    const SizedBox(height: 24),
+                  ],
+                ),
+                if (busy)
+                  Padding(
+                    padding: EdgeInsets.all(12),
+                    child: LinearProgressIndicator(),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Text(
+                    localizedStatus,
+                    key: const ValueKey('channels-status'),
+                  ),
+                ),
               ],
             ),
-            if (busy)
-              Padding(
-                padding: EdgeInsets.all(12),
-                child: LinearProgressIndicator(),
-              ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16),
+          ),
+        ),
+      );
+  List<Widget> _individualRule() {
+    return [
+      const SizedBox(height: 16),
+      DropdownButtonFormField<String>(
+        key: ValueKey('member-$principal-${members.length}'),
+        initialValue: members.any((m) => m['principalId'] == principal)
+            ? principal
+            : null,
+        isExpanded: true,
+        decoration: InputDecoration(labelText: strings.channelSelectMember),
+        items: [
+          for (final m in members.where(
+            (v) => ['member', 'reader'].contains(v['role']),
+          ))
+            DropdownMenuItem(
+              value: m['principalId'] as String,
               child: Text(
-                localizedStatus,
-                key: const ValueKey('channels-status'),
+                '${m['principalId']}${m['blocked'] == true ? strings.channelBlockedSuffix : ''}',
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-          ],
-        ),
+        ],
+        onChanged: busy
+            ? null
+            : (v) => setState(() {
+                principal = v;
+                manualPrincipal.clear();
+              }),
       ),
-    ),
-  );
+      if (memberCursor.isNotEmpty)
+        action(strings.channelMoreMembers, () => loadMembers(append: true)),
+      field(manualPrincipal, strings.channelPrincipalId),
+    ];
+  }
+
+  List<Widget> _channelEntry(Map<String, dynamic> c) {
+    return [
+      ListTile(
+        contentPadding: EdgeInsets.zero,
+        title: Text(c['title'] as String),
+        subtitle: Text(
+          '${c['id']}${c['archived'] == true ? strings.channelArchivedSuffix : ''}',
+        ),
+        trailing: Icon(
+          selected?['id'] == c['id'] ? Icons.expand_less : Icons.expand_more,
+        ),
+        onTap: busy
+            ? null
+            : () {
+                if (selected?['id'] == c['id']) {
+                  setState(() => selected = null);
+                } else {
+                  run(() => choose(c));
+                }
+              },
+      ),
+      if (selected?['id'] == c['id']) channelEditor(),
+    ];
+  }
 }
 
 class _ChannelEditorSurface extends StatefulWidget {

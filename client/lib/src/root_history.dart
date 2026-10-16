@@ -84,10 +84,7 @@ Future<RootIdentity> verifyRootHistory(
           origin,
           serverId,
         ) ||
-        (previous != null && _url(oldRoot) != _url(previous)) ||
-        _url(newRoot) == _url(oldRoot) ||
-        _url(device) == _url(newRoot) ||
-        _url(device) == _url(oldRoot) ||
+        !_validSuccessorKeys(oldRoot, newRoot, device, previous) ||
         t['issued_at'] < issuedBefore ||
         t['issued_at'] > now + 5 ||
         t['expires_at'] <= t['issued_at'] ||
@@ -116,6 +113,17 @@ Future<RootIdentity> verifyRootHistory(
   }
   return RootIdentity(principal!, history.length + 1, currentRoot);
 }
+
+bool _validSuccessorKeys(
+  List<int> oldRoot,
+  List<int> newRoot,
+  List<int> device,
+  List<int>? previous,
+) =>
+    (previous == null || _url(oldRoot) == _url(previous)) &&
+    _url(newRoot) != _url(oldRoot) &&
+    _url(device) != _url(newRoot) &&
+    _url(device) != _url(oldRoot);
 
 Future<void> _verifyRotationSignatures(
   Map<String, dynamic> proof,

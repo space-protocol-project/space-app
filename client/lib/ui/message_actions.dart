@@ -5,6 +5,16 @@ import '../l10n/failure_strings.dart';
 import '../src/chat_controller.dart';
 import '../src/generated/space/v1/space.pb.dart';
 
+Future<void> confirmDeleteMessage(
+  BuildContext context,
+  ChatController controller,
+  Content message,
+) => showDialog<void>(
+  context: context,
+  barrierDismissible: false,
+  builder: (_) => _MessageDialog(controller: controller, message: message),
+);
+
 class MessageActions extends StatelessWidget {
   const MessageActions({
     super.key,

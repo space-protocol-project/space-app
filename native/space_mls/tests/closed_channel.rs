@@ -317,3 +317,31 @@ fn manager_command_is_encrypted_and_cannot_also_be_chat_text() -> TestResult {
     assert!(pair.sender.encrypt(&mut pair.alice, &command).is_err());
     Ok(())
 }
+
+#[test]
+fn reactions_are_encrypted_bound_and_validated() -> TestResult {
+    let mut pair = Pair::new()?;
+    let value = serde_json::json!({"version":1,"id":vec![3;16],"text":"","files":[],"reaction":{"message_id":MESSAGE,"grant_id":"author-device","emoji":"👩🏽‍💻","active":true}});
+    let message: Message = serde_json::from_value(value.clone())?;
+    let ciphertext = pair.sender.encrypt(&mut pair.alice, &message)?;
+    assert!(!contains(&ciphertext, "👩🏽‍💻".as_bytes()));
+    let received = pair.receiver.decrypt(&mut pair.bob, &ciphertext)?;
+    assert_eq!(received.message.reaction.ok_or("Нет реакции")?.emoji, "👩🏽‍💻");
+    for (field, invalid) in [
+        ("emoji", serde_json::json!("<script>")),
+        ("grant_id", serde_json::json!("")),
+    ] {
+        let mut bad = value.clone();
+        bad["reaction"][field] = invalid;
+        let malformed: Message = serde_json::from_value(bad)?;
+        assert!(pair.sender.encrypt(&mut pair.alice, &malformed).is_err());
+    }
+    let mut bad = value;
+    bad["text"] = serde_json::json!("Нельзя совместить");
+    assert!(
+        pair.sender
+            .encrypt(&mut pair.alice, &serde_json::from_value(bad)?)
+            .is_err()
+    );
+    Ok(())
+}

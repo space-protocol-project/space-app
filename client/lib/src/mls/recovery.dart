@@ -43,62 +43,86 @@ extension MlsRecovery on MlsClient {
     if (messages.length > 20000) {
       throw StateError('В архиве слишком много сообщений');
     }
-    return messages.map((value) {
-      final item = value as Map;
-      final message = item['message'] as Map;
-      final text = message['text'] as String;
-      if (utf8.encode(text).length > 65536 ||
-          (message['files'] as List).length > 5 ||
-          item['sequence'] is! int ||
-          item['time'] is! int ||
-          item['author_id'] is! String ||
-          item['grant_id'] is! String) {
-        throw StateError('Повреждено сообщение архива');
+    return messages.map(_checkedHistoryItem).toList();
+  }
+
+  Map<String, dynamic> _checkedHistoryItem(dynamic value) {
+    final item = value as Map;
+    final message = item['message'] as Map;
+    final text = message['text'] as String;
+    if (utf8.encode(text).length > 65536 ||
+        (message['files'] as List).length > 5 ||
+        item['sequence'] is! int ||
+        item['time'] is! int ||
+        item['author_id'] is! String ||
+        item['grant_id'] is! String) {
+      throw StateError('Повреждено сообщение архива');
+    }
+    _historyBytes(message['id'], 16);
+    final reaction = _checkedHistoryReaction(message);
+    final files = (message['files'] as List).map(_checkedHistoryFile).toList();
+    return <String, dynamic>{
+      'archived': true,
+      'author_id': item['author_id'],
+      'grant_id': item['grant_id'],
+      'sequence': item['sequence'],
+      'time': item['time'],
+      'message': {
+        'version': 1,
+        'id': message['id'],
+        'text': text,
+        'files': files,
+        if (reaction != null) 'reaction': Map<String, dynamic>.from(reaction),
+      },
+    };
+  }
+
+  Map? _checkedHistoryReaction(Map message) {
+    final text = message['text'] as String;
+    final reaction = message['reaction'] as Map?;
+    if (reaction != null) {
+      _historyBytes(reaction['message_id'], 16);
+      if (reaction['grant_id'] is! String ||
+          (reaction['grant_id'] as String).length > 128 ||
+          reaction['emoji'] is! String ||
+          (reaction['emoji'] as String).length > 64 ||
+          reaction['active'] is! bool ||
+          text.isNotEmpty ||
+          (message['files'] as List).isNotEmpty) {
+        throw StateError('Повреждена реакция архива');
       }
-      _historyBytes(message['id'], 16);
-      final files = (message['files'] as List).map((value) {
-        final file = value as Map;
-        _historyBytes(file['key'], 32);
-        _historyBytes(file['nonce'], 24);
-        _historyBytes(file['id'], 16);
-        _historyBytes(file['message_id'], 16);
-        final name = file['name'] as String;
-        final size = file['size'] as int;
-        if (name.isEmpty ||
-            name.length > 255 ||
-            RegExp(r'[/\\\x00-\x1f]').hasMatch(name) ||
-            size < 1 ||
-            size > 20 * 1024 * 1024 ||
-            file['asset_id'] is! String) {
-          throw StateError('Повреждён дескриптор файла архива');
-        }
-        return {
-          for (final key in [
-            'id',
-            'message_id',
-            'name',
-            'size',
-            'asset_id',
-            'key',
-            'nonce',
-          ])
-            key: file[key],
-        };
-      }).toList();
-      return <String, dynamic>{
-        'archived': true,
-        'author_id': item['author_id'],
-        'grant_id': item['grant_id'],
-        'sequence': item['sequence'],
-        'time': item['time'],
-        'message': {
-          'version': 1,
-          'id': message['id'],
-          'text': text,
-          'files': files,
-        },
-      };
-    }).toList();
+    }
+    return reaction;
+  }
+
+  Map<String, dynamic> _checkedHistoryFile(dynamic value) {
+    final file = value as Map;
+    _historyBytes(file['key'], 32);
+    _historyBytes(file['nonce'], 24);
+    _historyBytes(file['id'], 16);
+    _historyBytes(file['message_id'], 16);
+    final name = file['name'] as String;
+    final size = file['size'] as int;
+    if (name.isEmpty ||
+        name.length > 255 ||
+        RegExp(r'[/\\\x00-\x1f]').hasMatch(name) ||
+        size < 1 ||
+        size > 20 * 1024 * 1024 ||
+        file['asset_id'] is! String) {
+      throw StateError('Повреждён дескриптор файла архива');
+    }
+    return {
+      for (final key in [
+        'id',
+        'message_id',
+        'name',
+        'size',
+        'asset_id',
+        'key',
+        'nonce',
+      ])
+        key: file[key],
+    };
   }
 
   void _historyBytes(dynamic value, int size) {

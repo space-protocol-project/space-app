@@ -604,5 +604,22 @@
   "homeAutoPublicIPHelp": "For the first IPv4 address. Checked through the router or ipify; domains and other addresses are preserved.",
   "homeDiagMappingOk": "The router confirmed a temporary TCP mapping. External reachability remains unverified.",
   "homeDiagMappingFailed": "Could not create or renew the mapping. Check router settings; CGNAT requires a public address or tunnel.",
-  "homeDiagAutomaticIPFailed": "Could not update the public IPv4 address. Check the internet connection."
+  "homeDiagAutomaticIPFailed": "Could not update the public IPv4 address. Check the internet connection.",
+  "emojiPicker": "Emoji",
+  "emojiSearch": "Search emoji",
+  "emojiRecent": "Recent",
+  "emojiAll": "All",
+  "addReaction": "Add reaction",
+  "reactionParticipants": "Reactions",
+  "copyMessage": "Copy",
+  "messageCopied": "Copied",
+  "emojiFaces": "Faces and emotions",
+  "emojiPeople": "People and gestures",
+  "emojiNature": "Animals and nature",
+  "emojiFood": "Food and drink",
+  "emojiTravel": "Travel and places",
+  "emojiActivities": "Activities",
+  "emojiObjects": "Objects",
+  "emojiSymbols": "Symbols",
+  "emojiFlags": "Flags"
 }

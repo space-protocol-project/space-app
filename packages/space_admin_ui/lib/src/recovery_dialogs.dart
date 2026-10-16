@@ -45,69 +45,19 @@ Future<String?> askRecoveryPassword(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, update) {
-          final strings =
-              AdminLocalizations.of(context) ??
-              lookupAdminLocalizations(const Locale('ru'));
-          return AlertDialog(
-            title: Text(
-              creating ? strings.recoveryProtect : strings.recoveryOpen,
-            ),
-            content: SingleChildScrollView(
-              primary: false,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(strings.recoveryPasswordHelp),
-                  const SizedBox(height: 16),
-                  TextField(
-                    scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
-                    obscureText: true,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    onChanged: (v) => first = v,
-                    decoration: InputDecoration(
-                      labelText: strings.recoveryPassword,
-                    ),
-                  ),
-                  if (creating) ...[
-                    const SizedBox(height: 12),
-                    TextField(
-                      scrollPadding: SpaceContentInsets.scrollPaddingOf(
-                        context,
-                      ),
-                      obscureText: true,
-                      enableSuggestions: false,
-                      autocorrect: false,
-                      onChanged: (v) => second = v,
-                      decoration: InputDecoration(
-                        labelText: strings.recoveryPasswordRepeat,
-                      ),
-                    ),
-                  ],
-                  if (invalid) Text(strings.recoveryPasswordInvalid),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(strings.cancel),
-              ),
-              FilledButton(
-                onPressed: () {
-                  if (creating && first != second) {
-                    update(() => invalid = true);
-                    return;
-                  }
-                  Navigator.pop(context, first);
-                },
-                child: Text(
-                  creating
-                      ? strings.recoveryEncrypt
-                      : strings.recoveryOpenButton,
-                ),
-              ),
-            ],
+          return _recoveryPasswordForm(
+            context,
+            creating: creating,
+            invalid: invalid,
+            onFirst: (v) => first = v,
+            onSecond: (v) => second = v,
+            onConfirm: () {
+              if (creating && first != second) {
+                update(() => invalid = true);
+                return;
+              }
+              Navigator.pop(context, first);
+            },
           );
         },
       ),
@@ -116,4 +66,64 @@ Future<String?> askRecoveryPassword(
     first = '';
     second = '';
   }
+}
+
+Widget _recoveryPasswordForm(
+  BuildContext context, {
+  required bool creating,
+  required bool invalid,
+  required ValueChanged<String> onFirst,
+  required ValueChanged<String> onSecond,
+  required VoidCallback onConfirm,
+}) {
+  final strings =
+      AdminLocalizations.of(context) ??
+      lookupAdminLocalizations(const Locale('ru'));
+  return AlertDialog(
+    title: Text(creating ? strings.recoveryProtect : strings.recoveryOpen),
+    content: SingleChildScrollView(
+      primary: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(strings.recoveryPasswordHelp),
+          const SizedBox(height: 16),
+          TextField(
+            scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
+            obscureText: true,
+            enableSuggestions: false,
+            autocorrect: false,
+            onChanged: onFirst,
+            decoration: InputDecoration(labelText: strings.recoveryPassword),
+          ),
+          if (creating) ...[
+            const SizedBox(height: 12),
+            TextField(
+              scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              onChanged: onSecond,
+              decoration: InputDecoration(
+                labelText: strings.recoveryPasswordRepeat,
+              ),
+            ),
+          ],
+          if (invalid) Text(strings.recoveryPasswordInvalid),
+        ],
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: Text(strings.cancel),
+      ),
+      FilledButton(
+        onPressed: onConfirm,
+        child: Text(
+          creating ? strings.recoveryEncrypt : strings.recoveryOpenButton,
+        ),
+      ),
+    ],
+  );
 }

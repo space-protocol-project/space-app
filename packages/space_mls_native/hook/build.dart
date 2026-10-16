@@ -105,6 +105,7 @@ Future<void> addDependencies(Uri root, BuildOutputBuilder output) async {
   await for (final entry in Directory.fromUri(root).list(recursive: true)) {
     if (entry is File &&
         (entry.path.endsWith('.rs') ||
+            entry.path.endsWith('emoji.txt') ||
             entry.path.endsWith('.toml') ||
             entry.path.endsWith('Cargo.lock'))) {
       output.dependencies.add(entry.uri);

@@ -20,9 +20,44 @@ class HomeOperationProgress extends StatelessWidget {
   );
 
   Widget _build(BuildContext context, HomeState state) {
+    final ring = _progressRing(context, state);
+    if (compact) return ring;
+    final remaining = state.downloadSecondsRemaining;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        ring,
+        const SizedBox(width: 20),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                state.phase.label(context),
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                context.strings.homeProgressElapsed(state.elapsed.inSeconds),
+              ),
+              if (remaining != null)
+                Text(context.strings.homeDownloadEstimate(remaining)),
+              const SizedBox(height: 6),
+              Text(
+                context.strings.homeProgressHint,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _progressRing(BuildContext context, HomeState state) {
     final size = compact ? 30.0 : 80.0;
     final transferring = state.phase == HomePhase.transferring;
-    final ring = TweenAnimationBuilder<double>(
+    return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: state.operationProgress),
       duration: MediaQuery.disableAnimationsOf(context)
           ? Duration.zero
@@ -57,37 +92,6 @@ class HomeOperationProgress extends StatelessWidget {
           ],
         ),
       ),
-    );
-    if (compact) return ring;
-    final remaining = state.downloadSecondsRemaining;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        ring,
-        const SizedBox(width: 20),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                state.phase.label(context),
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              const SizedBox(height: 6),
-              Text(
-                context.strings.homeProgressElapsed(state.elapsed.inSeconds),
-              ),
-              if (remaining != null)
-                Text(context.strings.homeDownloadEstimate(remaining)),
-              const SizedBox(height: 6),
-              Text(
-                context.strings.homeProgressHint,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

@@ -529,6 +529,10 @@ abstract interface class LiveSession {
   Future<void> close();
 }
 
+abstract interface class MessageReactions {
+  Future<Content> setReaction(Content message, String emoji, bool active);
+}
+
 abstract interface class MessageChanges {
   Future<Content> updateMessage(Content message, String text);
   Future<Content> deleteMessage(Content message);
@@ -624,6 +628,7 @@ class SpaceSession
     implements
         LiveSession,
         MessageChanges,
+        MessageReactions,
         MemberProfile,
         AttachmentSession,
         AttachmentPolicy,
@@ -1669,6 +1674,25 @@ class SpaceSession
   }
 
   @override
+  Future<Content> setReaction(
+    Content message,
+    String emoji,
+    bool active,
+  ) async {
+    await _ensureSession();
+    return (await ContentServiceClient(channel).setReaction(
+      SetReactionRequest(
+        channelId: message.channelId,
+        id: message.id,
+        emoji: emoji,
+        active: active,
+        expectedRevision: message.revision,
+      ),
+      options: _options,
+    )).content;
+  }
+
+  @override
   Future<Content> updateMessage(Content message, String text) async {
     await _ensureSession();
     final result = await ContentServiceClient(channel).updateContent(
@@ -2262,11 +2286,14 @@ Future<List<int>> checkedSigningBytes(
       grantExpiry > expiry &&
       grantExpiry > now &&
       (pairingId.isEmpty || transcript['pairing_id'] == pairingId) &&
-      (purpose == 'device.register' || purpose == 'device.delegate'
-          ? (purpose == 'device.register'
-                ? grantExpiry == issued + registrationDays * 86400
-                : grantExpiry <= issued + 30 * 86400)
-          : transcript['grant_id'] == grantId);
+      _validChallengeGrant(
+        purpose,
+        transcript['grant_id'],
+        grantId,
+        grantExpiry,
+        issued,
+        registrationDays,
+      );
   if (!valid) {
     throw const LocalFailure(
       LocalFailureCode.identityInvalid,
@@ -2287,6 +2314,24 @@ Future<List<int>> checkedSigningBytes(
     );
   }
   return utf8.encode('$prefix\u0000$canonical');
+}
+
+bool _validChallengeGrant(
+  String purpose,
+  dynamic actualGrant,
+  String grantId,
+  int expiry,
+  int issued,
+  int registrationDays,
+) {
+  switch (purpose) {
+    case 'device.register':
+      return expiry == issued + registrationDays * 86400;
+    case 'device.delegate':
+      return expiry <= issued + 30 * 86400;
+    default:
+      return actualGrant == grantId;
+  }
 }
 
 void _validateRecoveryKeys(

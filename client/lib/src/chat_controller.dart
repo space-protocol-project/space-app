@@ -92,6 +92,9 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       (event, _) =>
           handleRequest(event, () => _send(event.text, event.attachments)),
     );
+    on<ChatReactionSet>(
+      (event, _) => handleRequest(event, () => _setReaction(event)),
+    );
     on<ChatMessageChanged>(
       (event, _) =>
           handleRequest(event, () => _changeMessage(event.message, event.text)),
@@ -152,6 +155,47 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   bool get attachmentsEnabled =>
       _session is! AttachmentPolicy ||
       (_session as AttachmentPolicy).attachmentsEnabled;
+  bool get canReact =>
+      connected && canWrite && !busy && _session is MessageReactions;
+  Future<bool> setReaction(Content message, String emoji, bool active) =>
+      sendRequest(ChatReactionSet(message, emoji, active));
+  Future<bool> _setReaction(ChatReactionSet event) async {
+    final session = _session;
+    if (!canReact ||
+        session is! MessageReactions ||
+        event.message.deleted ||
+        event.message.channelId != channelId) {
+      return false;
+    }
+    final generation = _generation;
+    busy = true;
+    error = '';
+    _update();
+    try {
+      final result = await (session as MessageReactions).setReaction(
+        event.message,
+        event.emoji,
+        event.active,
+      );
+      if (!_current(session!, generation)) return false;
+      if (result.id != event.message.id ||
+          result.channelId != channelId ||
+          result.revision < event.message.revision) {
+        throw const FormatException('Неверный ответ реакции');
+      }
+      _mergeMessage(result);
+      _captureHistory();
+      await _flushHistory();
+      return true;
+    } catch (problem) {
+      if (identical(session, _session)) error = _explain(problem);
+      return false;
+    } finally {
+      busy = false;
+      _update();
+    }
+  }
+
   Future<bool> updateMessage(Content message, String text) =>
       sendRequest(ChatMessageChanged(message, text));
   Future<bool> deleteMessage(Content message) =>

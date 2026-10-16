@@ -205,44 +205,7 @@ class RecoveryToolsView extends StatelessWidget {
               Text(progress),
             ],
             const SizedBox(height: 16),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                if (onCreateQr != null)
-                  OutlinedButton.icon(
-                    onPressed: pending || !canCreateQr ? null : onCreateQr,
-                    icon: const Icon(Icons.qr_code),
-                    label: Text(strings.recoveryCreateQr),
-                  ),
-                FilledButton.icon(
-                  onPressed:
-                      pending ||
-                          (onCreateQr != null
-                              ? qrPreview == null
-                              : !connected || !hasRootAuthority)
-                      ? null
-                      : onExport,
-                  icon: const Icon(Icons.save_alt),
-                  label: Text(strings.recoveryExport),
-                ),
-                if (onExportJson != null)
-                  TextButton(
-                    onPressed: pending ? null : onExportJson,
-                    child: const Text('JSON'),
-                  ),
-                OutlinedButton.icon(
-                  onPressed: pending ? null : onRestore,
-                  icon: const Icon(Icons.restore),
-                  label: Text(strings.recoveryRestore),
-                ),
-                OutlinedButton.icon(
-                  onPressed: pending ? null : onScan,
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: Text(strings.recoveryScan),
-                ),
-              ],
-            ),
+            _cardActions(strings),
             if (onCreateQr != null && !canCreateQr && qrPreview == null) ...[
               const SizedBox(height: 12),
               Text(strings.recoveryOriginalCardNeeded),
@@ -251,62 +214,106 @@ class RecoveryToolsView extends StatelessWidget {
         ),
       );
 
-  Widget _deviceTools(
-    BuildContext context,
-    AdminLocalizations strings,
-  ) => RecoverySurface(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
+  Widget _deviceTools(BuildContext context, AdminLocalizations strings) =>
+      RecoverySurface(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Text(
-                strings.recoveryDevices,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    strings.recoveryDevices,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                IconButton(
+                  tooltip: strings.devicesRefresh,
+                  onPressed: pending || !connected || !hasDeviceManagement
+                      ? null
+                      : onRefreshDevices,
+                  icon: const Icon(Icons.refresh),
+                ),
+              ],
             ),
-            IconButton(
-              tooltip: strings.devicesRefresh,
-              onPressed: pending || !connected || !hasDeviceManagement
-                  ? null
-                  : onRefreshDevices,
-              icon: const Icon(Icons.refresh),
-            ),
+            Text(strings.recoveryDevicesHelp),
+            for (final grant in devices) ..._recoveryDevice(context, strings, grant),
           ],
         ),
-        Text(strings.recoveryDevicesHelp),
-        for (final grant in devices) ...[
-          const Divider(),
-          Text(
-            grant.recovery
-                ? strings.deviceRecovery
-                : grant.id == currentGrantId
-                ? strings.deviceCurrent
-                : strings.deviceOther,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          SelectableText(
-            grant.id,
-            style: const TextStyle(fontSize: 12, fontFamily: 'JetBrains Mono'),
-          ),
-          Text(
-            grant.revoked
-                ? strings.inviteRevokedState
-                : strings.deviceAccessUntil(
-                    '${DateTime.fromMillisecondsSinceEpoch(grant.expiresAt * 1000).toLocal()}',
-                  ),
-          ),
-          if (!grant.revoked &&
-              grant.expiresAt > DateTime.now().millisecondsSinceEpoch ~/ 1000)
-            TextButton(
-              onPressed: pending ? null : () => onRevoke(grant.id),
-              child: Text(strings.deviceRevokeAccess),
-            ),
-        ],
-      ],
-    ),
+      );
+  Widget _cardActions(AdminLocalizations strings) => Wrap(
+    spacing: 12,
+    runSpacing: 12,
+    children: [
+      if (onCreateQr != null)
+        OutlinedButton.icon(
+          onPressed: pending || !canCreateQr ? null : onCreateQr,
+          icon: const Icon(Icons.qr_code),
+          label: Text(strings.recoveryCreateQr),
+        ),
+      FilledButton.icon(
+        onPressed:
+            pending ||
+                (onCreateQr != null
+                    ? qrPreview == null
+                    : !connected || !hasRootAuthority)
+            ? null
+            : onExport,
+        icon: const Icon(Icons.save_alt),
+        label: Text(strings.recoveryExport),
+      ),
+      if (onExportJson != null)
+        TextButton(
+          onPressed: pending ? null : onExportJson,
+          child: const Text('JSON'),
+        ),
+      OutlinedButton.icon(
+        onPressed: pending ? null : onRestore,
+        icon: const Icon(Icons.restore),
+        label: Text(strings.recoveryRestore),
+      ),
+      OutlinedButton.icon(
+        onPressed: pending ? null : onScan,
+        icon: const Icon(Icons.qr_code_scanner),
+        label: Text(strings.recoveryScan),
+      ),
+    ],
   );
+
+  List<Widget> _recoveryDevice(
+    BuildContext context,
+    AdminLocalizations strings,
+    RecoveryDeviceView grant,
+  ) {
+    return [
+      const Divider(),
+      Text(
+        grant.recovery
+            ? strings.deviceRecovery
+            : grant.id == currentGrantId
+            ? strings.deviceCurrent
+            : strings.deviceOther,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      SelectableText(
+        grant.id,
+        style: const TextStyle(fontSize: 12, fontFamily: 'JetBrains Mono'),
+      ),
+      Text(
+        grant.revoked
+            ? strings.inviteRevokedState
+            : strings.deviceAccessUntil(
+                '${DateTime.fromMillisecondsSinceEpoch(grant.expiresAt * 1000).toLocal()}',
+              ),
+      ),
+      if (!grant.revoked &&
+          grant.expiresAt > DateTime.now().millisecondsSinceEpoch ~/ 1000)
+        TextButton(
+          onPressed: pending ? null : () => onRevoke(grant.id),
+          child: Text(strings.deviceRevokeAccess),
+        ),
+    ];
+  }
 }
 
 class RecoverySurface extends StatelessWidget {

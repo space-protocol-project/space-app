@@ -1612,4 +1612,55 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get homeDiagAutomaticIPFailed =>
       'Could not update the public IPv4 address. Check the internet connection.';
+
+  @override
+  String get emojiPicker => 'Emoji';
+
+  @override
+  String get emojiSearch => 'Search emoji';
+
+  @override
+  String get emojiRecent => 'Recent';
+
+  @override
+  String get emojiAll => 'All';
+
+  @override
+  String get addReaction => 'Add reaction';
+
+  @override
+  String get reactionParticipants => 'Reactions';
+
+  @override
+  String get copyMessage => 'Copy';
+
+  @override
+  String get messageCopied => 'Copied';
+
+  @override
+  String get emojiFaces => 'Faces and emotions';
+
+  @override
+  String get emojiPeople => 'People and gestures';
+
+  @override
+  String get emojiNature => 'Animals and nature';
+
+  @override
+  String get emojiFood => 'Food and drink';
+
+  @override
+  String get emojiTravel => 'Travel and places';
+
+  @override
+  String get emojiActivities => 'Activities';
+
+  @override
+  String get emojiObjects => 'Objects';
+
+  @override
+  String get emojiSymbols => 'Symbols';
+
+  @override
+  String get emojiFlags => 'Flags';
 }

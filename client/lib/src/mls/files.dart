@@ -87,8 +87,9 @@ class MlsFiles {
   Future<Uint8List> download(
     List<int> group,
     List<int> messageId,
-    Map<String, dynamic> descriptor,
-  ) async {
+    Map<String, dynamic> descriptor, {
+    bool Function()? cancelled,
+  }) async {
     final assetId = descriptor['asset_id'] as String;
     final expectedSize = (descriptor['size'] as int) + 16;
     if (expectedSize < 17 || expectedSize > 20 * 1024 * 1024 + 16) {
@@ -97,6 +98,7 @@ class MlsFiles {
     final data = BytesBuilder(copy: false);
     var offset = 0;
     while (offset < expectedSize) {
+      if (cancelled?.call() == true) throw StateError('Загрузка отменена');
       final chunk = await rpc.downloadChunk(
         DownloadChunkRequest(assetId: assetId, offset: Int64(offset)),
         options: await client.options(),
@@ -110,6 +112,7 @@ class MlsFiles {
       data.add(chunk.data);
       offset = chunk.nextOffset.toInt();
     }
+    if (cancelled?.call() == true) throw StateError('Загрузка отменена');
     final opened = await client.local.update('open_file', {
       'group_id': base64Encode(group),
       'message_id': messageId,

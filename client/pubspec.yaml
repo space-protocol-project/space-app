@@ -129,6 +129,8 @@ flutter:
           weight: 600
 
   assets:
+    - assets/emoji/catalog.json
+    - assets/emoji/UNICODE-LICENSE.txt
     - assets/legal/mls-NOTICES.txt
     - pubspec.yaml
     - assets/home/runtime-manifest.json

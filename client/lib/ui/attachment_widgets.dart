@@ -1,3 +1,5 @@
+import 'attachment_gallery.dart';
+
 import '../l10n/strings.dart';
 
 import 'package:flutter/material.dart';
@@ -29,45 +31,8 @@ class AttachmentComposer extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (state.files.isNotEmpty || state.busy)
-              Row(
-                children: [
-                  Text('${state.files.length}/5'),
-                  const Spacer(),
-                  if (state.busy)
-                    TextButton.icon(
-                      onPressed: queue.cancel,
-                      icon: const Icon(Icons.close),
-                      label: Text(context.strings.cancelUpload),
-                    ),
-                ],
-              ),
-            if (state.files.isNotEmpty)
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 76),
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    for (final file in state.files)
-                      _fileTile(
-                        dense: true,
-                        leading: const Icon(Icons.insert_drive_file_outlined),
-                        title: Text(
-                          file.file.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Text(attachmentSize(file.size)),
-                        trailing: IconButton(
-                          tooltip: context.strings.removeFile,
-                          onPressed: state.busy
-                              ? null
-                              : () => queue.remove(file, session: session),
-                          icon: const Icon(Icons.close),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
+              _uploadStatus(context, state),
+            if (state.files.isNotEmpty) _pendingFiles(context, state),
             if (state.busy) LinearProgressIndicator(value: state.progress),
             if (state.error.isNotEmpty)
               Text(
@@ -77,6 +42,45 @@ class AttachmentComposer extends StatelessWidget {
           ],
         ),
       );
+  Widget _pendingFiles(BuildContext context, AttachmentState state) =>
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 76),
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            for (final file in state.files) _pendingFile(context, state, file),
+          ],
+        ),
+      );
+
+  Widget _uploadStatus(BuildContext context, AttachmentState state) => Row(
+    children: [
+      Text('${state.files.length}/5'),
+      const Spacer(),
+      if (state.busy)
+        TextButton.icon(
+          onPressed: queue.cancel,
+          icon: const Icon(Icons.close),
+          label: Text(context.strings.cancelUpload),
+        ),
+    ],
+  );
+
+  Widget _pendingFile(
+    BuildContext context,
+    AttachmentState state,
+    PendingAttachment file,
+  ) => _fileTile(
+    dense: true,
+    leading: const Icon(Icons.insert_drive_file_outlined),
+    title: Text(file.file.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+    subtitle: Text(attachmentSize(file.size)),
+    trailing: IconButton(
+      tooltip: context.strings.removeFile,
+      onPressed: state.busy ? null : () => queue.remove(file, session: session),
+      icon: const Icon(Icons.close),
+    ),
+  );
 }
 
 class AttachFileButton extends StatelessWidget {
@@ -108,6 +112,71 @@ class AttachFileButton extends StatelessWidget {
 }
 
 Future<List<XFile>> openFilesPicker() => openFiles();
+
+class MessageAttachments extends StatelessWidget {
+  const MessageAttachments({
+    super.key,
+    required this.assets,
+    required this.session,
+  });
+  final List<Asset> assets;
+  final AttachmentSession? session;
+  @override
+  Widget build(BuildContext context) {
+    final images = assets
+        .where((asset) => isGalleryImage(asset.name, asset.mediaType))
+        .take(5)
+        .toList();
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (images.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: AttachmentGallery(
+              images: [
+                for (final asset in images)
+                  MessageImage(
+                    id: '${asset.id}/${asset.sha256}',
+                    name: asset.name,
+                    source: session,
+                    load: session == null
+                        ? null
+                        : (cancelled) => downloadAttachment(
+                            session!,
+                            asset,
+                            cancelled: cancelled,
+                          ),
+                    save: session == null
+                        ? null
+                        : () async {
+                            final bytes = await downloadAttachment(
+                              session!,
+                              asset,
+                            );
+                            await FileSaver.instance.saveAs(
+                              name: asset.name,
+                              includeExtension: false,
+                              bytes: bytes,
+                              mimeType: MimeType.custom,
+                              customMimeType: 'application/octet-stream',
+                            );
+                          },
+                  ),
+              ],
+            ),
+          ),
+        for (final asset in assets.where((asset) => !images.contains(asset)))
+          AttachmentCard(
+            key: ValueKey(asset.id),
+            asset: asset,
+            session: session,
+          ),
+      ],
+    );
+  }
+}
 
 class AttachmentCard extends StatefulWidget {
   const AttachmentCard({super.key, required this.asset, required this.session});

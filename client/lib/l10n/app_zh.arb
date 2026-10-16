@@ -604,5 +604,22 @@
   "homeAutoPublicIPHelp": "用于首个 IPv4 地址。通过路由器或 ipify 检查；保留域名及其他地址。",
   "homeDiagMappingOk": "路由器已确认临时 TCP 映射，尚未验证外网可达性。",
   "homeDiagMappingFailed": "无法创建或续期映射。请检查路由器设置；CGNAT 需要公网地址或隧道。",
-  "homeDiagAutomaticIPFailed": "无法更新公网 IPv4 地址，请检查网络连接。"
+  "homeDiagAutomaticIPFailed": "无法更新公网 IPv4 地址，请检查网络连接。",
+  "emojiPicker": "表情",
+  "emojiSearch": "搜索表情",
+  "emojiRecent": "最近使用",
+  "emojiAll": "全部",
+  "addReaction": "添加回应",
+  "reactionParticipants": "回应者",
+  "copyMessage": "复制",
+  "messageCopied": "已复制",
+  "emojiFaces": "表情与情感",
+  "emojiPeople": "人物与手势",
+  "emojiNature": "动物与自然",
+  "emojiFood": "食物与饮料",
+  "emojiTravel": "旅行与地点",
+  "emojiActivities": "活动",
+  "emojiObjects": "物品",
+  "emojiSymbols": "符号",
+  "emojiFlags": "旗帜"
 }

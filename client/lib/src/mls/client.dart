@@ -10,6 +10,7 @@ import '../rpc_clients.dart';
 import '../rpc_connection.dart';
 import 'local_store.dart';
 import 'envelope_checks.dart';
+import '../reactions.dart';
 
 part 'delivery.dart';
 part 'receive.dart';
@@ -45,10 +46,12 @@ class MlsChannelData {
   final Map<String, dynamic> channel;
   final List<MlsDevice> untrusted;
   bool get joined => channel['joined'] == true;
-  List<Map<String, dynamic>> get messages => mergeMlsHistory([
-    ...?channel['archived_messages'] as List?,
-    ...channel['messages'] as List,
-  ]);
+  List<Map<String, dynamic>> get messages => projectMlsReactions(
+    mergeMlsHistory([
+      ...?channel['archived_messages'] as List?,
+      ...channel['messages'] as List,
+    ]),
+  );
 }
 
 class MlsClient {

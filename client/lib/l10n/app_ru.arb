@@ -604,5 +604,22 @@
   "homeAutoPublicIPHelp": "Для первого адреса IPv4. Проверка через роутер или ipify; домены и остальные адреса сохраняются.",
   "homeDiagMappingOk": "Шлюз подтвердил временный проброс TCP. Доступность извне ещё не проверена.",
   "homeDiagMappingFailed": "Не удалось создать или продлить проброс. Проверьте настройки роутера; при CGNAT нужен публичный адрес или туннель.",
-  "homeDiagAutomaticIPFailed": "Не удалось обновить публичный IPv4. Проверьте подключение к интернету."
+  "homeDiagAutomaticIPFailed": "Не удалось обновить публичный IPv4. Проверьте подключение к интернету.",
+  "emojiPicker": "Эмодзи",
+  "emojiSearch": "Поиск эмодзи",
+  "emojiRecent": "Недавние",
+  "emojiAll": "Все",
+  "addReaction": "Добавить реакцию",
+  "reactionParticipants": "Кто отреагировал",
+  "copyMessage": "Скопировать",
+  "messageCopied": "Скопировано",
+  "emojiFaces": "Лица и эмоции",
+  "emojiPeople": "Люди и жесты",
+  "emojiNature": "Животные и природа",
+  "emojiFood": "Еда и напитки",
+  "emojiTravel": "Путешествия и места",
+  "emojiActivities": "Занятия",
+  "emojiObjects": "Предметы",
+  "emojiSymbols": "Символы",
+  "emojiFlags": "Флаги"
 }

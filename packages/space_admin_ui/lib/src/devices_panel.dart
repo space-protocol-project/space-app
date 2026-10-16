@@ -199,53 +199,46 @@ class _DevicesPanelState extends State<DevicesPanel> {
           ),
           if (busy && !confirming) const LinearProgressIndicator(),
           if (!busy && devices.isEmpty) Text(strings.devicesEmpty),
-          for (final grant in devices)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    grant['recovery'] == true
-                        ? strings.deviceRecovery
-                        : grant['id'] == widget.currentGrantId
-                        ? strings.deviceCurrent
-                        : strings.deviceOther,
-                  ),
-                  SelectableText(
-                    '${grant['id']}',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'JetBrains Mono',
-                    ),
-                  ),
-                  Text(
-                    grant['revoked'] == true
-                        ? strings.inviteRevokedState
-                        : active(grant)
-                        ? strings.deviceAccessUntil(expiry(grant))
-                        : strings.deviceExpired(expiry(grant)),
-                  ),
-                  Text(
-                    strings.deviceScopes(
-                      (grant['scopes'] as List? ?? []).join(', '),
-                    ),
-                  ),
-                  if ((grant['parentGrantId'] as String? ?? '').isNotEmpty)
-                    Text(strings.deviceParent('${grant['parentGrantId']}')),
-                  if (active(grant))
-                    TextButton(
-                      key: ValueKey('revoke-device-${grant['id']}'),
-                      onPressed: busy ? null : () => run(() => revoke(grant)),
-                      child: Text(strings.deviceRevokeAccess),
-                    ),
-                ],
-              ),
-            ),
+          for (final grant in devices) _deviceEntry(grant),
           if (localizedStatus.isNotEmpty)
             Text(localizedStatus, key: const ValueKey('devices-status')),
         ],
       ),
+    ),
+  );
+  Widget _deviceEntry(Map<String, dynamic> grant) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          grant['recovery'] == true
+              ? strings.deviceRecovery
+              : grant['id'] == widget.currentGrantId
+              ? strings.deviceCurrent
+              : strings.deviceOther,
+        ),
+        SelectableText(
+          '${grant['id']}',
+          style: const TextStyle(fontSize: 12, fontFamily: 'JetBrains Mono'),
+        ),
+        Text(
+          grant['revoked'] == true
+              ? strings.inviteRevokedState
+              : active(grant)
+              ? strings.deviceAccessUntil(expiry(grant))
+              : strings.deviceExpired(expiry(grant)),
+        ),
+        Text(strings.deviceScopes((grant['scopes'] as List? ?? []).join(', '))),
+        if ((grant['parentGrantId'] as String? ?? '').isNotEmpty)
+          Text(strings.deviceParent('${grant['parentGrantId']}')),
+        if (active(grant))
+          TextButton(
+            key: ValueKey('revoke-device-${grant['id']}'),
+            onPressed: busy ? null : () => run(() => revoke(grant)),
+            child: Text(strings.deviceRevokeAccess),
+          ),
+      ],
     ),
   );
 }

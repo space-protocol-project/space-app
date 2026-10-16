@@ -1,6 +1,10 @@
+import 'emoji_picker.dart';
+import 'message_reactions.dart';
+import 'message_context_menu.dart';
+import 'attachment_gallery.dart';
 import 'mls_files.dart';
 import 'mls_recovery.dart';
-import '../src/rpc_clients.dart' show MlsDevice;
+import '../src/rpc_clients.dart' show MlsDevice, Reaction;
 
 import 'dart:async';
 import 'dart:convert';
@@ -366,51 +370,79 @@ class _MlsConversationState extends State<_MlsConversation> {
   Widget messageCard(Map<String, dynamic> item) {
     final message = item['message'] as Map;
     final descriptors = (message['files'] as List).cast<Map<String, dynamic>>();
+    final images = descriptors
+        .where((file) => isGalleryImage(file['name'] as String))
+        .take(5)
+        .toList();
     final own = item['grant_id'] == widget.client.local.scope['grant_id'];
-    return Align(
-      alignment: own ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 680),
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: own
-              ? Theme.of(context).colorScheme.primaryContainer
-                    .withValues(alpha: .3)
-              : Theme.of(context).colorScheme.surfaceContainer,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              item['author_id'] as String,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-            const SizedBox(height: 6),
-            if (item['archived'] == true)
-              Text('Из архива', style: Theme.of(context).textTheme.labelSmall),
-            if ((message['text'] as String).isNotEmpty)
-              SelectableText(message['text'] as String),
-            if (widget.attachmentsEnabled)
-              for (final descriptor in descriptors)
-                TextButton.icon(
-                  onPressed: () => download(item, descriptor),
-                  icon: const Icon(Icons.download),
-                  label: Text(descriptor['name'] as String),
-                ),
-            if (!widget.attachmentsEnabled &&
-                (message['text'] as String).isEmpty)
-              Text(context.strings.mlsUnavailable),
-            Text(
-              DateFormat.Hm().format(
-                DateTime.fromMillisecondsSinceEpoch(item['time'] as int),
+    final reactions =
+        (item['reactions'] as List?)?.cast<Reaction>() ?? <Reaction>[];
+    final principal = widget.client.local.scope['principal_id'] as String;
+    final canReact =
+        widget.canWrite &&
+        !controller.state.busy &&
+        !controller.state.recoveryRequired &&
+        controller.state.data?.joined == true &&
+        controller.state.data?.channel['revocation_pending'] != true;
+    void react(String emoji, bool active) =>
+        controller.add(MlsReact(item, emoji, active));
+    return MessageContextMenu(
+      text: message['text'] as String,
+      onReact: canReact
+          ? (emoji) => react(
+              emoji,
+              !reactions.any(
+                (r) => r.emoji == emoji && r.principalIds.contains(principal),
               ),
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-          ],
+            )
+          : null,
+      child: Align(
+        alignment: own ? Alignment.centerRight : Alignment.centerLeft,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 680),
+          margin: const EdgeInsets.symmetric(vertical: 6),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: own
+                ? Theme.of(context).colorScheme.primaryContainer
+                      .withValues(alpha: .3)
+                : Theme.of(context).colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                item['author_id'] as String,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+              const SizedBox(height: 6),
+              if (item['archived'] == true)
+                Text(
+                  'Из архива',
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+              if ((message['text'] as String).isNotEmpty)
+                SelectableText(
+                  message['text'] as String,
+                  contextMenuBuilder: (_, _) => const SizedBox.shrink(),
+                ),
+              ..._messageFiles(item, message, descriptors, images),
+              MessageReactionBar(
+                reactions: reactions,
+                principalId: principal,
+                onSet: canReact ? react : null,
+              ),
+              Text(
+                DateFormat.Hm().format(
+                  DateTime.fromMillisecondsSinceEpoch(item['time'] as int),
+                ),
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -470,6 +502,15 @@ class _MlsConversationState extends State<_MlsConversation> {
                 tooltip: context.strings.mlsAttach,
                 icon: const Icon(Icons.add),
               ),
+            EmojiButton(
+              controller: draft,
+              enabled:
+                  !state.busy &&
+                  !state.recoveryRequired &&
+                  !submitting &&
+                  state.data?.joined == true &&
+                  widget.canWrite,
+            ),
             const Spacer(),
             IconButton.filled(
               onPressed:
@@ -603,81 +644,7 @@ class _MlsConversationState extends State<_MlsConversation> {
         padding: const EdgeInsets.only(top: 72),
         child: Column(
           children: [
-            Row(
-              children: [
-                const SizedBox(width: 16),
-                const Icon(Icons.lock_outline),
-                const SizedBox(width: 8),
-                Expanded(child: Text(context.strings.mlsTitle)),
-                PopupMenuButton<String>(
-                  tooltip: 'Защита и история',
-                  onSelected: (action) => safely(() async {
-                    if (action == 'code') {
-                      await showMlsGroupCode(
-                        context,
-                        widget.client,
-                        widget.channelId,
-                      );
-                    } else if (action == 'update') {
-                      await widget.client.selfUpdate(widget.channelId);
-                    } else if (action == 'cancel-transfer') {
-                      await widget.client.cancelTransfer(widget.channelId);
-                    } else {
-                      await manageMlsArchive(
-                        context,
-                        widget.client,
-                        exporting: action == 'export',
-                      );
-                    }
-                    if (mounted) controller.add(MlsRefresh());
-                  }),
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'cancel-transfer',
-                      child: Text('Отменить ожидающую передачу управления'),
-                    ),
-                    PopupMenuItem(
-                      value: 'code',
-                      enabled:
-                          state.data?.joined == true && state.error.isEmpty,
-                      child: const Text('Код группы'),
-                    ),
-                    PopupMenuItem(
-                      value: 'update',
-                      enabled:
-                          state.data?.joined == true &&
-                          !state.busy &&
-                          state.error.isEmpty,
-                      child: const Text('Обновить ключи'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'export',
-                      child: Text('Сохранить архив истории'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'import',
-                      child: Text('Восстановить архив истории'),
-                    ),
-                  ],
-                ),
-                if (widget.attachmentsEnabled)
-                  IconButton(
-                    onPressed: showFiles,
-                    tooltip: context.strings.mlsFiles,
-                    icon: const Icon(Icons.folder_outlined),
-                  ),
-                IconButton(
-                  onPressed: ownCode,
-                  tooltip: context.strings.mlsDeviceCode,
-                  icon: const Icon(Icons.fingerprint),
-                ),
-                IconButton(
-                  onPressed: state.busy ? null : devices,
-                  tooltip: context.strings.mlsDevices,
-                  icon: const Icon(Icons.devices),
-                ),
-              ],
-            ),
+            _header(state),
             Text(
               context.strings.mlsExperimental,
               style: Theme.of(context).textTheme.labelSmall,
@@ -714,4 +681,116 @@ class _MlsConversationState extends State<_MlsConversation> {
       );
     },
   );
+  Widget _header(MlsState state) => Row(
+    children: [
+      const SizedBox(width: 16),
+      const Icon(Icons.lock_outline),
+      const SizedBox(width: 8),
+      Expanded(child: Text(context.strings.mlsTitle)),
+      PopupMenuButton<String>(
+        tooltip: 'Защита и история',
+        onSelected: _securityAction,
+        itemBuilder: (context) => [
+          const PopupMenuItem(
+            value: 'cancel-transfer',
+            child: Text('Отменить ожидающую передачу управления'),
+          ),
+          PopupMenuItem(
+            value: 'code',
+            enabled: state.data?.joined == true && state.error.isEmpty,
+            child: const Text('Код группы'),
+          ),
+          PopupMenuItem(
+            value: 'update',
+            enabled:
+                state.data?.joined == true &&
+                !state.busy &&
+                state.error.isEmpty,
+            child: const Text('Обновить ключи'),
+          ),
+          const PopupMenuItem(
+            value: 'export',
+            child: Text('Сохранить архив истории'),
+          ),
+          const PopupMenuItem(
+            value: 'import',
+            child: Text('Восстановить архив истории'),
+          ),
+        ],
+      ),
+      if (widget.attachmentsEnabled)
+        IconButton(
+          onPressed: showFiles,
+          tooltip: context.strings.mlsFiles,
+          icon: const Icon(Icons.folder_outlined),
+        ),
+      IconButton(
+        onPressed: ownCode,
+        tooltip: context.strings.mlsDeviceCode,
+        icon: const Icon(Icons.fingerprint),
+      ),
+      IconButton(
+        onPressed: state.busy ? null : devices,
+        tooltip: context.strings.mlsDevices,
+        icon: const Icon(Icons.devices),
+      ),
+    ],
+  );
+
+  void _securityAction(String action) => safely(() async {
+    if (action == 'code') {
+      await showMlsGroupCode(context, widget.client, widget.channelId);
+    } else if (action == 'update') {
+      await widget.client.selfUpdate(widget.channelId);
+    } else if (action == 'cancel-transfer') {
+      await widget.client.cancelTransfer(widget.channelId);
+    } else {
+      await manageMlsArchive(
+        context,
+        widget.client,
+        exporting: action == 'export',
+      );
+    }
+    if (mounted) controller.add(MlsRefresh());
+  });
+
+  List<Widget> _messageFiles(
+    Map<String, dynamic> item,
+    Map message,
+    List<Map<String, dynamic>> descriptors,
+    List<Map<String, dynamic>> images,
+  ) => [
+    if (widget.attachmentsEnabled && images.isNotEmpty)
+      Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: AttachmentGallery(
+          images: [
+            for (final file in images)
+              MessageImage(
+                id: file['asset_id'] as String,
+                name: file['name'] as String,
+                source: widget.client,
+                load: (cancelled) => MlsFiles(widget.client).download(
+                  widget.groupId,
+                  (message['id'] as List).cast<int>(),
+                  file,
+                  cancelled: cancelled,
+                ),
+                save: () => download(item, file),
+              ),
+          ],
+        ),
+      ),
+    if (widget.attachmentsEnabled)
+      for (final descriptor in descriptors.where(
+        (file) => !images.contains(file),
+      ))
+        TextButton.icon(
+          onPressed: () => download(item, descriptor),
+          icon: const Icon(Icons.download),
+          label: Text(descriptor['name'] as String),
+        ),
+    if (!widget.attachmentsEnabled && (message['text'] as String).isEmpty)
+      Text(context.strings.mlsUnavailable),
+  ];
 }
