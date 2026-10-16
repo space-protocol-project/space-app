@@ -1458,4 +1458,125 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeLocalSettings => 'On this computer';
+
+  @override
+  String get homeDiagTitle => 'Connection diagnostics';
+
+  @override
+  String get homeDiagRun => 'Check';
+
+  @override
+  String get homeDiagRunning => 'Checking addresses…';
+
+  @override
+  String get homeDiagWANLabel => 'Router WAN IP (optional)';
+
+  @override
+  String get homeDiagWANHelp =>
+      'Copy it from the router status page. This field is not saved.';
+
+  @override
+  String get homeDiagCopyCommand => 'Copy command for another network';
+
+  @override
+  String get homeDiagExternalHelp =>
+      'Space on another network automatically checks saved spaces. For a separate check, run this command on an external computer. Proxies or VPNs may leave the result unconfirmed.';
+
+  @override
+  String get homeDiagUnsupported =>
+      'The installed runtime does not support diagnostics. Update the server.';
+
+  @override
+  String get homeDiagFailed =>
+      'Diagnostics could not run. Check the installed runtime and try again.';
+
+  @override
+  String get homeDiagLocalPrefix => 'Local check';
+
+  @override
+  String get homeDiagLocalOk =>
+      'The server responds locally; TLS and signature are valid.';
+
+  @override
+  String get homeDiagRouteOk =>
+      'The address is reachable from this computer; TLS and signature are valid.';
+
+  @override
+  String get homeDiagUnreachable =>
+      'Cannot connect. Check server startup, port and firewall. This does not prove CGNAT.';
+
+  @override
+  String get homeDiagDNS =>
+      'The domain cannot be resolved. Check the name and DNS record.';
+
+  @override
+  String get homeDiagCertificateOk => 'The space certificate is valid.';
+
+  @override
+  String get homeDiagCertificateMissing =>
+      'No certificate found. Start the server and check again.';
+
+  @override
+  String get homeDiagCertificateExpired =>
+      'Certificate validity check failed. Check the clock and certificate.';
+
+  @override
+  String get homeDiagCertificateMismatch =>
+      'The address presents a different certificate. Check routing; do not replace the trusted fingerprint.';
+
+  @override
+  String get homeDiagDiscovery =>
+      'The address responds, but the identity or signature is invalid. Check the address and tunnel.';
+
+  @override
+  String get homeDiagWANUnknown =>
+      'WAN IP is unknown; CGNAT cannot be determined. You can enter the router WAN IP above.';
+
+  @override
+  String get homeDiagWANInvalid =>
+      'Invalid WAN IP. Use the address from the router status page.';
+
+  @override
+  String get homeDiagWANShared =>
+      'WAN IP is in 100.64.0.0/10, a sign of CGNAT. Ask your ISP about a public IP or use a TCP tunnel.';
+
+  @override
+  String get homeDiagWANPrivate =>
+      'WAN IP is private: double NAT or CGNAT is possible. Check the upstream router and ISP service.';
+
+  @override
+  String get homeDiagWANPublic =>
+      'WAN IP is outside private and CGNAT ranges. This does not confirm that the port is reachable externally.';
+
+  @override
+  String get homeDiagExternal =>
+      'Not checked externally: no recent external connection. Open this space on a device on another network and check again. This does not mean the server is unreachable.';
+
+  @override
+  String get homeDiagBudget =>
+      'Diagnostics timed out; remaining addresses were not checked.';
+
+  @override
+  String get homeDiagUnknown => 'Unknown result; update the app and runtime.';
+
+  @override
+  String get homeDiagInterface =>
+      'The listen address does not belong to this computer. Select a local interface or all interfaces.';
+
+  @override
+  String get homeDiagIPv6Private =>
+      'WAN IPv6 is local and cannot provide direct internet access. This does not prove CGNAT.';
+
+  @override
+  String get homeDiagNotReady =>
+      'TLS responds, but the server is not ready (HTTP 503). Complete initial setup or wait for startup.';
+
+  @override
+  String get homeDiagObserved =>
+      'The HTTPS listener received a request from another public network. This observation applies to the stated time and this address.';
+
+  @override
+  String homeDiagObservedAt(String time) {
+    return 'Last external connection: $time';
+  }
 }

@@ -9,6 +9,9 @@ final class HomeState {
     this.updateAvailable = false,
     this.ip = '',
     this.network,
+    this.diagnosis,
+    this.diagnosisError,
+    this.diagnosing = false,
     this.error = '',
     this.installedVersion = '',
     this.availableVersion = '',
@@ -31,6 +34,9 @@ final class HomeState {
     updateAvailable: controller.updateAvailable,
     ip: controller.ip,
     network: controller.network,
+    diagnosis: controller.diagnosis,
+    diagnosisError: controller.diagnosisError,
+    diagnosing: controller.diagnosing,
     error: controller.error,
     installedVersion: controller.installedVersion,
     availableVersion: controller.availableVersion,
@@ -53,6 +59,9 @@ final class HomeState {
       availableReleaseNotes,
       recoverySummary;
   final HomeNetwork? network;
+  final HomeDiagnosis? diagnosis;
+  final HomeDiagnosisError? diagnosisError;
+  final bool diagnosing;
   final HomePhase phase;
   final double progress, operationProgress;
   final Duration elapsed;

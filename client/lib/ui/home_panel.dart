@@ -1,4 +1,5 @@
 import 'home_network_editor.dart';
+import 'home_diagnostics_panel.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -347,6 +348,10 @@ class _HomePanelState extends State<HomePanel> {
                 ..._transferControls(view),
                 ..._updateControls(context, view),
                 ..._connectionDetails(context, view),
+                if (view.ip.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  HomeDiagnosticsPanel(home: home, view: view),
+                ],
               ],
             ),
           ),

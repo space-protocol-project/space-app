@@ -1,4 +1,5 @@
 import 'home_network.dart';
+import 'home_diagnostics.dart';
 import 'server_endpoints.dart';
 import 'endpoint_connection.dart';
 export 'server_endpoints.dart';
@@ -66,6 +67,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     this.release = bundledHomeRelease,
     this.download = downloadHomeRelease,
     this.storage = const HomeStorage(),
+    this.diagnoseTool = runHomeDoctor,
   }) : super(const HomeState()) {
     on<HomeProgressTicked>((event, _) => handleRequest(event, _update));
     on<HomeStatePublished>(
@@ -76,6 +78,9 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
       (event, _) => handleRequest(event, () => _saveNetwork(event)),
     );
     on<HomeIPDetected>((event, _) => handleRequest(event, _detectIP));
+    on<HomeDiagnosisRequested>(
+      (event, _) => handleRequest(event, () => _diagnose(event.wanIP)),
+    );
     on<HomeUpdatePrepared>((event, _) => handleRequest(event, _prepareUpdate));
     on<HomeUpdateRequested>(
       (event, _) =>
@@ -116,6 +121,8 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     int listenPort = 8443,
   }) => sendRequest(HomeNetworkSaved(endpoints, listenHost, listenPort));
   Future<void> load() => sendRequest(HomeLoaded());
+  Future<void> diagnose({String wanIP = ''}) =>
+      sendRequest(HomeDiagnosisRequested(wanIP));
   Future<String> detectIP() => sendRequest(HomeIPDetected());
   Future<bool> prepareUpdate() => sendRequest(HomeUpdatePrepared());
   Future<void> performUpdate({bool recover = false}) =>
@@ -130,6 +137,11 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
   final Future<Directory> Function() directory;
   final Future<HomeRelease> Function() release;
   final HomeStorage storage;
+  final HomeTool diagnoseTool;
+  HomeDiagnosis? diagnosis;
+  HomeDiagnosisError? diagnosisError;
+  bool diagnosing = false;
+  int _diagnosisGeneration = 0;
   final Future<void> Function(HomeRelease, File, void Function(double))
   download;
   Directory? _root;
@@ -213,6 +225,48 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
 
   void _update() {
     if (!_disposed) publishState();
+  }
+
+  void _clearDiagnosis() {
+    _diagnosisGeneration++;
+    diagnosis = null;
+    diagnosisError = null;
+  }
+
+  Future<void> _diagnose(String wanIP) async {
+    if (busy || diagnosing || _disposed || !supported) return;
+    diagnosing = true;
+    _clearDiagnosis();
+    final generation = _diagnosisGeneration;
+    _update();
+    try {
+      final root = await _directory();
+      final offered = await release();
+      final active = await HomeInstallation(root)
+          .active(offered, legacy: await legacyHomeReleases(), persist: false);
+      if (active == null) throw const HomeDiagnosisUnsupported();
+      final result = await diagnoseTool(
+        HomeInstallation(root).runtime(active),
+        [
+          'doctor',
+          '-home-data',
+          '${root.path}/data',
+          '-json',
+          if (wanIP.trim().isNotEmpty) ...['-wan-ip', wanIP.trim()],
+        ],
+      );
+      final report = HomeDiagnosis.fromJson(result);
+      if (generation == _diagnosisGeneration && !_disposed) diagnosis = report;
+    } catch (problem) {
+      if (generation == _diagnosisGeneration && !_disposed) {
+        diagnosisError = problem is HomeDiagnosisUnsupported
+            ? HomeDiagnosisError.unsupported
+            : HomeDiagnosisError.failed;
+      }
+    } finally {
+      diagnosing = false;
+      _update();
+    }
   }
 
   void publishState() {
@@ -519,6 +573,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
               event.listenPort,
             );
       await next.write(root);
+      _clearDiagnosis();
       network = next;
       ip = next.endpoints.first.host;
       return true;
@@ -573,6 +628,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
 
   Future<HomeServerState?> _start(String address) async {
     if (busy || running || _disposed) return server;
+    _clearDiagnosis();
     busy = true;
     _beginProgress();
     error = '';
@@ -672,6 +728,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
   }
 
   Future<void> _stop() async {
+    _clearDiagnosis();
     phase = HomePhase.stopping;
     stopProgress = .2;
     _update();

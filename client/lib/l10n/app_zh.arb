@@ -556,5 +556,44 @@
   "homeBackupAddress": "备用地址",
   "homeConnectionAddresses": "成员连接",
   "homeAddressHelp": "请输入域名、IPv4 或 IPv6，不含 https:// 和方括号。主要地址不可用时可使用备用地址。",
-  "homeLocalSettings": "此计算机"
+  "homeLocalSettings": "此计算机",
+  "homeDiagTitle": "连接诊断",
+  "homeDiagRun": "检查",
+  "homeDiagRunning": "正在检查地址…",
+  "homeDiagWANLabel": "路由器 WAN IP（可选）",
+  "homeDiagWANHelp": "从路由器状态页面复制；此字段不会保存。",
+  "homeDiagCopyCommand": "复制用于其他网络的命令",
+  "homeDiagExternalHelp": "其他网络上的 Space 会自动检查已保存的空间。也可在外部电脑上运行此命令单独检查。使用代理或 VPN 时，结果可能仍无法确认。",
+  "homeDiagUnsupported": "已安装的 runtime 不支持诊断。请更新服务器。",
+  "homeDiagFailed": "无法运行诊断。请检查已安装的 runtime 后重试。",
+  "homeDiagLocalPrefix": "本地检查",
+  "homeDiagLocalOk": "服务器在本地响应；TLS 和签名有效。",
+  "homeDiagRouteOk": "此电脑可以访问该地址；TLS 和签名有效。",
+  "homeDiagUnreachable": "无法连接。请检查服务器是否运行、端口和防火墙。这不能证明存在 CGNAT。",
+  "homeDiagDNS": "无法解析域名。请检查名称和 DNS 记录。",
+  "homeDiagCertificateOk": "空间证书有效。",
+  "homeDiagCertificateMissing": "未找到证书。请启动服务器后重试。",
+  "homeDiagCertificateExpired": "证书有效期检查失败。请检查系统时间和证书。",
+  "homeDiagCertificateMismatch": "该地址提供了其他证书。请检查路由，不要替换受信任的指纹。",
+  "homeDiagDiscovery": "地址有响应，但身份或签名无效。请检查地址和隧道。",
+  "homeDiagWANUnknown": "WAN IP 未知，无法判断 CGNAT。可在上方输入路由器 WAN IP。",
+  "homeDiagWANInvalid": "WAN IP 无效。请使用路由器状态页面上的地址。",
+  "homeDiagWANShared": "WAN IP 位于 100.64.0.0/10，这是 CGNAT 的迹象。请向运营商询问公网 IP 或使用 TCP 隧道。",
+  "homeDiagWANPrivate": "WAN IP 为私有地址，可能存在双重 NAT 或 CGNAT。请检查上级路由器及运营商服务。",
+  "homeDiagWANPublic": "WAN IP 不在私有或 CGNAT 地址范围内。这不能确认端口可从外部访问。",
+  "homeDiagExternal": "尚未从外网确认：没有近期的外部连接。请在其他网络的设备上打开此空间后重试。这不代表服务器不可访问。",
+  "homeDiagBudget": "诊断已超时；其余地址尚未检查。",
+  "homeDiagUnknown": "未知结果；请更新应用和 runtime。",
+  "homeDiagInterface": "监听地址不属于此电脑。请选择本地接口或所有接口。",
+  "homeDiagIPv6Private": "WAN IPv6 为本地地址，无法提供直接的互联网访问。这不能证明存在 CGNAT。",
+  "homeDiagNotReady": "TLS 有响应，但服务器尚未就绪（HTTP 503）。请完成初始设置或等待启动。",
+  "homeDiagObserved": "HTTPS 入口收到了来自其他公网的请求。此确认仅对应所示时间和地址。",
+  "homeDiagObservedAt": "最近的外部连接：{time}",
+  "@homeDiagObservedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -2680,6 +2680,198 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'На этом компьютере'**
   String get homeLocalSettings;
+
+  /// No description provided for @homeDiagTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Диагностика подключения'**
+  String get homeDiagTitle;
+
+  /// No description provided for @homeDiagRun.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверить'**
+  String get homeDiagRun;
+
+  /// No description provided for @homeDiagRunning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверяем адреса…'**
+  String get homeDiagRunning;
+
+  /// No description provided for @homeDiagWANLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'WAN IP роутера (необязательно)'**
+  String get homeDiagWANLabel;
+
+  /// No description provided for @homeDiagWANHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес со страницы состояния роутера. Это поле не сохраняется.'**
+  String get homeDiagWANHelp;
+
+  /// No description provided for @homeDiagCopyCommand.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировать команду для другой сети'**
+  String get homeDiagCopyCommand;
+
+  /// No description provided for @homeDiagExternalHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Space в другой сети автоматически проверяет сохранённое пространство. Для отдельной проверки можно запустить эту команду на внешнем компьютере. Через прокси или VPN результат может остаться неподтверждённым.'**
+  String get homeDiagExternalHelp;
+
+  /// No description provided for @homeDiagUnsupported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Установленный runtime не поддерживает диагностику. Обновите сервер.'**
+  String get homeDiagUnsupported;
+
+  /// No description provided for @homeDiagFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось выполнить диагностику. Проверьте установленный runtime и повторите.'**
+  String get homeDiagFailed;
+
+  /// No description provided for @homeDiagLocalPrefix.
+  ///
+  /// In ru, this message translates to:
+  /// **'Локальная проверка'**
+  String get homeDiagLocalPrefix;
+
+  /// No description provided for @homeDiagLocalOk.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер отвечает локально; TLS и подпись верны.'**
+  String get homeDiagLocalOk;
+
+  /// No description provided for @homeDiagRouteOk.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес доступен с этого компьютера; TLS и подпись верны.'**
+  String get homeDiagRouteOk;
+
+  /// No description provided for @homeDiagUnreachable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет подключения. Проверьте запуск, порт и файрвол. Это не доказательство CGNAT.'**
+  String get homeDiagUnreachable;
+
+  /// No description provided for @homeDiagDNS.
+  ///
+  /// In ru, this message translates to:
+  /// **'Домен не разрешается. Проверьте имя и DNS-запись.'**
+  String get homeDiagDNS;
+
+  /// No description provided for @homeDiagCertificateOk.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сертификат пространства действителен.'**
+  String get homeDiagCertificateOk;
+
+  /// No description provided for @homeDiagCertificateMissing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет сертификата. Запустите сервер и повторите проверку.'**
+  String get homeDiagCertificateMissing;
+
+  /// No description provided for @homeDiagCertificateExpired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок действия сертификата не подходит. Проверьте часы и сертификат.'**
+  String get homeDiagCertificateExpired;
+
+  /// No description provided for @homeDiagCertificateMismatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'На адресе другой сертификат. Проверьте маршрутизацию; не заменяйте доверенный отпечаток.'**
+  String get homeDiagCertificateMismatch;
+
+  /// No description provided for @homeDiagDiscovery.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес отвечает, но идентичность или подпись неверна. Проверьте адрес и туннель.'**
+  String get homeDiagDiscovery;
+
+  /// No description provided for @homeDiagWANUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'WAN IP неизвестен; наличие CGNAT не определено. Можно указать WAN IP роутера выше.'**
+  String get homeDiagWANUnknown;
+
+  /// No description provided for @homeDiagWANInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Некорректный WAN IP. Возьмите адрес со страницы состояния роутера.'**
+  String get homeDiagWANInvalid;
+
+  /// No description provided for @homeDiagWANShared.
+  ///
+  /// In ru, this message translates to:
+  /// **'WAN IP входит в 100.64.0.0/10 — признак CGNAT. Уточните публичный IP у провайдера или используйте TCP-туннель.'**
+  String get homeDiagWANShared;
+
+  /// No description provided for @homeDiagWANPrivate.
+  ///
+  /// In ru, this message translates to:
+  /// **'WAN IP частный: возможны двойной NAT или CGNAT. Проверьте вышестоящий роутер и условия провайдера.'**
+  String get homeDiagWANPrivate;
+
+  /// No description provided for @homeDiagWANPublic.
+  ///
+  /// In ru, this message translates to:
+  /// **'WAN IP не относится к частным или CGNAT-диапазонам. Это не подтверждает доступность порта извне.'**
+  String get homeDiagWANPublic;
+
+  /// No description provided for @homeDiagExternal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Извне не проверено: свежего внешнего подключения нет. Откройте пространство на устройстве в другой сети и повторите проверку. Это не означает, что сервер недоступен.'**
+  String get homeDiagExternal;
+
+  /// No description provided for @homeDiagBudget.
+  ///
+  /// In ru, this message translates to:
+  /// **'Время диагностики истекло; оставшиеся адреса не проверены.'**
+  String get homeDiagBudget;
+
+  /// No description provided for @homeDiagUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неизвестный результат; обновите приложение и runtime.'**
+  String get homeDiagUnknown;
+
+  /// No description provided for @homeDiagInterface.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес прослушивания не принадлежит этому компьютеру. Выберите локальный интерфейс или все интерфейсы.'**
+  String get homeDiagInterface;
+
+  /// No description provided for @homeDiagIPv6Private.
+  ///
+  /// In ru, this message translates to:
+  /// **'WAN IPv6 локальный и не подходит для прямого доступа из интернета. Это не доказывает CGNAT.'**
+  String get homeDiagIPv6Private;
+
+  /// No description provided for @homeDiagNotReady.
+  ///
+  /// In ru, this message translates to:
+  /// **'TLS отвечает, но сервер ещё не готов (HTTP 503). Завершите первую настройку или дождитесь запуска.'**
+  String get homeDiagNotReady;
+
+  /// No description provided for @homeDiagObserved.
+  ///
+  /// In ru, this message translates to:
+  /// **'HTTPS-вход получил запрос из другой публичной сети. Подтверждение относится к указанному времени и этому адресу.'**
+  String get homeDiagObserved;
+
+  /// No description provided for @homeDiagObservedAt.
+  ///
+  /// In ru, this message translates to:
+  /// **'Последнее внешнее подключение: {time}'**
+  String homeDiagObservedAt(String time);
 }
 
 class _AppLocalizationsDelegate

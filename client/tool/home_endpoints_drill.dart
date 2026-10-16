@@ -9,6 +9,7 @@ import 'package:cryptography/cryptography.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/home_network.dart';
+import 'package:space_client/src/home_diagnostics.dart';
 import 'package:space_client/src/key_vault.dart';
 import 'package:space_client/src/mls/client.dart';
 import 'package:space_client/src/mls/files.dart';
@@ -195,6 +196,7 @@ Future<void> main(List<String> arguments) async {
       setupCode: state['setup_code'] as String,
     );
     await Future<void>.delayed(const Duration(seconds: 1));
+    await verifyDoctor(runtime, root, managed.serverId, fingerprint);
     final link = spaceEndpointLink(
       endpoints.first.origin,
       fingerprint,
@@ -295,4 +297,51 @@ Future<void> main(List<String> arguments) async {
     }
     await root.delete(recursive: true);
   }
+}
+
+Future<void> verifyDoctor(
+  Directory runtime,
+  Directory root,
+  String serverId,
+  String fingerprint,
+) async {
+  final report = HomeDiagnosis.fromJson(
+    await runHomeDoctor(runtime, [
+      'doctor',
+      '-home-data',
+      '${root.path}/data',
+      '-wan-ip',
+      '100.64.1.2',
+      '-json',
+    ]),
+  );
+  if (report.serverId != serverId ||
+      report.fingerprint != fingerprint ||
+      report.checks.any((check) => check.status == 'failed') ||
+      !report.checks.any((check) => check.code == 'local_ok') ||
+      !report.checks.any((check) => check.code == 'wan_shared') ||
+      !report.checks.any((check) => check.code == 'external_unverified') ||
+      report.outsideCommand.isEmpty) {
+    throw StateError(
+      'Диагностика локального сервера неверна: ${report.checks.map((check) => '${check.code}:${check.status}').join(', ')}',
+    );
+  }
+  final remote = HomeDiagnosis.fromJson(
+    await runHomeDoctor(runtime, [
+      'doctor',
+      '-endpoint',
+      report.endpoints.first.origin.toString(),
+      '-fingerprint',
+      fingerprint,
+      '-server-id',
+      serverId,
+      '-json',
+    ]),
+  );
+  if (!remote.checks.any((check) => check.code == 'route_ok')) {
+    throw StateError('Проверка адреса doctor не выполнена');
+  }
+  stdout.writeln(
+    'Doctor: локальный TLS, подпись, CGNAT-признак и проверка заданного адреса подтверждены; интернет-доступность не приписывается.',
+  );
 }

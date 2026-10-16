@@ -1344,6 +1344,109 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeLocalSettings => '此计算机';
+
+  @override
+  String get homeDiagTitle => '连接诊断';
+
+  @override
+  String get homeDiagRun => '检查';
+
+  @override
+  String get homeDiagRunning => '正在检查地址…';
+
+  @override
+  String get homeDiagWANLabel => '路由器 WAN IP（可选）';
+
+  @override
+  String get homeDiagWANHelp => '从路由器状态页面复制；此字段不会保存。';
+
+  @override
+  String get homeDiagCopyCommand => '复制用于其他网络的命令';
+
+  @override
+  String get homeDiagExternalHelp =>
+      '其他网络上的 Space 会自动检查已保存的空间。也可在外部电脑上运行此命令单独检查。使用代理或 VPN 时，结果可能仍无法确认。';
+
+  @override
+  String get homeDiagUnsupported => '已安装的 runtime 不支持诊断。请更新服务器。';
+
+  @override
+  String get homeDiagFailed => '无法运行诊断。请检查已安装的 runtime 后重试。';
+
+  @override
+  String get homeDiagLocalPrefix => '本地检查';
+
+  @override
+  String get homeDiagLocalOk => '服务器在本地响应；TLS 和签名有效。';
+
+  @override
+  String get homeDiagRouteOk => '此电脑可以访问该地址；TLS 和签名有效。';
+
+  @override
+  String get homeDiagUnreachable => '无法连接。请检查服务器是否运行、端口和防火墙。这不能证明存在 CGNAT。';
+
+  @override
+  String get homeDiagDNS => '无法解析域名。请检查名称和 DNS 记录。';
+
+  @override
+  String get homeDiagCertificateOk => '空间证书有效。';
+
+  @override
+  String get homeDiagCertificateMissing => '未找到证书。请启动服务器后重试。';
+
+  @override
+  String get homeDiagCertificateExpired => '证书有效期检查失败。请检查系统时间和证书。';
+
+  @override
+  String get homeDiagCertificateMismatch => '该地址提供了其他证书。请检查路由，不要替换受信任的指纹。';
+
+  @override
+  String get homeDiagDiscovery => '地址有响应，但身份或签名无效。请检查地址和隧道。';
+
+  @override
+  String get homeDiagWANUnknown => 'WAN IP 未知，无法判断 CGNAT。可在上方输入路由器 WAN IP。';
+
+  @override
+  String get homeDiagWANInvalid => 'WAN IP 无效。请使用路由器状态页面上的地址。';
+
+  @override
+  String get homeDiagWANShared =>
+      'WAN IP 位于 100.64.0.0/10，这是 CGNAT 的迹象。请向运营商询问公网 IP 或使用 TCP 隧道。';
+
+  @override
+  String get homeDiagWANPrivate =>
+      'WAN IP 为私有地址，可能存在双重 NAT 或 CGNAT。请检查上级路由器及运营商服务。';
+
+  @override
+  String get homeDiagWANPublic => 'WAN IP 不在私有或 CGNAT 地址范围内。这不能确认端口可从外部访问。';
+
+  @override
+  String get homeDiagExternal =>
+      '尚未从外网确认：没有近期的外部连接。请在其他网络的设备上打开此空间后重试。这不代表服务器不可访问。';
+
+  @override
+  String get homeDiagBudget => '诊断已超时；其余地址尚未检查。';
+
+  @override
+  String get homeDiagUnknown => '未知结果；请更新应用和 runtime。';
+
+  @override
+  String get homeDiagInterface => '监听地址不属于此电脑。请选择本地接口或所有接口。';
+
+  @override
+  String get homeDiagIPv6Private =>
+      'WAN IPv6 为本地地址，无法提供直接的互联网访问。这不能证明存在 CGNAT。';
+
+  @override
+  String get homeDiagNotReady => 'TLS 有响应，但服务器尚未就绪（HTTP 503）。请完成初始设置或等待启动。';
+
+  @override
+  String get homeDiagObserved => 'HTTPS 入口收到了来自其他公网的请求。此确认仅对应所示时间和地址。';
+
+  @override
+  String homeDiagObservedAt(String time) {
+    return '最近的外部连接：$time';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1526,4 +1629,107 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get homeLocalSettings => '此计算机';
+
+  @override
+  String get homeDiagTitle => '连接诊断';
+
+  @override
+  String get homeDiagRun => '检查';
+
+  @override
+  String get homeDiagRunning => '正在检查地址…';
+
+  @override
+  String get homeDiagWANLabel => '路由器 WAN IP（可选）';
+
+  @override
+  String get homeDiagWANHelp => '从路由器状态页面复制；此字段不会保存。';
+
+  @override
+  String get homeDiagCopyCommand => '复制用于其他网络的命令';
+
+  @override
+  String get homeDiagExternalHelp =>
+      '其他网络上的 Space 会自动检查已保存的空间。也可在外部电脑上运行此命令单独检查。使用代理或 VPN 时，结果可能仍无法确认。';
+
+  @override
+  String get homeDiagUnsupported => '已安装的 runtime 不支持诊断。请更新服务器。';
+
+  @override
+  String get homeDiagFailed => '无法运行诊断。请检查已安装的 runtime 后重试。';
+
+  @override
+  String get homeDiagLocalPrefix => '本地检查';
+
+  @override
+  String get homeDiagLocalOk => '服务器在本地响应；TLS 和签名有效。';
+
+  @override
+  String get homeDiagRouteOk => '此电脑可以访问该地址；TLS 和签名有效。';
+
+  @override
+  String get homeDiagUnreachable => '无法连接。请检查服务器是否运行、端口和防火墙。这不能证明存在 CGNAT。';
+
+  @override
+  String get homeDiagDNS => '无法解析域名。请检查名称和 DNS 记录。';
+
+  @override
+  String get homeDiagCertificateOk => '空间证书有效。';
+
+  @override
+  String get homeDiagCertificateMissing => '未找到证书。请启动服务器后重试。';
+
+  @override
+  String get homeDiagCertificateExpired => '证书有效期检查失败。请检查系统时间和证书。';
+
+  @override
+  String get homeDiagCertificateMismatch => '该地址提供了其他证书。请检查路由，不要替换受信任的指纹。';
+
+  @override
+  String get homeDiagDiscovery => '地址有响应，但身份或签名无效。请检查地址和隧道。';
+
+  @override
+  String get homeDiagWANUnknown => 'WAN IP 未知，无法判断 CGNAT。可在上方输入路由器 WAN IP。';
+
+  @override
+  String get homeDiagWANInvalid => 'WAN IP 无效。请使用路由器状态页面上的地址。';
+
+  @override
+  String get homeDiagWANShared =>
+      'WAN IP 位于 100.64.0.0/10，这是 CGNAT 的迹象。请向运营商询问公网 IP 或使用 TCP 隧道。';
+
+  @override
+  String get homeDiagWANPrivate =>
+      'WAN IP 为私有地址，可能存在双重 NAT 或 CGNAT。请检查上级路由器及运营商服务。';
+
+  @override
+  String get homeDiagWANPublic => 'WAN IP 不在私有或 CGNAT 地址范围内。这不能确认端口可从外部访问。';
+
+  @override
+  String get homeDiagExternal =>
+      '尚未从外网确认：没有近期的外部连接。请在其他网络的设备上打开此空间后重试。这不代表服务器不可访问。';
+
+  @override
+  String get homeDiagBudget => '诊断已超时；其余地址尚未检查。';
+
+  @override
+  String get homeDiagUnknown => '未知结果；请更新应用和 runtime。';
+
+  @override
+  String get homeDiagInterface => '监听地址不属于此电脑。请选择本地接口或所有接口。';
+
+  @override
+  String get homeDiagIPv6Private =>
+      'WAN IPv6 为本地地址，无法提供直接的互联网访问。这不能证明存在 CGNAT。';
+
+  @override
+  String get homeDiagNotReady => 'TLS 有响应，但服务器尚未就绪（HTTP 503）。请完成初始设置或等待启动。';
+
+  @override
+  String get homeDiagObserved => 'HTTPS 入口收到了来自其他公网的请求。此确认仅对应所示时间和地址。';
+
+  @override
+  String homeDiagObservedAt(String time) {
+    return '最近的外部连接：$time';
+  }
 }

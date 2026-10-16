@@ -1465,4 +1465,125 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get homeLocalSettings => 'На этом компьютере';
+
+  @override
+  String get homeDiagTitle => 'Диагностика подключения';
+
+  @override
+  String get homeDiagRun => 'Проверить';
+
+  @override
+  String get homeDiagRunning => 'Проверяем адреса…';
+
+  @override
+  String get homeDiagWANLabel => 'WAN IP роутера (необязательно)';
+
+  @override
+  String get homeDiagWANHelp =>
+      'Адрес со страницы состояния роутера. Это поле не сохраняется.';
+
+  @override
+  String get homeDiagCopyCommand => 'Скопировать команду для другой сети';
+
+  @override
+  String get homeDiagExternalHelp =>
+      'Space в другой сети автоматически проверяет сохранённое пространство. Для отдельной проверки можно запустить эту команду на внешнем компьютере. Через прокси или VPN результат может остаться неподтверждённым.';
+
+  @override
+  String get homeDiagUnsupported =>
+      'Установленный runtime не поддерживает диагностику. Обновите сервер.';
+
+  @override
+  String get homeDiagFailed =>
+      'Не удалось выполнить диагностику. Проверьте установленный runtime и повторите.';
+
+  @override
+  String get homeDiagLocalPrefix => 'Локальная проверка';
+
+  @override
+  String get homeDiagLocalOk =>
+      'Сервер отвечает локально; TLS и подпись верны.';
+
+  @override
+  String get homeDiagRouteOk =>
+      'Адрес доступен с этого компьютера; TLS и подпись верны.';
+
+  @override
+  String get homeDiagUnreachable =>
+      'Нет подключения. Проверьте запуск, порт и файрвол. Это не доказательство CGNAT.';
+
+  @override
+  String get homeDiagDNS => 'Домен не разрешается. Проверьте имя и DNS-запись.';
+
+  @override
+  String get homeDiagCertificateOk => 'Сертификат пространства действителен.';
+
+  @override
+  String get homeDiagCertificateMissing =>
+      'Нет сертификата. Запустите сервер и повторите проверку.';
+
+  @override
+  String get homeDiagCertificateExpired =>
+      'Срок действия сертификата не подходит. Проверьте часы и сертификат.';
+
+  @override
+  String get homeDiagCertificateMismatch =>
+      'На адресе другой сертификат. Проверьте маршрутизацию; не заменяйте доверенный отпечаток.';
+
+  @override
+  String get homeDiagDiscovery =>
+      'Адрес отвечает, но идентичность или подпись неверна. Проверьте адрес и туннель.';
+
+  @override
+  String get homeDiagWANUnknown =>
+      'WAN IP неизвестен; наличие CGNAT не определено. Можно указать WAN IP роутера выше.';
+
+  @override
+  String get homeDiagWANInvalid =>
+      'Некорректный WAN IP. Возьмите адрес со страницы состояния роутера.';
+
+  @override
+  String get homeDiagWANShared =>
+      'WAN IP входит в 100.64.0.0/10 — признак CGNAT. Уточните публичный IP у провайдера или используйте TCP-туннель.';
+
+  @override
+  String get homeDiagWANPrivate =>
+      'WAN IP частный: возможны двойной NAT или CGNAT. Проверьте вышестоящий роутер и условия провайдера.';
+
+  @override
+  String get homeDiagWANPublic =>
+      'WAN IP не относится к частным или CGNAT-диапазонам. Это не подтверждает доступность порта извне.';
+
+  @override
+  String get homeDiagExternal =>
+      'Извне не проверено: свежего внешнего подключения нет. Откройте пространство на устройстве в другой сети и повторите проверку. Это не означает, что сервер недоступен.';
+
+  @override
+  String get homeDiagBudget =>
+      'Время диагностики истекло; оставшиеся адреса не проверены.';
+
+  @override
+  String get homeDiagUnknown =>
+      'Неизвестный результат; обновите приложение и runtime.';
+
+  @override
+  String get homeDiagInterface =>
+      'Адрес прослушивания не принадлежит этому компьютеру. Выберите локальный интерфейс или все интерфейсы.';
+
+  @override
+  String get homeDiagIPv6Private =>
+      'WAN IPv6 локальный и не подходит для прямого доступа из интернета. Это не доказывает CGNAT.';
+
+  @override
+  String get homeDiagNotReady =>
+      'TLS отвечает, но сервер ещё не готов (HTTP 503). Завершите первую настройку или дождитесь запуска.';
+
+  @override
+  String get homeDiagObserved =>
+      'HTTPS-вход получил запрос из другой публичной сети. Подтверждение относится к указанному времени и этому адресу.';
+
+  @override
+  String homeDiagObservedAt(String time) {
+    return 'Последнее внешнее подключение: $time';
+  }
 }

@@ -6,6 +6,11 @@ final class HomeLoaded extends HomeEvent<void> {}
 
 final class HomeIPDetected extends HomeEvent<String> {}
 
+final class HomeDiagnosisRequested extends HomeEvent<void> {
+  HomeDiagnosisRequested(this.wanIP);
+  final String wanIP;
+}
+
 final class HomeUpdatePrepared extends HomeEvent<bool> {}
 
 final class HomeUpdateRequested extends HomeEvent<void> {
