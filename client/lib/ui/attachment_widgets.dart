@@ -73,7 +73,7 @@ class AttachmentComposer extends StatelessWidget {
   ) => _fileTile(
     dense: true,
     leading: const Icon(Icons.insert_drive_file_outlined),
-    title: Text(file.file.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+    title: Text(file.name, maxLines: 1, overflow: TextOverflow.ellipsis),
     subtitle: Text(attachmentSize(file.size)),
     trailing: IconButton(
       tooltip: context.strings.removeFile,

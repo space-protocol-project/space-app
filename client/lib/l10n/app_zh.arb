@@ -632,5 +632,6 @@
   "outboxDiscardDescription": "消息可能已到达服务器。从队列移除只会停止重试，不会删除其他成员的消息。",
   "outboxFileMessage": "含附件的消息",
   "outboxIdentityChanged": "设备授权已更改。原队列已保留，禁止从新设备自动发送。",
-  "outboxFull": "队列已满：最多100条消息和1 MiB。请等待发送或移除不需要的消息。"
+  "outboxFull": "队列已满：最多100条消息和1 MiB。请等待发送或移除不需要的消息。",
+  "outboxFileLimit": "每个空间和设备的待发送附件最多占用 200 MiB。请等待发送完成或移除不需要的消息。"
 }

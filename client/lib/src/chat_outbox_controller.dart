@@ -43,6 +43,14 @@ extension _ChatOutboxController on ChatController {
     _outboxTimer = null;
   }
 
+  Future<void> _finishOutbox() async {
+    try {
+      await _outboxDrain?.timeout(const Duration(seconds: 3));
+    } catch (_) {
+      // Остановка не ждёт недоступную сеть бесконечно; запрос уже сохранён.
+    }
+  }
+
   void _retryOutboxConnection(Discovery server, Object problem) {
     final scope = _outboxScope;
     if (scope == null ||
@@ -93,11 +101,23 @@ extension _ChatOutboxController on ChatController {
     }
   }
 
-  Future<bool> _enqueueMessage(String text, List<String> attachments) async {
+  Future<bool> _enqueueMessage(
+    String text,
+    List<String> attachments,
+    List<XFile> files,
+  ) async {
     final scope = _outboxScope;
     if (!canQueue || scope == null) return false;
-    if (text.trim().isEmpty && attachments.isEmpty) return false;
-    final request = jsonEncode([channelId, text, attachments]);
+    if (text.trim().isEmpty && attachments.isEmpty && files.isEmpty) {
+      return false;
+    }
+    if (files.isNotEmpty && !canQueueFiles) return false;
+    final request = jsonEncode([
+      channelId,
+      text,
+      attachments,
+      files.map((f) => [f.path, f.name]).toList(),
+    ]);
     if (_pendingText != request || _pendingKey.isEmpty) {
       _pendingText = request;
       _pendingKey = newRequestKey();
@@ -109,20 +129,19 @@ extension _ChatOutboxController on ChatController {
       attachments: attachments,
       createdAt: now().millisecondsSinceEpoch,
     );
-    return _persistMessage(scope, entry);
+    return _persistMessage(scope, entry, files: files);
   }
 
-  Future<bool> _persistMessage(OutboxScope scope, PendingMessage entry) async {
+  Future<bool> _persistMessage(
+    OutboxScope scope,
+    PendingMessage entry, {
+    List<XFile> files = const [],
+  }) async {
     final epoch = _outboxEpoch;
     busy = true;
     _update();
     try {
-      entry.validate();
-      final entries = await outboxStore.change(scope, (saved) {
-        if (!_outboxCurrent(scope, epoch)) return saved;
-        if (saved.any((message) => message.key == entry.key)) return saved;
-        return [...saved, entry];
-      });
+      final entries = await _saveMessageFiles(scope, epoch, entry, files);
       if (!_outboxCurrent(scope, epoch)) return false;
       _pendingMessages = entries;
       outboxError = '';
@@ -134,7 +153,11 @@ extension _ChatOutboxController on ChatController {
       return true;
     } catch (problem) {
       if (_outboxCurrent(scope, epoch)) {
-        outboxError = problem is OutboxFull ? 'full' : 'save';
+        outboxError = problem is FileQueueFull
+            ? 'files-full'
+            : problem is OutboxFull
+            ? 'full'
+            : 'save';
         _update();
       }
       return false;
@@ -149,7 +172,8 @@ extension _ChatOutboxController on ChatController {
         !connected ||
         accessRemoved ||
         _session == null ||
-        (outboxError.isNotEmpty && outboxError != 'full') ||
+        (outboxError.isNotEmpty &&
+            !['full', 'files-full'].contains(outboxError)) ||
         _outboxScope == null ||
         _outboxTimer != null) {
       return;
@@ -204,7 +228,7 @@ extension _ChatOutboxController on ChatController {
         entry.channelId,
         entry.text,
         entry.key,
-        entry.attachments,
+        entry.attachmentIds,
       );
     }
     if (entry.channelId != channelId) {
@@ -212,13 +236,13 @@ extension _ChatOutboxController on ChatController {
         'Сессия не поддерживает очередь каналов',
       );
     }
-    return entry.attachments.isEmpty
+    return entry.attachmentIds.isEmpty
         ? session.send(entry.text, entry.key)
         : (session as AttachmentSession).sendAttachments(
             entry.channelId,
             entry.text,
             entry.key,
-            entry.attachments,
+            entry.attachmentIds,
           );
   }
 
@@ -232,8 +256,9 @@ extension _ChatOutboxController on ChatController {
     _update();
     Content content;
     try {
-      content = await _sendWithSessionRecovery(scope, epoch, session, entry);
-      _checkMessageReceipt(scope, entry, content);
+      final sent = await _sendWithSessionRecovery(scope, epoch, session, entry);
+      content = sent.$2;
+      _checkMessageReceipt(scope, sent.$1, content);
     } catch (problem) {
       if (!_outboxCurrent(scope, epoch)) return false;
       return _pendingFailure(scope, epoch, entry, problem);
@@ -253,22 +278,23 @@ extension _ChatOutboxController on ChatController {
     if (!_outboxCurrent(scope, epoch)) return false;
     _pendingMessages = remaining;
     _outboxAttempt = 0;
-    if (outboxError == 'full') outboxError = '';
+    if (['full', 'files-full'].contains(outboxError)) outboxError = '';
     sendStatus = _pendingMessages.isEmpty
         ? MessageSendStatus.accepted
         : MessageSendStatus.queued;
     _update();
+    await _removeQueuedFiles(scope, entry.localFiles);
     return true;
   }
 
-  Future<Content> _sendWithSessionRecovery(
+  Future<(PendingMessage, Content)> _sendWithSessionRecovery(
     OutboxScope scope,
     int epoch,
     LiveSession session,
     PendingMessage entry,
   ) async {
     try {
-      return await _sendPending(session, entry);
+      return await _sendFilesAndMessage(scope, epoch, session, entry);
     } on GrpcError catch (problem) {
       if (problem.code != StatusCode.unauthenticated) rethrow;
     }
@@ -279,7 +305,7 @@ extension _ChatOutboxController on ChatController {
         'Устройство или пространство изменилось',
       );
     }
-    return _sendPending(session, entry);
+    return _sendFilesAndMessage(scope, epoch, session, entry);
   }
 
   void _checkMessageReceipt(
@@ -298,7 +324,7 @@ extension _ChatOutboxController on ChatController {
         (content.text != entry.text ||
             !listEquals(
               content.attachments.map((asset) => asset.id).toList(),
-              entry.attachments,
+              entry.attachmentIds,
             ))) {
       throw const FormatException('Подтверждение другого сообщения');
     }
@@ -321,6 +347,9 @@ extension _ChatOutboxController on ChatController {
     PendingMessage entry,
     Object problem,
   ) async {
+    if (!_pendingMessages.any((message) => message.key == entry.key)) {
+      return true;
+    }
     sendStatus = MessageSendStatus.unconfirmed;
     if (_retryableSend(problem)) {
       final delay = retryDelay(_outboxAttempt);
@@ -353,6 +382,9 @@ extension _ChatOutboxController on ChatController {
     if (scope == null || accessRemoved) return;
     final epoch = _outboxEpoch;
     try {
+      final removed = _pendingMessages
+          .where((entry) => entry.key == event.key)
+          .firstOrNull;
       final remaining = await outboxStore.change(
         scope,
         (saved) => _changedEntries(saved, event),
@@ -360,10 +392,17 @@ extension _ChatOutboxController on ChatController {
       if (!_outboxCurrent(scope, epoch)) return;
       _pendingMessages = remaining;
       outboxError = '';
+      if (event.discard && remaining.isEmpty) {
+        sendStatus = MessageSendStatus.idle;
+      }
       _outboxTimer?.cancel();
       _outboxTimer = null;
       _update();
       _wakeOutbox();
+      if (event.discard && removed != null) {
+        _activeFileUploads[event.key]?.cancel();
+        await _removeQueuedFiles(scope, removed.localFiles);
+      }
     } catch (_) {
       if (_outboxCurrent(scope, epoch)) {
         outboxError = 'storage';

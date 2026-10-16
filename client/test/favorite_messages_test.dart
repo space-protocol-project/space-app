@@ -160,6 +160,7 @@ void main() {
       openSession: (_, _) async => ChannelSession(),
       historyStore: store,
       outboxStore: MemoryChatOutbox(),
+      fileStore: EmptyQueuedFiles(),
       positions: MemoryPositions(),
     );
     controller.preview = Discovery(

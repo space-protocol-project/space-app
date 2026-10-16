@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart' as crypto;
 import 'package:file_selector/file_selector.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grpc/grpc.dart';
 
 import 'core.dart';
 import 'rpc_clients.dart';
@@ -12,10 +13,12 @@ const maxAttachmentSize = 20 * 1024 * 1024;
 const maxAttachments = 5;
 
 class PendingAttachment {
-  PendingAttachment(this.file, this.size) : key = newRequestKey();
+  PendingAttachment(this.file, this.size, {String? requestKey})
+    : key = requestKey ?? newRequestKey();
   final XFile file;
   final int size;
   final String key;
+  String get name => attachmentName(file);
   Asset? asset;
   String? hash;
 }
@@ -26,11 +29,13 @@ class AttachmentState {
     this.busy = false,
     this.progress = 0,
     this.error = '',
+    this.problem,
   });
   final List<PendingAttachment> files;
   final bool busy;
   final double progress;
   final String error;
+  final Object? problem;
 }
 
 sealed class AttachmentEvent {}
@@ -41,7 +46,9 @@ class AttachmentFilesAdded extends AttachmentEvent {
 }
 
 class AttachmentQueue extends Cubit<AttachmentState> {
-  AttachmentQueue() : super(const AttachmentState());
+  AttachmentQueue({List<PendingAttachment> files = const [], this.suspended})
+    : super(AttachmentState(files: List.unmodifiable(files)));
+  final bool Function()? suspended;
   Future<void> add(AttachmentFilesAdded event) async {
     if (state.busy || _adding) return;
     _adding = true;
@@ -67,7 +74,9 @@ class AttachmentQueue extends Cubit<AttachmentState> {
       );
     } catch (e) {
       if (!isClosed) {
-        emit(AttachmentState(files: state.files, error: e.toString()));
+        emit(
+          AttachmentState(files: state.files, error: e.toString(), problem: e),
+        );
       }
     } finally {
       _adding = false;
@@ -106,6 +115,9 @@ class AttachmentQueue extends Cubit<AttachmentState> {
 
   void _checkCancelled() {
     if (_cancelled || isClosed) throw StateError('Загрузка отменена');
+    if (suspended?.call() == true) {
+      throw const GrpcError.cancelled('Загрузка приостановлена');
+    }
   }
 
   void _progress(double value) {
@@ -142,7 +154,9 @@ class AttachmentQueue extends Cubit<AttachmentState> {
       return ids;
     } catch (e) {
       if (!isClosed) {
-        emit(AttachmentState(files: state.files, error: e.toString()));
+        emit(
+          AttachmentState(files: state.files, error: e.toString(), problem: e),
+        );
       }
       return null;
     }
@@ -154,7 +168,7 @@ class AttachmentQueue extends Cubit<AttachmentState> {
     PendingAttachment file,
     void Function(double) progress,
   ) async {
-    final bytes = await _readFile(file.file);
+    final bytes = await _readPending(file);
     if (bytes.length != file.size || bytes.length > maxAttachmentSize) {
       throw StateError('Размер выбранного файла изменился');
     }
@@ -167,12 +181,13 @@ class AttachmentQueue extends Cubit<AttachmentState> {
     final started = await session.beginUpload(
       BeginUploadRequest(
         channelId: channel,
-        name: file.file.name,
+        name: file.name,
         byteSize: Int64(bytes.length),
         sha256: hash.bytes,
         idempotencyKey: file.key,
       ),
     );
+    _verifyAsset(started.asset, channel, file, hash);
     if (started.chunkSize < 1 || started.chunkSize > 256 * 1024) {
       throw StateError('Некорректный размер части файла');
     }
@@ -198,11 +213,13 @@ class AttachmentQueue extends Cubit<AttachmentState> {
         progress(offset / bytes.length);
       }
       _checkCancelled();
-      final completed = await session.completeUpload(
-        CompleteUploadRequest(assetId: started.asset.id),
+      return await _completeFile(
+        session,
+        started.asset.id,
+        channel,
+        file,
+        hash,
       );
-      _checkCancelled();
-      return completed.asset;
     } catch (_) {
       if (_cancelled) {
         try {
@@ -215,23 +232,65 @@ class AttachmentQueue extends Cubit<AttachmentState> {
     }
   }
 
-  Future<Uint8List> _readFile(XFile file) async {
-    final result = BytesBuilder(copy: false);
-    await for (final chunk in file.openRead()) {
-      _checkCancelled();
-      if (result.length + chunk.length > maxAttachmentSize) {
-        throw StateError('Файл превышает 20 МиБ');
-      }
-      result.add(chunk);
-    }
-    return result.takeBytes();
-  }
-
   @override
   Future<void> close() {
     cancel();
     return super.close();
   }
+
+  Future<Uint8List> _readPending(PendingAttachment file) =>
+      readAttachmentBytes(file.file, cancelled: () => _cancelled || isClosed);
+
+  Future<Asset> _completeFile(
+    AttachmentSession session,
+    String id,
+    String channel,
+    PendingAttachment file,
+    crypto.Digest hash,
+  ) async {
+    final completed = await session.completeUpload(
+      CompleteUploadRequest(assetId: id),
+    );
+    _checkCancelled();
+    _verifyAsset(completed.asset, channel, file, hash);
+    if (completed.asset.id != id) throw StateError('Подтверждён другой файл');
+    return completed.asset;
+  }
+
+  void _verifyAsset(
+    Asset asset,
+    String channel,
+    PendingAttachment file,
+    crypto.Digest hash,
+  ) {
+    if (asset.id.isEmpty ||
+        asset.channelId != channel ||
+        asset.name != file.name ||
+        asset.byteSize.toInt() != file.size ||
+        asset.sha256.length != 32 ||
+        crypto.Digest(asset.sha256).toString() != hash.toString()) {
+      throw const FormatException('Ответ загрузки относится к другому файлу');
+    }
+  }
+}
+
+String attachmentName(XFile file) =>
+    file.name.replaceAll('\\', '/').split('/').last;
+
+Future<Uint8List> readAttachmentBytes(
+  XFile file, {
+  bool Function()? cancelled,
+}) async {
+  final result = BytesBuilder(copy: false);
+  await for (final chunk in file.openRead()) {
+    if (cancelled?.call() == true) throw StateError('Загрузка отменена');
+    if (result.length + chunk.length > maxAttachmentSize) {
+      throw StateError('Файл превышает 20 МиБ');
+    }
+    result.add(chunk);
+  }
+  if (result.isEmpty) throw StateError('Пустой файл');
+  return result.takeBytes();
 }
 
 Future<Uint8List> downloadAttachment(

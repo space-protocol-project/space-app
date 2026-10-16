@@ -61,6 +61,7 @@ class DelayedRemoval implements ChatOutboxStore {
 
 class DeliveryBackend {
   final messages = <String, Content>{};
+  final attachments = <String, List<Asset>>{};
   final requests = <(String, String, String)>[];
   bool offline = false, loseAck = false, badAck = false;
   Completer<void>? gate;
@@ -80,6 +81,7 @@ class DeliveryBackend {
         text: text,
         sequence: Int64(messages.length + 1),
         revision: Int64.ONE,
+        attachments: attachments[key],
       ),
     );
     if (responseFailure != null) throw responseFailure!;
@@ -152,6 +154,7 @@ void main() {
     final controller = ChatController(
       ChannelVault(),
       outboxStore: outbox ?? store(),
+      fileStore: EmptyQueuedFiles(),
       historyStore: history ?? MemoryHistory(),
       positions: MemoryPositions(),
       openSession: (_, _) async => session,

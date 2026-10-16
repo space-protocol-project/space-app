@@ -1,4 +1,10 @@
 import 'package:space_client/src/chat_outbox.dart';
+import 'package:space_client/src/queued_file_store.dart';
+
+class EmptyQueuedFiles extends QueuedFileStore {
+  @override
+  Future<void> clear(OutboxScope scope) async {}
+}
 
 class MemoryChatOutbox implements ChatOutboxStore {
   final data = <String, List<PendingMessage>>{};

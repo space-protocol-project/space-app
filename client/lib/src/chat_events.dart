@@ -54,9 +54,14 @@ final class ChatChannelSelected extends ChatEvent<void> {
 final class ChatChannelsRefreshed extends ChatEvent<void> {}
 
 final class ChatMessageSent extends ChatEvent<bool> {
-  ChatMessageSent(this.text, [this.attachments = const []]);
+  ChatMessageSent(
+    this.text, [
+    this.attachments = const [],
+    this.files = const [],
+  ]);
   final String text;
   final List<String> attachments;
+  final List<XFile> files;
 }
 
 final class ChatDeviceRevoked extends ChatEvent<void> {}

@@ -77,6 +77,7 @@ class OutboxPanel extends StatelessWidget {
   String _errorText(BuildContext context) => switch (state.outboxError) {
     'identity' => context.strings.outboxIdentityChanged,
     'full' => context.strings.outboxFull,
+    'files-full' => context.strings.outboxFileLimit,
     _ => context.strings.outboxUnavailable,
   };
 
@@ -114,9 +115,15 @@ class OutboxPanel extends StatelessWidget {
       overflow: TextOverflow.ellipsis,
     ),
     subtitle: Text(
-      entry.blocked
-          ? context.strings.outboxBlocked
-          : context.strings.outboxWaiting,
+      [
+        entry.blocked
+            ? context.strings.outboxBlocked
+            : context.strings.outboxWaiting,
+        if (entry.localFiles.isNotEmpty)
+          entry.localFiles.map((file) => file.name).join(', '),
+      ].join(' · '),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
     ),
     trailing: Row(
       mainAxisSize: MainAxisSize.min,

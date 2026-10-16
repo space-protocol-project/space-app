@@ -3094,6 +3094,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Очередь заполнена: до 100 сообщений и 1 МиБ. Дождитесь отправки или уберите ненужные сообщения.'**
   String get outboxFull;
+
+  /// No description provided for @outboxFileLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для ожидающих вложений доступно 200 МиБ на пространство и устройство. Дождитесь отправки или уберите ненужные сообщения.'**
+  String get outboxFileLimit;
 }
 
 class _AppLocalizationsDelegate

@@ -6,6 +6,7 @@ import '../channels_test.dart' show MemoryHistory, MemoryPositions;
 import '../chat_history_test.dart' show HistoryKeys;
 import '../support/rpc_fault_proxy.dart';
 import 'ordinary_sync.dart';
+import 'persistent_files.dart';
 
 import 'dart:io';
 import 'dart:async';
@@ -225,6 +226,7 @@ void main() {
         bytes,
       );
       await verifyOrdinarySync(discovery, ownerVault, owner);
+      await verifyPersistentFiles(discovery, ownerVault, restored, bytes);
     },
     skip: origin == null
         ? 'Нужен отдельный сервер: tools/check_attachments.ps1'

@@ -1700,4 +1700,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get outboxFull =>
       'The queue is full: up to 100 messages and 1 MiB. Wait for delivery or remove unwanted messages.';
+
+  @override
+  String get outboxFileLimit =>
+      'Pending attachments can use up to 200 MiB per space and device. Wait for delivery or remove unneeded messages.';
 }

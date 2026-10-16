@@ -632,5 +632,6 @@
   "outboxDiscardDescription": "The message may already be on the server. Removing it from the queue stops retries but does not delete it for participants.",
   "outboxFileMessage": "Message with attachments",
   "outboxIdentityChanged": "The device grant has changed. The previous queue is retained; automatic sending from the new device is blocked.",
-  "outboxFull": "The queue is full: up to 100 messages and 1 MiB. Wait for delivery or remove unwanted messages."
+  "outboxFull": "The queue is full: up to 100 messages and 1 MiB. Wait for delivery or remove unwanted messages.",
+  "outboxFileLimit": "Pending attachments can use up to 200 MiB per space and device. Wait for delivery or remove unneeded messages."
 }

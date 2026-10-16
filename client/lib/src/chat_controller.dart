@@ -8,6 +8,12 @@ import 'package:grpc/grpc.dart';
 import 'channel_positions.dart';
 import 'chat_history.dart';
 import 'chat_outbox.dart';
+import 'attachments.dart';
+import 'queued_file_store.dart';
+import 'queued_file.dart';
+
+import 'package:file_selector/file_selector.dart';
+
 import 'core.dart';
 import 'event_controller.dart';
 import 'generated/space/v1/space.pb.dart';
@@ -16,6 +22,7 @@ import 'local_failure.dart';
 part 'chat_events.dart';
 part 'chat_state.dart';
 part 'chat_outbox_controller.dart';
+part 'chat_outbox_files.dart';
 
 enum MessageSendStatus { idle, sending, unconfirmed, accepted, queued }
 
@@ -27,10 +34,12 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     ChannelPositionStore? positions,
     ChatHistoryStore? historyStore,
     ChatOutboxStore? outboxStore,
+    QueuedFileStore? fileStore,
     DateTime Function()? now,
   }) : positions = positions ?? LocalChannelPositions(),
        historyStore = historyStore ?? LocalChatHistory(),
        outboxStore = outboxStore ?? LocalChatOutbox(),
+       fileStore = fileStore ?? QueuedFileStore(),
        now = now ?? DateTime.now,
        super(const ChatState()) {
     on<ChatFrameReceived>(
@@ -95,8 +104,10 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       (event, _) => handleRequest(event, _refreshChannels),
     );
     on<ChatMessageSent>(
-      (event, _) =>
-          handleRequest(event, () => _send(event.text, event.attachments)),
+      (event, _) => handleRequest(
+        event,
+        () => _send(event.text, event.attachments, event.files),
+      ),
     );
     on<ChatReactionSet>(
       (event, _) => handleRequest(event, () => _setReaction(event)),
@@ -149,8 +160,17 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   );
   Future<void> selectChannel(String id) => sendRequest(ChatChannelSelected(id));
   Future<void> refreshChannels() => sendRequest(ChatChannelsRefreshed());
-  Future<bool> send(String text, {List<String> attachments = const []}) =>
-      sendRequest(ChatMessageSent(text, List.unmodifiable(attachments)));
+  Future<bool> send(
+    String text, {
+    List<String> attachments = const [],
+    List<XFile> files = const [],
+  }) => sendRequest(
+    ChatMessageSent(
+      text,
+      List.unmodifiable(attachments),
+      List.unmodifiable(files),
+    ),
+  );
   SpaceSession? get mlsSession =>
       _session is SpaceSession ? _session as SpaceSession : null;
   bool get encryptedChannel =>
@@ -161,9 +181,19 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       !encryptedChannel && attachmentsEnabled && _session is AttachmentSession
       ? _session as AttachmentSession
       : null;
-  bool get attachmentsEnabled =>
-      _session is! AttachmentPolicy ||
-      (_session as AttachmentPolicy).attachmentsEnabled;
+  bool get attachmentsEnabled => _session == null
+      ? _history?.attachmentsEnabled ?? true
+      : _session is! AttachmentPolicy ||
+            (_session as AttachmentPolicy).attachmentsEnabled;
+  bool get canAttachFiles =>
+      attachmentSession != null ||
+      _session == null &&
+          !accessRemoved &&
+          !encryptedChannel &&
+          attachmentsEnabled &&
+          _outboxScope != null &&
+          _outboxScope!.origin == knownOrigin;
+  bool get canQueueFiles => canQueue && canAttachFiles;
   bool get canReact =>
       connected && canWrite && !busy && _session is MessageReactions;
   Future<bool> setReaction(Content message, String emoji, bool active) =>
@@ -300,6 +330,8 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     _historyOrigin = origin;
     final saved = _history!;
     saved.title = spaceTitle;
+    saved.attachmentsEnabled =
+        session is AttachmentSession && attachmentsEnabled;
     saved.channels = channels
         .map((c) => Channel()..mergeFromProto3Json(c.toProto3Json()))
         .toList();
@@ -360,6 +392,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     if (origin.isNotEmpty) await historyStore.delete(origin);
     if (eraseOutbox && oldScope != null) {
       await outboxStore.change(oldScope, (_) => []);
+      await fileStore.clear(oldScope);
     }
   }
 
@@ -574,6 +607,8 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   }
 
   final ChatOutboxStore outboxStore;
+  final QueuedFileStore fileStore;
+  final _activeFileUploads = <String, AttachmentQueue>{};
   OutboxScope? _outboxScope;
   List<PendingMessage> _pendingMessages = const [];
   String outboxError = '';
@@ -1397,8 +1432,11 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     }
   }
 
-  Future<bool> _send(String text, List<String> attachments) =>
-      _enqueueMessage(text, attachments);
+  Future<bool> _send(
+    String text,
+    List<String> attachments,
+    List<XFile> files,
+  ) => _enqueueMessage(text, attachments, files);
 
   Future<void> _revoke() async {
     if (busy || _session == null) return;
@@ -1476,6 +1514,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     unawaited(_savePositions());
     _stopSubscription();
     unawaited(_session?.close());
+    await _finishOutbox();
     try {
       await _flushHistory().timeout(const Duration(seconds: 3));
     } on TimeoutException {

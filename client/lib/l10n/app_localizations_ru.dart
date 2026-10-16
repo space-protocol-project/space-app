@@ -1708,4 +1708,8 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get outboxFull =>
       'Очередь заполнена: до 100 сообщений и 1 МиБ. Дождитесь отправки или уберите ненужные сообщения.';
+
+  @override
+  String get outboxFileLimit =>
+      'Для ожидающих вложений доступно 200 МиБ на пространство и устройство. Дождитесь отправки или уберите ненужные сообщения.';
 }

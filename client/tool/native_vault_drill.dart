@@ -2,12 +2,16 @@
 // Production main.dart не содержит тестовых флагов или файлового fallback.
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:file_selector/file_selector.dart';
 
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/widgets.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/chat_history.dart';
 import 'package:space_client/src/chat_outbox.dart';
+import 'package:space_client/src/queued_file_store.dart';
 import 'package:space_client/src/generated/space/v1/space.pb.dart';
 import 'package:space_client/src/secure_vault.dart';
 
@@ -116,6 +120,19 @@ Future<void> main(List<String> args) async {
       if ((await LocalChatOutbox().read(scope)).isNotEmpty) {
         throw StateError('Тестовый слот очереди уже занят');
       }
+      final queuedFiles = await QueuedFileStore().stage(
+        scope,
+        'ordinary-pending',
+        [
+          XFile.fromData(
+            Uint8List.fromList(
+              utf8.encode('Файл переживает завершение процесса'),
+            ),
+            name: 'pending.txt',
+            path: 'pending.txt',
+          ),
+        ],
+      );
       await LocalChatOutbox().change(
         scope,
         (_) => [
@@ -125,6 +142,7 @@ Future<void> main(List<String> args) async {
             text: 'Неотправленное сообщение',
             createdAt: DateTime.now().millisecondsSinceEpoch,
             attachments: ['asset-pending'],
+            localFiles: queuedFiles,
           ),
         ],
       );
@@ -134,6 +152,7 @@ Future<void> main(List<String> args) async {
           'write': true,
           'favoriteWrite': true,
           'outboxWrite': true,
+          'filesWrite': true,
         }),
       );
     } else if (args[0] == 'reopen') {
@@ -172,12 +191,20 @@ Future<void> main(List<String> args) async {
           pending.single.attachments.single != 'asset-pending') {
         throw StateError('Очередь не сохранилась после завершения процесса');
       }
+      final file = await QueuedFileStore().read(
+        await outboxScope(record),
+        pending.single.localFiles.single,
+      );
+      if (utf8.decode(file) != 'Файл переживает завершение процесса') {
+        throw StateError('Копия файла не пережила завершение процесса');
+      }
       await report.writeAsString(
         jsonEncode({
           ...expected,
           'reopen': true,
           'favoriteReopen': true,
           'outboxReopen': true,
+          'filesReopen': true,
         }),
       );
     } else {
@@ -185,6 +212,7 @@ Future<void> main(List<String> args) async {
       if (record != null) {
         final scope = await outboxScope(record);
         await LocalChatOutbox().change(scope, (_) => []);
+        await QueuedFileStore().clear(scope);
         await const PlatformKeyStorage().delete(
           key: 'space.outbox.v1.${scope.id}',
         );
@@ -201,15 +229,16 @@ Future<void> main(List<String> args) async {
       if (await vault.load(origin) != null) {
         throw StateError('Тестовый слот не удалён');
       }
-      final expected =
-          jsonDecode(await report.readAsString()) as Map<String, dynamic>;
+      final expected = await report.exists()
+          ? jsonDecode(await report.readAsString()) as Map<String, dynamic>
+          : <String, dynamic>{};
       await report.writeAsString(jsonEncode({...expected, 'cleanup': true}));
     }
     exit(0);
-  } catch (_) {
+  } catch (error, trace) {
     // Приватные данные и содержимое vault в отчёт не попадают.
     await File('${args[2]}.error')
-        .writeAsString('Ошибка фазы ${args[0]} системного vault');
+        .writeAsString('Ошибка фазы ${args[0]}: ${error.runtimeType}\n$trace');
     exit(1);
   }
 }

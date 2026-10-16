@@ -1559,6 +1559,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get outboxFull => '队列已满：最多100条消息和1 MiB。请等待发送或移除不需要的消息。';
+
+  @override
+  String get outboxFileLimit => '每个空间和设备的待发送附件最多占用 200 MiB。请等待发送完成或移除不需要的消息。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1953,4 +1956,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get outboxFull => '队列已满：最多100条消息和1 MiB。请等待发送或移除不需要的消息。';
+
+  @override
+  String get outboxFileLimit => '每个空间和设备的待发送附件最多占用 200 MiB。请等待发送完成或移除不需要的消息。';
 }

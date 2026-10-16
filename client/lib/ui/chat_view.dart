@@ -260,19 +260,10 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     final restoreFocus = draftFocus.hasFocus;
     final target = widget.controller, startingScope = scope;
     final queue = attachmentQueue;
-    final session = target.attachmentSession;
     if (queue.state.busy || target.busy) return;
-    final ids = session == null || queue.state.files.isEmpty
-        ? <String>[]
-        : await queue.upload(session, target.channelId);
-    if (ids == null ||
-        !mounted ||
-        scope != startingScope ||
-        !identical(target, widget.controller)) {
-      return;
-    }
-    final sent = await target.send(text, attachments: ids);
-    if (sent && session != null) queue.clear();
+    final selected = queue.state.files.map((entry) => entry.file).toList();
+    final sent = await target.send(text, files: selected);
+    if (sent) queue.clear();
     if (!mounted) return;
     if (sent) _clearSentDraft(text, startingScope, target);
     if (restoreFocus) _restoreDraftFocus(startingScope, target);
@@ -667,10 +658,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     builder: (context, state) => DropTarget(
       enable:
           editing == null &&
-          state.connected &&
-          state.canWrite &&
+          state.canQueue &&
           !state.busy &&
-          widget.controller.attachmentSession != null,
+          widget.controller.canAttachFiles,
       onDragEntered: (_) => setState(() => draggingFiles = true),
       onDragExited: (_) => setState(() => draggingFiles = false),
       onDragDone: (details) {
@@ -825,7 +815,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
               ),
             ),
           ),
-        if (editing == null && widget.controller.attachmentSession != null)
+        if (editing == null && widget.controller.canAttachFiles)
           AttachmentComposer(
             queue: attachmentQueue,
             session: widget.controller.attachmentSession,
@@ -922,7 +912,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     return Row(
       key: const ValueKey('composer-actions'),
       children: [
-        if (editing == null && widget.controller.attachmentSession != null)
+        if (editing == null && widget.controller.canAttachFiles)
           AttachFileButton(queue: attachmentQueue, enabled: enabled),
         EmojiButton(controller: draft, enabled: enabled),
         const Spacer(),

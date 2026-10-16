@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -6,6 +5,8 @@ import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'secure_vault.dart';
+import 'outbox_lock.dart';
+import 'queued_file.dart';
 
 const maxPendingMessages = 100;
 const maxOutboxBytes = 1024 * 1024;
@@ -28,11 +29,18 @@ class PendingMessage {
     required this.text,
     required this.createdAt,
     List<String> attachments = const [],
+    List<QueuedFile> localFiles = const [],
+    List<String> uploadedFiles = const [],
     this.blocked = false,
-  }) : attachments = List.unmodifiable(attachments);
+  }) : attachments = List.unmodifiable(attachments),
+       localFiles = List.unmodifiable(localFiles),
+       uploadedFiles = List.unmodifiable(uploadedFiles);
   final String key, channelId, text;
   final int createdAt;
   final List<String> attachments;
+  final List<QueuedFile> localFiles;
+  final List<String> uploadedFiles;
+  List<String> get attachmentIds => [...attachments, ...uploadedFiles];
   final bool blocked;
 
   PendingMessage withBlocked(bool value) => PendingMessage(
@@ -41,7 +49,31 @@ class PendingMessage {
     text: text,
     createdAt: createdAt,
     attachments: attachments,
+    localFiles: localFiles,
+    uploadedFiles: uploadedFiles,
     blocked: value,
+  );
+
+  PendingMessage withFiles(List<QueuedFile> files) => PendingMessage(
+    key: key,
+    channelId: channelId,
+    text: text,
+    createdAt: createdAt,
+    attachments: attachments,
+    localFiles: files,
+    uploadedFiles: uploadedFiles,
+    blocked: blocked,
+  );
+
+  PendingMessage withUploaded(List<String> ids) => PendingMessage(
+    key: key,
+    channelId: channelId,
+    text: text,
+    createdAt: createdAt,
+    attachments: attachments,
+    localFiles: localFiles,
+    uploadedFiles: ids,
+    blocked: blocked,
   );
 
   Map<String, dynamic> toJson() => {
@@ -50,6 +82,8 @@ class PendingMessage {
     'text': text,
     'created': createdAt,
     'attachments': attachments,
+    'files': localFiles.map((file) => file.toJson()).toList(),
+    'uploaded': uploadedFiles,
     'blocked': blocked,
   };
 
@@ -60,6 +94,13 @@ class PendingMessage {
       text: value['text'] as String,
       createdAt: value['created'] as int,
       attachments: (value['attachments'] as List).cast<String>(),
+      localFiles: (value['files'] as List? ?? [])
+          .map(
+            (file) =>
+                QueuedFile.fromJson(Map<String, dynamic>.from(file as Map)),
+          )
+          .toList(),
+      uploadedFiles: (value['uploaded'] as List? ?? []).cast<String>(),
       blocked: value['blocked'] as bool,
     );
     result.validate();
@@ -75,13 +116,31 @@ class PendingMessage {
       throw const FormatException('Некорректная запись очереди');
     }
     if (utf8.encode(text).length > 4096 ||
-        attachments.length > 5 ||
-        (text.trim().isEmpty && attachments.isEmpty)) {
+        attachments.length + localFiles.length > 5 ||
+        (text.trim().isEmpty && attachments.isEmpty && localFiles.isEmpty)) {
       throw const FormatException('Некорректное сообщение очереди');
     }
-    if (attachments.any((id) => id.isEmpty || id.length > 128) ||
-        attachments.toSet().length != attachments.length) {
+    _validateFiles();
+  }
+
+  void _validateFiles() {
+    if (attachmentIds.any((id) => id.isEmpty || id.length > 128) ||
+        attachmentIds.toSet().length != attachmentIds.length ||
+        uploadedFiles.isNotEmpty && uploadedFiles.length != localFiles.length) {
       throw const FormatException('Некорректные вложения очереди');
+    }
+    if (localFiles.map((file) => file.id).toSet().length != localFiles.length ||
+        localFiles.map((file) => file.key).toSet().length !=
+            localFiles.length) {
+      throw const FormatException('Повторяющиеся файлы очереди');
+    }
+    for (var index = 0; index < localFiles.length; index++) {
+      final file = localFiles[index];
+      file.validate();
+      if (file.id != QueuedFile.slot(key, index) ||
+          file.key != '$key-file-$index') {
+        throw const FormatException('Файл относится к другому сообщению');
+      }
     }
   }
 }
@@ -104,7 +163,6 @@ class LocalChatOutbox implements ChatOutboxStore {
        directory = directory ?? getApplicationSupportDirectory;
   final SecureKeyStorage storage;
   final Future<Directory> Function() directory;
-  static final _operations = <String, Future<void>>{};
   String _key(OutboxScope scope) => 'space.outbox.v1.${scope.id}';
 
   Future<T> _locked<T>(OutboxScope scope, Future<T> Function() action) async {
@@ -112,23 +170,7 @@ class LocalChatOutbox implements ChatOutboxStore {
     final locks = await Directory('${root.path}/outbox-locks')
         .create(recursive: true);
     final path = '${locks.path}/${scope.id}.lock';
-    final previous = _operations[path] ?? Future<void>.value();
-    final done = Completer<void>();
-    _operations[path] = done.future;
-    await previous;
-    RandomAccessFile? file;
-    try {
-      file = await File(path).open(mode: FileMode.append);
-      await file.lock(FileLock.blockingExclusive);
-      return await action();
-    } finally {
-      try {
-        await file?.close();
-      } finally {
-        done.complete();
-        if (identical(_operations[path], done.future)) _operations.remove(path);
-      }
-    }
+    return OutboxLock.run(path, action);
   }
 
   Future<List<PendingMessage>> _read(OutboxScope scope) async {

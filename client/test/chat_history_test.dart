@@ -170,6 +170,7 @@ void main() {
         positions: MemoryPositions(),
         historyStore: store,
         outboxStore: MemoryChatOutbox(),
+        fileStore: EmptyQueuedFiles(),
         now: () => now,
       );
       controller.preview = Discovery(
