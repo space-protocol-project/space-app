@@ -10,6 +10,34 @@ import 'dart:io';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:grpc/grpc.dart';
 import 'package:space_client/src/core.dart';
+import 'package:space_client/src/rpc_clients.dart';
+
+Future<void> waitForPublicHome(Discovery server) async {
+  final connection = server.openConnection();
+  final deadline = DateTime.now().add(const Duration(seconds: 15));
+  try {
+    while (true) {
+      try {
+        final status = await AdminServiceClient(connection).getSetupStatus(
+          GetSetupStatusRequest(),
+          options: const RpcOptions(timeout: Duration(seconds: 2)),
+        );
+        if (!status.initialized) {
+          throw StateError('Публичный вход открыт до настройки владельца');
+        }
+        return;
+      } on GrpcError catch (error) {
+        if (error.code != StatusCode.unavailable ||
+            DateTime.now().isAfter(deadline)) {
+          rethrow;
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      }
+    }
+  } finally {
+    await connection.shutdown();
+  }
+}
 
 Future<void> expectAccessDenied(
   Future<void> Function() action,
@@ -176,8 +204,8 @@ Future<void> main(List<String> args) async {
           tlsFingerprint: fingerprint,
           connectOrigin: discovery.origin,
         );
+        await waitForPublicHome(remote);
         if (attempt == 0) {
-          await Future<void>.delayed(const Duration(seconds: 1));
           // Проверяем настоящий TLS handshake, а не только сравнение модели.
           try {
             await discover('https://127.0.0.1:18843', tlsFingerprint: '0' * 64);
