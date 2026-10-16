@@ -1,3 +1,11 @@
+import 'package:space_client/src/chat_controller.dart';
+import 'package:space_client/src/chat_outbox.dart';
+import 'package:space_client/src/rpc_connection.dart';
+
+import '../channels_test.dart' show MemoryHistory, MemoryPositions;
+import '../chat_history_test.dart' show HistoryKeys;
+import '../support/rpc_fault_proxy.dart';
+
 import 'dart:io';
 import 'dart:async';
 import 'dart:typed_data';
@@ -207,10 +215,115 @@ void main() {
             .assets,
         isEmpty,
       );
+      await verifyOrdinaryOutbox(
+        discovery,
+        ownerVault,
+        owner,
+        restored,
+        file,
+        bytes,
+      );
     },
     skip: origin == null
         ? 'Нужен отдельный сервер: tools/check_attachments.ps1'
         : false,
     timeout: const Timeout(Duration(minutes: 2)),
   );
+}
+
+class _LostCreateAck extends Discovery {
+  _LostCreateAck(Discovery source)
+    : super(
+        source.origin,
+        source.serverId,
+        source.publicKey,
+        connectOrigin: source.connectOrigin,
+        endpoint: source.endpoint,
+        tlsFingerprint: source.tlsFingerprint,
+        dialHost: source.dialHost,
+        announcement: source.announcement,
+      );
+  final keys = <String>[];
+  bool lose = true;
+  @override
+  RpcConnection openConnection({String setupCode = ''}) {
+    final proxy = RpcFaultProxy(super.openConnection(setupCode: setupCode));
+    proxy.beforeRequest = (request) {
+      if (request is CreateContentRequest) keys.add(request.idempotencyKey);
+    };
+    proxy.mutate = (method, response) {
+      if (lose && method == 'CreateContentRequest') {
+        throw const GrpcError.unavailable(
+          'Сервер сохранил сообщение; ответ потерян',
+        );
+      }
+      return response;
+    };
+    return proxy;
+  }
+}
+
+Future<void> verifyOrdinaryOutbox(
+  Discovery server,
+  IdentityVault vault,
+  SpaceSession uploader,
+  SpaceSession observer,
+  File file,
+  List<int> bytes,
+) async {
+  final root = await Directory.systemTemp.createTemp('space-live-outbox-');
+  final keys = HistoryKeys();
+  final remote = _LostCreateAck(server);
+  ChatController controller() => ChatController(
+    vault,
+    positions: MemoryPositions(),
+    historyStore: MemoryHistory(),
+    outboxStore: LocalChatOutbox(storage: keys, directory: () async => root),
+    retryDelay: (_) => const Duration(hours: 1),
+  );
+  final queue = AttachmentQueue();
+  ChatController? first, restarted;
+  try {
+    await queue.add(AttachmentFilesAdded([XFile(file.path)]));
+    final ids = await queue.upload(uploader, 'general');
+    expect(ids, hasLength(1));
+    first = controller()..preview = remote;
+    await first.connect();
+    const text = 'Постоянная очередь: потерянный ответ';
+    expect(await first.send(text, attachments: ids!), true);
+    await waitOutbox(() => first!.sendStatus == MessageSendStatus.unconfirmed);
+    expect(first.pendingMessages, hasLength(1));
+    final key = first.pendingMessages.single.key;
+    await first.close();
+    first = null;
+    remote.lose = false;
+    restarted = controller()..preview = remote;
+    await restarted.connect();
+    await waitOutbox(() => restarted!.pendingMessages.isEmpty);
+    expect(remote.keys, [key, key]);
+    final received = (await observer.messages())
+        .where((message) => message.text == text)
+        .toList();
+    expect(received, hasLength(1));
+    expect(received.single.attachments.single.id, ids.single);
+    expect(
+      await downloadAttachment(observer, received.single.attachments.single),
+      bytes,
+    );
+  } finally {
+    await first?.close();
+    await restarted?.close();
+    await queue.close();
+    await root.delete(recursive: true);
+  }
+}
+
+Future<void> waitOutbox(bool Function() condition) async {
+  final deadline = DateTime.now().add(const Duration(seconds: 15));
+  while (!condition()) {
+    if (DateTime.now().isAfter(deadline)) {
+      throw TimeoutException('Очередь не восстановилась');
+    }
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+  }
 }

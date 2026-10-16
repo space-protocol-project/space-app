@@ -949,7 +949,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get messageUnconfirmed =>
-      'Нет подтверждения сервера. Повторите отправку с тем же текстом.';
+      'Нет подтверждения сервера. Запрос сохранён в очереди.';
 
   @override
   String get messageAccepted => 'Принято сервером';
@@ -1670,4 +1670,42 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get emojiFlags => 'Флаги';
+
+  @override
+  String get messageQueued =>
+      'Сообщение сохранено в очереди на этом устройстве';
+
+  @override
+  String get outboxTitle => 'Очередь отправки';
+
+  @override
+  String get outboxWaiting => 'Ожидает отправки';
+
+  @override
+  String get outboxBlocked => 'Отправка остановлена';
+
+  @override
+  String get outboxUnavailable =>
+      'Не удалось прочитать или сохранить очередь. Текст остаётся в поле ввода.';
+
+  @override
+  String get outboxRetry => 'Повторить отправку';
+
+  @override
+  String get outboxDiscard => 'Убрать из очереди';
+
+  @override
+  String get outboxDiscardDescription =>
+      'Сообщение могло уже попасть на сервер. Удаление из очереди прекращает повторы, но не удаляет сообщение у участников.';
+
+  @override
+  String get outboxFileMessage => 'Сообщение с вложениями';
+
+  @override
+  String get outboxIdentityChanged =>
+      'Разрешение устройства изменилось. Прежняя очередь сохранена; автоматическая отправка от нового устройства запрещена.';
+
+  @override
+  String get outboxFull =>
+      'Очередь заполнена: до 100 сообщений и 1 МиБ. Дождитесь отправки или уберите ненужные сообщения.';
 }

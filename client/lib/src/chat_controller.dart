@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart' show VoidCallback, listEquals;
 import 'package:grpc/grpc.dart';
 
 import 'channel_positions.dart';
 import 'chat_history.dart';
+import 'chat_outbox.dart';
 import 'core.dart';
 import 'event_controller.dart';
 import 'generated/space/v1/space.pb.dart';
@@ -13,8 +15,9 @@ import 'local_failure.dart';
 
 part 'chat_events.dart';
 part 'chat_state.dart';
+part 'chat_outbox_controller.dart';
 
-enum MessageSendStatus { idle, sending, unconfirmed, accepted }
+enum MessageSendStatus { idle, sending, unconfirmed, accepted, queued }
 
 class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   ChatController(
@@ -23,9 +26,11 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     this.retryDelay = defaultRetryDelay,
     ChannelPositionStore? positions,
     ChatHistoryStore? historyStore,
+    ChatOutboxStore? outboxStore,
     DateTime Function()? now,
   }) : positions = positions ?? LocalChannelPositions(),
        historyStore = historyStore ?? LocalChatHistory(),
+       outboxStore = outboxStore ?? LocalChatOutbox(),
        now = now ?? DateTime.now,
        super(const ChatState()) {
     on<ChatFrameReceived>(
@@ -51,7 +56,8 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     );
     on<ChatHistoryFlushed>((event, _) => handleRequest(event, _flushHistory));
     on<ChatOfflineDataCleared>(
-      (event, _) => handleRequest(event, _clearOfflineData),
+      (event, _) =>
+          handleRequest(event, () => _clearOfflineData(eraseOutbox: true)),
     );
     on<ChatFavoriteToggled>(
       (event, _) => handleRequest(event, () => _toggleFavorite(event.message)),
@@ -101,6 +107,9 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     );
     on<ChatDeviceRevoked>((event, _) => handleRequest(event, _revoke));
     on<ChatDisconnected>((event, _) => handleRequest(event, _disconnect));
+    on<ChatOutboxChanged>(
+      (event, _) => handleRequest(event, () => _changePending(event)),
+    );
   }
 
   Future<void> restoreHistory(String origin) =>
@@ -248,6 +257,9 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       if (_disposed) return;
       _history = saved;
       _historyOrigin = origin;
+      await _loadOutbox(
+        OutboxScope(origin, saved.serverId, saved.principalId, saved.grantId),
+      );
       _readSequences.addAll(saved.readSequences);
       await historyStore.write(origin, saved);
       _update();
@@ -327,8 +339,11 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     }
   }
 
-  Future<void> _clearOfflineData() async {
+  Future<void> _clearOfflineData({bool eraseOutbox = false}) async {
     final origin = knownOrigin;
+    final oldScope = _outboxScope;
+    _stopOutbox();
+    _pendingMessages = const [];
     accessRemoved = true;
     _historyTimer?.cancel();
     _history = null;
@@ -343,6 +358,9 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     connected = false;
     _update();
     if (origin.isNotEmpty) await historyStore.delete(origin);
+    if (eraseOutbox && oldScope != null) {
+      await outboxStore.change(oldScope, (_) => []);
+    }
   }
 
   bool _accessDenied(Object problem) =>
@@ -555,6 +573,21 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     publishState();
   }
 
+  final ChatOutboxStore outboxStore;
+  OutboxScope? _outboxScope;
+  List<PendingMessage> _pendingMessages = const [];
+  String outboxError = '';
+  int _outboxEpoch = 0, _outboxAttempt = 0;
+  Future<void>? _outboxDrain;
+  bool _outboxWakeRequested = false;
+  Timer? _outboxTimer;
+  List<PendingMessage> get pendingMessages =>
+      accessRemoved ? const [] : List.unmodifiable(_pendingMessages);
+  bool get canQueue => _canQueueMessage;
+  Future<void> retryPending(String key) => sendRequest(ChatOutboxChanged(key));
+  Future<void> discardPending(String key) =>
+      sendRequest(ChatOutboxChanged(key, discard: true));
+
   final IdentityVault vault;
   Discovery? preview;
   LiveSession? _session;
@@ -758,6 +791,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       await _applyNickname(session, nickname);
       _sessionOrigin = server.origin.toString();
       _sessionServerId = server.serverId;
+      await _loadSessionOutbox(server, session);
       _invitationToken = '';
       _setupCode = '';
       await _loadPositions();
@@ -791,6 +825,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     } finally {
       busy = false;
       _update();
+      _wakeOutbox();
     }
   }
 
@@ -1220,6 +1255,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     if (!_acceptFrame(event.frame, event.channelId)) return false;
     reconnecting = false;
     _update();
+    _wakeOutbox();
     return true;
   }
 
@@ -1360,64 +1396,8 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     }
   }
 
-  Future<bool> _send(String text, List<String> attachments) async {
-    final session = _session;
-    if (busy ||
-        !connected ||
-        !canWrite ||
-        session == null ||
-        (text.trim().isEmpty && attachments.isEmpty)) {
-      return false;
-    }
-    final requestText = jsonEncode([text, attachments]);
-    if (_pendingText != requestText || _pendingKey.isEmpty) {
-      _pendingText = requestText;
-      _pendingKey = newRequestKey();
-    }
-    final startingChannel = channelId;
-    sendStatus = MessageSendStatus.sending;
-    busy = true;
-    error = '';
-    _update();
-    try {
-      final content = attachments.isEmpty
-          ? await session.send(text, _pendingKey)
-          : await (session as AttachmentSession).sendAttachments(
-              startingChannel,
-              text,
-              _pendingKey,
-              attachments,
-            );
-      if (!identical(_session, session) || channelId != startingChannel) {
-        sendStatus = MessageSendStatus.idle;
-        return false;
-      }
-      if (navigation != null && content.channelId != channelId) {
-        throw const LocalFailure(
-          LocalFailureCode.protocolInvalid,
-          'Ответ другого канала',
-        );
-      }
-      _mergeMessage(content);
-      _pendingKey = '';
-      _pendingText = '';
-      sendStatus = MessageSendStatus.accepted;
-      return true;
-    } catch (e) {
-      if (!identical(_session, session) || channelId != startingChannel) {
-        sendStatus = MessageSendStatus.idle;
-        return false;
-      }
-      sendStatus = MessageSendStatus.unconfirmed;
-      if (await _channelDenied(e)) return false;
-      error =
-          '${_explain(e, retry: true)} Повтор с тем же текстом использует прежний ключ запроса.';
-      return false;
-    } finally {
-      busy = false;
-      _update();
-    }
-  }
+  Future<bool> _send(String text, List<String> attachments) =>
+      _enqueueMessage(text, attachments);
 
   Future<void> _revoke() async {
     if (busy || _session == null) return;
@@ -1448,6 +1428,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
 
   Future<void> _disconnect() async {
     if (busy) return;
+    _stopOutbox();
     try {
       await _flushHistory().timeout(const Duration(seconds: 3));
     } catch (_) {}
@@ -1488,6 +1469,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   Future<void> close() async {
     _historyTimer?.cancel();
     _disposed = true;
+    _stopOutbox();
     _stopCatalog();
     _positionTimer?.cancel();
     unawaited(_savePositions());

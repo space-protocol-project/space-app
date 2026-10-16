@@ -1,3 +1,5 @@
+import 'support/chat_outbox.dart';
+
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -79,6 +81,7 @@ void main() {
         ChatController(
             ChannelVault(),
             positions: BrokenPositions(),
+            outboxStore: MemoryChatOutbox(),
             openSession: (_, _) async => session,
           )
           ..preview = Discovery(

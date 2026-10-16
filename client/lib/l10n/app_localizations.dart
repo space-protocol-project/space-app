@@ -1730,7 +1730,7 @@ abstract class AppLocalizations {
   /// No description provided for @messageUnconfirmed.
   ///
   /// In ru, this message translates to:
-  /// **'Нет подтверждения сервера. Повторите отправку с тем же текстом.'**
+  /// **'Нет подтверждения сервера. Запрос сохранён в очереди.'**
   String get messageUnconfirmed;
 
   /// No description provided for @messageAccepted.
@@ -3028,6 +3028,72 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Флаги'**
   String get emojiFlags;
+
+  /// No description provided for @messageQueued.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщение сохранено в очереди на этом устройстве'**
+  String get messageQueued;
+
+  /// No description provided for @outboxTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Очередь отправки'**
+  String get outboxTitle;
+
+  /// No description provided for @outboxWaiting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ожидает отправки'**
+  String get outboxWaiting;
+
+  /// No description provided for @outboxBlocked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправка остановлена'**
+  String get outboxBlocked;
+
+  /// No description provided for @outboxUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось прочитать или сохранить очередь. Текст остаётся в поле ввода.'**
+  String get outboxUnavailable;
+
+  /// No description provided for @outboxRetry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторить отправку'**
+  String get outboxRetry;
+
+  /// No description provided for @outboxDiscard.
+  ///
+  /// In ru, this message translates to:
+  /// **'Убрать из очереди'**
+  String get outboxDiscard;
+
+  /// No description provided for @outboxDiscardDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщение могло уже попасть на сервер. Удаление из очереди прекращает повторы, но не удаляет сообщение у участников.'**
+  String get outboxDiscardDescription;
+
+  /// No description provided for @outboxFileMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщение с вложениями'**
+  String get outboxFileMessage;
+
+  /// No description provided for @outboxIdentityChanged.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разрешение устройства изменилось. Прежняя очередь сохранена; автоматическая отправка от нового устройства запрещена.'**
+  String get outboxIdentityChanged;
+
+  /// No description provided for @outboxFull.
+  ///
+  /// In ru, this message translates to:
+  /// **'Очередь заполнена: до 100 сообщений и 1 МиБ. Дождитесь отправки или уберите ненужные сообщения.'**
+  String get outboxFull;
 }
 
 class _AppLocalizationsDelegate

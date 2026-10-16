@@ -1,3 +1,5 @@
+import 'support/chat_outbox.dart';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/chat_controller.dart';
 import 'package:space_client/src/chat_history.dart';
@@ -29,6 +31,7 @@ void main() {
               ChannelVault(),
               positions: MemoryPositions(),
               historyStore: history,
+              outboxStore: MemoryChatOutbox(),
               openSession: (_, _) async => session,
             )
             ..preview = Discovery(

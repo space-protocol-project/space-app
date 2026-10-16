@@ -1,3 +1,5 @@
+import 'support/chat_outbox.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -86,6 +88,7 @@ void main() {
               vault,
               positions: MemoryPositions(),
               historyStore: MemoryHistory(),
+              outboxStore: MemoryChatOutbox(),
               openSession: (_, _) async => sessions[origin]!,
             ),
             resume: (origin, controller) async {

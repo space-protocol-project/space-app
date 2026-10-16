@@ -1,3 +1,5 @@
+import 'support/chat_outbox.dart';
+
 import 'dart:async';
 
 import 'package:fixnum/fixnum.dart';
@@ -138,6 +140,7 @@ void main() {
       final restored = ChatController(
         RecordVault(savedRecord),
         historyStore: store,
+        outboxStore: MemoryChatOutbox(),
         now: () => now,
       );
       await restored.restoreHistory(origin);
@@ -146,6 +149,7 @@ void main() {
       final other = ChatController(
         RecordVault(record('other-grant')),
         historyStore: store,
+        outboxStore: MemoryChatOutbox(),
         now: () => now,
       );
       await other.restoreHistory(origin);
@@ -165,6 +169,7 @@ void main() {
         openSession: (_, _) async => session,
         positions: MemoryPositions(),
         historyStore: store,
+        outboxStore: MemoryChatOutbox(),
         now: () => now,
       );
       controller.preview = Discovery(
@@ -196,6 +201,7 @@ void main() {
         openSession: (_, _) async => session,
         positions: MemoryPositions(),
         historyStore: store,
+        outboxStore: MemoryChatOutbox(),
         now: () => now,
       );
       final discovery = Discovery(

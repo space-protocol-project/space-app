@@ -1,4 +1,7 @@
+import 'support/chat_outbox.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -70,6 +73,7 @@ void main() {
         ChannelVault(),
         positions: MemoryPositions(),
         historyStore: MemoryHistory(),
+        outboxStore: MemoryChatOutbox(),
         openSession: (_, _) async => opens++ == 0 ? hanging : next,
       );
       final discovery = Discovery(

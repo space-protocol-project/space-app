@@ -1,3 +1,5 @@
+import 'support/chat_outbox.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'dart:ui';
@@ -92,6 +94,7 @@ void main() {
         ChannelVault(),
         openSession: (_, _) async => ChannelSession(),
         historyStore: MemoryHistory(),
+        outboxStore: MemoryChatOutbox(),
         positions: MemoryPositions(),
       );
       controller.preview = Discovery(
@@ -156,6 +159,7 @@ void main() {
       ChannelVault(),
       openSession: (_, _) async => ChannelSession(),
       historyStore: store,
+      outboxStore: MemoryChatOutbox(),
       positions: MemoryPositions(),
     );
     controller.preview = Discovery(

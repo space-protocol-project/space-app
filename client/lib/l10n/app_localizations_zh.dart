@@ -855,7 +855,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sendingMessage => '正在发送…';
 
   @override
-  String get messageUnconfirmed => '未收到服务器确认。请重试相同文本。';
+  String get messageUnconfirmed => '未收到服务器确认，请求已保存在队列中。';
 
   @override
   String get messageAccepted => '服务器已接收';
@@ -1526,11 +1526,47 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get emojiFlags => '旗帜';
+
+  @override
+  String get messageQueued => '消息已保存在此设备的队列中';
+
+  @override
+  String get outboxTitle => '发送队列';
+
+  @override
+  String get outboxWaiting => '等待发送';
+
+  @override
+  String get outboxBlocked => '发送已停止';
+
+  @override
+  String get outboxUnavailable => '无法读取或保存队列。文本仍保留在输入框中。';
+
+  @override
+  String get outboxRetry => '重新发送';
+
+  @override
+  String get outboxDiscard => '从队列移除';
+
+  @override
+  String get outboxDiscardDescription => '消息可能已到达服务器。从队列移除只会停止重试，不会删除其他成员的消息。';
+
+  @override
+  String get outboxFileMessage => '含附件的消息';
+
+  @override
+  String get outboxIdentityChanged => '设备授权已更改。原队列已保留，禁止从新设备自动发送。';
+
+  @override
+  String get outboxFull => '队列已满：最多100条消息和1 MiB。请等待发送或移除不需要的消息。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
 class AppLocalizationsZhHans extends AppLocalizationsZh {
   AppLocalizationsZhHans() : super('zh_Hans');
+
+  @override
+  String get messageUnconfirmed => '未收到服务器确认，请求已保存在队列中。';
 
   @override
   String get updatesPackageUnavailable => '此系统暂无安装包。';
@@ -1884,4 +1920,37 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get emojiFlags => '旗帜';
+
+  @override
+  String get messageQueued => '消息已保存在此设备的队列中';
+
+  @override
+  String get outboxTitle => '发送队列';
+
+  @override
+  String get outboxWaiting => '等待发送';
+
+  @override
+  String get outboxBlocked => '发送已停止';
+
+  @override
+  String get outboxUnavailable => '无法读取或保存队列。文本仍保留在输入框中。';
+
+  @override
+  String get outboxRetry => '重新发送';
+
+  @override
+  String get outboxDiscard => '从队列移除';
+
+  @override
+  String get outboxDiscardDescription => '消息可能已到达服务器。从队列移除只会停止重试，不会删除其他成员的消息。';
+
+  @override
+  String get outboxFileMessage => '含附件的消息';
+
+  @override
+  String get outboxIdentityChanged => '设备授权已更改。原队列已保留，禁止从新设备自动发送。';
+
+  @override
+  String get outboxFull => '队列已满：最多100条消息和1 MiB。请等待发送或移除不需要的消息。';
 }

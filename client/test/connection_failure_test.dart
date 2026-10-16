@@ -1,3 +1,4 @@
+import 'support/chat_outbox.dart';
 import 'channels_test.dart' show MemoryHistory;
 
 import 'package:flutter/material.dart';
@@ -43,6 +44,7 @@ void main() {
           ChatController(
               Vault(),
               historyStore: MemoryHistory(),
+              outboxStore: MemoryChatOutbox(),
               openSession: (_, _) async {
                 calls++;
                 throw const GrpcError.permissionDenied('private-server-data');

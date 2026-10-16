@@ -19,6 +19,8 @@ class TestController extends ChatController {
   TestController() : super(TestVault());
   bool readOnly = false;
   @override
+  bool get canQueue => canWrite;
+  @override
   bool get canWrite => connected && !readOnly;
   void server(Discovery value) {
     preview = value;

@@ -353,7 +353,7 @@
   "failureCameraFrame": "无法读取画面。请检查摄像头或选择文件。",
   "failureCameraStopped": "摄像头已停止。请选择重新启动摄像头。",
   "sendingMessage": "正在发送…",
-  "messageUnconfirmed": "未收到服务器确认。请重试相同文本。",
+  "messageUnconfirmed": "未收到服务器确认，请求已保存在队列中。",
   "messageAccepted": "服务器已接收",
   "appSettings": "应用设置",
   "serverSettings": "服务器设置",
@@ -621,5 +621,16 @@
   "emojiActivities": "活动",
   "emojiObjects": "物品",
   "emojiSymbols": "符号",
-  "emojiFlags": "旗帜"
+  "emojiFlags": "旗帜",
+  "messageQueued": "消息已保存在此设备的队列中",
+  "outboxTitle": "发送队列",
+  "outboxWaiting": "等待发送",
+  "outboxBlocked": "发送已停止",
+  "outboxUnavailable": "无法读取或保存队列。文本仍保留在输入框中。",
+  "outboxRetry": "重新发送",
+  "outboxDiscard": "从队列移除",
+  "outboxDiscardDescription": "消息可能已到达服务器。从队列移除只会停止重试，不会删除其他成员的消息。",
+  "outboxFileMessage": "含附件的消息",
+  "outboxIdentityChanged": "设备授权已更改。原队列已保留，禁止从新设备自动发送。",
+  "outboxFull": "队列已满：最多100条消息和1 MiB。请等待发送或移除不需要的消息。"
 }

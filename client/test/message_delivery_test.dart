@@ -32,29 +32,39 @@ void main() {
       final sending = controller.stream.firstWhere(
         (state) => state.sendStatus == MessageSendStatus.sending,
       );
-      final failed = controller.send('Текст');
+      final queued = controller.send('Текст');
       await sending;
+      expect(await queued, true);
       expect(controller.sendStatus, MessageSendStatus.sending);
       expect(controller.messages, isEmpty);
+      final unconfirmed = controller.stream.firstWhere(
+        (state) => state.sendStatus == MessageSendStatus.unconfirmed,
+      );
       session.reply!.completeError(const GrpcError.unavailable());
-      expect(await failed, false);
-      expect(controller.sendStatus, MessageSendStatus.unconfirmed);
+      await unconfirmed;
+      final key = controller.pendingMessages.single.key;
       final retryStarted = controller.stream.firstWhere(
         (state) => state.sendStatus == MessageSendStatus.sending,
       );
-      final repeated = controller.send('Текст');
+      await controller.retryPending(key);
       await retryStarted;
+      final accepted = controller.stream.firstWhere(
+        (state) => state.sendStatus == MessageSendStatus.accepted,
+      );
       session.reply!.complete(
         Content(
           id: 'server-1',
           channelId: 'general',
           text: 'Текст',
           authorId: 'u_test',
+          sequence: Int64.ONE,
+          revision: Int64.ONE,
           createdAtUnixMs: Int64(1760000000123),
         ),
       );
-      expect(await repeated, true);
+      await accepted;
       expect(session.keys[0], session.keys[1]);
+      expect(controller.pendingMessages, isEmpty);
       expect(controller.sendStatus, MessageSendStatus.accepted);
       expect(controller.messages.single.createdAtUnixMs, Int64(1760000000123));
       await controller.disconnect();

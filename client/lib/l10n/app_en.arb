@@ -353,7 +353,7 @@
   "failureCameraFrame": "Could not read the frame. Check the camera or select a file.",
   "failureCameraStopped": "The camera was stopped. Select Restart camera.",
   "sendingMessage": "Sending…",
-  "messageUnconfirmed": "No server confirmation. Retry with the same text.",
+  "messageUnconfirmed": "No server confirmation. The request is saved in the queue.",
   "messageAccepted": "Accepted by server",
   "appSettings": "App settings",
   "serverSettings": "Server settings",
@@ -621,5 +621,16 @@
   "emojiActivities": "Activities",
   "emojiObjects": "Objects",
   "emojiSymbols": "Symbols",
-  "emojiFlags": "Flags"
+  "emojiFlags": "Flags",
+  "messageQueued": "Message saved in the queue on this device",
+  "outboxTitle": "Send queue",
+  "outboxWaiting": "Waiting to send",
+  "outboxBlocked": "Sending stopped",
+  "outboxUnavailable": "Could not read or save the queue. Your text remains in the input field.",
+  "outboxRetry": "Retry sending",
+  "outboxDiscard": "Remove from queue",
+  "outboxDiscardDescription": "The message may already be on the server. Removing it from the queue stops retries but does not delete it for participants.",
+  "outboxFileMessage": "Message with attachments",
+  "outboxIdentityChanged": "The device grant has changed. The previous queue is retained; automatic sending from the new device is blocked.",
+  "outboxFull": "The queue is full: up to 100 messages and 1 MiB. Wait for delivery or remove unwanted messages."
 }

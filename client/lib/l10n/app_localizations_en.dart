@@ -944,7 +944,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get messageUnconfirmed =>
-      'No server confirmation. Retry with the same text.';
+      'No server confirmation. The request is saved in the queue.';
 
   @override
   String get messageAccepted => 'Accepted by server';
@@ -1663,4 +1663,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emojiFlags => 'Flags';
+
+  @override
+  String get messageQueued => 'Message saved in the queue on this device';
+
+  @override
+  String get outboxTitle => 'Send queue';
+
+  @override
+  String get outboxWaiting => 'Waiting to send';
+
+  @override
+  String get outboxBlocked => 'Sending stopped';
+
+  @override
+  String get outboxUnavailable =>
+      'Could not read or save the queue. Your text remains in the input field.';
+
+  @override
+  String get outboxRetry => 'Retry sending';
+
+  @override
+  String get outboxDiscard => 'Remove from queue';
+
+  @override
+  String get outboxDiscardDescription =>
+      'The message may already be on the server. Removing it from the queue stops retries but does not delete it for participants.';
+
+  @override
+  String get outboxFileMessage => 'Message with attachments';
+
+  @override
+  String get outboxIdentityChanged =>
+      'The device grant has changed. The previous queue is retained; automatic sending from the new device is blocked.';
+
+  @override
+  String get outboxFull =>
+      'The queue is full: up to 100 messages and 1 MiB. Wait for delivery or remove unwanted messages.';
 }

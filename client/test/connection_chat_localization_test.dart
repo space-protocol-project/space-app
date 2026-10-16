@@ -17,6 +17,8 @@ class _Controller extends ChatController {
   _Controller() : super(_Vault());
   String inspectedAddress = '', token = '';
   @override
+  bool get canQueue => canWrite;
+  @override
   bool get canWrite => connected;
   @override
   Future<void> inspect(

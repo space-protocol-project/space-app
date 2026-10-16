@@ -29,6 +29,9 @@ final class ChatState {
     this.favorites = const {},
     this.unreadCounts = const {},
     this.sendStatus = MessageSendStatus.idle,
+    this.canQueue = false,
+    this.pendingMessages = const [],
+    this.outboxError = '',
   });
 
   factory ChatState.fromController(ChatController controller) {
@@ -74,6 +77,9 @@ final class ChatState {
           ch.id: controller.unreadCount(ch.id),
       }),
       sendStatus: controller.sendStatus,
+      canQueue: controller.canQueue,
+      pendingMessages: controller.pendingMessages,
+      outboxError: controller.outboxError,
     );
   }
 
@@ -104,6 +110,9 @@ final class ChatState {
   final Set<String> favorites;
   final Map<String, int> unreadCounts;
   final MessageSendStatus sendStatus;
+  final bool canQueue;
+  final String outboxError;
+  final List<PendingMessage> pendingMessages;
   bool isFavorite(Content message) =>
       favorites.contains('${message.channelId}/${message.id}');
   int unreadCount(String channelId) => unreadCounts[channelId] ?? 0;

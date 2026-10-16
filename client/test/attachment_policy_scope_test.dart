@@ -1,3 +1,5 @@
+import 'support/chat_outbox.dart';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/chat_controller.dart';
@@ -32,6 +34,7 @@ void main() {
           openSession: (_, _) async => session,
           positions: MemoryPositions(),
           historyStore: MemoryHistory(),
+          outboxStore: MemoryChatOutbox(),
         );
         controller.preview = Discovery(
           localOrigin('http://127.0.0.1:$port'),

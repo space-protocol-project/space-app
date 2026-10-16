@@ -1,4 +1,9 @@
+import 'package:fixnum/fixnum.dart';
+
+import 'support/chat_outbox.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -118,7 +123,14 @@ class ChannelSession
   Future<Content> send(String text, String key) async {
     requestKeys.add(key);
     if (failSend) throw const GrpcError.unavailable();
-    return Content(id: 'sent', channelId: selectedChannelId, text: text);
+    return Content(
+      id: 'sent',
+      channelId: selectedChannelId,
+      text: text,
+      authorId: principalId,
+      sequence: Int64.ONE,
+      revision: Int64.ONE,
+    );
   }
 
   @override
@@ -187,6 +199,7 @@ Future<ChatController> connected(
     openSession: (_, _) async => session,
     positions: positions,
     historyStore: MemoryHistory(),
+    outboxStore: MemoryChatOutbox(),
   );
   c.preview = Discovery(
     localOrigin('http://127.0.0.1:8080'),
@@ -208,6 +221,7 @@ void main() {
         openSession: (_, _) async => session,
         positions: MemoryPositions(),
         historyStore: MemoryHistory(),
+        outboxStore: MemoryChatOutbox(),
         retryDelay: (_) => const Duration(milliseconds: 5),
       );
       controller.preview = Discovery(
@@ -334,10 +348,13 @@ void main() {
     final c = await connected(session, positions);
     await c.send('Повтор');
     await c.send('Повтор');
-    expect(session.requestKeys[0], session.requestKeys[1]);
+    expect(c.pendingMessages.map((entry) => entry.key).toSet(), hasLength(2));
     await c.selectChannel('team');
     await c.send('Повтор');
-    expect(session.requestKeys[2], isNot(session.requestKeys[0]));
+    expect(
+      c.pendingMessages.where((entry) => entry.channelId == 'team'),
+      hasLength(1),
+    );
     session.streams['team']!.last.addError(const GrpcError.invalidArgument());
     await settle();
     expect(c.connected, false);

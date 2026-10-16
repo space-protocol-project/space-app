@@ -108,3 +108,9 @@ final class ChatReactionSet extends ChatEvent<bool> {
   final String emoji;
   final bool active;
 }
+
+final class ChatOutboxChanged extends ChatEvent<void> {
+  ChatOutboxChanged(this.key, {this.discard = false});
+  final String key;
+  final bool discard;
+}

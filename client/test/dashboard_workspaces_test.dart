@@ -1,3 +1,5 @@
+import 'support/chat_outbox.dart';
+
 import 'dart:io';
 import 'dart:async';
 import 'dart:ui' as ui;
@@ -66,6 +68,7 @@ void main() {
             vault,
             positions: MemoryPositions(),
             historyStore: MemoryHistory(),
+            outboxStore: MemoryChatOutbox(),
             openSession: (_, _) async => sessions[origin]!,
           ),
           resume: (origin, controller) async {

@@ -1,3 +1,5 @@
+import 'support/chat_outbox.dart';
+
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -71,6 +73,7 @@ void main() {
       ChannelVault(),
       openSession: (_, _) async => ChannelSession(),
       historyStore: MemoryHistory(),
+      outboxStore: MemoryChatOutbox(),
       positions: MemoryPositions(),
     );
     addTearDown(controller.close);

@@ -529,6 +529,15 @@ abstract interface class LiveSession {
   Future<void> close();
 }
 
+abstract interface class QueuedMessageSession {
+  Future<Content> sendQueued(
+    String channelId,
+    String text,
+    String key,
+    List<String> attachments,
+  );
+}
+
 abstract interface class MessageReactions {
   Future<Content> setReaction(Content message, String emoji, bool active);
 }
@@ -627,6 +636,7 @@ abstract interface class AttachmentSession {
 class SpaceSession
     implements
         LiveSession,
+        QueuedMessageSession,
         MessageChanges,
         MessageReactions,
         MemberProfile,
@@ -1583,6 +1593,25 @@ class SpaceSession
       options: _options,
     );
     return result.content;
+  }
+
+  @override
+  Future<Content> sendQueued(
+    String channelId,
+    String text,
+    String key,
+    List<String> attachments,
+  ) async {
+    final target = availableChannels
+        .where((entry) => entry.id == channelId)
+        .firstOrNull;
+    if (target == null ||
+        !target.permissions.write ||
+        target.archived ||
+        target.mlsGroupId.isNotEmpty) {
+      throw const GrpcError.permissionDenied('Отправка в канал недоступна');
+    }
+    return sendAttachments(channelId, text, key, attachments);
   }
 
   @override

@@ -1,3 +1,5 @@
+import 'support/chat_outbox.dart';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:space_client/src/chat_controller.dart';
@@ -41,6 +43,7 @@ void main() {
     ChatController create() => ChatController(
       RecordVault(record),
       historyStore: LocalChatHistory(storage: keys),
+      outboxStore: MemoryChatOutbox(),
       positions: positions,
       openSession: (_, _) async => SavedDeviceSession(record, identity),
     );

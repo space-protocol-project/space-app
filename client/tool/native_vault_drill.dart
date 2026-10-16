@@ -7,6 +7,7 @@ import 'package:cryptography/cryptography.dart';
 import 'package:flutter/widgets.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/chat_history.dart';
+import 'package:space_client/src/chat_outbox.dart';
 import 'package:space_client/src/generated/space/v1/space.pb.dart';
 import 'package:space_client/src/secure_vault.dart';
 
@@ -111,8 +112,29 @@ Future<void> main(List<String> args) async {
       ], DateTime.now());
       history.favorites.add('general/favorite-test');
       await LocalChatHistory().write(origin, history);
+      final scope = await outboxScope(record);
+      if ((await LocalChatOutbox().read(scope)).isNotEmpty) {
+        throw StateError('Тестовый слот очереди уже занят');
+      }
+      await LocalChatOutbox().change(
+        scope,
+        (_) => [
+          PendingMessage(
+            key: 'ordinary-pending',
+            channelId: 'general',
+            text: 'Неотправленное сообщение',
+            createdAt: DateTime.now().millisecondsSinceEpoch,
+            attachments: ['asset-pending'],
+          ),
+        ],
+      );
       await report.writeAsString(
-        jsonEncode({'digest': digest, 'write': true, 'favoriteWrite': true}),
+        jsonEncode({
+          'digest': digest,
+          'write': true,
+          'favoriteWrite': true,
+          'outboxWrite': true,
+        }),
       );
     } else if (args[0] == 'reopen') {
       final expected =
@@ -143,10 +165,30 @@ Future<void> main(List<String> args) async {
               'favorite-test') {
         throw StateError('Избранное не сохранилось после завершения процесса');
       }
+      final pending = await LocalChatOutbox().read(await outboxScope(record));
+      if (pending.length != 1 ||
+          pending.single.key != 'ordinary-pending' ||
+          pending.single.text != 'Неотправленное сообщение' ||
+          pending.single.attachments.single != 'asset-pending') {
+        throw StateError('Очередь не сохранилась после завершения процесса');
+      }
       await report.writeAsString(
-        jsonEncode({...expected, 'reopen': true, 'favoriteReopen': true}),
+        jsonEncode({
+          ...expected,
+          'reopen': true,
+          'favoriteReopen': true,
+          'outboxReopen': true,
+        }),
       );
     } else {
+      final record = await vault.load(origin);
+      if (record != null) {
+        final scope = await outboxScope(record);
+        await LocalChatOutbox().change(scope, (_) => []);
+        await const PlatformKeyStorage().delete(
+          key: 'space.outbox.v1.${scope.id}',
+        );
+      }
       await LocalChatHistory().delete(origin);
       await vault.clearRotation(origin);
       if (await vault.loadRotation(origin) != null ||
@@ -171,3 +213,10 @@ Future<void> main(List<String> args) async {
     exit(1);
   }
 }
+
+Future<OutboxScope> outboxScope(DeviceRecord record) async => OutboxScope(
+  record.origin,
+  record.serverId,
+  (await record.identity()).principalId,
+  record.grantId,
+);

@@ -1,3 +1,4 @@
+import 'outbox_panel.dart';
 import 'emoji_picker.dart';
 import 'message_reactions.dart';
 import 'message_context_menu.dart';
@@ -797,6 +798,11 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     );
   }
 
+  bool _showSendStatus(ChatState view) =>
+      view.sendStatus != MessageSendStatus.idle &&
+      view.outboxError.isEmpty &&
+      !view.pendingMessages.any((entry) => entry.channelId == view.channelId);
+
   Widget _composer(BuildContext context) {
     final view = widget.controller.state;
     final colors = Theme.of(context).colorScheme;
@@ -824,7 +830,8 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
             queue: attachmentQueue,
             session: widget.controller.attachmentSession,
           ),
-        if (view.sendStatus != MessageSendStatus.idle)
+        OutboxPanel(controller: widget.controller, state: view),
+        if (_showSendStatus(view))
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 6, 24, 0),
             child: Text(switch (view.sendStatus) {
@@ -833,6 +840,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                 context.strings.messageUnconfirmed,
               MessageSendStatus.accepted => context.strings.messageAccepted,
               MessageSendStatus.idle => '',
+              MessageSendStatus.queued => context.strings.messageQueued,
             }, style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant)),
           ),
         Flexible(child: _inputSurface(context)),
@@ -883,7 +891,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         key: const ValueKey('chat-draft'),
         focusNode: draftFocus,
         controller: draft,
-        enabled: view.connected && view.canWrite && !view.busy,
+        enabled: editing == null ? view.canQueue : view.canWrite && !view.busy,
         minLines: 3,
         maxLines: null,
         maxLength: editing == null ? 1024 : 4096,
@@ -908,7 +916,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
 
   Widget _composerButtons(BuildContext context) {
     final view = widget.controller.state;
-    final enabled = view.connected && view.canWrite && !view.busy;
+    final enabled = editing == null
+        ? view.canQueue
+        : view.canWrite && !view.busy;
     return Row(
       key: const ValueKey('composer-actions'),
       children: [

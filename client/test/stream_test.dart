@@ -1,3 +1,6 @@
+import 'package:fixnum/fixnum.dart';
+
+import 'support/chat_outbox.dart';
 import 'channels_test.dart' show MemoryHistory;
 
 import 'dart:async';
@@ -25,8 +28,14 @@ class Session implements LiveSession {
   @override
   Future<List<Content>> messages() async => [];
   @override
-  Future<Content> send(String text, String key) async =>
-      Content(id: key, text: text);
+  Future<Content> send(String text, String key) async => Content(
+    id: key,
+    channelId: 'general',
+    text: text,
+    authorId: principalId,
+    sequence: Int64.ONE,
+    revision: Int64.ONE,
+  );
   @override
   Future<void> login() async {
     logins++;
@@ -71,6 +80,7 @@ Future<ChatController> connect(Session session) async {
   final controller = ChatController(
     Vault(),
     historyStore: MemoryHistory(),
+    outboxStore: MemoryChatOutbox(),
     openSession: (_, _) async => session,
     retryDelay: (_) => const Duration(milliseconds: 5),
   );
