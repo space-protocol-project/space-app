@@ -6,6 +6,8 @@ import 'dart:io';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/widgets.dart';
 import 'package:space_client/src/core.dart';
+import 'package:space_client/src/chat_history.dart';
+import 'package:space_client/src/generated/space/v1/space.pb.dart';
 import 'package:space_client/src/secure_vault.dart';
 
 Future<void> main(List<String> args) async {
@@ -88,7 +90,30 @@ Future<void> main(List<String> args) async {
       final digest = url64(
         (await Sha256().hash(utf8.encode(jsonEncode(record.toJson())))).bytes,
       );
-      await report.writeAsString(jsonEncode({'digest': digest, 'write': true}));
+      final history =
+          ChatHistory(
+              serverId: record.serverId,
+              principalId: (await record.identity()).principalId,
+              grantId: record.grantId,
+            )
+            ..channels = [
+              Channel(
+                id: 'general',
+                permissions: ChannelPermissions(read: true),
+              ),
+            ];
+      history.merge([
+        Content(
+          id: 'favorite-test',
+          channelId: 'general',
+          text: 'Проверка избранного',
+        ),
+      ], DateTime.now());
+      history.favorites.add('general/favorite-test');
+      await LocalChatHistory().write(origin, history);
+      await report.writeAsString(
+        jsonEncode({'digest': digest, 'write': true, 'favoriteWrite': true}),
+      );
     } else if (args[0] == 'reopen') {
       final expected =
           jsonDecode(await report.readAsString()) as Map<String, dynamic>;
@@ -111,8 +136,18 @@ Future<void> main(List<String> args) async {
           jsonEncode(journal['next']) != jsonEncode(record.toJson())) {
         throw StateError('Журнал не сохранился после перезапуска');
       }
-      await report.writeAsString(jsonEncode({...expected, 'reopen': true}));
+      final history = await LocalChatHistory().read(origin);
+      if (history == null ||
+          !history.favorites.contains('general/favorite-test') ||
+          history.messages('general', DateTime.now()).single.id !=
+              'favorite-test') {
+        throw StateError('Избранное не сохранилось после завершения процесса');
+      }
+      await report.writeAsString(
+        jsonEncode({...expected, 'reopen': true, 'favoriteReopen': true}),
+      );
     } else {
+      await LocalChatHistory().delete(origin);
       await vault.clearRotation(origin);
       if (await vault.loadRotation(origin) != null ||
           await vault.load(origin) == null) {

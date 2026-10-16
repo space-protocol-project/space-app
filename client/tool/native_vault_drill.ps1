@@ -35,5 +35,5 @@ try {
     Invoke-VaultPhase 'cleanup'
 }
 $result = Get-Content -LiteralPath $vaultDrillReport -Raw | ConvertFrom-Json
-if (-not ($result.write -and $result.reopen -and $result.cleanup -and $result.crash -and $result.recovered)) { throw 'Неполный результат проверки vault' }
-Write-Output 'Windows secure storage: запись, новый процесс, неизменные рабочие ключи и очистка отдельного тестового слота — успешно.'
+if (-not ($result.write -and $result.reopen -and $result.favoriteWrite -and $result.favoriteReopen -and $result.cleanup -and $result.crash -and $result.recovered)) { throw 'Неполный результат проверки vault' }
+Write-Output 'Windows secure storage: ключи и избранные сообщения пережили завершение процесса; crash recovery и очистка отдельного слота — успешно.'
