@@ -150,6 +150,20 @@ void main() {
         );
         expect(session.serverIcon, isNotNull);
         await verifyUpgradedFiles(session);
+        await verifyUpgradedReaction(session, active: false);
+        await session.close();
+        session = null;
+        await updated.stop();
+        expect(updated.error, isEmpty);
+        final restarted = await updated.start('203.0.113.11');
+        expect(restarted, isNotNull, reason: updated.error);
+        final restartedDiscovery = await discover(
+          restarted!.localOrigin,
+          homeOrigin: restarted.publicOrigin,
+          tlsFingerprint: restarted.tlsFingerprint,
+        );
+        session = await SpaceSession.connect(restartedDiscovery, vault);
+        await verifyUpgradedReaction(session, active: true);
         await session.close();
         session = null;
         await updated.stop();
@@ -270,4 +284,22 @@ Future<void> verifyUpgradedFiles(SpaceSession session) async {
     ),
     true,
   );
+}
+
+Future<void> verifyUpgradedReaction(
+  SpaceSession session, {
+  required bool active,
+}) async {
+  final message = (await session.messages()).singleWhere(
+    (message) => message.text == 'Сообщение до обновления',
+  );
+  if (active) {
+    expect(message.reactions.single.emoji, '❤️');
+    expect(message.reactions.single.principalIds, [session.principalId]);
+    return;
+  }
+  expect(message.reactions, isEmpty);
+  final changed = await session.setReaction(message, '❤️', true);
+  expect(changed.reactions.single.emoji, '❤️');
+  expect(changed.reactions.single.principalIds, [session.principalId]);
 }
