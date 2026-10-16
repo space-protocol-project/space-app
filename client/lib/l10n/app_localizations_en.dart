@@ -1579,4 +1579,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String homeDiagObservedAt(String time) {
     return 'Last external connection: $time';
   }
+
+  @override
+  String get initialServerSetupTitle => 'First sign-in to your space';
+
+  @override
+  String get initialServerSetupHelp =>
+      'You will become the owner of this space and can appoint other members as administrators. This setup link can only be used once.';
 }

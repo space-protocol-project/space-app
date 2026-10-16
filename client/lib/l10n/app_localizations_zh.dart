@@ -1447,6 +1447,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String homeDiagObservedAt(String time) {
     return '最近的外部连接：$time';
   }
+
+  @override
+  String get initialServerSetupTitle => '首次登录空间';
+
+  @override
+  String get initialServerSetupHelp => '你将成为此空间的所有者，并可将其他成员设为管理员。此设置链接只能使用一次。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

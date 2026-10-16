@@ -21,6 +21,7 @@ final class ChatState {
     this.failureCode,
     this.failureRetry = false,
     this.invitationRole = '',
+    this.initialSetup = false,
     this.preview,
     this.serverIcon,
     this.messages = const [],
@@ -54,6 +55,7 @@ final class ChatState {
       failureCode: controller.failureCode,
       failureRetry: controller.failureRetry,
       invitationRole: controller.invitationRole,
+      initialSetup: controller._setupCode.isNotEmpty,
       preview: controller.preview,
       serverIcon: controller.serverIcon?.deepCopy()?..freeze(),
       messages: listEquals(messages, previous.messages)
@@ -94,6 +96,7 @@ final class ChatState {
       readThrough,
       invitationRole;
   final LocalFailureCode? failureCode;
+  final bool initialSetup;
   final Discovery? preview;
   final ServerIcon? serverIcon;
   final List<Content> messages;

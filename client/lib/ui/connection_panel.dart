@@ -214,6 +214,15 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
               ],
               Text(context.strings.firstTrustHelp),
               const SizedBox(height: 20),
+              if (view.initialSetup) ...[
+                Text(
+                  context.strings.initialServerSetupTitle,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(context.strings.initialServerSetupHelp),
+                const SizedBox(height: 20),
+              ],
               if (view.invitationRole.isNotEmpty)
                 Text(
                   view.invitationRole == 'reader'
@@ -224,10 +233,11 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
                 onPressed: view.busy || view.connected ? null : connect,
                 child: Text(context.strings.trustAndConnect),
               ),
-              PairingStartPanel(
-                controller: controller,
-                onConnected: widget.onConnected,
-              ),
+              if (!view.initialSetup)
+                PairingStartPanel(
+                  controller: controller,
+                  onConnected: widget.onConnected,
+                ),
             ],
             if (view.connected) ...[
               const SizedBox(height: 18),

@@ -49,8 +49,13 @@ class Discovery {
   final List<int> publicKey;
   final String? dialHost;
   final String tlsFingerprint;
-  RpcConnection openConnection() =>
-      RpcConnection.connect(connectOrigin, tlsFingerprint, dialHost: dialHost);
+  RpcConnection openConnection({String setupCode = ''}) =>
+      RpcConnection.connect(
+        connectOrigin,
+        tlsFingerprint,
+        dialHost: dialHost,
+        setupCode: setupCode,
+      );
   Future<String> fingerprint() async =>
       (await Sha256().hash(publicKey)).bytes
           .map((b) => b.toRadixString(16).padLeft(2, '0'))
@@ -64,12 +69,14 @@ class ConnectionInput {
     this.tlsFingerprint = '',
     this.endpoints = const [],
     this.serverId = '',
+    this.setupCode = '',
   ]);
   final String tlsFingerprint;
   final List<ServerEndpoint> endpoints;
   final String serverId;
   final Uri origin;
   final String invitationToken;
+  final String setupCode;
 }
 
 ConnectionInput parseConnectionInput(
@@ -88,6 +95,7 @@ ConnectionInput parseConnectionInput(
       throw const FormatException('Повторные поля приглашения');
     }
     _validateInvitationFields(fields);
+    _validateSetupLink(uri, fields, token);
     if (fields.containsKey('invite') &&
         token.isNotEmpty &&
         token != fields['invite']) {
@@ -107,20 +115,19 @@ ConnectionInput parseConnectionInput(
       localOrigin(uri.replace(path: '').removeFragment().toString()),
       token,
       fields['tls'] ?? '',
-      fields['addresses'] == null
-          ? const []
-          : parseEndpoints(
-              jsonDecode(
-                utf8.decode(
-                  base64Url.decode(base64Url.normalize(fields['addresses']!)),
-                ),
-              ),
-            ),
+      _invitedEndpoints(fields['addresses']),
       fields['server'] ?? '',
+      fields['setup'] ?? '',
     );
   }
   return ConnectionInput(localOrigin(address), token);
 }
+
+List<ServerEndpoint> _invitedEndpoints(String? encoded) => encoded == null
+    ? const []
+    : parseEndpoints(
+        jsonDecode(utf8.decode(base64Url.decode(base64Url.normalize(encoded)))),
+      );
 
 void _validateInvitationFields(Map<String, String> fields) {
   if ((fields.containsKey('addresses') &&
@@ -128,7 +135,8 @@ void _validateInvitationFields(Map<String, String> fields) {
       (fields.containsKey('server') &&
           !RegExp(r'^srv_[0-9a-f]{32}$').hasMatch(fields['server']!)) ||
       fields.keys.any(
-        (key) => !['invite', 'tls', 'server', 'addresses'].contains(key),
+        (key) =>
+            !['invite', 'tls', 'server', 'addresses', 'setup'].contains(key),
       ) ||
       (!fields.containsKey('invite') && !fields.containsKey('tls')) ||
       (fields.containsKey('tls') &&
@@ -139,6 +147,18 @@ void _validateInvitationFields(Map<String, String> fields) {
       LocalFailureCode.addressInvalid,
       'Некорректная ссылка приглашения',
     );
+  }
+}
+
+void _validateSetupLink(Uri uri, Map<String, String> fields, String token) {
+  if (!fields.containsKey('setup')) return;
+  if (uri.scheme != 'https' ||
+      !fields.containsKey('tls') ||
+      !fields.containsKey('server') ||
+      fields.containsKey('invite') ||
+      token.isNotEmpty ||
+      !RegExp(r'^setup_[A-Za-z0-9_-]{43}$').hasMatch(fields['setup']!)) {
+    throw const FormatException('Некорректная ссылка первичной настройки');
   }
 }
 
@@ -1121,7 +1141,8 @@ class SpaceSession
         'Сначала завершите сохранённую смену ключа для этого сервера',
       );
     }
-    final setupChannel = server.openConnection();
+    final remoteCode = server.connectOrigin.scheme == 'https' ? setupCode : '';
+    final setupChannel = server.openConnection(setupCode: remoteCode);
     bool automatic = false;
     try {
       automatic = (await AdminServiceClient(setupChannel).getSetupStatus(
@@ -1138,7 +1159,7 @@ class SpaceSession
       automatic,
       setupCode,
     );
-    final channel = server.openConnection();
+    final channel = server.openConnection(setupCode: remoteCode);
     final session = SpaceSession._(server, record, vault, channel);
     channel.recoverRouteWith(session._refreshNetworkRoute);
     try {
@@ -1197,6 +1218,7 @@ class SpaceSession
             options: session._options,
           )).initialized;
       await session.refreshChannels();
+      channel.clearSetupCode();
       return session;
     } catch (_) {
       await channel.shutdown();
@@ -1215,7 +1237,9 @@ class SpaceSession
     if (record != null) {
       checkTrust(server, record);
       await record.identity();
-      if (automatic && !record.administrative && record.rootSeed.isNotEmpty) {
+      if ((automatic || setupCode.isNotEmpty) &&
+          !record.administrative &&
+          record.rootSeed.isNotEmpty) {
         record = DeviceRecord(
           origin: record.origin,
           endpoint: record.endpoint,

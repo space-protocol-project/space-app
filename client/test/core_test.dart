@@ -6,6 +6,25 @@ import 'package:space_client/src/core.dart';
 import 'package:space_client/src/generated/space/v1/space.pb.dart';
 
 void main() {
+  test(
+    'Первичная настройка требует HTTPS, pin и server ID без приглашения',
+    () {
+      final fields =
+          'setup=setup_${'a' * 43}&tls=${'b' * 64}&server=srv_${'c' * 32}';
+      final input = parseConnectionInput('https://example.org:9443#$fields');
+      expect(input.setupCode, 'setup_${'a' * 43}');
+      expect(input.origin.fragment, isEmpty);
+      expect(input.invitationToken, isEmpty);
+      for (final link in [
+        'http://127.0.0.1#$fields',
+        'https://example.org#${fields.replaceAll('tls=${'b' * 64}&', '')}',
+        'https://example.org#$fields&invite=iv_${'d' * 43}',
+        'https://example.org#$fields&setup=setup_${'e' * 43}',
+      ]) {
+        expect(() => parseConnectionInput(link), throwsFormatException);
+      }
+    },
+  );
   test('Приглашение открывается в приложении без маршрута веб-панели', () {
     final code = 'iv_${'a' * 43}';
     for (final path in ['', '/']) {

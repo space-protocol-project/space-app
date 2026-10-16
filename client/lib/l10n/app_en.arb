@@ -595,5 +595,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "initialServerSetupTitle": "First sign-in to your space",
+  "initialServerSetupHelp": "You will become the owner of this space and can appoint other members as administrators. This setup link can only be used once."
 }

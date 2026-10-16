@@ -1586,4 +1586,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String homeDiagObservedAt(String time) {
     return 'Последнее внешнее подключение: $time';
   }
+
+  @override
+  String get initialServerSetupTitle => 'Первый вход в пространство';
+
+  @override
+  String get initialServerSetupHelp =>
+      'Вы станете владельцем этого пространства и сможете назначать других участников администраторами. Ссылка настройки одноразовая.';
 }

@@ -2872,6 +2872,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Последнее внешнее подключение: {time}'**
   String homeDiagObservedAt(String time);
+
+  /// No description provided for @initialServerSetupTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Первый вход в пространство'**
+  String get initialServerSetupTitle;
+
+  /// No description provided for @initialServerSetupHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вы станете владельцем этого пространства и сможете назначать других участников администраторами. Ссылка настройки одноразовая.'**
+  String get initialServerSetupHelp;
 }
 
 class _AppLocalizationsDelegate

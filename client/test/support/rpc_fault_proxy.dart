@@ -6,6 +6,8 @@ import 'package:space_client/src/rpc_connection.dart';
 class RpcFaultProxy implements RpcConnection {
   RpcFaultProxy(this.target);
   final RpcConnection target;
+  @override
+  void clearSetupCode() => target.clearSetupCode();
   GeneratedMessage Function(String method, GeneratedMessage response)? mutate;
   void Function(GeneratedMessage request)? beforeRequest;
   @override

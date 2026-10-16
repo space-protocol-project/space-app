@@ -44,6 +44,51 @@ Uint8List envelope(List<int> message, {int flags = 0}) {
 }
 
 void main() {
+  test(
+    'Секрет настройки передаётся только по pinned TLS и очищается',
+    () async {
+      expect(
+        () => RpcConnection.connect(
+          Uri.parse('http://127.0.0.1'),
+          '',
+          setupCode: 'secret',
+        ),
+        throwsArgumentError,
+      );
+      final server = await secureFixture();
+      final headers = <String?>[];
+      server.listen((request) async {
+        headers.add(request.headers.value('x-space-setup'));
+        await request.drain<void>();
+        request.response.headers.contentType = ContentType(
+          'application',
+          'proto',
+        );
+        request.response.add(GetSetupStatusResponse().writeToBuffer());
+        await request.response.close();
+      });
+      final origin = Uri.parse('https://127.0.0.1:${server.port}');
+      final connection = RpcConnection.connect(
+        origin,
+        fixtureFingerprint(),
+        setupCode: 'secret',
+      );
+      try {
+        final client = AdminServiceClient(connection);
+        await client.getSetupStatus(GetSetupStatusRequest());
+        expect(
+          () => connection.replaceRoute(origin, fixtureFingerprint()),
+          throwsStateError,
+        );
+        connection.clearSetupCode();
+        await client.getSetupStatus(GetSetupStatusRequest());
+        expect(headers, ['secret', null]);
+      } finally {
+        await connection.shutdown();
+        await server.close(force: true);
+      }
+    },
+  );
   test('Смена адреса не сбрасывает общий бюджет подписок', () async {
     var requests = 0;
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);

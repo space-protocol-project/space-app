@@ -26,8 +26,16 @@ class RpcConnection {
     String fingerprint, {
     connect.Codec? codec,
     String? dialHost,
+    String setupCode = '',
   }) : _codec = codec ?? const ProtoCodec(),
+       _setupCode = setupCode,
        _http = pinnedRpcClient(origin, fingerprint, dialHost: dialHost) {
+    if (setupCode.isNotEmpty &&
+        (origin.scheme != 'https' || fingerprint.isEmpty)) {
+      throw ArgumentError(
+        'Настройка требует HTTPS с закреплённым сертификатом',
+      );
+    }
     _client = connect.Client(
       protocol.Transport(
         baseUrl: origin.toString(),
@@ -37,6 +45,8 @@ class RpcConnection {
     );
   }
   final connect.Codec _codec;
+  String _setupCode;
+  void clearSetupCode() => _setupCode = '';
   HttpClient _http;
   final _budget = RpcSubscriptionBudget();
   Future<void> Function()? _routeRecovery;
@@ -73,6 +83,9 @@ class RpcConnection {
 
   void replaceRoute(Uri origin, String fingerprint, {String? dialHost}) {
     if (_closed) throw StateError('RPC-соединение закрыто');
+    if (_setupCode.isNotEmpty) {
+      throw StateError('Смена адреса во время первичной настройки запрещена');
+    }
     _http.close(force: true);
     _http = pinnedRpcClient(origin, fingerprint, dialHost: dialHost);
     _client = connect.Client(
@@ -158,6 +171,13 @@ class RpcConnection {
   }
 
   RpcCall _begin(RpcOptions? options, Duration defaultTimeout) {
+    if (_setupCode.isNotEmpty) {
+      options = RpcOptions(
+        timeout: options?.timeout,
+        onUnauthenticated: options?.onUnauthenticated,
+        metadata: {...?options?.metadata, 'x-space-setup': _setupCode},
+      );
+    }
     final call = RpcCall(options, defaultTimeout);
     _active.add(call);
     return call;
@@ -171,6 +191,7 @@ class RpcConnection {
   Future<void> shutdown() => terminate();
   Future<void> terminate() async {
     _closed = true;
+    clearSetupCode();
     for (final call in _active.toList()) {
       _finish(call);
     }

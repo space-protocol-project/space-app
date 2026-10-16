@@ -557,6 +557,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   }
 
   String _invitationToken = '', invitationRole = '';
+  String _setupCode = '';
   bool get canWrite =>
       connected &&
       !reconnecting &&
@@ -640,6 +641,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     error = '';
     preview = null;
     _invitationToken = '';
+    _setupCode = '';
     invitationRole = '';
     _update();
     try {
@@ -664,6 +666,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
         invitationRole = result.role;
       }
       preview = server;
+      _setupCode = input.setupCode;
     } catch (e) {
       error = _explain(e);
     } finally {
@@ -701,7 +704,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
         server,
         restoredRecord,
         pairingId,
-        setupCode,
+        _connectionSetupCode(setupCode),
       );
       if (_disposed || accessRemoved) {
         await session.close();
@@ -712,6 +715,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       _sessionOrigin = server.origin.toString();
       _sessionServerId = server.serverId;
       _invitationToken = '';
+      _setupCode = '';
       await _loadPositions();
       final initial = await session.messages();
       if (_disposed || accessRemoved) {
@@ -798,6 +802,9 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
             setupCode: setupCode,
           );
   }
+
+  String _connectionSetupCode(String explicit) =>
+      explicit.isEmpty ? _setupCode : explicit;
 
   Future<void> _selectCachedChannel(String id) async {
     if (!_history!.channels.any((c) => c.id == id && c.permissions.read)) {

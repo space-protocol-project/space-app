@@ -595,5 +595,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "initialServerSetupTitle": "首次登录空间",
+  "initialServerSetupHelp": "你将成为此空间的所有者，并可将其他成员设为管理员。此设置链接只能使用一次。"
 }
