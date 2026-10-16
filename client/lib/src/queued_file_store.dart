@@ -13,6 +13,8 @@ import 'outbox_lock.dart';
 import 'queued_file.dart';
 import 'secure_vault.dart';
 
+part 'queued_file_transfer.dart';
+
 const maxQueuedFileBytes = 200 * 1024 * 1024;
 
 class FileQueueFull extends OutboxFull {

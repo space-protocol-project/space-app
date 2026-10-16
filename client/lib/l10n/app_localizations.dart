@@ -3100,6 +3100,36 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Для ожидающих вложений доступно 200 МиБ на пространство и устройство. Дождитесь отправки или уберите ненужные сообщения.'**
   String get outboxFileLimit;
+
+  /// No description provided for @outboxRecover.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановить прежнюю очередь'**
+  String get outboxRecover;
+
+  /// No description provided for @outboxRecoverDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эти сообщения остались на этом компьютере под прежним разрешением устройства. Проверьте их перед переносом. Ключи запросов сохраняются, уже принятые сообщения не дублируются.'**
+  String get outboxRecoverDescription;
+
+  /// No description provided for @outboxRecoverTrust.
+  ///
+  /// In ru, this message translates to:
+  /// **'Я доверяю текущему устройству и разрешаю отправить эти сообщения от моего имени.'**
+  String get outboxRecoverTrust;
+
+  /// No description provided for @outboxRecoverSend.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перенести и отправить'**
+  String get outboxRecoverSend;
+
+  /// No description provided for @outboxRecoverFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось завершить перенос. Очередь сохранена; проверьте подключение и повторите.'**
+  String get outboxRecoverFailed;
 }
 
 class _AppLocalizationsDelegate

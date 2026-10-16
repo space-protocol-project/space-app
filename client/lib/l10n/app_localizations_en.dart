@@ -1704,4 +1704,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get outboxFileLimit =>
       'Pending attachments can use up to 200 MiB per space and device. Wait for delivery or remove unneeded messages.';
+
+  @override
+  String get outboxRecover => 'Recover previous queue';
+
+  @override
+  String get outboxRecoverDescription =>
+      'These messages remain on this computer under a previous device grant. Review them before recovery. Request keys are preserved, so accepted messages are not duplicated.';
+
+  @override
+  String get outboxRecoverTrust =>
+      'I trust the current device and allow it to send these messages on my behalf.';
+
+  @override
+  String get outboxRecoverSend => 'Recover and send';
+
+  @override
+  String get outboxRecoverFailed =>
+      'Recovery could not be completed. The queue is preserved; check your connection and retry.';
 }

@@ -8,8 +8,16 @@ import 'secure_vault.dart';
 import 'outbox_lock.dart';
 import 'queued_file.dart';
 
+part 'chat_outbox_sources.dart';
+
 const maxPendingMessages = 100;
 const maxOutboxBytes = 1024 * 1024;
+
+String outboxSnapshot(List<PendingMessage> entries) => sha256
+    .convert(
+      utf8.encode(jsonEncode(entries.map((entry) => entry.toJson()).toList())),
+    )
+    .toString();
 
 class OutboxFull extends FormatException {
   const OutboxFull() : super('Очередь заполнена');
@@ -205,7 +213,11 @@ class LocalChatOutbox implements ChatOutboxStore {
 
   @override
   Future<List<PendingMessage>> read(OutboxScope scope) =>
-      _locked(scope, () => _read(scope));
+      _locked(scope, () async {
+        final entries = await _read(scope);
+        if (entries.isNotEmpty) await _rememberScope(scope);
+        return entries;
+      });
 
   @override
   Future<List<PendingMessage>> change(
@@ -224,6 +236,7 @@ class LocalChatOutbox implements ChatOutboxStore {
     }
     // Пустой документ тоже записывается атомарно: отсутствие подтверждения
     // записи оставляет прежние ключи для безопасного повтора.
+    if (entries.isNotEmpty) await _rememberScope(scope);
     await storage.write(key: _key(scope), value: encoded);
     return List.unmodifiable(entries);
   });

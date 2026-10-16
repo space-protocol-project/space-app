@@ -8,6 +8,7 @@ import 'package:space_client/src/attachments.dart';
 import 'package:space_client/src/chat_controller.dart';
 import 'package:space_client/src/chat_outbox.dart';
 import 'package:space_client/src/core.dart';
+import 'package:space_client/src/pairing.dart';
 import 'package:space_client/src/queued_file_store.dart';
 import 'package:space_client/src/rpc_clients.dart';
 import 'package:space_client/src/rpc_connection.dart';
@@ -15,6 +16,42 @@ import 'package:space_client/src/rpc_connection.dart';
 import '../channels_test.dart' show MemoryHistory, MemoryPositions;
 import '../chat_history_test.dart' show HistoryKeys;
 import '../support/rpc_fault_proxy.dart';
+
+class _ReplacementVault implements IdentityVault {
+  DeviceRecord? record;
+  @override
+  Future<DeviceRecord?> load(String origin) async => record;
+  @override
+  Future<void> save(DeviceRecord value) async => record = value;
+}
+
+Future<IdentityVault> _replaceDevice(
+  Discovery server,
+  SpaceSession owner,
+) async {
+  final pairing = await PendingPairing.start(server);
+  try {
+    await owner.preparePairing(pairing.request.pairing);
+    await pairing.poll();
+    await owner.approvePairing(pairing.request.pairing);
+    final record = await pairing.verifiedRecord(await pairing.poll());
+    final vault = _ReplacementVault();
+    final session = await SpaceSession.connect(
+      server,
+      vault,
+      restoredRecord: record,
+      pairingId: pairing.request.pairing.id,
+    );
+    pairing.claimed = true;
+    expect(session.principalId, owner.principalId);
+    expect(session.currentGrantId, isNot(owner.currentGrantId));
+    await session.close();
+    await owner.revoke();
+    return vault;
+  } finally {
+    await pairing.close();
+  }
+}
 
 class _FileFault extends Discovery {
   _FileFault(Discovery source)
@@ -76,6 +113,7 @@ Future<void> _wait(
 Future<void> verifyPersistentFiles(
   Discovery server,
   IdentityVault vault,
+  SpaceSession owner,
   SpaceSession observer,
   List<int> bytes,
 ) async {
@@ -85,9 +123,9 @@ Future<void> verifyPersistentFiles(
   final keys = HistoryKeys(), fileKeys = HistoryKeys();
   final remote = _FileFault(server);
   final controllers = <ChatController>[];
-  Future<ChatController> start() async {
+  Future<ChatController> start({IdentityVault? replacement}) async {
     final controller = ChatController(
-      vault,
+      replacement ?? vault,
       historyStore: MemoryHistory(),
       positions: MemoryPositions(),
       outboxStore: LocalChatOutbox(storage: keys, directory: () async => root),
@@ -138,7 +176,22 @@ Future<void> verifyPersistentFiles(
     expect(second.pendingMessages.single.uploadedFiles, hasLength(1));
     await second.close();
     remote.loseMessage = false;
-    final third = await start();
+    final replacement = await _replaceDevice(server, owner);
+    final third = await start(replacement: replacement);
+    expect(third.pendingMessages, isEmpty);
+    expect(remote.createKeys, [
+      pending.key,
+    ], reason: 'Новый grant не отправляет прежнюю очередь сам');
+    expect(
+      await third.recoverOutbox(
+        third.state.outboxSources.single,
+        third.outboxRecoveryTarget,
+        snapshot: outboxSnapshot(
+          await third.outboxStore.read(third.state.outboxSources.single),
+        ),
+      ),
+      true,
+    );
     await _wait(third, () => third.pendingMessages.isEmpty, 'Повтор сообщения');
     expect(remote.beginKeys, [
       pending.localFiles.single.key,

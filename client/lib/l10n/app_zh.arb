@@ -633,5 +633,10 @@
   "outboxFileMessage": "含附件的消息",
   "outboxIdentityChanged": "设备授权已更改。原队列已保留，禁止从新设备自动发送。",
   "outboxFull": "队列已满：最多100条消息和1 MiB。请等待发送或移除不需要的消息。",
-  "outboxFileLimit": "每个空间和设备的待发送附件最多占用 200 MiB。请等待发送完成或移除不需要的消息。"
+  "outboxFileLimit": "每个空间和设备的待发送附件最多占用 200 MiB。请等待发送完成或移除不需要的消息。",
+  "outboxRecover": "恢复以前的发送队列",
+  "outboxRecoverDescription": "这些消息仍保存在此计算机上，属于以前的设备授权。请先检查消息再恢复。请求密钥保持不变，已接收的消息不会重复。",
+  "outboxRecoverTrust": "我信任当前设备，并允许它以我的身份发送这些消息。",
+  "outboxRecoverSend": "恢复并发送",
+  "outboxRecoverFailed": "无法完成恢复。队列已保留，请检查连接后重试。"
 }

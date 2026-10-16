@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../l10n/strings.dart';
 import '../src/chat_controller.dart';
 import '../src/chat_outbox.dart';
+import 'outbox_recovery.dart';
 
 class OutboxPanel extends StatelessWidget {
   const OutboxPanel({super.key, required this.controller, required this.state});
@@ -15,7 +16,11 @@ class OutboxPanel extends StatelessWidget {
     final count = state.pendingMessages
         .where((entry) => entry.channelId == state.channelId)
         .length;
-    if (count == 0 && state.outboxError.isEmpty) return const SizedBox.shrink();
+    if (count == 0 &&
+        state.outboxError.isEmpty &&
+        state.outboxSources.isEmpty) {
+      return const SizedBox.shrink();
+    }
     final size = MediaQuery.sizeOf(context);
     final compact =
         size.width < 600 ||
@@ -59,7 +64,9 @@ class OutboxPanel extends StatelessWidget {
     final entries = state.pendingMessages
         .where((entry) => entry.channelId == state.channelId)
         .toList();
-    if (entries.isEmpty && state.outboxError.isEmpty) {
+    if (entries.isEmpty &&
+        state.outboxError.isEmpty &&
+        state.outboxSources.isEmpty) {
       return const SizedBox.shrink();
     }
     return Padding(
@@ -69,6 +76,13 @@ class OutboxPanel extends StatelessWidget {
         children: [
           if (state.outboxError.isNotEmpty) _storageError(context),
           if (entries.isNotEmpty) _messages(context, entries),
+          for (final source in state.outboxSources)
+            OutboxRecoveryButton(
+              controller: controller,
+              source: source,
+              target: state.outboxRecoveryTarget,
+              enabled: !state.busy,
+            ),
         ],
       ),
     );

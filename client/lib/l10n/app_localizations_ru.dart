@@ -1712,4 +1712,22 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get outboxFileLimit =>
       'Для ожидающих вложений доступно 200 МиБ на пространство и устройство. Дождитесь отправки или уберите ненужные сообщения.';
+
+  @override
+  String get outboxRecover => 'Восстановить прежнюю очередь';
+
+  @override
+  String get outboxRecoverDescription =>
+      'Эти сообщения остались на этом компьютере под прежним разрешением устройства. Проверьте их перед переносом. Ключи запросов сохраняются, уже принятые сообщения не дублируются.';
+
+  @override
+  String get outboxRecoverTrust =>
+      'Я доверяю текущему устройству и разрешаю отправить эти сообщения от моего имени.';
+
+  @override
+  String get outboxRecoverSend => 'Перенести и отправить';
+
+  @override
+  String get outboxRecoverFailed =>
+      'Не удалось завершить перенос. Очередь сохранена; проверьте подключение и повторите.';
 }

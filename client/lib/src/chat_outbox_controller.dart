@@ -91,11 +91,16 @@ extension _ChatOutboxController on ChatController {
     _stopOutbox();
     _outboxScope = scope;
     _pendingMessages = const [];
+    _outboxSources = const [];
     outboxError = '';
     final epoch = _outboxEpoch;
     try {
       final entries = await outboxStore.read(scope);
       if (_outboxCurrent(scope, epoch)) _pendingMessages = entries;
+      final sources = outboxStore is LocalChatOutbox
+          ? await (outboxStore as LocalChatOutbox).previousScopes(scope)
+          : <OutboxScope>[];
+      if (_outboxCurrent(scope, epoch)) _outboxSources = sources;
     } catch (_) {
       if (_outboxCurrent(scope, epoch)) outboxError = 'storage';
     }
@@ -168,7 +173,8 @@ extension _ChatOutboxController on ChatController {
   }
 
   void _wakeOutbox() {
-    if (_disposed ||
+    if (_outboxRecovering ||
+        _disposed ||
         !connected ||
         accessRemoved ||
         _session == null ||

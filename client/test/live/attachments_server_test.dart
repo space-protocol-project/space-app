@@ -226,7 +226,13 @@ void main() {
         bytes,
       );
       await verifyOrdinarySync(discovery, ownerVault, owner);
-      await verifyPersistentFiles(discovery, ownerVault, restored, bytes);
+      await verifyPersistentFiles(
+        discovery,
+        ownerVault,
+        owner,
+        restored,
+        bytes,
+      );
     },
     skip: origin == null
         ? 'Нужен отдельный сервер: tools/check_attachments.ps1'

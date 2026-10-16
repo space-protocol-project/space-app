@@ -633,5 +633,10 @@
   "outboxFileMessage": "Message with attachments",
   "outboxIdentityChanged": "The device grant has changed. The previous queue is retained; automatic sending from the new device is blocked.",
   "outboxFull": "The queue is full: up to 100 messages and 1 MiB. Wait for delivery or remove unwanted messages.",
-  "outboxFileLimit": "Pending attachments can use up to 200 MiB per space and device. Wait for delivery or remove unneeded messages."
+  "outboxFileLimit": "Pending attachments can use up to 200 MiB per space and device. Wait for delivery or remove unneeded messages.",
+  "outboxRecover": "Recover previous queue",
+  "outboxRecoverDescription": "These messages remain on this computer under a previous device grant. Review them before recovery. Request keys are preserved, so accepted messages are not duplicated.",
+  "outboxRecoverTrust": "I trust the current device and allow it to send these messages on my behalf.",
+  "outboxRecoverSend": "Recover and send",
+  "outboxRecoverFailed": "Recovery could not be completed. The queue is preserved; check your connection and retry."
 }

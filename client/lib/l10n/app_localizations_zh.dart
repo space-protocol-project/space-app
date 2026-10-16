@@ -1562,6 +1562,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get outboxFileLimit => '每个空间和设备的待发送附件最多占用 200 MiB。请等待发送完成或移除不需要的消息。';
+
+  @override
+  String get outboxRecover => '恢复以前的发送队列';
+
+  @override
+  String get outboxRecoverDescription =>
+      '这些消息仍保存在此计算机上，属于以前的设备授权。请先检查消息再恢复。请求密钥保持不变，已接收的消息不会重复。';
+
+  @override
+  String get outboxRecoverTrust => '我信任当前设备，并允许它以我的身份发送这些消息。';
+
+  @override
+  String get outboxRecoverSend => '恢复并发送';
+
+  @override
+  String get outboxRecoverFailed => '无法完成恢复。队列已保留，请检查连接后重试。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1959,4 +1975,20 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get outboxFileLimit => '每个空间和设备的待发送附件最多占用 200 MiB。请等待发送完成或移除不需要的消息。';
+
+  @override
+  String get outboxRecover => '恢复以前的发送队列';
+
+  @override
+  String get outboxRecoverDescription =>
+      '这些消息仍保存在此计算机上，属于以前的设备授权。请先检查消息再恢复。请求密钥保持不变，已接收的消息不会重复。';
+
+  @override
+  String get outboxRecoverTrust => '我信任当前设备，并允许它以我的身份发送这些消息。';
+
+  @override
+  String get outboxRecoverSend => '恢复并发送';
+
+  @override
+  String get outboxRecoverFailed => '无法完成恢复。队列已保留，请检查连接后重试。';
 }

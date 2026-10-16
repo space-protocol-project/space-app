@@ -32,6 +32,8 @@ final class ChatState {
     this.canQueue = false,
     this.pendingMessages = const [],
     this.outboxError = '',
+    this.outboxSources = const [],
+    this.outboxRecoveryTarget = '',
   });
 
   factory ChatState.fromController(ChatController controller) {
@@ -80,6 +82,8 @@ final class ChatState {
       canQueue: controller.canQueue,
       pendingMessages: controller.pendingMessages,
       outboxError: controller.outboxError,
+      outboxSources: controller.outboxSources,
+      outboxRecoveryTarget: controller.outboxRecoveryTarget,
     );
   }
 
@@ -112,6 +116,8 @@ final class ChatState {
   final MessageSendStatus sendStatus;
   final bool canQueue;
   final String outboxError;
+  final List<OutboxScope> outboxSources;
+  final String outboxRecoveryTarget;
   final List<PendingMessage> pendingMessages;
   bool isFavorite(Content message) =>
       favorites.contains('${message.channelId}/${message.id}');

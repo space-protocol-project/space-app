@@ -119,3 +119,10 @@ final class ChatOutboxChanged extends ChatEvent<void> {
   final String key;
   final bool discard;
 }
+
+final class ChatOutboxRecovered extends ChatEvent<bool> {
+  ChatOutboxRecovered(this.source, this.target, this.snapshot);
+  final OutboxScope source;
+  final String target;
+  final String snapshot;
+}

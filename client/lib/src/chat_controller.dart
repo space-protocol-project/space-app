@@ -23,6 +23,7 @@ part 'chat_events.dart';
 part 'chat_state.dart';
 part 'chat_outbox_controller.dart';
 part 'chat_outbox_files.dart';
+part 'chat_outbox_recovery.dart';
 
 enum MessageSendStatus { idle, sending, unconfirmed, accepted, queued }
 
@@ -120,6 +121,9 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     on<ChatDisconnected>((event, _) => handleRequest(event, _disconnect));
     on<ChatOutboxChanged>(
       (event, _) => handleRequest(event, () => _changePending(event)),
+    );
+    on<ChatOutboxRecovered>(
+      (event, _) => handleRequest(event, () => _recoverOutbox(event)),
     );
   }
 
@@ -277,6 +281,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       final saved = await historyStore.read(origin);
       if (saved == null || _disposed) return;
       final record = await vault.load(origin);
+      await _rememberPreviousQueue(origin, saved, record);
       if (record == null ||
           record.serverId != saved.serverId ||
           record.grantId != saved.grantId ||
@@ -611,6 +616,17 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   final _activeFileUploads = <String, AttachmentQueue>{};
   OutboxScope? _outboxScope;
   List<PendingMessage> _pendingMessages = const [];
+  List<OutboxScope> _outboxSources = const [];
+  bool _outboxRecovering = false;
+  List<OutboxScope> get outboxSources => connected && !accessRemoved
+      ? List.unmodifiable(_outboxSources)
+      : const [];
+  String get outboxRecoveryTarget => _outboxScope?.id ?? '';
+  Future<bool> recoverOutbox(
+    OutboxScope source,
+    String target, {
+    required String snapshot,
+  }) => sendRequest(ChatOutboxRecovered(source, target, snapshot));
   String outboxError = '';
   int _outboxEpoch = 0, _outboxAttempt = 0;
   Future<void>? _outboxDrain;
