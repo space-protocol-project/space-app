@@ -5,7 +5,7 @@
 Отдельные Go и PostgreSQL не нужны. Участники могут пользоваться Android.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.3.3/packaging/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.3.5/packaging/install.sh | sh
 ```
 
 Установщик скачивает последний runtime, проверяет SHA-256 и запускает сервер.
@@ -13,7 +13,7 @@ curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server
 другой внешний порт, передайте адрес явно:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.3.3/packaging/install.sh | sh -s -- -address https://space.example.org:9443 -listen 0.0.0.0:9443
+curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.3.5/packaging/install.sh | sh -s -- -address https://space.example.org:9443 -listen 0.0.0.0:9443
 ```
 
 1. Разрешите входящий TCP-порт в файрволе сервера и в панели провайдера.
@@ -34,11 +34,11 @@ curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server
 
 Данные: `~/.local/share/space-server/home/data`; сеть: `home/config.json`.
 Runtime хранится отдельно в `runtimes/<версия>`. `SPACE_HOME` меняет общий каталог,
-`SPACE_VERSION=v0.3.3` закрепляет версию скачивания. Каталоги старых runtime
+`SPACE_VERSION=v0.3.5` закрепляет версию скачивания. Каталоги старых runtime
 установщик не удаляет. Для последующих запусков без скачивания используйте:
 
 ```sh
-~/.local/share/space-server/runtimes/v0.3.3/space-server start -data ~/.local/share/space-server/home
+~/.local/share/space-server/runtimes/v0.3.5/space-server start -data ~/.local/share/space-server/home
 ```
 
 При существующей конфигурации сервер использует сохранённые адреса. Их можно
