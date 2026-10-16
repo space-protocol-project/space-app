@@ -30,6 +30,9 @@ String diagnosticText(BuildContext context, String code) {
     'wan_public' => strings.homeDiagWANPublic,
     'external_unverified' => strings.homeDiagExternal,
     'external_observed' => strings.homeDiagObserved,
+    'router_mapping_ok' => strings.homeDiagMappingOk,
+    'router_mapping_failed' => strings.homeDiagMappingFailed,
+    'automatic_ip_failed' => strings.homeDiagAutomaticIPFailed,
     'budget_exhausted' => strings.homeDiagBudget,
     _ => strings.homeDiagUnknown,
   };

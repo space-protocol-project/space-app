@@ -55,8 +55,11 @@ final class HomeNetworkSaved extends HomeEvent<bool> {
     List<ServerEndpoint> endpoints,
     this.listenHost,
     this.listenPort,
+    this.autoPortMapping,
+    this.autoPublicIP,
   ) : endpoints = List.unmodifiable(endpoints);
   final List<ServerEndpoint> endpoints;
   final String listenHost;
   final int listenPort;
+  final bool autoPortMapping, autoPublicIP;
 }

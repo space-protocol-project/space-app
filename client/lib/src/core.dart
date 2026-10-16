@@ -874,6 +874,7 @@ class SpaceSession
               'Heartbeat каталога содержит данные',
             );
           }
+          await _pollNetworkRoute();
           continue;
         }
         if (!['owner', 'admin', 'member', 'reader'].contains(frame.role) ||
@@ -900,6 +901,8 @@ class SpaceSession
 
   int _expiresAt = 0;
   Future<void>? _loginTask;
+  Future<void>? _networkRouteTask;
+  DateTime? _networkRouteChecked;
   @override
   String principalId = '';
   RpcOptions get _options => RpcOptions(
@@ -1281,7 +1284,26 @@ class SpaceSession
   @override
   Future<void> login() =>
       _loginTask ??= _login().whenComplete(() => _loginTask = null);
-  Future<void> _refreshNetworkRoute() async {
+  Future<void> _refreshNetworkRoute() => _networkRouteTask ??=
+      _readNetworkRoute().whenComplete(() => _networkRouteTask = null);
+
+  Future<void> _pollNetworkRoute() async {
+    final now = DateTime.now();
+    if (_networkRouteChecked != null &&
+        now.difference(_networkRouteChecked!) < const Duration(seconds: 45)) {
+      return;
+    }
+    _networkRouteChecked = now;
+    try {
+      await _refreshNetworkRoute();
+    } on SocketException {
+      /* Сохраняем рабочее подключение до следующей проверки. */
+    } on TimeoutException {
+      /* Сохраняем рабочее подключение до следующей проверки. */
+    }
+  }
+
+  Future<void> _readNetworkRoute() async {
     if (record.endpointRevision > 0 && server.connectOrigin.scheme == 'https') {
       final next = await discoverConnection(
         parseConnectionInput(record.connectionAddress),
@@ -1708,6 +1730,7 @@ class SpaceSession
       );
       await for (final frame in frames) {
         if (frame.heartbeat) {
+          await _pollNetworkRoute();
           await refreshMembership();
           await refreshChannels();
         }

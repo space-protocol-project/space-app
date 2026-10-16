@@ -2884,6 +2884,48 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Вы станете владельцем этого пространства и сможете назначать других участников администраторами. Ссылка настройки одноразовая.'**
   String get initialServerSetupHelp;
+
+  /// No description provided for @homeAutoPortMapping.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автоматический проброс порта'**
+  String get homeAutoPortMapping;
+
+  /// No description provided for @homeAutoPortMappingHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Временное правило TCP через PCP, NAT-PMP или UPnP. Удаляется при остановке; не обходит CGNAT.'**
+  String get homeAutoPortMappingHelp;
+
+  /// No description provided for @homeAutoPublicIP.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновлять публичный IP'**
+  String get homeAutoPublicIP;
+
+  /// No description provided for @homeAutoPublicIPHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для первого адреса IPv4. Проверка через роутер или ipify; домены и остальные адреса сохраняются.'**
+  String get homeAutoPublicIPHelp;
+
+  /// No description provided for @homeDiagMappingOk.
+  ///
+  /// In ru, this message translates to:
+  /// **'Шлюз подтвердил временный проброс TCP. Доступность извне ещё не проверена.'**
+  String get homeDiagMappingOk;
+
+  /// No description provided for @homeDiagMappingFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось создать или продлить проброс. Проверьте настройки роутера; при CGNAT нужен публичный адрес или туннель.'**
+  String get homeDiagMappingFailed;
+
+  /// No description provided for @homeDiagAutomaticIPFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось обновить публичный IPv4. Проверьте подключение к интернету.'**
+  String get homeDiagAutomaticIPFailed;
 }
 
 class _AppLocalizationsDelegate

@@ -9,10 +9,26 @@ class HomeNetwork {
     this.listenHost = '::',
     this.listenPort = 8443,
     this.revision = 1,
+    this.autoPortMapping = false,
+    this.autoPublicIP = false,
+    this.previousAutomatic,
     String? identityOrigin,
   }) : endpoints = List.unmodifiable(endpoints),
        identityOrigin = identityOrigin ?? endpoints.first.origin.toString() {
     parseEndpoints(endpoints.map((e) => e.toJson()).toList());
+    if ((autoPortMapping || autoPublicIP || previousAutomatic != null) &&
+        endpoints.length > 7) {
+      throw const FormatException(
+        'Для автоматического адреса допускается до 7 адресов',
+      );
+    }
+    if (autoPublicIP &&
+        InternetAddress.tryParse(endpoints.first.host)?.type !=
+            InternetAddressType.IPv4) {
+      throw const FormatException(
+        'Автообновление IP требует IPv4 в первом адресе',
+      );
+    }
     if (InternetAddress.tryParse(listenHost) == null ||
         listenPort < 1 ||
         listenPort > 65535 ||
@@ -26,6 +42,18 @@ class HomeNetwork {
   final List<ServerEndpoint> endpoints;
   final String listenHost, identityOrigin;
   final int listenPort, revision;
+  final bool autoPortMapping, autoPublicIP;
+  final ServerEndpoint? previousAutomatic;
+  List<ServerEndpoint> get advertisedEndpoints => [
+    ...endpoints,
+    if (previousAutomatic != null &&
+        !endpoints.any((e) => e.origin == previousAutomatic!.origin))
+      ServerEndpoint.parse(
+        previousAutomatic!.host,
+        previousAutomatic!.port,
+        priority: 255,
+      ),
+  ];
 
   factory HomeNetwork.fromJson(Map<String, dynamic> data) {
     final endpoints = data['endpoints'] == null
@@ -42,6 +70,11 @@ class HomeNetwork {
       listenPort: data['listen_port'] as int? ?? data['port'] as int? ?? 8443,
       revision: data['endpoint_revision'] as int? ?? 1,
       identityOrigin: data['identity_origin'] as String?,
+      autoPortMapping: data['auto_port_mapping'] as bool? ?? false,
+      autoPublicIP: data['auto_public_ip'] as bool? ?? false,
+      previousAutomatic: data['previous_automatic'] == null
+          ? null
+          : parseEndpoints([data['previous_automatic']]).single,
     );
   }
   Map<String, Object> toJson() => {
@@ -52,9 +85,19 @@ class HomeNetwork {
     'endpoint_revision': revision,
     'listen_host': listenHost,
     'listen_port': listenPort,
+    'auto_port_mapping': autoPortMapping,
+    'auto_public_ip': autoPublicIP,
+    if (previousAutomatic != null)
+      'previous_automatic': previousAutomatic!.toJson(),
   };
 
-  HomeNetwork changed(List<ServerEndpoint> next, String host, int port) {
+  HomeNetwork changed(
+    List<ServerEndpoint> next,
+    String host,
+    int port, {
+    bool? autoPortMapping,
+    bool? autoPublicIP,
+  }) {
     final changed =
         jsonEncode(next.map((e) => e.row).toList()) !=
         jsonEncode(endpoints.map((e) => e.row).toList());
@@ -64,6 +107,9 @@ class HomeNetwork {
       listenPort: port,
       revision: revision + (changed ? 1 : 0),
       identityOrigin: identityOrigin,
+      autoPortMapping: autoPortMapping ?? this.autoPortMapping,
+      autoPublicIP: autoPublicIP ?? this.autoPublicIP,
+      previousAutomatic: previousAutomatic,
     );
   }
 

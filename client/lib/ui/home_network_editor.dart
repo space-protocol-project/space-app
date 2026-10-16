@@ -36,6 +36,8 @@ class HomeNetworkEditorState extends State<HomeNetworkEditor> {
         ),
       )
       .toList();
+  late bool autoPortMapping = widget.home.network?.autoPortMapping ?? false;
+  late bool autoPublicIP = widget.home.network?.autoPublicIP ?? false;
   String error = '';
   late HomeNetwork? loadedNetwork = widget.home.network;
   @override
@@ -47,6 +49,8 @@ class HomeNetworkEditorState extends State<HomeNetworkEditor> {
     port.text = '${network.endpoints.first.port}';
     listenPort.text = '${network.listenPort}';
     listenHost = network.listenHost;
+    autoPortMapping = network.autoPortMapping;
+    autoPublicIP = network.autoPublicIP;
     final previous = alternatives.toList();
     alternatives.clear();
     for (final endpoint in network.endpoints.skip(1)) {
@@ -92,6 +96,8 @@ class HomeNetworkEditorState extends State<HomeNetworkEditor> {
         endpoints,
         listenHost: listenHost,
         listenPort: int.parse(listenPort.text),
+        autoPortMapping: autoPortMapping,
+        autoPublicIP: autoPublicIP,
       );
       if (mounted) setState(() => error = saved ? '' : widget.home.error);
       return saved;
@@ -304,7 +310,14 @@ class HomeNetworkEditorState extends State<HomeNetworkEditor> {
       const SizedBox(height: 16),
       for (var i = 0; i <= alternatives.length; i++) addressCard(i),
       TextButton.icon(
-        onPressed: !widget.enabled || alternatives.length >= 7
+        onPressed:
+            !widget.enabled ||
+                alternatives.length >=
+                    ((autoPortMapping ||
+                            autoPublicIP ||
+                            loadedNetwork?.previousAutomatic != null)
+                        ? 6
+                        : 7)
             ? null
             : () => setState(() {
                 alternatives.add((
@@ -316,6 +329,25 @@ class HomeNetworkEditorState extends State<HomeNetworkEditor> {
         label: Text(context.strings.homeAddAddress),
       ),
       const SizedBox(height: 20),
+      SwitchListTile.adaptive(
+        contentPadding: EdgeInsets.zero,
+        title: Text(context.strings.homeAutoPortMapping),
+        subtitle: Text(context.strings.homeAutoPortMappingHelp),
+        value: autoPortMapping,
+        onChanged: widget.enabled
+            ? (value) => setState(() => autoPortMapping = value)
+            : null,
+      ),
+      SwitchListTile.adaptive(
+        contentPadding: EdgeInsets.zero,
+        title: Text(context.strings.homeAutoPublicIP),
+        subtitle: Text(context.strings.homeAutoPublicIPHelp),
+        value: autoPublicIP,
+        onChanged: widget.enabled
+            ? (value) => setState(() => autoPublicIP = value)
+            : null,
+      ),
+      const SizedBox(height: 12),
       localSettings(),
       if (error.isNotEmpty)
         Padding(

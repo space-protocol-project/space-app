@@ -1593,4 +1593,30 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get initialServerSetupHelp =>
       'Вы станете владельцем этого пространства и сможете назначать других участников администраторами. Ссылка настройки одноразовая.';
+
+  @override
+  String get homeAutoPortMapping => 'Автоматический проброс порта';
+
+  @override
+  String get homeAutoPortMappingHelp =>
+      'Временное правило TCP через PCP, NAT-PMP или UPnP. Удаляется при остановке; не обходит CGNAT.';
+
+  @override
+  String get homeAutoPublicIP => 'Обновлять публичный IP';
+
+  @override
+  String get homeAutoPublicIPHelp =>
+      'Для первого адреса IPv4. Проверка через роутер или ipify; домены и остальные адреса сохраняются.';
+
+  @override
+  String get homeDiagMappingOk =>
+      'Шлюз подтвердил временный проброс TCP. Доступность извне ещё не проверена.';
+
+  @override
+  String get homeDiagMappingFailed =>
+      'Не удалось создать или продлить проброс. Проверьте настройки роутера; при CGNAT нужен публичный адрес или туннель.';
+
+  @override
+  String get homeDiagAutomaticIPFailed =>
+      'Не удалось обновить публичный IPv4. Проверьте подключение к интернету.';
 }

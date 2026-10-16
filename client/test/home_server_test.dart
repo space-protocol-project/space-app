@@ -17,6 +17,8 @@ class _Home extends HomeController {
     List<ServerEndpoint> endpoints, {
     String listenHost = '::',
     int listenPort = 8443,
+    bool autoPortMapping = false,
+    bool autoPublicIP = false,
   }) async => true;
 }
 

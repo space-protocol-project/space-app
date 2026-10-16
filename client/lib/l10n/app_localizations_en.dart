@@ -1586,4 +1586,30 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get initialServerSetupHelp =>
       'You will become the owner of this space and can appoint other members as administrators. This setup link can only be used once.';
+
+  @override
+  String get homeAutoPortMapping => 'Automatic port forwarding';
+
+  @override
+  String get homeAutoPortMappingHelp =>
+      'Temporary TCP mapping using PCP, NAT-PMP or UPnP. Removed on shutdown; does not bypass CGNAT.';
+
+  @override
+  String get homeAutoPublicIP => 'Update public IP';
+
+  @override
+  String get homeAutoPublicIPHelp =>
+      'For the first IPv4 address. Checked through the router or ipify; domains and other addresses are preserved.';
+
+  @override
+  String get homeDiagMappingOk =>
+      'The router confirmed a temporary TCP mapping. External reachability remains unverified.';
+
+  @override
+  String get homeDiagMappingFailed =>
+      'Could not create or renew the mapping. Check router settings; CGNAT requires a public address or tunnel.';
+
+  @override
+  String get homeDiagAutomaticIPFailed =>
+      'Could not update the public IPv4 address. Check the internet connection.';
 }

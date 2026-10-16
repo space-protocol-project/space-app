@@ -119,7 +119,17 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     List<ServerEndpoint> endpoints, {
     String listenHost = '::',
     int listenPort = 8443,
-  }) => sendRequest(HomeNetworkSaved(endpoints, listenHost, listenPort));
+    bool autoPortMapping = false,
+    bool autoPublicIP = false,
+  }) => sendRequest(
+    HomeNetworkSaved(
+      endpoints,
+      listenHost,
+      listenPort,
+      autoPortMapping,
+      autoPublicIP,
+    ),
+  );
   Future<void> load() => sendRequest(HomeLoaded());
   Future<void> diagnose({String wanIP = ''}) =>
       sendRequest(HomeDiagnosisRequested(wanIP));
@@ -173,6 +183,8 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
   final _operationClock = Stopwatch();
   final _downloadClock = Stopwatch();
   Timer? _progressTimer;
+  Timer? _networkTimer;
+  bool _readingNetwork = false;
   Duration get elapsed => _operationClock.elapsed;
   int? get downloadSecondsRemaining {
     if (phase != HomePhase.downloading ||
@@ -566,11 +578,15 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
               event.endpoints,
               listenHost: event.listenHost,
               listenPort: event.listenPort,
+              autoPortMapping: event.autoPortMapping,
+              autoPublicIP: event.autoPublicIP,
             )
           : previous.changed(
               event.endpoints,
               event.listenHost,
               event.listenPort,
+              autoPortMapping: event.autoPortMapping,
+              autoPublicIP: event.autoPublicIP,
             );
       await next.write(root);
       _clearDiagnosis();
@@ -613,6 +629,42 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     );
   }
 
+  void _watchNetwork(Directory root, Process process) {
+    _networkTimer?.cancel();
+    _networkTimer = Timer.periodic(const Duration(seconds: 5), (_) async {
+      if (_readingNetwork || _disposed || !running || _process != process) {
+        return;
+      }
+      _readingNetwork = true;
+      try {
+        final next = await HomeNetwork.read(root);
+        final current = server;
+        if (next == null ||
+            current == null ||
+            next.revision <= (network?.revision ?? 0)) {
+          return;
+        }
+        if (_disposed || _process != process || !running) return;
+        network = next;
+        ip = next.endpoints.first.host;
+        server = HomeServerState(
+          current.localOrigin,
+          next.endpoints.first.origin.toString(),
+          current.setupCode,
+          current.tlsFingerprint,
+          serverId: current.serverId,
+          endpoints: next.advertisedEndpoints,
+        );
+        _clearDiagnosis();
+        _update();
+      } catch (_) {
+        // Во время атомарной замены повторим чтение на следующем такте.
+      } finally {
+        _readingNetwork = false;
+      }
+    });
+  }
+
   Future<void> _waitForHomeReady(File ready, Process process) async {
     final deadline = DateTime.now().add(const Duration(seconds: 60));
     while (!await ready.exists()) {
@@ -652,6 +704,12 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
           'Обновите runtime: требуется поддержка нескольких адресов пространства',
         );
       }
+      if ((network!.autoPortMapping || network!.autoPublicIP) &&
+          capabilities['automaticNetworkVersion'] != 1) {
+        throw const FormatException(
+          'Обновите runtime: требуется поддержка автоматических сетевых настроек',
+        );
+      }
       if (_disposed) {
         throw const FormatException('Запуск отменён при закрытии приложения');
       }
@@ -682,6 +740,8 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
       _process = process;
       _observeHomeProcess(process);
       await _waitForHomeReady(ready, process);
+      network = await HomeNetwork.read(root) ?? network;
+      ip = network!.endpoints.first.host;
       final result =
           jsonDecode(await ready.readAsString()) as Map<String, dynamic>;
       final pem = await File('${data.path}/server.crt').readAsString();
@@ -694,10 +754,11 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
         result['setup_code'] as String,
         crypto.sha256.convert(der).toString(),
         serverId: result['server_id'] as String? ?? '',
-        endpoints: network!.endpoints,
+        endpoints: network!.advertisedEndpoints,
       );
       running = true;
       phase = HomePhase.running;
+      _watchNetwork(root, process);
       return server;
     } catch (e) {
       failureCode = e is LocalFailure
@@ -728,6 +789,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
   }
 
   Future<void> _stop() async {
+    _networkTimer?.cancel();
     _clearDiagnosis();
     phase = HomePhase.stopping;
     stopProgress = .2;
@@ -795,6 +857,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
   @override
   Future<void> close() async {
     _disposed = true;
+    _networkTimer?.cancel();
     _endProgress();
     unawaited(_process?.stdin.close());
     await super.close();

@@ -1453,6 +1453,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get initialServerSetupHelp => '你将成为此空间的所有者，并可将其他成员设为管理员。此设置链接只能使用一次。';
+
+  @override
+  String get homeAutoPortMapping => '自动端口映射';
+
+  @override
+  String get homeAutoPortMappingHelp =>
+      '通过 PCP、NAT-PMP 或 UPnP 创建临时 TCP 映射，停止时删除；无法绕过 CGNAT。';
+
+  @override
+  String get homeAutoPublicIP => '更新公网 IP';
+
+  @override
+  String get homeAutoPublicIPHelp => '用于首个 IPv4 地址。通过路由器或 ipify 检查；保留域名及其他地址。';
+
+  @override
+  String get homeDiagMappingOk => '路由器已确认临时 TCP 映射，尚未验证外网可达性。';
+
+  @override
+  String get homeDiagMappingFailed => '无法创建或续期映射。请检查路由器设置；CGNAT 需要公网地址或隧道。';
+
+  @override
+  String get homeDiagAutomaticIPFailed => '无法更新公网 IPv4 地址，请检查网络连接。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1738,4 +1760,26 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String homeDiagObservedAt(String time) {
     return '最近的外部连接：$time';
   }
+
+  @override
+  String get homeAutoPortMapping => '自动端口映射';
+
+  @override
+  String get homeAutoPortMappingHelp =>
+      '通过 PCP、NAT-PMP 或 UPnP 创建临时 TCP 映射，停止时删除；无法绕过 CGNAT。';
+
+  @override
+  String get homeAutoPublicIP => '更新公网 IP';
+
+  @override
+  String get homeAutoPublicIPHelp => '用于首个 IPv4 地址。通过路由器或 ipify 检查；保留域名及其他地址。';
+
+  @override
+  String get homeDiagMappingOk => '路由器已确认临时 TCP 映射，尚未验证外网可达性。';
+
+  @override
+  String get homeDiagMappingFailed => '无法创建或续期映射。请检查路由器设置；CGNAT 需要公网地址或隧道。';
+
+  @override
+  String get homeDiagAutomaticIPFailed => '无法更新公网 IPv4 地址，请检查网络连接。';
 }

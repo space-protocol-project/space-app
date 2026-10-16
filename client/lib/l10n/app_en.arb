@@ -597,5 +597,12 @@
     }
   },
   "initialServerSetupTitle": "First sign-in to your space",
-  "initialServerSetupHelp": "You will become the owner of this space and can appoint other members as administrators. This setup link can only be used once."
+  "initialServerSetupHelp": "You will become the owner of this space and can appoint other members as administrators. This setup link can only be used once.",
+  "homeAutoPortMapping": "Automatic port forwarding",
+  "homeAutoPortMappingHelp": "Temporary TCP mapping using PCP, NAT-PMP or UPnP. Removed on shutdown; does not bypass CGNAT.",
+  "homeAutoPublicIP": "Update public IP",
+  "homeAutoPublicIPHelp": "For the first IPv4 address. Checked through the router or ipify; domains and other addresses are preserved.",
+  "homeDiagMappingOk": "The router confirmed a temporary TCP mapping. External reachability remains unverified.",
+  "homeDiagMappingFailed": "Could not create or renew the mapping. Check router settings; CGNAT requires a public address or tunnel.",
+  "homeDiagAutomaticIPFailed": "Could not update the public IPv4 address. Check the internet connection."
 }

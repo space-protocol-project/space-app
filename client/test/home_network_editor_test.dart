@@ -12,6 +12,8 @@ class _Home extends HomeController {
     List<ServerEndpoint> endpoints, {
     String listenHost = '::',
     int listenPort = 8443,
+    bool autoPortMapping = false,
+    bool autoPublicIP = false,
   }) async {
     saved = endpoints;
     port = listenPort;
@@ -79,6 +81,7 @@ void main() {
           );
           expect(tester.takeException(), isNull);
         }
+        await tester.ensureVisible(find.text('Сохранить настройки'));
         await tester.tap(find.text('Сохранить настройки'));
         await tester.pumpAndSettle();
         expect(home.saved!.map((e) => e.origin.toString()), [
