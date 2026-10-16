@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:fixnum/fixnum.dart';
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grpc/grpc.dart';
 import 'package:space_client/src/chat_controller.dart';
@@ -12,6 +13,7 @@ import 'package:space_client/src/generated/space/v1/space.pb.dart';
 import 'channels_test.dart'
     show ChannelSession, ChannelVault, MemoryHistory, MemoryPositions;
 import 'chat_history_test.dart' show HistoryKeys;
+import 'support/chat_outbox.dart';
 
 class OutboxKeys extends HistoryKeys {
   bool fail = false;
@@ -63,6 +65,7 @@ class DeliveryBackend {
   bool offline = false, loseAck = false, badAck = false;
   Completer<void>? gate;
   Object? failure;
+  Object? responseFailure;
   Future<Content> send(String channel, String text, String key) async {
     requests.add((channel, text, key));
     await gate?.future;
@@ -79,6 +82,7 @@ class DeliveryBackend {
         revision: Int64.ONE,
       ),
     );
+    if (responseFailure != null) throw responseFailure!;
     if (loseAck) throw const GrpcError.unavailable('Подтверждение потеряно');
     return badAck
         ? (message.deepCopy()..channelId = 'other')
@@ -90,9 +94,13 @@ class OutboxSession extends ChannelSession implements QueuedMessageSession {
   OutboxSession(this.backend);
   final DeliveryBackend backend;
   Object? loginFailure;
+  int logins = 0;
+  void Function()? onLogin;
   @override
   Future<void> login() async {
+    logins++;
     if (loginFailure != null) throw loginFailure!;
+    onLogin?.call();
   }
 
   @override
@@ -545,6 +553,140 @@ void main() {
     await controller.selectChannel('archive');
     expect(controller.canQueue, false);
     expect(await controller.send('Не ставить в очередь'), false);
+  });
+  test('Двое суток без сети и перезапуск сохраняют очередь и ключи', () {
+    fakeAsync((clock) {
+      final memory = MemoryChatOutbox();
+      final initial = DateTime.utc(2026, 10, 1);
+      ChatController create() {
+        final controller =
+            ChatController(
+                ChannelVault(),
+                outboxStore: memory,
+                historyStore: MemoryHistory(),
+                positions: MemoryPositions(),
+                openSession: (_, _) async => OutboxSession(backend),
+                now: () => initial.add(clock.elapsed),
+              )
+              ..preview = Discovery(
+                localOrigin(scope.origin),
+                scope.serverId,
+                List.filled(32, 1),
+              );
+        controllers.add(controller);
+        unawaited(controller.connect());
+        clock.flushMicrotasks();
+        expect(controller.connected, true);
+        return controller;
+      }
+
+      backend.offline = true;
+      final first = create();
+      for (var i = 0; i < 3; i++) {
+        unawaited(first.send('Длительный обрыв $i'));
+        clock.flushMicrotasks();
+      }
+      final pending = first.pendingMessages.map((m) => m.key).toList();
+      clock.elapse(const Duration(days: 2));
+      clock.flushMicrotasks();
+      expect(backend.requests.length, inInclusiveRange(5000, 5500));
+      expect(backend.requests.map((request) => request.$3).toSet(), {
+        pending.first,
+      });
+      expect(first.pendingMessages.map((m) => m.key), pending);
+      expect(first.pendingMessages.any((m) => m.blocked), false);
+      unawaited(first.close());
+      clock.flushMicrotasks();
+      backend.offline = false;
+      final restarted = create();
+      clock.flushMicrotasks();
+      expect(restarted.pendingMessages, isEmpty);
+      expect(backend.messages.keys, pending);
+      expect(backend.messages, hasLength(3));
+      unawaited(restarted.close());
+      clock.flushMicrotasks();
+    });
+  });
+  test('Истёкшая сессия обновляется без ручного повтора сообщения', () async {
+    backend.failure = const GrpcError.unauthenticated();
+    final session = OutboxSession(backend)
+      ..onLogin = () => backend.failure = null;
+    final controller = await connect(supplied: session);
+    expect(await controller.send('После обновления сессии'), true);
+    await eventually(() => controller.pendingMessages.isEmpty);
+    expect(session.logins, 1);
+    expect(backend.requests, hasLength(2));
+    expect(backend.requests.first.$3, backend.requests.last.$3);
+    expect(backend.messages, hasLength(1));
+  });
+  test(
+    'Оборванный HTTP-ответ повторяется без дубля и ручного вмешательства',
+    () async {
+      backend.responseFailure = const HttpException(
+        'Connection closed while receiving data',
+      );
+      final controller = await connect(delay: const Duration(milliseconds: 20));
+      expect(await controller.send('Ответ оборвался после записи'), true);
+      await eventually(() => backend.requests.length >= 2);
+      expect(controller.pendingMessages.single.blocked, false);
+      backend.responseFailure = null;
+      await eventually(() => controller.pendingMessages.isEmpty);
+      expect(
+        backend.requests.map((request) => request.$3).toSet(),
+        hasLength(1),
+      );
+      expect(backend.messages, hasLength(1));
+    },
+  );
+  test('Повторный отказ авторизации не вызывает бесконечный вход', () async {
+    backend.failure = const GrpcError.unauthenticated();
+    final session = OutboxSession(backend);
+    final controller = await connect(supplied: session);
+    expect(await controller.send('Сохранить до восстановления доступа'), true);
+    await eventually(() => controller.pendingMessages.single.blocked);
+    expect(session.logins, 1);
+    expect(backend.requests, hasLength(2));
+    expect(await store().read(scope), hasLength(1));
+    expect(backend.messages, isEmpty);
+  });
+  test(
+    'Обрыв при обновлении сессии сохраняет запрос для автоматического повтора',
+    () async {
+      backend.failure = const GrpcError.unauthenticated();
+      final session = OutboxSession(backend)
+        ..loginFailure = const GrpcError.unavailable();
+      final controller = await connect(
+        supplied: session,
+        delay: const Duration(milliseconds: 20),
+      );
+      expect(await controller.send('Войти после обрыва'), true);
+      await eventually(() => session.logins > 0);
+      session.loginFailure = null;
+      session.onLogin = () => backend.failure = null;
+      await eventually(() => controller.pendingMessages.isEmpty);
+      expect(
+        backend.requests.map((request) => request.$3).toSet(),
+        hasLength(1),
+      );
+      expect(backend.messages, hasLength(1));
+    },
+  );
+  test('Смена grant во время повторного входа запрещает повтор RPC', () async {
+    backend.failure = const GrpcError.unauthenticated();
+    final session = GrantOutboxSession(backend);
+    session.onLogin = () => session.grant = 'grant-b';
+    final controller = await connect(supplied: session);
+    expect(await controller.send('Только от исходного устройства'), true);
+    await eventually(() => controller.outboxError == 'identity');
+    expect(backend.requests, hasLength(1));
+    expect(backend.messages, isEmpty);
+    final original = OutboxScope(
+      scope.origin,
+      scope.serverId,
+      scope.principalId,
+      'grant-a',
+    );
+    expect(await store().read(original), hasLength(1));
   });
   test(
     'Заполненная очередь продолжает автоматически отправлять прежние сообщения',

@@ -822,6 +822,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     } catch (e) {
       await _rejectAccess(e);
       error = _explain(e);
+      _retryOutboxConnection(server, e);
     } finally {
       busy = false;
       _update();

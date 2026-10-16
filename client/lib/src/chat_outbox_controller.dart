@@ -43,6 +43,30 @@ extension _ChatOutboxController on ChatController {
     _outboxTimer = null;
   }
 
+  void _retryOutboxConnection(Discovery server, Object problem) {
+    final scope = _outboxScope;
+    if (scope == null ||
+        scope.origin != server.origin.toString() ||
+        scope.serverId != server.serverId ||
+        !_retryableSend(problem) ||
+        accessRemoved ||
+        outboxError.isNotEmpty ||
+        !_pendingMessages.any((entry) => !entry.blocked)) {
+      return;
+    }
+    final epoch = _outboxEpoch;
+    _outboxTimer?.cancel();
+    _outboxTimer = Timer(retryDelay(_outboxAttempt), () {
+      _outboxTimer = null;
+      if (_outboxCurrent(scope, epoch) &&
+          identical(preview, server) &&
+          !connected) {
+        unawaited(connect());
+      }
+    });
+    if (_outboxAttempt < 5) _outboxAttempt++;
+  }
+
   Future<void> _loadSessionOutbox(Discovery server, LiveSession session) =>
       _loadOutbox(
         OutboxScope(
@@ -208,7 +232,7 @@ extension _ChatOutboxController on ChatController {
     _update();
     Content content;
     try {
-      content = await _sendPending(session, entry);
+      content = await _sendWithSessionRecovery(scope, epoch, session, entry);
       _checkMessageReceipt(scope, entry, content);
     } catch (problem) {
       if (!_outboxCurrent(scope, epoch)) return false;
@@ -237,6 +261,27 @@ extension _ChatOutboxController on ChatController {
     return true;
   }
 
+  Future<Content> _sendWithSessionRecovery(
+    OutboxScope scope,
+    int epoch,
+    LiveSession session,
+    PendingMessage entry,
+  ) async {
+    try {
+      return await _sendPending(session, entry);
+    } on GrpcError catch (problem) {
+      if (problem.code != StatusCode.unauthenticated) rethrow;
+    }
+    // Один повтор после входа; ключ запроса и выдача устройства прежние.
+    await session.login();
+    if (!_checkOutboxDevice(scope, epoch) || !identical(session, _session)) {
+      throw const GrpcError.permissionDenied(
+        'Устройство или пространство изменилось',
+      );
+    }
+    return _sendPending(session, entry);
+  }
+
   void _checkMessageReceipt(
     OutboxScope scope,
     PendingMessage entry,
@@ -261,6 +306,7 @@ extension _ChatOutboxController on ChatController {
 
   bool _retryableSend(Object problem) =>
       problem is SocketException ||
+      problem is HttpException ||
       problem is TimeoutException ||
       problem is GrpcError &&
           [
