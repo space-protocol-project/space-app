@@ -1,11 +1,13 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grpc/grpc.dart';
 import 'package:space_client/l10n/app_localizations.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/generated/space/v1/space.pb.dart';
 import 'package:space_client/ui/message_actions.dart';
+import 'package:space_client/ui/chat_view.dart';
 import 'package:space_client/ui/message_bubble.dart';
 
 import 'stream_test.dart' as fixture;
@@ -147,39 +149,71 @@ void main() {
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           home: Scaffold(
-            body: Center(
-              child: MessageActions(
-                controller: controller,
-                message: session.message,
-              ),
-            ),
+            body: ChatView(controller: controller, openConnection: () {}),
           ),
         ),
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('chat-draft')),
+        'Черновик',
       );
       await tester.tap(find.byTooltip('Действия с сообщением'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Редактировать'));
       await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('chat-draft')))
+            .controller!
+            .text,
+        'До изменения',
+      );
       await tester.enterText(
-        find.byKey(const ValueKey('message-edit-text')),
+        find.byKey(const ValueKey('chat-draft')),
+        'Отменённая правка',
+      );
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('chat-draft')))
+            .controller!
+            .text,
+        'Черновик',
+      );
+      expect(controller.state.messages.single.text, 'До изменения');
+      await tester.tap(find.byTooltip('Действия с сообщением'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Редактировать'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const ValueKey('chat-draft')),
         'Мой новый текст',
       );
       session.failure = const GrpcError.unavailable('Нет сети');
       await tester.runAsync(() async {
-        await tester.tap(find.text('Сохранить'));
+        await tester.tap(find.byTooltip('Сохранить'));
         await fixture.settle();
       });
       await tester.pumpAndSettle();
       expect(find.text('Мой новый текст'), findsOneWidget);
-      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.byType(AlertDialog), findsNothing);
       session.failure = null;
       await tester.runAsync(() async {
-        await tester.tap(find.text('Сохранить'));
+        await tester.tap(find.byTooltip('Сохранить'));
         await fixture.settle();
       });
       await tester.pumpAndSettle();
       expect(find.byType(AlertDialog), findsNothing);
       expect(controller.state.messages.single.text, 'Мой новый текст');
+      expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('chat-draft')))
+            .controller!
+            .text,
+        'Черновик',
+      );
       await tester.pumpWidget(
         MaterialApp(
           locale: const Locale('ru'),
@@ -189,6 +223,7 @@ void main() {
             body: MessageActions(
               controller: controller,
               message: session.message,
+              onEdit: () {},
             ),
           ),
         ),

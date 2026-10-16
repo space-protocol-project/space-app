@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 import '../l10n/strings.dart';
@@ -12,9 +10,11 @@ class MessageActions extends StatelessWidget {
     super.key,
     required this.controller,
     required this.message,
+    required this.onEdit,
   });
   final ChatController controller;
   final Content message;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) => PopupMenuButton<bool>(
@@ -26,57 +26,36 @@ class MessageActions extends StatelessWidget {
       PopupMenuItem(value: false, child: Text(context.strings.editMessage)),
       PopupMenuItem(value: true, child: Text(context.strings.deleteMessage)),
     ],
-    onSelected: (deleting) => showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => _MessageDialog(
-        controller: controller,
-        message: message,
-        deleting: deleting,
-      ),
-    ),
+    onSelected: (deleting) => deleting
+        ? showDialog<void>(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) =>
+                _MessageDialog(controller: controller, message: message),
+          )
+        : onEdit(),
   );
 }
 
 class _MessageDialog extends StatefulWidget {
-  const _MessageDialog({
-    required this.controller,
-    required this.message,
-    required this.deleting,
-  });
+  const _MessageDialog({required this.controller, required this.message});
   final ChatController controller;
   final Content message;
-  final bool deleting;
 
   @override
   State<_MessageDialog> createState() => _MessageDialogState();
 }
 
 class _MessageDialogState extends State<_MessageDialog> {
-  late final text = TextEditingController(text: widget.message.text);
   bool saving = false;
   String error = '';
 
-  @override
-  void dispose() {
-    text.dispose();
-    super.dispose();
-  }
-
   Future<void> save() async {
-    if (!widget.deleting &&
-        ((text.text.trim().isEmpty && widget.message.attachments.isEmpty) ||
-            utf8.encode(text.text).length > 4096)) {
-      setState(() => error = context.strings.messageTextInvalid);
-      return;
-    }
     setState(() {
       saving = true;
       error = '';
     });
-    final success = widget.deleting
-        ? await widget.controller.deleteMessage(widget.message)
-        : await widget.controller.updateMessage(widget.message, text.text);
+    final success = await widget.controller.deleteMessage(widget.message);
     if (!mounted) return;
     if (success) {
       Navigator.of(context).pop();
@@ -93,11 +72,7 @@ class _MessageDialogState extends State<_MessageDialog> {
   Widget build(BuildContext context) => PopScope(
     canPop: !saving,
     child: AlertDialog(
-      title: Text(
-        widget.deleting
-            ? context.strings.deleteMessage
-            : context.strings.editMessage,
-      ),
+      title: Text(context.strings.deleteMessage),
       content: SizedBox(
         width: 480,
         child: SingleChildScrollView(
@@ -105,20 +80,7 @@ class _MessageDialogState extends State<_MessageDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (widget.deleting)
-                Text(context.strings.deleteMessageConfirm)
-              else
-                TextField(
-                  key: const ValueKey('message-edit-text'),
-                  controller: text,
-                  autofocus: true,
-                  enabled: !saving,
-                  minLines: 3,
-                  maxLines: 8,
-                  decoration: InputDecoration(
-                    labelText: context.strings.messageText,
-                  ),
-                ),
+              Text(context.strings.deleteMessageConfirm),
               if (error.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Text(
@@ -142,11 +104,7 @@ class _MessageDialogState extends State<_MessageDialog> {
                   dimension: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text(
-                  widget.deleting
-                      ? context.strings.deleteMessage
-                      : context.strings.saveMessage,
-                ),
+              : Text(context.strings.deleteMessage),
         ),
       ],
     ),

@@ -7,7 +7,11 @@ import 'channel_files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math' as math;
+
+import '../src/generated/space/v1/space.pb.dart';
+import '../l10n/failure_strings.dart';
 
 import 'package:flutter/services.dart';
 
@@ -50,6 +54,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       queues.putIfAbsent(scope, AttachmentQueue.new);
   bool draggingFiles = false;
   final draft = TextEditingController();
+  Content? editing;
+  TextEditingValue? savedDraft;
+  String editError = '';
   final draftFocus = FocusNode();
   final scroll = ScrollController();
   final Map<String, String> drafts = {};
@@ -87,6 +94,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     }
     final next = widget.controller.draftScope;
     if (next != scope) {
+      if (editing != null) finishEditing();
       previewVisible = false;
       drafts[scope] = draft.text;
       scope = next;
@@ -263,6 +271,10 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   }
 
   Future<void> send() async {
+    if (editing != null) {
+      await saveEdit();
+      return;
+    }
     final text = draft.text;
     final restoreFocus = draftFocus.hasFocus;
     final target = widget.controller, startingScope = scope;
@@ -283,6 +295,57 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     if (!mounted) return;
     if (sent) _clearSentDraft(text, startingScope, target);
     if (restoreFocus) _restoreDraftFocus(startingScope, target);
+  }
+
+  void startEditing(Content message) {
+    if (widget.controller.busy || attachmentQueue.state.busy) return;
+    setState(() {
+      savedDraft ??= draft.value;
+      editing = message;
+      editError = '';
+      draft.value = TextEditingValue(
+        text: message.text,
+        selection: TextSelection.collapsed(offset: message.text.length),
+      );
+      draggingFiles = false;
+    });
+    draftFocus.requestFocus();
+  }
+
+  void finishEditing() {
+    draft.value = savedDraft ?? TextEditingValue.empty;
+    savedDraft = null;
+    editing = null;
+    editError = '';
+  }
+
+  Future<void> saveEdit() async {
+    final message = editing;
+    final controller = widget.controller;
+    if (message == null || controller.busy) return;
+    final text = draft.text;
+    if ((text.trim().isEmpty && message.attachments.isEmpty) ||
+        utf8.encode(text).length > 4096) {
+      setState(() => editError = context.strings.messageTextInvalid);
+      return;
+    }
+    final success = await controller.updateMessage(message, text);
+    if (!mounted ||
+        !identical(editing, message) ||
+        !identical(controller, widget.controller)) {
+      return;
+    }
+    setState(() {
+      if (success) {
+        finishEditing();
+      } else {
+        editError = chatFailureText(context, controller);
+        if (editError.isEmpty) {
+          editError = context.strings.failureOperationFailed;
+        }
+      }
+    });
+    _restoreDraftFocus(scope, controller);
   }
 
   void _restoreDraftFocus(String startingScope, ChatController target) {
@@ -328,6 +391,13 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   }
 
   KeyEventResult _draftKeyEvent(FocusNode node, KeyEvent event) {
+    if (editing != null &&
+        event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.escape &&
+        !widget.controller.busy) {
+      setState(finishEditing);
+      return KeyEventResult.handled;
+    }
     final keyboard = HardwareKeyboard.instance;
     if (event is KeyUpEvent ||
         ![
@@ -404,7 +474,11 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
             edited: message.updatedAtUnixMs > 0,
             deleted: message.deleted,
             actions: controller.canChangeMessage(message)
-                ? MessageActions(controller: controller, message: message)
+                ? MessageActions(
+                    controller: controller,
+                    message: message,
+                    onEdit: () => startEditing(message),
+                  )
                 : null,
             author: author,
             mine: mine,
@@ -634,6 +708,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     bloc: widget.controller,
     builder: (context, state) => DropTarget(
       enable:
+          editing == null &&
           state.connected &&
           state.canWrite &&
           !state.busy &&
@@ -787,7 +862,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
               ),
             ),
           ),
-        if (widget.controller.attachmentSession != null)
+        if (editing == null && widget.controller.attachmentSession != null)
           AttachmentComposer(
             queue: attachmentQueue,
             session: widget.controller.attachmentSession,
@@ -814,6 +889,27 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (editing != null)
+            Row(
+              children: [
+                const SizedBox(width: 12),
+                const Icon(Icons.edit_outlined, size: 18),
+                const SizedBox(width: 8),
+                Expanded(child: Text(context.strings.editMessage)),
+                IconButton(
+                  onPressed: widget.controller.busy
+                      ? null
+                      : () => setState(finishEditing),
+                  tooltip: context.strings.cancelMessageChange,
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+          if (editError.isNotEmpty)
+            Text(
+              editError,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           Flexible(child: _draftField(context)),
           _composerButtons(context),
         ],
@@ -833,7 +929,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         enabled: view.connected && view.canWrite && !view.busy,
         minLines: 3,
         maxLines: null,
-        maxLength: 1024,
+        maxLength: editing == null ? 1024 : 4096,
         decoration: InputDecoration(
           hintText: view.connected && !view.canWrite
               ? context.strings.cannotSend
@@ -859,16 +955,18 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     return Row(
       key: const ValueKey('composer-actions'),
       children: [
-        if (widget.controller.attachmentSession != null)
+        if (editing == null && widget.controller.attachmentSession != null)
           AttachFileButton(queue: attachmentQueue, enabled: enabled),
         const Spacer(),
         IconButton.filled(
           onPressed: enabled ? send : null,
-          tooltip: context.strings.sendMessage,
+          tooltip: editing == null
+              ? context.strings.sendMessage
+              : context.strings.saveMessage,
           style: IconButton.styleFrom(
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
           ),
-          icon: const Icon(Icons.arrow_upward),
+          icon: Icon(editing == null ? Icons.arrow_upward : Icons.check),
         ),
       ],
     );
