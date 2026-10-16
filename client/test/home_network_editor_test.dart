@@ -7,6 +7,7 @@ import 'package:space_client/ui/home_network_editor.dart';
 class _Home extends HomeController {
   List<ServerEndpoint>? saved;
   int? port;
+  bool mapping = false, publicIP = false;
   @override
   Future<bool> configureNetwork(
     List<ServerEndpoint> endpoints, {
@@ -16,12 +17,53 @@ class _Home extends HomeController {
     bool autoPublicIP = false,
   }) async {
     saved = endpoints;
+    mapping = autoPortMapping;
+    publicIP = autoPublicIP;
     port = listenPort;
     return true;
   }
 }
 
 void main() {
+  testWidgets('Переключатели автоматизации сохраняются отдельно', (
+    tester,
+  ) async {
+    final home = _Home();
+    final address = TextEditingController(text: '8.8.8.8');
+    addTearDown(home.dispose);
+    addTearDown(address.dispose);
+    final editor = GlobalKey<HomeNetworkEditorState>();
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ru'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: HomeNetworkEditor(
+              key: editor,
+              home: home,
+              address: address,
+              enabled: true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.ensureVisible(find.text('Автоматический проброс порта'));
+    await tester.tap(find.text('Автоматический проброс порта'));
+    await tester.pumpAndSettle();
+    expect(await editor.currentState!.save(), isTrue);
+    expect(home.mapping, isTrue);
+    expect(home.publicIP, isFalse);
+    await tester.ensureVisible(find.text('Обновлять публичный IP'));
+    await tester.tap(find.text('Обновлять публичный IP'));
+    await tester.pumpAndSettle();
+    expect(await editor.currentState!.save(), isTrue);
+    expect(home.mapping, isTrue);
+    expect(home.publicIP, isTrue);
+  });
+
   for (final width in [390.0, 1100.0]) {
     testWidgets(
       'Адреса и разные порты сохраняются, смена языка не теряет ввод: $width',
