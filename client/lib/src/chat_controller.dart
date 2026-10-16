@@ -11,6 +11,8 @@ import 'chat_outbox.dart';
 import 'attachments.dart';
 import 'queued_file_store.dart';
 import 'queued_file.dart';
+import 'queued_mutation.dart';
+import 'queued_mutation_projection.dart';
 
 import 'package:file_selector/file_selector.dart';
 
@@ -24,6 +26,7 @@ part 'chat_state.dart';
 part 'chat_outbox_controller.dart';
 part 'chat_outbox_files.dart';
 part 'chat_outbox_recovery.dart';
+part 'chat_outbox_mutations.dart';
 
 enum MessageSendStatus { idle, sending, unconfirmed, accepted, queued }
 
@@ -199,10 +202,19 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
           _outboxScope!.origin == knownOrigin;
   bool get canQueueFiles => canQueue && canAttachFiles;
   bool get canReact =>
+      _canQueueMutation ||
       connected && canWrite && !busy && _session is MessageReactions;
   Future<bool> setReaction(Content message, String emoji, bool active) =>
       sendRequest(ChatReactionSet(message, emoji, active));
   Future<bool> _setReaction(ChatReactionSet event) async {
+    if (_canQueueMutation) {
+      return _enqueueMutation(
+        event.message,
+        MutationKind.reaction,
+        emoji: event.emoji,
+        active: event.active,
+      );
+    }
     final session = _session;
     if (!canReact ||
         session is! MessageReactions ||
@@ -244,9 +256,8 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   Future<bool> deleteMessage(Content message) =>
       sendRequest(ChatMessageChanged(message, null));
   bool canChangeMessage(Content message) =>
-      canWrite &&
+      (_canQueueMutation || canWrite && _session is MessageChanges) &&
       !busy &&
-      _session is MessageChanges &&
       !message.deleted &&
       message.revision > 0 &&
       message.authorId == principalId &&
@@ -675,8 +686,13 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       ...{for (final m in saved) m.id: m},
       ...live,
     }.values.toList()..sort((a, b) => a.sequence.compareTo(b.sequence));
-    if (attachmentsEnabled) return result;
-    return result.map((message) {
+    final projected = projectQueuedMutations(
+      result,
+      _pendingMessages,
+      principalId,
+    );
+    if (attachmentsEnabled) return projected;
+    return projected.map((message) {
       if (message.attachments.isEmpty) return message;
       return Content()
         ..mergeFromMessage(message)
@@ -1409,6 +1425,17 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   }
 
   Future<bool> _changeMessage(Content message, String? text) async {
+    if (_canQueueMutation && canChangeMessage(message)) {
+      return _enqueueMutation(
+        message,
+        text == null ? MutationKind.delete : MutationKind.edit,
+        text: text ?? '',
+      );
+    }
+    return _changeMessageOnline(message, text);
+  }
+
+  Future<bool> _changeMessageOnline(Content message, String? text) async {
     final session = _session;
     if (!canChangeMessage(message) ||
         session == null ||

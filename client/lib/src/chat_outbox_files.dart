@@ -20,7 +20,7 @@ extension _ChatOutboxFiles on ChatController {
     return outboxStore.change(scope, (saved) {
       if (!_outboxCurrent(scope, epoch)) return saved;
       if (saved.any((message) => message.key == entry.key)) return saved;
-      return [...saved, entry];
+      return _appendMutation(saved, entry);
     });
   }
 

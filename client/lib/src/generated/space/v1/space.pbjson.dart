@@ -1640,6 +1640,7 @@ const UpdateContentRequest$json = {
       '5': 3,
       '10': 'expectedRevision'
     },
+    {'1': 'idempotency_key', '3': 5, '4': 1, '5': 9, '10': 'idempotencyKey'},
   ],
 };
 
@@ -1647,7 +1648,8 @@ const UpdateContentRequest$json = {
 final $typed_data.Uint8List updateContentRequestDescriptor = $convert.base64Decode(
     'ChRVcGRhdGVDb250ZW50UmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSWQSDg'
     'oCaWQYAiABKAlSAmlkEhIKBHRleHQYAyABKAlSBHRleHQSKwoRZXhwZWN0ZWRfcmV2aXNpb24Y'
-    'BCABKANSEGV4cGVjdGVkUmV2aXNpb24=');
+    'BCABKANSEGV4cGVjdGVkUmV2aXNpb24SJwoPaWRlbXBvdGVuY3lfa2V5GAUgASgJUg5pZGVtcG'
+    '90ZW5jeUtleQ==');
 
 @$core.Deprecated('Use updateContentResponseDescriptor instead')
 const UpdateContentResponse$json = {
@@ -1661,13 +1663,16 @@ const UpdateContentResponse$json = {
       '6': '.space.v1.Content',
       '10': 'content'
     },
+    {'1': 'idempotency_key', '3': 2, '4': 1, '5': 9, '10': 'idempotencyKey'},
+    {'1': 'applied_revision', '3': 3, '4': 1, '5': 3, '10': 'appliedRevision'},
   ],
 };
 
 /// Descriptor for `UpdateContentResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List updateContentResponseDescriptor = $convert.base64Decode(
     'ChVVcGRhdGVDb250ZW50UmVzcG9uc2USKwoHY29udGVudBgBIAEoCzIRLnNwYWNlLnYxLkNvbn'
-    'RlbnRSB2NvbnRlbnQ=');
+    'RlbnRSB2NvbnRlbnQSJwoPaWRlbXBvdGVuY3lfa2V5GAIgASgJUg5pZGVtcG90ZW5jeUtleRIp'
+    'ChBhcHBsaWVkX3JldmlzaW9uGAMgASgDUg9hcHBsaWVkUmV2aXNpb24=');
 
 @$core.Deprecated('Use deleteContentRequestDescriptor instead')
 const DeleteContentRequest$json = {
@@ -1682,6 +1687,7 @@ const DeleteContentRequest$json = {
       '5': 3,
       '10': 'expectedRevision'
     },
+    {'1': 'idempotency_key', '3': 4, '4': 1, '5': 9, '10': 'idempotencyKey'},
   ],
 };
 
@@ -1689,7 +1695,7 @@ const DeleteContentRequest$json = {
 final $typed_data.Uint8List deleteContentRequestDescriptor = $convert.base64Decode(
     'ChREZWxldGVDb250ZW50UmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSWQSDg'
     'oCaWQYAiABKAlSAmlkEisKEWV4cGVjdGVkX3JldmlzaW9uGAMgASgDUhBleHBlY3RlZFJldmlz'
-    'aW9u');
+    'aW9uEicKD2lkZW1wb3RlbmN5X2tleRgEIAEoCVIOaWRlbXBvdGVuY3lLZXk=');
 
 @$core.Deprecated('Use deleteContentResponseDescriptor instead')
 const DeleteContentResponse$json = {
@@ -1703,13 +1709,16 @@ const DeleteContentResponse$json = {
       '6': '.space.v1.Content',
       '10': 'content'
     },
+    {'1': 'idempotency_key', '3': 2, '4': 1, '5': 9, '10': 'idempotencyKey'},
+    {'1': 'applied_revision', '3': 3, '4': 1, '5': 3, '10': 'appliedRevision'},
   ],
 };
 
 /// Descriptor for `DeleteContentResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List deleteContentResponseDescriptor = $convert.base64Decode(
     'ChVEZWxldGVDb250ZW50UmVzcG9uc2USKwoHY29udGVudBgBIAEoCzIRLnNwYWNlLnYxLkNvbn'
-    'RlbnRSB2NvbnRlbnQ=');
+    'RlbnRSB2NvbnRlbnQSJwoPaWRlbXBvdGVuY3lfa2V5GAIgASgJUg5pZGVtcG90ZW5jeUtleRIp'
+    'ChBhcHBsaWVkX3JldmlzaW9uGAMgASgDUg9hcHBsaWVkUmV2aXNpb24=');
 
 @$core.Deprecated('Use createContentRequestDescriptor instead')
 const CreateContentRequest$json = {
@@ -2566,6 +2575,7 @@ const SetReactionRequest$json = {
       '5': 3,
       '10': 'expectedRevision'
     },
+    {'1': 'idempotency_key', '3': 6, '4': 1, '5': 9, '10': 'idempotencyKey'},
   ],
 };
 
@@ -2573,7 +2583,8 @@ const SetReactionRequest$json = {
 final $typed_data.Uint8List setReactionRequestDescriptor = $convert.base64Decode(
     'ChJTZXRSZWFjdGlvblJlcXVlc3QSHQoKY2hhbm5lbF9pZBgBIAEoCVIJY2hhbm5lbElkEg4KAm'
     'lkGAIgASgJUgJpZBIUCgVlbW9qaRgDIAEoCVIFZW1vamkSFgoGYWN0aXZlGAQgASgIUgZhY3Rp'
-    'dmUSKwoRZXhwZWN0ZWRfcmV2aXNpb24YBSABKANSEGV4cGVjdGVkUmV2aXNpb24=');
+    'dmUSKwoRZXhwZWN0ZWRfcmV2aXNpb24YBSABKANSEGV4cGVjdGVkUmV2aXNpb24SJwoPaWRlbX'
+    'BvdGVuY3lfa2V5GAYgASgJUg5pZGVtcG90ZW5jeUtleQ==');
 
 @$core.Deprecated('Use setReactionResponseDescriptor instead')
 const SetReactionResponse$json = {
@@ -2587,13 +2598,84 @@ const SetReactionResponse$json = {
       '6': '.space.v1.Content',
       '10': 'content'
     },
+    {'1': 'idempotency_key', '3': 2, '4': 1, '5': 9, '10': 'idempotencyKey'},
+    {'1': 'applied_revision', '3': 3, '4': 1, '5': 3, '10': 'appliedRevision'},
   ],
 };
 
 /// Descriptor for `SetReactionResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List setReactionResponseDescriptor = $convert.base64Decode(
     'ChNTZXRSZWFjdGlvblJlc3BvbnNlEisKB2NvbnRlbnQYASABKAsyES5zcGFjZS52MS5Db250ZW'
-    '50Ugdjb250ZW50');
+    '50Ugdjb250ZW50EicKD2lkZW1wb3RlbmN5X2tleRgCIAEoCVIOaWRlbXBvdGVuY3lLZXkSKQoQ'
+    'YXBwbGllZF9yZXZpc2lvbhgDIAEoA1IPYXBwbGllZFJldmlzaW9u');
+
+@$core.Deprecated('Use applyContentMutationRequestDescriptor instead')
+const ApplyContentMutationRequest$json = {
+  '1': 'ApplyContentMutationRequest',
+  '2': [
+    {
+      '1': 'update',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.UpdateContentRequest',
+      '9': 0,
+      '10': 'update'
+    },
+    {
+      '1': 'delete',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.DeleteContentRequest',
+      '9': 0,
+      '10': 'delete'
+    },
+    {
+      '1': 'reaction',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.SetReactionRequest',
+      '9': 0,
+      '10': 'reaction'
+    },
+  ],
+  '8': [
+    {'1': 'action'},
+  ],
+};
+
+/// Descriptor for `ApplyContentMutationRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List applyContentMutationRequestDescriptor = $convert.base64Decode(
+    'ChtBcHBseUNvbnRlbnRNdXRhdGlvblJlcXVlc3QSOAoGdXBkYXRlGAEgASgLMh4uc3BhY2Uudj'
+    'EuVXBkYXRlQ29udGVudFJlcXVlc3RIAFIGdXBkYXRlEjgKBmRlbGV0ZRgCIAEoCzIeLnNwYWNl'
+    'LnYxLkRlbGV0ZUNvbnRlbnRSZXF1ZXN0SABSBmRlbGV0ZRI6CghyZWFjdGlvbhgDIAEoCzIcLn'
+    'NwYWNlLnYxLlNldFJlYWN0aW9uUmVxdWVzdEgAUghyZWFjdGlvbkIICgZhY3Rpb24=');
+
+@$core.Deprecated('Use applyContentMutationResponseDescriptor instead')
+const ApplyContentMutationResponse$json = {
+  '1': 'ApplyContentMutationResponse',
+  '2': [
+    {
+      '1': 'content',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.Content',
+      '10': 'content'
+    },
+    {'1': 'idempotency_key', '3': 2, '4': 1, '5': 9, '10': 'idempotencyKey'},
+    {'1': 'applied_revision', '3': 3, '4': 1, '5': 3, '10': 'appliedRevision'},
+  ],
+};
+
+/// Descriptor for `ApplyContentMutationResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List applyContentMutationResponseDescriptor =
+    $convert.base64Decode(
+        'ChxBcHBseUNvbnRlbnRNdXRhdGlvblJlc3BvbnNlEisKB2NvbnRlbnQYASABKAsyES5zcGFjZS'
+        '52MS5Db250ZW50Ugdjb250ZW50EicKD2lkZW1wb3RlbmN5X2tleRgCIAEoCVIOaWRlbXBvdGVu'
+        'Y3lLZXkSKQoQYXBwbGllZF9yZXZpc2lvbhgDIAEoA1IPYXBwbGllZFJldmlzaW9u');
 
 const $core.Map<$core.String, $core.dynamic> ChannelServiceBase$json = {
   '1': 'ChannelService',
@@ -2701,6 +2783,11 @@ const $core.Map<$core.String, $core.dynamic> ContentServiceBase$json = {
   '1': 'ContentService',
   '2': [
     {
+      '1': 'ApplyContentMutation',
+      '2': '.space.v1.ApplyContentMutationRequest',
+      '3': '.space.v1.ApplyContentMutationResponse'
+    },
+    {
       '1': 'SetReaction',
       '2': '.space.v1.SetReactionRequest',
       '3': '.space.v1.SetReactionResponse'
@@ -2735,14 +2822,16 @@ const $core.Map<$core.String, $core.dynamic> ContentServiceBase$json = {
 @$core.Deprecated('Use contentServiceDescriptor instead')
 const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
     ContentServiceBase$messageJson = {
+  '.space.v1.ApplyContentMutationRequest': ApplyContentMutationRequest$json,
+  '.space.v1.UpdateContentRequest': UpdateContentRequest$json,
+  '.space.v1.DeleteContentRequest': DeleteContentRequest$json,
   '.space.v1.SetReactionRequest': SetReactionRequest$json,
-  '.space.v1.SetReactionResponse': SetReactionResponse$json,
+  '.space.v1.ApplyContentMutationResponse': ApplyContentMutationResponse$json,
   '.space.v1.Content': Content$json,
   '.space.v1.Asset': Asset$json,
   '.space.v1.Reaction': Reaction$json,
-  '.space.v1.UpdateContentRequest': UpdateContentRequest$json,
+  '.space.v1.SetReactionResponse': SetReactionResponse$json,
   '.space.v1.UpdateContentResponse': UpdateContentResponse$json,
-  '.space.v1.DeleteContentRequest': DeleteContentRequest$json,
   '.space.v1.DeleteContentResponse': DeleteContentResponse$json,
   '.space.v1.CreateContentRequest': CreateContentRequest$json,
   '.space.v1.CreateContentResponse': CreateContentResponse$json,
@@ -2752,18 +2841,19 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
 
 /// Descriptor for `ContentService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
 final $typed_data.Uint8List contentServiceDescriptor = $convert.base64Decode(
-    'Cg5Db250ZW50U2VydmljZRJKCgtTZXRSZWFjdGlvbhIcLnNwYWNlLnYxLlNldFJlYWN0aW9uUm'
-    'VxdWVzdBodLnNwYWNlLnYxLlNldFJlYWN0aW9uUmVzcG9uc2UShAEKDVVwZGF0ZUNvbnRlbnQS'
-    'Hi5zcGFjZS52MS5VcGRhdGVDb250ZW50UmVxdWVzdBofLnNwYWNlLnYxLlVwZGF0ZUNvbnRlbn'
-    'RSZXNwb25zZSIygtPkkwIsOgEqMicvdjEvY2hhbm5lbHMve2NoYW5uZWxfaWR9L2NvbnRlbnRz'
-    'L3tpZH0SgQEKDURlbGV0ZUNvbnRlbnQSHi5zcGFjZS52MS5EZWxldGVDb250ZW50UmVxdWVzdB'
-    'ofLnNwYWNlLnYxLkRlbGV0ZUNvbnRlbnRSZXNwb25zZSIvgtPkkwIpKicvdjEvY2hhbm5lbHMv'
-    'e2NoYW5uZWxfaWR9L2NvbnRlbnRzL3tpZH0SggEKDUNyZWF0ZUNvbnRlbnQSHi5zcGFjZS52MS'
-    '5DcmVhdGVDb250ZW50UmVxdWVzdBofLnNwYWNlLnYxLkNyZWF0ZUNvbnRlbnRSZXNwb25zZSIw'
-    'gtPkkwIqOgEqIiUvYXBpL3YxL2NoYW5uZWxzL3tjaGFubmVsX2lkfS9jb250ZW50EnkKC0xpc3'
-    'RDb250ZW50Ehwuc3BhY2UudjEuTGlzdENvbnRlbnRSZXF1ZXN0Gh0uc3BhY2UudjEuTGlzdENv'
-    'bnRlbnRSZXNwb25zZSItgtPkkwInEiUvYXBpL3YxL2NoYW5uZWxzL3tjaGFubmVsX2lkfS9jb2'
-    '50ZW50');
+    'Cg5Db250ZW50U2VydmljZRJlChRBcHBseUNvbnRlbnRNdXRhdGlvbhIlLnNwYWNlLnYxLkFwcG'
+    'x5Q29udGVudE11dGF0aW9uUmVxdWVzdBomLnNwYWNlLnYxLkFwcGx5Q29udGVudE11dGF0aW9u'
+    'UmVzcG9uc2USSgoLU2V0UmVhY3Rpb24SHC5zcGFjZS52MS5TZXRSZWFjdGlvblJlcXVlc3QaHS'
+    '5zcGFjZS52MS5TZXRSZWFjdGlvblJlc3BvbnNlEoQBCg1VcGRhdGVDb250ZW50Eh4uc3BhY2Uu'
+    'djEuVXBkYXRlQ29udGVudFJlcXVlc3QaHy5zcGFjZS52MS5VcGRhdGVDb250ZW50UmVzcG9uc2'
+    'UiMoLT5JMCLDoBKjInL3YxL2NoYW5uZWxzL3tjaGFubmVsX2lkfS9jb250ZW50cy97aWR9EoEB'
+    'Cg1EZWxldGVDb250ZW50Eh4uc3BhY2UudjEuRGVsZXRlQ29udGVudFJlcXVlc3QaHy5zcGFjZS'
+    '52MS5EZWxldGVDb250ZW50UmVzcG9uc2UiL4LT5JMCKSonL3YxL2NoYW5uZWxzL3tjaGFubmVs'
+    'X2lkfS9jb250ZW50cy97aWR9EoIBCg1DcmVhdGVDb250ZW50Eh4uc3BhY2UudjEuQ3JlYXRlQ2'
+    '9udGVudFJlcXVlc3QaHy5zcGFjZS52MS5DcmVhdGVDb250ZW50UmVzcG9uc2UiMILT5JMCKjoB'
+    'KiIlL2FwaS92MS9jaGFubmVscy97Y2hhbm5lbF9pZH0vY29udGVudBJ5CgtMaXN0Q29udGVudB'
+    'IcLnNwYWNlLnYxLkxpc3RDb250ZW50UmVxdWVzdBodLnNwYWNlLnYxLkxpc3RDb250ZW50UmVz'
+    'cG9uc2UiLYLT5JMCJxIlL2FwaS92MS9jaGFubmVscy97Y2hhbm5lbF9pZH0vY29udGVudA==');
 
 const $core.Map<$core.String, $core.dynamic> AssetServiceBase$json = {
   '1': 'AssetService',

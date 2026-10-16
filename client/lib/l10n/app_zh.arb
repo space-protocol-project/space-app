@@ -638,5 +638,11 @@
   "outboxRecoverDescription": "这些消息仍保存在此计算机上，属于以前的设备授权。请先检查消息再恢复。请求密钥保持不变，已接收的消息不会重复。",
   "outboxRecoverTrust": "我信任当前设备，并允许它以我的身份发送这些消息。",
   "outboxRecoverSend": "恢复并发送",
-  "outboxRecoverFailed": "无法完成恢复。队列已保留，请检查连接后重试。"
+  "outboxRecoverFailed": "无法完成恢复。队列已保留，请检查连接后重试。",
+  "outboxEdit": "编辑消息",
+  "outboxDelete": "删除消息",
+  "outboxReactionAdd": "添加回应",
+  "outboxReactionRemove": "移除回应",
+  "outboxMutationBlocked": "更改已停止。请检查权限、runtime 版本和消息的最新状态。如有冲突，请移除此排队操作后重新执行。",
+  "outboxDiscardMutationDescription": "服务器可能已执行此操作。移出队列只会停止本地重试，不会撤销已执行的操作。依赖的操作将停止。"
 }

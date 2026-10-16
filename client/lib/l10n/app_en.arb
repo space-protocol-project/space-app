@@ -638,5 +638,11 @@
   "outboxRecoverDescription": "These messages remain on this computer under a previous device grant. Review them before recovery. Request keys are preserved, so accepted messages are not duplicated.",
   "outboxRecoverTrust": "I trust the current device and allow it to send these messages on my behalf.",
   "outboxRecoverSend": "Recover and send",
-  "outboxRecoverFailed": "Recovery could not be completed. The queue is preserved; check your connection and retry."
+  "outboxRecoverFailed": "Recovery could not be completed. The queue is preserved; check your connection and retry.",
+  "outboxEdit": "Edit message",
+  "outboxDelete": "Delete message",
+  "outboxReactionAdd": "Add reaction",
+  "outboxReactionRemove": "Remove reaction",
+  "outboxMutationBlocked": "Change stopped. Check your permissions, runtime version, and the latest message. For a conflict, discard this queued action and perform it again.",
+  "outboxDiscardMutationDescription": "The action may already have been applied on the server. Discarding stops local retries but does not undo the action. Dependent actions will stop."
 }

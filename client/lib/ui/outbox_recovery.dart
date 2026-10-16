@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/strings.dart';
 import '../src/chat_controller.dart';
 import '../src/chat_outbox.dart';
+import 'outbox_label.dart';
 
 class OutboxRecoveryButton extends StatelessWidget {
   const OutboxRecoveryButton({
@@ -110,7 +111,7 @@ class _RecoveryDialogState extends State<_RecoveryDialog> {
   Widget _entry(BuildContext context, PendingMessage entry) => ListTile(
     contentPadding: EdgeInsets.zero,
     title: Text(
-      entry.text.isEmpty ? context.strings.outboxFileMessage : entry.text,
+      outboxEntryTitle(context, entry),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
     ),

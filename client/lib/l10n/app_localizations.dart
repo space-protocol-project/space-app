@@ -3130,6 +3130,42 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не удалось завершить перенос. Очередь сохранена; проверьте подключение и повторите.'**
   String get outboxRecoverFailed;
+
+  /// No description provided for @outboxEdit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Правка сообщения'**
+  String get outboxEdit;
+
+  /// No description provided for @outboxDelete.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удаление сообщения'**
+  String get outboxDelete;
+
+  /// No description provided for @outboxReactionAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить реакцию'**
+  String get outboxReactionAdd;
+
+  /// No description provided for @outboxReactionRemove.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снять реакцию'**
+  String get outboxReactionRemove;
+
+  /// No description provided for @outboxMutationBlocked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменение остановлено. Проверьте права, версию runtime и новое состояние сообщения. При конфликте уберите действие из очереди и выполните его заново.'**
+  String get outboxMutationBlocked;
+
+  /// No description provided for @outboxDiscardMutationDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действие могло уже выполниться на сервере. Удаление из очереди прекращает локальные повторы, но не отменяет выполненное действие. Зависимые действия остановятся.'**
+  String get outboxDiscardMutationDescription;
 }
 
 class _AppLocalizationsDelegate

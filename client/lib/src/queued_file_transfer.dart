@@ -54,6 +54,7 @@ extension QueuedFileTransfer on QueuedFileStore {
     'created': entry.createdAt,
     'attachments': entry.attachments,
     'files': entry.localFiles.map((file) => file.toJson()).toList(),
+    'mutation': entry.mutation?.toJson(),
   });
 
   List<PendingMessage> _mergeTransfer(
@@ -76,7 +77,12 @@ extension QueuedFileTransfer on QueuedFileStore {
       merged.putIfAbsent(entry.key, () => entry.withBlocked(false));
     }
     if (merged.length > maxPendingMessages) throw const OutboxFull();
-    return merged.values.toList();
+    return merged.values.map((entry) {
+      final after = entry.mutation?.after ?? '';
+      return after.isNotEmpty && !merged.containsKey(after)
+          ? entry.withBlocked(true)
+          : entry;
+    }).toList();
   }
 
   Future<List<PendingMessage>> _transfer(

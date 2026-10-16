@@ -5,6 +5,7 @@ import '../l10n/strings.dart';
 import '../src/chat_controller.dart';
 import '../src/chat_outbox.dart';
 import 'outbox_recovery.dart';
+import 'outbox_label.dart';
 
 class OutboxPanel extends StatelessWidget {
   const OutboxPanel({super.key, required this.controller, required this.state});
@@ -124,14 +125,16 @@ class OutboxPanel extends StatelessWidget {
     contentPadding: EdgeInsets.zero,
     leading: Icon(entry.blocked ? Icons.error_outline : Icons.schedule),
     title: Text(
-      entry.text.isEmpty ? context.strings.outboxFileMessage : entry.text,
+      outboxEntryTitle(context, entry),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     ),
     subtitle: Text(
       [
         entry.blocked
-            ? context.strings.outboxBlocked
+            ? entry.mutation == null
+                  ? context.strings.outboxBlocked
+                  : context.strings.outboxMutationBlocked
             : context.strings.outboxWaiting,
         if (entry.localFiles.isNotEmpty)
           entry.localFiles.map((file) => file.name).join(', '),
@@ -162,7 +165,11 @@ class OutboxPanel extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(context.strings.outboxDiscard),
-        content: Text(context.strings.outboxDiscardDescription),
+        content: Text(
+          entry.mutation == null
+              ? context.strings.outboxDiscardDescription
+              : context.strings.outboxDiscardMutationDescription,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),

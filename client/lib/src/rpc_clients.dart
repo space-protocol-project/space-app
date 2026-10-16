@@ -77,6 +77,14 @@ class ChannelServiceClient {
 class ContentServiceClient {
   const ContentServiceClient(this.connection);
   final RpcConnection connection;
+  Future<ApplyContentMutationResponse> applyContentMutation(
+    ApplyContentMutationRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.ContentService.applyContentMutation,
+    request,
+    options: options,
+  );
   Future<CreateContentResponse> createContent(
     CreateContentRequest request, {
     RpcOptions? options,

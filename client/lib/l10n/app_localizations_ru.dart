@@ -1730,4 +1730,24 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get outboxRecoverFailed =>
       'Не удалось завершить перенос. Очередь сохранена; проверьте подключение и повторите.';
+
+  @override
+  String get outboxEdit => 'Правка сообщения';
+
+  @override
+  String get outboxDelete => 'Удаление сообщения';
+
+  @override
+  String get outboxReactionAdd => 'Добавить реакцию';
+
+  @override
+  String get outboxReactionRemove => 'Снять реакцию';
+
+  @override
+  String get outboxMutationBlocked =>
+      'Изменение остановлено. Проверьте права, версию runtime и новое состояние сообщения. При конфликте уберите действие из очереди и выполните его заново.';
+
+  @override
+  String get outboxDiscardMutationDescription =>
+      'Действие могло уже выполниться на сервере. Удаление из очереди прекращает локальные повторы, но не отменяет выполненное действие. Зависимые действия остановятся.';
 }

@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'secure_vault.dart';
 import 'outbox_lock.dart';
 import 'queued_file.dart';
+import 'queued_mutation.dart';
 
 part 'chat_outbox_sources.dart';
 
@@ -40,6 +41,7 @@ class PendingMessage {
     List<QueuedFile> localFiles = const [],
     List<String> uploadedFiles = const [],
     this.blocked = false,
+    this.mutation,
   }) : attachments = List.unmodifiable(attachments),
        localFiles = List.unmodifiable(localFiles),
        uploadedFiles = List.unmodifiable(uploadedFiles);
@@ -50,6 +52,7 @@ class PendingMessage {
   final List<String> uploadedFiles;
   List<String> get attachmentIds => [...attachments, ...uploadedFiles];
   final bool blocked;
+  final QueuedMutation? mutation;
 
   PendingMessage withBlocked(bool value) => PendingMessage(
     key: key,
@@ -60,6 +63,7 @@ class PendingMessage {
     localFiles: localFiles,
     uploadedFiles: uploadedFiles,
     blocked: value,
+    mutation: mutation,
   );
 
   PendingMessage withFiles(List<QueuedFile> files) => PendingMessage(
@@ -71,6 +75,7 @@ class PendingMessage {
     localFiles: files,
     uploadedFiles: uploadedFiles,
     blocked: blocked,
+    mutation: mutation,
   );
 
   PendingMessage withUploaded(List<String> ids) => PendingMessage(
@@ -82,7 +87,18 @@ class PendingMessage {
     localFiles: localFiles,
     uploadedFiles: ids,
     blocked: blocked,
+    mutation: mutation,
   );
+
+  PendingMessage withMutation(QueuedMutation value, {bool? blocked}) =>
+      PendingMessage(
+        key: key,
+        channelId: channelId,
+        text: text,
+        createdAt: createdAt,
+        mutation: value,
+        blocked: blocked ?? this.blocked,
+      );
 
   Map<String, dynamic> toJson() => {
     'key': key,
@@ -93,6 +109,7 @@ class PendingMessage {
     'files': localFiles.map((file) => file.toJson()).toList(),
     'uploaded': uploadedFiles,
     'blocked': blocked,
+    if (mutation != null) 'mutation': mutation!.toJson(),
   };
 
   factory PendingMessage.fromJson(Map<String, dynamic> value) {
@@ -110,6 +127,11 @@ class PendingMessage {
           .toList(),
       uploadedFiles: (value['uploaded'] as List? ?? []).cast<String>(),
       blocked: value['blocked'] as bool,
+      mutation: value['mutation'] == null
+          ? null
+          : QueuedMutation.fromJson(
+              Map<String, dynamic>.from(value['mutation'] as Map),
+            ),
     );
     result.validate();
     return result;
@@ -123,12 +145,36 @@ class PendingMessage {
         createdAt < 0) {
       throw const FormatException('Некорректная запись очереди');
     }
+    if (mutation != null) {
+      _validateMutation();
+      return;
+    }
     if (utf8.encode(text).length > 4096 ||
         attachments.length + localFiles.length > 5 ||
         (text.trim().isEmpty && attachments.isEmpty && localFiles.isEmpty)) {
       throw const FormatException('Некорректное сообщение очереди');
     }
     _validateFiles();
+  }
+
+  void _validateMutation() {
+    final change = mutation!;
+    change.validate();
+    if (attachments.isNotEmpty ||
+        localFiles.isNotEmpty ||
+        uploadedFiles.isNotEmpty ||
+        change.after == key ||
+        utf8.encode(text).length > 4096) {
+      throw const FormatException('Недопустимое изменение в очереди');
+    }
+    if (change.kind != MutationKind.edit && text.isNotEmpty) {
+      throw const FormatException('Изменение не должно содержать текст');
+    }
+    if (change.kind == MutationKind.edit &&
+        text.trim().isEmpty &&
+        !change.hasAttachments) {
+      throw const FormatException('Сообщение не может быть пустым');
+    }
   }
 
   void _validateFiles() {
@@ -188,7 +234,7 @@ class LocalChatOutbox implements ChatOutboxStore {
       throw const FormatException('Слишком большая очередь');
     }
     final data = jsonDecode(saved) as Map<String, dynamic>;
-    if (data['v'] != 1 || data['binding'] != scope.binding) {
+    if (![1, 2].contains(data['v']) || data['binding'] != scope.binding) {
       throw const FormatException('Очередь принадлежит другому устройству');
     }
     final entries = (data['messages'] as List)
@@ -197,6 +243,9 @@ class LocalChatOutbox implements ChatOutboxStore {
               PendingMessage.fromJson(Map<String, dynamic>.from(entry as Map)),
         )
         .toList();
+    if (data['v'] == 1 && entries.any((entry) => entry.mutation != null)) {
+      throw const FormatException('Изменения требуют второй версии очереди');
+    }
     _validate(entries);
     return entries;
   }
@@ -208,6 +257,25 @@ class LocalChatOutbox implements ChatOutboxStore {
     }
     for (final entry in entries) {
       entry.validate();
+    }
+    _validateDependencies(entries);
+  }
+
+  void _validateDependencies(List<PendingMessage> entries) {
+    final seen = <String, PendingMessage>{};
+    for (final entry in entries) {
+      final after = entry.mutation?.after ?? '';
+      if (after.isNotEmpty) _validateParent(entry, seen[after]);
+      seen[entry.key] = entry;
+    }
+  }
+
+  void _validateParent(PendingMessage entry, PendingMessage? parent) {
+    if (parent == null && entry.blocked) return;
+    if (parent == null ||
+        parent.channelId != entry.channelId ||
+        parent.mutation?.id != entry.mutation!.id) {
+      throw const FormatException('Недопустимая зависимость изменения');
     }
   }
 
@@ -227,7 +295,8 @@ class LocalChatOutbox implements ChatOutboxStore {
     final entries = update(await _read(scope));
     _validate(entries);
     final encoded = jsonEncode({
-      'v': 1,
+      // Старый клиент не должен отправить текст правки как новое сообщение.
+      'v': entries.any((entry) => entry.mutation != null) ? 2 : 1,
       'binding': scope.binding,
       'messages': entries.map((entry) => entry.toJson()).toList(),
     });

@@ -1578,6 +1578,26 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get outboxRecoverFailed => '无法完成恢复。队列已保留，请检查连接后重试。';
+
+  @override
+  String get outboxEdit => '编辑消息';
+
+  @override
+  String get outboxDelete => '删除消息';
+
+  @override
+  String get outboxReactionAdd => '添加回应';
+
+  @override
+  String get outboxReactionRemove => '移除回应';
+
+  @override
+  String get outboxMutationBlocked =>
+      '更改已停止。请检查权限、runtime 版本和消息的最新状态。如有冲突，请移除此排队操作后重新执行。';
+
+  @override
+  String get outboxDiscardMutationDescription =>
+      '服务器可能已执行此操作。移出队列只会停止本地重试，不会撤销已执行的操作。依赖的操作将停止。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1991,4 +2011,24 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get outboxRecoverFailed => '无法完成恢复。队列已保留，请检查连接后重试。';
+
+  @override
+  String get outboxEdit => '编辑消息';
+
+  @override
+  String get outboxDelete => '删除消息';
+
+  @override
+  String get outboxReactionAdd => '添加回应';
+
+  @override
+  String get outboxReactionRemove => '移除回应';
+
+  @override
+  String get outboxMutationBlocked =>
+      '更改已停止。请检查权限、runtime 版本和消息的最新状态。如有冲突，请移除此排队操作后重新执行。';
+
+  @override
+  String get outboxDiscardMutationDescription =>
+      '服务器可能已执行此操作。移出队列只会停止本地重试，不会撤销已执行的操作。依赖的操作将停止。';
 }

@@ -12,6 +12,7 @@ import 'package:space_client/src/core.dart';
 import 'package:space_client/src/chat_history.dart';
 import 'package:space_client/src/chat_outbox.dart';
 import 'package:space_client/src/queued_file_store.dart';
+import 'package:space_client/src/queued_mutation.dart';
 import 'package:space_client/src/generated/space/v1/space.pb.dart';
 import 'package:space_client/src/secure_vault.dart';
 
@@ -144,6 +145,35 @@ Future<void> main(List<String> args) async {
             attachments: ['asset-pending'],
             localFiles: queuedFiles,
           ),
+          PendingMessage(
+            key: 'pending-edit',
+            channelId: 'general',
+            text: 'Правка после перезапуска',
+            createdAt: 1,
+            mutation: QueuedMutation(
+              kind: MutationKind.edit,
+              id: 'existing',
+              author: scope.principalId,
+              sequence: 1,
+              revision: 2,
+            ),
+          ),
+          PendingMessage(
+            key: 'pending-reaction',
+            channelId: 'general',
+            text: '',
+            createdAt: 2,
+            mutation: QueuedMutation(
+              kind: MutationKind.reaction,
+              id: 'existing',
+              author: scope.principalId,
+              sequence: 1,
+              revision: 2,
+              emoji: '👍',
+              active: true,
+              after: 'pending-edit',
+            ),
+          ),
         ],
       );
       await report.writeAsString(
@@ -153,6 +183,7 @@ Future<void> main(List<String> args) async {
           'favoriteWrite': true,
           'outboxWrite': true,
           'filesWrite': true,
+          'mutationsWrite': true,
         }),
       );
     } else if (args[0] == 'reopen') {
@@ -185,18 +216,25 @@ Future<void> main(List<String> args) async {
         throw StateError('Избранное не сохранилось после завершения процесса');
       }
       final pending = await LocalChatOutbox().read(await outboxScope(record));
-      if (pending.length != 1 ||
-          pending.single.key != 'ordinary-pending' ||
-          pending.single.text != 'Неотправленное сообщение' ||
-          pending.single.attachments.single != 'asset-pending') {
+      if (pending.length != 3 ||
+          pending.first.key != 'ordinary-pending' ||
+          pending.first.text != 'Неотправленное сообщение' ||
+          pending.first.attachments.single != 'asset-pending') {
         throw StateError('Очередь не сохранилась после завершения процесса');
       }
       final file = await QueuedFileStore().read(
         await outboxScope(record),
-        pending.single.localFiles.single,
+        pending.first.localFiles.single,
       );
       if (utf8.decode(file) != 'Файл переживает завершение процесса') {
         throw StateError('Копия файла не пережила завершение процесса');
+      }
+      if (pending[1].mutation?.kind != MutationKind.edit ||
+          pending[1].text != 'Правка после перезапуска' ||
+          pending[2].mutation?.kind != MutationKind.reaction ||
+          pending[2].mutation?.emoji != '👍' ||
+          pending[2].mutation?.after != 'pending-edit') {
+        throw StateError('Очередь изменений не пережила завершение процесса');
       }
       await report.writeAsString(
         jsonEncode({
@@ -205,6 +243,7 @@ Future<void> main(List<String> args) async {
           'favoriteReopen': true,
           'outboxReopen': true,
           'filesReopen': true,
+          'mutationsReopen': true,
         }),
       );
     } else {

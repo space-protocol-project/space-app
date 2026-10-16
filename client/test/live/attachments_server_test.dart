@@ -7,6 +7,7 @@ import '../chat_history_test.dart' show HistoryKeys;
 import '../support/rpc_fault_proxy.dart';
 import 'ordinary_sync.dart';
 import 'persistent_files.dart';
+import 'queued_mutations.dart';
 
 import 'dart:io';
 import 'dart:async';
@@ -226,6 +227,7 @@ void main() {
         bytes,
       );
       await verifyOrdinarySync(discovery, ownerVault, owner);
+      await verifyQueuedMutations(discovery, ownerVault, owner, restored);
       await verifyPersistentFiles(
         discovery,
         ownerVault,

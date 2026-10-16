@@ -327,8 +327,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
           foreground &&
           scope == startingScope &&
           identical(widget.controller, target) &&
-          target.connected &&
-          target.canWrite &&
+          target.canQueue &&
           !target.busy &&
           ModalRoute.of(context)?.isCurrent != false) {
         draftFocus.requestFocus();
@@ -861,9 +860,13 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
               ],
             ),
           if (editError.isNotEmpty)
-            Text(
-              editError,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Text(
+                  editError,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ),
             ),
           Flexible(child: _draftField(context)),
           _composerButtons(context),
@@ -881,7 +884,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         key: const ValueKey('chat-draft'),
         focusNode: draftFocus,
         controller: draft,
-        enabled: editing == null ? view.canQueue : view.canWrite && !view.busy,
+        enabled: editing == null
+            ? view.canQueue
+            : widget.controller.canChangeMessage(editing!),
         minLines: 3,
         maxLines: null,
         maxLength: editing == null ? 1024 : 4096,
@@ -908,7 +913,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     final view = widget.controller.state;
     final enabled = editing == null
         ? view.canQueue
-        : view.canWrite && !view.busy;
+        : widget.controller.canChangeMessage(editing!);
     return Row(
       key: const ValueKey('composer-actions'),
       children: [

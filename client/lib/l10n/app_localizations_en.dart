@@ -1722,4 +1722,24 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get outboxRecoverFailed =>
       'Recovery could not be completed. The queue is preserved; check your connection and retry.';
+
+  @override
+  String get outboxEdit => 'Edit message';
+
+  @override
+  String get outboxDelete => 'Delete message';
+
+  @override
+  String get outboxReactionAdd => 'Add reaction';
+
+  @override
+  String get outboxReactionRemove => 'Remove reaction';
+
+  @override
+  String get outboxMutationBlocked =>
+      'Change stopped. Check your permissions, runtime version, and the latest message. For a conflict, discard this queued action and perform it again.';
+
+  @override
+  String get outboxDiscardMutationDescription =>
+      'The action may already have been applied on the server. Discarding stops local retries but does not undo the action. Dependent actions will stop.';
 }

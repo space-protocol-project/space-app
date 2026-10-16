@@ -10,6 +10,9 @@ import 'mls/platform_stub.dart'
     if (dart.library.ui) 'mls/platform_flutter.dart'
     as mls_platform;
 import 'local_failure.dart';
+import 'queued_mutation.dart';
+
+import 'package:fixnum/fixnum.dart';
 
 import 'dart:convert';
 import 'dart:async';
@@ -28,6 +31,8 @@ import 'root_device_proof.dart';
 import 'origin_binding.dart';
 import 'rpc_connection.dart';
 import 'root_rotation.dart' as rotation;
+
+part 'queued_mutation_rpc.dart';
 
 String url64(List<int> value) => base64Url.encode(value).replaceAll('=', '');
 
@@ -637,6 +642,7 @@ class SpaceSession
     implements
         LiveSession,
         QueuedMessageSession,
+        QueuedMutationSession,
         MessageChanges,
         MessageReactions,
         MemberProfile,
@@ -1719,6 +1725,17 @@ class SpaceSession
       ),
       options: _options,
     )).content;
+  }
+
+  @override
+  Future<MutationReceipt> mutateQueued(
+    String channelId,
+    String key,
+    String text,
+    QueuedMutation mutation,
+  ) async {
+    await _ensureSession();
+    return _mutateQueued(channelId, key, text, mutation);
   }
 
   @override

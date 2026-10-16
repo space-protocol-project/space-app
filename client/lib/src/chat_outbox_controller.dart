@@ -37,6 +37,11 @@ extension _ChatOutboxController on ChatController {
     return false;
   }
 
+  bool _receiptCurrent(OutboxScope scope, int epoch, LiveSession session) =>
+      _outboxCurrent(scope, epoch) &&
+      identical(session, _session) &&
+      _outboxGrantMatches(scope);
+
   void _stopOutbox() {
     _outboxEpoch++;
     _outboxTimer?.cancel();
@@ -200,7 +205,9 @@ extension _ChatOutboxController on ChatController {
   PendingMessage? _nextMessage() {
     final blockedChannels = <String>{};
     for (final entry in _pendingMessages) {
-      if (entry.blocked) blockedChannels.add(entry.channelId);
+      if (entry.blocked || entry.mutation?.after.isNotEmpty == true) {
+        blockedChannels.add(entry.channelId);
+      }
       if (!blockedChannels.contains(entry.channelId)) return entry;
     }
     return null;
@@ -258,6 +265,9 @@ extension _ChatOutboxController on ChatController {
     LiveSession session,
     PendingMessage entry,
   ) async {
+    if (entry.mutation != null) {
+      return _deliverMutation(scope, epoch, session, entry);
+    }
     sendStatus = MessageSendStatus.sending;
     _update();
     Content content;
@@ -277,9 +287,14 @@ extension _ChatOutboxController on ChatController {
     _history?.merge([content], now());
     await _flushHistory();
     if (cacheError.isNotEmpty) throw StateError('История не сохранена');
+    if (!_checkOutboxDevice(scope, epoch) || !identical(session, _session)) {
+      return false;
+    }
     final remaining = await outboxStore.change(
       scope,
-      (saved) => saved.where((message) => message.key != entry.key).toList(),
+      (saved) => _receiptCurrent(scope, epoch, session)
+          ? saved.where((message) => message.key != entry.key).toList()
+          : saved,
     );
     if (!_outboxCurrent(scope, epoch)) return false;
     _pendingMessages = remaining;
@@ -298,9 +313,21 @@ extension _ChatOutboxController on ChatController {
     int epoch,
     LiveSession session,
     PendingMessage entry,
+  ) => _recoverOutboxSession(
+    scope,
+    epoch,
+    session,
+    () => _sendFilesAndMessage(scope, epoch, session, entry),
+  );
+
+  Future<T> _recoverOutboxSession<T>(
+    OutboxScope scope,
+    int epoch,
+    LiveSession session,
+    Future<T> Function() operation,
   ) async {
     try {
-      return await _sendFilesAndMessage(scope, epoch, session, entry);
+      return await operation();
     } on GrpcError catch (problem) {
       if (problem.code != StatusCode.unauthenticated) rethrow;
     }
@@ -311,7 +338,7 @@ extension _ChatOutboxController on ChatController {
         'Устройство или пространство изменилось',
       );
     }
-    return _sendFilesAndMessage(scope, epoch, session, entry);
+    return operation();
   }
 
   void _checkMessageReceipt(
@@ -422,11 +449,21 @@ extension _ChatOutboxController on ChatController {
     ChatOutboxChanged event,
   ) {
     if (event.discard) {
-      return saved.where((entry) => entry.key != event.key).toList();
+      return saved
+          .where((entry) => entry.key != event.key)
+          .map(
+            (entry) => entry.mutation?.after == event.key
+                ? entry.withBlocked(true)
+                : entry,
+          )
+          .toList();
     }
     return saved
         .map(
-          (entry) => entry.key == event.key ? entry.withBlocked(false) : entry,
+          (entry) =>
+              entry.key == event.key && (entry.mutation?.after.isEmpty ?? true)
+              ? entry.withBlocked(false)
+              : entry,
         )
         .toList();
   }

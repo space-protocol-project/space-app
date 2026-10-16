@@ -169,7 +169,10 @@ class _Device {
   }
 }
 
-Future<_Vault> _pair(Discovery server, SpaceSession owner) async {
+Future<IdentityVault> pairOrdinaryDevice(
+  Discovery server,
+  SpaceSession owner,
+) async {
   final pairing = await PendingPairing.start(server);
   try {
     await owner.preparePairing(pairing.request.pairing);
@@ -200,7 +203,7 @@ Future<void> verifyOrdinarySync(
   SpaceSession owner,
 ) async {
   final root = await Directory.systemTemp.createTemp('space-two-devices-');
-  final secondVault = await _pair(server, owner);
+  final secondVault = await pairOrdinaryDevice(server, owner);
   final a = _Device(vault, _Network(server), Directory('${root.path}/a'));
   final b = _Device(secondVault, _Network(server), Directory('${root.path}/b'));
   final prefix = newRequestKey();

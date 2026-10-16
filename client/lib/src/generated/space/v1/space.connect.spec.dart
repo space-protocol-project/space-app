@@ -71,6 +71,15 @@ abstract final class ContentService {
   /// Fully-qualified name of the ContentService service.
   static const name = 'space.v1.ContentService';
 
+  /// Постоянная очередь использует отдельный RPC: старый runtime отклоняет
+  /// его до изменения данных, а не игнорирует неизвестный ключ запроса.
+  static const applyContentMutation = connect.Spec(
+    '/$name/ApplyContentMutation',
+    connect.StreamType.unary,
+    spacev1space.ApplyContentMutationRequest.new,
+    spacev1space.ApplyContentMutationResponse.new,
+  );
+
   static const setReaction = connect.Spec(
     '/$name/SetReaction',
     connect.StreamType.unary,

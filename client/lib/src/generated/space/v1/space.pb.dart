@@ -6136,12 +6136,14 @@ class UpdateContentRequest extends $pb.GeneratedMessage {
     $core.String? id,
     $core.String? text,
     $fixnum.Int64? expectedRevision,
+    $core.String? idempotencyKey,
   }) {
     final result = UpdateContentRequest._();
     if (channelId != null) result.channelId = channelId;
     if (id != null) result.id = id;
     if (text != null) result.text = text;
     if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
     return result;
   }
 
@@ -6162,6 +6164,7 @@ class UpdateContentRequest extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'id')
     ..aOS(3, _omitFieldNames ? '' : 'text')
     ..aInt64(4, _omitFieldNames ? '' : 'expectedRevision')
+    ..aOS(5, _omitFieldNames ? '' : 'idempotencyKey')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6222,14 +6225,27 @@ class UpdateContentRequest extends $pb.GeneratedMessage {
   $core.bool hasExpectedRevision() => $_has(3);
   @$pb.TagNumber(4)
   void clearExpectedRevision() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get idempotencyKey => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set idempotencyKey($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasIdempotencyKey() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearIdempotencyKey() => $_clearField(5);
 }
 
 class UpdateContentResponse extends $pb.GeneratedMessage {
   factory UpdateContentResponse({
     Content? content,
+    $core.String? idempotencyKey,
+    $fixnum.Int64? appliedRevision,
   }) {
     final result = UpdateContentResponse._();
     if (content != null) result.content = content;
+    if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
+    if (appliedRevision != null) result.appliedRevision = appliedRevision;
     return result;
   }
 
@@ -6248,6 +6264,8 @@ class UpdateContentResponse extends $pb.GeneratedMessage {
       createEmptyInstance: UpdateContentResponse.$_createMessage)
     ..aOM<Content>(1, _omitFieldNames ? '' : 'content',
         subBuilder: Content.$_createMessage)
+    ..aOS(2, _omitFieldNames ? '' : 'idempotencyKey')
+    ..aInt64(3, _omitFieldNames ? '' : 'appliedRevision')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6284,6 +6302,24 @@ class UpdateContentResponse extends $pb.GeneratedMessage {
   void clearContent() => $_clearField(1);
   @$pb.TagNumber(1)
   Content ensureContent() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.String get idempotencyKey => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set idempotencyKey($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasIdempotencyKey() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearIdempotencyKey() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get appliedRevision => $_getI64(2);
+  @$pb.TagNumber(3)
+  set appliedRevision($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAppliedRevision() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAppliedRevision() => $_clearField(3);
 }
 
 class DeleteContentRequest extends $pb.GeneratedMessage {
@@ -6291,11 +6327,13 @@ class DeleteContentRequest extends $pb.GeneratedMessage {
     $core.String? channelId,
     $core.String? id,
     $fixnum.Int64? expectedRevision,
+    $core.String? idempotencyKey,
   }) {
     final result = DeleteContentRequest._();
     if (channelId != null) result.channelId = channelId;
     if (id != null) result.id = id;
     if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
     return result;
   }
 
@@ -6315,6 +6353,7 @@ class DeleteContentRequest extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'channelId')
     ..aOS(2, _omitFieldNames ? '' : 'id')
     ..aInt64(3, _omitFieldNames ? '' : 'expectedRevision')
+    ..aOS(4, _omitFieldNames ? '' : 'idempotencyKey')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6366,14 +6405,27 @@ class DeleteContentRequest extends $pb.GeneratedMessage {
   $core.bool hasExpectedRevision() => $_has(2);
   @$pb.TagNumber(3)
   void clearExpectedRevision() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get idempotencyKey => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set idempotencyKey($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasIdempotencyKey() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearIdempotencyKey() => $_clearField(4);
 }
 
 class DeleteContentResponse extends $pb.GeneratedMessage {
   factory DeleteContentResponse({
     Content? content,
+    $core.String? idempotencyKey,
+    $fixnum.Int64? appliedRevision,
   }) {
     final result = DeleteContentResponse._();
     if (content != null) result.content = content;
+    if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
+    if (appliedRevision != null) result.appliedRevision = appliedRevision;
     return result;
   }
 
@@ -6392,6 +6444,8 @@ class DeleteContentResponse extends $pb.GeneratedMessage {
       createEmptyInstance: DeleteContentResponse.$_createMessage)
     ..aOM<Content>(1, _omitFieldNames ? '' : 'content',
         subBuilder: Content.$_createMessage)
+    ..aOS(2, _omitFieldNames ? '' : 'idempotencyKey')
+    ..aInt64(3, _omitFieldNames ? '' : 'appliedRevision')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6428,6 +6482,24 @@ class DeleteContentResponse extends $pb.GeneratedMessage {
   void clearContent() => $_clearField(1);
   @$pb.TagNumber(1)
   Content ensureContent() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.String get idempotencyKey => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set idempotencyKey($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasIdempotencyKey() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearIdempotencyKey() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get appliedRevision => $_getI64(2);
+  @$pb.TagNumber(3)
+  set appliedRevision($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAppliedRevision() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAppliedRevision() => $_clearField(3);
 }
 
 class CreateContentRequest extends $pb.GeneratedMessage {
@@ -9797,6 +9869,7 @@ class SetReactionRequest extends $pb.GeneratedMessage {
     $core.String? emoji,
     $core.bool? active,
     $fixnum.Int64? expectedRevision,
+    $core.String? idempotencyKey,
   }) {
     final result = SetReactionRequest._();
     if (channelId != null) result.channelId = channelId;
@@ -9804,6 +9877,7 @@ class SetReactionRequest extends $pb.GeneratedMessage {
     if (emoji != null) result.emoji = emoji;
     if (active != null) result.active = active;
     if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
     return result;
   }
 
@@ -9825,6 +9899,7 @@ class SetReactionRequest extends $pb.GeneratedMessage {
     ..aOS(3, _omitFieldNames ? '' : 'emoji')
     ..aOB(4, _omitFieldNames ? '' : 'active')
     ..aInt64(5, _omitFieldNames ? '' : 'expectedRevision')
+    ..aOS(6, _omitFieldNames ? '' : 'idempotencyKey')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -9893,14 +9968,27 @@ class SetReactionRequest extends $pb.GeneratedMessage {
   $core.bool hasExpectedRevision() => $_has(4);
   @$pb.TagNumber(5)
   void clearExpectedRevision() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get idempotencyKey => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set idempotencyKey($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasIdempotencyKey() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearIdempotencyKey() => $_clearField(6);
 }
 
 class SetReactionResponse extends $pb.GeneratedMessage {
   factory SetReactionResponse({
     Content? content,
+    $core.String? idempotencyKey,
+    $fixnum.Int64? appliedRevision,
   }) {
     final result = SetReactionResponse._();
     if (content != null) result.content = content;
+    if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
+    if (appliedRevision != null) result.appliedRevision = appliedRevision;
     return result;
   }
 
@@ -9919,6 +10007,8 @@ class SetReactionResponse extends $pb.GeneratedMessage {
       createEmptyInstance: SetReactionResponse.$_createMessage)
     ..aOM<Content>(1, _omitFieldNames ? '' : 'content',
         subBuilder: Content.$_createMessage)
+    ..aOS(2, _omitFieldNames ? '' : 'idempotencyKey')
+    ..aInt64(3, _omitFieldNames ? '' : 'appliedRevision')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -9954,6 +10044,231 @@ class SetReactionResponse extends $pb.GeneratedMessage {
   void clearContent() => $_clearField(1);
   @$pb.TagNumber(1)
   Content ensureContent() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.String get idempotencyKey => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set idempotencyKey($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasIdempotencyKey() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearIdempotencyKey() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get appliedRevision => $_getI64(2);
+  @$pb.TagNumber(3)
+  set appliedRevision($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAppliedRevision() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAppliedRevision() => $_clearField(3);
+}
+
+enum ApplyContentMutationRequest_Action { update, delete, reaction, notSet }
+
+class ApplyContentMutationRequest extends $pb.GeneratedMessage {
+  factory ApplyContentMutationRequest({
+    UpdateContentRequest? update,
+    DeleteContentRequest? delete,
+    SetReactionRequest? reaction,
+  }) {
+    final result = ApplyContentMutationRequest._();
+    if (update != null) result.update = update;
+    if (delete != null) result.delete = delete;
+    if (reaction != null) result.reaction = reaction;
+    return result;
+  }
+
+  ApplyContentMutationRequest._();
+
+  factory ApplyContentMutationRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ApplyContentMutationRequest()..mergeFromBuffer(data, registry);
+  factory ApplyContentMutationRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ApplyContentMutationRequest()..mergeFromJson(json, registry);
+
+  static const $core.Map<$core.int, ApplyContentMutationRequest_Action>
+      _ApplyContentMutationRequest_ActionByTag = {
+    1: ApplyContentMutationRequest_Action.update,
+    2: ApplyContentMutationRequest_Action.delete,
+    3: ApplyContentMutationRequest_Action.reaction,
+    0: ApplyContentMutationRequest_Action.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ApplyContentMutationRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ApplyContentMutationRequest.$_createMessage)
+    ..oo(0, [1, 2, 3])
+    ..aOM<UpdateContentRequest>(1, _omitFieldNames ? '' : 'update',
+        subBuilder: UpdateContentRequest.$_createMessage)
+    ..aOM<DeleteContentRequest>(2, _omitFieldNames ? '' : 'delete',
+        subBuilder: DeleteContentRequest.$_createMessage)
+    ..aOM<SetReactionRequest>(3, _omitFieldNames ? '' : 'reaction',
+        subBuilder: SetReactionRequest.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ApplyContentMutationRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ApplyContentMutationRequest copyWith(
+          void Function(ApplyContentMutationRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as ApplyContentMutationRequest))
+          as ApplyContentMutationRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ApplyContentMutationRequest() / ApplyContentMutationRequest.new instead')
+  static ApplyContentMutationRequest create() =>
+      ApplyContentMutationRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ApplyContentMutationRequest._();
+  @$core.override
+  ApplyContentMutationRequest createEmptyInstance() =>
+      ApplyContentMutationRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ApplyContentMutationRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ApplyContentMutationRequest>(
+          ApplyContentMutationRequest.$_createMessage);
+  static ApplyContentMutationRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  @$pb.TagNumber(2)
+  @$pb.TagNumber(3)
+  ApplyContentMutationRequest_Action whichAction() =>
+      _ApplyContentMutationRequest_ActionByTag[$_whichOneof(0)]!;
+  @$pb.TagNumber(1)
+  @$pb.TagNumber(2)
+  @$pb.TagNumber(3)
+  void clearAction() => $_clearField($_whichOneof(0));
+
+  @$pb.TagNumber(1)
+  UpdateContentRequest get update => $_getN(0);
+  @$pb.TagNumber(1)
+  set update(UpdateContentRequest value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasUpdate() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearUpdate() => $_clearField(1);
+  @$pb.TagNumber(1)
+  UpdateContentRequest ensureUpdate() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  DeleteContentRequest get delete => $_getN(1);
+  @$pb.TagNumber(2)
+  set delete(DeleteContentRequest value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasDelete() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearDelete() => $_clearField(2);
+  @$pb.TagNumber(2)
+  DeleteContentRequest ensureDelete() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  SetReactionRequest get reaction => $_getN(2);
+  @$pb.TagNumber(3)
+  set reaction(SetReactionRequest value) => $_setField(3, value);
+  @$pb.TagNumber(3)
+  $core.bool hasReaction() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearReaction() => $_clearField(3);
+  @$pb.TagNumber(3)
+  SetReactionRequest ensureReaction() => $_ensure(2);
+}
+
+class ApplyContentMutationResponse extends $pb.GeneratedMessage {
+  factory ApplyContentMutationResponse({
+    Content? content,
+    $core.String? idempotencyKey,
+    $fixnum.Int64? appliedRevision,
+  }) {
+    final result = ApplyContentMutationResponse._();
+    if (content != null) result.content = content;
+    if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
+    if (appliedRevision != null) result.appliedRevision = appliedRevision;
+    return result;
+  }
+
+  ApplyContentMutationResponse._();
+
+  factory ApplyContentMutationResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ApplyContentMutationResponse()..mergeFromBuffer(data, registry);
+  factory ApplyContentMutationResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ApplyContentMutationResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ApplyContentMutationResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ApplyContentMutationResponse.$_createMessage)
+    ..aOM<Content>(1, _omitFieldNames ? '' : 'content',
+        subBuilder: Content.$_createMessage)
+    ..aOS(2, _omitFieldNames ? '' : 'idempotencyKey')
+    ..aInt64(3, _omitFieldNames ? '' : 'appliedRevision')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ApplyContentMutationResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ApplyContentMutationResponse copyWith(
+          void Function(ApplyContentMutationResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as ApplyContentMutationResponse))
+          as ApplyContentMutationResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ApplyContentMutationResponse() / ApplyContentMutationResponse.new instead')
+  static ApplyContentMutationResponse create() =>
+      ApplyContentMutationResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ApplyContentMutationResponse._();
+  @$core.override
+  ApplyContentMutationResponse createEmptyInstance() =>
+      ApplyContentMutationResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ApplyContentMutationResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ApplyContentMutationResponse>(
+          ApplyContentMutationResponse.$_createMessage);
+  static ApplyContentMutationResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Content get content => $_getN(0);
+  @$pb.TagNumber(1)
+  set content(Content value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasContent() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearContent() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Content ensureContent() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.String get idempotencyKey => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set idempotencyKey($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasIdempotencyKey() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearIdempotencyKey() => $_clearField(2);
+
+  /// Версия именно этого действия; content может содержать более новую версию.
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get appliedRevision => $_getI64(2);
+  @$pb.TagNumber(3)
+  set appliedRevision($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAppliedRevision() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAppliedRevision() => $_clearField(3);
 }
 
 /// Экспериментальный контракт первого локального прототипа.
@@ -10001,6 +10316,12 @@ class ContentServiceApi {
 
   ContentServiceApi(this._client);
 
+  /// Постоянная очередь использует отдельный RPC: старый runtime отклоняет
+  /// его до изменения данных, а не игнорирует неизвестный ключ запроса.
+  $async.Future<ApplyContentMutationResponse> applyContentMutation(
+          $pb.ClientContext? ctx, ApplyContentMutationRequest request) =>
+      _client.invoke<ApplyContentMutationResponse>(ctx, 'ContentService',
+          'ApplyContentMutation', request, ApplyContentMutationResponse());
   $async.Future<SetReactionResponse> setReaction(
           $pb.ClientContext? ctx, SetReactionRequest request) =>
       _client.invoke<SetReactionResponse>(
