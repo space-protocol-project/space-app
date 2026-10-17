@@ -23,6 +23,7 @@ class AppPreferences
         event,
         () => switch (event) {
           PreferencesLoaded() => _load(),
+          NotificationsChanged() => _changeNotifications(event.mode),
           PreferencesChanged() => _change(
             dark: event.dark,
             effects: event.effects,
@@ -41,6 +42,15 @@ class AppPreferences
   }
 
   Future<void> load() => sendRequest(PreferencesLoaded());
+  Future<void> changeNotifications(int mode) =>
+      sendRequest(NotificationsChanged(mode));
+  int notificationMode = 0;
+  Future<void> _changeNotifications(int mode) {
+    notificationMode = [0, 1, 2].contains(mode) ? mode : 0;
+    publishState();
+    return _save();
+  }
+
   Future<void> change({
     bool? dark,
     bool? effects,
@@ -95,6 +105,8 @@ class AppPreferences
       final data = await SharedPreferences.getInstance();
       if (_disposed) return;
       dark = data.getBool('space.ui.dark') ?? true;
+      final mode = data.getInt('space.notifications.mode') ?? 0;
+      notificationMode = [0, 1, 2].contains(mode) ? mode : 0;
       effects = data.getBool('space.ui.effects') ?? true;
       uiScale = validUiScale(data.getDouble('space.ui.scale') ?? 1);
       final savedSend = data.getString('space.ui.sendShortcut');
@@ -171,6 +183,7 @@ class AppPreferences
 
   Future<void> _save() {
     final snapshot = (
+      notificationMode: notificationMode,
       uiScale: uiScale,
       dark: dark,
       effects: effects,
@@ -184,6 +197,7 @@ class AppPreferences
       try {
         final data = await SharedPreferences.getInstance();
         final results = await Future.wait([
+          data.setInt('space.notifications.mode', snapshot.notificationMode),
           data.setDouble('space.ui.scale', snapshot.uiScale),
           data.setBool('space.ui.dark', snapshot.dark),
           data.setBool('space.ui.effects', snapshot.effects),

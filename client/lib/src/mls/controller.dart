@@ -15,9 +15,10 @@ sealed class MlsEvent {}
 class MlsRefresh extends MlsEvent {}
 
 class MlsSend extends MlsEvent {
-  MlsSend(this.text, this.files);
+  MlsSend(this.text, this.files, {this.reply});
   final String text;
   final List<XFile> files;
+  final Map<String, dynamic>? reply;
   final done = Completer<bool>();
 }
 
@@ -162,8 +163,9 @@ class MlsController extends Bloc<MlsEvent, MlsState> {
           event.active,
         );
       case MlsSend():
-        await MlsFiles(client)
-            .send(channelId, groupId, event.text, event.files);
+        await MlsFiles(
+          client,
+        ).send(channelId, groupId, event.text, event.files, reply: event.reply);
     }
   }
 }

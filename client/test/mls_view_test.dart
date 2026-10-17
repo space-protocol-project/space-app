@@ -7,6 +7,7 @@ import 'package:space_client/l10n/app_localizations.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/rpc_clients.dart' show MlsDevice;
 import 'package:space_client/src/mls/client.dart';
+import 'package:space_client/src/mls/replies.dart';
 import 'package:space_client/src/mls/local_store.dart';
 import 'package:space_client/src/mls/native.dart';
 import 'package:space_client/ui/mls_channel.dart';
@@ -79,6 +80,64 @@ Widget app(Widget child) => MaterialApp(
 );
 
 void main() {
+  testWidgets('MLS: уведомление прокручивает список к сообщению вне экрана', (
+    tester,
+  ) async {
+    final client = _Client(100);
+    client.data.channel['messages'] = (client.data.channel['messages'] as List)
+        .reversed
+        .toList();
+    await tester.pumpWidget(
+      app(
+        MlsChannelView(
+          session: _Session(client),
+          channelId: 'private',
+          groupId: List.filled(32, 1),
+          attachmentsEnabled: false,
+          canWrite: true,
+          active: false,
+          jumpRequest: mlsMessageKey(entry(70)),
+          jumpGeneration: 1,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Сообщение 70').hitTestable(), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets(
+    'MLS: ответ через меню, предпросмотр и отмена сохраняют черновик',
+    (tester) async {
+      final client = _Client(1);
+      await tester.pumpWidget(
+        app(
+          MlsChannelView(
+            session: _Session(client),
+            channelId: 'private',
+            groupId: List.filled(32, 1),
+            attachmentsEnabled: true,
+            canWrite: true,
+            active: false,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'Черновик ответа');
+      await tester.longPress(find.text('Сообщение 0'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Ответить'));
+      await tester.pumpAndSettle();
+      expect(find.text('Сообщение 0\nФайл-0.txt'), findsOneWidget);
+      await tester.tap(find.byTooltip('Отменить ответ'));
+      await tester.pumpAndSettle();
+      expect(find.text('Сообщение 0\nФайл-0.txt'), findsNothing);
+      expect(find.text('Черновик ответа'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
   testWidgets(
     'Передача управления требует подтверждения и сохраняет роль при отмене',
     (tester) async {

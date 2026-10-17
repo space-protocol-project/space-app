@@ -17,6 +17,8 @@ import 'package:space_client/src/local_failure.dart';
 
 import 'support/historical_home_runtime.dart';
 
+import 'support/temp_directory.dart';
+
 class _Binding extends AutomatedTestWidgetsFlutterBinding {
   @override
   bool get overrideHttpClient => false;
@@ -247,7 +249,7 @@ Future<void> removeUpgradeDirectory(Directory root) async {
           .startsWith('space-real-upgrade-')) {
     throw StateError('Недопустимый каталог очистки проверки обновления');
   }
-  await root.delete(recursive: true);
+  await deleteTestDirectory(root, prefix: 'space-real-upgrade-');
 }
 
 Future<void> verifyUpgradedFiles(SpaceSession session) async {

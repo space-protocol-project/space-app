@@ -16,6 +16,8 @@ import '../channels_test.dart' show MemoryHistory, MemoryPositions;
 import '../chat_history_test.dart' show HistoryKeys;
 import '../support/rpc_fault_proxy.dart';
 
+import '../support/temp_directory.dart';
+
 const _backlogCount = 105;
 
 class _Vault implements IdentityVault {
@@ -224,7 +226,7 @@ Future<void> verifyOrdinarySync(
     await _explicitDisconnect(a, b, prefix);
   } finally {
     await Future.wait([a.stop(), b.stop()]);
-    await root.delete(recursive: true);
+    await deleteTestDirectory(root, prefix: 'space-two-devices-');
   }
 }
 

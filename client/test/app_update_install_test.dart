@@ -7,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/app_updates.dart';
 import 'package:space_client/ui/app_updates_view.dart';
 
+import 'support/temp_directory.dart';
+
 void main() {
   late Directory directory;
   late File file;
@@ -15,7 +17,7 @@ void main() {
     directory = await Directory.systemTemp.createTemp('space-install-test-');
     file = await File('${directory.path}/setup.exe').writeAsBytes(bytes);
   });
-  tearDown(() => directory.delete(recursive: true));
+  tearDown(() => deleteTestDirectory(directory, prefix: 'space-install-test-'));
 
   AppUpdates model({
     required List<String> events,

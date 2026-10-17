@@ -12,6 +12,8 @@ import 'home_backup_test.dart' show writeBackupManifest;
 
 import 'package:space_client/src/local_failure.dart';
 
+import 'support/temp_directory.dart';
+
 Future<void> copyFixture(Directory source, Directory destination) async {
   await destination.create(recursive: true);
   await for (final entry in source.list()) {
@@ -118,7 +120,7 @@ void main() {
       storage: HomeStorage(available: (_) async => 1024 * 1024 * 1024),
     );
   });
-  tearDown(() => root.delete(recursive: true));
+  tearDown(() => deleteTestDirectory(root, prefix: 'space-update-executor-'));
 
   test('После подтверждённого обновления удаляются лишние runtime', () async {
     final obsolete = release('v0.0.1');

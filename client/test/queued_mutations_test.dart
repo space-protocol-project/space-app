@@ -24,6 +24,8 @@ import 'chat_outbox_test.dart'
         eventually;
 import 'support/chat_outbox.dart' show EmptyQueuedFiles;
 
+import 'support/temp_directory.dart';
+
 class MutationBackend extends DeliveryBackend {
   final receipts = <String, (String, int)>{};
   final calls = <(String, int, MutationKind)>[];
@@ -160,7 +162,7 @@ void main() {
       if (!controller.isClosed) await controller.close();
     }
     controllers.clear();
-    await root.delete(recursive: true);
+    await deleteTestDirectory(root, prefix: 'space-mutation-queue-');
   });
 
   test(

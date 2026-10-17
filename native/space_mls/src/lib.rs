@@ -53,6 +53,15 @@ pub struct Message {
     pub manager: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reaction: Option<Reaction>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reply: Option<Reply>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Reply {
+    pub message_id: [u8; 16],
+    pub grant_id: String,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -73,6 +82,7 @@ impl Message {
             files,
             manager: None,
             reaction: None,
+            reply: None,
         };
         message.validate()?;
         Ok(message)
@@ -80,6 +90,16 @@ impl Message {
 
     fn validate(&self) -> Result<()> {
         if self.version != 1 || self.text.len() > MAX_TEXT_SIZE || self.files.len() > MAX_FILES {
+            return Err(Error::InvalidInput);
+        }
+        if let Some(reply) = &self.reply
+            && (self.manager.is_some()
+                || self.reaction.is_some()
+                || reply.grant_id.is_empty()
+                || reply.grant_id.len() > 128
+                || !reply.grant_id.is_ascii()
+                || reply.grant_id.chars().any(char::is_control))
+        {
             return Err(Error::InvalidInput);
         }
         if let Some(reaction) = &self.reaction {

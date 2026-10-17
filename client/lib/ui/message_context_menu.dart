@@ -14,6 +14,7 @@ class MessageContextMenu extends StatefulWidget {
     required this.child,
     required this.text,
     this.onReact,
+    this.onReply,
     this.onEdit,
     this.onDelete,
     this.onFavorite,
@@ -22,7 +23,7 @@ class MessageContextMenu extends StatefulWidget {
   final Widget child;
   final String text;
   final ValueChanged<String>? onReact;
-  final VoidCallback? onEdit, onDelete, onFavorite;
+  final VoidCallback? onReply, onEdit, onDelete, onFavorite;
   final bool favorite;
   static bool contains(BuildContext context) =>
       context.findAncestorStateOfType<_MessageContextMenuState>() != null;
@@ -44,6 +45,7 @@ class _MessageContextMenuState extends State<MessageContextMenu> {
     if (open || !mounted) return;
     if (widget.text.isEmpty &&
         widget.onReact == null &&
+        widget.onReply == null &&
         widget.onEdit == null &&
         widget.onDelete == null &&
         widget.onFavorite == null) {
@@ -124,6 +126,15 @@ class _MessageContextMenuState extends State<MessageContextMenu> {
           ],
         ),
       ),
+    if (widget.onReply != null)
+      PopupMenuItem(
+        value: 'reply',
+        child: ListTile(
+          leading: const Icon(Icons.reply),
+          title: Text(context.strings.replyMessage),
+          contentPadding: EdgeInsets.zero,
+        ),
+      ),
     if (widget.text.isNotEmpty)
       PopupMenuItem(
         value: 'copy',
@@ -188,6 +199,8 @@ class _MessageContextMenuState extends State<MessageContextMenu> {
             SnackBar(content: Text(context.strings.messageCopied)),
           );
         }
+      case 'reply':
+        widget.onReply?.call();
       case 'edit':
         widget.onEdit?.call();
       case 'delete':

@@ -53,7 +53,7 @@
   "noMessages": "连接后查看消息。",
   "openChat": "打开聊天",
   "yourAttention": "你的专注",
-  "attentionDescription": "应用不会发送系统通知，也不会开启摄像头或麦克风。保持自己的节奏。",
+  "attentionDescription": "可以在应用设置中启用通知。摄像头和麦克风仅在您操作时开启。",
   "settingsTitle": "应用设置",
   "settingsDescription": "保存在此设备上。",
   "appearance": "外观",
@@ -644,5 +644,15 @@
   "outboxReactionAdd": "添加回应",
   "outboxReactionRemove": "移除回应",
   "outboxMutationBlocked": "更改已停止。请检查权限、runtime 版本和消息的最新状态。如有冲突，请移除此排队操作后重新执行。",
-  "outboxDiscardMutationDescription": "服务器可能已执行此操作。移出队列只会停止本地重试，不会撤销已执行的操作。依赖的操作将停止。"
+  "outboxDiscardMutationDescription": "服务器可能已执行此操作。移出队列只会停止本地重试，不会撤销已执行的操作。依赖的操作将停止。",
+  "replyMessage": "回复",
+  "cancelReply": "取消回复",
+  "replyUnavailable": "原消息不可用",
+  "notifications": "通知",
+  "notificationsOff": "关闭",
+  "notificationsPrivate": "隐藏内容",
+  "notificationsPreview": "显示消息文本",
+  "notificationsDescription": "桌面端：应用运行时接收已连接空间的普通频道和已加入的加密频道通知。预览会将文本传给操作系统。暂不支持退出应用后的通知。",
+  "notificationPermissionError": "无法启用通知。请检查系统设置。",
+  "newMessageNotification": "新消息"
 }

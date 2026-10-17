@@ -28,6 +28,7 @@ class ChatHistory {
   final String serverId, principalId, grantId;
   String title = '', selected = 'general';
   bool attachmentsEnabled = false;
+  bool repliesSupported = false;
   List<Channel> channels = [];
   Map<String, int> readSequences = {};
   final Map<String, CachedMessage> entries = {};
@@ -94,6 +95,7 @@ class ChatHistory {
     'title': title,
     'selected': selected,
     'attachmentsEnabled': attachmentsEnabled,
+    'repliesSupported': repliesSupported,
     'channels': channels.map((c) => c.toProto3Json()).toList(),
     'reads': readSequences,
     'favorites': favorites.toList(),
@@ -122,6 +124,7 @@ class ChatHistory {
           ]
           ..readSequences = Map<String, int>.from(data['reads'] as Map);
     result.attachmentsEnabled = data['attachmentsEnabled'] == true;
+    result.repliesSupported = data['repliesSupported'] == true;
     for (final entry in data['messages'] as List) {
       final content = Content()..mergeFromProto3Json(entry['content']);
       final received = entry['received'] as int;

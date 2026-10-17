@@ -42,10 +42,11 @@ class PendingMessage {
     List<String> uploadedFiles = const [],
     this.blocked = false,
     this.mutation,
+    this.replyTo = '',
   }) : attachments = List.unmodifiable(attachments),
        localFiles = List.unmodifiable(localFiles),
        uploadedFiles = List.unmodifiable(uploadedFiles);
-  final String key, channelId, text;
+  final String key, channelId, text, replyTo;
   final int createdAt;
   final List<String> attachments;
   final List<QueuedFile> localFiles;
@@ -64,6 +65,7 @@ class PendingMessage {
     uploadedFiles: uploadedFiles,
     blocked: value,
     mutation: mutation,
+    replyTo: replyTo,
   );
 
   PendingMessage withFiles(List<QueuedFile> files) => PendingMessage(
@@ -76,6 +78,7 @@ class PendingMessage {
     uploadedFiles: uploadedFiles,
     blocked: blocked,
     mutation: mutation,
+    replyTo: replyTo,
   );
 
   PendingMessage withUploaded(List<String> ids) => PendingMessage(
@@ -88,6 +91,7 @@ class PendingMessage {
     uploadedFiles: ids,
     blocked: blocked,
     mutation: mutation,
+    replyTo: replyTo,
   );
 
   PendingMessage withMutation(QueuedMutation value, {bool? blocked}) =>
@@ -109,6 +113,7 @@ class PendingMessage {
     'files': localFiles.map((file) => file.toJson()).toList(),
     'uploaded': uploadedFiles,
     'blocked': blocked,
+    if (replyTo.isNotEmpty) 'replyTo': replyTo,
     if (mutation != null) 'mutation': mutation!.toJson(),
   };
 
@@ -127,6 +132,7 @@ class PendingMessage {
           .toList(),
       uploadedFiles: (value['uploaded'] as List? ?? []).cast<String>(),
       blocked: value['blocked'] as bool,
+      replyTo: value['replyTo'] as String? ?? '',
       mutation: value['mutation'] == null
           ? null
           : QueuedMutation.fromJson(
@@ -142,7 +148,9 @@ class PendingMessage {
         key.length > 128 ||
         channelId.isEmpty ||
         channelId.length > 128 ||
-        createdAt < 0) {
+        createdAt < 0 ||
+        utf8.encode(replyTo).length > 128 ||
+        mutation != null && replyTo.isNotEmpty) {
       throw const FormatException('Некорректная запись очереди');
     }
     if (mutation != null) {
@@ -234,7 +242,7 @@ class LocalChatOutbox implements ChatOutboxStore {
       throw const FormatException('Слишком большая очередь');
     }
     final data = jsonDecode(saved) as Map<String, dynamic>;
-    if (![1, 2].contains(data['v']) || data['binding'] != scope.binding) {
+    if (![1, 2, 3].contains(data['v']) || data['binding'] != scope.binding) {
       throw const FormatException('Очередь принадлежит другому устройству');
     }
     final entries = (data['messages'] as List)
@@ -245,6 +253,9 @@ class LocalChatOutbox implements ChatOutboxStore {
         .toList();
     if (data['v'] == 1 && entries.any((entry) => entry.mutation != null)) {
       throw const FormatException('Изменения требуют второй версии очереди');
+    }
+    if (data['v'] != 3 && entries.any((entry) => entry.replyTo.isNotEmpty)) {
+      throw const FormatException('Ответы требуют третьей версии очереди');
     }
     _validate(entries);
     return entries;
@@ -296,7 +307,11 @@ class LocalChatOutbox implements ChatOutboxStore {
     _validate(entries);
     final encoded = jsonEncode({
       // Старый клиент не должен отправить текст правки как новое сообщение.
-      'v': entries.any((entry) => entry.mutation != null) ? 2 : 1,
+      'v': entries.any((entry) => entry.replyTo.isNotEmpty)
+          ? 3
+          : entries.any((entry) => entry.mutation != null)
+          ? 2
+          : 1,
       'binding': scope.binding,
       'messages': entries.map((entry) => entry.toJson()).toList(),
     });

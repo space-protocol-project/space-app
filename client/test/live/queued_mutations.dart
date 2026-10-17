@@ -15,6 +15,8 @@ import '../chat_history_test.dart' show HistoryKeys;
 import '../support/rpc_fault_proxy.dart';
 import 'ordinary_sync.dart' show pairOrdinaryDevice;
 
+import '../support/temp_directory.dart';
+
 class _MutationNetwork extends Discovery {
   _MutationNetwork(Discovery source)
     : super(
@@ -185,6 +187,6 @@ Future<void> verifyQueuedMutations(
     for (final controller in controllers) {
       if (!controller.isClosed) await controller.close();
     }
-    await root.delete(recursive: true);
+    await deleteTestDirectory(root, prefix: 'space-live-mutations-');
   }
 }

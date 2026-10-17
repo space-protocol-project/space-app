@@ -14,6 +14,7 @@ import '../src/app_updates.dart';
 import 'components.dart';
 import 'app_updates_view.dart';
 import 'shortcut_settings.dart';
+import 'notification_settings.dart';
 import 'member_profile.dart';
 
 class OverviewPanel extends StatelessWidget {
@@ -149,9 +150,11 @@ class SettingsPanel extends StatelessWidget {
     required this.preferences,
     this.updates,
     this.prepareInstall,
+    this.requestNotificationPermission,
   });
   final AppUpdates? updates;
   final Future<void> Function()? prepareInstall;
+  final Future<bool> Function()? requestNotificationPermission;
   final AppPreferences preferences;
   @override
   Widget build(BuildContext context) =>
@@ -241,6 +244,11 @@ class SettingsPanel extends StatelessWidget {
       ),
       const SizedBox(height: 24),
       ShortcutSettings(preferences: preferences, value: state.sendShortcut),
+      const SizedBox(height: 24),
+      NotificationSettings(
+        preferences: preferences,
+        requestPermission: requestNotificationPermission,
+      ),
       if (state.error.isNotEmpty) ...[
         const SizedBox(height: 16),
         Text(

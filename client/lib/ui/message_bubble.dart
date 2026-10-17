@@ -1,3 +1,5 @@
+import 'message_body_layout.dart';
+import 'message_footer.dart';
 import 'message_markdown.dart';
 import 'space_appearance.dart';
 import '../l10n/strings.dart';
@@ -17,6 +19,7 @@ class MessageBubble extends StatelessWidget {
     this.onToggleFavorite,
     this.actions,
     this.reactions,
+    this.reply,
     this.attachments,
     this.edited = false,
     this.deleted = false,
@@ -25,7 +28,7 @@ class MessageBubble extends StatelessWidget {
   final bool mine, grouped, accepted;
   final DateTime? sentAt;
   final bool favorite, edited, deleted;
-  final Widget? actions, attachments, reactions;
+  final Widget? actions, attachments, reactions, reply;
   final VoidCallback? onToggleFavorite;
 
   String displayText(BuildContext context) =>
@@ -72,11 +75,7 @@ class MessageBubble extends StatelessWidget {
                     horizontal: 18,
                     vertical: 12,
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: _content(context),
-                  ),
+                  child: MessageBodyLayout(children: _content(context)),
                 ),
               ),
             ),
@@ -112,20 +111,6 @@ class MessageBubble extends StatelessWidget {
             ),
             const SizedBox(width: 6),
           ],
-          if (onToggleFavorite != null)
-            IconButton(
-              tooltip: favorite
-                  ? context.strings.removeFavorite
-                  : context.strings.addFavorite,
-              onPressed: onToggleFavorite,
-              visualDensity: VisualDensity.compact,
-              constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-              padding: EdgeInsets.zero,
-              icon: Icon(
-                favorite ? Icons.bookmark : Icons.bookmark_border,
-                size: 16,
-              ),
-            ),
           if (sentAt != null)
             Tooltip(
               message:
@@ -165,6 +150,7 @@ class MessageBubble extends StatelessWidget {
         ),
         const SizedBox(height: 4),
       ],
+      if (!deleted) ?reply,
       if (deleted)
         Text(
           context.strings.messageDeleted,
@@ -176,13 +162,13 @@ class MessageBubble extends StatelessWidget {
       else
         MessageMarkdown(text: displayText(context)),
       if (!deleted) ?attachments,
-      if (!deleted) ?reactions,
-      if (sentAt != null ||
-          accepted ||
-          onToggleFavorite != null ||
-          actions != null ||
-          edited)
-        _metadata(context),
+      Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: MessageFooter(
+          reactions: deleted ? null : reactions,
+          metadata: _metadata(context),
+        ),
+      ),
     ];
   }
 }

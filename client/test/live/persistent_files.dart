@@ -17,6 +17,8 @@ import '../channels_test.dart' show MemoryHistory, MemoryPositions;
 import '../chat_history_test.dart' show HistoryKeys;
 import '../support/rpc_fault_proxy.dart';
 
+import '../support/temp_directory.dart';
+
 class _ReplacementVault implements IdentityVault {
   DeviceRecord? record;
   @override
@@ -219,6 +221,6 @@ Future<void> verifyPersistentFiles(
     for (final controller in controllers) {
       if (!controller.isClosed) await controller.close();
     }
-    await root.delete(recursive: true);
+    await deleteTestDirectory(root, prefix: 'space-live-persistent-files-');
   }
 }

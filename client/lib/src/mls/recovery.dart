@@ -73,6 +73,7 @@ extension MlsRecovery on MlsClient {
         'text': text,
         'files': files,
         if (reaction != null) 'reaction': Map<String, dynamic>.from(reaction),
+        'reply': ?checkedMlsReply(message),
       },
     };
   }

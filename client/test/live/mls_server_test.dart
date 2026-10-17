@@ -1,3 +1,6 @@
+import 'package:space_client/src/chat_notifications.dart';
+import 'package:space_client/src/mls/notifications.dart';
+
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -22,6 +25,7 @@ import 'package:space_client/src/rpc_clients.dart'
 import 'package:space_client/src/root_rotation.dart' as rotation;
 import 'package:space_client/src/pairing.dart';
 import 'package:space_client/src/mls/client.dart';
+import 'package:space_client/src/mls/replies.dart';
 import 'package:space_client/src/mls/files.dart';
 import 'package:space_client/src/mls/local_store.dart';
 import 'package:space_client/src/mls/native.dart';
@@ -138,12 +142,33 @@ void main() {
       await b.trust(deviceA);
       view = await b.refresh('private', group);
       expect(view.joined, isTrue);
+      final watcher = MlsNotificationWatcher();
+      addTearDown(watcher.dispose);
+      final notices = <ChatNotice>[];
+      final source = MlsNotificationSource(
+        origin: origin,
+        principal: member.principalId,
+        channel: owner.availableChannels.firstWhere((c) => c.id == 'private'),
+        open: () async => b,
+        valid: () => true,
+      );
+      await watcher.poll([source], notices.add);
+      expect(notices, isEmpty);
       await a.send('private', 'Секретный текст');
+      await watcher.poll([source], notices.add);
+      expect(notices.single.message!.text, 'Секретный текст');
+      expect(
+        (await watcher.message(source, notices.single.message!.id))!.text,
+        'Секретный текст',
+      );
+      await watcher.poll([source], notices.add);
+      expect(notices, hasLength(1));
       view = await b.refresh('private', group);
       expect(
         (view.messages.single['message'] as Map)['text'],
         'Секретный текст',
       );
+      final originalReply = mlsReplyReference(view.messages.single);
       await a.trust(deviceC);
       await a.invite('private', deviceC);
       view = await b.refresh('private', group);
@@ -170,10 +195,16 @@ void main() {
       );
       await MlsFiles(a).send('private', group, 'Файл для группы', [
         XFile.fromData(bytes, path: 'секретный-файл.bin'),
-      ]);
+      ], reply: originalReply);
       view = await c.refresh('private', group);
       final item = view.messages.single;
       final message = item['message'] as Map;
+      expect(message['reply'], originalReply);
+      expect(
+        findMlsReply(view.messages, message['reply'] as Map),
+        isNull,
+        reason: 'Новому leaf недоступна история до приглашения',
+      );
       final descriptor =
           (message['files'] as List).single as Map<String, dynamic>;
       expect(descriptor['name'], 'секретный-файл.bin');
@@ -372,7 +403,11 @@ void main() {
             0;
       });
       await expectLater(
-        interrupted.send('private', 'Очередь пережила отзыв'),
+        interrupted.send(
+          'private',
+          'Очередь пережила отзыв',
+          reply: mlsReplyReference(item),
+        ),
         throwsA(isA<GrpcError>()),
       );
       await member.revoke();
@@ -429,6 +464,11 @@ void main() {
         ),
       );
       await c.refresh('private', group);
+      final replyView = await c.refresh('private', group);
+      final rebasedReply = replyView.messages.singleWhere(
+        (entry) => entry['message']['text'] == 'Очередь пережила отзыв',
+      );
+      expect(rebasedReply['message']['reply'], mlsReplyReference(item));
       await expectLater(
         b.refresh('private', group),
         throwsA(

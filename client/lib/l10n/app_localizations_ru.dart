@@ -172,7 +172,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get attentionDescription =>
-      'Оболочка не отправляет системные уведомления и не включает камеру или микрофон. Можно оставаться в своём ритме.';
+      'Уведомления можно включить в настройках приложения. Камера и микрофон включаются только по вашему действию.';
 
   @override
   String get settingsTitle => 'Настройки приложения';
@@ -1750,4 +1750,36 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get outboxDiscardMutationDescription =>
       'Действие могло уже выполниться на сервере. Удаление из очереди прекращает локальные повторы, но не отменяет выполненное действие. Зависимые действия остановятся.';
+
+  @override
+  String get replyMessage => 'Ответить';
+
+  @override
+  String get cancelReply => 'Отменить ответ';
+
+  @override
+  String get replyUnavailable => 'Исходное сообщение недоступно';
+
+  @override
+  String get notifications => 'Уведомления';
+
+  @override
+  String get notificationsOff => 'Выключены';
+
+  @override
+  String get notificationsPrivate => 'Скрывать содержимое';
+
+  @override
+  String get notificationsPreview => 'Показывать текст сообщения';
+
+  @override
+  String get notificationsDescription =>
+      'На компьютере: Обычные и присоединённые закрытые каналы подключённых пространств, пока приложение запущено. Предпросмотр передаёт текст операционной системе. Доставка после закрытия приложения пока не поддерживается.';
+
+  @override
+  String get notificationPermissionError =>
+      'Не удалось разрешить уведомления. Проверьте системные настройки.';
+
+  @override
+  String get newMessageNotification => 'Новое сообщение';
 }

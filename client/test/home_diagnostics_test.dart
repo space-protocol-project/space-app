@@ -11,6 +11,8 @@ import 'package:space_client/src/home_installation.dart';
 import 'package:space_client/src/home_runtime.dart';
 import 'package:space_client/ui/home_diagnostics_panel.dart';
 
+import 'support/temp_directory.dart';
+
 Map<String, dynamic> diagnosticFixture() => {
   'format': 1,
   'external': 'unverified',
@@ -110,7 +112,9 @@ void main() {
     final root = await Directory.systemTemp.createTemp(
       'space-doctor-controller-',
     );
-    addTearDown(() => root.delete(recursive: true));
+    addTearDown(
+      () => deleteTestDirectory(root, prefix: 'space-doctor-controller-'),
+    );
     final release = await bundledHomeRelease();
     final installation = HomeInstallation(root);
     final runtime = await installation.runtime(release).create(recursive: true);

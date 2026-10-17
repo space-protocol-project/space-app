@@ -6,6 +6,11 @@ sealed class PreferencesCommand<T> extends PreferencesEvent<T> {}
 
 final class PreferencesLoaded extends PreferencesCommand<void> {}
 
+final class NotificationsChanged extends PreferencesCommand<void> {
+  NotificationsChanged(this.mode);
+  final int mode;
+}
+
 final class PreferencesChanged extends PreferencesCommand<void> {
   PreferencesChanged({
     this.dark,

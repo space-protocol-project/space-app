@@ -1,3 +1,4 @@
+import 'message_reply.dart';
 import 'outbox_panel.dart';
 import 'emoji_picker.dart';
 import 'message_reactions.dart';
@@ -60,6 +61,34 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   bool draggingFiles = false;
   final draft = TextEditingController();
   Content? editing;
+  final replyDrafts = <String, String>{};
+  String get replyTo => replyDrafts[scope] ?? '';
+  Content? replyTarget(String id) => widget.controller.messages
+      .where((m) => m.id == id && m.channelId == widget.controller.channelId)
+      .firstOrNull;
+  void startReply(Content message) {
+    if (!widget.controller.canReplyTo(message)) return;
+    setState(() {
+      if (editing != null) finishEditing();
+      replyDrafts[scope] = message.id;
+    });
+    draftFocus.requestFocus();
+  }
+
+  Widget replyPreview(String id, {bool composer = false}) {
+    final target = replyTarget(id);
+    return MessageReply(
+      key: ValueKey(composer ? 'composer-reply' : 'reply-$id'),
+      message: target,
+      onJump: target == null || target.deleted
+          ? null
+          : () => unawaited(jumpToMessage(id)),
+      onCancel: composer
+          ? () => setState(() => replyDrafts.remove(scope))
+          : null,
+    );
+  }
+
   TextEditingValue? savedDraft;
   String editError = '';
   final draftFocus = FocusNode();
@@ -262,7 +291,11 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     final queue = attachmentQueue;
     if (queue.state.busy || target.busy) return;
     final selected = queue.state.files.map((entry) => entry.file).toList();
-    final sent = await target.send(text, files: selected);
+    final replying = replyTo;
+    final sent = await target.send(text, files: selected, replyTo: replying);
+    if (sent && replyDrafts[startingScope] == replying) {
+      replyDrafts.remove(startingScope);
+    }
     if (sent) queue.clear();
     if (!mounted) return;
     if (sent) _clearSentDraft(text, startingScope, target);
@@ -391,17 +424,19 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     return KeyEventResult.handled;
   }
 
+  String _authorName(BuildContext context, Content message, bool mine) {
+    if (mine) return context.strings.you;
+    final name = message.participantNames[message.authorId] ?? message.authorId;
+    return name.length > 16 ? '${name.substring(0, 16)}…' : name;
+  }
+
   Widget _messageRow(BuildContext context, int index, int boundary) {
     final controller = widget.controller;
     final view = widget.controller.state;
     final colors = Theme.of(context).colorScheme;
     final message = view.messages[index];
     final mine = message.authorId == view.principalId;
-    final author = mine
-        ? context.strings.you
-        : message.authorId.length > 16
-        ? '${message.authorId.substring(0, 16)}…'
-        : message.authorId;
+    final author = _authorName(context, message, mine);
     final grouped =
         index > 0 &&
         view.messages[index - 1].authorId == message.authorId &&
@@ -440,6 +475,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
                       ),
                     ),
                   )
+                : null,
+            onReply: controller.canReplyTo(message)
+                ? () => startReply(message)
                 : null,
             onEdit: controller.canChangeMessage(message)
                 ? () => startEditing(message)
@@ -843,6 +881,8 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (editing == null && replyTo.isNotEmpty)
+            replyPreview(replyTo, composer: true),
           if (editing != null)
             Row(
               children: [
@@ -947,6 +987,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     return MessageBubble(
       key: messageKeys.putIfAbsent(message.id, GlobalKey.new),
       text: message.text,
+      reply: message.replyToId.isEmpty ? null : replyPreview(message.replyToId),
       attachments: message.deleted || !controller.attachmentsEnabled
           ? null
           : MessageAttachments(
@@ -956,6 +997,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       reactions: MessageReactionBar(
         reactions: message.reactions,
         principalId: view.principalId,
+        authorName: (id) => message.participantNames[id] ?? id,
         onSet: controller.canReact && !message.deleted
             ? (emoji, active) =>
                   unawaited(controller.setReaction(message, emoji, active))

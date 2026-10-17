@@ -115,6 +115,7 @@ extension _ChatOutboxController on ChatController {
     String text,
     List<String> attachments,
     List<XFile> files,
+    String replyTo,
   ) async {
     final scope = _outboxScope;
     if (!canQueue || scope == null) return false;
@@ -122,10 +123,12 @@ extension _ChatOutboxController on ChatController {
       return false;
     }
     if (files.isNotEmpty && !canQueueFiles) return false;
+    if (replyTo.isNotEmpty && (!repliesSupported || !canRead)) return false;
     final request = jsonEncode([
       channelId,
       text,
       attachments,
+      replyTo,
       files.map((f) => [f.path, f.name]).toList(),
     ]);
     if (_pendingText != request || _pendingKey.isEmpty) {
@@ -138,6 +141,7 @@ extension _ChatOutboxController on ChatController {
       text: text,
       attachments: attachments,
       createdAt: now().millisecondsSinceEpoch,
+      replyTo: replyTo,
     );
     return _persistMessage(scope, entry, files: files);
   }
@@ -236,6 +240,16 @@ extension _ChatOutboxController on ChatController {
   }
 
   Future<Content> _sendPending(LiveSession session, PendingMessage entry) {
+    if (entry.replyTo.isNotEmpty) {
+      _requireReplySupport(session, entry);
+      return (session as ReplyMessageSession).sendReplyQueued(
+        entry.channelId,
+        entry.text,
+        entry.key,
+        entry.attachmentIds,
+        entry.replyTo,
+      );
+    }
     if (session is QueuedMessageSession) {
       return (session as QueuedMessageSession).sendQueued(
         entry.channelId,
@@ -350,7 +364,8 @@ extension _ChatOutboxController on ChatController {
         content.channelId != entry.channelId ||
         content.authorId != scope.principalId ||
         content.sequence <= 0 ||
-        content.revision < 1) {
+        content.revision < 1 ||
+        content.replyToId != entry.replyTo) {
       throw const FormatException('Неверное подтверждение сообщения');
     }
     if (content.revision == 1 &&

@@ -27,6 +27,7 @@ part 'chat_outbox_controller.dart';
 part 'chat_outbox_files.dart';
 part 'chat_outbox_recovery.dart';
 part 'chat_outbox_mutations.dart';
+part 'chat_replies.dart';
 
 enum MessageSendStatus { idle, sending, unconfirmed, accepted, queued }
 
@@ -110,7 +111,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     on<ChatMessageSent>(
       (event, _) => handleRequest(
         event,
-        () => _send(event.text, event.attachments, event.files),
+        () => _send(event.text, event.attachments, event.files, event.replyTo),
       ),
     );
     on<ChatReactionSet>(
@@ -171,11 +172,13 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     String text, {
     List<String> attachments = const [],
     List<XFile> files = const [],
+    String replyTo = '',
   }) => sendRequest(
     ChatMessageSent(
       text,
       List.unmodifiable(attachments),
       List.unmodifiable(files),
+      replyTo,
     ),
   );
   SpaceSession? get mlsSession =>
@@ -200,6 +203,19 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
           attachmentsEnabled &&
           _outboxScope != null &&
           _outboxScope!.origin == knownOrigin;
+  bool get repliesSupported => _session == null
+      ? _history?.repliesSupported ?? false
+      : _session is ReplyMessageSession &&
+            (_session as ReplyMessageSession).repliesSupported;
+  bool canReplyTo(Content message) =>
+      canQueue &&
+      canRead &&
+      repliesSupported &&
+      !encryptedChannel &&
+      !message.deleted &&
+      message.channelId == channelId &&
+      message.id.isNotEmpty &&
+      message.sequence > 0;
   bool get canQueueFiles => canQueue && canAttachFiles;
   bool get canReact =>
       _canQueueMutation ||
@@ -348,6 +364,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     saved.title = spaceTitle;
     saved.attachmentsEnabled =
         session is AttachmentSession && attachmentsEnabled;
+    saved.repliesSupported = repliesSupported;
     saved.channels = channels
         .map((c) => Channel()..mergeFromProto3Json(c.toProto3Json()))
         .toList();
@@ -1479,7 +1496,8 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     String text,
     List<String> attachments,
     List<XFile> files,
-  ) => _enqueueMessage(text, attachments, files);
+    String replyTo,
+  ) => _enqueueMessage(text, attachments, files, replyTo);
 
   Future<void> _revoke() async {
     if (busy || _session == null) return;

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/strings.dart';
 import '../src/generated/space/v1/space.pb.dart';
 import 'emoji_picker.dart';
+import 'reaction_people.dart';
 
 class MessageReactionBar extends StatelessWidget {
   const MessageReactionBar({
@@ -25,9 +26,10 @@ class MessageReactionBar extends StatelessWidget {
     children: [
       for (final reaction in reactions)
         InputChip(
+          shape: const StadiumBorder(),
           selected: reaction.principalIds.contains(principalId),
           showCheckmark: false,
-          label: Text('${reaction.emoji} ${reaction.principalIds.length}'),
+          label: ReactionPeople(reaction: reaction, authorName: authorName),
           onPressed: onSet == null
               ? null
               : () => onSet!(
@@ -63,7 +65,7 @@ class MessageReactionBar extends StatelessWidget {
             ),
           ),
         ),
-      if (onSet != null)
+      if (onSet != null && reactions.isEmpty)
         IconButton(
           visualDensity: VisualDensity.compact,
           tooltip: context.strings.addReaction,

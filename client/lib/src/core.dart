@@ -534,6 +534,17 @@ abstract interface class LiveSession {
   Future<void> close();
 }
 
+abstract interface class ReplyMessageSession {
+  bool get repliesSupported;
+  Future<Content> sendReplyQueued(
+    String channelId,
+    String text,
+    String key,
+    List<String> attachments,
+    String replyTo,
+  );
+}
+
 abstract interface class QueuedMessageSession {
   Future<Content> sendQueued(
     String channelId,
@@ -642,6 +653,7 @@ class SpaceSession
     implements
         LiveSession,
         QueuedMessageSession,
+        ReplyMessageSession,
         QueuedMutationSession,
         MessageChanges,
         MessageReactions,
@@ -761,6 +773,8 @@ class SpaceSession
   bool attachmentsEnabled = false;
   bool mlsSupported = false;
   @override
+  bool repliesSupported = false;
+  @override
   ServerIcon? serverIcon;
   @override
   String chatTitle = 'Общий чат';
@@ -811,6 +825,7 @@ class SpaceSession
     );
     await _pinMlsCatalog(result.channels);
     mlsSupported = manifest.mlsSupported;
+    repliesSupported = manifest.ordinaryRepliesSupported;
     _applyCatalog(
       result.channels,
       manifest.title,
@@ -1191,6 +1206,7 @@ class SpaceSession
         GetManifestRequest(),
         options: RpcOptions(timeout: const Duration(seconds: 10)),
       );
+      session.repliesSupported = manifest.ordinaryRepliesSupported;
       session.spaceTitle = manifest.title;
       session.serverIcon = manifest.hasIcon() ? manifest.icon : null;
       session.chatTitle =
@@ -1599,6 +1615,40 @@ class SpaceSession
       options: _options,
     );
     return result.content;
+  }
+
+  @override
+  Future<Content> sendReplyQueued(
+    String channelId,
+    String text,
+    String key,
+    List<String> attachments,
+    String replyTo,
+  ) async {
+    if (!repliesSupported || replyTo.isEmpty) {
+      throw const GrpcError.failedPrecondition('Сервер не поддерживает ответы');
+    }
+    final target = availableChannels
+        .where((c) => c.id == channelId)
+        .firstOrNull;
+    if (target == null ||
+        !target.permissions.read ||
+        !target.permissions.write ||
+        target.archived ||
+        target.mlsGroupId.isNotEmpty) {
+      throw const GrpcError.permissionDenied('Ответ в канал недоступен');
+    }
+    await _ensureSession();
+    return (await ContentServiceClient(channel).createContent(
+      CreateContentRequest(
+        channelId: channelId,
+        text: text,
+        idempotencyKey: key,
+        attachmentIds: attachments,
+        replyToId: replyTo,
+      ),
+      options: _options,
+    )).content;
   }
 
   @override

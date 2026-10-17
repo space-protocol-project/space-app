@@ -19,6 +19,7 @@ extension MlsDelivery on MlsClient {
     List<Map<String, dynamic>> files = const [],
     List<String> assetIds = const [],
     List<int>? messageId,
+    Map<String, dynamic>? reply,
   }) => _serial(
     () => _send(
       channelId,
@@ -26,6 +27,7 @@ extension MlsDelivery on MlsClient {
       files: files,
       assetIds: assetIds,
       messageId: messageId,
+      reply: reply,
     ),
   );
 
@@ -36,10 +38,12 @@ extension MlsDelivery on MlsClient {
     List<String> assetIds = const [],
     List<int>? messageId,
     Map<String, dynamic>? reaction,
+    Map<String, dynamic>? reply,
   }) async {
     final id = messageId ?? mlsId();
     final document = await local.read();
     final channel = _channel(document, channelId);
+    await requireReplyTarget(channelId, reply);
     if (channel['revocation_pending'] == true) {
       throw StateError(
         'Сначала дождитесь исключения отозванных устройств из канала',
@@ -59,6 +63,7 @@ extension MlsDelivery on MlsClient {
       'text': text,
       'files': files,
       'reaction': ?reaction,
+      'reply': ?reply,
     };
     await local.update(
       'encrypt',
@@ -382,6 +387,9 @@ extension MlsDelivery on MlsClient {
         reaction: message['reaction'] == null
             ? null
             : Map<String, dynamic>.from(message['reaction'] as Map),
+        reply: message['reply'] == null
+            ? null
+            : Map<String, dynamic>.from(message['reply'] as Map),
         files: (message['files'] as List).cast<Map<String, dynamic>>(),
         assetIds: (retry['asset_ids'] as List).cast<String>(),
       );

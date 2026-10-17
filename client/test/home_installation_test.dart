@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/home_installation.dart';
 import 'package:space_client/src/home_runtime.dart';
 
+import 'support/temp_directory.dart';
+
 HomeRelease release(
   String version, [
   String platform = 'windows-x64',
@@ -48,7 +50,9 @@ void main() {
     root = await Directory.systemTemp.createTemp('space-runtime-selection-');
     store = HomeInstallation(root);
   });
-  tearDown(() async => root.delete(recursive: true));
+  tearDown(
+    () async => deleteTestDirectory(root, prefix: 'space-runtime-selection-'),
+  );
 
   test('Новая установка ещё не выбирает версию', () async {
     expect(await store.active(release('v0.1.0')), isNull);

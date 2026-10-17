@@ -1,5 +1,7 @@
 import 'emoji_picker.dart';
 import 'message_reactions.dart';
+import 'message_reply.dart';
+import '../src/mls/replies.dart';
 import 'message_context_menu.dart';
 import 'attachment_gallery.dart';
 import 'mls_files.dart';
@@ -29,11 +31,15 @@ class MlsChannelView extends StatefulWidget {
     required this.attachmentsEnabled,
     required this.canWrite,
     required this.active,
+    this.jumpRequest,
+    this.jumpGeneration = 0,
   });
   final SpaceSession session;
   final String channelId;
   final List<int> groupId;
   final bool attachmentsEnabled, canWrite, active;
+  final String? jumpRequest;
+  final int jumpGeneration;
   @override
   State<MlsChannelView> createState() => _MlsChannelViewState();
 }
@@ -60,6 +66,8 @@ class _MlsChannelViewState extends State<MlsChannelView> {
         attachmentsEnabled: widget.attachmentsEnabled,
         canWrite: widget.canWrite,
         active: widget.active,
+        jumpRequest: widget.jumpRequest,
+        jumpGeneration: widget.jumpGeneration,
       );
     },
   );
@@ -73,11 +81,15 @@ class _MlsConversation extends StatefulWidget {
     required this.attachmentsEnabled,
     required this.canWrite,
     required this.active,
+    this.jumpRequest,
+    this.jumpGeneration = 0,
   });
   final MlsClient client;
   final String channelId;
   final List<int> groupId;
   final bool attachmentsEnabled, canWrite, active;
+  final String? jumpRequest;
+  final int jumpGeneration;
   @override
   State<_MlsConversation> createState() => _MlsConversationState();
 }
@@ -90,9 +102,57 @@ class _MlsConversationState extends State<_MlsConversation> {
   );
   final draft = TextEditingController();
   final scroll = ScrollController();
+  final messageKeys = <String, GlobalKey>{};
+  int seenJump = -1;
+
+  void scheduleJump(List<Map<String, dynamic>> messages) {
+    final id = widget.jumpRequest;
+    if (id == null || seenJump == widget.jumpGeneration) return;
+    if (!messages.any((item) => mlsMessageKey(item) == id)) return;
+    final generation = widget.jumpGeneration;
+    seenJump = generation;
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => seekMessage(id, generation),
+    );
+  }
+
+  Future<void> seekMessage(String id, int generation) async {
+    var low = 0.0;
+    var high = scroll.hasClients ? scroll.position.maxScrollExtent : 0.0;
+    for (var attempt = 0; attempt < 24; attempt++) {
+      if (!mounted ||
+          generation != widget.jumpGeneration ||
+          !scroll.hasClients) {
+        return;
+      }
+      final target = messageKeys[id]?.currentContext;
+      if (target != null && target.mounted) {
+        await Scrollable.ensureVisible(target, alignment: 0.4);
+        return;
+      }
+      final messages = [
+        ...?controller.state.data?.messages,
+      ]..sort((a, b) => (a['sequence'] as int).compareTo(b['sequence'] as int));
+      final index = messages.indexWhere((item) => mlsMessageKey(item) == id);
+      final visible = messages.indexWhere(
+        (item) => messageKeys[mlsMessageKey(item)]?.currentContext != null,
+      );
+      if (index < 0 || visible < 0) return;
+      if (index < visible) {
+        high = scroll.offset;
+      } else {
+        low = scroll.offset;
+      }
+      scroll.jumpTo((low + high) / 2);
+      await WidgetsBinding.instance.endOfFrame;
+    }
+  }
+
   List<XFile> files = [];
   bool submitting = false;
   String? submittedText;
+  Map<String, dynamic>? replyTarget;
+  Map<String, dynamic>? submittedReply;
   Timer? timer;
   DialogRoute<void>? filesRoute;
 
@@ -388,6 +448,9 @@ class _MlsConversationState extends State<_MlsConversation> {
         controller.add(MlsReact(item, emoji, active));
     return MessageContextMenu(
       text: message['text'] as String,
+      onReply: canReact
+          ? () => setState(() => replyTarget = mlsReplyReference(item))
+          : null,
       onReact: canReact
           ? (emoji) => react(
               emoji,
@@ -419,6 +482,8 @@ class _MlsConversationState extends State<_MlsConversation> {
                 style: Theme.of(context).textTheme.labelSmall,
               ),
               const SizedBox(height: 6),
+              if (message['reply'] != null)
+                replyPreview(message['reply'] as Map),
               if (item['archived'] == true)
                 Text(
                   'Из архива',
@@ -458,6 +523,7 @@ class _MlsConversationState extends State<_MlsConversation> {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (replyTarget != null) replyPreview(replyTarget!, cancel: true),
         if (widget.attachmentsEnabled && files.isNotEmpty)
           Wrap(
             children: files
@@ -537,7 +603,13 @@ class _MlsConversationState extends State<_MlsConversation> {
         controller: scroll,
         padding: const EdgeInsets.symmetric(horizontal: 24),
         itemCount: messages.length,
-        itemBuilder: (context, index) => messageCard(messages[index]),
+        itemBuilder: (context, index) => KeyedSubtree(
+          key: messageKeys.putIfAbsent(
+            mlsMessageKey(messages[index]),
+            GlobalKey.new,
+          ),
+          child: messageCard(messages[index]),
+        ),
       );
       if (!widget.attachmentsEnabled || constraints.maxWidth < 1080) {
         return chat;
@@ -613,8 +685,10 @@ class _MlsConversationState extends State<_MlsConversation> {
     final event = MlsSend(
       draft.text,
       widget.attachmentsEnabled ? List.of(files) : [],
+      reply: replyTarget,
     );
     submittedText = draft.text;
+    submittedReply = replyTarget;
     setState(() => submitting = true);
     controller.add(event);
     final accepted = await event.done.future;
@@ -626,7 +700,18 @@ class _MlsConversationState extends State<_MlsConversation> {
   void clearSubmitted() {
     if (draft.text != submittedText) return;
     draft.clear();
-    setState(() => files = []);
+    setState(() {
+      files = [];
+      if (identical(replyTarget, submittedReply)) replyTarget = null;
+    });
+  }
+
+  Widget replyPreview(Map reference, {bool cancel = false}) {
+    final messages = controller.state.data?.messages ?? [];
+    return MessageReply(
+      message: mlsReplyContent(findMlsReply(messages, reference)),
+      onCancel: cancel ? () => setState(() => replyTarget = null) : null,
+    );
   }
 
   @override
@@ -640,6 +725,7 @@ class _MlsConversationState extends State<_MlsConversation> {
       final messages = [
         ...?state.data?.messages,
       ]..sort((a, b) => (a['sequence'] as int).compareTo(b['sequence'] as int));
+      scheduleJump(messages);
       return Padding(
         padding: const EdgeInsets.only(top: 72),
         child: Column(

@@ -15,6 +15,8 @@ import 'channels_test.dart'
 import 'chat_history_test.dart' show HistoryKeys;
 import 'support/chat_outbox.dart';
 
+import 'support/temp_directory.dart';
+
 class OutboxKeys extends HistoryKeys {
   bool fail = false;
   @override
@@ -181,7 +183,7 @@ void main() {
       if (!controller.isClosed) await controller.close();
     }
     controllers.clear();
-    await directory.delete(recursive: true);
+    await deleteTestDirectory(directory, prefix: 'space-outbox-');
   });
 
   test(

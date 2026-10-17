@@ -23,6 +23,8 @@ import 'channels_test.dart' show ChannelVault, MemoryHistory, MemoryPositions;
 import 'chat_history_test.dart' show HistoryKeys;
 import 'chat_outbox_test.dart' show DeliveryBackend, OutboxSession, eventually;
 
+import 'support/temp_directory.dart';
+
 class _Upload {
   _Upload(this.asset);
   final Asset asset;
@@ -189,7 +191,7 @@ void main() {
       if (!controller.isClosed) await controller.close();
     }
     controllers.clear();
-    await root.delete(recursive: true);
+    await deleteTestDirectory(root, prefix: 'space-persistent-files-');
   });
 
   test(

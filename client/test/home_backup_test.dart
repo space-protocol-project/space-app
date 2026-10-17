@@ -8,6 +8,8 @@ import 'package:space_client/src/local_failure.dart';
 
 import 'home_installation_test.dart' show release;
 
+import 'support/temp_directory.dart';
+
 Future<void> writeBackupManifest(Directory root) async {
   final files = <String, String>{}, directories = <String>[];
   await for (final entry in root.list(recursive: true, followLinks: false)) {
@@ -42,7 +44,7 @@ void main() {
     await File('${root.path}/data/server.key').writeAsString('fixture');
     await writeBackupManifest(root);
   });
-  tearDown(() => root.delete(recursive: true));
+  tearDown(() => deleteTestDirectory(root, prefix: 'space-backup-check-'));
   test(
     'Полная копия проходит проверку; отсутствие каталога имеет отдельный код',
     () async {

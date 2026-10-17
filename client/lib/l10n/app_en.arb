@@ -53,7 +53,7 @@
   "noMessages": "Connect to open messages.",
   "openChat": "Open chat",
   "yourAttention": "Your attention",
-  "attentionDescription": "The app does not send system notifications or activate your camera or microphone. Keep your own pace.",
+  "attentionDescription": "You can enable notifications in app settings. The camera and microphone are activated only by your action.",
   "settingsTitle": "App settings",
   "settingsDescription": "Saved on this device.",
   "appearance": "Appearance",
@@ -644,5 +644,15 @@
   "outboxReactionAdd": "Add reaction",
   "outboxReactionRemove": "Remove reaction",
   "outboxMutationBlocked": "Change stopped. Check your permissions, runtime version, and the latest message. For a conflict, discard this queued action and perform it again.",
-  "outboxDiscardMutationDescription": "The action may already have been applied on the server. Discarding stops local retries but does not undo the action. Dependent actions will stop."
+  "outboxDiscardMutationDescription": "The action may already have been applied on the server. Discarding stops local retries but does not undo the action. Dependent actions will stop.",
+  "replyMessage": "Reply",
+  "cancelReply": "Cancel reply",
+  "replyUnavailable": "Original message is unavailable",
+  "notifications": "Notifications",
+  "notificationsOff": "Off",
+  "notificationsPrivate": "Hide content",
+  "notificationsPreview": "Show message text",
+  "notificationsDescription": "On desktop: Ordinary and joined encrypted channels in connected spaces while the app is running. Previews share text with the operating system. Delivery after quitting is not supported yet.",
+  "notificationPermissionError": "Could not enable notifications. Check system settings.",
+  "newMessageNotification": "New message"
 }

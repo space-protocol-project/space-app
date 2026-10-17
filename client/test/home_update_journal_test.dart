@@ -8,6 +8,8 @@ import 'package:space_client/src/local_failure.dart';
 
 import 'home_installation_test.dart' show release;
 
+import 'support/temp_directory.dart';
+
 void main() {
   late Directory root;
   late HomeUpdateJournal journal;
@@ -15,7 +17,7 @@ void main() {
     root = await Directory.systemTemp.createTemp('space-update-journal-');
     journal = HomeUpdateJournal(root);
   });
-  tearDown(() => root.delete(recursive: true));
+  tearDown(() => deleteTestDirectory(root, prefix: 'space-update-journal-'));
 
   test('HomeController не запускает и не загружает сервер при незавершённой операции', () async {
     await journal.begin(release('v0.1.0'), release('v0.2.0'));

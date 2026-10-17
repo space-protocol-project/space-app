@@ -9,6 +9,8 @@ import 'package:space_client/src/home_update_journal.dart';
 
 import 'home_installation_test.dart' show installed, release;
 
+import 'support/temp_directory.dart';
+
 void main() {
   late Directory root;
   late HomeInstallation installation;
@@ -40,7 +42,7 @@ void main() {
       await Directory.systemTemp.resolveSymbolicLinks(),
     );
     expect(path.basename(resolved), startsWith('space-runtime-cleanup-'));
-    await root.delete(recursive: true);
+    await deleteTestDirectory(root, prefix: 'space-runtime-cleanup-');
   });
 
   test(

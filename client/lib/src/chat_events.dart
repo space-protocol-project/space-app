@@ -58,8 +58,9 @@ final class ChatMessageSent extends ChatEvent<bool> {
     this.text, [
     this.attachments = const [],
     this.files = const [],
+    this.replyTo = '',
   ]);
-  final String text;
+  final String text, replyTo;
   final List<String> attachments;
   final List<XFile> files;
 }

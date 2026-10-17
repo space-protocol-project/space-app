@@ -172,7 +172,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get attentionDescription =>
-      'The app does not send system notifications or activate your camera or microphone. Keep your own pace.';
+      'You can enable notifications in app settings. The camera and microphone are activated only by your action.';
 
   @override
   String get settingsTitle => 'App settings';
@@ -1742,4 +1742,36 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get outboxDiscardMutationDescription =>
       'The action may already have been applied on the server. Discarding stops local retries but does not undo the action. Dependent actions will stop.';
+
+  @override
+  String get replyMessage => 'Reply';
+
+  @override
+  String get cancelReply => 'Cancel reply';
+
+  @override
+  String get replyUnavailable => 'Original message is unavailable';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get notificationsOff => 'Off';
+
+  @override
+  String get notificationsPrivate => 'Hide content';
+
+  @override
+  String get notificationsPreview => 'Show message text';
+
+  @override
+  String get notificationsDescription =>
+      'On desktop: Ordinary and joined encrypted channels in connected spaces while the app is running. Previews share text with the operating system. Delivery after quitting is not supported yet.';
+
+  @override
+  String get notificationPermissionError =>
+      'Could not enable notifications. Check system settings.';
+
+  @override
+  String get newMessageNotification => 'New message';
 }

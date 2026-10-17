@@ -169,7 +169,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get yourAttention => '你的专注';
 
   @override
-  String get attentionDescription => '应用不会发送系统通知，也不会开启摄像头或麦克风。保持自己的节奏。';
+  String get attentionDescription => '可以在应用设置中启用通知。摄像头和麦克风仅在您操作时开启。';
 
   @override
   String get settingsTitle => '应用设置';
@@ -1598,11 +1598,45 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get outboxDiscardMutationDescription =>
       '服务器可能已执行此操作。移出队列只会停止本地重试，不会撤销已执行的操作。依赖的操作将停止。';
+
+  @override
+  String get replyMessage => '回复';
+
+  @override
+  String get cancelReply => '取消回复';
+
+  @override
+  String get replyUnavailable => '原消息不可用';
+
+  @override
+  String get notifications => '通知';
+
+  @override
+  String get notificationsOff => '关闭';
+
+  @override
+  String get notificationsPrivate => '隐藏内容';
+
+  @override
+  String get notificationsPreview => '显示消息文本';
+
+  @override
+  String get notificationsDescription =>
+      '桌面端：应用运行时接收已连接空间的普通频道和已加入的加密频道通知。预览会将文本传给操作系统。暂不支持退出应用后的通知。';
+
+  @override
+  String get notificationPermissionError => '无法启用通知。请检查系统设置。';
+
+  @override
+  String get newMessageNotification => '新消息';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
 class AppLocalizationsZhHans extends AppLocalizationsZh {
   AppLocalizationsZhHans() : super('zh_Hans');
+
+  @override
+  String get attentionDescription => '可以在应用设置中启用通知。摄像头和麦克风仅在您操作时开启。';
 
   @override
   String get messageUnconfirmed => '未收到服务器确认，请求已保存在队列中。';
@@ -2031,4 +2065,35 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   @override
   String get outboxDiscardMutationDescription =>
       '服务器可能已执行此操作。移出队列只会停止本地重试，不会撤销已执行的操作。依赖的操作将停止。';
+
+  @override
+  String get replyMessage => '回复';
+
+  @override
+  String get cancelReply => '取消回复';
+
+  @override
+  String get replyUnavailable => '原消息不可用';
+
+  @override
+  String get notifications => '通知';
+
+  @override
+  String get notificationsOff => '关闭';
+
+  @override
+  String get notificationsPrivate => '隐藏内容';
+
+  @override
+  String get notificationsPreview => '显示消息文本';
+
+  @override
+  String get notificationsDescription =>
+      '桌面端：应用运行时接收已连接空间的普通频道和已加入的加密频道通知。预览会将文本传给操作系统。暂不支持退出应用后的通知。';
+
+  @override
+  String get notificationPermissionError => '无法启用通知。请检查系统设置。';
+
+  @override
+  String get newMessageNotification => '新消息';
 }

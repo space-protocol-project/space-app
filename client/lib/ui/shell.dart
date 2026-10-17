@@ -1,4 +1,4 @@
-import '../src/generated/space/v1/space.pb.dart' show Channel;
+import '../src/generated/space/v1/space.pb.dart' show Channel, Content;
 import 'mls_channel.dart';
 import '../src/message_summary.dart';
 
@@ -12,6 +12,13 @@ import '../l10n/app_localizations.dart';
 import 'admin_panel.dart';
 
 import 'dart:async';
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
+
+import '../src/chat_notifications.dart';
+import '../src/system_notifications.dart';
+import '../src/mls/notifications.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,6 +48,9 @@ import 'space_frame.dart';
 import 'space_popup.dart';
 import 'measure_size.dart';
 import 'retained_indexed_stack.dart';
+
+part 'shell_notifications.dart';
+part 'shell_mls_notifications.dart';
 
 enum Section {
   overview(Icons.home_outlined),
@@ -72,11 +82,13 @@ class SpaceShell extends StatefulWidget {
     this.presence,
     this.workspaces,
     this.updates,
+    this.notifications,
     this.hostingEnabled = true,
   });
   final bool hostingEnabled;
   final AppPreferences preferences;
   final AppUpdates? updates;
+  final SystemNotifications? notifications;
   final ChatController? controller;
   final ServerPresence? presence;
   final ServerWorkspaces? workspaces;
@@ -84,7 +96,24 @@ class SpaceShell extends StatefulWidget {
   State<SpaceShell> createState() => _SpaceShellState();
 }
 
-class _SpaceShellState extends State<SpaceShell> {
+class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
+  late final systemNotifications =
+      widget.notifications ?? SystemNotifications();
+  final notificationTracker = ChatNotificationTracker();
+  StreamSubscription<String>? notificationTaps;
+  Future<void> notificationJobs = Future.value();
+  final pendingNotices = <String, ChatNotice>{};
+  bool notificationDraining = false;
+  bool notificationFocused = true;
+  final mlsNotificationWatcher = MlsNotificationWatcher();
+  Timer? mlsNotificationTimer;
+  int mlsNotificationGeneration = 0;
+  int previousMlsNotificationMode = 0;
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    notificationFocused = state == AppLifecycleState.resumed;
+  }
+
   late final ChatController initialController =
       widget.controller ?? ChatController(SecureIdentityVault());
   ChatController? activeController;
@@ -413,6 +442,14 @@ class _SpaceShellState extends State<SpaceShell> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    mlsNotificationTimer = Timer.periodic(
+      const Duration(seconds: 3),
+      (_) => unawaited(pollMlsNotifications()),
+    );
+    notificationTaps = systemNotifications.targets.stream.listen(
+      (payload) => unawaited(openNotification(payload)),
+    );
     dashboard = widget.controller == null;
     if (home.supported) unawaited(home.load());
     unawaited(updates.check());
@@ -790,6 +827,11 @@ class _SpaceShellState extends State<SpaceShell> {
 
   @override
   void dispose() {
+    mlsNotificationTimer?.cancel();
+    mlsNotificationWatcher.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    unawaited(notificationTaps?.cancel());
+    if (widget.notifications == null) unawaited(systemNotifications.dispose());
     menuButtonFocus.dispose();
     menuFocus.dispose();
     if (widget.presence == null) presence.dispose();
@@ -1412,8 +1454,17 @@ class _SpaceShellState extends State<SpaceShell> {
                     key: ValueKey((
                       'mls',
                       controller.mlsSession!.server.serverId,
+                      controller.principalId,
+                      controller.mlsSession,
                       controller.channelId,
+                      base64Encode(
+                        controller.channels
+                            .firstWhere((c) => c.id == controller.channelId)
+                            .mlsGroupId,
+                      ),
                     )),
+                    jumpRequest: jumpRequest,
+                    jumpGeneration: jumpGeneration,
                     session: controller.mlsSession!,
                     channelId: controller.channelId,
                     groupId: controller.channels
@@ -1584,11 +1635,14 @@ class _SpaceShellState extends State<SpaceShell> {
   }
 
   void _preferencesChanged(BuildContext context, PreferencesState state) {
+    resetMlsNotifications();
+    clearPrivateNotifications();
     unawaited(watchSavedServers());
     _refreshShell();
   }
 
   void _workspacesChanged(BuildContext context, WorkspaceState state) {
+    receiveNotifications(state);
     cacheServerIcons();
     handleDeniedServers();
     _refreshShell();
@@ -1703,6 +1757,8 @@ class _SpaceShellState extends State<SpaceShell> {
                             pages(),
                             SettingsPanel(
                               preferences: widget.preferences,
+                              requestNotificationPermission:
+                                  systemNotifications.requestPermission,
                               updates: updates,
                               prepareInstall: prepareAppInstall,
                             ),

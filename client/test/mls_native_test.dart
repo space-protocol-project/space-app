@@ -118,6 +118,7 @@ void main() {
         'id': List.filled(16, 1),
         'text': 'После перезапуска',
         'files': [],
+        'reply': {'message_id': List.filled(16, 9), 'grant_id': 'grant-2'},
       },
     });
     final decrypted = await bob.update('decrypt', {
@@ -125,6 +126,10 @@ void main() {
       'ciphertext': encrypted['ciphertext'],
     });
     expect((decrypted['message'] as Map)['text'], 'После перезапуска');
+    expect((decrypted['message'] as Map)['reply'], {
+      'message_id': List.filled(16, 9),
+      'grant_id': 'grant-2',
+    });
     await expectLater(
       bob.update('decrypt', {
         'group_id': group,

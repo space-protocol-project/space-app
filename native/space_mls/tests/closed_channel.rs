@@ -58,6 +58,57 @@ fn two_devices_exchange_private_messages() -> TestResult {
 }
 
 #[test]
+fn reply_reference_is_authenticated_inside_ciphertext() -> TestResult {
+    let mut pair = Pair::new()?;
+    let mut message = text("Ответ с зашифрованной ссылкой")?;
+    message.reply = Some(space_mls::Reply {
+        message_id: [9; 16],
+        grant_id: "original-device-grant".into(),
+    });
+    let ciphertext = pair.sender.encrypt(&mut pair.alice, &message)?;
+    assert!(!contains(&ciphertext, b"original-device-grant"));
+    let mut tampered = ciphertext.clone();
+    let last = tampered.len() - 1;
+    tampered[last] ^= 1;
+    assert!(pair.receiver.decrypt(&mut pair.bob, &tampered).is_err());
+    let received = pair.receiver.decrypt(&mut pair.bob, &ciphertext)?;
+    let reference = received.message.reply.ok_or("Отсутствует ссылка ответа")?;
+    assert_eq!(reference.message_id, [9; 16]);
+    assert_eq!(reference.grant_id, "original-device-grant");
+    Ok(())
+}
+
+#[test]
+fn reply_cannot_be_disguised_as_control_message() -> TestResult {
+    let mut pair = Pair::new()?;
+    for grant in ["", "bad\ngrant", "не-ascii"] {
+        let mut message = text("Ответ")?;
+        message.reply = Some(space_mls::Reply {
+            message_id: [9; 16],
+            grant_id: grant.into(),
+        });
+        assert!(pair.sender.encrypt(&mut pair.alice, &message).is_err());
+    }
+    let mut message = text("Ответ")?;
+    message.reply = Some(space_mls::Reply {
+        message_id: [9; 16],
+        grant_id: "grant".into(),
+    });
+    message.manager = Some("grant".into());
+    assert!(pair.sender.encrypt(&mut pair.alice, &message).is_err());
+    message.manager = None;
+    message.text.clear();
+    message.reaction = Some(space_mls::Reaction {
+        message_id: [9; 16],
+        grant_id: "grant".into(),
+        emoji: "👍".into(),
+        active: true,
+    });
+    assert!(pair.sender.encrypt(&mut pair.alice, &message).is_err());
+    Ok(())
+}
+
+#[test]
 fn encrypted_file_crosses_mls_without_exposing_name_or_key() -> TestResult {
     let mut pair = Pair::new()?;
     let bytes = vec![0x42; 256 * 1024 + 31];

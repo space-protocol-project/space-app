@@ -2,6 +2,7 @@ part of 'preferences.dart';
 
 final class PreferencesState {
   const PreferencesState({
+    this.notificationMode = 0,
     this.uiScale = 1,
     this.dark = true,
     this.effects = true,
@@ -15,6 +16,7 @@ final class PreferencesState {
   });
   factory PreferencesState.fromController(AppPreferences controller) =>
       PreferencesState(
+        notificationMode: controller.notificationMode,
         uiScale: controller.uiScale,
         dark: controller.dark,
         effects: controller.effects,
@@ -32,6 +34,7 @@ final class PreferencesState {
         theme: controller.theme,
       );
   final double uiScale;
+  final int notificationMode;
   final bool dark, effects;
   final String palette, language, sendShortcut, error;
   final List<String> origins;

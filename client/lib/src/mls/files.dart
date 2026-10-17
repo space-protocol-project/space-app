@@ -17,9 +17,11 @@ class MlsFiles {
     String channel,
     List<int> group,
     String text,
-    List<XFile> files,
-  ) async {
+    List<XFile> files, {
+    Map<String, dynamic>? reply,
+  }) async {
     if (files.length > 5) throw StateError('Не более пяти файлов');
+    await client.requireReplyTarget(channel, reply);
     final messageId = mlsId();
     final descriptors = <Map<String, dynamic>>[];
     final ids = <String>[];
@@ -47,6 +49,7 @@ class MlsFiles {
       files: descriptors,
       assetIds: ids,
       messageId: messageId,
+      reply: reply,
     );
   }
 

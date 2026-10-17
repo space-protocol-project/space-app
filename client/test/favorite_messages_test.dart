@@ -115,7 +115,10 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.byIcon(Icons.bookmark_border));
+      expect(find.byIcon(Icons.bookmark_border), findsNothing);
+      await tester.longPress(find.text(controller.messages.single.text).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Добавить в избранное'));
       await tester.pumpAndSettle();
       expect(find.byType(FavoriteMessages), findsOneWidget);
       expect(controller.isFavorite(controller.messages.single), isTrue);
@@ -129,7 +132,9 @@ void main() {
       await tester.tap(marker);
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-      await tester.tap(find.byIcon(Icons.bookmark));
+      await tester.longPress(find.text(controller.messages.single.text).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Удалить из избранного'));
       await tester.pumpAndSettle();
       expect(find.byType(FavoriteMessages), findsNothing);
       await tester.pumpWidget(const SizedBox());

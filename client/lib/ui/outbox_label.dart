@@ -6,6 +6,9 @@ import '../src/queued_mutation.dart';
 
 String outboxEntryTitle(BuildContext context, PendingMessage entry) {
   final strings = context.strings;
+  if (entry.replyTo.isNotEmpty) {
+    return '${strings.replyMessage}: ${entry.text.isEmpty ? strings.outboxFileMessage : entry.text}';
+  }
   return switch (entry.mutation?.kind) {
     MutationKind.edit => '${strings.outboxEdit}: ${entry.text}',
     MutationKind.delete => strings.outboxDelete,

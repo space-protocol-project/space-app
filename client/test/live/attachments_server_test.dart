@@ -8,6 +8,7 @@ import '../support/rpc_fault_proxy.dart';
 import 'ordinary_sync.dart';
 import 'persistent_files.dart';
 import 'queued_mutations.dart';
+import 'message_replies.dart';
 
 import 'dart:io';
 import 'dart:async';
@@ -19,6 +20,8 @@ import 'package:grpc/grpc.dart';
 import 'package:space_client/src/attachments.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/rpc_clients.dart';
+
+import '../support/temp_directory.dart';
 
 class _MemoryVault implements IdentityVault {
   DeviceRecord? record;
@@ -228,6 +231,7 @@ void main() {
       );
       await verifyOrdinarySync(discovery, ownerVault, owner);
       await verifyQueuedMutations(discovery, ownerVault, owner, restored);
+      await verifyMessageReplies(discovery, ownerVault, owner);
       await verifyPersistentFiles(
         discovery,
         ownerVault,
@@ -326,7 +330,7 @@ Future<void> verifyOrdinaryOutbox(
     await first?.close();
     await restarted?.close();
     await queue.close();
-    await root.delete(recursive: true);
+    await deleteTestDirectory(root, prefix: 'space-live-outbox-');
   }
 }
 

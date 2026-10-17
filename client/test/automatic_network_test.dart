@@ -4,12 +4,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/home_network.dart';
 import 'package:space_client/src/server_endpoints.dart';
 
+import 'support/temp_directory.dart';
+
 void main() {
   test(
     'Автонастройки и прежний маршрут сохраняются после перезапуска',
     () async {
       final root = await Directory.systemTemp.createTemp('space-auto-network-');
-      addTearDown(() => root.delete(recursive: true));
+      addTearDown(
+        () => deleteTestDirectory(root, prefix: 'space-auto-network-'),
+      );
       final original = HomeNetwork(
         [ServerEndpoint.parse('8.8.8.8', 9443)],
         identityOrigin: 'https://8.8.4.4:8443',

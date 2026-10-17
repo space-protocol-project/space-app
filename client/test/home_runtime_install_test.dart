@@ -6,6 +6,8 @@ import 'package:space_client/src/core.dart';
 import 'package:space_client/src/home_controller.dart';
 import 'package:space_client/src/home_runtime.dart';
 
+import 'support/temp_directory.dart';
+
 class _RuntimeBinding extends AutomatedTestWidgetsFlutterBinding {
   @override
   bool get overrideHttpClient => false;
@@ -89,7 +91,7 @@ void main() {
         await home.stop();
         restored?.dispose();
         home.dispose();
-        await root.delete(recursive: true);
+        await deleteTestDirectory(root, prefix: 'space home install ');
       }
     },
     skip: !enabled,

@@ -10,6 +10,7 @@ import '../rpc_clients.dart';
 import '../rpc_connection.dart';
 import 'local_store.dart';
 import 'envelope_checks.dart';
+import 'replies.dart';
 import '../reactions.dart';
 
 part 'delivery.dart';
@@ -68,6 +69,14 @@ class MlsClient {
   final Future<void> Function(String id, List<int> group)? pinChannel;
   final bool Function()? attachmentsEnabled;
   bool get filesAllowed => attachmentsEnabled?.call() ?? true;
+  Future<void> requireReplyTarget(String channelId, Map? reply) async {
+    if (reply == null) return;
+    final channel = _channel(await local.read(), channelId);
+    if (findMlsReply(MlsChannelData(channel).messages, reply) == null) {
+      throw StateError('Исходное сообщение отсутствует в этом закрытом канале');
+    }
+  }
+
   bool _registered = false;
   Future<void>? _maintenance;
   DateTime? _maintainedAt;

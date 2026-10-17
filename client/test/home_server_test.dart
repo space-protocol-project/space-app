@@ -11,6 +11,8 @@ import 'package:space_client/src/home_controller.dart';
 import 'package:space_client/src/home_runtime.dart';
 import 'package:space_client/ui/home_panel.dart';
 
+import 'support/temp_directory.dart';
+
 class _Home extends HomeController {
   @override
   Future<bool> configureNetwork(
@@ -83,7 +85,7 @@ void main() {
     'Проверка SHA-256 и запрет выхода файлов из каталога установки',
     () async {
       final root = await Directory.systemTemp.createTemp('space-home-test-');
-      addTearDown(() => root.delete(recursive: true));
+      addTearDown(() => deleteTestDirectory(root, prefix: 'space-home-test-'));
       for (final name in [
         'space-server.exe',
         '../outside.txt',

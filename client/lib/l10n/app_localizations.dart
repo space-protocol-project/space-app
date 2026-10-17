@@ -422,7 +422,7 @@ abstract class AppLocalizations {
   /// No description provided for @attentionDescription.
   ///
   /// In ru, this message translates to:
-  /// **'Оболочка не отправляет системные уведомления и не включает камеру или микрофон. Можно оставаться в своём ритме.'**
+  /// **'Уведомления можно включить в настройках приложения. Камера и микрофон включаются только по вашему действию.'**
   String get attentionDescription;
 
   /// No description provided for @settingsTitle.
@@ -3166,6 +3166,66 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Действие могло уже выполниться на сервере. Удаление из очереди прекращает локальные повторы, но не отменяет выполненное действие. Зависимые действия остановятся.'**
   String get outboxDiscardMutationDescription;
+
+  /// No description provided for @replyMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ответить'**
+  String get replyMessage;
+
+  /// No description provided for @cancelReply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отменить ответ'**
+  String get cancelReply;
+
+  /// No description provided for @replyUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исходное сообщение недоступно'**
+  String get replyUnavailable;
+
+  /// No description provided for @notifications.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления'**
+  String get notifications;
+
+  /// No description provided for @notificationsOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выключены'**
+  String get notificationsOff;
+
+  /// No description provided for @notificationsPrivate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скрывать содержимое'**
+  String get notificationsPrivate;
+
+  /// No description provided for @notificationsPreview.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показывать текст сообщения'**
+  String get notificationsPreview;
+
+  /// No description provided for @notificationsDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'На компьютере: Обычные и присоединённые закрытые каналы подключённых пространств, пока приложение запущено. Предпросмотр передаёт текст операционной системе. Доставка после закрытия приложения пока не поддерживается.'**
+  String get notificationsDescription;
+
+  /// No description provided for @notificationPermissionError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось разрешить уведомления. Проверьте системные настройки.'**
+  String get notificationPermissionError;
+
+  /// No description provided for @newMessageNotification.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новое сообщение'**
+  String get newMessageNotification;
 }
 
 class _AppLocalizationsDelegate

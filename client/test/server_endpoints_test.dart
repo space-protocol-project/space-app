@@ -7,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/home_network.dart';
 
+import 'support/temp_directory.dart';
+
 void main() {
   final identity = Uri.parse('https://203.0.113.10:8443');
   final pin = 'a' * 64;
@@ -228,7 +230,7 @@ void main() {
 
   test('Смена адресов и локального порта сохраняет постоянный origin после перезапуска', () async {
     final root = await Directory.systemTemp.createTemp('space-endpoints-');
-    addTearDown(() => root.delete(recursive: true));
+    addTearDown(() => deleteTestDirectory(root, prefix: 'space-endpoints-'));
     final original = HomeNetwork.fromJson({'ip': '203.0.113.10', 'port': 8443});
     final next = original.changed(
       [

@@ -55,6 +55,7 @@ extension QueuedFileTransfer on QueuedFileStore {
     'attachments': entry.attachments,
     'files': entry.localFiles.map((file) => file.toJson()).toList(),
     'mutation': entry.mutation?.toJson(),
+    'replyTo': entry.replyTo,
   });
 
   List<PendingMessage> _mergeTransfer(

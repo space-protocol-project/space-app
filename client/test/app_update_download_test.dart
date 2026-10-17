@@ -8,6 +8,8 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:space_client/src/app_updates.dart';
 
+import 'support/temp_directory.dart';
+
 void main() {
   late Directory directory;
   final bytes = utf8.encode('проверенный пакет');
@@ -24,7 +26,7 @@ void main() {
     directory = await Directory.systemTemp.createTemp('space-update-test-');
   });
   tearDown(() async {
-    await directory.delete(recursive: true);
+    await deleteTestDirectory(directory, prefix: 'space-update-test-');
   });
   AppUpdates model(http.Client client) =>
       AppUpdates(

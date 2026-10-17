@@ -7,6 +7,8 @@ import 'package:space_client/src/home_update_journal.dart';
 
 import 'home_installation_test.dart' show release;
 
+import 'support/temp_directory.dart';
+
 typedef _OpenNative = IntPtr Function(
   Pointer<Utf16>,
   Uint32,
@@ -32,7 +34,9 @@ void main() {
     'Заблокированный журнал сохраняет прежнюю запись до атомарной замены',
     () async {
       final root = await Directory.systemTemp.createTemp('space-journal-lock-');
-      addTearDown(() => root.delete(recursive: true));
+      addTearDown(
+        () => deleteTestDirectory(root, prefix: 'space-journal-lock-'),
+      );
       final journal = HomeUpdateJournal(root);
       final original = await journal.begin(
         release('v0.1.0'),

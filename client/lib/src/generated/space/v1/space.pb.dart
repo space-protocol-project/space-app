@@ -4630,6 +4630,7 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     ServerIcon? icon,
     $core.bool? attachmentsEnabled,
     $core.bool? mlsSupported,
+    $core.bool? ordinaryRepliesSupported,
   }) {
     final result = GetManifestResponse._();
     if (protocolVersion != null) result.protocolVersion = protocolVersion;
@@ -4640,6 +4641,8 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     if (attachmentsEnabled != null)
       result.attachmentsEnabled = attachmentsEnabled;
     if (mlsSupported != null) result.mlsSupported = mlsSupported;
+    if (ordinaryRepliesSupported != null)
+      result.ordinaryRepliesSupported = ordinaryRepliesSupported;
     return result;
   }
 
@@ -4665,6 +4668,7 @@ class GetManifestResponse extends $pb.GeneratedMessage {
         subBuilder: ServerIcon.$_createMessage)
     ..aOB(6, _omitFieldNames ? '' : 'attachmentsEnabled')
     ..aOB(7, _omitFieldNames ? '' : 'mlsSupported')
+    ..aOB(8, _omitFieldNames ? '' : 'ordinaryRepliesSupported')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -4748,6 +4752,16 @@ class GetManifestResponse extends $pb.GeneratedMessage {
   $core.bool hasMlsSupported() => $_has(6);
   @$pb.TagNumber(7)
   void clearMlsSupported() => $_clearField(7);
+
+  /// Только ответы обычных каналов. MLS-ответы согласуются отдельно.
+  @$pb.TagNumber(8)
+  $core.bool get ordinaryRepliesSupported => $_getBF(7);
+  @$pb.TagNumber(8)
+  set ordinaryRepliesSupported($core.bool value) => $_setBool(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasOrdinaryRepliesSupported() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearOrdinaryRepliesSupported() => $_clearField(8);
 }
 
 class Channel extends $pb.GeneratedMessage {
@@ -5977,6 +5991,9 @@ class Content extends $pb.GeneratedMessage {
     $core.bool? deleted,
     $core.Iterable<Asset>? attachments,
     $core.Iterable<Reaction>? reactions,
+    $core.String? replyToId,
+    $core.Iterable<$core.MapEntry<$core.String, $core.String>>?
+        participantNames,
   }) {
     final result = Content._();
     if (id != null) result.id = id;
@@ -5990,6 +6007,9 @@ class Content extends $pb.GeneratedMessage {
     if (deleted != null) result.deleted = deleted;
     if (attachments != null) result.attachments.addAll(attachments);
     if (reactions != null) result.reactions.addAll(reactions);
+    if (replyToId != null) result.replyToId = replyToId;
+    if (participantNames != null)
+      result.participantNames.addEntries(participantNames);
     return result;
   }
 
@@ -6019,6 +6039,13 @@ class Content extends $pb.GeneratedMessage {
         subBuilder: Asset.$_createMessage)
     ..pPM<Reaction>(11, _omitFieldNames ? '' : 'reactions',
         subBuilder: Reaction.$_createMessage)
+    ..aOS(12, _omitFieldNames ? '' : 'replyToId')
+    ..m<$core.String, $core.String>(
+        13, _omitFieldNames ? '' : 'participantNames',
+        entryClassName: 'Content.ParticipantNamesEntry',
+        keyFieldType: $pb.PbFieldType.OS,
+        valueFieldType: $pb.PbFieldType.OS,
+        packageName: const $pb.PackageName('space.v1'))
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6128,6 +6155,20 @@ class Content extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(11)
   $pb.PbList<Reaction> get reactions => $_getList(10);
+
+  /// Ответ только на сообщение того же обычного канала; без копии текста.
+  @$pb.TagNumber(12)
+  $core.String get replyToId => $_getSZ(11);
+  @$pb.TagNumber(12)
+  set replyToId($core.String value) => $_setString(11, value);
+  @$pb.TagNumber(12)
+  $core.bool hasReplyToId() => $_has(11);
+  @$pb.TagNumber(12)
+  void clearReplyToId() => $_clearField(12);
+
+  /// Актуальные имена видимых авторов и участников реакций; идентификаторы не меняются.
+  @$pb.TagNumber(13)
+  $pb.PbMap<$core.String, $core.String> get participantNames => $_getMap(12);
 }
 
 class UpdateContentRequest extends $pb.GeneratedMessage {
@@ -6508,12 +6549,14 @@ class CreateContentRequest extends $pb.GeneratedMessage {
     $core.String? text,
     $core.String? idempotencyKey,
     $core.Iterable<$core.String>? attachmentIds,
+    $core.String? replyToId,
   }) {
     final result = CreateContentRequest._();
     if (channelId != null) result.channelId = channelId;
     if (text != null) result.text = text;
     if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
     if (attachmentIds != null) result.attachmentIds.addAll(attachmentIds);
+    if (replyToId != null) result.replyToId = replyToId;
     return result;
   }
 
@@ -6534,6 +6577,7 @@ class CreateContentRequest extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'text')
     ..aOS(3, _omitFieldNames ? '' : 'idempotencyKey')
     ..pPS(4, _omitFieldNames ? '' : 'attachmentIds')
+    ..aOS(5, _omitFieldNames ? '' : 'replyToId')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6588,6 +6632,15 @@ class CreateContentRequest extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(4)
   $pb.PbList<$core.String> get attachmentIds => $_getList(3);
+
+  @$pb.TagNumber(5)
+  $core.String get replyToId => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set replyToId($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasReplyToId() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearReplyToId() => $_clearField(5);
 }
 
 class CreateContentResponse extends $pb.GeneratedMessage {

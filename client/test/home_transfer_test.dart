@@ -8,6 +8,8 @@ import 'package:space_client/src/home_transfer.dart';
 
 import 'home_installation_test.dart' show installed, release;
 
+import 'support/temp_directory.dart';
+
 void main() {
   late Directory root, runtime;
   late File archive;
@@ -47,7 +49,9 @@ void main() {
       },
     );
   });
-  tearDown(() async => root.delete(recursive: true));
+  tearDown(
+    () async => deleteTestDirectory(root, prefix: 'space-transfer-test-'),
+  );
 
   test(
     'Импорт проверяет данные до переключения каталога и переносит runtime',

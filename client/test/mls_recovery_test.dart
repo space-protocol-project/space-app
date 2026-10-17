@@ -7,12 +7,16 @@ import 'package:space_client/src/mls/history_archive.dart';
 
 import 'mls_native_test.dart' show local, MemoryMlsStorage;
 
+import 'support/temp_directory.dart';
+
 void main() {
   test(
     'Откат защищённой записи блокирует ratchet, но разрешает архив истории',
     () async {
       final directory = await Directory.systemTemp.createTemp('mls-rollback-');
-      addTearDown(() => directory.delete(recursive: true));
+      addTearDown(
+        () => deleteTestDirectory(directory, prefix: 'mls-rollback-'),
+      );
       final storage = MemoryMlsStorage();
       final original = await local(1, storage);
       final store = MlsLocalStore(
@@ -44,7 +48,9 @@ void main() {
       final directory = await Directory.systemTemp.createTemp(
         'mls-interrupted-',
       );
-      addTearDown(() => directory.delete(recursive: true));
+      addTearDown(
+        () => deleteTestDirectory(directory, prefix: 'mls-interrupted-'),
+      );
       final storage = MemoryMlsStorage();
       final original = await local(1, storage);
       final store = MlsLocalStore(

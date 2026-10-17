@@ -1218,6 +1218,13 @@ final $typed_data.Uint8List getManifestRequestDescriptor =
 const GetManifestResponse$json = {
   '1': 'GetManifestResponse',
   '2': [
+    {
+      '1': 'ordinary_replies_supported',
+      '3': 8,
+      '4': 1,
+      '5': 8,
+      '10': 'ordinaryRepliesSupported'
+    },
     {'1': 'mls_supported', '3': 7, '4': 1, '5': 8, '10': 'mlsSupported'},
     {
       '1': 'attachments_enabled',
@@ -1250,12 +1257,13 @@ const GetManifestResponse$json = {
 
 /// Descriptor for `GetManifestResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List getManifestResponseDescriptor = $convert.base64Decode(
-    'ChNHZXRNYW5pZmVzdFJlc3BvbnNlEiMKDW1sc19zdXBwb3J0ZWQYByABKAhSDG1sc1N1cHBvcn'
-    'RlZBIvChNhdHRhY2htZW50c19lbmFibGVkGAYgASgIUhJhdHRhY2htZW50c0VuYWJsZWQSKQoQ'
-    'cHJvdG9jb2xfdmVyc2lvbhgBIAEoCVIPcHJvdG9jb2xWZXJzaW9uEhsKCXNlcnZlcl9pZBgCIA'
-    'EoCVIIc2VydmVySWQSLQoIY2hhbm5lbHMYAyADKAsyES5zcGFjZS52MS5DaGFubmVsUghjaGFu'
-    'bmVscxIUCgV0aXRsZRgEIAEoCVIFdGl0bGUSKAoEaWNvbhgFIAEoCzIULnNwYWNlLnYxLlNlcn'
-    'Zlckljb25SBGljb24=');
+    'ChNHZXRNYW5pZmVzdFJlc3BvbnNlEjwKGm9yZGluYXJ5X3JlcGxpZXNfc3VwcG9ydGVkGAggAS'
+    'gIUhhvcmRpbmFyeVJlcGxpZXNTdXBwb3J0ZWQSIwoNbWxzX3N1cHBvcnRlZBgHIAEoCFIMbWxz'
+    'U3VwcG9ydGVkEi8KE2F0dGFjaG1lbnRzX2VuYWJsZWQYBiABKAhSEmF0dGFjaG1lbnRzRW5hYm'
+    'xlZBIpChBwcm90b2NvbF92ZXJzaW9uGAEgASgJUg9wcm90b2NvbFZlcnNpb24SGwoJc2VydmVy'
+    'X2lkGAIgASgJUghzZXJ2ZXJJZBItCghjaGFubmVscxgDIAMoCzIRLnNwYWNlLnYxLkNoYW5uZW'
+    'xSCGNoYW5uZWxzEhQKBXRpdGxlGAQgASgJUgV0aXRsZRIoCgRpY29uGAUgASgLMhQuc3BhY2Uu'
+    'djEuU2VydmVySWNvblIEaWNvbg==');
 
 @$core.Deprecated('Use channelDescriptor instead')
 const Channel$json = {
@@ -1613,7 +1621,27 @@ const Content$json = {
       '6': '.space.v1.Reaction',
       '10': 'reactions'
     },
+    {'1': 'reply_to_id', '3': 12, '4': 1, '5': 9, '10': 'replyToId'},
+    {
+      '1': 'participant_names',
+      '3': 13,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.Content.ParticipantNamesEntry',
+      '10': 'participantNames'
+    },
   ],
+  '3': [Content_ParticipantNamesEntry$json],
+};
+
+@$core.Deprecated('Use contentDescriptor instead')
+const Content_ParticipantNamesEntry$json = {
+  '1': 'ParticipantNamesEntry',
+  '2': [
+    {'1': 'key', '3': 1, '4': 1, '5': 9, '10': 'key'},
+    {'1': 'value', '3': 2, '4': 1, '5': 9, '10': 'value'},
+  ],
+  '7': {'7': true},
 };
 
 /// Descriptor for `Content`. Decode as a `google.protobuf.DescriptorProto`.
@@ -1624,7 +1652,11 @@ final $typed_data.Uint8List contentDescriptor = $convert.base64Decode(
     'F0ZWRBdFVuaXhNcxIaCghyZXZpc2lvbhgHIAEoA1IIcmV2aXNpb24SKwoSdXBkYXRlZF9hdF91'
     'bml4X21zGAggASgDUg91cGRhdGVkQXRVbml4TXMSGAoHZGVsZXRlZBgJIAEoCFIHZGVsZXRlZB'
     'IxCgthdHRhY2htZW50cxgKIAMoCzIPLnNwYWNlLnYxLkFzc2V0UgthdHRhY2htZW50cxIwCgly'
-    'ZWFjdGlvbnMYCyADKAsyEi5zcGFjZS52MS5SZWFjdGlvblIJcmVhY3Rpb25z');
+    'ZWFjdGlvbnMYCyADKAsyEi5zcGFjZS52MS5SZWFjdGlvblIJcmVhY3Rpb25zEh4KC3JlcGx5X3'
+    'RvX2lkGAwgASgJUglyZXBseVRvSWQSVAoRcGFydGljaXBhbnRfbmFtZXMYDSADKAsyJy5zcGFj'
+    'ZS52MS5Db250ZW50LlBhcnRpY2lwYW50TmFtZXNFbnRyeVIQcGFydGljaXBhbnROYW1lcxpDCh'
+    'VQYXJ0aWNpcGFudE5hbWVzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUYAiABKAlS'
+    'BXZhbHVlOgI4AQ==');
 
 @$core.Deprecated('Use updateContentRequestDescriptor instead')
 const UpdateContentRequest$json = {
@@ -1728,6 +1760,7 @@ const CreateContentRequest$json = {
     {'1': 'text', '3': 2, '4': 1, '5': 9, '10': 'text'},
     {'1': 'idempotency_key', '3': 3, '4': 1, '5': 9, '10': 'idempotencyKey'},
     {'1': 'attachment_ids', '3': 4, '4': 3, '5': 9, '10': 'attachmentIds'},
+    {'1': 'reply_to_id', '3': 5, '4': 1, '5': 9, '10': 'replyToId'},
   ],
 };
 
@@ -1735,7 +1768,8 @@ const CreateContentRequest$json = {
 final $typed_data.Uint8List createContentRequestDescriptor = $convert.base64Decode(
     'ChRDcmVhdGVDb250ZW50UmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSWQSEg'
     'oEdGV4dBgCIAEoCVIEdGV4dBInCg9pZGVtcG90ZW5jeV9rZXkYAyABKAlSDmlkZW1wb3RlbmN5'
-    'S2V5EiUKDmF0dGFjaG1lbnRfaWRzGAQgAygJUg1hdHRhY2htZW50SWRz');
+    'S2V5EiUKDmF0dGFjaG1lbnRfaWRzGAQgAygJUg1hdHRhY2htZW50SWRzEh4KC3JlcGx5X3RvX2'
+    'lkGAUgASgJUglyZXBseVRvSWQ=');
 
 @$core.Deprecated('Use createContentResponseDescriptor instead')
 const CreateContentResponse$json = {
@@ -2830,6 +2864,7 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
   '.space.v1.Content': Content$json,
   '.space.v1.Asset': Asset$json,
   '.space.v1.Reaction': Reaction$json,
+  '.space.v1.Content.ParticipantNamesEntry': Content_ParticipantNamesEntry$json,
   '.space.v1.SetReactionResponse': SetReactionResponse$json,
   '.space.v1.UpdateContentResponse': UpdateContentResponse$json,
   '.space.v1.DeleteContentResponse': DeleteContentResponse$json,
@@ -3112,6 +3147,7 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
   '.space.v1.Content': Content$json,
   '.space.v1.Asset': Asset$json,
   '.space.v1.Reaction': Reaction$json,
+  '.space.v1.Content.ParticipantNamesEntry': Content_ParticipantNamesEntry$json,
   '.space.v1.ListEventsRequest': ListEventsRequest$json,
   '.space.v1.ListEventsResponse': ListEventsResponse$json,
 };

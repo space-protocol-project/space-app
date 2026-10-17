@@ -12,6 +12,8 @@ import 'package:space_client/src/home_runtime.dart';
 
 import 'home_installation_test.dart' show installed, release;
 
+import 'support/temp_directory.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late Directory root;
@@ -20,7 +22,7 @@ void main() {
     await Directory('${root.path}/data').create();
     await File('${root.path}/data/probe').writeAsBytes(List.filled(100, 1));
   });
-  tearDown(() => root.delete(recursive: true));
+  tearDown(() => deleteTestDirectory(root, prefix: 'space storage проверка '));
   test('Оценка включает копии данных, архив/runtime и запас; измеряется указанный каталог', () async {
     final storage = HomeStorage(
       available: (directory) async {

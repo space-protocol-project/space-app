@@ -143,6 +143,7 @@ extension _ChatOutboxFiles on ChatController {
     LiveSession session,
     PendingMessage entry,
   ) async {
+    _requireReplySupport(session, entry);
     final prepared = await _prepareMessageFiles(scope, epoch, session, entry);
     try {
       return (prepared, await _sendPending(session, prepared));

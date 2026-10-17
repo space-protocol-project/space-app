@@ -17,6 +17,8 @@ import 'chat_history_test.dart' show HistoryKeys;
 import 'chat_outbox_test.dart'
     show DeliveryBackend, GrantOutboxSession, eventually;
 
+import 'support/temp_directory.dart';
+
 class _FaultOutbox implements ChatOutboxStore {
   _FaultOutbox(this.delegate, this.failScope, {this.after = false});
   final ChatOutboxStore delegate;
@@ -68,7 +70,7 @@ void main() {
       if (!controller.isClosed) await controller.close();
     }
     controllers.clear();
-    await root.delete(recursive: true);
+    await deleteTestDirectory(root, prefix: 'space-outbox-recovery-');
   });
   PendingMessage message([String key = 'same-key']) => PendingMessage(
     key: key,
@@ -95,6 +97,51 @@ void main() {
       active: () => true,
     );
   }
+
+  test('Перенос ответа сохраняет цель, ключ и байты вложения', () async {
+    final bytes = Uint8List.fromList(utf8.encode('Файл ответа'));
+    await files.enqueue(
+      source,
+      PendingMessage(
+        key: 'reply',
+        channelId: 'general',
+        text: 'Ответ',
+        createdAt: 1,
+        replyTo: 'message-1',
+      ),
+      [XFile.fromData(bytes, name: 'reply.txt', path: 'reply.txt')],
+      outbox,
+      active: () => true,
+    );
+    final before = (await outbox.read(source)).single;
+    await files.transfer(source, target, outbox, active: () => true);
+    final after = (await outbox.read(target)).single;
+    expect(after.replyTo, 'message-1');
+    expect(after.key, before.key);
+    expect(await files.read(target, after.localFiles.single), bytes);
+    expect(await outbox.read(source), isEmpty);
+  });
+
+  test(
+    'При переносе одинаковый ключ не объединяет ответы на разные сообщения',
+    () async {
+      PendingMessage reply(String id) => PendingMessage(
+        key: 'reply',
+        channelId: 'general',
+        text: 'Ответ',
+        createdAt: 1,
+        replyTo: id,
+      );
+      await outbox.change(source, (_) => [reply('message-1')]);
+      await outbox.change(target, (_) => [reply('message-2')]);
+      await expectLater(
+        files.transfer(source, target, outbox, active: () => true),
+        throwsFormatException,
+      );
+      expect((await outbox.read(source)).single.replyTo, 'message-1');
+      expect((await outbox.read(target)).single.replyTo, 'message-2');
+    },
+  );
 
   test(
     'Каталог переживает перезапуск и не смешивает серверы и личности',
