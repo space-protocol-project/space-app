@@ -180,5 +180,7 @@
   "loadOlderMessages": "加载更早的消息",
   "historyPageFailed": "无法加载历史记录。请重试。",
   "messageSearchAllChannels": "所有可用频道",
-  "messageSearchMixed": "私密频道仅在此设备上搜索"
+  "messageSearchMixed": "私密频道仅在此设备上搜索",
+  "savedMlsSearchChannels": "已保存的私密频道",
+  "savedMlsMessagePreview": "已保存的消息 · 离线"
 }

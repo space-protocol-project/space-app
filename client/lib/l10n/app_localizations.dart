@@ -3280,6 +3280,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Закрытые каналы — поиск только на этом устройстве'**
   String get messageSearchMixed;
+
+  /// No description provided for @savedMlsSearchChannels.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранённые закрытые каналы'**
+  String get savedMlsSearchChannels;
+
+  /// No description provided for @savedMlsMessagePreview.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранённое сообщение · без подключения к серверу'**
+  String get savedMlsMessagePreview;
 }
 
 class _AppLocalizationsDelegate

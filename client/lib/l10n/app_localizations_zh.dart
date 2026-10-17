@@ -1656,6 +1656,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get messageSearchMixed => '私密频道仅在此设备上搜索';
+
+  @override
+  String get savedMlsSearchChannels => '已保存的私密频道';
+
+  @override
+  String get savedMlsMessagePreview => '已保存的消息 · 离线';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2150,4 +2156,10 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get messageSearchMixed => '私密频道仅在此设备上搜索';
+
+  @override
+  String get savedMlsSearchChannels => '已保存的私密频道';
+
+  @override
+  String get savedMlsMessagePreview => '已保存的消息 · 离线';
 }

@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:collection';
 
 import 'package:fixnum/fixnum.dart';
 
 import 'rpc_clients.dart';
 import 'mls/client.dart';
 import 'mls/replies.dart';
+import 'mls/local_store.dart';
+
+part 'mls_message_search.dart';
 
 class MessageSearchPage {
   const MessageSearchPage(this.messages, {this.next = ''});
@@ -73,47 +77,5 @@ Future<MessageSearchPage> searchMlsMessages(
   String query,
   String cursor,
 ) async {
-  final term = checkedSearchQuery(query).toLowerCase();
-  final document = await client.local.read();
-  final saved = (document['channels'] as Map)[channel] as Map<String, dynamic>?;
-  if (saved == null ||
-      saved['joined'] != true ||
-      saved['revocation_pending'] == true ||
-      saved['group_id'] != base64Encode(group)) {
-    throw StateError('Нет доступа к истории MLS');
-  }
-  final messages =
-      MlsChannelData(saved).messages
-          .where(
-            (item) =>
-                item['deleted'] != true &&
-                ((item['message'] as Map)['text'] as String)
-                    .toLowerCase()
-                    .contains(term),
-          )
-          .map(
-            (item) => Content(
-              id: mlsMessageKey(item),
-              channelId: channel,
-              text: (item['message'] as Map)['text'] as String,
-              authorId: item['author_id'] as String,
-              sequence: Int64(item['sequence'] as int),
-            ),
-          )
-          .toList()
-        ..sort((a, b) {
-          final order = b.sequence.compareTo(a.sequence);
-          return order == 0 ? b.id.compareTo(a.id) : order;
-        });
-  final start = cursor.isEmpty
-      ? 0
-      : messages.indexWhere((m) => m.id == cursor) + 1;
-  if (cursor.isNotEmpty && start == 0) {
-    throw StateError('История изменилась, повторите поиск');
-  }
-  final page = messages.skip(start).take(50).toList();
-  return MessageSearchPage(
-    page,
-    next: start + page.length < messages.length ? page.last.id : '',
-  );
+  return searchSavedMlsMessages(client.local, channel, group, query, cursor);
 }

@@ -1812,4 +1812,11 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get messageSearchMixed =>
       'Закрытые каналы — поиск только на этом устройстве';
+
+  @override
+  String get savedMlsSearchChannels => 'Сохранённые закрытые каналы';
+
+  @override
+  String get savedMlsMessagePreview =>
+      'Сохранённое сообщение · без подключения к серверу';
 }

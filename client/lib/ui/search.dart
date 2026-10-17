@@ -18,6 +18,8 @@ class SpaceSearchPanel extends StatefulWidget {
     this.localOnly = false,
     this.searchAllChannels,
     this.channelNames = const {},
+    this.allChannelsLabel,
+    this.allChannelsLocalOnly = false,
   });
   final Map<String, String> sections;
   final List<Content> messages;
@@ -27,6 +29,8 @@ class SpaceSearchPanel extends StatefulWidget {
   final bool localOnly;
   final Future<MessageSearchPage> Function(String, String)? searchAllChannels;
   final Map<String, String> channelNames;
+  final String? allChannelsLabel;
+  final bool allChannelsLocalOnly;
   @override
   State<SpaceSearchPanel> createState() => _SpaceSearchPanelState();
 }
@@ -52,7 +56,7 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
       failure = '';
       loading = false;
     });
-    if (widget.searchMessages == null || value.trim().runes.length < 2) return;
+    if (activeSearch == null || value.trim().runes.length < 2) return;
     debounce = Timer(const Duration(milliseconds: 300), () => load());
   }
 
@@ -60,7 +64,7 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
       allChannels ? widget.searchAllChannels : widget.searchMessages;
 
   Future<void> load({bool more = false}) async {
-    if (loading || widget.searchMessages == null) return;
+    if (loading || activeSearch == null) return;
     final current = generation;
     final term = query.trim();
     setState(() {
@@ -92,9 +96,9 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
   Widget searchStatus(BuildContext context) => Column(
     children: [
       Text(
-        allChannels
+        allChannels && !widget.allChannelsLocalOnly
             ? context.strings.messageSearchMixed
-            : widget.localOnly
+            : widget.localOnly || allChannels && widget.allChannelsLocalOnly
             ? context.strings.messageSearchLocal
             : context.strings.messageSearchServer,
       ),
@@ -133,7 +137,7 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
                 onChanged: changeQuery,
                 maxLength: 128,
                 decoration: InputDecoration(
-                  hintText: widget.searchMessages == null
+                  hintText: activeSearch == null
                       ? context.strings.searchHint
                       : context.strings.search,
                   prefixIcon: const Icon(Icons.search),
@@ -161,20 +165,23 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
             key: const ValueKey('search-all-channels'),
             dense: true,
             contentPadding: EdgeInsets.zero,
-            title: Text(context.strings.messageSearchAllChannels),
+            title: Text(
+              widget.allChannelsLabel ??
+                  context.strings.messageSearchAllChannels,
+            ),
             value: allChannels,
             onChanged: (value) {
               setState(() => allChannels = value ?? false);
               changeQuery(query);
             },
           ),
-        if (widget.searchMessages != null) searchStatus(context),
+        if (activeSearch != null) searchStatus(context),
         Flexible(child: results(context)),
       ],
     ),
   );
   String resultSubtitle(BuildContext context, Content message) {
-    if (widget.searchMessages == null) return context.strings.loadedMessage;
+    if (activeSearch == null) return context.strings.loadedMessage;
     if (!allChannels) return message.authorId;
     return '${widget.channelNames[message.channelId] ?? message.channelId} · ${message.authorId}';
   }
@@ -186,7 +193,7 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
         .toList();
     final contents = term.isEmpty
         ? <Content>[]
-        : widget.searchMessages != null
+        : activeSearch != null
         ? found
         : widget.messages
               .where(

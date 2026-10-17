@@ -1803,4 +1803,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get messageSearchMixed =>
       'Private channels are searched only on this device';
+
+  @override
+  String get savedMlsSearchChannels => 'Saved private channels';
+
+  @override
+  String get savedMlsMessagePreview => 'Saved message · offline';
 }

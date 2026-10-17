@@ -27,11 +27,18 @@ class _MessageSearchScope {
   Map<String, String> get channelNames => {
     for (final channel in channels) channel.id: channel.title,
   };
-  Future<MessageSearchPage> Function(String, String)? get allSearch =>
-      available && remote != null ? fetchAll : null;
+  bool get offline => !target.connected;
+  Future<MessageSearchPage> Function(String, String)? get allSearch {
+    if (offline) return target.canSearchSavedMls ? fetchSavedAll : null;
+    return available && remote != null ? fetchAll : null;
+  }
+
   bool get local => group.isNotEmpty;
   bool get available =>
-      target.canRead && (local ? mls != null : remote != null);
+      target.canRead &&
+      (offline
+          ? local && target.canSearchSavedMls
+          : (local ? mls != null : remote != null));
   bool get sameSession =>
       target.knownOrigin == origin &&
       target.principalId == principal &&
@@ -133,8 +140,52 @@ class _MessageSearchScope {
     return page;
   }
 
+  Future<MessageSearchPage> fetchSavedAll(String query, String cursor) async {
+    final document = await savedDocument();
+    final saved = document['channels'] as Map;
+    final ids = channels
+        .where(
+          (channel) =>
+              readable(channel) && joinedGroup(saved[channel.id], channel),
+        )
+        .map((channel) => channel.id)
+        .toList();
+    final page = await searchChannelPages(
+      channels: ids,
+      query: query,
+      cursor: cursor,
+      fetch: (id, term, after) => searchMlsDocument(
+        document,
+        id,
+        channels.firstWhere((channel) => channel.id == id).mlsGroupId,
+        term,
+        after,
+      ),
+    );
+    if (!valid) throw StateError('Доступ изменился');
+    return page;
+  }
+
+  Future<Map<String, dynamic>> savedDocument() async {
+    if (!valid || !offline) throw StateError('Пространство изменилось');
+    final document = await (await target.savedMlsArchive()).read();
+    if (!valid || !offline) throw StateError('Пространство изменилось');
+    return document;
+  }
+
   Future<MessageSearchPage> fetch(String query, String cursor) async {
     if (!valid) throw StateError('Канал изменился');
+    if (offline) {
+      final page = await searchMlsDocument(
+        await savedDocument(),
+        id,
+        group,
+        query,
+        cursor,
+      );
+      if (!valid) throw StateError('Доступ изменился');
+      return page;
+    }
     final page = local
         ? await searchMlsMessages(
             await mls!.mlsClient(),
@@ -175,6 +226,10 @@ extension _ShellMessageSearch on _SpaceShellState {
             localOnly: scope.local,
             channelNames: scope.channelNames,
             searchAllChannels: scope.allSearch,
+            allChannelsLabel: scope.offline
+                ? context.strings.savedMlsSearchChannels
+                : null,
+            allChannelsLocalOnly: scope.offline,
             searchMessages: scope.available
                 ? (query, cursor) =>
                       guardedMessageSearch(scope, valid, query, cursor)
@@ -193,7 +248,59 @@ extension _ShellMessageSearch on _SpaceShellState {
     }
     if (!valid()) return;
     if (hit == null) return;
+    if (scope.offline) {
+      await openSavedSearchHit(scope, hit!);
+      return;
+    }
     await openSearchHit(scope, hit!);
+  }
+
+  Future<void> openSavedSearchHit(
+    _MessageSearchScope scope,
+    Content message,
+  ) async {
+    if (!scope.valid) return;
+    VoidCallback? close;
+    final subscription = workspaces.stream.listen((_) {
+      if (!mounted || !identical(controller, scope.target) || !scope.valid) {
+        close?.call();
+      }
+    });
+    try {
+      await showSpacePopup<void>(
+        context,
+        top: headerHeight + 22,
+        builder: (context) {
+          close = searchPanelCloser(context);
+          return SizedBox(
+            height: 420,
+            child: Column(
+              children: [
+                ListTile(
+                  title: Text(
+                    scope.channelNames[message.channelId] ?? message.channelId,
+                  ),
+                  subtitle: Text(context.strings.savedMlsMessagePreview),
+                  trailing: IconButton(
+                    onPressed: close,
+                    icon: const Icon(Icons.close),
+                    tooltip: context.strings.close,
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: SelectableText(message.text),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    } finally {
+      unawaited(subscription.cancel());
+    }
   }
 
   Future<void> openSearchHit(_MessageSearchScope scope, Content message) async {

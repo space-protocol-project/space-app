@@ -663,5 +663,7 @@
   "loadOlderMessages": "Load older messages",
   "historyPageFailed": "Could not load history. Please retry.",
   "messageSearchAllChannels": "All available channels",
-  "messageSearchMixed": "Private channels are searched only on this device"
+  "messageSearchMixed": "Private channels are searched only on this device",
+  "savedMlsSearchChannels": "Saved private channels",
+  "savedMlsMessagePreview": "Saved message · offline"
 }

@@ -19,6 +19,8 @@ import 'package:file_selector/file_selector.dart';
 import 'core.dart';
 import 'message_search.dart';
 import 'history_pages.dart';
+import 'mls/saved_archive.dart';
+import 'mls/local_store.dart';
 import 'event_controller.dart';
 import 'generated/space/v1/space.pb.dart';
 import 'local_failure.dart';
@@ -39,6 +41,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     this.vault, {
     this.openSession = SpaceSession.connect,
     this.retryDelay = defaultRetryDelay,
+    this.openMlsArchive = openSavedMlsArchive,
     ChannelPositionStore? positions,
     ChatHistoryStore? historyStore,
     ChatOutboxStore? outboxStore,
@@ -200,6 +203,26 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       replyTo,
     ),
   );
+  final SavedMlsArchiveOpener openMlsArchive;
+  bool get canSearchSavedMls =>
+      !connected &&
+      !accessRemoved &&
+      _history != null &&
+      _historyOrigin == knownOrigin;
+  Future<MlsLocalStore> savedMlsArchive() async {
+    final history = _history, origin = knownOrigin;
+    if (!canSearchSavedMls || history == null) {
+      throw StateError('Нет сохранённого архива MLS');
+    }
+    final archive = await openMlsArchive(vault, origin, history);
+    if (!canSearchSavedMls ||
+        !identical(history, _history) ||
+        knownOrigin != origin) {
+      throw StateError('Устройство изменилось');
+    }
+    return archive;
+  }
+
   MessageSearchSession? get messageSearch =>
       connected && _session is MessageSearchSession
       ? _session as MessageSearchSession
