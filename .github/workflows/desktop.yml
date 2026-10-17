@@ -4,9 +4,9 @@ on:
   push:
     branches: [main]
     tags: ['v*']
-    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_secure_storage.ps1', 'tools/check_linux_notification_activation.py', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
+    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_attachments.ps1', 'tools/check_desktop_chat_ci.ps1', 'tools/check_secure_storage.ps1', 'tools/check_linux_notification_activation.py', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
   pull_request:
-    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_secure_storage.ps1', 'tools/check_linux_notification_activation.py', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
+    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_attachments.ps1', 'tools/check_desktop_chat_ci.ps1', 'tools/check_secure_storage.ps1', 'tools/check_linux_notification_activation.py', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
 permissions:
   contents: read
 concurrency:
@@ -201,9 +201,49 @@ jobs:
           name: Space-android
           path: dist/*
           if-no-files-found: error
+  chat-e2e:
+    name: Интерфейс чата и отдельная PostgreSQL
+    needs: validate
+    runs-on: windows-2025
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: app-source
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          # Проверенная версия runtime v0.4.2, схема 22.
+          ref: c87ac2a25d43992b7f075cdbafc04541dc66fcc2
+          path: space-server
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: space-server/go.mod
+          cache-dependency-path: space-server/go.sum
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.7'
+          channel: stable
+          cache: true
+      - name: Rust для настоящего MLS-ядра
+        run: rustup toolchain install 1.99.0 --profile minimal
+      - name: UI → RPC → PostgreSQL → второй клиент
+        working-directory: app-source
+        shell: pwsh
+        run: ./tools/check_desktop_chat_ci.ps1
+      - name: Журналы изолированной проверки
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-chat-logs
+          path: |
+            ${{ runner.temp }}/desktop-chat-*/postgres.log
+            ${{ runner.temp }}/desktop-chat-*/space_v03_*/server.*.log
+          if-no-files-found: warn
+          retention-days: 7
   publish:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    needs: [validate, desktop, android, verify-release, verify-mls]
+    needs: [validate, desktop, android, chat-e2e, verify-release, verify-mls]
     runs-on: ubuntu-latest
     permissions:
       contents: write
