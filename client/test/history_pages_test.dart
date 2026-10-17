@@ -107,6 +107,34 @@ Future<ChatController> pagedController(
 }
 
 void main() {
+  test('Уведомление загружает старое сообщение одной страницей', () async {
+    final session = PagedSession(total: 100000);
+    final controller = await pagedController(session);
+    addTearDown(controller.close);
+    final result = await controller.notificationMessage(1234);
+    expect(result?.id, 'id-1234');
+    expect(session.requests, [('general', 0), ('general', 1235)]);
+    expect(controller.messages, hasLength(101));
+    expect(await controller.notificationMessage(1234), isNotNull);
+    expect(session.requests, hasLength(2));
+    expect(controller.hasOlderHistory, isTrue);
+  });
+  test(
+    'Отзыв доступа во время загрузки цели не показывает сообщение',
+    () async {
+      final session = PagedSession(total: 100000);
+      final controller = await pagedController(session);
+      addTearDown(controller.close);
+      session.olderGate = Completer<void>();
+      final result = controller.notificationMessage(1234);
+      await Future<void>.delayed(Duration.zero);
+      session.availableChannels.first.permissions.read = false;
+      await controller.refreshChannels();
+      session.olderGate!.complete();
+      expect(await result, isNull);
+      expect(controller.messages.where((m) => m.id == 'id-1234'), isEmpty);
+    },
+  );
   test(
     'История: подключение одной страницей и загрузка больше 1100 без дублей',
     () async {

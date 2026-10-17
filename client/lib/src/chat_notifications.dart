@@ -20,8 +20,10 @@ class ChatNotificationTarget {
       if (payload.length > 2048) return null;
       final parts = jsonDecode(payload) as List;
       if (![4, 6].contains(parts.length) ||
+          !parts.take(3).every(_scopePart) ||
           parts[3] is! int ||
-          (parts[3] as int) <= 0) {
+          (parts[3] as int) <= 0 ||
+          (parts[3] as int) >= 9223372036854775807) {
         return null;
       }
       if (parts.length == 6 &&
@@ -43,6 +45,9 @@ class ChatNotificationTarget {
       return null;
     }
   }
+
+  static bool _scopePart(dynamic part) =>
+      part is String && part.isNotEmpty && part.length <= 1024;
 
   bool accessible(ChatState state) =>
       state.connected &&

@@ -20,10 +20,11 @@ class SpaceApp extends StatefulWidget {
 
 class _SpaceAppState extends State<SpaceApp> {
   final preferences = AppPreferences();
+  late final Future<void> startupReady;
   @override
   void initState() {
     super.initState();
-    unawaited(preferences.load());
+    startupReady = preferences.load();
   }
 
   @override
@@ -53,6 +54,7 @@ class _SpaceAppState extends State<SpaceApp> {
           supportedLocales: AppLocalizations.supportedLocales,
           home: SpaceShell(
             preferences: preferences,
+            startupReady: startupReady,
             controller: widget.controller,
           ),
         ),

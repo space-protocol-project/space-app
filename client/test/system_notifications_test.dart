@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/system_notifications.dart';
+import 'package:space_client/src/notification_targets.dart';
+
+import 'chat_history_test.dart' show HistoryKeys;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +29,23 @@ void main() {
         () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
             .setMockMethodCallHandler(channel, null),
       );
-      final service = SystemNotifications();
+      final saved = NotificationTargets(storage: HistoryKeys());
+      final service = SystemNotifications(savedTargets: saved);
+      final nativeCalls = <MethodCall>[];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemNotifications.activationChannel, (
+            call,
+          ) async {
+            nativeCalls.add(call);
+            return null;
+          });
+      addTearDown(
+        () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(
+              SystemNotifications.activationChannel,
+              null,
+            ),
+      );
       addTearDown(service.dispose);
       final taps = <String>[];
       final subscription = service.targets.stream.listen(taps.add);
@@ -43,15 +62,24 @@ void main() {
         body: 'Новое сообщение',
         target: ['https://secret.example', 'me', 'general', 2],
       );
-      final sent = calls.where((call) => call.method == 'notify').toList();
+      final sent = platform == TargetPlatform.windows
+          ? nativeCalls.where((call) => call.method == 'show').toList()
+          : calls.where((call) => call.method == 'notify').toList();
       expect(sent, hasLength(2));
-      final actions = (sent.last.arguments as Map)['actions'] as List;
+      final actions = (sent.last.arguments as Map)['actions'] as List? ?? [];
       expect(actions.length, platform == TargetPlatform.linux ? 1 : 0);
       expect(
         jsonEncode(sent.last.arguments),
         isNot(contains('secret.example')),
       );
       Future<void> click() async {
+        if (platform == TargetPlatform.windows) {
+          await service.activate(
+            (sent.last.arguments as Map)['token'] as String,
+          );
+          await Future<void>.delayed(Duration.zero);
+          return;
+        }
         await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
             .handlePlatformMessage(
               'local_notifier',

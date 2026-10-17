@@ -1,9 +1,11 @@
 #include <flutter/dart_project.h>
 #include <flutter/flutter_view_controller.h>
 #include <windows.h>
+#include <roapi.h>
 
 #include "flutter_window.h"
 #include "utils.h"
+#include "notification_activation.h"
 
 // GetMessage возвращает -1 при ошибке, 0 при завершении и >0 для сообщения.
 static int RunMessageLoop() {
@@ -27,16 +29,32 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   // Initialize COM, so that it is available for use in the library and/or
   // plugins.
-  ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+  ::RoInitialize(RO_INIT_SINGLETHREADED);
 
   flutter::DartProject project(L"data");
 
   std::vector<std::string> command_line_arguments =
       GetCommandLineArguments();
+  const auto activation = NotificationActivation::Parse(command_line_arguments);
+  const HANDLE instance_mutex = NotificationActivation::InstanceMutex();
+  if (!instance_mutex) return EXIT_FAILURE;
+  if (GetLastError() == ERROR_ALREADY_EXISTS) {
+    for (int attempt = 0; attempt < 100; ++attempt) {
+      if (NotificationActivation::Forward(activation)) {
+        CloseHandle(instance_mutex);
+        ::RoUninitialize();
+        return EXIT_SUCCESS;
+      }
+      Sleep(100);
+    }
+    CloseHandle(instance_mutex);
+    ::RoUninitialize();
+    return EXIT_FAILURE;
+  }
 
   project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
 
-  FlutterWindow window(project);
+  FlutterWindow window(project, activation);
   Win32Window::Point origin(10, 10);
   Win32Window::Size size(1024, 1024);
   if (!window.Create(L"Space", origin, size)) {
@@ -46,6 +64,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   const int exit_code = RunMessageLoop();
 
-  ::CoUninitialize();
+  CloseHandle(instance_mutex);
+  ::RoUninitialize();
   return exit_code;
 }

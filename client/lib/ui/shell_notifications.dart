@@ -2,6 +2,7 @@ part of 'shell.dart';
 
 extension _ShellNotifications on _SpaceShellState {
   void receiveNotifications(WorkspaceState state) {
+    retryNotificationOpen();
     notificationTracker.retainOrigins(state.chats.keys);
     for (final chat in state.chats.values) {
       for (final notice in notificationTracker.observe(chat)) {
@@ -141,13 +142,62 @@ extension _ShellNotifications on _SpaceShellState {
   }
 
   void clearPrivateNotifications() {
+    notificationOpenEpoch++;
+    deferredNotification = null;
     pendingNotices.clear();
     notificationJobs = notificationJobs
         .then((_) => systemNotifications.clear())
         .catchError((Object _) {});
   }
 
+  Future<void> restoreNotificationActivation() async {
+    try {
+      await widget.startupReady;
+      if (!mounted) return;
+      await workspaces.synchronize(widget.preferences.origins);
+      if (!mounted) return;
+      await systemNotifications.listenForActivation(
+        enabled: widget.preferences.notificationMode != 0,
+      );
+    } catch (_) {
+      // Неудача запуска из уведомления не препятствует обычному запуску.
+    } finally {
+      notificationStartupComplete = true;
+    }
+  }
+
+  Future<void> queueNotificationOpen(String payload) async {
+    if (widget.preferences.notificationMode == 0 ||
+        ChatNotificationTarget.decode(payload) == null) {
+      return;
+    }
+    notificationOpenEpoch++;
+    deferredNotification = payload;
+    await drainNotificationOpen();
+  }
+
+  void retryNotificationOpen() {
+    if (notificationOpening || deferredNotification == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(drainNotificationOpen());
+    });
+  }
+
+  Future<void> drainNotificationOpen() async {
+    final payload = deferredNotification;
+    if (!mounted || notificationOpening || payload == null) return;
+    notificationOpening = true;
+    try {
+      deferredNotification = null;
+      await openNotification(payload);
+    } finally {
+      notificationOpening = false;
+      if (deferredNotification != payload) retryNotificationOpen();
+    }
+  }
+
   Future<void> openNotification(String payload) async {
+    final epoch = notificationOpenEpoch;
     try {
       final target = ChatNotificationTarget.decode(payload);
       if (target == null) return;
@@ -155,41 +205,71 @@ extension _ShellNotifications on _SpaceShellState {
       if (chat == null || !widget.preferences.origins.contains(target.origin)) {
         return;
       }
-      await workspaces.reconnect(target.origin);
-      if (!mounted || !target.accessible(chat.state)) return;
+      if (!await notificationConnectionReady(chat, target, payload, epoch)) {
+        return;
+      }
+      if (!notificationAccessCurrent(chat, target, epoch)) return;
       if (!await notificationMlsTargetAvailable(target)) return;
-      if (!mounted || !target.accessible(chat.state)) return;
+      if (!notificationAccessCurrent(chat, target, epoch)) return;
       await openSpace(target.origin, channel: target.channel);
-      if (!notificationDestinationCurrent(chat, target)) return;
+      if (!notificationDestinationCurrent(chat, target, epoch)) return;
       await systemNotifications.focus();
-      if (!notificationDestinationCurrent(chat, target)) return;
+      if (!notificationDestinationCurrent(chat, target, epoch)) return;
       final message = target.mlsKey.isEmpty
-          ? chat.messages
-                .where(
-                  (m) =>
-                      m.channelId == target.channel &&
-                      m.sequence.toInt() == target.sequence,
-                )
-                .firstOrNull
+          ? await chat.notificationMessage(target.sequence)
           : await mlsNotificationMessage(
               target.origin,
               target.channel,
               target.group,
               target.mlsKey,
             );
-      if (!notificationDestinationCurrent(chat, target)) return;
+      if (!notificationDestinationCurrent(chat, target, epoch)) return;
       if (message != null) openMessage(message.id);
     } catch (_) {
       // Устаревшее или подменённое уведомление не меняет подключение.
     }
   }
 
+  Future<bool> notificationConnectionReady(
+    ChatController chat,
+    ChatNotificationTarget target,
+    String payload,
+    int epoch,
+  ) async {
+    await workspaces.reconnect(target.origin);
+    if (chat.busy) {
+      try {
+        await chat.stream
+            .firstWhere((state) => !state.busy)
+            .timeout(const Duration(seconds: 30));
+      } on TimeoutException {
+        // Цель остаётся до завершения текущего подключения.
+      }
+    }
+    if (!mounted || epoch != notificationOpenEpoch) return false;
+    if (chat.connected || chat.accessRemoved) return true;
+    if (widget.preferences.origins.contains(target.origin)) {
+      deferredNotification ??= payload;
+    }
+    return false;
+  }
+
   bool notificationDestinationCurrent(
     ChatController chat,
     ChatNotificationTarget target,
+    int epoch,
+  ) =>
+      notificationAccessCurrent(chat, target, epoch) &&
+      identical(controller, chat) &&
+      controller.channelId == target.channel;
+
+  bool notificationAccessCurrent(
+    ChatController chat,
+    ChatNotificationTarget target,
+    int epoch,
   ) =>
       mounted &&
-      identical(controller, chat) &&
-      controller.channelId == target.channel &&
+      epoch == notificationOpenEpoch &&
+      widget.preferences.notificationMode != 0 &&
       target.accessible(chat.state);
 }

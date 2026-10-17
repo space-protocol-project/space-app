@@ -87,12 +87,14 @@ class SpaceShell extends StatefulWidget {
     this.workspaces,
     this.updates,
     this.notifications,
+    this.startupReady,
     this.hostingEnabled = true,
   });
   final bool hostingEnabled;
   final AppPreferences preferences;
   final AppUpdates? updates;
   final SystemNotifications? notifications;
+  final Future<void>? startupReady;
   final ChatController? controller;
   final ServerPresence? presence;
   final ServerWorkspaces? workspaces;
@@ -109,6 +111,10 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   final pendingNotices = <String, ChatNotice>{};
   bool notificationDraining = false;
   bool notificationFocused = true;
+  bool notificationOpening = false;
+  String? deferredNotification;
+  int notificationOpenEpoch = 0;
+  bool notificationStartupComplete = false;
   final mlsNotificationWatcher = MlsNotificationWatcher();
   Timer? mlsNotificationTimer;
   int mlsNotificationGeneration = 0;
@@ -452,7 +458,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
       (_) => unawaited(pollMlsNotifications()),
     );
     notificationTaps = systemNotifications.targets.stream.listen(
-      (payload) => unawaited(openNotification(payload)),
+      (payload) => unawaited(queueNotificationOpen(payload)),
     );
     dashboard = widget.controller == null;
     if (home.supported) unawaited(home.load());
@@ -469,6 +475,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
       );
     }
     unawaited(watchSavedServers());
+    unawaited(restoreNotificationActivation());
   }
 
   Future<void> startHome(String ip) async {
@@ -1613,7 +1620,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
 
   void _preferencesChanged(BuildContext context, PreferencesState state) {
     resetMlsNotifications();
-    clearPrivateNotifications();
+    if (notificationStartupComplete) clearPrivateNotifications();
     unawaited(watchSavedServers());
     _refreshShell();
   }

@@ -229,6 +229,34 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       : null;
   Future<void> revealSearchMessage(Content message) =>
       sendRequest(ChatSearchMessageRevealed(message, _session));
+  Future<Content?> notificationMessage(int sequence) async {
+    final session = _session, channel = channelId, principal = principalId;
+    if (!connected || !canRead || encryptedChannel) return null;
+    final cached = messages
+        .where((m) => m.channelId == channel && m.sequence.toInt() == sequence)
+        .firstOrNull;
+    if (cached != null) return cached.deleted ? null : cached;
+    if (session is! HistoryPageSession) return null;
+    final page = await (session as HistoryPageSession).historyPage(
+      channel,
+      before: sequence + 1,
+    );
+    if (!identical(session, _session) ||
+        channel != channelId ||
+        principal != principalId ||
+        !connected ||
+        !canRead ||
+        encryptedChannel) {
+      return null;
+    }
+    final message = page.messages
+        .where((m) => m.channelId == channel && m.sequence.toInt() == sequence)
+        .firstOrNull;
+    if (message == null || message.deleted) return null;
+    await revealSearchMessage(message);
+    return messages.where((m) => m.id == message.id && !m.deleted).firstOrNull;
+  }
+
   SpaceSession? get mlsSession =>
       _session is SpaceSession ? _session as SpaceSession : null;
   bool get encryptedChannel =>

@@ -2,11 +2,52 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'notification_targets.dart';
+
 class SystemNotifications {
-  SystemNotifications({this.appName = 'Space'});
+  SystemNotifications({
+    this.appName = 'Space',
+    NotificationTargets? savedTargets,
+  }) : savedTargets = savedTargets ?? NotificationTargets();
+  final NotificationTargets savedTargets;
+  static const activationChannel = MethodChannel(
+    'space/notification-activation',
+  );
+  bool _activationListening = false;
+
+  Future<void> listenForActivation({required bool enabled}) async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.windows) return;
+    if (_activationListening) return;
+    _activationListening = true;
+    activationChannel.setMethodCallHandler((call) async {
+      if (call.method == 'activate' && call.arguments is String) {
+        await activate(call.arguments as String);
+      }
+    });
+    if (!enabled) await savedTargets.clear();
+    try {
+      final token = await activationChannel.invokeMethod<String>('initial');
+      if (token != null && token.isNotEmpty) await activate(token);
+    } on MissingPluginException {
+      // Старый или тестовый runner не поддерживает запуск из карточки.
+    }
+  }
+
+  Future<void> activate(String token) async {
+    try {
+      final payload = await savedTargets.take(token);
+      if (!_disposed && payload != null && !targets.isClosed) {
+        targets.add(payload);
+      }
+    } catch (_) {
+      // Повреждённая запись не открывает произвольный адрес.
+    }
+  }
+
   final String appName;
   static bool get supported =>
       !kIsWeb &&
@@ -57,6 +98,17 @@ class SystemNotifications {
   }) async {
     await initialize();
     if (_disposed) return;
+    if (defaultTargetPlatform == TargetPlatform.windows) {
+      final token = await savedTargets.save(id, jsonEncode(target));
+      await activationChannel.invokeMethod<void>('show', {
+        'token': token,
+        'appId': appName,
+        'title': title,
+        'body': body,
+        'tag': '$id',
+      });
+      return;
+    }
     if (!_active.containsKey(id) && _active.length >= 64) return;
     if (_active.containsKey(id)) await _active[id]!.close();
     final notification = _active.putIfAbsent(
@@ -83,6 +135,14 @@ class SystemNotifications {
   }
 
   Future<void> clear() async {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
+      await savedTargets.clear();
+      try {
+        await activationChannel.invokeMethod<void>('clear', {'appId': appName});
+      } on MissingPluginException {
+        // Тестовый runner.
+      }
+    }
     for (final notification in _active.values) {
       notification.onClick = null;
       notification.onClickAction = null;
@@ -92,6 +152,7 @@ class SystemNotifications {
 
   Future<void> dispose() async {
     _disposed = true;
+    if (_activationListening) activationChannel.setMethodCallHandler(null);
     for (final notification in _active.values) {
       notification.onClick = null;
       notification.onClickAction = null;

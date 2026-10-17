@@ -36,12 +36,24 @@ class _Session extends DashboardSession {
 }
 
 class _Notifications extends SystemNotifications {
+  String? startupPayload;
+  int activationStarts = 0;
+  int clears = 0;
+  @override
+  Future<void> listenForActivation({required bool enabled}) async {
+    activationStarts++;
+    if (startupPayload != null) targets.add(startupPayload!);
+  }
+
   Completer<void>? focusGate;
   int focuses = 0;
   @override
   Future<void> initialize() async {}
   @override
-  Future<void> clear() async {}
+  Future<void> clear() async {
+    clears++;
+  }
+
   @override
   Future<void> focus() async {
     focuses++;
@@ -56,6 +68,9 @@ void main() {
     'wrong-principal',
     'unknown-origin',
     'revoked-during-focus',
+    'cold-start',
+    'cold-load-preferences',
+    'notifications-off',
   ]) {
     testWidgets('Нажатие системного уведомления: $scenario', (tester) async {
       SharedPreferences.setMockInitialValues({});
@@ -86,7 +101,29 @@ void main() {
         await workspaces.refresh();
       });
       final notifications = _Notifications();
-      final preferences = AppPreferences()..origins.addAll([first, second]);
+      final startupReady = Completer<void>();
+      final cold = scenario.startsWith('cold-');
+      if (cold) {
+        notifications.startupPayload = jsonEncode([
+          second,
+          'u_test',
+          'team',
+          7,
+        ]);
+      } else {
+        startupReady.complete();
+      }
+      final preferences = AppPreferences()
+        ..origins.addAll([first, second])
+        ..notificationMode = scenario == 'notifications-off' ? 0 : 1;
+      if (scenario == 'cold-load-preferences') {
+        preferences.origins.clear();
+        preferences.notificationMode = 0;
+        SharedPreferences.setMockInitialValues({
+          'space.ui.origins': [first, second],
+          'space.notifications.mode': 1,
+        });
+      }
       final presence = ServerPresence(probe: (_) async => true);
       await tester.pumpWidget(
         MaterialApp(
@@ -102,6 +139,7 @@ void main() {
             preferences: preferences,
             presence: presence,
             notifications: notifications,
+            startupReady: startupReady.future,
             hostingEnabled: false,
           ),
         ),
@@ -118,14 +156,26 @@ void main() {
       if (scenario == 'revoked-during-focus') {
         notifications.focusGate = Completer<void>();
       }
-      notifications.targets.add(
-        jsonEncode([
-          scenario == 'unknown-origin' ? 'http://unknown.invalid' : second,
-          scenario == 'wrong-principal' ? 'someone-else' : target.principalId,
-          'team',
-          7,
-        ]),
-      );
+      if (cold) {
+        expect(notifications.activationStarts, 0);
+        expect(target.channelId, 'general');
+        if (scenario == 'cold-load-preferences') {
+          final loading = preferences.load();
+          await tester.pumpAndSettle();
+          await loading;
+          expect(notifications.clears, 0);
+        }
+        startupReady.complete();
+      } else {
+        notifications.targets.add(
+          jsonEncode([
+            scenario == 'unknown-origin' ? 'http://unknown.invalid' : second,
+            scenario == 'wrong-principal' ? 'someone-else' : target.principalId,
+            'team',
+            7,
+          ]),
+        );
+      }
       for (var frame = 0; frame < 8; frame++) {
         await tester.pump();
         await tester.runAsync(
@@ -141,7 +191,8 @@ void main() {
         await tester.runAsync(() async => Future<void>.delayed(Duration.zero));
         await tester.pumpAndSettle();
         expect(target.canRead, isFalse);
-      } else if (scenario == 'valid') {
+      } else if (scenario == 'valid' || cold) {
+        expect(notifications.activationStarts, 1);
         expect(target.channelId, 'team');
         expect(notifications.focuses, 1);
         expect(find.text('Цель уведомления · Второй · team'), findsOneWidget);

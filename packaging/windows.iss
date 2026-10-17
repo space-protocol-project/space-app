@@ -37,6 +37,11 @@ Name: "{autodesktop}\Space"; Filename: "{app}\space_client.exe"; Tasks: desktopi
 Filename: "{app}\space_client.exe"; Description: "{cm:LaunchProgram,Space}"; Flags: nowait postinstall skipifsilent
 Filename: "{app}\space_client.exe"; Flags: nowait; Check: ShouldRelaunch
 
+[Registry]
+Root: HKCU; Subkey: "Software\Classes\space-notification"; ValueType: string; ValueData: "URL:Space notification"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\space-notification"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
+Root: HKCU; Subkey: "Software\Classes\space-notification\shell\open\command"; ValueType: string; ValueData: """{app}\space_client.exe"" ""%1"""
+
 [Code]
 function ShouldRelaunch: Boolean;
 var
