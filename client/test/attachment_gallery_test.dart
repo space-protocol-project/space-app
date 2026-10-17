@@ -52,6 +52,17 @@ Future<void> settleImages(WidgetTester tester, int expected) async {
   fail('Изображения не загрузились');
 }
 
+Future<void> settleDownloadFailure(WidgetTester tester) async {
+  for (var i = 0; i < 500; i++) {
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 10)),
+    );
+    await tester.pump();
+    if (find.byIcon(Icons.refresh).evaluate().isNotEmpty) return;
+  }
+  fail('Подмена файла не была отклонена');
+}
+
 Widget screen(Widget child) => MaterialApp(
   locale: const Locale('ru'),
   supportedLocales: AppLocalizations.supportedLocales,
@@ -130,7 +141,7 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await settleDownloadFailure(tester);
     expect(find.byIcon(Icons.refresh), findsOneWidget);
     expect(
       tester
