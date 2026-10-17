@@ -134,3 +134,5 @@ final class ChatSearchMessageRevealed extends ChatEvent<void> {
   final Content message;
   final LiveSession? session;
 }
+
+final class ChatOlderHistoryRequested extends ChatEvent<void> {}

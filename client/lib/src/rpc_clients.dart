@@ -76,6 +76,14 @@ class ChannelServiceClient {
 
 class ContentServiceClient {
   const ContentServiceClient(this.connection);
+  Future<GetHistoryPageResponse> getHistoryPage(
+    GetHistoryPageRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.ContentService.getHistoryPage,
+    request,
+    options: options,
+  );
   Future<SearchContentResponse> searchContent(
     SearchContentRequest request, {
     RpcOptions? options,

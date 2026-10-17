@@ -92,6 +92,8 @@ abstract class ChannelServiceBase extends $pb.GeneratedService {
 }
 
 abstract class ContentServiceBase extends $pb.GeneratedService {
+  $async.Future<$0.GetHistoryPageResponse> getHistoryPage(
+      $pb.ServerContext ctx, $0.GetHistoryPageRequest request);
   $async.Future<$0.SearchContentResponse> searchContent(
       $pb.ServerContext ctx, $0.SearchContentRequest request);
   $async.Future<$0.ApplyContentMutationResponse> applyContentMutation(
@@ -109,6 +111,8 @@ abstract class ContentServiceBase extends $pb.GeneratedService {
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
+      case 'GetHistoryPage':
+        return $0.GetHistoryPageRequest();
       case 'SearchContent':
         return $0.SearchContentRequest();
       case 'ApplyContentMutation':
@@ -131,6 +135,8 @@ abstract class ContentServiceBase extends $pb.GeneratedService {
   $async.Future<$pb.GeneratedMessage> handleCall($pb.ServerContext ctx,
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
+      case 'GetHistoryPage':
+        return getHistoryPage(ctx, request as $0.GetHistoryPageRequest);
       case 'SearchContent':
         return searchContent(ctx, request as $0.SearchContentRequest);
       case 'ApplyContentMutation':

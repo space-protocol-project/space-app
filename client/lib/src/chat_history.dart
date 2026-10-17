@@ -31,6 +31,7 @@ class ChatHistory {
   bool repliesSupported = false;
   List<Channel> channels = [];
   Map<String, int> readSequences = {};
+  Map<String, String> eventCursors = {};
   final Map<String, CachedMessage> entries = {};
   final Set<String> favorites = {};
   void prune(DateTime now) {
@@ -98,12 +99,27 @@ class ChatHistory {
     'repliesSupported': repliesSupported,
     'channels': channels.map((c) => c.toProto3Json()).toList(),
     'reads': readSequences,
+    'eventCursors': Map<String, String>.of(eventCursors),
     'favorites': favorites.toList(),
     'messages': [
       for (final entry in entries.values)
         {'content': entry.content.toProto3Json(), 'received': entry.receivedAt},
     ],
   };
+  static Map<String, String> _readEventCursors(dynamic value) {
+    if (value == null) return {};
+    if (value is! Map || value.length > 500) {
+      throw const FormatException('Некорректные курсоры истории');
+    }
+    final result = Map<String, String>.from(value);
+    if (result.entries.any(
+      (entry) => entry.key.length > 128 || entry.value.length > 512,
+    )) {
+      throw const FormatException('Некорректные курсоры истории');
+    }
+    return result;
+  }
+
   static ChatHistory fromJson(Map<String, dynamic> data, DateTime now) {
     if (data['v'] != 1 ||
         (data['channels'] as List).length > 500 ||
@@ -123,6 +139,7 @@ class ChatHistory {
               Channel()..mergeFromProto3Json(channel),
           ]
           ..readSequences = Map<String, int>.from(data['reads'] as Map);
+    result.eventCursors = _readEventCursors(data['eventCursors']);
     result.attachmentsEnabled = data['attachmentsEnabled'] == true;
     result.repliesSupported = data['repliesSupported'] == true;
     for (final entry in data['messages'] as List) {

@@ -26,6 +26,7 @@ import 'package:protobuf/protobuf.dart' show GeneratedMessage;
 
 import 'rpc_clients.dart';
 import 'message_search.dart';
+import 'history_pages.dart';
 import 'root_history.dart';
 import 'root_adoption.dart';
 import 'root_device_proof.dart';
@@ -653,6 +654,7 @@ abstract interface class AttachmentSession {
 class SpaceSession
     implements
         MessageSearchSession,
+        HistoryPageSession,
         LiveSession,
         QueuedMessageSession,
         ReplyMessageSession,
@@ -1582,7 +1584,7 @@ class SpaceSession
     if (before < 0) throw ArgumentError('Некорректный курсор');
     await _ensureSession();
     final principal = principalId;
-    _requireSearchChannel(id);
+    _requireOrdinaryRead(id);
     final response = await ContentServiceClient(channel).searchContent(
       SearchContentRequest(
         channelId: id,
@@ -1592,54 +1594,39 @@ class SpaceSession
       options: _options,
     );
     if (principalId != principal) throw StateError('Личность изменилась');
-    _requireSearchChannel(id);
+    _requireOrdinaryRead(id);
     return checkedSearchPage(response, id, term, before);
   }
 
-  void _requireSearchChannel(String id) {
+  void _requireOrdinaryRead(String id) {
     final target = availableChannels.where((c) => c.id == id).firstOrNull;
     if (target == null ||
         !target.permissions.visible ||
         !target.permissions.read ||
         target.mlsGroupId.isNotEmpty) {
-      throw const GrpcError.permissionDenied(
-        'Канал недоступен для серверного поиска',
-      );
+      throw const GrpcError.permissionDenied('Канал недоступен для чтения');
     }
   }
 
   @override
-  Future<List<Content>> messages() async {
+  Future<HistoryPage> historyPage(String id, {int before = 0}) async {
+    if (before < 0) throw ArgumentError('Некорректная граница истории');
     await _ensureSession();
-    final id = selectedChannelId;
-    if (!canRead || selectedChannel?.mlsGroupId.isNotEmpty == true) return [];
-    final result = <Content>[];
-    var cursor = '';
-    for (var page = 0; page < 11; page++) {
-      final response = await ContentServiceClient(channel).listContent(
-        ListContentRequest(channelId: id, after: cursor),
-        options: _options,
-      );
-      if (response.contents.any((message) => message.sequence.isNegative)) {
-        throw const LocalFailure(
-          LocalFailureCode.protocolInvalid,
-          'Некорректный порядковый номер сообщения',
-        );
-      }
-      result.addAll(response.contents);
-      if (response.contents.length < 100) return result;
-      if (response.nextCursor.isEmpty || response.nextCursor == cursor) {
-        throw const LocalFailure(
-          LocalFailureCode.protocolInvalid,
-          'Сервер повторил курсор',
-        );
-      }
-      cursor = response.nextCursor;
-    }
-    throw const LocalFailure(
-      LocalFailureCode.protocolInvalid,
-      'Слишком много страниц',
+    final principal = principalId;
+    _requireOrdinaryRead(id);
+    final response = await ContentServiceClient(channel).getHistoryPage(
+      GetHistoryPageRequest(channelId: id, beforeSequence: Int64(before)),
+      options: _options,
     );
+    if (principalId != principal) throw StateError('Личность изменилась');
+    _requireOrdinaryRead(id);
+    return checkedHistoryPage(response, id, before);
+  }
+
+  @override
+  Future<List<Content>> messages() async {
+    if (!canRead || selectedChannel?.mlsGroupId.isNotEmpty == true) return [];
+    return (await historyPage(selectedChannelId)).messages;
   }
 
   @override

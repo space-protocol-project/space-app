@@ -1644,6 +1644,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get messageSearchLimit => '显示前 200 条结果。请缩小搜索范围。';
+
+  @override
+  String get loadOlderMessages => '加载更早的消息';
+
+  @override
+  String get historyPageFailed => '无法加载历史记录。请重试。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2126,4 +2132,10 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get messageSearchLimit => '显示前 200 条结果。请缩小搜索范围。';
+
+  @override
+  String get loadOlderMessages => '加载更早的消息';
+
+  @override
+  String get historyPageFailed => '无法加载历史记录。请重试。';
 }

@@ -2755,6 +2755,49 @@ final $typed_data.Uint8List searchContentResponseDescriptor = $convert.base64Dec
     '50ZW50Ughjb250ZW50cxIwChRuZXh0X2JlZm9yZV9zZXF1ZW5jZRgCIAEoA1ISbmV4dEJlZm9y'
     'ZVNlcXVlbmNl');
 
+@$core.Deprecated('Use getHistoryPageRequestDescriptor instead')
+const GetHistoryPageRequest$json = {
+  '1': 'GetHistoryPageRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'before_sequence', '3': 2, '4': 1, '5': 3, '10': 'beforeSequence'},
+  ],
+};
+
+/// Descriptor for `GetHistoryPageRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getHistoryPageRequestDescriptor = $convert.base64Decode(
+    'ChVHZXRIaXN0b3J5UGFnZVJlcXVlc3QSHQoKY2hhbm5lbF9pZBgBIAEoCVIJY2hhbm5lbElkEi'
+    'cKD2JlZm9yZV9zZXF1ZW5jZRgCIAEoA1IOYmVmb3JlU2VxdWVuY2U=');
+
+@$core.Deprecated('Use getHistoryPageResponseDescriptor instead')
+const GetHistoryPageResponse$json = {
+  '1': 'GetHistoryPageResponse',
+  '2': [
+    {
+      '1': 'contents',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.Content',
+      '10': 'contents'
+    },
+    {
+      '1': 'next_before_sequence',
+      '3': 2,
+      '4': 1,
+      '5': 3,
+      '10': 'nextBeforeSequence'
+    },
+    {'1': 'event_cursor', '3': 3, '4': 1, '5': 9, '10': 'eventCursor'},
+  ],
+};
+
+/// Descriptor for `GetHistoryPageResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getHistoryPageResponseDescriptor = $convert.base64Decode(
+    'ChZHZXRIaXN0b3J5UGFnZVJlc3BvbnNlEi0KCGNvbnRlbnRzGAEgAygLMhEuc3BhY2UudjEuQ2'
+    '9udGVudFIIY29udGVudHMSMAoUbmV4dF9iZWZvcmVfc2VxdWVuY2UYAiABKANSEm5leHRCZWZv'
+    'cmVTZXF1ZW5jZRIhCgxldmVudF9jdXJzb3IYAyABKAlSC2V2ZW50Q3Vyc29y');
+
 const $core.Map<$core.String, $core.dynamic> ChannelServiceBase$json = {
   '1': 'ChannelService',
   '2': [
@@ -2861,6 +2904,12 @@ const $core.Map<$core.String, $core.dynamic> ContentServiceBase$json = {
   '1': 'ContentService',
   '2': [
     {
+      '1': 'GetHistoryPage',
+      '2': '.space.v1.GetHistoryPageRequest',
+      '3': '.space.v1.GetHistoryPageResponse',
+      '4': {}
+    },
+    {
       '1': 'SearchContent',
       '2': '.space.v1.SearchContentRequest',
       '3': '.space.v1.SearchContentResponse',
@@ -2906,12 +2955,14 @@ const $core.Map<$core.String, $core.dynamic> ContentServiceBase$json = {
 @$core.Deprecated('Use contentServiceDescriptor instead')
 const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
     ContentServiceBase$messageJson = {
-  '.space.v1.SearchContentRequest': SearchContentRequest$json,
-  '.space.v1.SearchContentResponse': SearchContentResponse$json,
+  '.space.v1.GetHistoryPageRequest': GetHistoryPageRequest$json,
+  '.space.v1.GetHistoryPageResponse': GetHistoryPageResponse$json,
   '.space.v1.Content': Content$json,
   '.space.v1.Asset': Asset$json,
   '.space.v1.Reaction': Reaction$json,
   '.space.v1.Content.ParticipantNamesEntry': Content_ParticipantNamesEntry$json,
+  '.space.v1.SearchContentRequest': SearchContentRequest$json,
+  '.space.v1.SearchContentResponse': SearchContentResponse$json,
   '.space.v1.ApplyContentMutationRequest': ApplyContentMutationRequest$json,
   '.space.v1.UpdateContentRequest': UpdateContentRequest$json,
   '.space.v1.DeleteContentRequest': DeleteContentRequest$json,
@@ -2928,22 +2979,24 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
 
 /// Descriptor for `ContentService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
 final $typed_data.Uint8List contentServiceDescriptor = $convert.base64Decode(
-    'Cg5Db250ZW50U2VydmljZRKGAQoNU2VhcmNoQ29udGVudBIeLnNwYWNlLnYxLlNlYXJjaENvbn'
-    'RlbnRSZXF1ZXN0Gh8uc3BhY2UudjEuU2VhcmNoQ29udGVudFJlc3BvbnNlIjSC0+STAi4SLC9h'
-    'cGkvdjEvY2hhbm5lbHMve2NoYW5uZWxfaWR9L2NvbnRlbnQvc2VhcmNoEmUKFEFwcGx5Q29udG'
-    'VudE11dGF0aW9uEiUuc3BhY2UudjEuQXBwbHlDb250ZW50TXV0YXRpb25SZXF1ZXN0GiYuc3Bh'
-    'Y2UudjEuQXBwbHlDb250ZW50TXV0YXRpb25SZXNwb25zZRJKCgtTZXRSZWFjdGlvbhIcLnNwYW'
-    'NlLnYxLlNldFJlYWN0aW9uUmVxdWVzdBodLnNwYWNlLnYxLlNldFJlYWN0aW9uUmVzcG9uc2US'
-    'hAEKDVVwZGF0ZUNvbnRlbnQSHi5zcGFjZS52MS5VcGRhdGVDb250ZW50UmVxdWVzdBofLnNwYW'
-    'NlLnYxLlVwZGF0ZUNvbnRlbnRSZXNwb25zZSIygtPkkwIsOgEqMicvdjEvY2hhbm5lbHMve2No'
-    'YW5uZWxfaWR9L2NvbnRlbnRzL3tpZH0SgQEKDURlbGV0ZUNvbnRlbnQSHi5zcGFjZS52MS5EZW'
-    'xldGVDb250ZW50UmVxdWVzdBofLnNwYWNlLnYxLkRlbGV0ZUNvbnRlbnRSZXNwb25zZSIvgtPk'
-    'kwIpKicvdjEvY2hhbm5lbHMve2NoYW5uZWxfaWR9L2NvbnRlbnRzL3tpZH0SggEKDUNyZWF0ZU'
-    'NvbnRlbnQSHi5zcGFjZS52MS5DcmVhdGVDb250ZW50UmVxdWVzdBofLnNwYWNlLnYxLkNyZWF0'
-    'ZUNvbnRlbnRSZXNwb25zZSIwgtPkkwIqOgEqIiUvYXBpL3YxL2NoYW5uZWxzL3tjaGFubmVsX2'
-    'lkfS9jb250ZW50EnkKC0xpc3RDb250ZW50Ehwuc3BhY2UudjEuTGlzdENvbnRlbnRSZXF1ZXN0'
-    'Gh0uc3BhY2UudjEuTGlzdENvbnRlbnRSZXNwb25zZSItgtPkkwInEiUvYXBpL3YxL2NoYW5uZW'
-    'xzL3tjaGFubmVsX2lkfS9jb250ZW50');
+    'Cg5Db250ZW50U2VydmljZRKKAQoOR2V0SGlzdG9yeVBhZ2USHy5zcGFjZS52MS5HZXRIaXN0b3'
+    'J5UGFnZVJlcXVlc3QaIC5zcGFjZS52MS5HZXRIaXN0b3J5UGFnZVJlc3BvbnNlIjWC0+STAi8S'
+    'LS9hcGkvdjEvY2hhbm5lbHMve2NoYW5uZWxfaWR9L2NvbnRlbnQvaGlzdG9yeRKGAQoNU2Vhcm'
+    'NoQ29udGVudBIeLnNwYWNlLnYxLlNlYXJjaENvbnRlbnRSZXF1ZXN0Gh8uc3BhY2UudjEuU2Vh'
+    'cmNoQ29udGVudFJlc3BvbnNlIjSC0+STAi4SLC9hcGkvdjEvY2hhbm5lbHMve2NoYW5uZWxfaW'
+    'R9L2NvbnRlbnQvc2VhcmNoEmUKFEFwcGx5Q29udGVudE11dGF0aW9uEiUuc3BhY2UudjEuQXBw'
+    'bHlDb250ZW50TXV0YXRpb25SZXF1ZXN0GiYuc3BhY2UudjEuQXBwbHlDb250ZW50TXV0YXRpb2'
+    '5SZXNwb25zZRJKCgtTZXRSZWFjdGlvbhIcLnNwYWNlLnYxLlNldFJlYWN0aW9uUmVxdWVzdBod'
+    'LnNwYWNlLnYxLlNldFJlYWN0aW9uUmVzcG9uc2UShAEKDVVwZGF0ZUNvbnRlbnQSHi5zcGFjZS'
+    '52MS5VcGRhdGVDb250ZW50UmVxdWVzdBofLnNwYWNlLnYxLlVwZGF0ZUNvbnRlbnRSZXNwb25z'
+    'ZSIygtPkkwIsOgEqMicvdjEvY2hhbm5lbHMve2NoYW5uZWxfaWR9L2NvbnRlbnRzL3tpZH0SgQ'
+    'EKDURlbGV0ZUNvbnRlbnQSHi5zcGFjZS52MS5EZWxldGVDb250ZW50UmVxdWVzdBofLnNwYWNl'
+    'LnYxLkRlbGV0ZUNvbnRlbnRSZXNwb25zZSIvgtPkkwIpKicvdjEvY2hhbm5lbHMve2NoYW5uZW'
+    'xfaWR9L2NvbnRlbnRzL3tpZH0SggEKDUNyZWF0ZUNvbnRlbnQSHi5zcGFjZS52MS5DcmVhdGVD'
+    'b250ZW50UmVxdWVzdBofLnNwYWNlLnYxLkNyZWF0ZUNvbnRlbnRSZXNwb25zZSIwgtPkkwIqOg'
+    'EqIiUvYXBpL3YxL2NoYW5uZWxzL3tjaGFubmVsX2lkfS9jb250ZW50EnkKC0xpc3RDb250ZW50'
+    'Ehwuc3BhY2UudjEuTGlzdENvbnRlbnRSZXF1ZXN0Gh0uc3BhY2UudjEuTGlzdENvbnRlbnRSZX'
+    'Nwb25zZSItgtPkkwInEiUvYXBpL3YxL2NoYW5uZWxzL3tjaGFubmVsX2lkfS9jb250ZW50');
 
 const $core.Map<$core.String, $core.dynamic> AssetServiceBase$json = {
   '1': 'AssetService',

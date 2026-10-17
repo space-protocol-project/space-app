@@ -659,5 +659,7 @@
   "messageSearchLocal": "Поиск только на этом устройстве · MLS",
   "messageSearchFailed": "Не удалось выполнить поиск. Повторить",
   "messageSearchMore": "Ещё сообщения",
-  "messageSearchLimit": "Показаны первые 200 совпадений. Уточните запрос."
+  "messageSearchLimit": "Показаны первые 200 совпадений. Уточните запрос.",
+  "loadOlderMessages": "Загрузить предыдущие сообщения",
+  "historyPageFailed": "Не удалось загрузить историю. Повторите попытку."
 }

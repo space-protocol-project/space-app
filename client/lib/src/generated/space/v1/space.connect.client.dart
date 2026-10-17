@@ -146,6 +146,23 @@ extension type ChannelServiceClient (connect.Transport _transport) {
   }
 }
 extension type ContentServiceClient (connect.Transport _transport) {
+  Future<spacev1space.GetHistoryPageResponse> getHistoryPage(
+    spacev1space.GetHistoryPageRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ContentService.getHistoryPage,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
   Future<spacev1space.SearchContentResponse> searchContent(
     spacev1space.SearchContentRequest input, {
     connect.Headers? headers,

@@ -2,6 +2,9 @@ part of 'chat_controller.dart';
 
 final class ChatState {
   const ChatState({
+    this.historyLoading = false,
+    this.hasOlderHistory = false,
+    this.historyError = '',
     this.busy = false,
     this.connected = false,
     this.reconnecting = false,
@@ -41,6 +44,9 @@ final class ChatState {
     final channels = controller.channels;
     final previous = controller.state;
     return ChatState(
+      historyLoading: controller.historyLoading,
+      hasOlderHistory: controller.hasOlderHistory,
+      historyError: controller.historyError,
       busy: controller.busy,
       connected: controller.connected,
       reconnecting: controller.reconnecting,
@@ -87,6 +93,8 @@ final class ChatState {
     );
   }
 
+  final bool historyLoading, hasOlderHistory;
+  final String historyError;
   final bool busy,
       connected,
       reconnecting,

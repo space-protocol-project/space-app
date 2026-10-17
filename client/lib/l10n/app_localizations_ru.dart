@@ -1798,4 +1798,11 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get messageSearchLimit =>
       'Показаны первые 200 совпадений. Уточните запрос.';
+
+  @override
+  String get loadOlderMessages => 'Загрузить предыдущие сообщения';
+
+  @override
+  String get historyPageFailed =>
+      'Не удалось загрузить историю. Повторите попытку.';
 }

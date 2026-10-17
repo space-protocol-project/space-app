@@ -18,6 +18,7 @@ import 'package:file_selector/file_selector.dart';
 
 import 'core.dart';
 import 'message_search.dart';
+import 'history_pages.dart';
 import 'event_controller.dart';
 import 'generated/space/v1/space.pb.dart';
 import 'local_failure.dart';
@@ -29,6 +30,7 @@ part 'chat_outbox_files.dart';
 part 'chat_outbox_recovery.dart';
 part 'chat_outbox_mutations.dart';
 part 'chat_replies.dart';
+part 'chat_history_pages.dart';
 
 enum MessageSendStatus { idle, sending, unconfirmed, accepted, queued }
 
@@ -89,6 +91,9 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
         _mergeMessage(event.message);
         publishState();
       }),
+    );
+    on<ChatOlderHistoryRequested>(
+      (event, _) => handleRequest(event, _loadOlderHistory),
     );
     on<ChatReadMarked>(
       (event, _) => handleRequest(event, () => _markRead(event.id)),
@@ -400,6 +405,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     saved.selected = channelId;
     saved.readSequences = Map.of(_readSequences);
     saved.merge(_messages.values, now());
+    if (_pagedHistory) saved.eventCursors[channelId] = cursor;
     _queueHistoryFlush();
   }
 
@@ -703,6 +709,15 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   bool reconnecting = false;
   static Duration defaultRetryDelay(int attempt) =>
       Duration(seconds: 1 << (attempt > 5 ? 5 : attempt));
+  final _historyChanges = <String, Content>{};
+  bool _historyChangesOverflow = false;
+  int _historyEpoch = 0, _historyFloor = 0, _historyNextBefore = 0;
+  bool _pagedHistory = false, historyLoading = false;
+  String historyError = '';
+  bool get hasOlderHistory =>
+      connected && canRead && !encryptedChannel && _historyNextBefore > 0;
+  int get historyGeneration => _historyEpoch;
+  Future<void> loadOlderHistory() => sendRequest(ChatOlderHistoryRequested());
   bool busy = false, connected = false, _disposed = false;
   String error = '',
       fingerprint = '',
@@ -899,7 +914,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       _invitationToken = '';
       _setupCode = '';
       await _loadPositions();
-      final initial = await session.messages();
+      final initial = await _initialHistory(session);
       if (_disposed || accessRemoved) {
         await session.close();
         return;
@@ -912,10 +927,9 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
             'История другого канала',
           );
         }
-        _messages[message.id] = message;
+        _mergeMessage(message);
       }
       _restoreReadSequence();
-      cursor = _cursors[channelId] ?? '';
       connected = true;
       if (session is ChannelUpdates) {
         unawaited(_watchCatalog(session, ++_catalogGeneration));
@@ -1030,7 +1044,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       }
       nav.selectChannel(nextId);
       cursor = _cursors[nextId] ?? '';
-      final initial = await session.messages();
+      final initial = await _initialHistory(session);
       if (_disposed) return;
       for (final m in initial) {
         if (m.channelId != nextId) {
@@ -1039,7 +1053,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
             'История другого канала',
           );
         }
-        _messages[m.id] = m;
+        _mergeMessage(m);
       }
       connected = true;
       await _savePositions();
@@ -1241,6 +1255,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   bool _current(LiveSession session, int generation) =>
       !_disposed && _session == session && _generation == generation;
   void _stopSubscription() {
+    _resetHistoryPaging();
     _generation++;
     _retryTimer?.cancel();
     if (_retryDone != null && !_retryDone!.isCompleted) _retryDone!.complete();
@@ -1310,7 +1325,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       return _streamChannelAvailable(watchedChannel);
     }
     _validateContentFrame(frame, watchedChannel);
-    _mergeMessage(frame.event.content);
+    _mergeHistoryFrame(frame.event.content);
     cursor = frame.cursor;
     _cursors[watchedChannel] = cursor;
     _queuePositions();
@@ -1453,7 +1468,9 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   MessageSendStatus sendStatus = MessageSendStatus.idle;
 
   void _mergeMessage(Content message) {
-    final previous = _messages[message.id];
+    final previous =
+        _messages[message.id] ??
+        _history?.entries['${message.channelId}/${message.id}']?.content;
     if (previous != null && previous.revision > message.revision) return;
     _messages[message.id] = message;
     if (message.deleted) {

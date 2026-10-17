@@ -10475,6 +10475,159 @@ class SearchContentResponse extends $pb.GeneratedMessage {
   void clearNextBeforeSequence() => $_clearField(2);
 }
 
+/// Свежая страница обычного канала. before_sequence=0 открывает конец истории.
+class GetHistoryPageRequest extends $pb.GeneratedMessage {
+  factory GetHistoryPageRequest({
+    $core.String? channelId,
+    $fixnum.Int64? beforeSequence,
+  }) {
+    final result = GetHistoryPageRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (beforeSequence != null) result.beforeSequence = beforeSequence;
+    return result;
+  }
+
+  GetHistoryPageRequest._();
+
+  factory GetHistoryPageRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetHistoryPageRequest()..mergeFromBuffer(data, registry);
+  factory GetHistoryPageRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetHistoryPageRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetHistoryPageRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetHistoryPageRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aInt64(2, _omitFieldNames ? '' : 'beforeSequence')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetHistoryPageRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetHistoryPageRequest copyWith(
+          void Function(GetHistoryPageRequest) updates) =>
+      super.copyWith((message) => updates(message as GetHistoryPageRequest))
+          as GetHistoryPageRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetHistoryPageRequest() / GetHistoryPageRequest.new instead')
+  static GetHistoryPageRequest create() => GetHistoryPageRequest._();
+  static $pb.GeneratedMessage $_createMessage() => GetHistoryPageRequest._();
+  @$core.override
+  GetHistoryPageRequest createEmptyInstance() => GetHistoryPageRequest._();
+  @$core.pragma('dart2js:noInline')
+  static GetHistoryPageRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetHistoryPageRequest>(
+          GetHistoryPageRequest.$_createMessage);
+  static GetHistoryPageRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get beforeSequence => $_getI64(1);
+  @$pb.TagNumber(2)
+  set beforeSequence($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasBeforeSequence() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearBeforeSequence() => $_clearField(2);
+}
+
+class GetHistoryPageResponse extends $pb.GeneratedMessage {
+  factory GetHistoryPageResponse({
+    $core.Iterable<Content>? contents,
+    $fixnum.Int64? nextBeforeSequence,
+    $core.String? eventCursor,
+  }) {
+    final result = GetHistoryPageResponse._();
+    if (contents != null) result.contents.addAll(contents);
+    if (nextBeforeSequence != null)
+      result.nextBeforeSequence = nextBeforeSequence;
+    if (eventCursor != null) result.eventCursor = eventCursor;
+    return result;
+  }
+
+  GetHistoryPageResponse._();
+
+  factory GetHistoryPageResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetHistoryPageResponse()..mergeFromBuffer(data, registry);
+  factory GetHistoryPageResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetHistoryPageResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetHistoryPageResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetHistoryPageResponse.$_createMessage)
+    ..pPM<Content>(1, _omitFieldNames ? '' : 'contents',
+        subBuilder: Content.$_createMessage)
+    ..aInt64(2, _omitFieldNames ? '' : 'nextBeforeSequence')
+    ..aOS(3, _omitFieldNames ? '' : 'eventCursor')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetHistoryPageResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetHistoryPageResponse copyWith(
+          void Function(GetHistoryPageResponse) updates) =>
+      super.copyWith((message) => updates(message as GetHistoryPageResponse))
+          as GetHistoryPageResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetHistoryPageResponse() / GetHistoryPageResponse.new instead')
+  static GetHistoryPageResponse create() => GetHistoryPageResponse._();
+  static $pb.GeneratedMessage $_createMessage() => GetHistoryPageResponse._();
+  @$core.override
+  GetHistoryPageResponse createEmptyInstance() => GetHistoryPageResponse._();
+  @$core.pragma('dart2js:noInline')
+  static GetHistoryPageResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetHistoryPageResponse>(
+          GetHistoryPageResponse.$_createMessage);
+  static GetHistoryPageResponse? _defaultInstance;
+
+  /// Не более 100 записей, по возрастанию sequence, включая tombstone.
+  @$pb.TagNumber(1)
+  $pb.PbList<Content> get contents => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get nextBeforeSequence => $_getI64(1);
+  @$pb.TagNumber(2)
+  set nextBeforeSequence($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasNextBeforeSequence() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearNextBeforeSequence() => $_clearField(2);
+
+  /// Курсор событий, согласованный со страницей в одной транзакции.
+  @$pb.TagNumber(3)
+  $core.String get eventCursor => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set eventCursor($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasEventCursor() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearEventCursor() => $_clearField(3);
+}
+
 /// Экспериментальный контракт первого локального прототипа.
 class ChannelServiceApi {
   final $pb.RpcClient _client;
@@ -10520,6 +10673,10 @@ class ContentServiceApi {
 
   ContentServiceApi(this._client);
 
+  $async.Future<GetHistoryPageResponse> getHistoryPage(
+          $pb.ClientContext? ctx, GetHistoryPageRequest request) =>
+      _client.invoke<GetHistoryPageResponse>(ctx, 'ContentService',
+          'GetHistoryPage', request, GetHistoryPageResponse());
   $async.Future<SearchContentResponse> searchContent(
           $pb.ClientContext? ctx, SearchContentRequest request) =>
       _client.invoke<SearchContentResponse>(ctx, 'ContentService',

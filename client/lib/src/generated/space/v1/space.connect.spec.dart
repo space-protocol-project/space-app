@@ -71,6 +71,13 @@ abstract final class ContentService {
   /// Fully-qualified name of the ContentService service.
   static const name = 'space.v1.ContentService';
 
+  static const getHistoryPage = connect.Spec(
+    '/$name/GetHistoryPage',
+    connect.StreamType.unary,
+    spacev1space.GetHistoryPageRequest.new,
+    spacev1space.GetHistoryPageResponse.new,
+  );
+
   static const searchContent = connect.Spec(
     '/$name/SearchContent',
     connect.StreamType.unary,

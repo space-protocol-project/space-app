@@ -659,5 +659,7 @@
   "messageSearchLocal": "Search on this device only · MLS",
   "messageSearchFailed": "Search failed. Retry",
   "messageSearchMore": "More messages",
-  "messageSearchLimit": "Showing the first 200 matches. Refine your query."
+  "messageSearchLimit": "Showing the first 200 matches. Refine your query.",
+  "loadOlderMessages": "Load older messages",
+  "historyPageFailed": "Could not load history. Please retry."
 }

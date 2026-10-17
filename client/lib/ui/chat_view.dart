@@ -1,3 +1,5 @@
+import 'package:flutter/rendering.dart' show ScrollDirection;
+
 import 'message_reply.dart';
 import 'outbox_panel.dart';
 import 'emoji_picker.dart';
@@ -32,6 +34,8 @@ import 'favorite_messages.dart';
 import 'space_appearance.dart';
 import 'measure_size.dart';
 
+part 'chat_history_paging.dart';
+
 class ChatView extends StatefulWidget {
   const ChatView({
     super.key,
@@ -59,6 +63,26 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   AttachmentQueue get attachmentQueue =>
       queues.putIfAbsent(scope, AttachmentQueue.new);
   bool draggingFiles = false;
+  bool loadingOlderViewport = false;
+  _HistoryViewport? historyViewport;
+  void beginHistoryViewport(_HistoryViewport request) {
+    setState(() {
+      historyViewport = request;
+      loadingOlderViewport = true;
+      jumping = true;
+    });
+  }
+
+  void endHistoryViewport(_HistoryViewport request) {
+    if (!mounted || !identical(historyViewport, request)) return;
+    setState(() {
+      historyViewport = null;
+      loadingOlderViewport = false;
+      jumping = false;
+    });
+    if (scope == request.scope) queueReadCheck();
+  }
+
   final draft = TextEditingController();
   Content? editing;
   final replyDrafts = <String, String>{};
@@ -130,6 +154,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     if (next != scope) {
       if (editing != null) finishEditing();
       previewVisible = false;
+      historyViewport = null;
+      loadingOlderViewport = false;
+      jumping = false;
       drafts[scope] = draft.text;
       scope = next;
       entryReadThrough = widget.controller.readThrough;
@@ -608,19 +635,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
             alignment: Alignment.topCenter,
             child: SizedBox(
               width: SpaceAppearance.conversationWidth,
-              child: ListView.builder(
-                key: viewport,
-                controller: scroll,
-                padding: EdgeInsets.fromLTRB(
-                  24,
-                  24 + widget.topInset,
-                  24,
-                  composerHeight + 36,
-                ),
-                itemCount: view.messages.length,
-                itemBuilder: (context, index) =>
-                    _messageRow(context, index, boundary),
-              ),
+              child: historyMessageList(context, boundary),
             ),
           ),
         ),

@@ -1790,4 +1790,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get messageSearchLimit =>
       'Showing the first 200 matches. Refine your query.';
+
+  @override
+  String get loadOlderMessages => 'Load older messages';
+
+  @override
+  String get historyPageFailed => 'Could not load history. Please retry.';
 }

@@ -3256,6 +3256,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Показаны первые 200 совпадений. Уточните запрос.'**
   String get messageSearchLimit;
+
+  /// No description provided for @loadOlderMessages.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загрузить предыдущие сообщения'**
+  String get loadOlderMessages;
+
+  /// No description provided for @historyPageFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить историю. Повторите попытку.'**
+  String get historyPageFailed;
 }
 
 class _AppLocalizationsDelegate

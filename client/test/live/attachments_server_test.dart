@@ -9,6 +9,7 @@ import 'ordinary_sync.dart';
 import 'persistent_files.dart';
 import 'queued_mutations.dart';
 import 'message_replies.dart';
+import 'history_pages.dart';
 
 import 'dart:io';
 import 'dart:async';
@@ -232,6 +233,7 @@ void main() {
       await verifyOrdinarySync(discovery, ownerVault, owner);
       await verifyQueuedMutations(discovery, ownerVault, owner, restored);
       await verifyMessageReplies(discovery, ownerVault, owner);
+      await verifyHistoryPages(discovery, ownerVault);
       await verifyPersistentFiles(
         discovery,
         ownerVault,
