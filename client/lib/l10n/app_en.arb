@@ -654,5 +654,10 @@
   "notificationsPreview": "Show message text",
   "notificationsDescription": "On desktop: Ordinary and joined encrypted channels in connected spaces while the app is running. Previews share text with the operating system. Delivery after quitting is not supported yet.",
   "notificationPermissionError": "Could not enable notifications. Check system settings.",
-  "newMessageNotification": "New message"
+  "newMessageNotification": "New message",
+  "messageSearchServer": "Search the selected channel history",
+  "messageSearchLocal": "Search on this device only · MLS",
+  "messageSearchFailed": "Search failed. Retry",
+  "messageSearchMore": "More messages",
+  "messageSearchLimit": "Showing the first 200 matches. Refine your query."
 }

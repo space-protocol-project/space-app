@@ -10324,6 +10324,157 @@ class ApplyContentMutationResponse extends $pb.GeneratedMessage {
   void clearAppliedRevision() => $_clearField(3);
 }
 
+/// Буквальный поиск подстроки без учёта регистра в одном обычном канале.
+/// Запрос: 2–128 символов, максимум 512 байт. Страница: не более 50 записей.
+class SearchContentRequest extends $pb.GeneratedMessage {
+  factory SearchContentRequest({
+    $core.String? channelId,
+    $core.String? query,
+    $fixnum.Int64? beforeSequence,
+  }) {
+    final result = SearchContentRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (query != null) result.query = query;
+    if (beforeSequence != null) result.beforeSequence = beforeSequence;
+    return result;
+  }
+
+  SearchContentRequest._();
+
+  factory SearchContentRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SearchContentRequest()..mergeFromBuffer(data, registry);
+  factory SearchContentRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SearchContentRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'SearchContentRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: SearchContentRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'query')
+    ..aInt64(3, _omitFieldNames ? '' : 'beforeSequence')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SearchContentRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SearchContentRequest copyWith(void Function(SearchContentRequest) updates) =>
+      super.copyWith((message) => updates(message as SearchContentRequest))
+          as SearchContentRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use SearchContentRequest() / SearchContentRequest.new instead')
+  static SearchContentRequest create() => SearchContentRequest._();
+  static $pb.GeneratedMessage $_createMessage() => SearchContentRequest._();
+  @$core.override
+  SearchContentRequest createEmptyInstance() => SearchContentRequest._();
+  @$core.pragma('dart2js:noInline')
+  static SearchContentRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SearchContentRequest>(
+          SearchContentRequest.$_createMessage);
+  static SearchContentRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get query => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set query($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasQuery() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearQuery() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get beforeSequence => $_getI64(2);
+  @$pb.TagNumber(3)
+  set beforeSequence($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasBeforeSequence() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearBeforeSequence() => $_clearField(3);
+}
+
+class SearchContentResponse extends $pb.GeneratedMessage {
+  factory SearchContentResponse({
+    $core.Iterable<Content>? contents,
+    $fixnum.Int64? nextBeforeSequence,
+  }) {
+    final result = SearchContentResponse._();
+    if (contents != null) result.contents.addAll(contents);
+    if (nextBeforeSequence != null)
+      result.nextBeforeSequence = nextBeforeSequence;
+    return result;
+  }
+
+  SearchContentResponse._();
+
+  factory SearchContentResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SearchContentResponse()..mergeFromBuffer(data, registry);
+  factory SearchContentResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SearchContentResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'SearchContentResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: SearchContentResponse.$_createMessage)
+    ..pPM<Content>(1, _omitFieldNames ? '' : 'contents',
+        subBuilder: Content.$_createMessage)
+    ..aInt64(2, _omitFieldNames ? '' : 'nextBeforeSequence')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SearchContentResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SearchContentResponse copyWith(
+          void Function(SearchContentResponse) updates) =>
+      super.copyWith((message) => updates(message as SearchContentResponse))
+          as SearchContentResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use SearchContentResponse() / SearchContentResponse.new instead')
+  static SearchContentResponse create() => SearchContentResponse._();
+  static $pb.GeneratedMessage $_createMessage() => SearchContentResponse._();
+  @$core.override
+  SearchContentResponse createEmptyInstance() => SearchContentResponse._();
+  @$core.pragma('dart2js:noInline')
+  static SearchContentResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SearchContentResponse>(
+          SearchContentResponse.$_createMessage);
+  static SearchContentResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<Content> get contents => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get nextBeforeSequence => $_getI64(1);
+  @$pb.TagNumber(2)
+  set nextBeforeSequence($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasNextBeforeSequence() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearNextBeforeSequence() => $_clearField(2);
+}
+
 /// Экспериментальный контракт первого локального прототипа.
 class ChannelServiceApi {
   final $pb.RpcClient _client;
@@ -10368,6 +10519,11 @@ class ContentServiceApi {
   final $pb.RpcClient _client;
 
   ContentServiceApi(this._client);
+
+  $async.Future<SearchContentResponse> searchContent(
+          $pb.ClientContext? ctx, SearchContentRequest request) =>
+      _client.invoke<SearchContentResponse>(ctx, 'ContentService',
+          'SearchContent', request, SearchContentResponse());
 
   /// Постоянная очередь использует отдельный RPC: старый runtime отклоняет
   /// его до изменения данных, а не игнорирует неизвестный ключ запроса.

@@ -3226,6 +3226,36 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Новое сообщение'**
   String get newMessageNotification;
+
+  /// No description provided for @messageSearchServer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поиск в истории выбранного канала'**
+  String get messageSearchServer;
+
+  /// No description provided for @messageSearchLocal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поиск только на этом устройстве · MLS'**
+  String get messageSearchLocal;
+
+  /// No description provided for @messageSearchFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось выполнить поиск. Повторить'**
+  String get messageSearchFailed;
+
+  /// No description provided for @messageSearchMore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ещё сообщения'**
+  String get messageSearchMore;
+
+  /// No description provided for @messageSearchLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показаны первые 200 совпадений. Уточните запрос.'**
+  String get messageSearchLimit;
 }
 
 class _AppLocalizationsDelegate

@@ -17,6 +17,7 @@ import 'queued_mutation_projection.dart';
 import 'package:file_selector/file_selector.dart';
 
 import 'core.dart';
+import 'message_search.dart';
 import 'event_controller.dart';
 import 'generated/space/v1/space.pb.dart';
 import 'local_failure.dart';
@@ -75,6 +76,19 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     );
     on<ChatFavoriteToggled>(
       (event, _) => handleRequest(event, () => _toggleFavorite(event.message)),
+    );
+    on<ChatSearchMessageRevealed>(
+      (event, _) => handleRequest(event, () async {
+        if (!identical(_session, event.session) ||
+            !connected ||
+            !canRead ||
+            encryptedChannel ||
+            event.message.channelId != channelId) {
+          return;
+        }
+        _mergeMessage(event.message);
+        publishState();
+      }),
     );
     on<ChatReadMarked>(
       (event, _) => handleRequest(event, () => _markRead(event.id)),
@@ -181,6 +195,12 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       replyTo,
     ),
   );
+  MessageSearchSession? get messageSearch =>
+      connected && _session is MessageSearchSession
+      ? _session as MessageSearchSession
+      : null;
+  Future<void> revealSearchMessage(Content message) =>
+      sendRequest(ChatSearchMessageRevealed(message, _session));
   SpaceSession? get mlsSession =>
       _session is SpaceSession ? _session as SpaceSession : null;
   bool get encryptedChannel =>

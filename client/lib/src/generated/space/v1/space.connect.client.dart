@@ -146,6 +146,23 @@ extension type ChannelServiceClient (connect.Transport _transport) {
   }
 }
 extension type ContentServiceClient (connect.Transport _transport) {
+  Future<spacev1space.SearchContentResponse> searchContent(
+    spacev1space.SearchContentRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ContentService.searchContent,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
   /// Постоянная очередь использует отдельный RPC: старый runtime отклоняет
   /// его до изменения данных, а не игнорирует неизвестный ключ запроса.
   Future<spacev1space.ApplyContentMutationResponse> applyContentMutation(

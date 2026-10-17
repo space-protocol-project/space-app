@@ -171,5 +171,10 @@
   "notificationsDescription": "桌面端：应用运行时接收已连接空间的普通频道和已加入的加密频道通知。预览会将文本传给操作系统。暂不支持退出应用后的通知。",
   "notificationPermissionError": "无法启用通知。请检查系统设置。",
   "newMessageNotification": "新消息",
-  "attentionDescription": "可以在应用设置中启用通知。摄像头和麦克风仅在您操作时开启。"
+  "attentionDescription": "可以在应用设置中启用通知。摄像头和麦克风仅在您操作时开启。",
+  "messageSearchServer": "搜索当前频道历史记录",
+  "messageSearchLocal": "仅在此设备搜索 · MLS",
+  "messageSearchFailed": "搜索失败。重试",
+  "messageSearchMore": "更多消息",
+  "messageSearchLimit": "显示前 200 条结果。请缩小搜索范围。"
 }

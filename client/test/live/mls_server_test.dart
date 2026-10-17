@@ -2,6 +2,9 @@ import 'package:space_client/src/chat_notifications.dart';
 import 'package:space_client/src/mls/notifications.dart';
 
 import 'dart:convert';
+
+import 'package:space_client/src/message_search.dart';
+
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -168,6 +171,15 @@ void main() {
         (view.messages.single['message'] as Map)['text'],
         'Секретный текст',
       );
+      final localSearch = await searchMlsMessages(
+        b,
+        'private',
+        group,
+        'СЕКРЕТНЫЙ',
+        '',
+      );
+      expect(localSearch.messages.single.text, 'Секретный текст');
+      expect(localSearch.next, isEmpty);
       final originalReply = mlsReplyReference(view.messages.single);
       await a.trust(deviceC);
       await a.invite('private', deviceC);

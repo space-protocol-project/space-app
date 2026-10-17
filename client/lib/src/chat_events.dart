@@ -127,3 +127,10 @@ final class ChatOutboxRecovered extends ChatEvent<bool> {
   final String target;
   final String snapshot;
 }
+
+final class ChatSearchMessageRevealed extends ChatEvent<void> {
+  ChatSearchMessageRevealed(Content message, this.session)
+    : message = message.deepCopy()..freeze();
+  final Content message;
+  final LiveSession? session;
+}

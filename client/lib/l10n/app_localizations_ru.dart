@@ -1782,4 +1782,20 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get newMessageNotification => 'Новое сообщение';
+
+  @override
+  String get messageSearchServer => 'Поиск в истории выбранного канала';
+
+  @override
+  String get messageSearchLocal => 'Поиск только на этом устройстве · MLS';
+
+  @override
+  String get messageSearchFailed => 'Не удалось выполнить поиск. Повторить';
+
+  @override
+  String get messageSearchMore => 'Ещё сообщения';
+
+  @override
+  String get messageSearchLimit =>
+      'Показаны первые 200 совпадений. Уточните запрос.';
 }

@@ -2711,6 +2711,50 @@ final $typed_data.Uint8List applyContentMutationResponseDescriptor =
         '52MS5Db250ZW50Ugdjb250ZW50EicKD2lkZW1wb3RlbmN5X2tleRgCIAEoCVIOaWRlbXBvdGVu'
         'Y3lLZXkSKQoQYXBwbGllZF9yZXZpc2lvbhgDIAEoA1IPYXBwbGllZFJldmlzaW9u');
 
+@$core.Deprecated('Use searchContentRequestDescriptor instead')
+const SearchContentRequest$json = {
+  '1': 'SearchContentRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'query', '3': 2, '4': 1, '5': 9, '10': 'query'},
+    {'1': 'before_sequence', '3': 3, '4': 1, '5': 3, '10': 'beforeSequence'},
+  ],
+};
+
+/// Descriptor for `SearchContentRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List searchContentRequestDescriptor = $convert.base64Decode(
+    'ChRTZWFyY2hDb250ZW50UmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSWQSFA'
+    'oFcXVlcnkYAiABKAlSBXF1ZXJ5EicKD2JlZm9yZV9zZXF1ZW5jZRgDIAEoA1IOYmVmb3JlU2Vx'
+    'dWVuY2U=');
+
+@$core.Deprecated('Use searchContentResponseDescriptor instead')
+const SearchContentResponse$json = {
+  '1': 'SearchContentResponse',
+  '2': [
+    {
+      '1': 'contents',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.Content',
+      '10': 'contents'
+    },
+    {
+      '1': 'next_before_sequence',
+      '3': 2,
+      '4': 1,
+      '5': 3,
+      '10': 'nextBeforeSequence'
+    },
+  ],
+};
+
+/// Descriptor for `SearchContentResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List searchContentResponseDescriptor = $convert.base64Decode(
+    'ChVTZWFyY2hDb250ZW50UmVzcG9uc2USLQoIY29udGVudHMYASADKAsyES5zcGFjZS52MS5Db2'
+    '50ZW50Ughjb250ZW50cxIwChRuZXh0X2JlZm9yZV9zZXF1ZW5jZRgCIAEoA1ISbmV4dEJlZm9y'
+    'ZVNlcXVlbmNl');
+
 const $core.Map<$core.String, $core.dynamic> ChannelServiceBase$json = {
   '1': 'ChannelService',
   '2': [
@@ -2817,6 +2861,12 @@ const $core.Map<$core.String, $core.dynamic> ContentServiceBase$json = {
   '1': 'ContentService',
   '2': [
     {
+      '1': 'SearchContent',
+      '2': '.space.v1.SearchContentRequest',
+      '3': '.space.v1.SearchContentResponse',
+      '4': {}
+    },
+    {
       '1': 'ApplyContentMutation',
       '2': '.space.v1.ApplyContentMutationRequest',
       '3': '.space.v1.ApplyContentMutationResponse'
@@ -2856,15 +2906,17 @@ const $core.Map<$core.String, $core.dynamic> ContentServiceBase$json = {
 @$core.Deprecated('Use contentServiceDescriptor instead')
 const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
     ContentServiceBase$messageJson = {
+  '.space.v1.SearchContentRequest': SearchContentRequest$json,
+  '.space.v1.SearchContentResponse': SearchContentResponse$json,
+  '.space.v1.Content': Content$json,
+  '.space.v1.Asset': Asset$json,
+  '.space.v1.Reaction': Reaction$json,
+  '.space.v1.Content.ParticipantNamesEntry': Content_ParticipantNamesEntry$json,
   '.space.v1.ApplyContentMutationRequest': ApplyContentMutationRequest$json,
   '.space.v1.UpdateContentRequest': UpdateContentRequest$json,
   '.space.v1.DeleteContentRequest': DeleteContentRequest$json,
   '.space.v1.SetReactionRequest': SetReactionRequest$json,
   '.space.v1.ApplyContentMutationResponse': ApplyContentMutationResponse$json,
-  '.space.v1.Content': Content$json,
-  '.space.v1.Asset': Asset$json,
-  '.space.v1.Reaction': Reaction$json,
-  '.space.v1.Content.ParticipantNamesEntry': Content_ParticipantNamesEntry$json,
   '.space.v1.SetReactionResponse': SetReactionResponse$json,
   '.space.v1.UpdateContentResponse': UpdateContentResponse$json,
   '.space.v1.DeleteContentResponse': DeleteContentResponse$json,
@@ -2876,19 +2928,22 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
 
 /// Descriptor for `ContentService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
 final $typed_data.Uint8List contentServiceDescriptor = $convert.base64Decode(
-    'Cg5Db250ZW50U2VydmljZRJlChRBcHBseUNvbnRlbnRNdXRhdGlvbhIlLnNwYWNlLnYxLkFwcG'
-    'x5Q29udGVudE11dGF0aW9uUmVxdWVzdBomLnNwYWNlLnYxLkFwcGx5Q29udGVudE11dGF0aW9u'
-    'UmVzcG9uc2USSgoLU2V0UmVhY3Rpb24SHC5zcGFjZS52MS5TZXRSZWFjdGlvblJlcXVlc3QaHS'
-    '5zcGFjZS52MS5TZXRSZWFjdGlvblJlc3BvbnNlEoQBCg1VcGRhdGVDb250ZW50Eh4uc3BhY2Uu'
-    'djEuVXBkYXRlQ29udGVudFJlcXVlc3QaHy5zcGFjZS52MS5VcGRhdGVDb250ZW50UmVzcG9uc2'
-    'UiMoLT5JMCLDoBKjInL3YxL2NoYW5uZWxzL3tjaGFubmVsX2lkfS9jb250ZW50cy97aWR9EoEB'
-    'Cg1EZWxldGVDb250ZW50Eh4uc3BhY2UudjEuRGVsZXRlQ29udGVudFJlcXVlc3QaHy5zcGFjZS'
-    '52MS5EZWxldGVDb250ZW50UmVzcG9uc2UiL4LT5JMCKSonL3YxL2NoYW5uZWxzL3tjaGFubmVs'
-    'X2lkfS9jb250ZW50cy97aWR9EoIBCg1DcmVhdGVDb250ZW50Eh4uc3BhY2UudjEuQ3JlYXRlQ2'
-    '9udGVudFJlcXVlc3QaHy5zcGFjZS52MS5DcmVhdGVDb250ZW50UmVzcG9uc2UiMILT5JMCKjoB'
-    'KiIlL2FwaS92MS9jaGFubmVscy97Y2hhbm5lbF9pZH0vY29udGVudBJ5CgtMaXN0Q29udGVudB'
-    'IcLnNwYWNlLnYxLkxpc3RDb250ZW50UmVxdWVzdBodLnNwYWNlLnYxLkxpc3RDb250ZW50UmVz'
-    'cG9uc2UiLYLT5JMCJxIlL2FwaS92MS9jaGFubmVscy97Y2hhbm5lbF9pZH0vY29udGVudA==');
+    'Cg5Db250ZW50U2VydmljZRKGAQoNU2VhcmNoQ29udGVudBIeLnNwYWNlLnYxLlNlYXJjaENvbn'
+    'RlbnRSZXF1ZXN0Gh8uc3BhY2UudjEuU2VhcmNoQ29udGVudFJlc3BvbnNlIjSC0+STAi4SLC9h'
+    'cGkvdjEvY2hhbm5lbHMve2NoYW5uZWxfaWR9L2NvbnRlbnQvc2VhcmNoEmUKFEFwcGx5Q29udG'
+    'VudE11dGF0aW9uEiUuc3BhY2UudjEuQXBwbHlDb250ZW50TXV0YXRpb25SZXF1ZXN0GiYuc3Bh'
+    'Y2UudjEuQXBwbHlDb250ZW50TXV0YXRpb25SZXNwb25zZRJKCgtTZXRSZWFjdGlvbhIcLnNwYW'
+    'NlLnYxLlNldFJlYWN0aW9uUmVxdWVzdBodLnNwYWNlLnYxLlNldFJlYWN0aW9uUmVzcG9uc2US'
+    'hAEKDVVwZGF0ZUNvbnRlbnQSHi5zcGFjZS52MS5VcGRhdGVDb250ZW50UmVxdWVzdBofLnNwYW'
+    'NlLnYxLlVwZGF0ZUNvbnRlbnRSZXNwb25zZSIygtPkkwIsOgEqMicvdjEvY2hhbm5lbHMve2No'
+    'YW5uZWxfaWR9L2NvbnRlbnRzL3tpZH0SgQEKDURlbGV0ZUNvbnRlbnQSHi5zcGFjZS52MS5EZW'
+    'xldGVDb250ZW50UmVxdWVzdBofLnNwYWNlLnYxLkRlbGV0ZUNvbnRlbnRSZXNwb25zZSIvgtPk'
+    'kwIpKicvdjEvY2hhbm5lbHMve2NoYW5uZWxfaWR9L2NvbnRlbnRzL3tpZH0SggEKDUNyZWF0ZU'
+    'NvbnRlbnQSHi5zcGFjZS52MS5DcmVhdGVDb250ZW50UmVxdWVzdBofLnNwYWNlLnYxLkNyZWF0'
+    'ZUNvbnRlbnRSZXNwb25zZSIwgtPkkwIqOgEqIiUvYXBpL3YxL2NoYW5uZWxzL3tjaGFubmVsX2'
+    'lkfS9jb250ZW50EnkKC0xpc3RDb250ZW50Ehwuc3BhY2UudjEuTGlzdENvbnRlbnRSZXF1ZXN0'
+    'Gh0uc3BhY2UudjEuTGlzdENvbnRlbnRSZXNwb25zZSItgtPkkwInEiUvYXBpL3YxL2NoYW5uZW'
+    'xzL3tjaGFubmVsX2lkfS9jb250ZW50');
 
 const $core.Map<$core.String, $core.dynamic> AssetServiceBase$json = {
   '1': 'AssetService',

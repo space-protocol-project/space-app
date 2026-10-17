@@ -17,6 +17,8 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
 import '../src/chat_notifications.dart';
+import '../src/message_search.dart';
+import '../src/core.dart' show SpaceSession;
 import '../src/system_notifications.dart';
 import '../src/mls/notifications.dart';
 
@@ -50,6 +52,7 @@ import 'measure_size.dart';
 import 'retained_indexed_stack.dart';
 
 part 'shell_notifications.dart';
+part 'shell_message_search.dart';
 part 'shell_mls_notifications.dart';
 
 enum Section {
@@ -750,34 +753,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   }
 
   Section selected = Section.overview;
-  Future<void> search() async {
-    closeNavigation();
-    final route = await showSpacePopup<String>(
-      context,
-      top: headerHeight + 22,
-      surfaceKey: const ValueKey('space-search-surface'),
-      builder: (context) => SpaceSearchPanel(
-        sections: {
-          for (final section in [
-            Section.overview,
-            Section.chat,
-            Section.identity,
-            Section.settings,
-          ])
-            section.name: section == Section.chat
-                ? chatLabel
-                : section.localized(context),
-        },
-        messages: controller.messages,
-      ),
-    );
-    if (!mounted || route == null || route.isEmpty) return;
-    if (route.startsWith('message:')) {
-      openMessage(route.substring(8));
-      return;
-    }
-    select(Section.values.firstWhere((section) => section.name == route));
-  }
+  Future<void> search() => openMessageSearch();
 
   String get chatLabel => controller.channels.isNotEmpty
       ? controller.chatTitle

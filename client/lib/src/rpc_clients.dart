@@ -76,6 +76,14 @@ class ChannelServiceClient {
 
 class ContentServiceClient {
   const ContentServiceClient(this.connection);
+  Future<SearchContentResponse> searchContent(
+    SearchContentRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.ContentService.searchContent,
+    request,
+    options: options,
+  );
   final RpcConnection connection;
   Future<ApplyContentMutationResponse> applyContentMutation(
     ApplyContentMutationRequest request, {

@@ -1774,4 +1774,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get newMessageNotification => 'New message';
+
+  @override
+  String get messageSearchServer => 'Search the selected channel history';
+
+  @override
+  String get messageSearchLocal => 'Search on this device only · MLS';
+
+  @override
+  String get messageSearchFailed => 'Search failed. Retry';
+
+  @override
+  String get messageSearchMore => 'More messages';
+
+  @override
+  String get messageSearchLimit =>
+      'Showing the first 200 matches. Refine your query.';
 }

@@ -1629,6 +1629,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get newMessageNotification => '新消息';
+
+  @override
+  String get messageSearchServer => '搜索当前频道历史记录';
+
+  @override
+  String get messageSearchLocal => '仅在此设备搜索 · MLS';
+
+  @override
+  String get messageSearchFailed => '搜索失败。重试';
+
+  @override
+  String get messageSearchMore => '更多消息';
+
+  @override
+  String get messageSearchLimit => '显示前 200 条结果。请缩小搜索范围。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2096,4 +2111,19 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get newMessageNotification => '新消息';
+
+  @override
+  String get messageSearchServer => '搜索当前频道历史记录';
+
+  @override
+  String get messageSearchLocal => '仅在此设备搜索 · MLS';
+
+  @override
+  String get messageSearchFailed => '搜索失败。重试';
+
+  @override
+  String get messageSearchMore => '更多消息';
+
+  @override
+  String get messageSearchLimit => '显示前 200 条结果。请缩小搜索范围。';
 }

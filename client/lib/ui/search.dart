@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import '../src/message_search.dart';
 import '../src/message_summary.dart';
 import '../l10n/strings.dart';
 
@@ -10,9 +13,16 @@ class SpaceSearchPanel extends StatefulWidget {
     super.key,
     required this.sections,
     required this.messages,
+    this.searchMessages,
+    this.onMessageSelected,
+    this.localOnly = false,
   });
   final Map<String, String> sections;
   final List<Content> messages;
+  final Future<MessageSearchPage> Function(String query, String cursor)?
+  searchMessages;
+  final void Function(Content)? onMessageSelected;
+  final bool localOnly;
   @override
   State<SpaceSearchPanel> createState() => _SpaceSearchPanelState();
 }
@@ -20,8 +30,79 @@ class SpaceSearchPanel extends StatefulWidget {
 class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
   final input = TextEditingController();
   String query = '';
+  String next = '';
+  String failure = '';
+  List<Content> found = [];
+  bool loading = false;
+  int generation = 0;
+  Timer? debounce;
+
+  void changeQuery(String value) {
+    debounce?.cancel();
+    generation++;
+    setState(() {
+      query = value;
+      found = [];
+      next = '';
+      failure = '';
+      loading = false;
+    });
+    if (widget.searchMessages == null || value.trim().runes.length < 2) return;
+    debounce = Timer(const Duration(milliseconds: 300), () => load());
+  }
+
+  Future<void> load({bool more = false}) async {
+    if (loading || widget.searchMessages == null) return;
+    final current = generation;
+    final term = query.trim();
+    setState(() {
+      loading = true;
+      failure = '';
+    });
+    try {
+      final page = await widget.searchMessages!(term, more ? next : '');
+      if (!mounted || generation != current) return;
+      setState(() {
+        found = {
+          for (final item in [
+            ...(more ? found : <Content>[]),
+            ...page.messages,
+          ])
+            item.id: item,
+        }.values.take(200).toList();
+        next = page.next;
+      });
+    } catch (_) {
+      if (mounted && generation == current) {
+        setState(() => failure = context.strings.messageSearchFailed);
+      }
+    } finally {
+      if (mounted && generation == current) setState(() => loading = false);
+    }
+  }
+
+  Widget searchStatus(BuildContext context) => Column(
+    children: [
+      Text(
+        widget.localOnly
+            ? context.strings.messageSearchLocal
+            : context.strings.messageSearchServer,
+      ),
+      if (loading) const LinearProgressIndicator(),
+      if (failure.isNotEmpty)
+        TextButton(onPressed: () => load(), child: Text(failure)),
+      if (found.length >= 200) Text(context.strings.messageSearchLimit),
+    ],
+  );
+
+  void selectMessage(BuildContext context, Content message) {
+    widget.onMessageSelected?.call(message);
+    Navigator.pop(context, 'message:${message.id}');
+  }
+
   @override
   void dispose() {
+    debounce?.cancel();
     input.dispose();
     super.dispose();
   }
@@ -39,15 +120,18 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
                 key: const ValueKey('space-search-input'),
                 controller: input,
                 autofocus: true,
-                onChanged: (value) => setState(() => query = value),
+                onChanged: changeQuery,
+                maxLength: 128,
                 decoration: InputDecoration(
-                  hintText: context.strings.searchHint,
+                  hintText: widget.searchMessages == null
+                      ? context.strings.searchHint
+                      : context.strings.search,
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: IconButton(
                     tooltip: context.strings.clearSearch,
                     onPressed: () {
                       input.clear();
-                      setState(() => query = '');
+                      changeQuery('');
                     },
                     icon: const Icon(Icons.clear),
                   ),
@@ -62,6 +146,7 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
           ],
         ),
         const SizedBox(height: 12),
+        if (widget.searchMessages != null) searchStatus(context),
         Flexible(child: results(context)),
       ],
     ),
@@ -73,6 +158,8 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
         .toList();
     final contents = term.isEmpty
         ? <Content>[]
+        : widget.searchMessages != null
+        ? found
         : widget.messages
               .where(
                 (message) =>
@@ -84,7 +171,7 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
       primary: false,
       shrinkWrap: true,
       children: [
-        if (matching.isEmpty && contents.isEmpty)
+        if (matching.isEmpty && contents.isEmpty && !loading && failure.isEmpty)
           Padding(
             padding: EdgeInsets.all(28),
             child: Text(context.strings.nothingFound),
@@ -104,8 +191,17 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
-            subtitle: Text(context.strings.loadedMessage),
-            onTap: () => Navigator.pop(context, 'message:${message.id}'),
+            subtitle: Text(
+              widget.searchMessages == null
+                  ? context.strings.loadedMessage
+                  : message.authorId,
+            ),
+            onTap: () => selectMessage(context, message),
+          ),
+        if (next.isNotEmpty && found.length < 200)
+          TextButton(
+            onPressed: loading ? null : () => load(more: true),
+            child: Text(context.strings.messageSearchMore),
           ),
       ],
     );

@@ -115,6 +115,13 @@ Future<void> verifyMessageReplies(
       'Исходник ответа ${newRequestKey()}',
       newRequestKey(),
     );
+    final searchPage = await owner.searchMessages(
+      'general',
+      parent.text.toUpperCase(),
+      '',
+    );
+    expect(searchPage.messages.single.id, parent.id);
+    expect((await owner.searchMessages('general', '%_', '')).messages, isEmpty);
     final text = 'Ответ с файлом ${newRequestKey()}';
     final bytes = Uint8List.fromList(List.generate(32768, (i) => i % 251));
     final original = await File('${root.path}/reply.bin').writeAsBytes(bytes);

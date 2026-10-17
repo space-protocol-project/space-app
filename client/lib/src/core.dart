@@ -25,6 +25,7 @@ import 'package:grpc/grpc.dart';
 import 'package:protobuf/protobuf.dart' show GeneratedMessage;
 
 import 'rpc_clients.dart';
+import 'message_search.dart';
 import 'root_history.dart';
 import 'root_adoption.dart';
 import 'root_device_proof.dart';
@@ -651,6 +652,7 @@ abstract interface class AttachmentSession {
 
 class SpaceSession
     implements
+        MessageSearchSession,
         LiveSession,
         QueuedMessageSession,
         ReplyMessageSession,
@@ -1567,6 +1569,43 @@ class SpaceSession
       request.administrative = pairing.administrative;
     }
     return request;
+  }
+
+  @override
+  Future<MessageSearchPage> searchMessages(
+    String id,
+    String query,
+    String cursor,
+  ) async {
+    final term = checkedSearchQuery(query);
+    final before = cursor.isEmpty ? 0 : int.parse(cursor);
+    if (before < 0) throw ArgumentError('Некорректный курсор');
+    await _ensureSession();
+    final principal = principalId;
+    _requireSearchChannel(id);
+    final response = await ContentServiceClient(channel).searchContent(
+      SearchContentRequest(
+        channelId: id,
+        query: term,
+        beforeSequence: Int64(before),
+      ),
+      options: _options,
+    );
+    if (principalId != principal) throw StateError('Личность изменилась');
+    _requireSearchChannel(id);
+    return checkedSearchPage(response, id, term, before);
+  }
+
+  void _requireSearchChannel(String id) {
+    final target = availableChannels.where((c) => c.id == id).firstOrNull;
+    if (target == null ||
+        !target.permissions.visible ||
+        !target.permissions.read ||
+        target.mlsGroupId.isNotEmpty) {
+      throw const GrpcError.permissionDenied(
+        'Канал недоступен для серверного поиска',
+      );
+    }
   }
 
   @override
