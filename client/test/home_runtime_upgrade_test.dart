@@ -221,9 +221,8 @@ void main() {
         expect(session.principalId, principal);
         expect(session.role, 'owner');
         expect(
-          (await session.messages()).any(
-            (message) => message.text == 'Сообщение до обновления',
-          ),
+          (await readHistoricalMessages(session))
+              .any((message) => message.text == 'Сообщение до обновления'),
           true,
         );
       } finally {
@@ -237,6 +236,19 @@ void main() {
     skip: !enabled,
     timeout: const Timeout(Duration(minutes: 15)),
   );
+}
+
+// Проверка отката читает старый runtime через существовавший в нём ListContent.
+// Современный GetHistoryPage намеренно не добавляется в историческую сборку.
+Future<List<Content>> readHistoricalMessages(SpaceSession session) async {
+  final options = await session.mlsOptions(
+    expectedGrant: session.record.grantId,
+  );
+  final response = await ContentServiceClient(session.channel).listContent(
+    ListContentRequest(channelId: session.selectedChannelId),
+    options: options,
+  );
+  return response.contents;
 }
 
 Future<void> removeUpgradeDirectory(Directory root) async {
