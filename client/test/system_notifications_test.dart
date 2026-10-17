@@ -10,7 +10,11 @@ import 'chat_history_test.dart' show HistoryKeys;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  for (final platform in [TargetPlatform.macOS, TargetPlatform.linux]) {
+  for (final platform in [
+    TargetPlatform.macOS,
+    TargetPlatform.linux,
+    TargetPlatform.android,
+  ]) {
     test('Разрешение ОС проверяется на $platform', () async {
       debugDefaultTargetPlatformOverride = platform;
       addTearDown(() => debugDefaultTargetPlatformOverride = null);

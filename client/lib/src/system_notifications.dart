@@ -39,7 +39,9 @@ class SystemNotifications {
 
   Future<void> activate(String token) async {
     try {
-      final payload = await savedTargets.take(token);
+      final payload = defaultTargetPlatform == TargetPlatform.android
+          ? await _androidTarget(token)
+          : await savedTargets.take(token);
       if (!_disposed && payload != null && !targets.isClosed) {
         targets.add(payload);
       }
@@ -49,12 +51,16 @@ class SystemNotifications {
   }
 
   final String appName;
+  Future<String?> _androidTarget(String token) async =>
+      await activationChannel.invokeMethod<String>('take', token) ??
+      await savedTargets.take(token);
   static bool get supported =>
       !kIsWeb &&
       const [
         TargetPlatform.windows,
         TargetPlatform.macOS,
         TargetPlatform.linux,
+        TargetPlatform.android,
       ].contains(defaultTargetPlatform);
   Future<void>? _initializing;
   final targets = StreamController<String>.broadcast();
@@ -62,7 +68,7 @@ class SystemNotifications {
 
   Future<void> initialize() async {
     if (!supported) {
-      throw UnsupportedError('Уведомления доступны на компьютере');
+      throw UnsupportedError('Уведомления недоступны на этой платформе');
     }
     try {
       await (_initializing ??= defaultTargetPlatform == TargetPlatform.windows

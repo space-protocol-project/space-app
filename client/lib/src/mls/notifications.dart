@@ -140,17 +140,47 @@ class MlsNotificationWatcher {
 
   Future<Content?> message(MlsNotificationSource source, String key) async {
     final client = await source.open();
+    if (await _readChannel(source, client) == null) return null;
+    final pushedSequence = key.startsWith('@push:')
+        ? int.tryParse(key.substring(6))
+        : null;
+    if (pushedSequence != null) {
+      if (!await _refreshPush(source, client, pushedSequence)) return null;
+    }
     final channel = await _readChannel(source, client);
     if (channel == null) return null;
     final item = MlsChannelData(channel).messages
         .where(
           (item) =>
-              mlsMessageKey(item) == key &&
+              (pushedSequence == null
+                  ? mlsMessageKey(item) == key
+                  : item['sequence'] == pushedSequence) &&
               item['archived'] != true &&
               item['deleted'] != true,
         )
         .firstOrNull;
     return item == null ? null : _content(source, item);
+  }
+
+  Future<bool> _refreshPush(
+    MlsNotificationSource source,
+    MlsClient client,
+    int sequence,
+  ) async {
+    final deadline = DateTime.now().add(const Duration(seconds: 30));
+    var cursor = 0;
+    while (source.valid() && DateTime.now().isBefore(deadline)) {
+      final data = await client.refresh(
+        source.channel.id,
+        source.channel.mlsGroupId,
+      );
+      if (!source.valid() || data.untrusted.isNotEmpty) return false;
+      final next = data.channel['cursor'] as int;
+      if (next >= sequence) return true;
+      if (next <= cursor) return false;
+      cursor = next;
+    }
+    return false;
   }
 
   Content _content(MlsNotificationSource source, Map item) => Content(

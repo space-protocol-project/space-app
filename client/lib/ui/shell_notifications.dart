@@ -1,12 +1,42 @@
 part of 'shell.dart';
 
 extension _ShellNotifications on _SpaceShellState {
+  Future<void> syncAndroidNotifications() async {
+    try {
+      await androidPush.sync(
+        enabled: widget.preferences.notificationMode != 0,
+        origins: widget.preferences.origins,
+      );
+      if (widget.preferences.notificationMode != 0) {
+        await registerAndroidNotifications();
+      }
+    } catch (_) {
+      /* Системный запрет не прерывает чат. */
+    }
+  }
+
   void receiveNotifications(WorkspaceState state) {
+    if (widget.preferences.notificationMode != 0) {
+      unawaited(registerAndroidNotifications());
+    }
     retryNotificationOpen();
     notificationTracker.retainOrigins(state.chats.keys);
     for (final chat in state.chats.values) {
       for (final notice in notificationTracker.observe(chat)) {
         queueNotification(notice);
+      }
+    }
+  }
+
+  Future<void> registerAndroidNotifications() async {
+    if (!AndroidPush.supported) return;
+    for (final chat in workspaces.controllers.values) {
+      final session = chat.mlsSession;
+      if (!chat.connected || chat.accessRemoved || session == null) continue;
+      try {
+        await androidPush.register(session);
+      } catch (_) {
+        /* Следующее подключение повторит регистрацию. */
       }
     }
   }
@@ -159,6 +189,7 @@ extension _ShellNotifications on _SpaceShellState {
       await systemNotifications.listenForActivation(
         enabled: widget.preferences.notificationMode != 0,
       );
+      await syncAndroidNotifications();
     } catch (_) {
       // Неудача запуска из уведомления не препятствует обычному запуску.
     } finally {

@@ -32,9 +32,11 @@ import 'root_adoption.dart';
 import 'root_device_proof.dart';
 import 'origin_binding.dart';
 import 'rpc_connection.dart';
+import 'rpc_http.dart' show pinnedRpcClient;
 import 'root_rotation.dart' as rotation;
 
 part 'queued_mutation_rpc.dart';
+part 'push_registration.dart';
 
 String url64(List<int> value) => base64Url.encode(value).replaceAll('=', '');
 

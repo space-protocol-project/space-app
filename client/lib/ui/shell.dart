@@ -21,6 +21,7 @@ import '../src/message_search.dart';
 import '../src/channel_search.dart';
 import '../src/core.dart' show SpaceSession;
 import '../src/system_notifications.dart';
+import '../src/android_push.dart';
 import '../src/mls/notifications.dart';
 
 import 'package:flutter/material.dart';
@@ -115,6 +116,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   String? deferredNotification;
   int notificationOpenEpoch = 0;
   bool notificationStartupComplete = false;
+  final androidPush = AndroidPush();
   final mlsNotificationWatcher = MlsNotificationWatcher();
   Timer? mlsNotificationTimer;
   int mlsNotificationGeneration = 0;
@@ -1619,6 +1621,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   }
 
   void _preferencesChanged(BuildContext context, PreferencesState state) {
+    unawaited(syncAndroidNotifications());
     resetMlsNotifications();
     if (notificationStartupComplete) clearPrivateNotifications();
     unawaited(watchSavedServers());

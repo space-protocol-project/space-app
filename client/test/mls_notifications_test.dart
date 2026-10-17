@@ -79,6 +79,21 @@ MlsNotificationSource _source(
 }
 
 void main() {
+  test('MLS push: номер события разрешается только после проверенной синхронизации', () async {
+    final client = NotificationMlsClient();
+    final source = _source(client);
+    final watcher = MlsNotificationWatcher();
+    client.incoming = [entry(8)];
+    final message = await watcher.message(source, '@push:8');
+    expect(message?.text, 'Сообщение 8');
+    expect(client.calls, 1);
+    client.untrusted = true;
+    expect(await watcher.message(source, '@push:9'), isNull);
+    client.untrusted = false;
+    client.local.channels['private']['revocation_pending'] = true;
+    expect(await watcher.message(source, '@push:8'), isNull);
+  });
+
   test('MLS: история, повторы и собственная личность не уведомляют', () async {
     final client = NotificationMlsClient();
     final input = _source(client);
