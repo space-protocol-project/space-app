@@ -18,6 +18,7 @@ import 'package:crypto/crypto.dart';
 
 import '../src/chat_notifications.dart';
 import '../src/message_search.dart';
+import '../src/channel_search.dart';
 import '../src/core.dart' show SpaceSession;
 import '../src/system_notifications.dart';
 import '../src/mls/notifications.dart';

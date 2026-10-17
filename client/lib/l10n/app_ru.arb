@@ -661,5 +661,7 @@
   "messageSearchMore": "Ещё сообщения",
   "messageSearchLimit": "Показаны первые 200 совпадений. Уточните запрос.",
   "loadOlderMessages": "Загрузить предыдущие сообщения",
-  "historyPageFailed": "Не удалось загрузить историю. Повторите попытку."
+  "historyPageFailed": "Не удалось загрузить историю. Повторите попытку.",
+  "messageSearchAllChannels": "Во всех доступных каналах",
+  "messageSearchMixed": "Закрытые каналы — поиск только на этом устройстве"
 }

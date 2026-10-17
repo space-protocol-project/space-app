@@ -3268,6 +3268,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не удалось загрузить историю. Повторите попытку.'**
   String get historyPageFailed;
+
+  /// No description provided for @messageSearchAllChannels.
+  ///
+  /// In ru, this message translates to:
+  /// **'Во всех доступных каналах'**
+  String get messageSearchAllChannels;
+
+  /// No description provided for @messageSearchMixed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрытые каналы — поиск только на этом устройстве'**
+  String get messageSearchMixed;
 }
 
 class _AppLocalizationsDelegate

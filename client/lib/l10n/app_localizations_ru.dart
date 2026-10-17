@@ -1805,4 +1805,11 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get historyPageFailed =>
       'Не удалось загрузить историю. Повторите попытку.';
+
+  @override
+  String get messageSearchAllChannels => 'Во всех доступных каналах';
+
+  @override
+  String get messageSearchMixed =>
+      'Закрытые каналы — поиск только на этом устройстве';
 }

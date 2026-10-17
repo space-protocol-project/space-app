@@ -661,5 +661,7 @@
   "messageSearchMore": "更多消息",
   "messageSearchLimit": "显示前 200 条结果。请缩小搜索范围。",
   "loadOlderMessages": "加载更早的消息",
-  "historyPageFailed": "无法加载历史记录。请重试。"
+  "historyPageFailed": "无法加载历史记录。请重试。",
+  "messageSearchAllChannels": "所有可用频道",
+  "messageSearchMixed": "私密频道仅在此设备上搜索"
 }

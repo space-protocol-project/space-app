@@ -1796,4 +1796,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get historyPageFailed => 'Could not load history. Please retry.';
+
+  @override
+  String get messageSearchAllChannels => 'All available channels';
+
+  @override
+  String get messageSearchMixed =>
+      'Private channels are searched only on this device';
 }

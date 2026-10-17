@@ -16,6 +16,8 @@ class SpaceSearchPanel extends StatefulWidget {
     this.searchMessages,
     this.onMessageSelected,
     this.localOnly = false,
+    this.searchAllChannels,
+    this.channelNames = const {},
   });
   final Map<String, String> sections;
   final List<Content> messages;
@@ -23,6 +25,8 @@ class SpaceSearchPanel extends StatefulWidget {
   searchMessages;
   final void Function(Content)? onMessageSelected;
   final bool localOnly;
+  final Future<MessageSearchPage> Function(String, String)? searchAllChannels;
+  final Map<String, String> channelNames;
   @override
   State<SpaceSearchPanel> createState() => _SpaceSearchPanelState();
 }
@@ -34,6 +38,7 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
   String failure = '';
   List<Content> found = [];
   bool loading = false;
+  bool allChannels = false;
   int generation = 0;
   Timer? debounce;
 
@@ -51,6 +56,9 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
     debounce = Timer(const Duration(milliseconds: 300), () => load());
   }
 
+  Future<MessageSearchPage> Function(String, String)? get activeSearch =>
+      allChannels ? widget.searchAllChannels : widget.searchMessages;
+
   Future<void> load({bool more = false}) async {
     if (loading || widget.searchMessages == null) return;
     final current = generation;
@@ -60,7 +68,7 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
       failure = '';
     });
     try {
-      final page = await widget.searchMessages!(term, more ? next : '');
+      final page = await activeSearch!(term, more ? next : '');
       if (!mounted || generation != current) return;
       setState(() {
         found = {
@@ -68,7 +76,7 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
             ...(more ? found : <Content>[]),
             ...page.messages,
           ])
-            item.id: item,
+            (item.channelId, item.id): item,
         }.values.take(200).toList();
         next = page.next;
       });
@@ -84,7 +92,9 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
   Widget searchStatus(BuildContext context) => Column(
     children: [
       Text(
-        widget.localOnly
+        allChannels
+            ? context.strings.messageSearchMixed
+            : widget.localOnly
             ? context.strings.messageSearchLocal
             : context.strings.messageSearchServer,
       ),
@@ -146,11 +156,29 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
           ],
         ),
         const SizedBox(height: 12),
+        if (widget.searchAllChannels != null)
+          CheckboxListTile(
+            key: const ValueKey('search-all-channels'),
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+            title: Text(context.strings.messageSearchAllChannels),
+            value: allChannels,
+            onChanged: (value) {
+              setState(() => allChannels = value ?? false);
+              changeQuery(query);
+            },
+          ),
         if (widget.searchMessages != null) searchStatus(context),
         Flexible(child: results(context)),
       ],
     ),
   );
+  String resultSubtitle(BuildContext context, Content message) {
+    if (widget.searchMessages == null) return context.strings.loadedMessage;
+    if (!allChannels) return message.authorId;
+    return '${widget.channelNames[message.channelId] ?? message.channelId} · ${message.authorId}';
+  }
+
   Widget results(BuildContext context) {
     final term = query.toLowerCase().trim();
     final matching = widget.sections.entries
@@ -171,7 +199,11 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
       primary: false,
       shrinkWrap: true,
       children: [
-        if (matching.isEmpty && contents.isEmpty && !loading && failure.isEmpty)
+        if (matching.isEmpty &&
+            contents.isEmpty &&
+            !loading &&
+            failure.isEmpty &&
+            next.isEmpty)
           Padding(
             padding: EdgeInsets.all(28),
             child: Text(context.strings.nothingFound),
@@ -191,11 +223,7 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
-            subtitle: Text(
-              widget.searchMessages == null
-                  ? context.strings.loadedMessage
-                  : message.authorId,
-            ),
+            subtitle: Text(resultSubtitle(context, message)),
             onTap: () => selectMessage(context, message),
           ),
         if (next.isNotEmpty && found.length < 200)

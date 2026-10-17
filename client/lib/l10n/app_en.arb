@@ -661,5 +661,7 @@
   "messageSearchMore": "More messages",
   "messageSearchLimit": "Showing the first 200 matches. Refine your query.",
   "loadOlderMessages": "Load older messages",
-  "historyPageFailed": "Could not load history. Please retry."
+  "historyPageFailed": "Could not load history. Please retry.",
+  "messageSearchAllChannels": "All available channels",
+  "messageSearchMixed": "Private channels are searched only on this device"
 }

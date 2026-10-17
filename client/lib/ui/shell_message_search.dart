@@ -2,7 +2,11 @@ part of 'shell.dart';
 
 class _MessageSearchScope {
   _MessageSearchScope(this.target)
-    : origin = target.knownOrigin,
+    : channels = [
+        for (final channel in target.channels)
+          Channel.fromBuffer(channel.writeToBuffer()),
+      ],
+      origin = target.knownOrigin,
       principal = target.principalId,
       id = target.channelId,
       mls = target.mlsSession,
@@ -15,13 +19,24 @@ class _MessageSearchScope {
             [],
       );
   final ChatController target;
+  final List<Channel> channels;
   final String origin, principal, id;
   final List<int> group;
   final SpaceSession? mls;
   final MessageSearchSession? remote;
+  Map<String, String> get channelNames => {
+    for (final channel in channels) channel.id: channel.title,
+  };
+  Future<MessageSearchPage> Function(String, String)? get allSearch =>
+      available && remote != null ? fetchAll : null;
   bool get local => group.isNotEmpty;
   bool get available =>
       target.canRead && (local ? mls != null : remote != null);
+  bool get sameSession =>
+      target.knownOrigin == origin &&
+      target.principalId == principal &&
+      identical(target.mlsSession, mls) &&
+      identical(target.messageSearch, remote);
   bool get valid =>
       target.knownOrigin == origin &&
       target.principalId == principal &&
@@ -29,6 +44,7 @@ class _MessageSearchScope {
       target.canRead &&
       identical(target.mlsSession, mls) &&
       identical(target.messageSearch, remote) &&
+      catalogCurrent &&
       target.channels.any(
         (channel) =>
             channel.id == id &&
@@ -36,6 +52,87 @@ class _MessageSearchScope {
             channel.permissions.read &&
             base64Encode(channel.mlsGroupId) == base64Encode(group),
       );
+  bool get catalogCurrent =>
+      channels.length == target.channels.length &&
+      channels.every(
+        (saved) => target.channels.any(
+          (current) =>
+              current.id == saved.id &&
+              current.archived == saved.archived &&
+              current.permissions == saved.permissions &&
+              base64Encode(current.mlsGroupId) ==
+                  base64Encode(saved.mlsGroupId),
+        ),
+      );
+
+  bool readable(Channel channel) =>
+      !channel.archived &&
+      channel.permissions.visible &&
+      channel.permissions.read;
+
+  Future<MessageSearchPage> fetchAll(String query, String cursor) async {
+    if (!valid) throw StateError('Доступ изменился');
+    final candidates = channels.where(readable).toList();
+    final joined = await joinedGroups(candidates);
+    final ids = candidates
+        .where(
+          (channel) =>
+              channel.mlsGroupId.isEmpty || joined.contains(channel.id),
+        )
+        .map((channel) => channel.id)
+        .toList();
+    final page = await searchChannelPages(
+      channels: ids,
+      query: query,
+      cursor: cursor,
+      fetch: (id, term, after) => fetchChannel(
+        channels.firstWhere((channel) => channel.id == id),
+        term,
+        after,
+      ),
+    );
+    if (!valid) throw StateError('Доступ изменился');
+    return page;
+  }
+
+  Future<Set<String>> joinedGroups(List<Channel> candidates) async {
+    if (mls == null || !candidates.any((c) => c.mlsGroupId.isNotEmpty)) {
+      return {};
+    }
+    final document = await (await mls!.mlsClient()).local.read();
+    final saved = document['channels'] as Map;
+    return {
+      for (final channel in candidates)
+        if (joinedGroup(saved[channel.id], channel)) channel.id,
+    };
+  }
+
+  bool joinedGroup(dynamic saved, Channel channel) =>
+      channel.mlsGroupId.isNotEmpty &&
+      saved is Map &&
+      saved['joined'] == true &&
+      saved['revocation_pending'] != true &&
+      saved['group_id'] == base64Encode(channel.mlsGroupId);
+
+  Future<MessageSearchPage> fetchChannel(
+    Channel channel,
+    String query,
+    String cursor,
+  ) async {
+    if (!valid) throw StateError('Доступ изменился');
+    final page = channel.mlsGroupId.isNotEmpty
+        ? await searchMlsMessages(
+            await mls!.mlsClient(),
+            channel.id,
+            channel.mlsGroupId,
+            query,
+            cursor,
+          )
+        : await remote!.searchMessages(channel.id, query, cursor);
+    if (!valid) throw StateError('Доступ изменился');
+    return page;
+  }
+
   Future<MessageSearchPage> fetch(String query, String cursor) async {
     if (!valid) throw StateError('Канал изменился');
     final page = local
@@ -76,6 +173,8 @@ extension _ShellMessageSearch on _SpaceShellState {
             sections: searchSections(context),
             messages: scope.target.messages,
             localOnly: scope.local,
+            channelNames: scope.channelNames,
+            searchAllChannels: scope.allSearch,
             searchMessages: scope.available
                 ? (query, cursor) =>
                       guardedMessageSearch(scope, valid, query, cursor)
@@ -93,10 +192,37 @@ extension _ShellMessageSearch on _SpaceShellState {
       return;
     }
     if (!valid()) return;
-    if (hit != null && !scope.local) {
-      await scope.target.revealSearchMessage(hit!);
+    if (hit == null) return;
+    await openSearchHit(scope, hit!);
+  }
+
+  Future<void> openSearchHit(_MessageSearchScope scope, Content message) async {
+    if (scope.target.channelId != message.channelId) {
+      await scope.target.selectChannel(message.channelId);
     }
-    if (valid()) openMessage(route.substring(8));
+    if (!mounted ||
+        !identical(controller, scope.target) ||
+        !scope.sameSession ||
+        !scope.catalogCurrent ||
+        !scope.target.canRead ||
+        scope.target.channelId != message.channelId) {
+      return;
+    }
+    final channel = scope.target.channels
+        .where((c) => c.id == message.channelId)
+        .firstOrNull;
+    if (channel == null || !scope.readable(channel)) return;
+    if (channel.mlsGroupId.isEmpty) {
+      await scope.target.revealSearchMessage(message);
+    }
+    if (mounted &&
+        identical(controller, scope.target) &&
+        scope.sameSession &&
+        scope.catalogCurrent &&
+        scope.target.channelId == message.channelId &&
+        scope.target.canRead) {
+      openMessage(message.id);
+    }
   }
 
   Future<MessageSearchPage> guardedMessageSearch(

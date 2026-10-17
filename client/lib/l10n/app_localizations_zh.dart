@@ -1650,6 +1650,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get historyPageFailed => '无法加载历史记录。请重试。';
+
+  @override
+  String get messageSearchAllChannels => '所有可用频道';
+
+  @override
+  String get messageSearchMixed => '私密频道仅在此设备上搜索';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2138,4 +2144,10 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get historyPageFailed => '无法加载历史记录。请重试。';
+
+  @override
+  String get messageSearchAllChannels => '所有可用频道';
+
+  @override
+  String get messageSearchMixed => '私密频道仅在此设备上搜索';
 }
