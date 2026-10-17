@@ -1,3 +1,5 @@
+import 'message_input_surface.dart';
+
 import 'package:flutter/rendering.dart' show ScrollDirection;
 
 import 'message_reply.dart';
@@ -890,43 +892,40 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     );
   }
 
-  Widget _inputSurface(BuildContext context) => GlassSurface(
-    child: Padding(
-      padding: const EdgeInsets.fromLTRB(12, 6, 12, 14),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (editing == null && replyTo.isNotEmpty)
-            replyPreview(replyTo, composer: true),
-          if (editing != null)
-            Row(
-              children: [
-                const SizedBox(width: 12),
-                const Icon(Icons.edit_outlined, size: 18),
-                const SizedBox(width: 8),
-                Expanded(child: Text(context.strings.editMessage)),
-                IconButton(
-                  onPressed: widget.controller.busy
-                      ? null
-                      : () => setState(finishEditing),
-                  tooltip: context.strings.cancelMessageChange,
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
-          if (editError.isNotEmpty)
-            Flexible(
-              child: SingleChildScrollView(
-                child: Text(
-                  editError,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
+  Widget _inputSurface(BuildContext context) => MessageInputSurface(
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (editing == null && replyTo.isNotEmpty)
+          replyPreview(replyTo, composer: true),
+        if (editing != null)
+          Row(
+            children: [
+              const SizedBox(width: 12),
+              const Icon(Icons.edit_outlined, size: 18),
+              const SizedBox(width: 8),
+              Expanded(child: Text(context.strings.editMessage)),
+              IconButton(
+                onPressed: widget.controller.busy
+                    ? null
+                    : () => setState(finishEditing),
+                tooltip: context.strings.cancelMessageChange,
+                icon: const Icon(Icons.close),
+              ),
+            ],
+          ),
+        if (editError.isNotEmpty)
+          Flexible(
+            child: SingleChildScrollView(
+              child: Text(
+                editError,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             ),
-          Flexible(child: _draftField(context)),
-          _composerButtons(context),
-        ],
-      ),
+          ),
+        Flexible(child: _draftField(context)),
+        _composerButtons(context),
+      ],
     ),
   );
 
@@ -945,20 +944,10 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         minLines: 3,
         maxLines: null,
         maxLength: editing == null ? 1024 : 4096,
-        decoration: InputDecoration(
-          hintText: view.connected && !view.canWrite
+        decoration: messageInputDecoration(
+          view.connected && !view.canWrite
               ? context.strings.cannotSend
               : context.strings.messageHint,
-          counterText: '',
-          filled: false,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          disabledBorder: InputBorder.none,
         ),
       ),
     );

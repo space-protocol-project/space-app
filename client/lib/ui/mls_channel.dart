@@ -1,3 +1,4 @@
+import 'message_input_surface.dart';
 import 'emoji_picker.dart';
 import 'message_reactions.dart';
 import 'message_reply.dart';
@@ -513,87 +514,84 @@ class _MlsConversationState extends State<_MlsConversation> {
     );
   }
 
-  Widget composer(MlsState state) => Container(
-    margin: const EdgeInsets.all(16),
+  Widget composer(MlsState state) => Padding(
     padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surfaceContainer,
-      borderRadius: BorderRadius.circular(24),
-    ),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (replyTarget != null) replyPreview(replyTarget!, cancel: true),
-        if (widget.attachmentsEnabled && files.isNotEmpty)
-          Wrap(
-            children: files
-                .map(
-                  (file) => InputChip(
-                    label: Text(file.name),
-                    onDeleted: state.busy
-                        ? null
-                        : () => setState(() => files.remove(file)),
-                  ),
-                )
-                .toList(),
-          ),
-        ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.sizeOf(context).height / 3,
-          ),
-          child: TextField(
-            controller: draft,
-            minLines: 3,
-            maxLines: null,
-            enabled:
-                !state.busy &&
-                !state.recoveryRequired &&
-                state.data?.channel['revocation_pending'] != true &&
-                !submitting &&
-                state.data?.joined == true &&
-                widget.canWrite,
-            decoration: InputDecoration(
-              hintText: context.strings.mlsInput,
-              border: InputBorder.none,
+    child: MessageInputSurface(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (replyTarget != null) replyPreview(replyTarget!, cancel: true),
+          if (widget.attachmentsEnabled && files.isNotEmpty)
+            Wrap(
+              children: files
+                  .map(
+                    (file) => InputChip(
+                      label: Text(file.name),
+                      onDeleted: state.busy
+                          ? null
+                          : () => setState(() => files.remove(file)),
+                    ),
+                  )
+                  .toList(),
             ),
-          ),
-        ),
-        Row(
-          children: [
-            if (widget.attachmentsEnabled)
-              IconButton(
-                onPressed: state.busy || state.recoveryRequired
-                    ? null
-                    : pickFiles,
-                tooltip: context.strings.mlsAttach,
-                icon: const Icon(Icons.add),
-              ),
-            EmojiButton(
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(context).height / 3,
+            ),
+            child: TextField(
               controller: draft,
+              minLines: 3,
+              maxLines: null,
               enabled:
                   !state.busy &&
                   !state.recoveryRequired &&
+                  state.data?.channel['revocation_pending'] != true &&
                   !submitting &&
                   state.data?.joined == true &&
                   widget.canWrite,
+              decoration: messageInputDecoration(context.strings.mlsInput),
             ),
-            const Spacer(),
-            IconButton.filled(
-              onPressed:
-                  state.busy ||
-                      state.recoveryRequired ||
-                      state.data?.channel['revocation_pending'] == true ||
-                      submitting ||
-                      state.data?.joined != true ||
-                      !widget.canWrite
-                  ? null
-                  : submit,
-              tooltip: context.strings.mlsSend,
-              icon: const Icon(Icons.arrow_upward),
-            ),
-          ],
-        ),
-      ],
+          ),
+          Row(
+            children: [
+              if (widget.attachmentsEnabled)
+                IconButton(
+                  onPressed: state.busy || state.recoveryRequired
+                      ? null
+                      : pickFiles,
+                  tooltip: context.strings.mlsAttach,
+                  icon: const Icon(Icons.add),
+                ),
+              EmojiButton(
+                controller: draft,
+                enabled:
+                    !state.busy &&
+                    !state.recoveryRequired &&
+                    !submitting &&
+                    state.data?.joined == true &&
+                    widget.canWrite,
+              ),
+              const Spacer(),
+              IconButton.filled(
+                onPressed:
+                    state.busy ||
+                        state.recoveryRequired ||
+                        state.data?.channel['revocation_pending'] == true ||
+                        submitting ||
+                        state.data?.joined != true ||
+                        !widget.canWrite
+                    ? null
+                    : submit,
+                tooltip: context.strings.mlsSend,
+                style: IconButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                ),
+                icon: const Icon(Icons.arrow_upward),
+              ),
+            ],
+          ),
+        ],
+      ),
     ),
   );
 
