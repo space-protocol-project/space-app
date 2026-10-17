@@ -4,9 +4,9 @@ on:
   push:
     branches: [main]
     tags: ['v*']
-    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_secure_storage.ps1', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
+    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_secure_storage.ps1', 'tools/check_linux_notification_activation.py', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
   pull_request:
-    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_secure_storage.ps1', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
+    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_secure_storage.ps1', 'tools/check_linux_notification_activation.py', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
 permissions:
   contents: read
 concurrency:

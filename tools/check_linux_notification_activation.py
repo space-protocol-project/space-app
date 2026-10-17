@@ -48,7 +48,7 @@ def outer(installer, bundle):
         assert 'DBusActivatable=true' in desktop.read_text()
         assert '--gapplication-service' in service.read_text()
         shutil.copytree(bundle, executable.parent, dirs_exist_ok=True)
-        result = subprocess.run(['dbus-run-session', '--', 'xvfb-run', '-a',
+        result = subprocess.run(['xvfb-run', '-a', 'dbus-run-session', '--',
                                  sys.executable, __file__, '--inside', str(root)], env=env)
         if result.returncode:
             log = probe / 'application.log'
