@@ -1,4 +1,7 @@
 import 'message_input_surface.dart';
+import 'message_body_layout.dart';
+import 'message_footer.dart';
+import 'message_markdown.dart';
 import 'emoji_picker.dart';
 import 'message_reactions.dart';
 import 'message_reply.dart';
@@ -473,8 +476,7 @@ class _MlsConversationState extends State<_MlsConversation> {
                 : Theme.of(context).colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: MessageBodyLayout(
             children: [
               Text(
                 item['author_id'] as String,
@@ -491,21 +493,23 @@ class _MlsConversationState extends State<_MlsConversation> {
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
               if ((message['text'] as String).isNotEmpty)
-                SelectableText(
-                  message['text'] as String,
-                  contextMenuBuilder: (_, _) => const SizedBox.shrink(),
-                ),
+                MessageMarkdown(text: message['text'] as String),
               ..._messageFiles(item, message, descriptors, images),
-              MessageReactionBar(
-                reactions: reactions,
-                principalId: principal,
-                onSet: canReact ? react : null,
-              ),
-              Text(
-                DateFormat.Hm().format(
-                  DateTime.fromMillisecondsSinceEpoch(item['time'] as int),
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: MessageFooter(
+                  reactions: MessageReactionBar(
+                    reactions: reactions,
+                    principalId: principal,
+                    onSet: canReact ? react : null,
+                  ),
+                  metadata: Text(
+                    DateFormat.Hm().format(
+                      DateTime.fromMillisecondsSinceEpoch(item['time'] as int),
+                    ),
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
                 ),
-                style: Theme.of(context).textTheme.labelSmall,
               ),
             ],
           ),

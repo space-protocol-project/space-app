@@ -12,6 +12,9 @@ import 'package:space_client/src/mls/local_store.dart';
 import 'package:space_client/src/mls/native.dart';
 import 'package:space_client/ui/mls_channel.dart';
 import 'package:space_client/ui/mls_files.dart';
+import 'package:space_client/ui/message_footer.dart';
+import 'package:space_client/ui/message_markdown.dart';
+import 'package:space_client/ui/message_reactions.dart';
 
 import 'mls_native_test.dart' show MemoryMlsStorage;
 
@@ -80,6 +83,52 @@ Widget app(Widget child) => MaterialApp(
 );
 
 void main() {
+  for (final width in [390.0, 1500.0]) {
+    testWidgets('MLS: Markdown и время справа от реакций на ширине $width', (
+      tester,
+    ) async {
+      tester.view.physicalSize = Size(width, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final client = _Client(1);
+      final message = client.data.messages.single['message'] as Map;
+      message['text'] = '**Жирный текст**\n\n![Иллюстрация](https://example.invalid/private.png)';
+      message['files'] = <Map<String, dynamic>>[];
+      await tester.pumpWidget(
+        app(
+          MlsChannelView(
+            session: _Session(client),
+            channelId: 'private',
+            groupId: List.filled(32, 1),
+            attachmentsEnabled: true,
+            canWrite: true,
+            active: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(MessageMarkdown), findsOneWidget);
+      expect(find.text('Жирный текст', findRichText: true), findsOneWidget);
+      expect(find.textContaining('**Жирный текст**'), findsNothing);
+      expect(find.byType(Image), findsNothing);
+      final footer = find.byType(MessageFooter);
+      final metadata = find
+          .descendant(of: footer, matching: find.byType(Text))
+          .last;
+      final reactions = find.byType(MessageReactionBar);
+      expect(
+        tester.getRect(metadata).right,
+        closeTo(tester.getRect(footer).right, .1),
+      );
+      expect(
+        tester.getRect(metadata).left,
+        greaterThanOrEqualTo(tester.getRect(reactions).right),
+      );
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    });
+  }
   testWidgets('MLS: уведомление прокручивает список к сообщению вне экрана', (
     tester,
   ) async {
