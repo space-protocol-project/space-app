@@ -56,38 +56,44 @@ void main() {
       await expectLater(store.save(99, '[]'), throwsArgumentError);
     },
   );
-  for (final enabled in [true, false]) {
-    test(
-      'Холодный запуск: ожидание слушателя, одноразовое нажатие, режим $enabled',
-      () async {
-        debugDefaultTargetPlatformOverride = TargetPlatform.windows;
-        addTearDown(() => debugDefaultTargetPlatformOverride = null);
-        final store = NotificationTargets(storage: HistoryKeys());
-        final token = await store.save(42, payload);
-        final service = SystemNotifications(savedTargets: store);
-        addTearDown(service.dispose);
-        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-            .setMockMethodCallHandler(
-              SystemNotifications.activationChannel,
-              (call) async => call.method == 'initial' ? token : null,
-            );
-        addTearDown(
-          () => TestDefaultBinaryMessengerBinding
-              .instance
-              .defaultBinaryMessenger
+  for (final platform in [
+    TargetPlatform.windows,
+    TargetPlatform.macOS,
+    TargetPlatform.linux,
+  ]) {
+    for (final enabled in [true, false]) {
+      test(
+        'Холодный запуск: ожидание слушателя, одноразовое нажатие, режим $enabled на $platform',
+        () async {
+          debugDefaultTargetPlatformOverride = platform;
+          addTearDown(() => debugDefaultTargetPlatformOverride = null);
+          final store = NotificationTargets(storage: HistoryKeys());
+          final token = await store.save(42, payload);
+          final service = SystemNotifications(savedTargets: store);
+          addTearDown(service.dispose);
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemNotifications.activationChannel,
-                null,
-              ),
-        );
-        final taps = <String>[];
-        final subscription = service.targets.stream.listen(taps.add);
-        addTearDown(subscription.cancel);
-        await service.listenForActivation(enabled: enabled);
-        await service.activate(token);
-        await Future<void>.delayed(Duration.zero);
-        expect(taps, enabled ? [payload] : isEmpty);
-      },
-    );
+                (call) async => call.method == 'initial' ? token : null,
+              );
+          addTearDown(
+            () => TestDefaultBinaryMessengerBinding
+                .instance
+                .defaultBinaryMessenger
+                .setMockMethodCallHandler(
+                  SystemNotifications.activationChannel,
+                  null,
+                ),
+          );
+          final taps = <String>[];
+          final subscription = service.targets.stream.listen(taps.add);
+          addTearDown(subscription.cancel);
+          await service.listenForActivation(enabled: enabled);
+          await service.activate(token);
+          await Future<void>.delayed(Duration.zero);
+          expect(taps, enabled ? [payload] : isEmpty);
+        },
+      );
+    }
   }
 }

@@ -21,14 +21,14 @@ class NotificationTargets {
     return result;
   }
 
-  Future<Map<String, dynamic>> _read() async {
+  Future<Map<String, dynamic>> _read({bool discardExpired = true}) async {
     final value = await storage.read(key: key);
     if (value == null) return {};
     if (value.length > 200000) throw StateError('Слишком много уведомлений');
     final data = Map<String, dynamic>.from(jsonDecode(value) as Map);
-    final cutoff = now()
-        .subtract(const Duration(days: 7))
-        .millisecondsSinceEpoch;
+    final cutoff = discardExpired
+        ? now().subtract(const Duration(days: 7)).millisecondsSinceEpoch
+        : 0;
     data.removeWhere((token, entry) => !_valid(token, entry, cutoff));
     return data;
   }
@@ -36,6 +36,7 @@ class NotificationTargets {
   bool _valid(String token, dynamic entry, int cutoff) =>
       tokenPattern.hasMatch(token) &&
       entry is Map &&
+      entry['id'] is int &&
       entry['time'] is int &&
       entry['time'] >= cutoff &&
       entry['time'] <= now().millisecondsSinceEpoch &&
@@ -73,5 +74,14 @@ class NotificationTargets {
     return entry?['payload'] as String?;
   });
 
-  Future<void> clear() => _serial(() => storage.delete(key: key));
+  Future<List<int>> clear() => _serial(() async {
+    var data = <String, dynamic>{};
+    try {
+      data = await _read(discardExpired: false);
+    } catch (_) {
+      // Повреждение целей не должно мешать их удалению.
+    }
+    await storage.delete(key: key);
+    return data.values.map((entry) => entry['id'] as int).take(64).toList();
+  });
 }

@@ -20,7 +20,7 @@ class SystemNotifications {
   bool _activationListening = false;
 
   Future<void> listenForActivation({required bool enabled}) async {
-    if (kIsWeb || defaultTargetPlatform != TargetPlatform.windows) return;
+    if (!supported) return;
     if (_activationListening) return;
     _activationListening = true;
     activationChannel.setMethodCallHandler((call) async {
@@ -58,7 +58,6 @@ class SystemNotifications {
       ].contains(defaultTargetPlatform);
   Future<void>? _initializing;
   final targets = StreamController<String>.broadcast();
-  final _active = <int, LocalNotification>{};
   bool _disposed = false;
 
   Future<void> initialize() async {
@@ -66,7 +65,9 @@ class SystemNotifications {
       throw UnsupportedError('Уведомления доступны на компьютере');
     }
     try {
-      await (_initializing ??= localNotifier.setup(appName: appName));
+      await (_initializing ??= defaultTargetPlatform == TargetPlatform.windows
+          ? localNotifier.setup(appName: appName)
+          : activationChannel.invokeMethod<void>('initialize'));
     } catch (_) {
       _initializing = null;
       rethrow;
@@ -76,7 +77,8 @@ class SystemNotifications {
   Future<bool> requestPermission() async {
     if (!supported) return false;
     await initialize();
-    return true;
+    if (defaultTargetPlatform == TargetPlatform.windows) return true;
+    return await activationChannel.invokeMethod<bool>('permission') ?? false;
   }
 
   Future<void> focus() async {
@@ -98,66 +100,34 @@ class SystemNotifications {
   }) async {
     await initialize();
     if (_disposed) return;
-    if (defaultTargetPlatform == TargetPlatform.windows) {
-      final token = await savedTargets.save(id, jsonEncode(target));
-      await activationChannel.invokeMethod<void>('show', {
-        'token': token,
-        'appId': appName,
-        'title': title,
-        'body': body,
-        'tag': '$id',
-      });
-      return;
-    }
-    if (!_active.containsKey(id) && _active.length >= 64) return;
-    if (_active.containsKey(id)) await _active[id]!.close();
-    final notification = _active.putIfAbsent(
-      id,
-      () => LocalNotification(
-        identifier: 'space-$id',
-        title: title,
-        silent: true,
-      ),
-    );
-    notification.title = title;
-    notification.body = body;
-    notification.actions = defaultTargetPlatform == TargetPlatform.linux
-        ? [LocalNotificationAction(text: actionLabel)]
-        : [];
-    final payload = jsonEncode(target);
-    notification.onClick = () {
-      if (!targets.isClosed) targets.add(payload);
-    };
-    notification.onClickAction = (index) {
-      if (index == 0 && !targets.isClosed) targets.add(payload);
-    };
-    await notification.show();
+    final token = await savedTargets.save(id, jsonEncode(target));
+    await activationChannel.invokeMethod<void>('show', {
+      'token': token,
+      'appId': appName,
+      'title': title,
+      'body': body,
+      'tag': '$id',
+      'actionLabel': actionLabel,
+    });
   }
 
   Future<void> clear() async {
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
-      await savedTargets.clear();
+    if (supported) {
+      final ids = await savedTargets.clear();
       try {
-        await activationChannel.invokeMethod<void>('clear', {'appId': appName});
+        await activationChannel.invokeMethod<void>('clear', {
+          'appId': appName,
+          'ids': ids,
+        });
       } on MissingPluginException {
         // Тестовый runner.
       }
-    }
-    for (final notification in _active.values) {
-      notification.onClick = null;
-      notification.onClickAction = null;
-      await notification.close();
     }
   }
 
   Future<void> dispose() async {
     _disposed = true;
     if (_activationListening) activationChannel.setMethodCallHandler(null);
-    for (final notification in _active.values) {
-      notification.onClick = null;
-      notification.onClickAction = null;
-      localNotifier.removeListener(notification);
-    }
     await targets.close();
   }
 }

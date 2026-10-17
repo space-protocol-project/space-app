@@ -64,7 +64,7 @@ jobs:
           cache: true
       - name: Зависимости Linux (только CI)
         if: matrix.target == 'linux'
-        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev libnotify-dev
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev libnotify-dev xvfb xauth dbus-x11 python3-gi
       - name: Зависимости приложения
         working-directory: client
         run: flutter pub get
@@ -118,6 +118,16 @@ jobs:
           path: dist/*
           if-no-files-found: error
           retention-days: 30
+      - name: Нативный запуск Linux из уведомления
+        if: matrix.target == 'linux'
+        shell: bash
+        run: |
+          (cd client && flutter build linux --release --no-pub --target tool/notification_activation_probe.dart)
+          /usr/bin/python3 tools/check_linux_notification_activation.py dist/Space-linux-x64.run client/build/linux/x64/release/bundle
+      - name: Нативная очередь нажатия macOS до готовности Dart
+        if: matrix.target == 'macos'
+        working-directory: client
+        run: xcodebuild test -workspace macos/Runner.xcworkspace -scheme Runner -configuration Debug -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO
       - name: Проверка установки поверх v0.2.1 и перезапуска
         if: matrix.target == 'windows'
         shell: pwsh

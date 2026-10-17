@@ -10,6 +10,32 @@ import 'chat_history_test.dart' show HistoryKeys;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  for (final platform in [TargetPlatform.macOS, TargetPlatform.linux]) {
+    test('Разрешение ОС проверяется на $platform', () async {
+      debugDefaultTargetPlatformOverride = platform;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+      var allowed = false;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            SystemNotifications.activationChannel,
+            (call) async => call.method == 'permission' ? allowed : null,
+          );
+      addTearDown(
+        () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(
+              SystemNotifications.activationChannel,
+              null,
+            ),
+      );
+      final service = SystemNotifications(
+        savedTargets: NotificationTargets(storage: HistoryKeys()),
+      );
+      addTearDown(service.dispose);
+      expect(await service.requestPermission(), isFalse);
+      allowed = true;
+      expect(await service.requestPermission(), isTrue);
+    });
+  }
   for (final platform in [
     TargetPlatform.windows,
     TargetPlatform.macOS,
@@ -62,43 +88,28 @@ void main() {
         body: 'Новое сообщение',
         target: ['https://secret.example', 'me', 'general', 2],
       );
-      final sent = platform == TargetPlatform.windows
-          ? nativeCalls.where((call) => call.method == 'show').toList()
-          : calls.where((call) => call.method == 'notify').toList();
+      final sent = nativeCalls.where((call) => call.method == 'show').toList();
       expect(sent, hasLength(2));
-      final actions = (sent.last.arguments as Map)['actions'] as List? ?? [];
-      expect(actions.length, platform == TargetPlatform.linux ? 1 : 0);
       expect(
         jsonEncode(sent.last.arguments),
         isNot(contains('secret.example')),
       );
       Future<void> click() async {
-        if (platform == TargetPlatform.windows) {
-          await service.activate(
-            (sent.last.arguments as Map)['token'] as String,
-          );
-          await Future<void>.delayed(Duration.zero);
-          return;
-        }
-        await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-            .handlePlatformMessage(
-              'local_notifier',
-              const StandardMethodCodec().encodeMethodCall(
-                MethodCall(
-                  platform == TargetPlatform.linux
-                      ? 'onLocalNotificationClickAction'
-                      : 'onLocalNotificationClick',
-                  {'notificationId': 'space-42', 'actionIndex': 0},
-                ),
-              ),
-              (_) {},
-            );
+        await service.activate((sent.last.arguments as Map)['token'] as String);
         await Future<void>.delayed(Duration.zero);
       }
 
       await click();
       expect(jsonDecode(taps.single).last, 2);
+      await service.show(
+        id: 99,
+        title: 'Space',
+        body: 'Новое сообщение',
+        target: ['https://secret.example', 'me', 'general', 3],
+      );
       await service.clear();
+      final clear = nativeCalls.lastWhere((call) => call.method == 'clear');
+      expect((clear.arguments as Map)['ids'], [99]);
       await click();
       expect(taps, hasLength(1));
     });

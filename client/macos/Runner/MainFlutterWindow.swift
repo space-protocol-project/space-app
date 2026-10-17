@@ -9,6 +9,7 @@ class MainFlutterWindow: NSWindow {
     self.center()
 
     RegisterGeneratedPlugins(registry: flutterViewController)
+    (NSApp.delegate as? AppDelegate)?.notifications.attach(flutterViewController.engine.binaryMessenger)
 
     super.awakeFromNib()
   }

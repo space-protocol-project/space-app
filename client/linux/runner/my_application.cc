@@ -6,10 +6,12 @@
 #endif
 
 #include "flutter/generated_plugin_registrant.h"
+#include "notification_activation.h"
 
 struct _MyApplication {
   GtkApplication parent_instance;
   char** dart_entrypoint_arguments;
+  NotificationActivation* notifications;
 };
 
 G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION)
@@ -22,6 +24,11 @@ static void first_frame_cb(MyApplication* self, FlView* view) {
 // Implements GApplication::activate.
 static void my_application_activate(GApplication* application) {
   MyApplication* self = MY_APPLICATION(application);
+  GList* windows = gtk_application_get_windows(GTK_APPLICATION(application));
+  if (windows) {
+    gtk_window_present(GTK_WINDOW(windows->data));
+    return;
+  }
   GtkWindow* window =
       GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
 
@@ -74,29 +81,20 @@ static void my_application_activate(GApplication* application) {
   gtk_widget_realize(GTK_WIDGET(view));
 
   fl_register_plugins(FL_PLUGIN_REGISTRY(view));
+  self->notifications = new NotificationActivation(application,
+      fl_engine_get_binary_messenger(fl_view_get_engine(view)));
 
   gtk_widget_grab_focus(GTK_WIDGET(view));
 }
 
-// Implements GApplication::local_command_line.
-static gboolean my_application_local_command_line(GApplication* application,
-                                                  gchar*** arguments,
-                                                  int* exit_status) {
-  MyApplication* self = MY_APPLICATION(application);
-  // Strip out the first argument as it is the binary name.
-  self->dart_entrypoint_arguments = g_strdupv(*arguments + 1);
-
-  g_autoptr(GError) error = nullptr;
-  if (!g_application_register(application, nullptr, &error)) {
-    g_warning("Failed to register: %s", error->message);
-    *exit_status = 1;
-    return TRUE;
-  }
-
-  g_application_activate(application);
-  *exit_status = 0;
-
-  return TRUE;
+// Ключ из системной карточки проверяется до создания окна.
+static void open_notification(GSimpleAction*, GVariant* value, gpointer data) {
+  if (!value || !g_variant_is_of_type(value, G_VARIANT_TYPE_STRING)) return;
+  const gchar* token = g_variant_get_string(value, nullptr);
+  if (!NotificationActivation::Valid(token)) return;
+  MyApplication* self = MY_APPLICATION(data);
+  g_application_activate(G_APPLICATION(self));
+  if (self->notifications) self->notifications->Receive(token);
 }
 
 // Implements GApplication::startup.
@@ -106,6 +104,9 @@ static void my_application_startup(GApplication* application) {
   // Perform any actions required at application startup.
 
   G_APPLICATION_CLASS(my_application_parent_class)->startup(application);
+  g_autoptr(GSimpleAction) action = g_simple_action_new("open-notification", G_VARIANT_TYPE_STRING);
+  g_signal_connect(action, "activate", G_CALLBACK(open_notification), application);
+  g_action_map_add_action(G_ACTION_MAP(application), G_ACTION(action));
 }
 
 // Implements GApplication::shutdown.
@@ -120,14 +121,14 @@ static void my_application_shutdown(GApplication* application) {
 // Implements GObject::dispose.
 static void my_application_dispose(GObject* object) {
   MyApplication* self = MY_APPLICATION(object);
+  delete self->notifications;
+  self->notifications = nullptr;
   g_clear_pointer(&self->dart_entrypoint_arguments, g_strfreev);
   G_OBJECT_CLASS(my_application_parent_class)->dispose(object);
 }
 
 static void my_application_class_init(MyApplicationClass* klass) {
   G_APPLICATION_CLASS(klass)->activate = my_application_activate;
-  G_APPLICATION_CLASS(klass)->local_command_line =
-      my_application_local_command_line;
   G_APPLICATION_CLASS(klass)->startup = my_application_startup;
   G_APPLICATION_CLASS(klass)->shutdown = my_application_shutdown;
   G_OBJECT_CLASS(klass)->dispose = my_application_dispose;
@@ -144,5 +145,5 @@ MyApplication* my_application_new() {
 
   return MY_APPLICATION(g_object_new(my_application_get_type(),
                                      "application-id", APPLICATION_ID, "flags",
-                                     G_APPLICATION_NON_UNIQUE, nullptr));
+                                     0, nullptr));
 }
