@@ -1,0 +1,35 @@
+name: Диск и резервные копии
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['client/lib/src/home*', 'client/lib/ui/home*', 'client/lib/l10n/**', 'client/test/home*', '.github/workflows/home-storage.yml']
+  pull_request:
+    paths: ['client/lib/src/home*', 'client/lib/ui/home*', 'client/lib/l10n/**', 'client/test/home*', '.github/workflows/home-storage.yml']
+permissions:
+  contents: read
+jobs:
+  storage:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2025, macos-14, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.7'
+          channel: stable
+          cache: true
+      - name: Rust для нативных зависимостей приложения
+        run: rustup toolchain install 1.99.0 --profile minimal
+      - name: Зависимости
+        working-directory: client
+        run: flutter pub get
+      - name: Анализ приложения
+        working-directory: client
+        run: flutter analyze
+      - name: Хранение, очистка, импорт, обновление и остановка
+        working-directory: client
+        run: flutter test --no-pub --concurrency=1 test/home_disk_test.dart test/home_disk_panel_test.dart test/home_storage_test.dart test/home_runtime_cleanup_test.dart test/home_transfer_test.dart test/home_server_test.dart test/home_update_executor_test.dart test/home_shutdown_test.dart test/home_localization_test.dart
