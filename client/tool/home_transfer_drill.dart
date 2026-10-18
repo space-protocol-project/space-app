@@ -4,6 +4,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:space_client/src/home_archive_inspection.dart';
+
+import 'home_transfer_assets.dart';
+
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/root_rotation.dart';
 import 'package:space_client/src/rpc_clients.dart';
@@ -145,10 +149,12 @@ Future<Map<String, dynamic>> seedSpace(
     }
     await owner.close();
     owner = await SpaceSession.connect(space.discovery, ownerVault);
+    final attachment = await seedTransferAttachment(member);
     final recovery = await owner.recoveryPayload();
     await owner.prepareRotation();
     return {
       'message': message.id,
+      'attachment': attachment,
       'owner': owner.principalId,
       'member': member.principalId,
       'recovery': recovery,
@@ -190,6 +196,7 @@ Future<void> verifySpace(
     )) {
       throw StateError('Сообщение потеряно');
     }
+    await verifyTransferAttachment(member, saved['attachment'] as String);
     await member.send('Сообщение после переноса', 'transfer-drill-after');
     final card = await recordFromRecovery(
       saved['recovery'] as Map<String, dynamic>,
@@ -258,6 +265,11 @@ Future<void> main(List<String> arguments) async {
       '-home-data',
       '${original.path}/data',
     ]);
+    final report = await inspectTransferArchive(executable, archive);
+    if (report.serverId != identity.serverId || await imported.exists()) {
+      throw StateError('Проверка изменила пространство или его идентичность');
+    }
+    await report.requireCurrentSource(archive);
     await maintenance(executable, runtime, [
       '-home-import',
       archive,
@@ -273,11 +285,66 @@ Future<void> main(List<String> arguments) async {
       throw StateError('Доверенная идентичность изменилась');
     }
     await verifySpace(running, saved, owner, member);
+    await running.stop();
+    running = null;
+    running = await startSpace(executable, runtime, imported, '203.0.113.11');
+    await verifyTransferRestart(running, saved, owner, member);
     stdout.writeln(
-      'Перенос: новый IP, прежний TLS, история root, владелец, участник, сообщения и старая карточка восстановления проверены.',
+      'Перенос: новый IP, прежний TLS, история root, владелец, участник, сообщения, файл, реакция, старая карточка восстановления и повторный запуск проверены.',
     );
   } finally {
     await running?.stop();
     await temporary.delete(recursive: true);
+  }
+}
+
+Future<HomeArchiveInspection> inspectTransferArchive(
+  String executable,
+  String archive,
+) async {
+  final digest = await homeArchiveDigest(archive);
+  final result = await Process.run(executable, [
+    '-home-verify-export',
+    archive,
+  ]);
+  if (result.exitCode != 0) {
+    throw StateError('Проверка архива: ${result.stderr}');
+  }
+  final report = HomeArchiveInspection.fromJson(
+    jsonDecode(result.stdout as String) as Map<String, dynamic>,
+    archive,
+    digest,
+  );
+  await report.requireCurrentSource(archive);
+  return report;
+}
+
+Future<void> verifyTransferRestart(
+  RunningSpace space,
+  Map<String, dynamic> saved,
+  TransferVault ownerVault,
+  HomeVault memberVault,
+) async {
+  final owner = await SpaceSession.connect(space.discovery, ownerVault);
+  try {
+    final member = await SpaceSession.connect(space.discovery, memberVault);
+    try {
+      if (owner.principalId != saved['owner'] ||
+          owner.role != 'owner' ||
+          member.principalId != saved['member']) {
+        throw StateError('Перезапуск изменил участников или права');
+      }
+      final messages = await member.messages();
+      if (messages.where((m) => m.text == 'Сообщение после переноса').length !=
+              1 ||
+          !messages.any((m) => m.id == saved['message'])) {
+        throw StateError('Перезапуск потерял или продублировал сообщения');
+      }
+      await verifyTransferAttachment(member, saved['attachment'] as String);
+    } finally {
+      await member.close();
+    }
+  } finally {
+    await owner.close();
   }
 }
