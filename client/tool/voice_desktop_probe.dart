@@ -93,7 +93,7 @@ Future<Map<String, int>> waitForAudio(NativeVoiceMedia media) async {
 Future<void> scenario(Directory work, String origin, String role) async {
   await flag(work, '$role-progress', 'connect');
   final server = await discover(origin);
-  if (server.voiceRoomsVersion != 2) {
+  if (server.voiceRoomsVersion != 3) {
     throw StateError('Нет поддержки голоса');
   }
   final session = await SpaceSession.connect(server, HomeVault());

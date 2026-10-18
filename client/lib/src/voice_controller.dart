@@ -106,12 +106,13 @@ class VoiceController extends Cubit<VoiceState> {
         await _quietLeave(api, room, reply.sessionId);
         return;
       }
-      if (reply.sessionId.isEmpty ||
-          !reply.hasState() ||
-          reply.state.capacity != 2) {
+      if (reply.sessionId.isEmpty) {
         throw StateError('Некорректный ответ голосового сервера');
       }
       _id = reply.sessionId;
+      if (!reply.hasState() || reply.state.capacity != 8) {
+        throw StateError('Некорректный ответ голосового сервера');
+      }
       await media.answer(reply.answerSdp);
       if (generation != _generation) {
         return;

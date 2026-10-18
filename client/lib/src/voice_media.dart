@@ -47,11 +47,7 @@ class NativeVoiceMedia implements VoiceMedia {
     _peer = peer;
     peer.onConnectionState = _connectionChanged;
     peer.onTrack = _track;
-    final transceiver = await peer.addTransceiver(
-      kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
-      init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendRecv),
-    );
-    _sender = transceiver.sender;
+    _sender = await _prepareAudio(peer);
     final gathered = Completer<void>();
     peer.onIceGatheringState = (state) {
       if (state == RTCIceGatheringState.RTCIceGatheringStateComplete &&
@@ -78,10 +74,24 @@ class NativeVoiceMedia implements VoiceMedia {
       throw StateError('Вход отменён');
     }
     final sdp = (await peer.getLocalDescription())?.sdp;
-    if (sdp == null || sdp.length > 12288) {
+    if (sdp == null || sdp.length > 65536) {
       throw StateError('Некорректное предложение WebRTC');
     }
     return sdp;
+  }
+
+  Future<RTCRtpSender> _prepareAudio(RTCPeerConnection peer) async {
+    final outgoing = await peer.addTransceiver(
+      kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
+      init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendRecv),
+    );
+    for (var index = 1; index < 7; index++) {
+      await peer.addTransceiver(
+        kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
+        init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly),
+      );
+    }
+    return outgoing.sender;
   }
 
   void _connectionChanged(RTCPeerConnectionState state) {
@@ -128,7 +138,7 @@ class NativeVoiceMedia implements VoiceMedia {
 
   @override
   Future<void> answer(String sdp) async {
-    if (_closed || sdp.length > 16384) {
+    if (_closed || sdp.length > 65536) {
       throw StateError('Подключение закрыто');
     }
     await _peer!

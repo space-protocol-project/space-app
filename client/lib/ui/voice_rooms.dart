@@ -36,7 +36,7 @@ class VoiceRoomsView extends StatelessWidget {
     if (Platform.isAndroid || Platform.isIOS) {
       return [Text(context.strings.voiceDesktopOnly)];
     }
-    if (connected.server.voiceRoomsVersion != 2) {
+    if (connected.server.voiceRoomsVersion != 3) {
       return [Text(context.strings.voiceUpdateRuntime)];
     }
     return [
@@ -154,16 +154,18 @@ class VoiceParticipants extends StatelessWidget {
           if (!state.active) {
             return const SizedBox.shrink();
           }
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${context.strings.voiceParticipants} · ${state.title}',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              for (final person in state.roster?.participants ?? [])
-                _person(context, person),
-            ],
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${context.strings.voiceParticipants} · ${state.title}',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                for (final person in state.roster?.participants ?? [])
+                  _person(context, person),
+              ],
+            ),
           );
         },
       );

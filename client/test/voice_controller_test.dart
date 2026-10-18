@@ -62,6 +62,7 @@ class FakeVoiceApi implements VoiceSignaling {
   final List<String> log;
   final StreamController<void> closing;
   Completer<JoinVoiceRoomResponse>? pending;
+  int capacity = 8;
   bool failed = false, canPublish = true, configurationDenied = false;
   @override
   Stream<void> get disconnected => closing.stream;
@@ -75,7 +76,7 @@ class FakeVoiceApi implements VoiceSignaling {
   }
 
   VoiceRoomState get roster => VoiceRoomState(
-    capacity: 2,
+    capacity: capacity,
     canPublish: canPublish,
     participants: [
       VoiceParticipant(sessionId: 'local', nickname: 'Алиса', muted: true),
@@ -124,6 +125,18 @@ Future<void> waitFor(bool Function() condition) async {
 }
 
 void main() {
+  test('Несовместимая вместимость закрывает медиа и серверный сеанс', () async {
+    final log = <String>[];
+    final api = FakeVoiceApi(log)..capacity = 2;
+    final media = FakeVoiceMedia(log);
+    final controller = VoiceController(mediaFactory: () => media);
+    addTearDown(controller.close);
+    await controller.join(api, 'room', 'Комната');
+    expect(controller.state.phase, VoicePhase.failed);
+    expect(media.closed, true);
+    expect(log, contains('leave:local'));
+    expect(log, isNot(contains('answer')));
+  });
   test('Отказ конфигурации не запускает ICE или захват микрофона', () async {
     final log = <String>[];
     final media = FakeVoiceMedia(log),
