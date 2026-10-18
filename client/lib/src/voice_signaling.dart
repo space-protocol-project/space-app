@@ -1,8 +1,10 @@
 import 'core.dart';
 import 'generated/space/v1/voice.pb.dart';
+import 'voice_network.dart';
 
 abstract interface class VoiceSignaling {
   Stream<void> get disconnected;
+  Future<VoiceNetworkSettings> configure(String room);
   Future<JoinVoiceRoomResponse> join(String room, String offer);
   Future<VoiceRoomState> update(
     String room,
@@ -18,6 +20,9 @@ class SessionVoiceSignaling implements VoiceSignaling {
   final SpaceSession session;
   @override
   Stream<void> get disconnected => session.closing;
+  @override
+  Future<VoiceNetworkSettings> configure(String room) async =>
+      VoiceNetworkSettings.fromReply(await session.voiceConfiguration(room));
   @override
   Future<JoinVoiceRoomResponse> join(String room, String offer) =>
       session.joinVoiceRoom(room, offer);

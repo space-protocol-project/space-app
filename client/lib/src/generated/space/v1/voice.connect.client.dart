@@ -9,6 +9,23 @@ import "voice.connect.spec.dart" as specs;
 
 /// Голос передаётся WebRTC, через RPC проходит только управление и SDP.
 extension type VoiceServiceClient (connect.Transport _transport) {
+  Future<spacev1voice.GetVoiceConfigurationResponse> getVoiceConfiguration(
+    spacev1voice.GetVoiceConfigurationRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.VoiceService.getVoiceConfiguration,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
   Future<spacev1voice.JoinVoiceRoomResponse> joinVoiceRoom(
     spacev1voice.JoinVoiceRoomRequest input, {
     connect.Headers? headers,

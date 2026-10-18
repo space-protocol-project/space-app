@@ -11,6 +11,13 @@ abstract final class VoiceService {
   /// Fully-qualified name of the VoiceService service.
   static const name = 'space.v1.VoiceService';
 
+  static const getVoiceConfiguration = connect.Spec(
+    '/$name/GetVoiceConfiguration',
+    connect.StreamType.unary,
+    spacev1voice.GetVoiceConfigurationRequest.new,
+    spacev1voice.GetVoiceConfigurationResponse.new,
+  );
+
   static const joinVoiceRoom = connect.Spec(
     '/$name/JoinVoiceRoom',
     connect.StreamType.unary,

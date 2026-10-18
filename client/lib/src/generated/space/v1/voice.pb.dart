@@ -13,6 +13,7 @@
 import 'dart:async' as $async;
 import 'dart:core' as $core;
 
+import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
@@ -756,12 +757,238 @@ class GetVoiceRoomResponse extends $pb.GeneratedMessage {
   VoiceRoomState ensureState() => $_ensure(0);
 }
 
+/// Выдаётся только после проверки доступа к комнате. Общий TURN-секрет
+/// остаётся на runtime; клиент получает временный пароль без идентификатора личности.
+class VoiceIceServer extends $pb.GeneratedMessage {
+  factory VoiceIceServer({
+    $core.Iterable<$core.String>? urls,
+    $core.String? username,
+    $core.String? credential,
+  }) {
+    final result = VoiceIceServer._();
+    if (urls != null) result.urls.addAll(urls);
+    if (username != null) result.username = username;
+    if (credential != null) result.credential = credential;
+    return result;
+  }
+
+  VoiceIceServer._();
+
+  factory VoiceIceServer.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      VoiceIceServer()..mergeFromBuffer(data, registry);
+  factory VoiceIceServer.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      VoiceIceServer()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'VoiceIceServer',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: VoiceIceServer.$_createMessage)
+    ..pPS(1, _omitFieldNames ? '' : 'urls')
+    ..aOS(2, _omitFieldNames ? '' : 'username')
+    ..aOS(3, _omitFieldNames ? '' : 'credential')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  VoiceIceServer clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  VoiceIceServer copyWith(void Function(VoiceIceServer) updates) =>
+      super.copyWith((message) => updates(message as VoiceIceServer))
+          as VoiceIceServer;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use VoiceIceServer() / VoiceIceServer.new instead')
+  static VoiceIceServer create() => VoiceIceServer._();
+  static $pb.GeneratedMessage $_createMessage() => VoiceIceServer._();
+  @$core.override
+  VoiceIceServer createEmptyInstance() => VoiceIceServer._();
+  @$core.pragma('dart2js:noInline')
+  static VoiceIceServer getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<VoiceIceServer>(
+          VoiceIceServer.$_createMessage);
+  static VoiceIceServer? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<$core.String> get urls => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $core.String get username => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set username($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasUsername() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearUsername() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get credential => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set credential($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasCredential() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearCredential() => $_clearField(3);
+}
+
+class GetVoiceConfigurationRequest extends $pb.GeneratedMessage {
+  factory GetVoiceConfigurationRequest({
+    $core.String? channelId,
+  }) {
+    final result = GetVoiceConfigurationRequest._();
+    if (channelId != null) result.channelId = channelId;
+    return result;
+  }
+
+  GetVoiceConfigurationRequest._();
+
+  factory GetVoiceConfigurationRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetVoiceConfigurationRequest()..mergeFromBuffer(data, registry);
+  factory GetVoiceConfigurationRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetVoiceConfigurationRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetVoiceConfigurationRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetVoiceConfigurationRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetVoiceConfigurationRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetVoiceConfigurationRequest copyWith(
+          void Function(GetVoiceConfigurationRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as GetVoiceConfigurationRequest))
+          as GetVoiceConfigurationRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetVoiceConfigurationRequest() / GetVoiceConfigurationRequest.new instead')
+  static GetVoiceConfigurationRequest create() =>
+      GetVoiceConfigurationRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      GetVoiceConfigurationRequest._();
+  @$core.override
+  GetVoiceConfigurationRequest createEmptyInstance() =>
+      GetVoiceConfigurationRequest._();
+  @$core.pragma('dart2js:noInline')
+  static GetVoiceConfigurationRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetVoiceConfigurationRequest>(
+          GetVoiceConfigurationRequest.$_createMessage);
+  static GetVoiceConfigurationRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+}
+
+class GetVoiceConfigurationResponse extends $pb.GeneratedMessage {
+  factory GetVoiceConfigurationResponse({
+    $core.Iterable<VoiceIceServer>? iceServers,
+    $core.bool? relayOnly,
+    $fixnum.Int64? expiresAtUnix,
+  }) {
+    final result = GetVoiceConfigurationResponse._();
+    if (iceServers != null) result.iceServers.addAll(iceServers);
+    if (relayOnly != null) result.relayOnly = relayOnly;
+    if (expiresAtUnix != null) result.expiresAtUnix = expiresAtUnix;
+    return result;
+  }
+
+  GetVoiceConfigurationResponse._();
+
+  factory GetVoiceConfigurationResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetVoiceConfigurationResponse()..mergeFromBuffer(data, registry);
+  factory GetVoiceConfigurationResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetVoiceConfigurationResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetVoiceConfigurationResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetVoiceConfigurationResponse.$_createMessage)
+    ..pPM<VoiceIceServer>(1, _omitFieldNames ? '' : 'iceServers',
+        subBuilder: VoiceIceServer.$_createMessage)
+    ..aOB(2, _omitFieldNames ? '' : 'relayOnly')
+    ..aInt64(3, _omitFieldNames ? '' : 'expiresAtUnix')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetVoiceConfigurationResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetVoiceConfigurationResponse copyWith(
+          void Function(GetVoiceConfigurationResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as GetVoiceConfigurationResponse))
+          as GetVoiceConfigurationResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetVoiceConfigurationResponse() / GetVoiceConfigurationResponse.new instead')
+  static GetVoiceConfigurationResponse create() =>
+      GetVoiceConfigurationResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      GetVoiceConfigurationResponse._();
+  @$core.override
+  GetVoiceConfigurationResponse createEmptyInstance() =>
+      GetVoiceConfigurationResponse._();
+  @$core.pragma('dart2js:noInline')
+  static GetVoiceConfigurationResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetVoiceConfigurationResponse>(
+          GetVoiceConfigurationResponse.$_createMessage);
+  static GetVoiceConfigurationResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<VoiceIceServer> get iceServers => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $core.bool get relayOnly => $_getBF(1);
+  @$pb.TagNumber(2)
+  set relayOnly($core.bool value) => $_setBool(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasRelayOnly() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRelayOnly() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get expiresAtUnix => $_getI64(2);
+  @$pb.TagNumber(3)
+  set expiresAtUnix($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasExpiresAtUnix() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearExpiresAtUnix() => $_clearField(3);
+}
+
 /// Голос передаётся WebRTC, через RPC проходит только управление и SDP.
 class VoiceServiceApi {
   final $pb.RpcClient _client;
 
   VoiceServiceApi(this._client);
 
+  $async.Future<GetVoiceConfigurationResponse> getVoiceConfiguration(
+          $pb.ClientContext? ctx, GetVoiceConfigurationRequest request) =>
+      _client.invoke<GetVoiceConfigurationResponse>(ctx, 'VoiceService',
+          'GetVoiceConfiguration', request, GetVoiceConfigurationResponse());
   $async.Future<JoinVoiceRoomResponse> joinVoiceRoom(
           $pb.ClientContext? ctx, JoinVoiceRoomRequest request) =>
       _client.invoke<JoinVoiceRoomResponse>(ctx, 'VoiceService',

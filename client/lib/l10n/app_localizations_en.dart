@@ -2015,7 +2015,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voiceLimit =>
-      'Initial rooms support two participants. External connectivity and TURN are not yet verified; start on the same local network.';
+      'Up to two participants per room. For internet connections, the owner configures STUN/TURN; the app receives the settings automatically.';
 
   @override
   String get voiceDesktopOnly =>

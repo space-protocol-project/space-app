@@ -188,9 +188,67 @@ final $typed_data.Uint8List getVoiceRoomResponseDescriptor = $convert.base64Deco
     'ChRHZXRWb2ljZVJvb21SZXNwb25zZRIuCgVzdGF0ZRgBIAEoCzIYLnNwYWNlLnYxLlZvaWNlUm'
     '9vbVN0YXRlUgVzdGF0ZQ==');
 
+@$core.Deprecated('Use voiceIceServerDescriptor instead')
+const VoiceIceServer$json = {
+  '1': 'VoiceIceServer',
+  '2': [
+    {'1': 'urls', '3': 1, '4': 3, '5': 9, '10': 'urls'},
+    {'1': 'username', '3': 2, '4': 1, '5': 9, '10': 'username'},
+    {'1': 'credential', '3': 3, '4': 1, '5': 9, '10': 'credential'},
+  ],
+};
+
+/// Descriptor for `VoiceIceServer`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List voiceIceServerDescriptor = $convert.base64Decode(
+    'Cg5Wb2ljZUljZVNlcnZlchISCgR1cmxzGAEgAygJUgR1cmxzEhoKCHVzZXJuYW1lGAIgASgJUg'
+    'h1c2VybmFtZRIeCgpjcmVkZW50aWFsGAMgASgJUgpjcmVkZW50aWFs');
+
+@$core.Deprecated('Use getVoiceConfigurationRequestDescriptor instead')
+const GetVoiceConfigurationRequest$json = {
+  '1': 'GetVoiceConfigurationRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+  ],
+};
+
+/// Descriptor for `GetVoiceConfigurationRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getVoiceConfigurationRequestDescriptor =
+    $convert.base64Decode(
+        'ChxHZXRWb2ljZUNvbmZpZ3VyYXRpb25SZXF1ZXN0Eh0KCmNoYW5uZWxfaWQYASABKAlSCWNoYW'
+        '5uZWxJZA==');
+
+@$core.Deprecated('Use getVoiceConfigurationResponseDescriptor instead')
+const GetVoiceConfigurationResponse$json = {
+  '1': 'GetVoiceConfigurationResponse',
+  '2': [
+    {
+      '1': 'ice_servers',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.VoiceIceServer',
+      '10': 'iceServers'
+    },
+    {'1': 'relay_only', '3': 2, '4': 1, '5': 8, '10': 'relayOnly'},
+    {'1': 'expires_at_unix', '3': 3, '4': 1, '5': 3, '10': 'expiresAtUnix'},
+  ],
+};
+
+/// Descriptor for `GetVoiceConfigurationResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getVoiceConfigurationResponseDescriptor =
+    $convert.base64Decode(
+        'Ch1HZXRWb2ljZUNvbmZpZ3VyYXRpb25SZXNwb25zZRI5CgtpY2Vfc2VydmVycxgBIAMoCzIYLn'
+        'NwYWNlLnYxLlZvaWNlSWNlU2VydmVyUgppY2VTZXJ2ZXJzEh0KCnJlbGF5X29ubHkYAiABKAhS'
+        'CXJlbGF5T25seRImCg9leHBpcmVzX2F0X3VuaXgYAyABKANSDWV4cGlyZXNBdFVuaXg=');
+
 const $core.Map<$core.String, $core.dynamic> VoiceServiceBase$json = {
   '1': 'VoiceService',
   '2': [
+    {
+      '1': 'GetVoiceConfiguration',
+      '2': '.space.v1.GetVoiceConfigurationRequest',
+      '3': '.space.v1.GetVoiceConfigurationResponse'
+    },
     {
       '1': 'JoinVoiceRoom',
       '2': '.space.v1.JoinVoiceRoomRequest',
@@ -217,6 +275,9 @@ const $core.Map<$core.String, $core.dynamic> VoiceServiceBase$json = {
 @$core.Deprecated('Use voiceServiceDescriptor instead')
 const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
     VoiceServiceBase$messageJson = {
+  '.space.v1.GetVoiceConfigurationRequest': GetVoiceConfigurationRequest$json,
+  '.space.v1.GetVoiceConfigurationResponse': GetVoiceConfigurationResponse$json,
+  '.space.v1.VoiceIceServer': VoiceIceServer$json,
   '.space.v1.JoinVoiceRoomRequest': JoinVoiceRoomRequest$json,
   '.space.v1.JoinVoiceRoomResponse': JoinVoiceRoomResponse$json,
   '.space.v1.VoiceRoomState': VoiceRoomState$json,
@@ -231,10 +292,12 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
 
 /// Descriptor for `VoiceService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
 final $typed_data.Uint8List voiceServiceDescriptor = $convert.base64Decode(
-    'CgxWb2ljZVNlcnZpY2USUAoNSm9pblZvaWNlUm9vbRIeLnNwYWNlLnYxLkpvaW5Wb2ljZVJvb2'
-    '1SZXF1ZXN0Gh8uc3BhY2UudjEuSm9pblZvaWNlUm9vbVJlc3BvbnNlElYKD1VwZGF0ZVZvaWNl'
-    'Um9vbRIgLnNwYWNlLnYxLlVwZGF0ZVZvaWNlUm9vbVJlcXVlc3QaIS5zcGFjZS52MS5VcGRhdG'
-    'VWb2ljZVJvb21SZXNwb25zZRJTCg5MZWF2ZVZvaWNlUm9vbRIfLnNwYWNlLnYxLkxlYXZlVm9p'
-    'Y2VSb29tUmVxdWVzdBogLnNwYWNlLnYxLkxlYXZlVm9pY2VSb29tUmVzcG9uc2USTQoMR2V0Vm'
-    '9pY2VSb29tEh0uc3BhY2UudjEuR2V0Vm9pY2VSb29tUmVxdWVzdBoeLnNwYWNlLnYxLkdldFZv'
-    'aWNlUm9vbVJlc3BvbnNl');
+    'CgxWb2ljZVNlcnZpY2USaAoVR2V0Vm9pY2VDb25maWd1cmF0aW9uEiYuc3BhY2UudjEuR2V0Vm'
+    '9pY2VDb25maWd1cmF0aW9uUmVxdWVzdBonLnNwYWNlLnYxLkdldFZvaWNlQ29uZmlndXJhdGlv'
+    'blJlc3BvbnNlElAKDUpvaW5Wb2ljZVJvb20SHi5zcGFjZS52MS5Kb2luVm9pY2VSb29tUmVxdW'
+    'VzdBofLnNwYWNlLnYxLkpvaW5Wb2ljZVJvb21SZXNwb25zZRJWCg9VcGRhdGVWb2ljZVJvb20S'
+    'IC5zcGFjZS52MS5VcGRhdGVWb2ljZVJvb21SZXF1ZXN0GiEuc3BhY2UudjEuVXBkYXRlVm9pY2'
+    'VSb29tUmVzcG9uc2USUwoOTGVhdmVWb2ljZVJvb20SHy5zcGFjZS52MS5MZWF2ZVZvaWNlUm9v'
+    'bVJlcXVlc3QaIC5zcGFjZS52MS5MZWF2ZVZvaWNlUm9vbVJlc3BvbnNlEk0KDEdldFZvaWNlUm'
+    '9vbRIdLnNwYWNlLnYxLkdldFZvaWNlUm9vbVJlcXVlc3QaHi5zcGFjZS52MS5HZXRWb2ljZVJv'
+    'b21SZXNwb25zZQ==');

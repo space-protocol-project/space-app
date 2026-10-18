@@ -42,6 +42,7 @@ class VoiceController extends Cubit<VoiceState> {
   StreamSubscription<void>? _disconnected;
   Future<void>? _leaving;
   Timer? _timer;
+  Timer? _connectionDeadline;
   String _id = '';
   int _generation = 0;
   bool _closed = false, _joining = false;
@@ -78,8 +79,25 @@ class VoiceController extends Cubit<VoiceState> {
     _subscription = media.changes.listen(
       (status) => _mediaChanged(status, generation),
     );
+    _connectionDeadline = Timer(const Duration(seconds: 45), () {
+      if (generation == _generation) {
+        unawaited(
+          _fail(
+            StateError(
+              'Не удалось подключить голос. Проверьте доступность STUN/TURN и медиа-портов.',
+            ),
+          ),
+        );
+      }
+    });
     try {
-      final offer = await media.offer();
+      final network = await api
+          .configure(room)
+          .timeout(const Duration(seconds: 10));
+      if (generation != _generation) {
+        return;
+      }
+      final offer = await media.offer(network);
       if (generation != _generation) {
         return;
       }
@@ -119,6 +137,8 @@ class VoiceController extends Cubit<VoiceState> {
       return;
     }
     if (status == VoiceMediaStatus.connected) {
+      _connectionDeadline?.cancel();
+      _connectionDeadline = null;
       _publish(phase: VoicePhase.connected);
     }
   }
@@ -300,6 +320,8 @@ class VoiceController extends Cubit<VoiceState> {
     }
     _timer?.cancel();
     _timer = null;
+    _connectionDeadline?.cancel();
+    _connectionDeadline = null;
     final media = _media, api = _api, id = _id, room = state.room;
     _media = null;
     _api = null;

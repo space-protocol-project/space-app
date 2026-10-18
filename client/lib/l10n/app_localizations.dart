@@ -3661,7 +3661,7 @@ abstract class AppLocalizations {
   /// No description provided for @voiceLimit.
   ///
   /// In ru, this message translates to:
-  /// **'Первые комнаты рассчитаны на двух участников. Проверка внешнего подключения и TURN ещё впереди; начните с одной локальной сети.'**
+  /// **'До двух участников в комнате. Для подключения через интернет владелец настраивает STUN/TURN; приложение получает настройки автоматически.'**
   String get voiceLimit;
 
   /// No description provided for @voiceDesktopOnly.

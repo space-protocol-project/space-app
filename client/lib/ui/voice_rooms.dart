@@ -36,7 +36,7 @@ class VoiceRoomsView extends StatelessWidget {
     if (Platform.isAndroid || Platform.isIOS) {
       return [Text(context.strings.voiceDesktopOnly)];
     }
-    if (connected.server.voiceRoomsVersion != 1) {
+    if (connected.server.voiceRoomsVersion != 2) {
       return [Text(context.strings.voiceUpdateRuntime)];
     }
     return [

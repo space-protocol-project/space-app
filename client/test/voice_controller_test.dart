@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/generated/space/v1/voice.pb.dart';
 import 'package:space_client/src/voice_controller.dart';
 import 'package:space_client/src/voice_media.dart';
+import 'package:space_client/src/voice_network.dart';
 import 'package:space_client/src/voice_signaling.dart';
 
 class FakeVoiceMedia implements VoiceMedia {
@@ -18,7 +19,9 @@ class FakeVoiceMedia implements VoiceMedia {
   @override
   Stream<VoiceMediaStatus> get changes => stream.stream;
   @override
-  Future<String> offer() async {
+  Future<String> offer([
+    VoiceNetworkSettings settings = const VoiceNetworkSettings.local(),
+  ]) async {
     log.add('offer');
     return 'audio offer';
   }
@@ -59,9 +62,18 @@ class FakeVoiceApi implements VoiceSignaling {
   final List<String> log;
   final StreamController<void> closing;
   Completer<JoinVoiceRoomResponse>? pending;
-  bool failed = false, canPublish = true;
+  bool failed = false, canPublish = true, configurationDenied = false;
   @override
   Stream<void> get disconnected => closing.stream;
+  @override
+  Future<VoiceNetworkSettings> configure(String room) async {
+    log.add('configure');
+    if (configurationDenied) {
+      throw StateError('Доступ к комнате отозван');
+    }
+    return const VoiceNetworkSettings.local();
+  }
+
   VoiceRoomState get roster => VoiceRoomState(
     capacity: 2,
     canPublish: canPublish,
@@ -112,6 +124,19 @@ Future<void> waitFor(bool Function() condition) async {
 }
 
 void main() {
+  test('Отказ конфигурации не запускает ICE или захват микрофона', () async {
+    final log = <String>[];
+    final media = FakeVoiceMedia(log),
+        api = FakeVoiceApi(log)..configurationDenied = true;
+    final controller = VoiceController(mediaFactory: () => media);
+    addTearDown(controller.close);
+    await controller.join(api, 'room', 'Комната');
+    expect(controller.state.phase, VoicePhase.failed);
+    expect(log, contains('configure'));
+    expect(log, isNot(contains('offer')));
+    expect(log, isNot(contains('microphone:true')));
+    expect(media.closed, true);
+  });
   test('Отзыв права говорить останавливает локальный микрофон', () async {
     final log = <String>[];
     final media = FakeVoiceMedia(log), api = FakeVoiceApi(log);

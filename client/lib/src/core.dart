@@ -350,7 +350,7 @@ Future<Discovery> _discoveryFromBytes(
     identityOrigin,
     id,
     key,
-    voiceRoomsVersion: data['voice_rooms_version'] == '1' ? 1 : 0,
+    voiceRoomsVersion: data['voice_rooms_version'] == '2' ? 2 : 0,
     dialHost: dialAddress ?? networkOrigin.host,
     tlsFingerprint: fingerprint,
     connectOrigin: discoveryConnectOrigin(data, networkOrigin),

@@ -742,7 +742,7 @@
   "voiceDeafened": "Sound off",
   "voiceEmpty": "No voice rooms yet. An owner or administrator can create one.",
   "voiceConnectFirst": "Connect to a space to open voice rooms.",
-  "voiceLimit": "Initial rooms support two participants. External connectivity and TURN are not yet verified; start on the same local network.",
+  "voiceLimit": "Up to two participants per room. For internet connections, the owner configures STUN/TURN; the app receives the settings automatically.",
   "voiceDesktopOnly": "Voice rooms are currently available on desktop.",
   "voicePrivacy": "No recording or camera. Audio passes through your space server; it is not participant-to-participant MLS encryption.",
   "voiceFailure": "Could not continue the conversation",

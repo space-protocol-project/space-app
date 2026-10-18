@@ -1855,7 +1855,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get voiceConnectFirst => '请先连接空间以打开语音房间。';
 
   @override
-  String get voiceLimit => '首个版本支持两人。外网连接和 TURN 尚未验证，请先在同一局域网中使用。';
+  String get voiceLimit => '每个房间最多两位参与者。通过互联网连接时，由所有者配置 STUN/TURN，应用会自动获取设置。';
 
   @override
   String get voiceDesktopOnly => '语音房间目前仅支持桌面端。';
@@ -2567,7 +2567,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get voiceConnectFirst => '请先连接空间以打开语音房间。';
 
   @override
-  String get voiceLimit => '首个版本支持两人。外网连接和 TURN 尚未验证，请先在同一局域网中使用。';
+  String get voiceLimit => '每个房间最多两位参与者。通过互联网连接时，由所有者配置 STUN/TURN，应用会自动获取设置。';
 
   @override
   String get voiceDesktopOnly => '语音房间目前仅支持桌面端。';

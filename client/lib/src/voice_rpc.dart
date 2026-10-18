@@ -1,6 +1,17 @@
 part of 'core.dart';
 
 extension VoiceSession on SpaceSession {
+  Future<voice.GetVoiceConfigurationResponse> voiceConfiguration(
+    String room,
+  ) async {
+    await _ensureSession();
+    return channel.unary(
+      voice_specs.VoiceService.getVoiceConfiguration,
+      voice.GetVoiceConfigurationRequest(channelId: room),
+      options: _options,
+    );
+  }
+
   List<Channel> get voiceRooms => availableChannels
       .where((c) => !c.archived && c.views.any((v) => v.type == 'voice_room'))
       .toList(growable: false);

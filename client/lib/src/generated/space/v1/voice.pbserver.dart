@@ -21,6 +21,8 @@ import 'voice.pbjson.dart';
 export 'voice.pb.dart';
 
 abstract class VoiceServiceBase extends $pb.GeneratedService {
+  $async.Future<$0.GetVoiceConfigurationResponse> getVoiceConfiguration(
+      $pb.ServerContext ctx, $0.GetVoiceConfigurationRequest request);
   $async.Future<$0.JoinVoiceRoomResponse> joinVoiceRoom(
       $pb.ServerContext ctx, $0.JoinVoiceRoomRequest request);
   $async.Future<$0.UpdateVoiceRoomResponse> updateVoiceRoom(
@@ -32,6 +34,8 @@ abstract class VoiceServiceBase extends $pb.GeneratedService {
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
+      case 'GetVoiceConfiguration':
+        return $0.GetVoiceConfigurationRequest();
       case 'JoinVoiceRoom':
         return $0.JoinVoiceRoomRequest();
       case 'UpdateVoiceRoom':
@@ -48,6 +52,9 @@ abstract class VoiceServiceBase extends $pb.GeneratedService {
   $async.Future<$pb.GeneratedMessage> handleCall($pb.ServerContext ctx,
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
+      case 'GetVoiceConfiguration':
+        return getVoiceConfiguration(
+            ctx, request as $0.GetVoiceConfigurationRequest);
       case 'JoinVoiceRoom':
         return joinVoiceRoom(ctx, request as $0.JoinVoiceRoomRequest);
       case 'UpdateVoiceRoom':

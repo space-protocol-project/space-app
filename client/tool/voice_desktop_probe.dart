@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/voice_controller.dart';
 import 'package:space_client/src/voice_media.dart';
+import 'package:space_client/src/voice_network.dart';
 import 'package:space_client/src/voice_signaling.dart';
 
 import 'home_vault.dart';
@@ -16,9 +17,15 @@ class ProbeMedia extends NativeVoiceMedia {
   final Directory work;
   final String role;
   @override
-  Future<String> offer() async {
+  Future<String> offer([
+    VoiceNetworkSettings settings = const VoiceNetworkSettings.local(),
+  ]) async {
     await flag(work, '$role-media', 'offer');
-    final result = await super.offer();
+    final result = await super.offer(settings);
+    if (settings.relayOnly &&
+        (!result.contains(' typ relay') || result.contains(' typ host'))) {
+      throw StateError('Direct candidate in relay-only probe');
+    }
     await flag(work, '$role-media', 'offered');
     return result;
   }
@@ -86,7 +93,7 @@ Future<Map<String, int>> waitForAudio(NativeVoiceMedia media) async {
 Future<void> scenario(Directory work, String origin, String role) async {
   await flag(work, '$role-progress', 'connect');
   final server = await discover(origin);
-  if (server.voiceRoomsVersion != 1) {
+  if (server.voiceRoomsVersion != 2) {
     throw StateError('Нет поддержки голоса');
   }
   final session = await SpaceSession.connect(server, HomeVault());
@@ -127,10 +134,17 @@ Future<void> scenario(Directory work, String origin, String role) async {
     await barrier(work, role == 'A' ? 'B-joined' : 'A-joined');
     await waitUntil(() => controller.state.roster?.participants.length == 2);
     await flag(work, '$role-progress', 'microphone');
+    // Оба процесса используют один физический аудиодрайвер стенда.
+    // Разрешения открываем по очереди, затем передаём одновременно.
+    if (role == 'B') {
+      await barrier(work, 'A-microphone');
+    }
     await controller.toggleMicrophone();
     if (controller.state.muted) {
       throw StateError('Микрофон не включён: ${controller.state.error}');
     }
+    await flag(work, '$role-microphone', 'ready');
+    await barrier(work, role == 'A' ? 'B-microphone' : 'A-microphone');
     final counts = await waitForAudio(media);
     await flag(work, '$role-audio', jsonEncode(counts));
     await barrier(work, role == 'A' ? 'B-audio' : 'A-audio');

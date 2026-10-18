@@ -3,11 +3,15 @@ import 'dart:io';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
+import 'voice_network.dart';
+
 enum VoiceMediaStatus { connecting, connected, failed }
 
 abstract interface class VoiceMedia {
   Stream<VoiceMediaStatus> get changes;
-  Future<String> offer();
+  Future<String> offer([
+    VoiceNetworkSettings settings = const VoiceNetworkSettings.local(),
+  ]);
   Future<void> answer(String sdp);
   Future<void> microphone(bool enabled);
   Future<void> deafen(bool enabled);
@@ -27,15 +31,14 @@ class NativeVoiceMedia implements VoiceMedia {
   Stream<VoiceMediaStatus> get changes => _changes.stream;
 
   @override
-  Future<String> offer() async {
+  Future<String> offer([
+    VoiceNetworkSettings settings = const VoiceNetworkSettings.local(),
+  ]) async {
     if (!(Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
       throw UnsupportedError('Голосовой срез доступен на компьютере');
     }
     await WebRTC.initialize(options: {'logSeverity': 'error'});
-    final peer = await createPeerConnection({
-      'iceServers': <Map<String, dynamic>>[],
-      'sdpSemantics': 'unified-plan',
-    });
+    final peer = await createPeerConnection(settings.peerConfiguration);
     if (_closed) {
       await peer.close();
       await peer.dispose();
@@ -70,7 +73,7 @@ class NativeVoiceMedia implements VoiceMedia {
         !gathered.isCompleted) {
       gathered.complete();
     }
-    await gathered.future.timeout(const Duration(seconds: 8));
+    await gathered.future.timeout(const Duration(seconds: 15));
     if (_closed) {
       throw StateError('Вход отменён');
     }
@@ -128,7 +131,9 @@ class NativeVoiceMedia implements VoiceMedia {
     if (_closed || sdp.length > 16384) {
       throw StateError('Подключение закрыто');
     }
-    await _peer!.setRemoteDescription(RTCSessionDescription(sdp, 'answer'));
+    await _peer!
+        .setRemoteDescription(RTCSessionDescription(sdp, 'answer'))
+        .timeout(const Duration(seconds: 15));
   }
 
   @override
