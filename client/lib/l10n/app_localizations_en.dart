@@ -1837,4 +1837,50 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get homeArchiveCheckFailed =>
       'The archive could not be verified. It may be damaged or incompatible with the runtime. Restoration has not started.';
+
+  @override
+  String get homeDiskTitle => 'Disk and backups';
+
+  @override
+  String get homeDiskPolicy =>
+      'Cleanup keeps the current and previous runtime, the three newest verified backups and the current recovery backup. Other backups are offered only after 30 days. Files outside the home server are never removed.';
+
+  @override
+  String get homeDiskScan => 'Show sizes / refresh';
+
+  @override
+  String get homeDiskClean => 'Delete selected';
+
+  @override
+  String get homeDiskConfirm =>
+      'Selected folders will be permanently removed. Space data, protected backups and external ZIP archives will remain. Continue?';
+
+  @override
+  String get homeDiskFailed =>
+      'Inspection or cleanup could not finish. State may have changed; refresh the list. Links and pending recovery block cleanup.';
+
+  @override
+  String get homeDiskData => 'Space data';
+
+  @override
+  String get homeDiskRuntimes => 'Server versions';
+
+  @override
+  String get homeDiskBackups => 'Backups';
+
+  @override
+  String get homeDiskRecoveries => 'Recovery data';
+
+  @override
+  String get homeDiskFree => 'Free on server disk';
+
+  @override
+  String get homeDiskEstimate =>
+      'Sizes are estimates and may change while the server runs. Cleanup checks selected files again.';
+
+  @override
+  String get homeDiskNothing => 'No old folders can be safely removed.';
+
+  @override
+  String get homeDiskStop => 'Stop the server before cleanup.';
 }

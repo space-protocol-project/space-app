@@ -87,6 +87,18 @@ class HomeStorage {
   const HomeStorage({this.available = availableHomeBytes});
   final Future<int> Function(Directory) available;
   static const reserve = 256 * 1024 * 1024;
+  Future<HomeSpaceReport> requireBytes(Directory destination, int bytes) async {
+    if (bytes < 0) throw const FormatException('Некорректный размер операции');
+    final report = HomeSpaceReport(
+      bytes + reserve,
+      await available(destination),
+    );
+    if (report.availableBytes < report.requiredBytes) {
+      throw HomeSpaceFailure(report);
+    }
+    return report;
+  }
+
   Future<HomeSpaceReport> check(
     Directory root, {
     int additionalBytes = 0,

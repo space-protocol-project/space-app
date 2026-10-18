@@ -6,6 +6,7 @@
 - [Руководство приложения](docs/APPLICATION-GUIDE.md).
 - [Домашний сервер — «Выйти в эфир»](docs/HOME-SERVER.md).
 - [Перенос пространства на другой компьютер](docs/SPACE-TRANSFER.md).
+- [Диск, резервные копии и безопасная очистка](docs/HOME-DISK.md).
 - [Управление сервером](docs/ADMIN-GUIDE.md).
 - [Сервер и runtime](https://github.com/space-protocol-project/space-server).
 - [Протокол, архитектура и промосайт](https://github.com/space-protocol-project/space-protocol).

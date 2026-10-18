@@ -7,6 +7,7 @@ import 'home_installation.dart';
 import 'home_runtime.dart';
 import 'home_update_executor.dart';
 import 'home_archive_inspection.dart';
+import 'home_storage.dart';
 
 class HomeTransfer {
   HomeTransfer(
@@ -14,10 +15,12 @@ class HomeTransfer {
     this.runtime,
     this.release, {
     this.tool = runHomeTool,
+    this.storage = const HomeStorage(),
   });
   final Directory root, runtime;
   final HomeRelease release;
   final HomeTool tool;
+  final HomeStorage storage;
 
   Future<void> requireSupport() async {
     final capabilities = await tool(runtime, ['-runtime-info']);
@@ -30,6 +33,9 @@ class HomeTransfer {
 
   Future<void> exportTo(String destination) async {
     await requireSupport();
+    final bytes = await homeDirectoryBytes(Directory('${root.path}/data'));
+    await storage.requireBytes(root, bytes * 2);
+    await storage.requireBytes(File(destination).absolute.parent, bytes * 2);
     await tool(runtime, [
       '-home-export',
       destination,
@@ -67,6 +73,7 @@ class HomeTransfer {
     await inspection.requireCurrentSource(source);
     publicIP = publicIP.trim().toLowerCase();
     await _requireEmptyDestination();
+    await storage.requireBytes(root, inspection.unpackedBytes * 4);
     final imported = Directory('${root.path}/transferred');
     if (!await imported.exists()) {
       await requireSupport();

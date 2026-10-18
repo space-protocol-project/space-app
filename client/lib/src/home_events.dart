@@ -4,6 +4,15 @@ sealed class HomeEvent<T> extends RequestEvent<T> {}
 
 final class HomeLoaded extends HomeEvent<void> {}
 
+final class HomeDiskRequested extends HomeEvent<HomeDiskReport?> {}
+
+final class HomeDiskCleaned extends HomeEvent<bool> {
+  HomeDiskCleaned(this.report, Set<String> selected)
+    : selected = Set.unmodifiable(selected);
+  final HomeDiskReport report;
+  final Set<String> selected;
+}
+
 final class HomeIPDetected extends HomeEvent<String> {}
 
 final class HomeDiagnosisRequested extends HomeEvent<void> {

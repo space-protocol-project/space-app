@@ -3333,6 +3333,90 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не удалось проверить архив. Он может быть повреждён или несовместим с runtime. Восстановление не начато.'**
   String get homeArchiveCheckFailed;
+
+  /// No description provided for @homeDiskTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Диск и резервные копии'**
+  String get homeDiskTitle;
+
+  /// No description provided for @homeDiskPolicy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Очистка сохраняет текущий и предыдущий runtime, три самые новые проверенные копии и копию текущего восстановления. Другие копии предлагаются только спустя 30 дней. Файлы вне домашнего сервера не удаляются.'**
+  String get homeDiskPolicy;
+
+  /// No description provided for @homeDiskScan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показать размеры / обновить'**
+  String get homeDiskScan;
+
+  /// No description provided for @homeDiskClean.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить выбранное'**
+  String get homeDiskClean;
+
+  /// No description provided for @homeDiskConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбранные каталоги будут удалены без возможности отмены. Данные пространства, защищённые копии и внешние ZIP-архивы сохранятся. Продолжить?'**
+  String get homeDiskConfirm;
+
+  /// No description provided for @homeDiskFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось завершить проверку или очистку. Состояние могло измениться; обновите список. При ссылках и незавершённом восстановлении очистка запрещена.'**
+  String get homeDiskFailed;
+
+  /// No description provided for @homeDiskData.
+  ///
+  /// In ru, this message translates to:
+  /// **'Данные пространства'**
+  String get homeDiskData;
+
+  /// No description provided for @homeDiskRuntimes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Версии сервера'**
+  String get homeDiskRuntimes;
+
+  /// No description provided for @homeDiskBackups.
+  ///
+  /// In ru, this message translates to:
+  /// **'Резервные копии'**
+  String get homeDiskBackups;
+
+  /// No description provided for @homeDiskRecoveries.
+  ///
+  /// In ru, this message translates to:
+  /// **'Данные восстановления'**
+  String get homeDiskRecoveries;
+
+  /// No description provided for @homeDiskFree.
+  ///
+  /// In ru, this message translates to:
+  /// **'Свободно на диске сервера'**
+  String get homeDiskFree;
+
+  /// No description provided for @homeDiskEstimate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Размеры приблизительные и могут меняться во время работы сервера. Очистка повторно проверяет выбранные файлы.'**
+  String get homeDiskEstimate;
+
+  /// No description provided for @homeDiskNothing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет старых каталогов, которые можно безопасно удалить.'**
+  String get homeDiskNothing;
+
+  /// No description provided for @homeDiskStop.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для очистки сначала остановите сервер.'**
+  String get homeDiskStop;
 }
 
 class _AppLocalizationsDelegate

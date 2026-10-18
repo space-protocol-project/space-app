@@ -1688,6 +1688,49 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeArchiveCheckFailed => '无法验证备份。文件可能已损坏或与运行时不兼容。尚未开始恢复。';
+
+  @override
+  String get homeDiskTitle => '磁盘和备份';
+
+  @override
+  String get homeDiskPolicy =>
+      '清理会保留当前和上一版运行时、最新的三个已验证备份以及当前恢复备份。其他备份仅在30天后列为候选。不会删除家庭服务器之外的文件。';
+
+  @override
+  String get homeDiskScan => '查看大小 / 刷新';
+
+  @override
+  String get homeDiskClean => '删除所选';
+
+  @override
+  String get homeDiskConfirm => '所选文件夹将永久删除。空间数据、受保护的备份和外部ZIP存档会保留。是否继续？';
+
+  @override
+  String get homeDiskFailed => '无法完成检查或清理。状态可能已更改，请刷新列表。链接和未完成的恢复会阻止清理。';
+
+  @override
+  String get homeDiskData => '空间数据';
+
+  @override
+  String get homeDiskRuntimes => '服务器版本';
+
+  @override
+  String get homeDiskBackups => '备份';
+
+  @override
+  String get homeDiskRecoveries => '恢复数据';
+
+  @override
+  String get homeDiskFree => '服务器磁盘可用空间';
+
+  @override
+  String get homeDiskEstimate => '大小为估计值，服务器运行时可能变化。清理会再次检查所选文件。';
+
+  @override
+  String get homeDiskNothing => '没有可安全删除的旧文件夹。';
+
+  @override
+  String get homeDiskStop => '清理前请先停止服务器。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2214,4 +2257,47 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get homeArchiveCheckFailed => '无法验证备份。文件可能已损坏或与运行时不兼容。尚未开始恢复。';
+
+  @override
+  String get homeDiskTitle => '磁盘和备份';
+
+  @override
+  String get homeDiskPolicy =>
+      '清理会保留当前和上一版运行时、最新的三个已验证备份以及当前恢复备份。其他备份仅在30天后列为候选。不会删除家庭服务器之外的文件。';
+
+  @override
+  String get homeDiskScan => '查看大小 / 刷新';
+
+  @override
+  String get homeDiskClean => '删除所选';
+
+  @override
+  String get homeDiskConfirm => '所选文件夹将永久删除。空间数据、受保护的备份和外部ZIP存档会保留。是否继续？';
+
+  @override
+  String get homeDiskFailed => '无法完成检查或清理。状态可能已更改，请刷新列表。链接和未完成的恢复会阻止清理。';
+
+  @override
+  String get homeDiskData => '空间数据';
+
+  @override
+  String get homeDiskRuntimes => '服务器版本';
+
+  @override
+  String get homeDiskBackups => '备份';
+
+  @override
+  String get homeDiskRecoveries => '恢复数据';
+
+  @override
+  String get homeDiskFree => '服务器磁盘可用空间';
+
+  @override
+  String get homeDiskEstimate => '大小为估计值，服务器运行时可能变化。清理会再次检查所选文件。';
+
+  @override
+  String get homeDiskNothing => '没有可安全删除的旧文件夹。';
+
+  @override
+  String get homeDiskStop => '清理前请先停止服务器。';
 }

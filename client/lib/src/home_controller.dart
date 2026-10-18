@@ -20,12 +20,15 @@ import 'home_backup.dart';
 import 'home_installation.dart';
 import 'home_runtime.dart';
 import 'home_storage.dart';
+import 'home_disk.dart';
+export 'home_disk.dart';
 import 'home_update_executor.dart';
 import 'home_update_journal.dart';
 import 'local_failure.dart';
 
 part 'home_events.dart';
 part 'home_state.dart';
+part 'home_disk_actions.dart';
 
 enum HomePhase {
   idle,
@@ -77,6 +80,10 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
       (event, emit) => event.runAndComplete(() => emit(event.state)),
     );
     on<HomeLoaded>((event, _) => handleRequest(event, _load));
+    on<HomeDiskRequested>((event, _) => handleRequest(event, _scanDisk));
+    on<HomeDiskCleaned>(
+      (event, _) => handleRequest(event, () => _cleanDisk(event)),
+    );
     on<HomeNetworkSaved>(
       (event, _) => handleRequest(event, () => _saveNetwork(event)),
     );
@@ -120,6 +127,9 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     );
   }
   final bool hostingEnabled;
+  Future<HomeDiskReport?> inspectDisk() => sendRequest(HomeDiskRequested());
+  Future<bool> cleanDisk(HomeDiskReport report, Set<String> selected) =>
+      sendRequest(HomeDiskCleaned(report, selected));
   bool get supported => hostingEnabled && canHostSpace;
   Future<bool> exportData(String path) =>
       sendRequest(HomeExportRequested(path));
@@ -396,7 +406,13 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
       await HomeUpdateJournal(root).requireSettled();
       final offered = await release();
       final runtime = await _prepare(root, offered);
-      final transfer = HomeTransfer(root, runtime, offered, tool: transferTool);
+      final transfer = HomeTransfer(
+        root,
+        runtime,
+        offered,
+        tool: transferTool,
+        storage: storage,
+      );
       phase = HomePhase.transferring;
       _update();
       if (importing) {
@@ -412,6 +428,11 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
       }
       return true;
     } catch (problem) {
+      if (problem is LocalFailure) failureCode = problem.code;
+      if (problem is HomeSpaceFailure) {
+        spaceReport = problem.report;
+        failureCode = problem.code;
+      }
       error = problem.toString().replaceFirst('FormatException: ', '');
       return false;
     } finally {

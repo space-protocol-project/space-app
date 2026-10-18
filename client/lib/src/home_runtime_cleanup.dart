@@ -6,6 +6,7 @@ import 'package:path/path.dart' as path;
 import 'home_installation.dart';
 import 'home_runtime.dart';
 import 'home_update_journal.dart';
+import 'home_disk_tree.dart';
 
 /// Вызывается под process.lock. Ошибка очистки не отменяет обновление.
 class HomeRuntimeCleanup {
@@ -18,7 +19,7 @@ class HomeRuntimeCleanup {
       final candidates = await obsolete();
       for (final folder in candidates) {
         try {
-          await folder.delete(recursive: true);
+          await deleteHomeDiskTree(folder);
           removed.add(path.basename(folder.path));
         } on FileSystemException {
           // Занятые или недоступные файлы остаются до следующей очистки.

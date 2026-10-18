@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/home_installation.dart';
 import 'package:space_client/src/home_transfer.dart';
 import 'package:space_client/src/home_archive_inspection.dart';
+import 'package:space_client/src/home_storage.dart';
 
 import 'home_installation_test.dart' show installed, release;
 
@@ -21,6 +22,7 @@ void main() {
   var changeDuringImport = false;
   var changeDuringInspection = false;
   var invalidReport = false;
+  var freeBytes = 1 << 40;
   setUp(() async {
     root = await Directory.systemTemp.createTemp('space-transfer-test-');
     final version = release('v0.2.4');
@@ -33,10 +35,12 @@ void main() {
     changeDuringImport = false;
     changeDuringInspection = false;
     invalidReport = false;
+    freeBytes = 1 << 40;
     transfer = HomeTransfer(
       root,
       runtime,
       version,
+      storage: HomeStorage(available: (_) async => freeBytes),
       tool: (runtime, args) async {
         calls.add(args.first);
         if (args.first == '-runtime-info') {
@@ -76,6 +80,44 @@ void main() {
   tearDown(
     () async => deleteTestDirectory(root, prefix: 'space-transfer-test-'),
   );
+
+  test(
+    'Нехватка места отменяет импорт до запуска PostgreSQL и публикации',
+    () async {
+      final report = await transfer.inspect(archive.path);
+      freeBytes = 0;
+      await expectLater(
+        transfer.importFrom(archive.path, inspection: report),
+        throwsA(isA<HomeSpaceFailure>()),
+      );
+      expect(calls, isNot(contains('-home-import')));
+      expect(await File('${root.path}/home-location.json').exists(), false);
+    },
+  );
+
+  test('Экспорт не запускается без места на диске назначения', () async {
+    final destination = await Directory('${root.path}/external').create();
+    final checked = <String>[];
+    final exporter = HomeTransfer(
+      root,
+      runtime,
+      transfer.release,
+      tool: transfer.tool,
+      storage: HomeStorage(
+        available: (folder) async {
+          checked.add(folder.path);
+          return folder.path == root.path ? 1 << 40 : 0;
+        },
+      ),
+    );
+    await expectLater(
+      exporter.exportTo('${destination.path}/copy.zip'),
+      throwsA(isA<HomeSpaceFailure>()),
+    );
+    expect(checked, [root.path, destination.absolute.path]);
+    expect(calls, isNot(contains('-home-export')));
+    expect(await File('${destination.path}/copy.zip').exists(), false);
+  });
 
   test(
     'Импорт проверяет данные до переключения каталога и переносит runtime',

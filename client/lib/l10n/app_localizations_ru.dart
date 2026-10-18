@@ -1847,4 +1847,51 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get homeArchiveCheckFailed =>
       'Не удалось проверить архив. Он может быть повреждён или несовместим с runtime. Восстановление не начато.';
+
+  @override
+  String get homeDiskTitle => 'Диск и резервные копии';
+
+  @override
+  String get homeDiskPolicy =>
+      'Очистка сохраняет текущий и предыдущий runtime, три самые новые проверенные копии и копию текущего восстановления. Другие копии предлагаются только спустя 30 дней. Файлы вне домашнего сервера не удаляются.';
+
+  @override
+  String get homeDiskScan => 'Показать размеры / обновить';
+
+  @override
+  String get homeDiskClean => 'Удалить выбранное';
+
+  @override
+  String get homeDiskConfirm =>
+      'Выбранные каталоги будут удалены без возможности отмены. Данные пространства, защищённые копии и внешние ZIP-архивы сохранятся. Продолжить?';
+
+  @override
+  String get homeDiskFailed =>
+      'Не удалось завершить проверку или очистку. Состояние могло измениться; обновите список. При ссылках и незавершённом восстановлении очистка запрещена.';
+
+  @override
+  String get homeDiskData => 'Данные пространства';
+
+  @override
+  String get homeDiskRuntimes => 'Версии сервера';
+
+  @override
+  String get homeDiskBackups => 'Резервные копии';
+
+  @override
+  String get homeDiskRecoveries => 'Данные восстановления';
+
+  @override
+  String get homeDiskFree => 'Свободно на диске сервера';
+
+  @override
+  String get homeDiskEstimate =>
+      'Размеры приблизительные и могут меняться во время работы сервера. Очистка повторно проверяет выбранные файлы.';
+
+  @override
+  String get homeDiskNothing =>
+      'Нет старых каталогов, которые можно безопасно удалить.';
+
+  @override
+  String get homeDiskStop => 'Для очистки сначала остановите сервер.';
 }

@@ -687,6 +687,19 @@
         "type": "String"
       }
     }
-  }
-
+  },
+  "homeDiskTitle": "Disk and backups",
+  "homeDiskPolicy": "Cleanup keeps the current and previous runtime, the three newest verified backups and the current recovery backup. Other backups are offered only after 30 days. Files outside the home server are never removed.",
+  "homeDiskScan": "Show sizes / refresh",
+  "homeDiskClean": "Delete selected",
+  "homeDiskConfirm": "Selected folders will be permanently removed. Space data, protected backups and external ZIP archives will remain. Continue?",
+  "homeDiskFailed": "Inspection or cleanup could not finish. State may have changed; refresh the list. Links and pending recovery block cleanup.",
+  "homeDiskData": "Space data",
+  "homeDiskRuntimes": "Server versions",
+  "homeDiskBackups": "Backups",
+  "homeDiskRecoveries": "Recovery data",
+  "homeDiskFree": "Free on server disk",
+  "homeDiskEstimate": "Sizes are estimates and may change while the server runs. Cleanup checks selected files again.",
+  "homeDiskNothing": "No old folders can be safely removed.",
+  "homeDiskStop": "Stop the server before cleanup."
 }
