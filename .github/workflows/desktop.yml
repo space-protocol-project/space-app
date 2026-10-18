@@ -217,7 +217,7 @@ jobs:
         with:
           repository: space-protocol-project/space-server
           # Совместимая версия runtime v0.7.0, схема 23.
-          ref: 6942a97f7a30d5d952d9a52cd523204e68262743
+          ref: 8a2d60a1833b6110a5d072f9a70a174df0535fb9
           path: space-server
       - uses: actions/setup-go@v5
         with:
