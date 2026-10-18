@@ -48,6 +48,12 @@ class _LocalSession implements SpaceSession {
   _LocalSession(this.client);
   final MlsClient client;
   @override
+  Discovery get server => Discovery(
+    localOrigin('http://127.0.0.1:18080'),
+    'search-test',
+    const [],
+  );
+  @override
   bool get mlsSupported => true;
   @override
   Future<MlsClient> mlsClient() async => client;
