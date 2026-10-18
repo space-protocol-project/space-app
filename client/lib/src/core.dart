@@ -32,11 +32,14 @@ import 'root_adoption.dart';
 import 'root_device_proof.dart';
 import 'origin_binding.dart';
 import 'rpc_connection.dart';
+import 'generated/space/v1/voice.pb.dart' as voice;
+import 'generated/space/v1/voice.connect.spec.dart' as voice_specs;
 import 'rpc_http.dart' show pinnedRpcClient;
 import 'root_rotation.dart' as rotation;
 
 part 'queued_mutation_rpc.dart';
 part 'push_registration.dart';
+part 'voice_rpc.dart';
 
 String url64(List<int> value) => base64Url.encode(value).replaceAll('=', '');
 
@@ -47,6 +50,7 @@ class Discovery {
     this.publicKey, {
     this.dialHost,
     this.tlsFingerprint = '',
+    this.voiceRoomsVersion = 0,
     this.announcement,
     Uri? connectOrigin,
     Uri? endpoint,
@@ -58,6 +62,7 @@ class Discovery {
   final List<int> publicKey;
   final String? dialHost;
   final String tlsFingerprint;
+  final int voiceRoomsVersion;
   RpcConnection openConnection({String setupCode = ''}) =>
       RpcConnection.connect(
         connectOrigin,
@@ -345,6 +350,7 @@ Future<Discovery> _discoveryFromBytes(
     identityOrigin,
     id,
     key,
+    voiceRoomsVersion: data['voice_rooms_version'] == '1' ? 1 : 0,
     dialHost: dialAddress ?? networkOrigin.host,
     tlsFingerprint: fingerprint,
     connectOrigin: discoveryConnectOrigin(data, networkOrigin),
@@ -675,6 +681,8 @@ class SpaceSession
         ChannelNavigation,
         ChannelUpdates,
         SpaceAdministration {
+  final _closing = StreamController<void>.broadcast();
+  Stream<void> get closing => _closing.stream;
   SpaceSession._(this.server, this.record, this.vault, this.channel);
   Future<MlsClient>? _mlsClient;
   String _mlsGrant = '';
@@ -856,7 +864,7 @@ class SpaceSession
           !seen.add(c.id) ||
           c.title.isEmpty ||
           c.latestMessageSequence.isNegative ||
-          !c.views.any((v) => v.type == 'chat') ||
+          !c.views.any((v) => ['chat', 'voice_room'].contains(v.type)) ||
           !c.hasPermissions()) {
         throw const LocalFailure(
           LocalFailureCode.protocolInvalid,
@@ -871,12 +879,15 @@ class SpaceSession
       chatTitle = current?.title ?? 'Канал недоступен';
       return;
     }
+    final textChannels = availableChannels
+        .where((c) => c.views.any((v) => v.type == 'chat'))
+        .toList();
     final initial =
-        availableChannels
+        textChannels
             .where((c) => c.permissions.read && !c.archived)
             .firstOrNull ??
-        availableChannels.where((c) => c.permissions.read).firstOrNull ??
-        availableChannels.firstOrNull;
+        textChannels.where((c) => c.permissions.read).firstOrNull ??
+        textChannels.firstOrNull;
     if (initial != null) {
       selectChannel(initial.id);
     } else {
@@ -1939,6 +1950,10 @@ class SpaceSession
 
   @override
   Future<void> close() async {
+    if (!_closing.isClosed) {
+      _closing.add(null);
+      unawaited(_closing.close());
+    }
     try {
       await channel.terminate().timeout(const Duration(seconds: 5));
     } catch (_) {

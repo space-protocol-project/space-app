@@ -74,6 +74,9 @@ jobs:
       - name: Markdown и раскладка обычного и MLS-чата
         working-directory: client
         run: flutter test test/composer_markdown_test.dart test/mls_view_test.dart
+      - name: Голосовые комнаты и завершение захвата микрофона
+        working-directory: client
+        run: flutter test test/voice_controller_test.dart test/voice_widgets_test.dart test/channels_test.dart
       - name: Атомарная запись защищённого состояния Windows
         if: matrix.target == 'windows'
         shell: pwsh

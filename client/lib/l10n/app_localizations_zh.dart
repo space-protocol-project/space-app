@@ -1799,6 +1799,81 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeBackupWaiting => '等待运行时运行并到达备份时间';
+
+  @override
+  String get voiceTitle => '语音房间';
+
+  @override
+  String get voiceDescription => '无摄像头的语音交流。只有您主动操作时才会启用麦克风。';
+
+  @override
+  String get voiceCreate => '创建房间';
+
+  @override
+  String get voiceName => '房间名称';
+
+  @override
+  String get voiceJoin => '加入';
+
+  @override
+  String get voiceLeave => '退出语音';
+
+  @override
+  String get voiceMicrophoneOn => '开启麦克风';
+
+  @override
+  String get voiceMicrophoneOff => '关闭麦克风';
+
+  @override
+  String get voiceSoundOn => '开启声音';
+
+  @override
+  String get voiceSoundOff => '关闭声音';
+
+  @override
+  String get voiceJoining => '连接中…';
+
+  @override
+  String get voiceConnected => '通话中';
+
+  @override
+  String get voiceParticipants => '参与者';
+
+  @override
+  String get voiceMuted => '麦克风已关闭';
+
+  @override
+  String get voiceSpeaking => '麦克风已开启';
+
+  @override
+  String get voiceDeafened => '声音已关闭';
+
+  @override
+  String get voiceEmpty => '还没有语音房间。所有者或管理员可以创建第一个房间。';
+
+  @override
+  String get voiceConnectFirst => '请先连接空间以打开语音房间。';
+
+  @override
+  String get voiceLimit => '首个版本支持两人。外网连接和 TURN 尚未验证，请先在同一局域网中使用。';
+
+  @override
+  String get voiceDesktopOnly => '语音房间目前仅支持桌面端。';
+
+  @override
+  String get voicePrivacy => '不录音、不使用摄像头。音频经过空间服务器，并非参与者之间的 MLS 加密。';
+
+  @override
+  String get voiceFailure => '无法继续通话';
+
+  @override
+  String get voiceCancel => '取消';
+
+  @override
+  String get voiceSave => '创建';
+
+  @override
+  String get voiceUpdateRuntime => '语音房间需要支持语音的新运行时。请在“广播”中更新服务器。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2436,4 +2511,79 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get homeBackupWaiting => '等待运行时运行并到达备份时间';
+
+  @override
+  String get voiceTitle => '语音房间';
+
+  @override
+  String get voiceDescription => '无摄像头的语音交流。只有您主动操作时才会启用麦克风。';
+
+  @override
+  String get voiceCreate => '创建房间';
+
+  @override
+  String get voiceName => '房间名称';
+
+  @override
+  String get voiceJoin => '加入';
+
+  @override
+  String get voiceLeave => '退出语音';
+
+  @override
+  String get voiceMicrophoneOn => '开启麦克风';
+
+  @override
+  String get voiceMicrophoneOff => '关闭麦克风';
+
+  @override
+  String get voiceSoundOn => '开启声音';
+
+  @override
+  String get voiceSoundOff => '关闭声音';
+
+  @override
+  String get voiceJoining => '连接中…';
+
+  @override
+  String get voiceConnected => '通话中';
+
+  @override
+  String get voiceParticipants => '参与者';
+
+  @override
+  String get voiceMuted => '麦克风已关闭';
+
+  @override
+  String get voiceSpeaking => '麦克风已开启';
+
+  @override
+  String get voiceDeafened => '声音已关闭';
+
+  @override
+  String get voiceEmpty => '还没有语音房间。所有者或管理员可以创建第一个房间。';
+
+  @override
+  String get voiceConnectFirst => '请先连接空间以打开语音房间。';
+
+  @override
+  String get voiceLimit => '首个版本支持两人。外网连接和 TURN 尚未验证，请先在同一局域网中使用。';
+
+  @override
+  String get voiceDesktopOnly => '语音房间目前仅支持桌面端。';
+
+  @override
+  String get voicePrivacy => '不录音、不使用摄像头。音频经过空间服务器，并非参与者之间的 MLS 加密。';
+
+  @override
+  String get voiceFailure => '无法继续通话';
+
+  @override
+  String get voiceCancel => '取消';
+
+  @override
+  String get voiceSave => '创建';
+
+  @override
+  String get voiceUpdateRuntime => '语音房间需要支持语音的新运行时。请在“广播”中更新服务器。';
 }

@@ -1967,4 +1967,85 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get homeBackupWaiting =>
       'Ожидание работающего runtime и срока копирования';
+
+  @override
+  String get voiceTitle => 'Голосовые комнаты';
+
+  @override
+  String get voiceDescription =>
+      'Разговор без камеры. Микрофон включается только по вашему нажатию.';
+
+  @override
+  String get voiceCreate => 'Создать комнату';
+
+  @override
+  String get voiceName => 'Название комнаты';
+
+  @override
+  String get voiceJoin => 'Войти';
+
+  @override
+  String get voiceLeave => 'Выйти из разговора';
+
+  @override
+  String get voiceMicrophoneOn => 'Включить микрофон';
+
+  @override
+  String get voiceMicrophoneOff => 'Выключить микрофон';
+
+  @override
+  String get voiceSoundOn => 'Включить звук';
+
+  @override
+  String get voiceSoundOff => 'Отключить звук';
+
+  @override
+  String get voiceJoining => 'Подключаемся…';
+
+  @override
+  String get voiceConnected => 'В разговоре';
+
+  @override
+  String get voiceParticipants => 'Участники';
+
+  @override
+  String get voiceMuted => 'Микрофон выключен';
+
+  @override
+  String get voiceSpeaking => 'Микрофон включён';
+
+  @override
+  String get voiceDeafened => 'Звук выключен';
+
+  @override
+  String get voiceEmpty =>
+      'Голосовых комнат пока нет. Владелец или администратор может создать первую.';
+
+  @override
+  String get voiceConnectFirst =>
+      'Подключитесь к пространству, чтобы открыть голосовые комнаты.';
+
+  @override
+  String get voiceLimit =>
+      'Первые комнаты рассчитаны на двух участников. Проверка внешнего подключения и TURN ещё впереди; начните с одной локальной сети.';
+
+  @override
+  String get voiceDesktopOnly => 'Голосовой срез пока доступен на компьютере.';
+
+  @override
+  String get voicePrivacy =>
+      'Без записи и камеры. Звук проходит через сервер пространства; это не MLS-шифрование между участниками.';
+
+  @override
+  String get voiceFailure => 'Не удалось продолжить разговор';
+
+  @override
+  String get voiceCancel => 'Отмена';
+
+  @override
+  String get voiceSave => 'Создать';
+
+  @override
+  String get voiceUpdateRuntime =>
+      'Для голосовых комнат нужен новый runtime с поддержкой голоса. Обновите сервер в «Эфире».';
 }

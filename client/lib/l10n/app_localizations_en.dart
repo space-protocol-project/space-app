@@ -1956,4 +1956,85 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get homeBackupWaiting =>
       'Waiting for a running runtime and the scheduled time';
+
+  @override
+  String get voiceTitle => 'Voice rooms';
+
+  @override
+  String get voiceDescription =>
+      'Audio conversations. Your microphone turns on only when you choose.';
+
+  @override
+  String get voiceCreate => 'Create room';
+
+  @override
+  String get voiceName => 'Room name';
+
+  @override
+  String get voiceJoin => 'Join';
+
+  @override
+  String get voiceLeave => 'Leave conversation';
+
+  @override
+  String get voiceMicrophoneOn => 'Turn microphone on';
+
+  @override
+  String get voiceMicrophoneOff => 'Turn microphone off';
+
+  @override
+  String get voiceSoundOn => 'Turn sound on';
+
+  @override
+  String get voiceSoundOff => 'Turn sound off';
+
+  @override
+  String get voiceJoining => 'Connecting…';
+
+  @override
+  String get voiceConnected => 'Connected';
+
+  @override
+  String get voiceParticipants => 'Participants';
+
+  @override
+  String get voiceMuted => 'Microphone off';
+
+  @override
+  String get voiceSpeaking => 'Microphone on';
+
+  @override
+  String get voiceDeafened => 'Sound off';
+
+  @override
+  String get voiceEmpty =>
+      'No voice rooms yet. An owner or administrator can create one.';
+
+  @override
+  String get voiceConnectFirst => 'Connect to a space to open voice rooms.';
+
+  @override
+  String get voiceLimit =>
+      'Initial rooms support two participants. External connectivity and TURN are not yet verified; start on the same local network.';
+
+  @override
+  String get voiceDesktopOnly =>
+      'Voice rooms are currently available on desktop.';
+
+  @override
+  String get voicePrivacy =>
+      'No recording or camera. Audio passes through your space server; it is not participant-to-participant MLS encryption.';
+
+  @override
+  String get voiceFailure => 'Could not continue the conversation';
+
+  @override
+  String get voiceCancel => 'Cancel';
+
+  @override
+  String get voiceSave => 'Create';
+
+  @override
+  String get voiceUpdateRuntime =>
+      'Voice rooms require a runtime with voice support. Update your server in Broadcast.';
 }

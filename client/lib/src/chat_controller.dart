@@ -537,7 +537,9 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       _session is ChannelNavigation ? _session as ChannelNavigation : null;
   List<Channel> get channels => accessRemoved
       ? []
-      : navigation?.availableChannels ?? _history?.channels ?? [];
+      : (navigation?.availableChannels ?? _history?.channels ?? [])
+            .where((c) => c.views.any((v) => v.type == 'chat'))
+            .toList(growable: false);
   String get channelId =>
       navigation?.selectedChannelId ?? _history?.selected ?? 'general';
   bool get canRead =>

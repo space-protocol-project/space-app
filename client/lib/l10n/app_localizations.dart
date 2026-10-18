@@ -3549,6 +3549,156 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Ожидание работающего runtime и срока копирования'**
   String get homeBackupWaiting;
+
+  /// No description provided for @voiceTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Голосовые комнаты'**
+  String get voiceTitle;
+
+  /// No description provided for @voiceDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разговор без камеры. Микрофон включается только по вашему нажатию.'**
+  String get voiceDescription;
+
+  /// No description provided for @voiceCreate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать комнату'**
+  String get voiceCreate;
+
+  /// No description provided for @voiceName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название комнаты'**
+  String get voiceName;
+
+  /// No description provided for @voiceJoin.
+  ///
+  /// In ru, this message translates to:
+  /// **'Войти'**
+  String get voiceJoin;
+
+  /// No description provided for @voiceLeave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти из разговора'**
+  String get voiceLeave;
+
+  /// No description provided for @voiceMicrophoneOn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включить микрофон'**
+  String get voiceMicrophoneOn;
+
+  /// No description provided for @voiceMicrophoneOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выключить микрофон'**
+  String get voiceMicrophoneOff;
+
+  /// No description provided for @voiceSoundOn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включить звук'**
+  String get voiceSoundOn;
+
+  /// No description provided for @voiceSoundOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отключить звук'**
+  String get voiceSoundOff;
+
+  /// No description provided for @voiceJoining.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключаемся…'**
+  String get voiceJoining;
+
+  /// No description provided for @voiceConnected.
+  ///
+  /// In ru, this message translates to:
+  /// **'В разговоре'**
+  String get voiceConnected;
+
+  /// No description provided for @voiceParticipants.
+  ///
+  /// In ru, this message translates to:
+  /// **'Участники'**
+  String get voiceParticipants;
+
+  /// No description provided for @voiceMuted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Микрофон выключен'**
+  String get voiceMuted;
+
+  /// No description provided for @voiceSpeaking.
+  ///
+  /// In ru, this message translates to:
+  /// **'Микрофон включён'**
+  String get voiceSpeaking;
+
+  /// No description provided for @voiceDeafened.
+  ///
+  /// In ru, this message translates to:
+  /// **'Звук выключен'**
+  String get voiceDeafened;
+
+  /// No description provided for @voiceEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Голосовых комнат пока нет. Владелец или администратор может создать первую.'**
+  String get voiceEmpty;
+
+  /// No description provided for @voiceConnectFirst.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключитесь к пространству, чтобы открыть голосовые комнаты.'**
+  String get voiceConnectFirst;
+
+  /// No description provided for @voiceLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Первые комнаты рассчитаны на двух участников. Проверка внешнего подключения и TURN ещё впереди; начните с одной локальной сети.'**
+  String get voiceLimit;
+
+  /// No description provided for @voiceDesktopOnly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Голосовой срез пока доступен на компьютере.'**
+  String get voiceDesktopOnly;
+
+  /// No description provided for @voicePrivacy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Без записи и камеры. Звук проходит через сервер пространства; это не MLS-шифрование между участниками.'**
+  String get voicePrivacy;
+
+  /// No description provided for @voiceFailure.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось продолжить разговор'**
+  String get voiceFailure;
+
+  /// No description provided for @voiceCancel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отмена'**
+  String get voiceCancel;
+
+  /// No description provided for @voiceSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать'**
+  String get voiceSave;
+
+  /// No description provided for @voiceUpdateRuntime.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для голосовых комнат нужен новый runtime с поддержкой голоса. Обновите сервер в «Эфире».'**
+  String get voiceUpdateRuntime;
 }
 
 class _AppLocalizationsDelegate

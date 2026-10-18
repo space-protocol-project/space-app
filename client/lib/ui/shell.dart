@@ -29,6 +29,8 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../src/chat_controller.dart';
+import '../src/voice_controller.dart';
+import 'voice_rooms.dart';
 import '../src/preferences.dart';
 import '../src/app_updates.dart';
 import '../src/secure_vault.dart';
@@ -106,6 +108,7 @@ class SpaceShell extends StatefulWidget {
 class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   late final systemNotifications =
       widget.notifications ?? SystemNotifications();
+  final voice = VoiceController();
   final notificationTracker = ChatNotificationTracker();
   StreamSubscription<String>? notificationTaps;
   Future<void> notificationJobs = Future.value();
@@ -813,6 +816,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    unawaited(voice.close());
     mlsNotificationTimer?.cancel();
     mlsNotificationWatcher.dispose();
     WidgetsBinding.instance.removeObserver(this);
@@ -1494,7 +1498,10 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             description: context.strings.feedDescription,
             icon: Icons.view_agenda_outlined,
           ),
-          Section.rooms => const RoomsPanel(),
+          Section.rooms => VoiceRoomsView(
+            session: controller.mlsSession,
+            controller: voice,
+          ),
           Section.identity => const SizedBox.shrink(),
           Section.settings => administrationPage(),
         },
@@ -1769,6 +1776,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
                     ],
                   ),
                 ),
+                VoiceCallBar(controller: voice),
               ],
             ),
           ),
