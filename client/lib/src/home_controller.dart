@@ -14,6 +14,8 @@ import 'package:path_provider/path_provider.dart';
 import 'event_controller.dart';
 import 'platform_capabilities.dart';
 import 'home_transfer.dart';
+import 'home_archive_inspection.dart';
+export 'home_archive_inspection.dart';
 import 'home_backup.dart';
 import 'home_installation.dart';
 import 'home_runtime.dart';
@@ -68,6 +70,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     this.download = downloadHomeRelease,
     this.storage = const HomeStorage(),
     this.diagnoseTool = runHomeDoctor,
+    this.transferTool = runHomeTool,
   }) : super(const HomeState()) {
     on<HomeProgressTicked>((event, _) => handleRequest(event, _update));
     on<HomeStatePublished>(
@@ -101,8 +104,16 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     on<HomeImportRequested>(
       (event, _) => handleRequest(
         event,
-        () => _transfer(event.path, importing: true, publicIP: event.publicIP),
+        () => _transfer(
+          event.path,
+          importing: true,
+          publicIP: event.publicIP,
+          inspection: event.inspection,
+        ),
       ),
+    );
+    on<HomeArchiveInspected>(
+      (event, _) => handleRequest(event, () => _inspectArchive(event.path)),
     );
     on<HomeErrorReported>(
       (event, _) => handleRequest(event, () => _reportError(event.message)),
@@ -112,8 +123,14 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
   bool get supported => hostingEnabled && canHostSpace;
   Future<bool> exportData(String path) =>
       sendRequest(HomeExportRequested(path));
-  Future<bool> importData(String path, {String publicIP = ''}) =>
-      sendRequest(HomeImportRequested(path, publicIP));
+  final HomeTool transferTool;
+  Future<HomeArchiveInspection?> inspectArchive(String path) =>
+      sendRequest(HomeArchiveInspected(path));
+  Future<bool> importData(
+    String path, {
+    String publicIP = '',
+    HomeArchiveInspection? inspection,
+  }) => sendRequest(HomeImportRequested(path, publicIP, inspection));
 
   Future<bool> configureNetwork(
     List<ServerEndpoint> endpoints, {
@@ -363,6 +380,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     String path, {
     bool importing = false,
     String publicIP = '',
+    HomeArchiveInspection? inspection,
   }) async {
     if (busy || running || _disposed || !supported) return false;
     busy = true;
@@ -378,11 +396,15 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
       await HomeUpdateJournal(root).requireSettled();
       final offered = await release();
       final runtime = await _prepare(root, offered);
-      final transfer = HomeTransfer(root, runtime, offered);
+      final transfer = HomeTransfer(root, runtime, offered, tool: transferTool);
       phase = HomePhase.transferring;
       _update();
       if (importing) {
-        _root = await transfer.importFrom(path, publicIP: publicIP);
+        _root = await transfer.importFrom(
+          path,
+          publicIP: publicIP,
+          inspection: inspection,
+        );
         installedVersion = offered.version;
         await _load();
       } else {
@@ -392,6 +414,36 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     } catch (problem) {
       error = problem.toString().replaceFirst('FormatException: ', '');
       return false;
+    } finally {
+      await _unlock();
+      busy = false;
+      phase = HomePhase.stopped;
+      _endProgress();
+      _update();
+    }
+  }
+
+  Future<HomeArchiveInspection?> _inspectArchive(String path) async {
+    if (busy || running || _disposed || !supported) return null;
+    busy = true;
+    _beginProgress();
+    _update();
+    try {
+      final root = await _directory();
+      _lock = await File('${root.path}/process.lock')
+          .open(mode: FileMode.append);
+      await _lock!.lock(FileLock.exclusive);
+      await HomeUpdateJournal(root).requireSettled();
+      final offered = await release();
+      final runtime = await _prepare(root, offered);
+      phase = HomePhase.transferring;
+      _update();
+      return await HomeTransfer(
+        root,
+        runtime,
+        offered,
+        tool: transferTool,
+      ).inspect(path);
     } finally {
       await _unlock();
       busy = false;

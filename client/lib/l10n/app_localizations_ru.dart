@@ -1819,4 +1819,32 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get savedMlsMessagePreview =>
       'Сохранённое сообщение · без подключения к серверу';
+
+  @override
+  String get homeArchiveVerified => 'Архив проверен';
+
+  @override
+  String homeArchiveSummary(
+    String serverId,
+    int schema,
+    int files,
+    String size,
+  ) {
+    return 'Пространство: $serverId\nВерсия данных: $schema\nФайлов в архиве: $files\nОбъём после распаковки: $size МиБ';
+  }
+
+  @override
+  String get homeArchiveReviewHelp =>
+      'Состав и контрольные суммы проверены. Это не подтверждает источник архива: восстанавливайте только свою копию. Сервер ещё не восстанавливался. Ключ владельца и история MLS на устройстве восстанавливаются отдельно.';
+
+  @override
+  String get homeArchiveRestore => 'Начать восстановление';
+
+  @override
+  String get homeArchiveUnsupported =>
+      'Этот runtime ещё не умеет проверять архивы. Нужен совместимый выпуск приложения и runtime с поддержкой проверки; восстановление не начато.';
+
+  @override
+  String get homeArchiveCheckFailed =>
+      'Не удалось проверить архив. Он может быть повреждён или несовместим с runtime. Восстановление не начато.';
 }

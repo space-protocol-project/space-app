@@ -665,5 +665,28 @@
   "messageSearchAllChannels": "所有可用频道",
   "messageSearchMixed": "私密频道仅在此设备上搜索",
   "savedMlsSearchChannels": "已保存的私密频道",
-  "savedMlsMessagePreview": "已保存的消息 · 离线"
+  "savedMlsMessagePreview": "已保存的消息 · 离线",
+  "homeArchiveVerified": "备份已验证",
+  "homeArchiveSummary": "空间：{serverId}\n数据版本：{schema}\n备份文件数：{files}\n解压后大小：{size} MiB",
+  "homeArchiveReviewHelp": "已验证文件和校验和。这不能证明来源可信，请仅恢复自己的备份。尚未开始恢复。所有者密钥和设备的 MLS 历史需单独恢复。",
+  "homeArchiveRestore": "开始恢复",
+  "homeArchiveUnsupported": "此运行时尚不支持备份验证。需要支持验证的兼容应用和运行时版本；尚未开始恢复。",
+  "homeArchiveCheckFailed": "无法验证备份。文件可能已损坏或与运行时不兼容。尚未开始恢复。",
+  "@homeArchiveSummary": {
+    "placeholders": {
+      "serverId": {
+        "type": "String"
+      },
+      "schema": {
+        "type": "int"
+      },
+      "files": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  }
+
 }

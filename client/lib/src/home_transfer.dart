@@ -6,6 +6,7 @@ import 'package:crypto/crypto.dart';
 import 'home_installation.dart';
 import 'home_runtime.dart';
 import 'home_update_executor.dart';
+import 'home_archive_inspection.dart';
 
 class HomeTransfer {
   HomeTransfer(
@@ -39,7 +40,31 @@ class HomeTransfer {
     ]);
   }
 
-  Future<Directory> importFrom(String source, {String publicIP = ''}) async {
+  Future<HomeArchiveInspection> inspect(String source) async {
+    final capabilities = await tool(runtime, ['-runtime-info']);
+    if (capabilities['portableInspectionVersion'] != 1 ||
+        capabilities['portableTransferVersion'] != 1) {
+      throw const HomeArchiveInspectionUnsupported();
+    }
+    final digest = await homeArchiveDigest(source);
+    final report = HomeArchiveInspection.fromJson(
+      await tool(runtime, ['-home-verify-export', source]),
+      source,
+      digest,
+    );
+    await report.requireCurrentSource(source);
+    return report;
+  }
+
+  Future<Directory> importFrom(
+    String source, {
+    String publicIP = '',
+    HomeArchiveInspection? inspection,
+  }) async {
+    if (inspection == null) {
+      throw const FormatException('Сначала проверьте и подтвердите архив');
+    }
+    await inspection.requireCurrentSource(source);
     publicIP = publicIP.trim().toLowerCase();
     await _requireEmptyDestination();
     final imported = Directory('${root.path}/transferred');
@@ -56,6 +81,13 @@ class HomeTransfer {
       ]);
     }
     await _verifyPreparedImport(imported, source, publicIP);
+    if (await File('${imported.path}/import-source.sha256').readAsString() !=
+        inspection.digest) {
+      throw const FormatException(
+        'Подготовленный импорт не соответствует проверенному архиву',
+      );
+    }
+    await inspection.requireCurrentSource(source);
     await _installImportedRuntime(imported);
     final pending = File('${root.path}/home-location.json.tmp');
     await pending.writeAsString(

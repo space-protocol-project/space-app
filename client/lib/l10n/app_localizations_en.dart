@@ -1809,4 +1809,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get savedMlsMessagePreview => 'Saved message · offline';
+
+  @override
+  String get homeArchiveVerified => 'Archive verified';
+
+  @override
+  String homeArchiveSummary(
+    String serverId,
+    int schema,
+    int files,
+    String size,
+  ) {
+    return 'Space: $serverId\nData version: $schema\nFiles in archive: $files\nUnpacked size: $size MiB';
+  }
+
+  @override
+  String get homeArchiveReviewHelp =>
+      'Contents and checksums were verified. This does not authenticate the source: restore only your own backup. Restoration has not started. Restore the owner key and device MLS history separately.';
+
+  @override
+  String get homeArchiveRestore => 'Start restoration';
+
+  @override
+  String get homeArchiveUnsupported =>
+      'This runtime cannot verify archives yet. A compatible app and runtime release with archive verification is required; restoration has not started.';
+
+  @override
+  String get homeArchiveCheckFailed =>
+      'The archive could not be verified. It may be damaged or incompatible with the runtime. Restoration has not started.';
 }

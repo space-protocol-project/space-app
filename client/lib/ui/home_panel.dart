@@ -1,5 +1,6 @@
 import 'home_network_editor.dart';
 import 'home_diagnostics_panel.dart';
+import 'home_archive_review.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -149,11 +150,18 @@ class _HomePanelState extends State<HomePanel> {
     String publicIP,
     bool importing,
   ) async {
+    final inspection = importing ? await _inspectAndConfirm(path) : null;
+    if (importing && inspection == null) return;
+    if (!mounted) return;
     final wasRunning = widget.home.running;
     if (wasRunning) await widget.onStop();
     if (widget.home.running) return;
     final success = importing
-        ? await widget.home.importData(path, publicIP: publicIP)
+        ? await widget.home.importData(
+            path,
+            publicIP: publicIP,
+            inspection: inspection,
+          )
         : await widget.home.exportData(path);
     if (!importing && wasRunning && mounted) {
       await startWithNetwork();
@@ -169,6 +177,27 @@ class _HomePanelState extends State<HomePanel> {
         ),
       );
     }
+  }
+
+  Future<HomeArchiveInspection?> _inspectAndConfirm(String path) async {
+    try {
+      final report = await widget.home.inspectArchive(path);
+      if (report == null || !mounted) return null;
+      if (await confirmHomeArchive(context, report)) return report;
+    } catch (problem) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              problem is HomeArchiveInspectionUnsupported
+                  ? context.strings.homeArchiveUnsupported
+                  : context.strings.homeArchiveCheckFailed,
+            ),
+          ),
+        );
+      }
+    }
+    return null;
   }
 
   Future<String?> _confirmTransfer(bool importing) async {

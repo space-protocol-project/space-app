@@ -1662,6 +1662,32 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get savedMlsMessagePreview => '已保存的消息 · 离线';
+
+  @override
+  String get homeArchiveVerified => '备份已验证';
+
+  @override
+  String homeArchiveSummary(
+    String serverId,
+    int schema,
+    int files,
+    String size,
+  ) {
+    return '空间：$serverId\n数据版本：$schema\n备份文件数：$files\n解压后大小：$size MiB';
+  }
+
+  @override
+  String get homeArchiveReviewHelp =>
+      '已验证文件和校验和。这不能证明来源可信，请仅恢复自己的备份。尚未开始恢复。所有者密钥和设备的 MLS 历史需单独恢复。';
+
+  @override
+  String get homeArchiveRestore => '开始恢复';
+
+  @override
+  String get homeArchiveUnsupported => '此运行时尚不支持备份验证。需要支持验证的兼容应用和运行时版本；尚未开始恢复。';
+
+  @override
+  String get homeArchiveCheckFailed => '无法验证备份。文件可能已损坏或与运行时不兼容。尚未开始恢复。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2162,4 +2188,30 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get savedMlsMessagePreview => '已保存的消息 · 离线';
+
+  @override
+  String get homeArchiveVerified => '备份已验证';
+
+  @override
+  String homeArchiveSummary(
+    String serverId,
+    int schema,
+    int files,
+    String size,
+  ) {
+    return '空间：$serverId\n数据版本：$schema\n备份文件数：$files\n解压后大小：$size MiB';
+  }
+
+  @override
+  String get homeArchiveReviewHelp =>
+      '已验证文件和校验和。这不能证明来源可信，请仅恢复自己的备份。尚未开始恢复。所有者密钥和设备的 MLS 历史需单独恢复。';
+
+  @override
+  String get homeArchiveRestore => '开始恢复';
+
+  @override
+  String get homeArchiveUnsupported => '此运行时尚不支持备份验证。需要支持验证的兼容应用和运行时版本；尚未开始恢复。';
+
+  @override
+  String get homeArchiveCheckFailed => '无法验证备份。文件可能已损坏或与运行时不兼容。尚未开始恢复。';
 }

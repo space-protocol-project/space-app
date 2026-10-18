@@ -3292,6 +3292,47 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Сохранённое сообщение · без подключения к серверу'**
   String get savedMlsMessagePreview;
+
+  /// No description provided for @homeArchiveVerified.
+  ///
+  /// In ru, this message translates to:
+  /// **'Архив проверен'**
+  String get homeArchiveVerified;
+
+  /// No description provided for @homeArchiveSummary.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пространство: {serverId}\nВерсия данных: {schema}\nФайлов в архиве: {files}\nОбъём после распаковки: {size} МиБ'**
+  String homeArchiveSummary(
+    String serverId,
+    int schema,
+    int files,
+    String size,
+  );
+
+  /// No description provided for @homeArchiveReviewHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Состав и контрольные суммы проверены. Это не подтверждает источник архива: восстанавливайте только свою копию. Сервер ещё не восстанавливался. Ключ владельца и история MLS на устройстве восстанавливаются отдельно.'**
+  String get homeArchiveReviewHelp;
+
+  /// No description provided for @homeArchiveRestore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Начать восстановление'**
+  String get homeArchiveRestore;
+
+  /// No description provided for @homeArchiveUnsupported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этот runtime ещё не умеет проверять архивы. Нужен совместимый выпуск приложения и runtime с поддержкой проверки; восстановление не начато.'**
+  String get homeArchiveUnsupported;
+
+  /// No description provided for @homeArchiveCheckFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось проверить архив. Он может быть повреждён или несовместим с runtime. Восстановление не начато.'**
+  String get homeArchiveCheckFailed;
 }
 
 class _AppLocalizationsDelegate

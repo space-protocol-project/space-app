@@ -665,5 +665,28 @@
   "messageSearchAllChannels": "All available channels",
   "messageSearchMixed": "Private channels are searched only on this device",
   "savedMlsSearchChannels": "Saved private channels",
-  "savedMlsMessagePreview": "Saved message · offline"
+  "savedMlsMessagePreview": "Saved message · offline",
+  "homeArchiveVerified": "Archive verified",
+  "homeArchiveSummary": "Space: {serverId}\nData version: {schema}\nFiles in archive: {files}\nUnpacked size: {size} MiB",
+  "homeArchiveReviewHelp": "Contents and checksums were verified. This does not authenticate the source: restore only your own backup. Restoration has not started. Restore the owner key and device MLS history separately.",
+  "homeArchiveRestore": "Start restoration",
+  "homeArchiveUnsupported": "This runtime cannot verify archives yet. A compatible app and runtime release with archive verification is required; restoration has not started.",
+  "homeArchiveCheckFailed": "The archive could not be verified. It may be damaged or incompatible with the runtime. Restoration has not started.",
+  "@homeArchiveSummary": {
+    "placeholders": {
+      "serverId": {
+        "type": "String"
+      },
+      "schema": {
+        "type": "int"
+      },
+      "files": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  }
+
 }

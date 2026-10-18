@@ -46,8 +46,14 @@ final class HomeExportRequested extends HomeEvent<bool> {
 }
 
 final class HomeImportRequested extends HomeEvent<bool> {
-  HomeImportRequested(this.path, this.publicIP);
+  HomeImportRequested(this.path, this.publicIP, this.inspection);
   final String path, publicIP;
+  final HomeArchiveInspection? inspection;
+}
+
+final class HomeArchiveInspected extends HomeEvent<HomeArchiveInspection?> {
+  HomeArchiveInspected(this.path);
+  final String path;
 }
 
 final class HomeNetworkSaved extends HomeEvent<bool> {

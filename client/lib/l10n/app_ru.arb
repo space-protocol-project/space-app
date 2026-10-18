@@ -665,5 +665,28 @@
   "messageSearchAllChannels": "Во всех доступных каналах",
   "messageSearchMixed": "Закрытые каналы — поиск только на этом устройстве",
   "savedMlsSearchChannels": "Сохранённые закрытые каналы",
-  "savedMlsMessagePreview": "Сохранённое сообщение · без подключения к серверу"
+  "savedMlsMessagePreview": "Сохранённое сообщение · без подключения к серверу",
+  "homeArchiveVerified": "Архив проверен",
+  "homeArchiveSummary": "Пространство: {serverId}\nВерсия данных: {schema}\nФайлов в архиве: {files}\nОбъём после распаковки: {size} МиБ",
+  "homeArchiveReviewHelp": "Состав и контрольные суммы проверены. Это не подтверждает источник архива: восстанавливайте только свою копию. Сервер ещё не восстанавливался. Ключ владельца и история MLS на устройстве восстанавливаются отдельно.",
+  "homeArchiveRestore": "Начать восстановление",
+  "homeArchiveUnsupported": "Этот runtime ещё не умеет проверять архивы. Нужен совместимый выпуск приложения и runtime с поддержкой проверки; восстановление не начато.",
+  "homeArchiveCheckFailed": "Не удалось проверить архив. Он может быть повреждён или несовместим с runtime. Восстановление не начато.",
+  "@homeArchiveSummary": {
+    "placeholders": {
+      "serverId": {
+        "type": "String"
+      },
+      "schema": {
+        "type": "int"
+      },
+      "files": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  }
+
 }
