@@ -1,6 +1,34 @@
 part of 'home_controller.dart';
 
 extension HomeDiskActions on HomeController {
+  Future<HomeBackupPreferences> _backupPreferences(Directory root) async {
+    final offered = await release();
+    final active = await HomeInstallation(root)
+        .active(offered, legacy: await legacyHomeReleases(), persist: false);
+    return HomeBackupPreferences(
+      root,
+      active == null ? null : HomeInstallation(root).runtime(active),
+      tool: transferTool,
+    );
+  }
+
+  Future<HomeBackupSettings?> _backupSettings() async {
+    if (busy || _disposed || !supported) return null;
+    return _diskOperation(
+      (root) async => (await _backupPreferences(root)).load(),
+    );
+  }
+
+  Future<void> _saveBackupPolicy(HomeBackupPolicy policy) async {
+    if (busy || _disposed || !supported) {
+      throw StateError('Дождитесь завершения другой операции');
+    }
+    await _diskOperation((root) async {
+      await HomeUpdateJournal(root).requireSettled();
+      await (await _backupPreferences(root)).save(policy);
+    });
+  }
+
   Future<HomeDiskReport?> _scanDisk() async {
     if (busy || _disposed || !supported) return null;
     return _diskOperation(

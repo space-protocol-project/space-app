@@ -6,6 +6,14 @@ final class HomeLoaded extends HomeEvent<void> {}
 
 final class HomeDiskRequested extends HomeEvent<HomeDiskReport?> {}
 
+final class HomeBackupSettingsRequested
+    extends HomeEvent<HomeBackupSettings?> {}
+
+final class HomeBackupPolicySaved extends HomeEvent<void> {
+  HomeBackupPolicySaved(this.policy);
+  final HomeBackupPolicy policy;
+}
+
 final class HomeDiskCleaned extends HomeEvent<bool> {
   HomeDiskCleaned(this.report, Set<String> selected)
     : selected = Set.unmodifiable(selected);

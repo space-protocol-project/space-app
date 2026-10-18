@@ -1853,7 +1853,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get homeDiskPolicy =>
-      'Очистка сохраняет текущий и предыдущий runtime, три самые новые проверенные копии и копию текущего восстановления. Другие копии предлагаются только спустя 30 дней. Файлы вне домашнего сервера не удаляются.';
+      'Ручная очистка runtime и копий обновления сохраняет текущий и предыдущий runtime, три самые новые проверенные копии и копию текущего восстановления. Другие копии предлагаются только спустя 30 дней. Файлы вне домашнего сервера не удаляются.';
 
   @override
   String get homeDiskScan => 'Показать размеры / обновить';
@@ -1894,4 +1894,77 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get homeDiskStop => 'Для очистки сначала остановите сервер.';
+
+  @override
+  String get homeBackupTitle => 'Копии по расписанию';
+
+  @override
+  String get homeBackupHelp =>
+      'Копии создаёт работающий runtime без отключения чатов. После простоя создаётся одна свежая копия. Изменения применяются в течение минуты; начатая операция может завершиться по прежним настройкам.';
+
+  @override
+  String get homeBackupUnsupported =>
+      'Установите или обновите runtime для копий по расписанию.';
+
+  @override
+  String get homeBackupEnabled => 'Включить расписание';
+
+  @override
+  String get homeBackupInterval => 'Интервал, часы';
+
+  @override
+  String get homeBackupPrune => 'Автоматически удалять старые копии';
+
+  @override
+  String get homeBackupCount => 'Количество копий (3–100)';
+
+  @override
+  String get homeBackupDays => 'Срок хранения, дни (1–3650)';
+
+  @override
+  String get homeBackupQuota => 'Лимит, МиБ (0 — без лимита)';
+
+  @override
+  String get homeBackupRetention =>
+      'При включённой автоочистке применяется любой из лимитов. Три самые новые проверенные копии сохраняются даже при превышении объёма. Неизвестные, повреждённые и несовместимые файлы не удаляются.';
+
+  @override
+  String get homeBackupSave => 'Сохранить настройки';
+
+  @override
+  String get homeBackupConfigure => 'Настроить копирование';
+
+  @override
+  String get homeBackupRefresh => 'Обновить статус';
+
+  @override
+  String get homeBackupFailed =>
+      'Копирование или очистка не завершены. Проверьте настройки, место и доступ к диску. Следующая попытка — не раньше чем через пять минут.';
+
+  @override
+  String get homeBackupLast => 'Последняя успешная копия';
+
+  @override
+  String get homeBackupNext => 'Следующая проверка';
+
+  @override
+  String get homeBackupProtected =>
+      'Часть файлов защищена от удаления или лимит объёма недостижим при сохранении трёх копий.';
+
+  @override
+  String get homeBackupOff => 'Расписание выключено';
+
+  @override
+  String get homeBackupRunning => 'Создаётся копия…';
+
+  @override
+  String get homeBackupOK => 'Последняя операция завершена';
+
+  @override
+  String get homeBackupSpace =>
+      'Не удалось подтвердить свободное место для новой копии.';
+
+  @override
+  String get homeBackupWaiting =>
+      'Ожидание работающего runtime и срока копирования';
 }

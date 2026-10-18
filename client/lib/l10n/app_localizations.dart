@@ -3343,7 +3343,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeDiskPolicy.
   ///
   /// In ru, this message translates to:
-  /// **'Очистка сохраняет текущий и предыдущий runtime, три самые новые проверенные копии и копию текущего восстановления. Другие копии предлагаются только спустя 30 дней. Файлы вне домашнего сервера не удаляются.'**
+  /// **'Ручная очистка runtime и копий обновления сохраняет текущий и предыдущий runtime, три самые новые проверенные копии и копию текущего восстановления. Другие копии предлагаются только спустя 30 дней. Файлы вне домашнего сервера не удаляются.'**
   String get homeDiskPolicy;
 
   /// No description provided for @homeDiskScan.
@@ -3417,6 +3417,138 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Для очистки сначала остановите сервер.'**
   String get homeDiskStop;
+
+  /// No description provided for @homeBackupTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Копии по расписанию'**
+  String get homeBackupTitle;
+
+  /// No description provided for @homeBackupHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Копии создаёт работающий runtime без отключения чатов. После простоя создаётся одна свежая копия. Изменения применяются в течение минуты; начатая операция может завершиться по прежним настройкам.'**
+  String get homeBackupHelp;
+
+  /// No description provided for @homeBackupUnsupported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Установите или обновите runtime для копий по расписанию.'**
+  String get homeBackupUnsupported;
+
+  /// No description provided for @homeBackupEnabled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включить расписание'**
+  String get homeBackupEnabled;
+
+  /// No description provided for @homeBackupInterval.
+  ///
+  /// In ru, this message translates to:
+  /// **'Интервал, часы'**
+  String get homeBackupInterval;
+
+  /// No description provided for @homeBackupPrune.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автоматически удалять старые копии'**
+  String get homeBackupPrune;
+
+  /// No description provided for @homeBackupCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Количество копий (3–100)'**
+  String get homeBackupCount;
+
+  /// No description provided for @homeBackupDays.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок хранения, дни (1–3650)'**
+  String get homeBackupDays;
+
+  /// No description provided for @homeBackupQuota.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лимит, МиБ (0 — без лимита)'**
+  String get homeBackupQuota;
+
+  /// No description provided for @homeBackupRetention.
+  ///
+  /// In ru, this message translates to:
+  /// **'При включённой автоочистке применяется любой из лимитов. Три самые новые проверенные копии сохраняются даже при превышении объёма. Неизвестные, повреждённые и несовместимые файлы не удаляются.'**
+  String get homeBackupRetention;
+
+  /// No description provided for @homeBackupSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить настройки'**
+  String get homeBackupSave;
+
+  /// No description provided for @homeBackupConfigure.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настроить копирование'**
+  String get homeBackupConfigure;
+
+  /// No description provided for @homeBackupRefresh.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить статус'**
+  String get homeBackupRefresh;
+
+  /// No description provided for @homeBackupFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Копирование или очистка не завершены. Проверьте настройки, место и доступ к диску. Следующая попытка — не раньше чем через пять минут.'**
+  String get homeBackupFailed;
+
+  /// No description provided for @homeBackupLast.
+  ///
+  /// In ru, this message translates to:
+  /// **'Последняя успешная копия'**
+  String get homeBackupLast;
+
+  /// No description provided for @homeBackupNext.
+  ///
+  /// In ru, this message translates to:
+  /// **'Следующая проверка'**
+  String get homeBackupNext;
+
+  /// No description provided for @homeBackupProtected.
+  ///
+  /// In ru, this message translates to:
+  /// **'Часть файлов защищена от удаления или лимит объёма недостижим при сохранении трёх копий.'**
+  String get homeBackupProtected;
+
+  /// No description provided for @homeBackupOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Расписание выключено'**
+  String get homeBackupOff;
+
+  /// No description provided for @homeBackupRunning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создаётся копия…'**
+  String get homeBackupRunning;
+
+  /// No description provided for @homeBackupOK.
+  ///
+  /// In ru, this message translates to:
+  /// **'Последняя операция завершена'**
+  String get homeBackupOK;
+
+  /// No description provided for @homeBackupSpace.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось подтвердить свободное место для новой копии.'**
+  String get homeBackupSpace;
+
+  /// No description provided for @homeBackupWaiting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ожидание работающего runtime и срока копирования'**
+  String get homeBackupWaiting;
 }
 
 class _AppLocalizationsDelegate

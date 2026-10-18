@@ -1843,7 +1843,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeDiskPolicy =>
-      'Cleanup keeps the current and previous runtime, the three newest verified backups and the current recovery backup. Other backups are offered only after 30 days. Files outside the home server are never removed.';
+      'Manual cleanup of runtimes and update backups keeps the current and previous runtime, the three newest verified backups and the current recovery backup. Other backups are offered only after 30 days. Files outside the home server are never removed.';
 
   @override
   String get homeDiskScan => 'Show sizes / refresh';
@@ -1883,4 +1883,77 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeDiskStop => 'Stop the server before cleanup.';
+
+  @override
+  String get homeBackupTitle => 'Scheduled backups';
+
+  @override
+  String get homeBackupHelp =>
+      'The running runtime creates backups without disconnecting chats. One fresh backup follows downtime. Changes apply within a minute; a running job may finish with its previous settings.';
+
+  @override
+  String get homeBackupUnsupported =>
+      'Install or update the runtime for scheduled backups.';
+
+  @override
+  String get homeBackupEnabled => 'Enable schedule';
+
+  @override
+  String get homeBackupInterval => 'Interval, hours';
+
+  @override
+  String get homeBackupPrune => 'Automatically remove old backups';
+
+  @override
+  String get homeBackupCount => 'Backup count (3–100)';
+
+  @override
+  String get homeBackupDays => 'Retention, days (1–3650)';
+
+  @override
+  String get homeBackupQuota => 'Limit, MiB (0 = unlimited)';
+
+  @override
+  String get homeBackupRetention =>
+      'When automatic cleanup is enabled, any exceeded limit applies. The three newest verified backups remain even above the size limit. Unknown, corrupt and incompatible files are kept.';
+
+  @override
+  String get homeBackupSave => 'Save settings';
+
+  @override
+  String get homeBackupConfigure => 'Configure backups';
+
+  @override
+  String get homeBackupRefresh => 'Refresh status';
+
+  @override
+  String get homeBackupFailed =>
+      'Backup or cleanup did not finish. Check settings, disk space and access. Retry is no earlier than five minutes later.';
+
+  @override
+  String get homeBackupLast => 'Last successful backup';
+
+  @override
+  String get homeBackupNext => 'Next check';
+
+  @override
+  String get homeBackupProtected =>
+      'Some files are protected or the size limit cannot hold three backups.';
+
+  @override
+  String get homeBackupOff => 'Schedule disabled';
+
+  @override
+  String get homeBackupRunning => 'Creating a backup…';
+
+  @override
+  String get homeBackupOK => 'Last operation finished';
+
+  @override
+  String get homeBackupSpace =>
+      'Could not confirm enough free space for a new backup.';
+
+  @override
+  String get homeBackupWaiting =>
+      'Waiting for a running runtime and the scheduled time';
 }

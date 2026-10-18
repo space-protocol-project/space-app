@@ -32,4 +32,4 @@ jobs:
         run: flutter analyze
       - name: Хранение, очистка, импорт, обновление и остановка
         working-directory: client
-        run: flutter test --no-pub --concurrency=1 test/home_disk_test.dart test/home_disk_panel_test.dart test/home_storage_test.dart test/home_runtime_cleanup_test.dart test/home_transfer_test.dart test/home_server_test.dart test/home_update_executor_test.dart test/home_shutdown_test.dart test/home_localization_test.dart
+        run: flutter test --no-pub --concurrency=1 test/home_backup_policy_test.dart test/home_backup_editor_test.dart test/home_disk_test.dart test/home_disk_panel_test.dart test/home_storage_test.dart test/home_runtime_cleanup_test.dart test/home_transfer_test.dart test/home_server_test.dart test/home_update_executor_test.dart test/home_shutdown_test.dart test/home_localization_test.dart

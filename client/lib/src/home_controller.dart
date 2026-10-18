@@ -22,6 +22,8 @@ import 'home_runtime.dart';
 import 'home_storage.dart';
 import 'home_disk.dart';
 export 'home_disk.dart';
+import 'home_backup_policy.dart';
+export 'home_backup_policy.dart';
 import 'home_update_executor.dart';
 import 'home_update_journal.dart';
 import 'local_failure.dart';
@@ -81,6 +83,12 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     );
     on<HomeLoaded>((event, _) => handleRequest(event, _load));
     on<HomeDiskRequested>((event, _) => handleRequest(event, _scanDisk));
+    on<HomeBackupSettingsRequested>(
+      (event, _) => handleRequest(event, _backupSettings),
+    );
+    on<HomeBackupPolicySaved>(
+      (event, _) => handleRequest(event, () => _saveBackupPolicy(event.policy)),
+    );
     on<HomeDiskCleaned>(
       (event, _) => handleRequest(event, () => _cleanDisk(event)),
     );
@@ -127,6 +135,10 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     );
   }
   final bool hostingEnabled;
+  Future<HomeBackupSettings?> backupSettings() =>
+      sendRequest(HomeBackupSettingsRequested());
+  Future<void> saveBackupPolicy(HomeBackupPolicy policy) =>
+      sendRequest(HomeBackupPolicySaved(policy));
   Future<HomeDiskReport?> inspectDisk() => sendRequest(HomeDiskRequested());
   Future<bool> cleanDisk(HomeDiskReport report, Set<String> selected) =>
       sendRequest(HomeDiskCleaned(report, selected));

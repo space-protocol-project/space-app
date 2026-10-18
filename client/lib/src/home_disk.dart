@@ -74,7 +74,11 @@ class HomeDiskManager {
       root: await root.resolveSymbolicLinks(),
       dataBytes: sizes['data']!,
       runtimeBytes: sizes['runtimes']!,
-      backupBytes: sizes['backups']!,
+      backupBytes:
+          sizes['backups']! +
+          await homeDirectoryBytes(
+            Directory(path.join(root.path, 'scheduled-backups')),
+          ),
       recoveryBytes: sizes['recoveries']!,
       availableBytes: await storage.available(root),
       candidates: candidates,

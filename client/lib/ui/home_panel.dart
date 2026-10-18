@@ -2,6 +2,7 @@ import 'home_network_editor.dart';
 import 'home_diagnostics_panel.dart';
 import 'home_archive_review.dart';
 import 'home_disk_panel.dart';
+import 'home_backup_panel.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -378,6 +379,7 @@ class _HomePanelState extends State<HomePanel> {
                 ..._transferControls(view),
                 ..._updateControls(context, view),
                 HomeDiskPanel(home: home, view: view),
+                HomeBackupPanel(home: home, view: view),
                 ..._connectionDetails(context, view),
                 if (view.ip.isNotEmpty) ...[
                   const SizedBox(height: 24),

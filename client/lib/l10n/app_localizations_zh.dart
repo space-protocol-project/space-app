@@ -1694,7 +1694,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeDiskPolicy =>
-      '清理会保留当前和上一版运行时、最新的三个已验证备份以及当前恢复备份。其他备份仅在30天后列为候选。不会删除家庭服务器之外的文件。';
+      '运行时和更新备份的手动清理：清理会保留当前和上一版运行时、最新的三个已验证备份以及当前恢复备份。其他备份仅在30天后列为候选。不会删除家庭服务器之外的文件。';
 
   @override
   String get homeDiskScan => '查看大小 / 刷新';
@@ -1731,6 +1731,74 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeDiskStop => '清理前请先停止服务器。';
+
+  @override
+  String get homeBackupTitle => '定时备份';
+
+  @override
+  String get homeBackupHelp =>
+      '运行中的运行时会备份而不中断聊天。停机后创建一个最新备份。更改在一分钟内生效，正在运行的任务可能按原设置完成。';
+
+  @override
+  String get homeBackupUnsupported => '请安装或更新运行时以使用定时备份。';
+
+  @override
+  String get homeBackupEnabled => '启用定时备份';
+
+  @override
+  String get homeBackupInterval => '间隔（小时）';
+
+  @override
+  String get homeBackupPrune => '自动删除旧备份';
+
+  @override
+  String get homeBackupCount => '备份数量（3–100）';
+
+  @override
+  String get homeBackupDays => '保留天数（1–3650）';
+
+  @override
+  String get homeBackupQuota => '上限，MiB（0为不限）';
+
+  @override
+  String get homeBackupRetention =>
+      '启用自动清理后，任一超限条件都会生效。即使超出容量上限，也保留最新三个已验证备份。未知、损坏和不兼容文件不会删除。';
+
+  @override
+  String get homeBackupSave => '保存设置';
+
+  @override
+  String get homeBackupConfigure => '设置备份';
+
+  @override
+  String get homeBackupRefresh => '刷新状态';
+
+  @override
+  String get homeBackupFailed => '备份或清理未完成。请检查设置、磁盘空间和访问权限。至少五分钟后重试。';
+
+  @override
+  String get homeBackupLast => '上次成功备份';
+
+  @override
+  String get homeBackupNext => '下次检查';
+
+  @override
+  String get homeBackupProtected => '部分文件受到保护，或容量上限无法容纳三个备份。';
+
+  @override
+  String get homeBackupOff => '定时备份已关闭';
+
+  @override
+  String get homeBackupRunning => '正在创建备份…';
+
+  @override
+  String get homeBackupOK => '上次操作已完成';
+
+  @override
+  String get homeBackupSpace => '无法确认有足够空间创建新备份。';
+
+  @override
+  String get homeBackupWaiting => '等待运行时运行并到达备份时间';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2263,7 +2331,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get homeDiskPolicy =>
-      '清理会保留当前和上一版运行时、最新的三个已验证备份以及当前恢复备份。其他备份仅在30天后列为候选。不会删除家庭服务器之外的文件。';
+      '运行时和更新备份的手动清理：清理会保留当前和上一版运行时、最新的三个已验证备份以及当前恢复备份。其他备份仅在30天后列为候选。不会删除家庭服务器之外的文件。';
 
   @override
   String get homeDiskScan => '查看大小 / 刷新';
@@ -2300,4 +2368,72 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get homeDiskStop => '清理前请先停止服务器。';
+
+  @override
+  String get homeBackupTitle => '定时备份';
+
+  @override
+  String get homeBackupHelp =>
+      '运行中的运行时会备份而不中断聊天。停机后创建一个最新备份。更改在一分钟内生效，正在运行的任务可能按原设置完成。';
+
+  @override
+  String get homeBackupUnsupported => '请安装或更新运行时以使用定时备份。';
+
+  @override
+  String get homeBackupEnabled => '启用定时备份';
+
+  @override
+  String get homeBackupInterval => '间隔（小时）';
+
+  @override
+  String get homeBackupPrune => '自动删除旧备份';
+
+  @override
+  String get homeBackupCount => '备份数量（3–100）';
+
+  @override
+  String get homeBackupDays => '保留天数（1–3650）';
+
+  @override
+  String get homeBackupQuota => '上限，MiB（0为不限）';
+
+  @override
+  String get homeBackupRetention =>
+      '启用自动清理后，任一超限条件都会生效。即使超出容量上限，也保留最新三个已验证备份。未知、损坏和不兼容文件不会删除。';
+
+  @override
+  String get homeBackupSave => '保存设置';
+
+  @override
+  String get homeBackupConfigure => '设置备份';
+
+  @override
+  String get homeBackupRefresh => '刷新状态';
+
+  @override
+  String get homeBackupFailed => '备份或清理未完成。请检查设置、磁盘空间和访问权限。至少五分钟后重试。';
+
+  @override
+  String get homeBackupLast => '上次成功备份';
+
+  @override
+  String get homeBackupNext => '下次检查';
+
+  @override
+  String get homeBackupProtected => '部分文件受到保护，或容量上限无法容纳三个备份。';
+
+  @override
+  String get homeBackupOff => '定时备份已关闭';
+
+  @override
+  String get homeBackupRunning => '正在创建备份…';
+
+  @override
+  String get homeBackupOK => '上次操作已完成';
+
+  @override
+  String get homeBackupSpace => '无法确认有足够空间创建新备份。';
+
+  @override
+  String get homeBackupWaiting => '等待运行时运行并到达备份时间';
 }
