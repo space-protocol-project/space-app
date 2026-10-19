@@ -79,7 +79,10 @@ else()
 endif()
 
 set(LIBWEBRTC_ASSET "libwebrtc-${LIBWEBRTC_OS}-${LIBWEBRTC_ARCH}-release")
-set(ZIPFILE "${LIBWEBRTC_THIRD_PARTY_DIR}/downloads/${LIBWEBRTC_ASSET}.zip")
+set(LIBWEBRTC_DOWNLOAD_DIR "${LIBWEBRTC_THIRD_PARTY_DIR}/downloads/${LIBWEBRTC_BINARY_VERSION}")
+set(ZIPFILE "${LIBWEBRTC_DOWNLOAD_DIR}/${LIBWEBRTC_ASSET}.zip")
+set(LIBWEBRTC_VERSION_MARKER "${LIBWEBRTC_THIRD_PARTY_DIR}/libwebrtc/.space-version")
+set(LIBWEBRTC_CACHE_KEY "${LIBWEBRTC_BINARY_VERSION}/${LIBWEBRTC_ASSET}")
 
 # Final URL = <base>/<binary_version>/<asset>.zip
 set(DOWNLOAD_URL "${LIBWEBRTC_DOWNLOAD_URL_BASE}/${LIBWEBRTC_BINARY_VERSION}/${LIBWEBRTC_ASSET}.zip")
@@ -121,21 +124,26 @@ endfunction()
 
 if(NOT EXISTS "${ZIPFILE}")
   message(NOTICE "download: ${DOWNLOAD_URL}")
-  file(MAKE_DIRECTORY "${LIBWEBRTC_THIRD_PARTY_DIR}/downloads")
+  file(MAKE_DIRECTORY "${LIBWEBRTC_DOWNLOAD_DIR}")
   file(DOWNLOAD "${DOWNLOAD_URL}"
-      ${ZIPFILE}
+      "${ZIPFILE}.partial"
       STATUS download_status
       LOG download_log)
 
   if(NOT download_status EQUAL 0)
+    file(REMOVE "${ZIPFILE}.partial")
     message(FATAL_ERROR "Failed to download dependency: ${download_log}")
   endif()
+  file(RENAME "${ZIPFILE}.partial" "${ZIPFILE}")
+endif()
 
+# Один unversioned ZIP раньше незаметно сохранял старую DLL после смены ini.
+# Маркер относится ко всему распакованному комплекту: заголовкам и библиотекам.
+set(_libwebrtc_extracted_version "")
+if(EXISTS "${LIBWEBRTC_VERSION_MARKER}")
+  file(READ "${LIBWEBRTC_VERSION_MARKER}" _libwebrtc_extracted_version)
+endif()
+if(NOT "${_libwebrtc_extracted_version}" STREQUAL "${LIBWEBRTC_CACHE_KEY}")
   _libwebrtc_extract_and_normalize("${ZIPFILE}" "${LIBWEBRTC_THIRD_PARTY_DIR}")
-else()
-  if(NOT EXISTS "${LIBWEBRTC_THIRD_PARTY_DIR}/libwebrtc")
-    message(NOTICE "libwebrtc directory does not exist after extraction.")
-    _libwebrtc_extract_and_normalize("${ZIPFILE}" "${LIBWEBRTC_THIRD_PARTY_DIR}")
-  endif()
-  message(TRACE "libwebrtc already downloaded.")
+  file(WRITE "${LIBWEBRTC_VERSION_MARKER}" "${LIBWEBRTC_CACHE_KEY}")
 endif()

@@ -1,6 +1,7 @@
 ﻿param([Parameter(Mandatory=$true)][string]$Runtime,[switch]$PostgresOnly,[ValidateSet('direct','udp','tcp')][string]$Relay='direct',[switch]$Recovery)
 $ErrorActionPreference='Stop'
 $appRoot=Split-Path $PSScriptRoot -Parent
+. (Join-Path $PSScriptRoot 'voice_probe_output.ps1')
 $serverRoot=Join-Path (Split-Path $appRoot -Parent) 'space-server'
 $id=[guid]::NewGuid().ToString('N')
 $work=Join-Path $appRoot ".local/voice-check-$id"
@@ -105,9 +106,9 @@ try {
   $start.RedirectStandardOutput=$true
   $start.RedirectStandardError=$true
   $worker=[Diagnostics.Process]::Start($start)
-  $output=[IO.File]::Create((Join-Path $work "$role.stdout.log"))
-  $errors=[IO.File]::Create((Join-Path $work "$role.stderr.log"))
-  $captures+=@{output=$output; errors=$errors; outTask=$worker.StandardOutput.BaseStream.CopyToAsync($output); errTask=$worker.StandardError.BaseStream.CopyToAsync($errors)}
+  $output=[IO.FileStream]::new((Join-Path $work "$role.stdout.log"),[IO.FileMode]::Create,[IO.FileAccess]::Write,[IO.FileShare]::Read)
+  $errors=[IO.FileStream]::new((Join-Path $work "$role.stderr.log"),[IO.FileMode]::Create,[IO.FileAccess]::Write,[IO.FileShare]::Read)
+  $captures+=@{output=$output; errors=$errors; outTask=[SpaceVoiceProbeOutput]::Copy($worker.StandardOutput.BaseStream,$output); errTask=[SpaceVoiceProbeOutput]::Copy($worker.StandardError.BaseStream,$errors)}
   $workers+=$worker
   if($role -eq 'A'){
    $ready.Restart()

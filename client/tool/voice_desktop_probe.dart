@@ -37,7 +37,9 @@ class ProbeMedia extends NativeVoiceMedia {
     VoiceNetworkSettings settings = const VoiceNetworkSettings.local(),
   ]) async {
     await flag(work, '$role-media', 'offer');
+    final clock = Stopwatch()..start();
     final result = await super.offer(settings);
+    await flag(work, '$role-offer-ms', '${clock.elapsedMilliseconds}');
     if (settings.relayOnly &&
         (!result.contains(' typ relay') || result.contains(' typ host'))) {
       throw StateError('Direct candidate in relay-only probe');
@@ -49,7 +51,9 @@ class ProbeMedia extends NativeVoiceMedia {
   @override
   Future<void> answer(String sdp) async {
     await flag(work, '$role-media', 'answer');
+    final clock = Stopwatch()..start();
     await super.answer(sdp);
+    await flag(work, '$role-answer-ms', '${clock.elapsedMilliseconds}');
     await flag(work, '$role-media', 'answered');
   }
 }
