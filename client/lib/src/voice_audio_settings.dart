@@ -1,3 +1,5 @@
+import 'voice_shortcut.dart';
+
 enum VoiceInputProfile { speech, studio, custom }
 
 class VoiceAudioSettings {
@@ -10,11 +12,13 @@ class VoiceAudioSettings {
     this.pushToTalk = false,
     this.automaticSensitivity = true,
     this.thresholdDb = -45,
+    this.shortcut = const VoiceShortcut(),
   });
   final double inputGain, outputGain;
   final bool noiseSuppression, echoCancellation, autoGainControl;
   final bool pushToTalk, automaticSensitivity;
   final double thresholdDb;
+  final VoiceShortcut shortcut;
 
   VoiceInputProfile get profile {
     if (noiseSuppression && echoCancellation && autoGainControl) {
@@ -40,6 +44,7 @@ class VoiceAudioSettings {
     bool? pushToTalk,
     bool? automaticSensitivity,
     double? thresholdDb,
+    VoiceShortcut? shortcut,
   }) => VoiceAudioSettings(
     inputGain: _gain(inputGain ?? this.inputGain),
     outputGain: _gain(outputGain ?? this.outputGain),
@@ -49,6 +54,7 @@ class VoiceAudioSettings {
     pushToTalk: pushToTalk ?? this.pushToTalk,
     automaticSensitivity: automaticSensitivity ?? this.automaticSensitivity,
     thresholdDb: _threshold(thresholdDb ?? this.thresholdDb),
+    shortcut: shortcut ?? this.shortcut,
   );
 
   VoiceAudioSettings withProfile(VoiceInputProfile profile) {
@@ -78,6 +84,7 @@ class VoiceAudioSettings {
       pushToTalk: value['pushToTalk'] == true,
       automaticSensitivity: value['automaticSensitivity'] != false,
       thresholdDb: _threshold(value['thresholdDb']),
+      shortcut: VoiceShortcut.fromJson(value['shortcut']),
     );
   }
 
@@ -90,5 +97,6 @@ class VoiceAudioSettings {
     'pushToTalk': pushToTalk,
     'automaticSensitivity': automaticSensitivity,
     'thresholdDb': thresholdDb,
+    'shortcut': shortcut.toJson(),
   };
 }

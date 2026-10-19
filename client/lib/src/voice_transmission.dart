@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import 'voice_audio_settings.dart';
+import 'voice_shortcut.dart';
 
 /// Разрешение передачи применяется только к уже включённому микрофону.
 class VoiceTransmission with WidgetsBindingObserver {
@@ -26,6 +27,7 @@ class VoiceTransmission with WidgetsBindingObserver {
         WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
     WidgetsBinding.instance.addObserver(this);
     HardwareKeyboard.instance.addHandler(_key);
+    voiceShortcutRecording.addListener(_shortcutRecordingChanged);
     transmit(false);
     _timer = Timer.periodic(const Duration(milliseconds: 50), (_) => _sample());
   }
@@ -39,13 +41,31 @@ class VoiceTransmission with WidgetsBindingObserver {
   }
 
   bool _key(KeyEvent event) {
-    if (!settings.pushToTalk || event.logicalKey != LogicalKeyboardKey.f8) {
+    if (!settings.pushToTalk || voiceShortcutRecording.value) return false;
+    final shortcut = settings.shortcut;
+    if (_held && !shortcut.modifiersMatch) {
+      _held = false;
+      transmit(false);
+    }
+    if (event.logicalKey != shortcut.key || !shortcut.modifiersMatch) {
       return false;
     }
-    if (event is KeyDownEvent && !event.synthesized && _focused) _held = true;
+    if (event is KeyDownEvent &&
+        !event.synthesized &&
+        _focused &&
+        shortcut.modifiersMatch) {
+      _held = true;
+    }
     if (event is KeyUpEvent) _held = false;
     transmit(_active && _focused && _held);
     return true;
+  }
+
+  void _shortcutRecordingChanged() {
+    _generation++;
+    _held = false;
+    _tail = 0;
+    if (_active) transmit(false);
   }
 
   @override
@@ -64,12 +84,21 @@ class VoiceTransmission with WidgetsBindingObserver {
   }
 
   Future<void> _sample() async {
-    if (!_active || _sampling || settings.pushToTalk) return;
+    if (!_active ||
+        _sampling ||
+        settings.pushToTalk ||
+        voiceShortcutRecording.value) {
+      return;
+    }
     _sampling = true;
     final generation = _generation;
     try {
       final value = await level();
-      if (generation != _generation || settings.pushToTalk) return;
+      if (generation != _generation ||
+          settings.pushToTalk ||
+          voiceShortcutRecording.value) {
+        return;
+      }
       transmit(_gate(value));
     } catch (_) {
       if (generation == _generation) {
@@ -105,6 +134,7 @@ class VoiceTransmission with WidgetsBindingObserver {
     _active = false;
     _held = false;
     HardwareKeyboard.instance.removeHandler(_key);
+    voiceShortcutRecording.removeListener(_shortcutRecordingChanged);
     WidgetsBinding.instance.removeObserver(this);
     transmit(false);
   }

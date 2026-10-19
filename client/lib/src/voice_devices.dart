@@ -147,7 +147,9 @@ class VoiceDevices extends Cubit<VoiceDevicesState> {
   }
 
   Future<void> select(VoiceDevice device) async {
-    if (isClosed || state.busy || !state.devices.contains(device)) return;
+    final refreshing = _refreshing;
+    if (refreshing != null) await refreshing;
+    if (isClosed || state.busy || !_available(device)) return;
     _publish(busy: true);
     try {
       await beforeDeviceChanged?.call();
@@ -167,7 +169,14 @@ class VoiceDevices extends Cubit<VoiceDevicesState> {
     }
   }
 
+  bool _available(VoiceDevice device) => state.devices.any(
+    (current) => current.id == device.id && current.input == device.input,
+  );
+
   Future<void> updateAudio(VoiceAudioSettings settings) async {
+    final refreshing = _refreshing;
+    if (refreshing != null) await refreshing;
+    if (_choice == null && !isClosed) await refresh();
     if (isClosed || state.busy) return;
     _publish(busy: true);
     try {

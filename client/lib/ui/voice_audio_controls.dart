@@ -8,6 +8,7 @@ import '../l10n/strings.dart';
 import '../src/voice_audio_settings.dart';
 import '../src/voice_devices.dart';
 import '../src/voice_microphone_test.dart';
+import 'voice_shortcut_settings.dart';
 
 class VoiceGainSlider extends StatefulWidget {
   const VoiceGainSlider({
@@ -103,6 +104,7 @@ class VoiceProcessingControls extends StatelessWidget {
         ),
         if (!state.audio.automaticSensitivity) _sensitivity(context),
       ],
+      VoiceShortcutSettings(devices: devices, showError: false),
       const Divider(height: 32),
       Text(
         context.strings.voiceProcessingTitle,

@@ -10,6 +10,20 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get voiceShortcutTitle => 'Push-to-talk shortcut';
+
+  @override
+  String get voiceShortcutScope =>
+      'Active window only. Transmission closes on focus loss.';
+
+  @override
+  String get voiceShortcutPress =>
+      'Press a key or combine it with Ctrl, Alt, Shift or Meta. Release the keys before saving. Escape cancels.';
+
+  @override
+  String get voiceShortcutSave => 'Save';
+
+  @override
   String get deviceTransferTitle => 'Device transfer';
 
   @override
@@ -2163,7 +2177,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voicePushToTalkHint =>
-      'Enable the microphone in the room, then hold F8 to speak. Works while this window has focus. The microphone test plays continuously.';
+      'Enable the microphone in the room, then hold your chosen shortcut to speak. Works while this window has focus. The microphone test plays continuously.';
 
   @override
   String get voiceAutomaticSensitivity => 'Automatic input sensitivity';

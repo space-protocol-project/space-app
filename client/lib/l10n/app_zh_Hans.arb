@@ -1,4 +1,8 @@
 {
+  "voiceShortcutTitle": "按键通话快捷键",
+  "voiceShortcutScope": "仅在活动窗口中生效。失去焦点时停止传输。",
+  "voiceShortcutPress": "按下一个键或与 Ctrl、Alt、Shift、Meta 组合。保存前松开所有键。Escape 取消。",
+  "voiceShortcutSave": "保存",
   "deviceTransferTitle": "迁移设备",
   "deviceTransferHelp": "只需两步：保存一个加密归档，然后在新设备上将其拖入此处。空间、密钥、历史、队列、草稿、设置和家庭服务器一起迁移。",
   "deviceTransferExport": "完整迁移",
@@ -304,7 +308,7 @@
   "voiceRefreshDevices": "刷新设备",
   "voiceCloseDevices": "关闭",
   "voicePushToTalk": "按键说话",
-  "voicePushToTalkHint": "先在房间中开启麦克风，再按住 F8 说话。仅在窗口获得焦点时有效。麦克风测试连续播放。",
+  "voicePushToTalkHint": "先在房间中开启麦克风，再按住选定的快捷键说话。仅在窗口获得焦点时有效。麦克风测试连续播放。",
   "voiceAutomaticSensitivity": "自动输入灵敏度",
   "voiceSensitivity": "输入阈值",
   "recoveryIncludeSpaces": "包含空间",

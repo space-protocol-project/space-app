@@ -1831,6 +1831,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
                             SettingsPanel(
                               preferences: widget.preferences,
                               deviceTransfer: deviceTransferArea(),
+                              voiceDevices: voice.devices,
                               requestNotificationPermission:
                                   systemNotifications.requestPermission,
                               updates: updates,

@@ -10,6 +10,20 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
+  String get voiceShortcutTitle => 'Клавиши рации';
+
+  @override
+  String get voiceShortcutScope =>
+      'Действуют в активном окне. При потере фокуса передача закрывается.';
+
+  @override
+  String get voiceShortcutPress =>
+      'Нажмите клавишу или сочетание с Ctrl, Alt, Shift или Meta. Отпустите клавиши перед сохранением. Escape — отмена.';
+
+  @override
+  String get voiceShortcutSave => 'Сохранить';
+
+  @override
   String get deviceTransferTitle => 'Перенос устройства';
 
   @override
@@ -2177,7 +2191,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get voicePushToTalkHint =>
-      'Включите микрофон в комнате и удерживайте F8 для разговора. Работает, пока окно активно. Проверка микрофона воспроизводится непрерывно.';
+      'Включите микрофон в комнате и удерживайте выбранные клавиши для разговора. Работает, пока окно активно. Проверка микрофона воспроизводится непрерывно.';
 
   @override
   String get voiceAutomaticSensitivity =>

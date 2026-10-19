@@ -253,6 +253,38 @@ void main() {
     await controller.close();
   });
 
+  test('Выбор по ID сохраняется после смены объектов при обновлении', () async {
+    final backend = DevicesBackend();
+    final controller = VoiceDevices(backend: backend);
+    addTearDown(controller.close);
+    await controller.refresh();
+    final old = controller.state.devices.first;
+    backend.available = [
+      VoiceDevice(old.id, old.label, input: true),
+      backend.speaker,
+    ];
+    await controller.refresh();
+    await controller.select(old);
+    expect(controller.state.input, old.id);
+  });
+
+  test('Фоновое перечисление не теряет смену настроек рации', () async {
+    final backend = DevicesBackend();
+    final controller = VoiceDevices(backend: backend);
+    addTearDown(controller.close);
+    await controller.refresh();
+    backend.listing = Completer<List<VoiceDevice>>();
+    final refresh = controller.refresh();
+    final change = controller.updateAudio(
+      controller.state.audio.copyWith(pushToTalk: true),
+    );
+    backend.listing!.complete([backend.microphone, backend.speaker]);
+    await refresh;
+    await change;
+    expect(controller.state.audio.pushToTalk, true);
+    expect((await SavedVoiceDevicePreferences().load()).audio.pushToTalk, true);
+  });
+
   testWidgets('Подтверждённый микрофон показан после повторного открытия', (
     tester,
   ) async {

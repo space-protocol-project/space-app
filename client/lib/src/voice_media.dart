@@ -28,6 +28,10 @@ abstract interface class VoiceAudioMedia {
 class NativeVoiceMedia implements VoiceMedia, VoiceAudioMedia {
   NativeVoiceMedia({this.playbackVolume = 1.0});
   final double playbackVolume;
+  bool _transmitting = false;
+  int _transmissionRevision = 0;
+  // Подтверждённое нативным обработчиком состояние, без записи звука.
+  bool get transmitting => _transmitting;
   String? inputDeviceId;
   VoiceAudioSettings _audio = const VoiceAudioSettings();
   late final _transmission = VoiceTransmission(
@@ -36,9 +40,15 @@ class NativeVoiceMedia implements VoiceMedia, VoiceAudioMedia {
   );
 
   void _transmit(bool enabled) {
+    final revision = ++_transmissionRevision;
+    final value = enabled && !_closed && !_deafened;
     unawaited(
-      VoiceAudioNative.transmission(enabled && !_closed && !_deafened)
+      VoiceAudioNative.transmission(value)
+          .then((_) {
+            if (revision == _transmissionRevision) _transmitting = value;
+          })
           .catchError((Object _) {
+            _transmitting = false;
             for (final track
                 in _microphone?.getAudioTracks() ?? <MediaStreamTrack>[]) {
               track.enabled = false;

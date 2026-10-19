@@ -1,4 +1,4 @@
-﻿param([Parameter(Mandatory=$true)][string]$Runtime,[switch]$PostgresOnly,[ValidateSet('direct','udp','tcp')][string]$Relay='direct')
+﻿param([Parameter(Mandatory=$true)][string]$Runtime,[switch]$PostgresOnly,[ValidateSet('direct','udp','tcp')][string]$Relay='direct',[switch]$Recovery)
 $ErrorActionPreference='Stop'
 $appRoot=Split-Path $PSScriptRoot -Parent
 $serverRoot=Join-Path (Split-Path $appRoot -Parent) 'space-server'
@@ -37,6 +37,8 @@ $grpcPort=Free-Port
 $previousDb=$env:SPACE_DATABASE_URL
 $previousTest=$env:SPACE_TEST_DATABASE_URL
 $previousProbe=$env:SPACE_VOICE_DESKTOP_CHECK
+$previousRecovery=$env:SPACE_VOICE_RECOVERY_CHECK
+$env:SPACE_VOICE_RECOVERY_CHECK=if($Recovery){'1'}else{'0'}
 try {
  & (Join-Path $pgBin 'initdb.exe') -D $data -U voice_test -A trust --encoding=UTF8 --no-locale > (Join-Path $work 'initdb.log') 2>&1
  if($LASTEXITCODE -ne 0){throw 'initdb failed'}
@@ -116,9 +118,22 @@ try {
    }
   }
  }
- foreach($worker in $workers){if(!$worker.WaitForExit(90000)){throw 'Voice client timeout'};if($worker.ExitCode -ne 0){throw 'Voice client failed'}}
+ if($Recovery){
+  foreach($phase in @('recovery-ready','reconnecting')){
+   $ready.Restart()
+   while(!(Test-Path -LiteralPath (Join-Path $work "A-$phase")) -or !(Test-Path -LiteralPath (Join-Path $work "B-$phase"))){
+    if(@($workers|Where-Object {$_.HasExited}).Count -gt 0){throw "Voice client exited before $phase; logs: $work"}
+    if($ready.Elapsed.TotalSeconds -gt 65){throw "Voice recovery timeout: $phase; logs: $work"}
+    Start-Sleep -Milliseconds 100
+   }
+   if($phase -eq 'recovery-ready'){$server.Kill();$server.WaitForExit()}
+  }
+  $server=Start-Process -FilePath $serverExe -ArgumentList @('-http',"127.0.0.1:$httpPort",'-grpc',"127.0.0.1:$grpcPort",'-origin',$origin) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $work 'server-restarted.stdout.log') -RedirectStandardError (Join-Path $work 'server-restarted.stderr.log')
+ }
+ foreach($worker in $workers){if(!$worker.WaitForExit(90000)){throw 'Voice client timeout'};if($worker.ExitCode -ne 0){throw "Voice client failed; logs: $work"}}
  $reports=@('A','B')|ForEach-Object {Get-Content -LiteralPath (Join-Path $work "$_.json") -Raw|ConvertFrom-Json}
  if(!$reports[0].success -or !$reports[1].success -or $reports[0].pid -eq $reports[1].pid){throw 'Two independent clients were not verified'}
+ if($Recovery -and (!$reports[0].reconnected -or !$reports[1].reconnected)){throw 'Recovery was not verified'}
  $reports|Select-Object role,pid,sent,received,samples|Format-Table
  Write-Output "Voice check passed: $work"
 } finally {
@@ -141,6 +156,7 @@ try {
  $env:SPACE_DATABASE_URL=$previousDb
  $env:SPACE_TEST_DATABASE_URL=$previousTest
  $env:SPACE_VOICE_DESKTOP_CHECK=$previousProbe
+ $env:SPACE_VOICE_RECOVERY_CHECK=$previousRecovery
  foreach($exe in $copies){if(Test-Path -LiteralPath $exe){Remove-Item -LiteralPath $exe}}
  # Только собственные одноразовые данные после остановки PostgreSQL.
  $expectedRoot=[IO.Path]::GetFullPath((Join-Path $appRoot ".local/voice-check-$id"))

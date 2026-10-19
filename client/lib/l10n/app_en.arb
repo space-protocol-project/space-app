@@ -1,4 +1,8 @@
 {
+  "voiceShortcutTitle": "Push-to-talk shortcut",
+  "voiceShortcutScope": "Active window only. Transmission closes on focus loss.",
+  "voiceShortcutPress": "Press a key or combine it with Ctrl, Alt, Shift or Meta. Release the keys before saving. Escape cancels.",
+  "voiceShortcutSave": "Save",
   "deviceTransferTitle": "Device transfer",
   "deviceTransferHelp": "Two steps: save one encrypted archive, then drop it here on the new device. Spaces, keys, history, queues, drafts, settings and the home server move together.",
   "deviceTransferExport": "Full transfer",
@@ -787,7 +791,7 @@
   "voiceRefreshDevices": "Refresh devices",
   "voiceCloseDevices": "Close",
   "voicePushToTalk": "Push to talk",
-  "voicePushToTalkHint": "Enable the microphone in the room, then hold F8 to speak. Works while this window has focus. The microphone test plays continuously.",
+  "voicePushToTalkHint": "Enable the microphone in the room, then hold your chosen shortcut to speak. Works while this window has focus. The microphone test plays continuously.",
   "voiceAutomaticSensitivity": "Automatic input sensitivity",
   "voiceSensitivity": "Input threshold",
   "recoveryIncludeSpaces": "Include spaces",

@@ -101,6 +101,30 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @voiceShortcutTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клавиши рации'**
+  String get voiceShortcutTitle;
+
+  /// No description provided for @voiceShortcutScope.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действуют в активном окне. При потере фокуса передача закрывается.'**
+  String get voiceShortcutScope;
+
+  /// No description provided for @voiceShortcutPress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нажмите клавишу или сочетание с Ctrl, Alt, Shift или Meta. Отпустите клавиши перед сохранением. Escape — отмена.'**
+  String get voiceShortcutPress;
+
+  /// No description provided for @voiceShortcutSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить'**
+  String get voiceShortcutSave;
+
   /// No description provided for @deviceTransferTitle.
   ///
   /// In ru, this message translates to:
@@ -3931,7 +3955,7 @@ abstract class AppLocalizations {
   /// No description provided for @voicePushToTalkHint.
   ///
   /// In ru, this message translates to:
-  /// **'Включите микрофон в комнате и удерживайте F8 для разговора. Работает, пока окно активно. Проверка микрофона воспроизводится непрерывно.'**
+  /// **'Включите микрофон в комнате и удерживайте выбранные клавиши для разговора. Работает, пока окно активно. Проверка микрофона воспроизводится непрерывно.'**
   String get voicePushToTalkHint;
 
   /// No description provided for @voiceAutomaticSensitivity.

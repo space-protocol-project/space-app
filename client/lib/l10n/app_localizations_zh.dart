@@ -10,6 +10,19 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get voiceShortcutTitle => '按键通话快捷键';
+
+  @override
+  String get voiceShortcutScope => '仅在活动窗口中生效。失去焦点时停止传输。';
+
+  @override
+  String get voiceShortcutPress =>
+      '按下一个键或与 Ctrl、Alt、Shift、Meta 组合。保存前松开所有键。Escape 取消。';
+
+  @override
+  String get voiceShortcutSave => '保存';
+
+  @override
   String get deviceTransferTitle => '迁移设备';
 
   @override
@@ -1994,7 +2007,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get voicePushToTalkHint =>
-      '先在房间中开启麦克风，再按住 F8 说话。仅在窗口获得焦点时有效。麦克风测试连续播放。';
+      '先在房间中开启麦克风，再按住选定的快捷键说话。仅在窗口获得焦点时有效。麦克风测试连续播放。';
 
   @override
   String get voiceAutomaticSensitivity => '自动输入灵敏度';
@@ -2053,6 +2066,19 @@ class AppLocalizationsZh extends AppLocalizations {
 /// The translations for Chinese, using the Han script (`zh_Hans`).
 class AppLocalizationsZhHans extends AppLocalizationsZh {
   AppLocalizationsZhHans() : super('zh_Hans');
+
+  @override
+  String get voiceShortcutTitle => '按键通话快捷键';
+
+  @override
+  String get voiceShortcutScope => '仅在活动窗口中生效。失去焦点时停止传输。';
+
+  @override
+  String get voiceShortcutPress =>
+      '按下一个键或与 Ctrl、Alt、Shift、Meta 组合。保存前松开所有键。Escape 取消。';
+
+  @override
+  String get voiceShortcutSave => '保存';
 
   @override
   String get deviceTransferTitle => '迁移设备';
@@ -2880,7 +2906,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get voicePushToTalkHint =>
-      '先在房间中开启麦克风，再按住 F8 说话。仅在窗口获得焦点时有效。麦克风测试连续播放。';
+      '先在房间中开启麦克风，再按住选定的快捷键说话。仅在窗口获得焦点时有效。麦克风测试连续播放。';
 
   @override
   String get voiceAutomaticSensitivity => '自动输入灵敏度';
