@@ -10,7 +10,7 @@
 - [Перенос отдельного домашнего пространства и рабочего состояния MLS](docs/FULL-MIGRATION.md).
 - [Диск, резервные копии и безопасная очистка](docs/HOME-DISK.md).
 - [Управление сервером](docs/ADMIN-GUIDE.md).
-- [Голосовые комнаты — настольный срез в разработке](docs/VOICE-ROOMS.md).
+- [Голосовые комнаты и настройки звука](docs/VOICE-ROOMS.md).
 - [Сервер и runtime](https://github.com/space-protocol-project/space-server).
 - [Протокол, архитектура и промосайт](https://github.com/space-protocol-project/space-protocol).
 
@@ -38,7 +38,7 @@ Android: установите `Space-android.apk` из выпуска. Моби�
 
 Оболочка по согласованному концепту: кнопки пространств без фоновой панели, скруглённый слева список каналов с прямым стыком чата, компактная карточка справа и входящие/исходящие пузырьки. Снимок получен из настоящих Flutter-виджетов с демонстрационными данными, а не из работающего сообщества. Палитры, логотип и локальные шрифты сохранены. Снимок иллюстрирует интерфейс с демонстрационным разговором.
 
-Flutter 3.47.6 / Dart 3.13.5. Из каталога `client`:
+Flutter 3.47.7 (версия закреплена в CI). Из каталога `client`:
 
 ```powershell
 flutter pub get
@@ -51,22 +51,23 @@ flutter test --no-pub
 
 ## Публикация
 
-Текущий экспериментальный выпуск — [v0.2.3](https://github.com/space-protocol-project/space-app/releases/latest), опубликован 14 октября 2026 года. В приложении закреплён [домашний runtime v0.2.2](https://github.com/space-protocol-project/space-server/releases/tag/v0.2.2).
+Текущий обычный выпуск — [v0.7.2](https://github.com/space-protocol-project/space-app/releases/tag/v0.7.2), опубликован 19 октября 2026 года. Совместим с [домашним runtime v0.7.1](https://github.com/space-protocol-project/space-server/releases/tag/v0.7.1), схемой PostgreSQL 23 и голосовым профилем 3. Для обновления клиента с v0.7.1 новый runtime не требуется. Выпуск добавляет настройки голоса и рации, восстановление соединения и полный перенос устройства.
 
 | Система | Скачать последнюю версию |
 | --- | --- |
 | Windows 10/11 x64 | [Установщик EXE](https://github.com/space-protocol-project/space-app/releases/latest/download/Space-Setup-windows-x64.exe) |
 | macOS Apple Silicon | [Образ DMG](https://github.com/space-protocol-project/space-app/releases/latest/download/Space-macos-arm64.dmg) |
 | Linux x64 | [Установщик RUN](https://github.com/space-protocol-project/space-app/releases/latest/download/Space-linux-x64.run) |
+| Android | [Подписанный APK](https://github.com/space-protocol-project/space-app/releases/latest/download/Space-android.apk) |
 
-[SHA-256 установщиков](https://github.com/space-protocol-project/space-app/releases/latest/download/SHA256SUMS.txt). Ссылки автоматически ведут на последний публичный выпуск. Ключи подписи для обновлений не требуются; загрузка проверяется по размеру и SHA-256. В установленной Windows-копии приложение запускает установщик и перезапускается после обновления. [Как обновить](docs/APP-UPDATES.md), [как восстановить домашний сервер](docs/HOME-RECOVERY.md).
+[SHA-256 установщиков](https://github.com/space-protocol-project/space-app/releases/latest/download/SHA256SUMS.txt). Ссылки автоматически ведут на последний публичный выпуск. Отдельная подпись манифеста настольного обновления не используется; загрузка проверяется по размеру и SHA-256. Android APK подписывается ключом выпуска, и обновление требует сохранения этой подписи. В установленной Windows-копии приложение запускает установщик и перезапускается после обновления. [Как обновить](docs/APP-UPDATES.md), [как восстановить домашний сервер](docs/HOME-RECOVERY.md).
 
-[CI выпуска клиента](https://github.com/space-protocol-project/space-app/actions/runs/38483265549) проверил сборки трёх ОС, системный vault Windows и установку поверх v0.2.1 с сохранением данных и перезапуском. [CI runtime](https://github.com/space-protocol-project/space-server/actions/runs/38482588850) проверил обновление и восстановление реальной PostgreSQL на трёх ОС. Локальные проверки кода перед выпуском: 213 тестов Flutter, четыре штатных пропуска, анализ и Windows release.
+[Релизный CI v0.7.2](https://github.com/space-protocol-project/space-app/actions/runs/39260379635) проверяет установщики трёх настольных ОС, подписанный Android APK, обновление Windows поверх v0.2.1 с сохранением данных и перезапуском, нативные уведомления, MLS на четырёх платформах и совместимую пару клиента/runtime. Дополнительный [предрелизный прогон пары](https://github.com/space-protocol-project/space-server/actions/runs/39257316119) прошёл Go `-race`, vet, проверку уязвимых вызовов, полный Flutter и сквозные RPC/PostgreSQL/MLS-сценарии. На Linux прошли 711 Flutter-тестов, 19 штатно пропущены; отдельный Windows-прогон того же Dart-кода — 713 успешных и 17 пропусков. Анализ чистый, максимум COG 15.
 
-Тег `vX.Y.Z` запускает проверки и сборку Windows Setup, macOS DMG и Linux RUN. CI публикует выпуск только после успешных сборок и проверок; описание берётся из одноимённого раздела [Changelog.md](Changelog.md), вместе с установщиками публикуется SHA-256. [Подробности](packaging/README.md).
+Тег `vX.Y.Z` запускает проверки и сборку Windows Setup, macOS DMG, Linux RUN и подписанного Android APK. CI публикует выпуск только после успешных сборок и проверок; описание берётся из одноимённого раздела [Changelog.md](Changelog.md), вместе с установщиками публикуется SHA-256. [Подробности](packaging/README.md).
 
-Windows — первая проверенная платформа. macOS/Linux требуют ручной проверки установки, защищённого хранилища и восстановления; DMG пока без подписи Apple и notarization. Реальное подключение друзей из интернета проверяется отдельно от runner.
+Windows прошла нативные стенды аудио и переподключения. Ручные акустика, физические клавиши/гарнитуры, публичный TURN/TLS, перенос на чистую ОС и приёмка на реальном оборудовании macOS/Linux ещё не завершены; Android на устройстве/эмуляторе также не проверялся. Эти ограничения не закрываются зелёным CI: [открытая матрица Р1–Р12](https://github.com/space-protocol-project/space-protocol/blob/codex/voice-rooms/TODO.md). DMG пока без подписи Apple и notarization. Звук доступен runtime и не является MLS/E2EE; экспериментальные ограничения MLS сохраняются.
 
-В v0.3.0 доступны вложения до пяти файлов по 20 МиБ, независимая политика файлов и квоты каждого сервера, а также уникальное имя участника в «Обзоре» пространства. Для этих функций обновите домашний runtime до v0.3.0 (схема 14) в разделе «Эфир» после установки приложения.
+Вложения до пяти файлов по 20 МиБ, независимая политика файлов и квоты каждого сервера, а также уникальное имя участника доступны начиная с v0.3.0. Для текущего клиента v0.7.2 используйте runtime v0.7.1 со схемой 23; прежняя рекомендация runtime v0.3.0 относится к историческому выпуску.
 
 [Резервные копии по расписанию и настройки хранения](docs/SCHEDULED-BACKUPS.md).
