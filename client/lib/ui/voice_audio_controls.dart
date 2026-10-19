@@ -45,21 +45,26 @@ class _VoiceGainSliderState extends State<VoiceGainSlider> {
           '${widget.label} · ${(value * 100).round()}%',
           style: Theme.of(context).textTheme.titleSmall,
         ),
-        Slider(
-          value: value,
-          min: 0,
-          max: 2,
-          divisions: 100,
-          label: '${(value * 100).round()}%',
-          onChanged: widget.onChanged == null
-              ? null
-              : (value) => setState(() => _drag = value),
-          onChangeEnd: widget.onChanged == null
-              ? null
-              : (value) {
-                  setState(() => _drag = null);
-                  widget.onChanged!(value);
-                },
+        // Локальный Overlay удерживает узлы индикатора Slider внутри диалога.
+        Overlay.wrap(
+          alwaysSizeToContent: true,
+          clipBehavior: Clip.none,
+          child: Slider(
+            value: value,
+            min: 0,
+            max: 2,
+            divisions: 100,
+            label: '${(value * 100).round()}%',
+            onChanged: widget.onChanged == null
+                ? null
+                : (value) => setState(() => _drag = value),
+            onChangeEnd: widget.onChanged == null
+                ? null
+                : (value) {
+                    setState(() => _drag = null);
+                    widget.onChanged!(value);
+                  },
+          ),
         ),
       ],
     );
@@ -178,15 +183,19 @@ class VoiceProcessingControls extends StatelessWidget {
       Text(
         '${context.strings.voiceSensitivity}: ${state.audio.thresholdDb.round()} dBFS',
       ),
-      Slider(
-        value: state.audio.thresholdDb,
-        min: -60,
-        max: -10,
-        divisions: 50,
-        label: '${state.audio.thresholdDb.round()} dBFS',
-        onChanged: state.busy
-            ? null
-            : (value) => _update(state.audio.copyWith(thresholdDb: value)),
+      Overlay.wrap(
+        alwaysSizeToContent: true,
+        clipBehavior: Clip.none,
+        child: Slider(
+          value: state.audio.thresholdDb,
+          min: -60,
+          max: -10,
+          divisions: 50,
+          label: '${state.audio.thresholdDb.round()} dBFS',
+          onChanged: state.busy
+              ? null
+              : (value) => _update(state.audio.copyWith(thresholdDb: value)),
+        ),
       ),
     ],
   );

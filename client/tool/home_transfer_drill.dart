@@ -46,8 +46,9 @@ Future<RunningSpace> startSpace(
   String executable,
   String runtime,
   Directory root,
-  String ip,
-) async {
+  String ip, {
+  String bindHost = '127.0.0.1',
+}) async {
   final data = Directory('${root.path}/data');
   final process = await Process.start(executable, [
     '-home-runtime',
@@ -57,19 +58,24 @@ Future<RunningSpace> startSpace(
     '-public-ip',
     ip,
     '-http',
-    '127.0.0.1:18080',
+    '$bindHost:18080',
     '-grpc',
-    '127.0.0.1:19090',
+    '$bindHost:19090',
     '-https',
-    '127.0.0.1:8443',
+    '$bindHost:8443',
     '-managed',
   ]);
   process.stdout.listen(stdout.add);
   process.stderr.listen(stderr.add);
+  int? exited;
+  unawaited(process.exitCode.then((code) => exited = code));
   try {
     final ready = File('${data.path}/state.json');
     final deadline = DateTime.now().add(const Duration(seconds: 60));
     while (!await ready.exists()) {
+      if (exited != null) {
+        throw StateError('Сервер завершился до готовности, код $exited');
+      }
       if (DateTime.now().isAfter(deadline)) {
         throw StateError('Нет готовности сервера');
       }

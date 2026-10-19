@@ -38,6 +38,7 @@ void main() {
           runtime!,
           original,
           '203.0.113.10',
+          bindHost: '127.0.0.2',
         );
         final sourceStorage = MemoryMlsStorage();
         final sourceVault = KeyIdentityVault(sourceStorage);
@@ -157,6 +158,7 @@ void main() {
           runtime,
           restored,
           '203.0.113.10',
+          bindHost: '127.0.0.2',
         );
         session = await SpaceSession.connect(running.discovery, targetVault);
         expect(session.record.grantId, record.grantId);
