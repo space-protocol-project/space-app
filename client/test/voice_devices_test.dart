@@ -201,7 +201,10 @@ void main() {
   test('Native desktop microphone selection is passed as sourceId, not playback deviceId', () {
     final constraints = voiceMicrophoneConstraints('chosen-microphone');
     final audio = constraints['audio'] as Map;
-    expect(audio['optional'], contains(equals({'sourceId': 'chosen-microphone'})));
+    expect(
+      audio['optional'],
+      contains(equals({'sourceId': 'chosen-microphone'})),
+    );
     expect(audio.containsKey('deviceId'), false);
     expect(constraints['video'], false);
     expect(
@@ -226,7 +229,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Микрофон'), findsOneWidget);
-    await tester.tap(find.byType(DropdownButtonFormField<String>).first);
+    await tester.tap(find.byType(DropdownButton<String>).first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Microphone').last);
     await tester.pumpAndSettle();
@@ -248,6 +251,80 @@ void main() {
     expect(controller.state.output, 'speaker');
     expect(backend.selected, [backend.microphone, backend.speaker]);
     await controller.close();
+  });
+
+  testWidgets('Подтверждённый микрофон показан после повторного открытия', (
+    tester,
+  ) async {
+    final backend = DevicesBackend();
+    var controller = VoiceDevices(backend: backend);
+    Widget dialog() => MaterialApp(
+      locale: const Locale('ru'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: VoiceDevicesDialog(devices: controller),
+    );
+    await tester.pumpWidget(dialog());
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(DropdownButton<String>).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Microphone').last);
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<DropdownButton<String>>(
+            find.byType(DropdownButton<String>).first,
+          )
+          .value,
+      'mic',
+    );
+    await tester.pumpWidget(const SizedBox());
+    await controller.close();
+    controller = VoiceDevices(backend: DevicesBackend());
+    addTearDown(controller.close);
+    await tester.pumpWidget(dialog());
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<DropdownButton<String>>(
+            find.byType(DropdownButton<String>).first,
+          )
+          .value,
+      'mic',
+    );
+    expect(controller.state.error, isEmpty);
+  });
+
+  testWidgets('Неудачный выбор не показывает неприменённый микрофон', (
+    tester,
+  ) async {
+    final backend = DevicesBackend();
+    final controller = VoiceDevices(backend: backend);
+    addTearDown(controller.close);
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ru'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: VoiceDevicesDialog(devices: controller),
+      ),
+    );
+    await tester.pumpAndSettle();
+    backend.error = StateError('Микрофон отключён');
+    await tester.tap(find.byType(DropdownButton<String>).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Microphone').last);
+    await tester.pumpAndSettle();
+    expect(controller.state.input, isNull);
+    expect(
+      tester
+          .widget<DropdownButton<String>>(
+            find.byType(DropdownButton<String>).first,
+          )
+          .value,
+      isNull,
+    );
+    expect(find.textContaining('Микрофон отключён'), findsOneWidget);
   });
 
   test('Failed switching preserves the previous choice', () async {

@@ -202,42 +202,49 @@ class _VoiceDevicesDialogState extends State<VoiceDevicesDialog>
     final selected = input ? state.input : state.output;
     final missing = input ? state.inputUnavailable : state.outputUnavailable;
     final value = selected;
-    return DropdownButtonFormField<String>(
-      key: ValueKey('${input ? 'input' : 'output'}-$value'),
-      initialValue: value,
-      isExpanded: true,
+    return InputDecorator(
+      isEmpty: value == null,
       decoration: InputDecoration(
         prefixIcon: Icon(input ? Icons.mic_none : Icons.headphones_outlined),
         border: const OutlineInputBorder(),
       ),
-      hint: Text(context.strings.voiceCurrentDevice),
-      items: [
-        if (missing)
-          DropdownMenuItem(
-            value: selected,
-            enabled: false,
-            child: Text(
-              context.strings.voiceDeviceDisconnected,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        for (final device in options)
-          DropdownMenuItem(
-            value: device.id,
-            child: Text(
-              device.label.isEmpty ? device.id : device.label,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-      ],
-      onChanged: state.busy
-          ? null
-          : (id) {
-              if (id == null) return;
-              unawaited(
-                devices.select(options.firstWhere((device) => device.id == id)),
-              );
-            },
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          key: ValueKey(input ? 'voice-input' : 'voice-output'),
+          value: value,
+          isExpanded: true,
+          hint: Text(context.strings.voiceCurrentDevice),
+          items: [
+            if (missing)
+              DropdownMenuItem(
+                value: selected,
+                enabled: false,
+                child: Text(
+                  context.strings.voiceDeviceDisconnected,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            for (final device in options)
+              DropdownMenuItem(
+                value: device.id,
+                child: Text(
+                  device.label.isEmpty ? device.id : device.label,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+          ],
+          onChanged: state.busy
+              ? null
+              : (id) {
+                  if (id == null) return;
+                  unawaited(
+                    devices.select(
+                      options.firstWhere((device) => device.id == id),
+                    ),
+                  );
+                },
+        ),
+      ),
     );
   }
 }
