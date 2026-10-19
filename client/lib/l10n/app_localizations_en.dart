@@ -10,6 +10,40 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get deviceTransferTitle => 'Device transfer';
+
+  @override
+  String get deviceTransferHelp =>
+      'Two steps: save one encrypted archive, then drop it here on the new device. Spaces, keys, history, queues, drafts, settings and the home server move together.';
+
+  @override
+  String get deviceTransferExport => 'Full transfer';
+
+  @override
+  String get deviceTransferExportHelp => 'Save the entire device in one file';
+
+  @override
+  String get deviceTransferRestore => 'Full restore';
+
+  @override
+  String get deviceTransferRestoreHelp =>
+      'Drop the archive here or click to select a file';
+
+  @override
+  String get deviceTransferOneFile => 'Drop one full device transfer file.';
+
+  @override
+  String get deviceTransferPasswordHelp =>
+      'The archive requires a password of at least 12 characters. After verification, full transfer stops all spaces and the home server on the source device. Keep the archive and password outside the OS disk. Restore into a fresh installation and restart the app. Do not restore one archive onto several devices. After resuming messages, create a fresh archive for the next move.';
+
+  @override
+  String get deviceTransferFinished =>
+      'Keep the archive and password. Close the app; open it again after restoring. Do not resume messaging on the source device.';
+
+  @override
+  String get deviceTransferClose => 'Close application';
+
+  @override
   String get failureConflict =>
       'The message has changed. Close the editor and open the latest version; you can copy your text before closing.';
 

@@ -151,11 +151,13 @@ class SettingsPanel extends StatelessWidget {
     this.updates,
     this.prepareInstall,
     this.requestNotificationPermission,
+    this.deviceTransfer,
   });
   final AppUpdates? updates;
   final Future<void> Function()? prepareInstall;
   final Future<bool> Function()? requestNotificationPermission;
   final AppPreferences preferences;
+  final Widget? deviceTransfer;
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<AppPreferences, PreferencesState>(
@@ -258,6 +260,10 @@ class SettingsPanel extends StatelessWidget {
       ],
       const SizedBox(height: 24),
       AppUpdatesView(updates: updates, prepareInstall: prepareInstall),
+      if (deviceTransfer != null) ...[
+        const SizedBox(height: 24),
+        deviceTransfer!,
+      ],
     ],
   );
 }

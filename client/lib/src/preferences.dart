@@ -42,6 +42,11 @@ class AppPreferences
   }
 
   Future<void> load() => sendRequest(PreferencesLoaded());
+  Future<void> flush() async {
+    await _writes;
+    if (error.isNotEmpty) throw StateError(error);
+  }
+
   Future<void> changeNotifications(int mode) =>
       sendRequest(NotificationsChanged(mode));
   int notificationMode = 0;

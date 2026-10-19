@@ -36,6 +36,12 @@ import '../src/app_updates.dart';
 import '../src/secure_vault.dart';
 import '../src/home_controller.dart';
 import '../src/home_migration.dart';
+import '../src/device_migration.dart';
+import '../src/saved_drafts.dart';
+import 'device_transfer_area.dart';
+
+import 'package:path_provider/path_provider.dart';
+
 import '../src/mls/platform_flutter.dart' as mls_platform;
 import '../src/server_presence.dart';
 import '../src/server_workspaces.dart';
@@ -417,6 +423,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   }
 
   Future<void> watchSavedServers() async {
+    if (movingDevice) return;
     deniedHandled.removeWhere(
       (origin) => workspaces[origin]?.accessRemoved != true,
     );
@@ -426,7 +433,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   }
 
   void announcePresence(ServerPresenceChange change) {
-    if (!mounted) return;
+    if (!mounted || movingDevice) return;
     if (change.online &&
         !(home.busy &&
             home.phase == HomePhase.stopping &&
@@ -679,6 +686,56 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     }
     await stopHome();
   }
+
+  Future<DeviceMigration> _deviceMigration(
+    void Function(String) progress,
+  ) async {
+    await home.load();
+    return DeviceMigration(
+      home: home,
+      devices: HomeMigration(
+        vault: SecureIdentityVault(),
+        storage: const PlatformKeyStorage(),
+        locks: mls_platform.lockDirectory,
+      ),
+      preferences: await SharedPreferences.getInstance(),
+      directory: getApplicationSupportDirectory,
+      stop: _stopDeviceForMigration,
+      progress: progress,
+    );
+  }
+
+  bool movingDevice = false;
+
+  Future<void> _stopDeviceForMigration() async {
+    movingDevice = true;
+    mlsNotificationTimer?.cancel();
+    await presence.watch([]);
+    await voice.leave();
+    await widget.preferences.flush();
+    await SavedDrafts.flush();
+    for (final target in {
+      initialController,
+      ...workspaces.controllers.values,
+      ...transientControllers,
+    }) {
+      await target.flushHistory();
+      if (target.cacheError.isNotEmpty) {
+        throw StateError('Не удалось сохранить историю: ${target.cacheError}');
+      }
+      await target.disconnect();
+    }
+    await stopHome();
+    await widget.preferences.flush();
+    await SavedDrafts.flush();
+  }
+
+  Widget deviceTransferArea() => DeviceTransferArea(
+    export: (path, password, progress) async =>
+        (await _deviceMigration(progress)).export(path, password),
+    restore: (path, password, progress) async =>
+        (await _deviceMigration(progress)).restore(path, password),
+  );
 
   Future<void> createOwnSpace() async {
     if (!home.supported) return;
@@ -1773,6 +1830,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
                             pages(),
                             SettingsPanel(
                               preferences: widget.preferences,
+                              deviceTransfer: deviceTransferArea(),
                               requestNotificationPermission:
                                   systemNotifications.requestPermission,
                               updates: updates,

@@ -205,6 +205,29 @@ class MlsLocalStore {
     return raw != null && (jsonDecode(raw) as Map)['transferred'] == transferId;
   });
 
+  // При переносе всего устройства несколько ratchet останавливаются подряд.
+  // После обрыва разрешено остановить лишь неизменившийся исходный снимок.
+  Future<void> completeDeviceTransfer(
+    Map<String, dynamic> checkpoint,
+    String transferId,
+  ) => _serial(() async {
+    final raw = await storage.read(key: storageKey);
+    try {
+      await _verify(raw);
+    } on MlsRecoveryRequired {
+      await _completeInterruptedRetirement(raw, checkpoint, transferId);
+      return;
+    }
+    if (raw != null && (jsonDecode(raw) as Map)['transferred'] == transferId) {
+      return;
+    }
+    if (raw != jsonEncode(checkpoint)) {
+      throw StateError('Исходное состояние MLS изменилось после экспорта');
+    }
+    await validateCheckpoint(checkpoint);
+    await _save(_frozenCheckpoint(checkpoint, transferId));
+  });
+
   Future<void> _completeInterruptedRetirement(
     String? raw,
     Map<String, dynamic> checkpoint,

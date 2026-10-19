@@ -10,6 +10,42 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
+  String get deviceTransferTitle => 'Перенос устройства';
+
+  @override
+  String get deviceTransferHelp =>
+      'Два шага: сохраните один зашифрованный архив, затем перетащите его сюда на новом устройстве. Пространства, ключи, история, очереди, черновики, настройки и домашний Эфир переносятся вместе.';
+
+  @override
+  String get deviceTransferExport => 'Полный перенос';
+
+  @override
+  String get deviceTransferExportHelp =>
+      'Сохранить устройство целиком в один файл';
+
+  @override
+  String get deviceTransferRestore => 'Полное восстановление';
+
+  @override
+  String get deviceTransferRestoreHelp =>
+      'Перетащите архив сюда или нажмите, чтобы выбрать файл';
+
+  @override
+  String get deviceTransferOneFile =>
+      'Перетащите один файл полного переноса устройства.';
+
+  @override
+  String get deviceTransferPasswordHelp =>
+      'Архив защищён паролем от 12 символов. Полный перенос остановит все пространства и домашний сервер на исходном устройстве после проверки архива. Сохраните архив и пароль вне диска ОС. Восстановление выполняется в новой установке; после него перезапустите приложение. Не восстанавливайте один архив на нескольких устройствах. Для следующего переноса после продолжения переписки нужен новый архив.';
+
+  @override
+  String get deviceTransferFinished =>
+      'Сохраните архив и пароль. Закройте приложение; после восстановления откройте его заново. Прежнее устройство не используйте для продолжения переписки.';
+
+  @override
+  String get deviceTransferClose => 'Закрыть приложение';
+
+  @override
   String get failureConflict =>
       'Сообщение уже изменено. Закройте редактор и откройте актуальную версию; ваш текст можно скопировать перед закрытием.';
 

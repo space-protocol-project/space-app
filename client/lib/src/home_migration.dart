@@ -23,6 +23,16 @@ class HomeMigration {
   final Future<Directory> Function() locks;
   final MlsEngine engine;
 
+  Future<MlsLocalStore?> deviceStore(DeviceRecord record) => _store(record);
+
+  Future<void> installServer({
+    required HomeController home,
+    required String path,
+    required String publicIP,
+    required HomeArchiveInspection report,
+    required String id,
+  }) => _installServer(home, path, publicIP, report, id);
+
   Future<MlsLocalStore?> _store(DeviceRecord record) async {
     final scope = record.mlsIdentity;
     if (scope == null) {

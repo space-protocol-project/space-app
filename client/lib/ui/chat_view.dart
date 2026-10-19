@@ -1,4 +1,5 @@
 import 'message_input_surface.dart';
+import '../src/saved_drafts.dart';
 
 import 'package:flutter/rendering.dart' show ScrollDirection;
 
@@ -120,6 +121,8 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   final draftFocus = FocusNode();
   final scroll = ScrollController();
   final Map<String, String> drafts = {};
+  bool changingDraft = false;
+  int draftLoadGeneration = 0;
   final Map<String, double> offsets = {};
   bool restoreScroll = true;
   String scope = '';
@@ -141,6 +144,31 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
     WidgetsBinding.instance.addObserver(this);
     scroll.addListener(queueReadCheck);
+    draft.addListener(saveDraft);
+    unawaited(loadDraft(scope));
+  }
+
+  void saveDraft() {
+    if (editing != null || changingDraft) return;
+    draftLoadGeneration++;
+    drafts[scope] = draft.text;
+    SavedDrafts.save(scope, draft.text);
+  }
+
+  Future<void> loadDraft(String requestedScope) async {
+    final generation = draftLoadGeneration;
+    try {
+      final text = await SavedDrafts.load(requestedScope);
+      if (!mounted ||
+          generation != draftLoadGeneration ||
+          scope != requestedScope ||
+          draft.text.isNotEmpty) {
+        return;
+      }
+      draft.text = text;
+    } catch (_) {
+      // Ошибка хранилища не должна мешать набору нового сообщения.
+    }
   }
 
   @override
@@ -163,7 +191,10 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       scope = next;
       entryReadThrough = widget.controller.readThrough;
       messageKeys.clear();
+      changingDraft = true;
       draft.text = drafts[scope] ?? '';
+      changingDraft = false;
+      unawaited(loadDraft(scope));
       restoreScroll = true;
     }
   }

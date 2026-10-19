@@ -5,14 +5,20 @@ import '../l10n/strings.dart';
 Future<String?> migrationPassword(
   BuildContext context, {
   required bool importing,
+  bool device = false,
 }) => showDialog<String>(
   context: context,
-  builder: (_) => _MigrationPasswordDialog(importing: importing),
+  builder: (_) =>
+      _MigrationPasswordDialog(importing: importing, device: device),
 );
 
 class _MigrationPasswordDialog extends StatefulWidget {
-  const _MigrationPasswordDialog({required this.importing});
+  const _MigrationPasswordDialog({
+    required this.importing,
+    this.device = false,
+  });
   final bool importing;
+  final bool device;
   @override
   State<_MigrationPasswordDialog> createState() =>
       _MigrationPasswordDialogState();
@@ -34,7 +40,13 @@ class _MigrationPasswordDialogState extends State<_MigrationPasswordDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text(context.strings.migrationTitle),
+    title: Text(
+      widget.device
+          ? (widget.importing
+                ? context.strings.deviceTransferRestore
+                : context.strings.deviceTransferExport)
+          : context.strings.migrationTitle,
+    ),
     content: SizedBox(
       width: 500,
       child: SingleChildScrollView(
@@ -43,7 +55,9 @@ class _MigrationPasswordDialogState extends State<_MigrationPasswordDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.importing
+              widget.device
+                  ? context.strings.deviceTransferPasswordHelp
+                  : widget.importing
                   ? context.strings.migrationImportHelp
                   : context.strings.migrationExportHelp,
             ),

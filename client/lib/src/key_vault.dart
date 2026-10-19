@@ -49,6 +49,11 @@ class KeyIdentityVault implements RotationJournalVault {
   }
 
   Future<void> _requireActive(String origin) async {
+    if (await _storage.read(key: 'space.device-migration.export') != null) {
+      throw StateError(
+        'Устройство перенесено. Продолжите работу на новом устройстве.',
+      );
+    }
     if (await _storage.read(key: '${await _key(origin)}.transferred') != null) {
       throw StateError(
         'Устройство перенесено. Восстановите архив на новом устройстве.',

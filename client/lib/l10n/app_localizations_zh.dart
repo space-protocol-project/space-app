@@ -10,6 +10,38 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get deviceTransferTitle => '迁移设备';
+
+  @override
+  String get deviceTransferHelp =>
+      '只需两步：保存一个加密归档，然后在新设备上将其拖入此处。空间、密钥、历史、队列、草稿、设置和家庭服务器一起迁移。';
+
+  @override
+  String get deviceTransferExport => '完整迁移';
+
+  @override
+  String get deviceTransferExportHelp => '将整个设备保存到一个文件';
+
+  @override
+  String get deviceTransferRestore => '完整恢复';
+
+  @override
+  String get deviceTransferRestoreHelp => '将归档拖入此处或点击选择文件';
+
+  @override
+  String get deviceTransferOneFile => '请拖入一个完整设备迁移文件。';
+
+  @override
+  String get deviceTransferPasswordHelp =>
+      '密码至少12个字符。归档验证后会停止原设备的所有空间和家庭服务器。请将归档和密码保存在系统磁盘之外。恢复到全新安装后重新启动应用。请勿将同一归档恢复到多台设备。继续通信后，下次迁移需要创建新归档。';
+
+  @override
+  String get deviceTransferFinished => '请保存归档和密码。关闭应用，恢复后重新打开。请勿在原设备上继续通信。';
+
+  @override
+  String get deviceTransferClose => '关闭应用';
+
+  @override
   String get failureConflict => '消息已更改。请关闭编辑器并打开最新版本；关闭前可以复制您输入的文本。';
 
   @override
@@ -2021,6 +2053,38 @@ class AppLocalizationsZh extends AppLocalizations {
 /// The translations for Chinese, using the Han script (`zh_Hans`).
 class AppLocalizationsZhHans extends AppLocalizationsZh {
   AppLocalizationsZhHans() : super('zh_Hans');
+
+  @override
+  String get deviceTransferTitle => '迁移设备';
+
+  @override
+  String get deviceTransferHelp =>
+      '只需两步：保存一个加密归档，然后在新设备上将其拖入此处。空间、密钥、历史、队列、草稿、设置和家庭服务器一起迁移。';
+
+  @override
+  String get deviceTransferExport => '完整迁移';
+
+  @override
+  String get deviceTransferExportHelp => '将整个设备保存到一个文件';
+
+  @override
+  String get deviceTransferRestore => '完整恢复';
+
+  @override
+  String get deviceTransferRestoreHelp => '将归档拖入此处或点击选择文件';
+
+  @override
+  String get deviceTransferOneFile => '请拖入一个完整设备迁移文件。';
+
+  @override
+  String get deviceTransferPasswordHelp =>
+      '密码至少12个字符。归档验证后会停止原设备的所有空间和家庭服务器。请将归档和密码保存在系统磁盘之外。恢复到全新安装后重新启动应用。请勿将同一归档恢复到多台设备。继续通信后，下次迁移需要创建新归档。';
+
+  @override
+  String get deviceTransferFinished => '请保存归档和密码。关闭应用，恢复后重新打开。请勿在原设备上继续通信。';
+
+  @override
+  String get deviceTransferClose => '关闭应用';
 
   @override
   String get attentionDescription => '可以在应用设置中启用通知。摄像头和麦克风仅在您操作时开启。';

@@ -101,6 +101,66 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @deviceTransferTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перенос устройства'**
+  String get deviceTransferTitle;
+
+  /// No description provided for @deviceTransferHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Два шага: сохраните один зашифрованный архив, затем перетащите его сюда на новом устройстве. Пространства, ключи, история, очереди, черновики, настройки и домашний Эфир переносятся вместе.'**
+  String get deviceTransferHelp;
+
+  /// No description provided for @deviceTransferExport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Полный перенос'**
+  String get deviceTransferExport;
+
+  /// No description provided for @deviceTransferExportHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить устройство целиком в один файл'**
+  String get deviceTransferExportHelp;
+
+  /// No description provided for @deviceTransferRestore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Полное восстановление'**
+  String get deviceTransferRestore;
+
+  /// No description provided for @deviceTransferRestoreHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перетащите архив сюда или нажмите, чтобы выбрать файл'**
+  String get deviceTransferRestoreHelp;
+
+  /// No description provided for @deviceTransferOneFile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перетащите один файл полного переноса устройства.'**
+  String get deviceTransferOneFile;
+
+  /// No description provided for @deviceTransferPasswordHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Архив защищён паролем от 12 символов. Полный перенос остановит все пространства и домашний сервер на исходном устройстве после проверки архива. Сохраните архив и пароль вне диска ОС. Восстановление выполняется в новой установке; после него перезапустите приложение. Не восстанавливайте один архив на нескольких устройствах. Для следующего переноса после продолжения переписки нужен новый архив.'**
+  String get deviceTransferPasswordHelp;
+
+  /// No description provided for @deviceTransferFinished.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохраните архив и пароль. Закройте приложение; после восстановления откройте его заново. Прежнее устройство не используйте для продолжения переписки.'**
+  String get deviceTransferFinished;
+
+  /// No description provided for @deviceTransferClose.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть приложение'**
+  String get deviceTransferClose;
+
   /// No description provided for @failureConflict.
   ///
   /// In ru, this message translates to:
