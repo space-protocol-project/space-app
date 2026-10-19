@@ -108,7 +108,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feed => 'Feed';
 
   @override
-  String get rooms => 'Meetings';
+  String get rooms => 'Rooms';
 
   @override
   String get identity => 'My access and devices';

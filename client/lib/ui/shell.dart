@@ -1108,6 +1108,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
           for (final section in [
             Section.overview,
             Section.chat,
+            Section.rooms,
             Section.settings,
           ])
             _sidebarSection(section),
@@ -1200,6 +1201,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             onTap: showServers,
           ),
           if (controller.preview != null || controller.connected) chatGroup(),
+          _sidebarSection(Section.rooms),
           ListTile(
             leading: const Icon(Icons.bookmark_border),
             title: Text(context.strings.favoriteMessages),

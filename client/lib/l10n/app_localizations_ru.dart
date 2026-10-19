@@ -110,7 +110,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get feed => 'Лента';
 
   @override
-  String get rooms => 'Встречи';
+  String get rooms => 'Комнаты';
 
   @override
   String get identity => 'Мой доступ и устройства';
