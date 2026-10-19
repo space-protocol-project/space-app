@@ -27,9 +27,7 @@ class _MigrationPasswordDialog extends StatefulWidget {
 class _MigrationPasswordDialogState extends State<_MigrationPasswordDialog> {
   final password = TextEditingController();
   final confirmation = TextEditingController();
-  bool get valid => widget.importing
-      ? password.text.isNotEmpty
-      : password.text.length >= 12 && password.text == confirmation.text;
+  bool get valid => widget.importing || password.text == confirmation.text;
 
   @override
   void dispose() {

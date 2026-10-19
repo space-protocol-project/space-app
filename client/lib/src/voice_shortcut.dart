@@ -41,13 +41,15 @@ class VoiceShortcut {
         keyboard.isMetaPressed == meta;
   }
 
-  String get label => [
+  String get label => keys.join(' + ');
+
+  List<String> get keys => [
     if (control) 'Ctrl',
     if (alt) 'Alt',
     if (shift) 'Shift',
     if (meta) 'Meta',
     key == LogicalKeyboardKey.space ? 'Space' : key.keyLabel,
-  ].join(' + ');
+  ];
 
   static VoiceShortcut fromKey(LogicalKeyboardKey key) => VoiceShortcut(
     key: key,

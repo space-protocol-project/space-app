@@ -46,7 +46,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deviceTransferPasswordHelp =>
-      '密码至少12个字符。归档验证后会停止原设备的所有空间和家庭服务器。请将归档和密码保存在系统磁盘之外。恢复到全新安装后重新启动应用。请勿将同一归档恢复到多台设备。继续通信后，下次迁移需要创建新归档。';
+      '归档密码可以任意设置，也可以留空。归档验证后会停止原设备的所有空间和家庭服务器。请将归档和密码保存在系统磁盘之外。恢复到全新安装后重新启动应用。请勿将同一归档恢复到多台设备。继续通信后，下次迁移需要创建新归档。';
 
   @override
   String get deviceTransferFinished => '请保存归档和密码。关闭应用，恢复后重新打开。请勿在原设备上继续通信。';
@@ -2054,7 +2054,7 @@ class AppLocalizationsZh extends AppLocalizations {
       '恢复后将继续使用原设备身份。此归档只能用于一台新设备。旧服务器必须停止。现有密钥不会被替换。';
 
   @override
-  String get migrationPassword => '归档密码（至少 12 个字符）';
+  String get migrationPassword => '归档密码';
 
   @override
   String get migrationPasswordRepeat => '再次输入密码';

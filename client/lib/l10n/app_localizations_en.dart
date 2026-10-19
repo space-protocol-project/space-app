@@ -48,7 +48,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deviceTransferPasswordHelp =>
-      'The archive requires a password of at least 12 characters. After verification, full transfer stops all spaces and the home server on the source device. Keep the archive and password outside the OS disk. Restore into a fresh installation and restart the app. Do not restore one archive onto several devices. After resuming messages, create a fresh archive for the next move.';
+      'The archive password can be anything, including empty. After verification, full transfer stops all spaces and the home server on the source device. Keep the archive and password outside the OS disk. Restore into a fresh installation and restart the app. Do not restore one archive onto several devices. After resuming messages, create a fresh archive for the next move.';
 
   @override
   String get deviceTransferFinished =>
@@ -2225,7 +2225,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Restoring continues the previous device. Use the archive on only one new device. The old server must be stopped. Existing keys are never replaced.';
 
   @override
-  String get migrationPassword => 'Archive password (at least 12 characters)';
+  String get migrationPassword => 'Archive password';
 
   @override
   String get migrationPasswordRepeat => 'Repeat password';

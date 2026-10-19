@@ -33,26 +33,20 @@ void main() {
       await tester.pumpAndSettle();
       expect(
         tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
-        isNull,
+        isNotNull,
       );
-      await tester.enterText(
-        find.byType(TextField).first,
-        'Длинный пароль переноса',
-      );
+      await tester.enterText(find.byType(TextField).first, 'я');
       await tester.enterText(find.byType(TextField).last, 'не совпадает');
       await tester.pump();
       expect(
         tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
         isNull,
       );
-      await tester.enterText(
-        find.byType(TextField).last,
-        'Длинный пароль переноса',
-      );
+      await tester.enterText(find.byType(TextField).last, 'я');
       await tester.pump();
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
-      expect(result, 'Длинный пароль переноса');
+      expect(result, 'я');
       expect(tester.takeException(), isNull);
     });
   }
