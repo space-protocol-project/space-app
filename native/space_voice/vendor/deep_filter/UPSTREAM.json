@@ -1,0 +1,77 @@
+{
+  "commit": "978576aa8400552a4ce9730838c635aa30db5e61",
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "f7ef673bf046d823dcd775bdd0768432bd8855f81d0e5e1290a0a48c42e2dca3"
+    },
+    {
+      "path": "libDF/Cargo.toml",
+      "sha256": "90b361cd67f7bafcbccda5877559730b084f1986796102f4efded80bee2a451d"
+    },
+    {
+      "path": "libDF/LICENSE-APACHE",
+      "sha256": "1eaee808c5fb6b4e895ba30425285a5cdc5dd25bba2cd230f264c2200c331aec"
+    },
+    {
+      "path": "libDF/LICENSE-MIT",
+      "sha256": "24e6bb09c928af8d8e56268082f87413247ce36b39dd5d33add2f9893968065e"
+    },
+    {
+      "path": "libDF/src/augmentations.rs",
+      "sha256": "430477c42756dee447da7a99eccbf57e03addcc653455a50345f070eb57b949e"
+    },
+    {
+      "path": "libDF/src/bin/enhance_wav.rs",
+      "sha256": "49cf4fa689b87ad73fa49bf7057ca98f6d970ea08ab7a937ea9ee59b51d152d8"
+    },
+    {
+      "path": "libDF/src/bin/sample-dataset.rs",
+      "sha256": "764b1a8beeeba17b799b8378538b2cf5aa78c445f208d870531d05ed3129281c"
+    },
+    {
+      "path": "libDF/src/bin/sample-hdf5.rs",
+      "sha256": "8c0669d10de1b1f74dccb7bfc7146e10b8802fcc7a6597bbe5933e42e002edfd"
+    },
+    {
+      "path": "libDF/src/capi.rs",
+      "sha256": "c325381b26f541c221466f62c5f6c2d10a96729d1b971d75aa34417c7802f791"
+    },
+    {
+      "path": "libDF/src/dataloader.rs",
+      "sha256": "4f7f1f1f5ea1ae9fc3e154a89cde25e62be6cd3d00aabebd192dd63d68027fa4"
+    },
+    {
+      "path": "libDF/src/dataset.rs",
+      "sha256": "723710f5b848b9bd520df5733701c1090ea937124f6a5b3afc570aa547caa57c"
+    },
+    {
+      "path": "libDF/src/hdf5_key_cache.rs",
+      "sha256": "490afdaf1f52ac524f74152d9c2b8e44fd1d3a34817e7c0eaf19b41566859997"
+    },
+    {
+      "path": "libDF/src/lib.rs",
+      "sha256": "180df9cc7e7129d4372f09345846b17709a296bd51e3f8af073e1333ed1aab48"
+    },
+    {
+      "path": "libDF/src/tract.rs",
+      "sha256": "ad809ddb10e489990e572a8e97d79394df762c6f9c16a8defc9484d03c94426b"
+    },
+    {
+      "path": "libDF/src/transforms.rs",
+      "sha256": "2e85325ef8ca1dc0fa175c802466779f0f0c2449565180022bd3ea9d5920019b"
+    },
+    {
+      "path": "libDF/src/util.rs",
+      "sha256": "2542f314b353482f6f37879c3b366d34f0de207877bf030de33c7f26ef251587"
+    },
+    {
+      "path": "libDF/src/wav_utils.rs",
+      "sha256": "045aa96f0716d680e9d2e5c971f23ba79e4ec5be6103748e0673bf75057b21c3"
+    },
+    {
+      "path": "models/DeepFilterNet3_onnx.tar.gz",
+      "sha256": "c94d91f70911001c946e0fabb4aa9adc37045f45a03b56008cb0c8244cb63616"
+    }
+  ]
+}

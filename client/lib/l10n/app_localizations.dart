@@ -4059,6 +4059,108 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Обновить список комнат'**
   String get voiceRefreshRooms;
+
+  /// No description provided for @voiceRouteDirect.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прямое соединение'**
+  String get voiceRouteDirect;
+
+  /// No description provided for @voiceRouteRelay.
+  ///
+  /// In ru, this message translates to:
+  /// **'Через TURN'**
+  String get voiceRouteRelay;
+
+  /// No description provided for @voiceRouteUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Маршрут пока неизвестен'**
+  String get voiceRouteUnknown;
+
+  /// No description provided for @voiceRoundTrip.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задержка RTT: {milliseconds} мс'**
+  String voiceRoundTrip(int milliseconds);
+
+  /// No description provided for @voiceProfileSpeechHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Шумоподавление DeepFilterNet3, подавление эха, выравнивание громкости и фильтр гула.'**
+  String get voiceProfileSpeechHelp;
+
+  /// No description provided for @voiceProfileStudioHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Без обработки микрофона. Для музыки и подготовленного звука; используйте наушники.'**
+  String get voiceProfileStudioHelp;
+
+  /// No description provided for @voiceProfileCustomHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все параметры обработки можно настроить отдельно.'**
+  String get voiceProfileCustomHelp;
+
+  /// No description provided for @voiceActivity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Активация по голосу'**
+  String get voiceActivity;
+
+  /// No description provided for @voiceActivityHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'После ручного включения микрофона передача открывается при превышении порога. Фон тоже может сработать — настройте чувствительность.'**
+  String get voiceActivityHelp;
+
+  /// No description provided for @voiceNoiseSuppressionHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'DeepFilterNet3 — нейросетевое подавление шума. WebRTC — более лёгкий вариант. Звук обрабатывается на вашем устройстве.'**
+  String get voiceNoiseSuppressionHelp;
+
+  /// No description provided for @voiceNoiseWebRtc.
+  ///
+  /// In ru, this message translates to:
+  /// **'WebRTC'**
+  String get voiceNoiseWebRtc;
+
+  /// No description provided for @voiceNoiseOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отключено'**
+  String get voiceNoiseOff;
+
+  /// No description provided for @voiceAdvancedSettings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Расширенные настройки голоса'**
+  String get voiceAdvancedSettings;
+
+  /// No description provided for @voiceHighPass.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фильтр низкочастотного гула'**
+  String get voiceHighPass;
+
+  /// No description provided for @voiceAdvancedActivation.
+  ///
+  /// In ru, this message translates to:
+  /// **'Устойчивое срабатывание по голосу'**
+  String get voiceAdvancedActivation;
+
+  /// No description provided for @voiceAdvancedActivationHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удерживает передачу при колебаниях уровня около порога, чтобы не обрывать тихие окончания слов. Определяет уровень, а не распознаёт речь.'**
+  String get voiceAdvancedActivationHelp;
+
+  /// No description provided for @voiceReleaseDelay.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задержка закрытия передачи: {milliseconds} мс'**
+  String voiceReleaseDelay(int milliseconds);
 }
 
 class _AppLocalizationsDelegate

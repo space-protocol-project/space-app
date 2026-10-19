@@ -2235,4 +2235,65 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voiceRefreshRooms => 'Refresh rooms';
+
+  @override
+  String get voiceRouteDirect => 'Direct connection';
+
+  @override
+  String get voiceRouteRelay => 'Via TURN';
+
+  @override
+  String get voiceRouteUnknown => 'Route not yet known';
+
+  @override
+  String voiceRoundTrip(int milliseconds) {
+    return 'RTT: $milliseconds ms';
+  }
+
+  @override
+  String get voiceProfileSpeechHelp =>
+      'DeepFilterNet3 noise suppression, echo cancellation, automatic gain and high-pass filter.';
+
+  @override
+  String get voiceProfileStudioHelp =>
+      'Unprocessed microphone audio. For music and prepared input; use headphones.';
+
+  @override
+  String get voiceProfileCustomHelp =>
+      'Adjust each processing option separately.';
+
+  @override
+  String get voiceActivity => 'Voice activity';
+
+  @override
+  String get voiceActivityHelp =>
+      'After manually enabling the microphone, transmission opens above the threshold. Noise can also trigger it; adjust sensitivity.';
+
+  @override
+  String get voiceNoiseSuppressionHelp =>
+      'DeepFilterNet3 uses neural noise suppression. WebRTC is a lighter option. Audio is processed on your device.';
+
+  @override
+  String get voiceNoiseWebRtc => 'WebRTC';
+
+  @override
+  String get voiceNoiseOff => 'Off';
+
+  @override
+  String get voiceAdvancedSettings => 'Advanced voice settings';
+
+  @override
+  String get voiceHighPass => 'Low-frequency noise filter';
+
+  @override
+  String get voiceAdvancedActivation => 'Stable voice activation';
+
+  @override
+  String get voiceAdvancedActivationHelp =>
+      'Keeps transmission open near the threshold to preserve quiet word endings. Uses sound level, not speech recognition.';
+
+  @override
+  String voiceReleaseDelay(int milliseconds) {
+    return 'Transmission release delay: $milliseconds ms';
+  }
 }

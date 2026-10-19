@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'generated/space/v1/voice.pb.dart';
 import 'voice_media.dart';
+import 'voice_connection_info.dart';
 import 'voice_devices.dart';
 import 'voice_signaling.dart';
 import 'voice_recovery.dart';
@@ -30,11 +31,13 @@ class VoiceState {
     this.error = '',
     this.roster,
     this.canPublish = false,
+    this.connection = const VoiceConnectionInfo(),
   });
   final VoicePhase phase;
   final String title, room, error;
   final bool muted, deafened, busy, canPublish;
   final VoiceRoomState? roster;
+  final VoiceConnectionInfo connection;
   bool get active =>
       phase == VoicePhase.joining ||
       phase == VoicePhase.reconnecting ||
@@ -79,6 +82,7 @@ class VoiceController extends Cubit<VoiceState> {
   int _generation = 0;
   bool _closed = false;
   int? _pollingGeneration, _connectingGeneration;
+  int? _statisticsGeneration;
 
   Future<void> join(VoiceSignaling api, String room, String title) async {
     if (_closed || (_connectingGeneration == _generation && _target != null)) {
@@ -289,6 +293,16 @@ class VoiceController extends Cubit<VoiceState> {
     if (generation != _generation || _closed) {
       return;
     }
+    if (status == VoiceMediaStatus.processingFailed) {
+      unawaited(
+        _fail(
+          StateError(
+            'Ошибка обработки микрофона. Выберите другой режим шумоподавления.',
+          ),
+        ),
+      );
+      return;
+    }
     if (status == VoiceMediaStatus.failed) {
       unawaited(
         Future<void>.microtask(() async {
@@ -302,6 +316,7 @@ class VoiceController extends Cubit<VoiceState> {
       _connectionDeadline = null;
       _recovery.reset();
       _publish(phase: VoicePhase.connected);
+      unawaited(_refreshConnection(generation));
     }
   }
 
@@ -311,6 +326,7 @@ class VoiceController extends Cubit<VoiceState> {
     bool? muted,
     bool? deafened,
     bool? busy,
+    VoiceConnectionInfo? connection,
     String error = '',
   }) {
     if (_closed) {
@@ -328,11 +344,13 @@ class VoiceController extends Cubit<VoiceState> {
         error: error,
         roster: roomState,
         canPublish: roomState?.canPublish ?? false,
+        connection: connection ?? state.connection,
       ),
     );
   }
 
   Future<void> _refresh(int generation) async {
+    unawaited(_refreshConnection(generation));
     if (_pollingGeneration == generation ||
         state.busy ||
         _id.isEmpty ||
@@ -358,6 +376,40 @@ class VoiceController extends Cubit<VoiceState> {
         _pollingGeneration = null;
       }
     }
+  }
+
+  Future<void> _refreshConnection(int generation) async {
+    final media = _media;
+    if (generation != _generation ||
+        _statisticsGeneration == generation ||
+        state.phase != VoicePhase.connected ||
+        media is! VoiceConnectionMedia) {
+      return;
+    }
+    _statisticsGeneration = generation;
+    var info = const VoiceConnectionInfo();
+    try {
+      final pending = Future<VoiceConnectionInfo>.sync(
+        () => (media as VoiceConnectionMedia).connectionInfo(),
+      );
+      unawaited(
+        pending.then(
+          (_) => _finishStatistics(generation),
+          onError: (Object _, StackTrace stack) =>
+              _finishStatistics(generation),
+        ),
+      );
+      info = await pending.timeout(const Duration(seconds: 2));
+    } catch (_) {
+      // Диагностика не должна прерывать разговор или heartbeat комнаты.
+    }
+    if (generation == _generation && state.phase == VoicePhase.connected) {
+      _publish(connection: info, error: state.error);
+    }
+  }
+
+  void _finishStatistics(int generation) {
+    if (_statisticsGeneration == generation) _statisticsGeneration = null;
   }
 
   Future<void> _checkAudioDevices(int generation) async {

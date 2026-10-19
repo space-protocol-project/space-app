@@ -23,6 +23,7 @@ class VoiceTransmission with WidgetsBindingObserver {
     stop();
     settings = value;
     _active = true;
+    _noise = -55;
     _focused =
         WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
     WidgetsBinding.instance.addObserver(this);
@@ -84,10 +85,7 @@ class VoiceTransmission with WidgetsBindingObserver {
   }
 
   Future<void> _sample() async {
-    if (!_active ||
-        _sampling ||
-        settings.pushToTalk ||
-        voiceShortcutRecording.value) {
+    if (!_active || _sampling || voiceShortcutRecording.value) {
       return;
     }
     _sampling = true;
@@ -120,7 +118,10 @@ class VoiceTransmission with WidgetsBindingObserver {
         ? (_noise + 10).clamp(-50.0, -25.0)
         : settings.thresholdDb;
     if (db < threshold) _noise = _noise * .98 + db.clamp(-70, -25) * .02;
-    if (db >= threshold) _tail = 6;
+    final closingThreshold = settings.advancedActivation && _tail > 0
+        ? threshold - 4
+        : threshold;
+    if (db >= closingThreshold) _tail = (settings.releaseDelayMs / 50).ceil();
     final open = _tail > 0;
     if (_tail > 0) _tail--;
     return open;

@@ -13,6 +13,7 @@ import '../src/generated/space/v1/voice.pb.dart';
 import '../src/generated/space/v1/space.pb.dart' show Channel;
 import 'components.dart';
 import 'voice_devices.dart';
+import 'voice_connection_info.dart';
 
 class VoiceRoomsView extends StatelessWidget {
   const VoiceRoomsView({
@@ -184,6 +185,8 @@ class VoiceCallBar extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     _controls(context, state),
+                    if (state.phase == VoicePhase.connected)
+                      VoiceConnectionDetails(info: state.connection),
                     _deviceWarning(),
                   ],
                 ),

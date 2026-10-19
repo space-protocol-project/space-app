@@ -14,6 +14,9 @@ Future<void> main() async {
       'Space MLS — Rust',
     ], await rootBundle.loadString('assets/legal/mls-NOTICES.txt'));
     yield LicenseEntryWithLineBreaks([
+      'DeepFilterNet3 — локальное шумоподавление',
+    ], await rootBundle.loadString('assets/legal/voice-NOTICES.txt'));
+    yield LicenseEntryWithLineBreaks([
       'Unicode Emoji / CLDR',
     ], await rootBundle.loadString('assets/emoji/UNICODE-LICENSE.txt'));
     for (final entry in {

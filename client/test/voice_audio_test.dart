@@ -33,6 +33,79 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
+  for (final locale in ['ru', 'en', 'zh']) {
+    testWidgets('Профили и расширенная обработка сохраняются: $locale', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(390, 600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      final devices = VoiceDevices(backend: DevicesBackend());
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: Locale(locale),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: VoiceDevicesDialog(devices: devices),
+        ),
+      );
+      await tester.pumpAndSettle();
+      for (final mode in VoiceNoiseSuppression.values) {
+        final dropdown = find.byType(
+          DropdownButtonFormField<VoiceNoiseSuppression>,
+        );
+        await tester.ensureVisible(dropdown);
+        await tester.tap(dropdown);
+        await tester.pumpAndSettle();
+        final label = switch (mode) {
+          VoiceNoiseSuppression.deepFilter => 'DeepFilterNet3',
+          VoiceNoiseSuppression.webrtc => 'WebRTC',
+          VoiceNoiseSuppression.disabled => AppLocalizations.of(
+            tester.element(dropdown),
+          )!.voiceNoiseOff,
+        };
+        await tester.tap(find.text(label).last);
+        await tester.pumpAndSettle();
+        expect(devices.state.audio.noiseMode, mode);
+        expect(
+          (await SavedVoiceDevicePreferences().load()).audio.noiseMode,
+          mode,
+        );
+      }
+      final studio = find.byKey(const ValueKey('voice-profile-studio'));
+      await tester.ensureVisible(studio);
+      await tester.tap(studio);
+      await tester.pumpAndSettle();
+      expect(devices.state.audio.profile, VoiceInputProfile.studio);
+      expect(devices.state.audio.highPassFilter, false);
+      final custom = find.byKey(const ValueKey('voice-profile-custom'));
+      await tester.ensureVisible(custom);
+      await tester.tap(custom);
+      await tester.pumpAndSettle();
+      expect(devices.state.audio.profile, VoiceInputProfile.custom);
+      final strings = AppLocalizations.of(tester.element(custom))!;
+      final advanced = find.text(strings.voiceAdvancedSettings);
+      await tester.ensureVisible(advanced);
+      await tester.tap(advanced);
+      await tester.pumpAndSettle();
+      final filter = find.text(strings.voiceHighPass);
+      await tester.ensureVisible(filter);
+      await tester.tap(filter);
+      await tester.pumpAndSettle();
+      expect(devices.state.audio.highPassFilter, true);
+      final slider = find.byKey(const ValueKey('voice-release-delay'));
+      await tester.ensureVisible(slider);
+      await tester.drag(slider, const Offset(30, 0));
+      await tester.pumpAndSettle();
+      final saved = (await SavedVoiceDevicePreferences().load()).audio;
+      expect(saved.profile, VoiceInputProfile.custom);
+      expect(saved.highPassFilter, true);
+      expect(saved.releaseDelayMs, greaterThan(300));
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+      await devices.close();
+    });
+  }
+
   testWidgets('Transmission controls persist PTT and manual sensitivity', (
     tester,
   ) async {
@@ -232,6 +305,17 @@ void main() {
               )['audio']
               as Map;
       expect(audio['noiseSuppression'], false);
+      expect(audio['highpassFilter'], true);
+      expect(audio['optional'], contains(equals({'googHighpassFilter': true})));
+      final studio =
+          voiceMicrophoneConstraints(
+                'mic',
+                const VoiceAudioSettings().withProfile(
+                  VoiceInputProfile.studio,
+                ),
+              )['audio']
+              as Map;
+      expect(studio['highpassFilter'], false);
       expect(
         audio['optional'],
         contains(equals({'googEchoCancellation': false})),

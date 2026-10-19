@@ -5,6 +5,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'voice_audio_native.dart';
 import 'voice_audio_settings.dart';
 import 'voice_media.dart';
+import 'voice_denoiser.dart';
 
 abstract interface class VoiceMicrophoneProbe {
   Future<void> open(String? device, VoiceAudioSettings settings);
@@ -22,6 +23,7 @@ class NativeVoiceMicrophoneProbe implements VoiceMicrophoneProbe {
   Object? _failure;
   bool _closed = false;
   Future<void>? _closing;
+  final _denoiser = VoiceDenoiser();
 
   void _check() {
     if (_closed) throw StateError('Проверка микрофона остановлена');
@@ -32,6 +34,7 @@ class NativeVoiceMicrophoneProbe implements VoiceMicrophoneProbe {
     _check();
     await VoiceAudioNative.gain(settings.inputGain);
     await VoiceAudioNative.transmission(true);
+    await _denoiser.open(settings);
     _check();
     _settings = settings;
     final stream = await navigator.mediaDevices.getUserMedia(
@@ -180,7 +183,11 @@ class NativeVoiceMicrophoneProbe implements VoiceMicrophoneProbe {
       try {
         await _closePeer(_sender);
       } finally {
-        await _closePeer(_receiver);
+        try {
+          await _closePeer(_receiver);
+        } finally {
+          await _denoiser.close();
+        }
       }
     }
   }

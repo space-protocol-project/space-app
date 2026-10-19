@@ -131,6 +131,20 @@ class VoiceHarness {
 }
 
 void main() {
+  test('Ошибка обработки закрывает захват без повторного входа', () {
+    fakeAsync((clock) {
+      final h = VoiceHarness(clock)..start();
+      h.media.single.stream.add(VoiceMediaStatus.processingFailed);
+      clock.flushMicrotasks();
+      expect(h.media.single.closed, true);
+      expect(h.controller.state.phase, VoicePhase.failed);
+      expect(h.controller.state.muted, true);
+      clock.elapse(const Duration(minutes: 1));
+      expect(h.media.length, 1);
+      h.dispose();
+    });
+  });
+
   test('Потеря медиа: новое соединение, новый TURN, микрофон выключен', () {
     fakeAsync((clock) {
       final h = VoiceHarness(clock)..start();

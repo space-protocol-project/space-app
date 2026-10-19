@@ -21,7 +21,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 0.7.6+36
+version: 0.7.7+37
 
 environment:
   sdk: ^3.13.5
@@ -39,6 +39,8 @@ dependencies:
     path: ../packages/space_api
   space_mls_native:
     path: ../packages/space_mls_native
+  space_voice_native:
+    path: ../packages/space_voice_native
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -136,6 +138,7 @@ flutter:
     - assets/emoji/catalog.json
     - assets/emoji/UNICODE-LICENSE.txt
     - assets/legal/mls-NOTICES.txt
+    - assets/legal/voice-NOTICES.txt
     - pubspec.yaml
     - assets/home/runtime-manifest.json
     - assets/home/legacy-runtime-manifest.json

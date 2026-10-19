@@ -1,9 +1,19 @@
 #include "../client/vendor/flutter_webrtc/common/space_voice_signal.h"
+#include "../client/vendor/flutter_webrtc/common/space_voice_denoiser.h"
 #include <cassert>
 #include <limits>
 #include <thread>
 
 int main() {
+  SpaceVoiceDenoiser filter = {nullptr, nullptr, 0};
+  float raw[] = {100, -100};
+  assert(SpaceDenoise(&filter, raw, 2, 48000) == 1 && raw[0] == 100);
+  filter.context = &filter;
+  filter.process = [](void*, float*, int32_t, int32_t) -> int32_t { return 0; };
+  assert(SpaceDenoise(&filter, raw, 2, 48000) == 0 && raw[0] == 0 && raw[1] == 0);
+  filter.process = [](void*, float*, int32_t, int32_t) -> int32_t { return 1; };
+  raw[0] = 200;
+  assert(SpaceDenoise(&filter, raw, 2, 48000) == 0 && raw[0] == 0);
   SpaceVoiceSignal signal;
   float quiet[] = {1000, -1000};
   signal.SetGain(0.5f);

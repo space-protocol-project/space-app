@@ -2250,4 +2250,65 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get voiceRefreshRooms => 'Обновить список комнат';
+
+  @override
+  String get voiceRouteDirect => 'Прямое соединение';
+
+  @override
+  String get voiceRouteRelay => 'Через TURN';
+
+  @override
+  String get voiceRouteUnknown => 'Маршрут пока неизвестен';
+
+  @override
+  String voiceRoundTrip(int milliseconds) {
+    return 'Задержка RTT: $milliseconds мс';
+  }
+
+  @override
+  String get voiceProfileSpeechHelp =>
+      'Шумоподавление DeepFilterNet3, подавление эха, выравнивание громкости и фильтр гула.';
+
+  @override
+  String get voiceProfileStudioHelp =>
+      'Без обработки микрофона. Для музыки и подготовленного звука; используйте наушники.';
+
+  @override
+  String get voiceProfileCustomHelp =>
+      'Все параметры обработки можно настроить отдельно.';
+
+  @override
+  String get voiceActivity => 'Активация по голосу';
+
+  @override
+  String get voiceActivityHelp =>
+      'После ручного включения микрофона передача открывается при превышении порога. Фон тоже может сработать — настройте чувствительность.';
+
+  @override
+  String get voiceNoiseSuppressionHelp =>
+      'DeepFilterNet3 — нейросетевое подавление шума. WebRTC — более лёгкий вариант. Звук обрабатывается на вашем устройстве.';
+
+  @override
+  String get voiceNoiseWebRtc => 'WebRTC';
+
+  @override
+  String get voiceNoiseOff => 'Отключено';
+
+  @override
+  String get voiceAdvancedSettings => 'Расширенные настройки голоса';
+
+  @override
+  String get voiceHighPass => 'Фильтр низкочастотного гула';
+
+  @override
+  String get voiceAdvancedActivation => 'Устойчивое срабатывание по голосу';
+
+  @override
+  String get voiceAdvancedActivationHelp =>
+      'Удерживает передачу при колебаниях уровня около порога, чтобы не обрывать тихие окончания слов. Определяет уровень, а не распознаёт речь.';
+
+  @override
+  String voiceReleaseDelay(int milliseconds) {
+    return 'Задержка закрытия передачи: $milliseconds мс';
+  }
 }

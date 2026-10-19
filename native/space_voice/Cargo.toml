@@ -1,0 +1,22 @@
+[package]
+name = "space_voice"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+deep_filter = { path = "vendor/deep_filter/libDF", default-features = false, features = ["tract", "default-model"] }
+ndarray = "=0.16.1"
+rubato = "=0.14.1"
+
+[profile.release]
+debug = 0
+strip = "debuginfo"
+
+[profile.dev]
+debug = 0
+opt-level = 2
+incremental = false

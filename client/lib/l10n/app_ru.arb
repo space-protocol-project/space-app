@@ -818,5 +818,36 @@
   "migrationPassword": "Пароль архива",
   "migrationPasswordRepeat": "Повторите пароль",
   "migrationExported": "Перенос сохранён. Прежнее устройство остановлено. Сохраните архив и пароль перед переустановкой ОС.",
-  "voiceRefreshRooms": "Обновить список комнат"
+  "voiceRefreshRooms": "Обновить список комнат",
+  "voiceRouteDirect": "Прямое соединение",
+  "voiceRouteRelay": "Через TURN",
+  "voiceRouteUnknown": "Маршрут пока неизвестен",
+  "voiceRoundTrip": "Задержка RTT: {milliseconds} мс",
+  "@voiceRoundTrip": {
+    "placeholders": {
+      "milliseconds": {
+        "type": "int"
+      }
+    }
+  },
+  "voiceProfileSpeechHelp": "Шумоподавление DeepFilterNet3, подавление эха, выравнивание громкости и фильтр гула.",
+  "voiceProfileStudioHelp": "Без обработки микрофона. Для музыки и подготовленного звука; используйте наушники.",
+  "voiceProfileCustomHelp": "Все параметры обработки можно настроить отдельно.",
+  "voiceActivity": "Активация по голосу",
+  "voiceActivityHelp": "После ручного включения микрофона передача открывается при превышении порога. Фон тоже может сработать — настройте чувствительность.",
+  "voiceNoiseSuppressionHelp": "DeepFilterNet3 — нейросетевое подавление шума. WebRTC — более лёгкий вариант. Звук обрабатывается на вашем устройстве.",
+  "voiceNoiseWebRtc": "WebRTC",
+  "voiceNoiseOff": "Отключено",
+  "voiceAdvancedSettings": "Расширенные настройки голоса",
+  "voiceHighPass": "Фильтр низкочастотного гула",
+  "voiceAdvancedActivation": "Устойчивое срабатывание по голосу",
+  "voiceAdvancedActivationHelp": "Удерживает передачу при колебаниях уровня около порога, чтобы не обрывать тихие окончания слов. Определяет уровень, а не распознаёт речь.",
+  "voiceReleaseDelay": "Задержка закрытия передачи: {milliseconds} мс",
+  "@voiceReleaseDelay": {
+    "placeholders": {
+      "milliseconds": {
+        "type": "int"
+      }
+    }
+  }
 }

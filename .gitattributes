@@ -2,3 +2,6 @@
 docs/upstream/*.patch whitespace=-blank-at-eol
 # Сохраняем пробелы исходного стороннего пакета при импорте.
 client/vendor/flutter_webrtc/** whitespace=-blank-at-eol,-blank-at-eof
+# Хэши закреплённых исходников DeepFilterNet не зависят от ОС checkout.
+native/space_voice/vendor/deep_filter/** text eol=lf
+native/space_voice/vendor/deep_filter/models/*.gz -text

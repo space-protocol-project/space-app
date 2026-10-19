@@ -1019,6 +1019,13 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  space_voice_native:
+    dependency: "direct main"
+    description:
+      path: "../packages/space_voice_native"
+      relative: true
+    source: path
+    version: "0.1.0"
   stack_trace:
     dependency: transitive
     description:

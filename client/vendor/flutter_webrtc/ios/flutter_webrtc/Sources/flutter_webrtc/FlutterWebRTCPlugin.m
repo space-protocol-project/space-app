@@ -1269,7 +1269,25 @@ static void FlutterWebRTCApplyFieldTrials(void) {
   } else if ([@"spaceVoiceTransmit" isEqualToString:call.method]) {
     [AudioManager sharedInstance].spaceVoiceProcessing.transmit = [call.arguments[@"enabled"] boolValue];
     result(nil);
+  } else if ([@"spaceVoiceDenoiser" isEqualToString:call.method]) {
+    NSNumber* context = call.arguments[@"context"];
+    NSNumber* callback = call.arguments[@"callback"];
+    NSNumber* expected = call.arguments[@"expected"];
+    if (![context isKindOfClass:[NSNumber class]] || ![callback isKindOfClass:[NSNumber class]] ||
+        ![expected isKindOfClass:[NSNumber class]] || context.longLongValue < 0 ||
+        callback.longLongValue < 0 || expected.longLongValue < 0 ||
+        ((context.longLongValue == 0) != (callback.longLongValue == 0))) {
+      result([FlutterError errorWithCode:@"InvalidDenoiser" message:@"Invalid denoiser binding" details:nil]);
+      return;
+    }
+    [[AudioManager sharedInstance].spaceVoiceProcessing configureDenoiser:context.unsignedLongLongValue
+        callback:callback.unsignedLongLongValue expected:expected.unsignedLongLongValue];
+    result(nil);
   } else if ([@"spaceVoiceLevel" isEqualToString:call.method]) {
+    if (![AudioManager sharedInstance].spaceVoiceProcessing.healthy) {
+      result([FlutterError errorWithCode:@"VoiceProcessingFailed" message:@"DeepFilterNet3 processing failed" details:nil]);
+      return;
+    }
     result(@([AudioManager sharedInstance].spaceVoiceProcessing.level));
   } else if ([@"setVolume" isEqualToString:call.method]) {
     NSDictionary* argsMap = call.arguments;

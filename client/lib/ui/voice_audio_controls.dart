@@ -88,83 +88,196 @@ class VoiceProcessingControls extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       const Divider(height: 40),
-      SwitchListTile(
-        contentPadding: EdgeInsets.zero,
-        title: Text(context.strings.voicePushToTalk),
-        subtitle: Text(context.strings.voicePushToTalkHint),
-        value: state.audio.pushToTalk,
-        onChanged: state.busy
-            ? null
-            : (value) => _update(state.audio.copyWith(pushToTalk: value)),
-      ),
-      if (!state.audio.pushToTalk) ...[
-        SwitchListTile(
-          contentPadding: EdgeInsets.zero,
-          title: Text(context.strings.voiceAutomaticSensitivity),
-          value: state.audio.automaticSensitivity,
-          onChanged: state.busy
-              ? null
-              : (value) =>
-                    _update(state.audio.copyWith(automaticSensitivity: value)),
-        ),
-        if (!state.audio.automaticSensitivity) _sensitivity(context),
-      ],
-      VoiceShortcutSettings(devices: devices, showError: false),
+      _profiles(context),
       const Divider(height: 32),
-      Text(
-        context.strings.voiceProcessingTitle,
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      const SizedBox(height: 16),
-      DropdownButtonFormField<VoiceInputProfile>(
-        isExpanded: true,
-        key: ValueKey(state.audio.profile),
-        initialValue: state.audio.profile,
-        decoration: InputDecoration(
-          labelText: context.strings.voiceInputProfile,
-          border: const OutlineInputBorder(),
-        ),
-        items: [
-          DropdownMenuItem(
-            value: VoiceInputProfile.speech,
-            child: Text(context.strings.voiceProfileSpeech),
-          ),
-          DropdownMenuItem(
-            value: VoiceInputProfile.studio,
-            child: Text(context.strings.voiceProfileStudio),
-          ),
-          DropdownMenuItem(
-            value: VoiceInputProfile.custom,
-            enabled: false,
-            child: Text(context.strings.voiceProfileCustom),
-          ),
-        ],
-        onChanged: state.busy
-            ? null
-            : (profile) {
-                if (profile != null) _update(state.audio.withProfile(profile));
-              },
-      ),
-      const SizedBox(height: 12),
-      _switch(
-        context.strings.voiceNoiseSuppression,
-        state.audio.noiseSuppression,
-        (value) => _update(state.audio.copyWith(noiseSuppression: value)),
-      ),
+      _inputMode(context),
+      if (!state.audio.pushToTalk) _activation(context),
+      if (state.audio.pushToTalk)
+        VoiceShortcutSettings(devices: devices, showError: false),
+      const Divider(height: 32),
+      _noiseSuppression(context),
       _switch(
         context.strings.voiceEchoCancellation,
         state.audio.echoCancellation,
         (value) => _update(state.audio.copyWith(echoCancellation: value)),
       ),
+      _advanced(context),
+      const SizedBox(height: 8),
+      Text(
+        context.strings.voiceProcessingHint,
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
+    ],
+  );
+
+  Widget _profiles(BuildContext context) => RadioGroup<VoiceInputProfile>(
+    groupValue: state.audio.profile,
+    onChanged: (profile) {
+      if (!state.busy && profile != null) {
+        _update(state.audio.withProfile(profile));
+      }
+    },
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          context.strings.voiceInputProfile,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        _profile(
+          VoiceInputProfile.speech,
+          context.strings.voiceProfileSpeech,
+          context.strings.voiceProfileSpeechHelp,
+        ),
+        _profile(
+          VoiceInputProfile.studio,
+          context.strings.voiceProfileStudio,
+          context.strings.voiceProfileStudioHelp,
+        ),
+        _profile(
+          VoiceInputProfile.custom,
+          context.strings.voiceProfileCustom,
+          context.strings.voiceProfileCustomHelp,
+        ),
+      ],
+    ),
+  );
+
+  Widget _profile(VoiceInputProfile profile, String title, String help) =>
+      RadioListTile<VoiceInputProfile>(
+        key: ValueKey('voice-profile-${profile.name}'),
+        contentPadding: EdgeInsets.zero,
+        value: profile,
+        enabled: !state.busy,
+        title: Text(title),
+        subtitle: Text(help),
+      );
+
+  Widget _inputMode(BuildContext context) => RadioGroup<bool>(
+    groupValue: state.audio.pushToTalk,
+    onChanged: (value) {
+      if (!state.busy && value != null) {
+        _update(state.audio.copyWith(pushToTalk: value));
+      }
+    },
+    child: Column(
+      children: [
+        RadioListTile<bool>(
+          contentPadding: EdgeInsets.zero,
+          value: false,
+          enabled: !state.busy,
+          title: Text(context.strings.voiceActivity),
+          subtitle: Text(context.strings.voiceActivityHelp),
+        ),
+        RadioListTile<bool>(
+          contentPadding: EdgeInsets.zero,
+          value: true,
+          enabled: !state.busy,
+          title: Text(context.strings.voicePushToTalk),
+          subtitle: Text(context.strings.voicePushToTalkHint),
+        ),
+      ],
+    ),
+  );
+
+  Widget _activation(BuildContext context) => Column(
+    children: [
+      _switch(
+        context.strings.voiceAutomaticSensitivity,
+        state.audio.automaticSensitivity,
+        (value) => _update(state.audio.copyWith(automaticSensitivity: value)),
+      ),
+      if (!state.audio.automaticSensitivity) _sensitivity(context),
+    ],
+  );
+
+  Widget _noiseSuppression(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 12),
+    child: DropdownButtonFormField<VoiceNoiseSuppression>(
+      key: ValueKey('noise-${state.audio.noiseMode.name}'),
+      initialValue: state.audio.noiseMode,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: context.strings.voiceNoiseSuppression,
+        helperText: context.strings.voiceNoiseSuppressionHelp,
+        helperMaxLines: 4,
+        border: const OutlineInputBorder(),
+      ),
+      items: [
+        DropdownMenuItem(
+          value: VoiceNoiseSuppression.deepFilter,
+          child: const Text('DeepFilterNet3'),
+        ),
+        DropdownMenuItem(
+          value: VoiceNoiseSuppression.webrtc,
+          child: Text(context.strings.voiceNoiseWebRtc),
+        ),
+        DropdownMenuItem(
+          value: VoiceNoiseSuppression.disabled,
+          child: Text(context.strings.voiceNoiseOff),
+        ),
+      ],
+      onChanged: state.busy
+          ? null
+          : (value) {
+              if (value != null) {
+                _update(state.audio.copyWith(noiseMode: value));
+              }
+            },
+    ),
+  );
+
+  Widget _advanced(BuildContext context) => ExpansionTile(
+    key: const PageStorageKey('voice-advanced-settings'),
+    tilePadding: EdgeInsets.zero,
+    title: Text(context.strings.voiceAdvancedSettings),
+    children: [
       _switch(
         context.strings.voiceAutoGain,
         state.audio.autoGainControl,
         (value) => _update(state.audio.copyWith(autoGainControl: value)),
       ),
-      const SizedBox(height: 8),
-      Text(
-        context.strings.voiceProcessingHint,
-        style: Theme.of(context).textTheme.bodySmall,
+      _switch(
+        context.strings.voiceHighPass,
+        state.audio.highPassFilter,
+        (value) => _update(state.audio.copyWith(highPassFilter: value)),
+      ),
+      if (!state.audio.pushToTalk) ...[
+        _switch(
+          context.strings.voiceAdvancedActivation,
+          state.audio.advancedActivation,
+          (value) => _update(state.audio.copyWith(advancedActivation: value)),
+        ),
+        Text(
+          context.strings.voiceAdvancedActivationHelp,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        _releaseDelay(context),
+      ],
+    ],
+  );
+
+  Widget _releaseDelay(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      const SizedBox(height: 16),
+      Text(context.strings.voiceReleaseDelay(state.audio.releaseDelayMs)),
+      Overlay.wrap(
+        alwaysSizeToContent: true,
+        clipBehavior: Clip.none,
+        child: Slider(
+          key: const ValueKey('voice-release-delay'),
+          value: state.audio.releaseDelayMs.toDouble(),
+          min: 50,
+          max: 1000,
+          divisions: 19,
+          label: '${state.audio.releaseDelayMs} ms',
+          onChanged: state.busy
+              ? null
+              : (value) => _update(
+                  state.audio.copyWith(releaseDelayMs: value.round()),
+                ),
+        ),
       ),
     ],
   );

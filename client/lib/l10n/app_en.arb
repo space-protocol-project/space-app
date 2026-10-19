@@ -818,5 +818,36 @@
   "migrationPassword": "Archive password",
   "migrationPasswordRepeat": "Repeat password",
   "migrationExported": "Migration saved. The previous device is stopped. Preserve the archive and password before reinstalling the OS.",
-  "voiceRefreshRooms": "Refresh rooms"
+  "voiceRefreshRooms": "Refresh rooms",
+  "voiceRouteDirect": "Direct connection",
+  "voiceRouteRelay": "Via TURN",
+  "voiceRouteUnknown": "Route not yet known",
+  "voiceRoundTrip": "RTT: {milliseconds} ms",
+  "@voiceRoundTrip": {
+    "placeholders": {
+      "milliseconds": {
+        "type": "int"
+      }
+    }
+  },
+  "voiceProfileSpeechHelp": "DeepFilterNet3 noise suppression, echo cancellation, automatic gain and high-pass filter.",
+  "voiceProfileStudioHelp": "Unprocessed microphone audio. For music and prepared input; use headphones.",
+  "voiceProfileCustomHelp": "Adjust each processing option separately.",
+  "voiceActivity": "Voice activity",
+  "voiceActivityHelp": "After manually enabling the microphone, transmission opens above the threshold. Noise can also trigger it; adjust sensitivity.",
+  "voiceNoiseSuppressionHelp": "DeepFilterNet3 uses neural noise suppression. WebRTC is a lighter option. Audio is processed on your device.",
+  "voiceNoiseWebRtc": "WebRTC",
+  "voiceNoiseOff": "Off",
+  "voiceAdvancedSettings": "Advanced voice settings",
+  "voiceHighPass": "Low-frequency noise filter",
+  "voiceAdvancedActivation": "Stable voice activation",
+  "voiceAdvancedActivationHelp": "Keeps transmission open near the threshold to preserve quiet word endings. Uses sound level, not speech recognition.",
+  "voiceReleaseDelay": "Transmission release delay: {milliseconds} ms",
+  "@voiceReleaseDelay": {
+    "placeholders": {
+      "milliseconds": {
+        "type": "int"
+      }
+    }
+  }
 }

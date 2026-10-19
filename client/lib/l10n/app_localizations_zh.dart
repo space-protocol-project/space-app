@@ -2064,6 +2064,62 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get voiceRefreshRooms => '刷新房间列表';
+
+  @override
+  String get voiceRouteDirect => '直接连接';
+
+  @override
+  String get voiceRouteRelay => '通过 TURN';
+
+  @override
+  String get voiceRouteUnknown => '连接路径尚未知';
+
+  @override
+  String voiceRoundTrip(int milliseconds) {
+    return '往返延迟：$milliseconds 毫秒';
+  }
+
+  @override
+  String get voiceProfileSpeechHelp => 'DeepFilterNet3 降噪、回声消除、自动增益和高通滤波。';
+
+  @override
+  String get voiceProfileStudioHelp => '不处理麦克风音频。适合音乐和已处理的输入；请使用耳机。';
+
+  @override
+  String get voiceProfileCustomHelp => '单独调整各项音频处理设置。';
+
+  @override
+  String get voiceActivity => '语音激活';
+
+  @override
+  String get voiceActivityHelp => '手动开启麦克风后，超过阈值才会发送。噪声也可能触发，请调整灵敏度。';
+
+  @override
+  String get voiceNoiseSuppressionHelp =>
+      'DeepFilterNet3 使用神经网络降噪。WebRTC 的资源占用更低。音频在本机处理。';
+
+  @override
+  String get voiceNoiseWebRtc => 'WebRTC';
+
+  @override
+  String get voiceNoiseOff => '关闭';
+
+  @override
+  String get voiceAdvancedSettings => '高级语音设置';
+
+  @override
+  String get voiceHighPass => '低频噪声滤波';
+
+  @override
+  String get voiceAdvancedActivation => '稳定语音激活';
+
+  @override
+  String get voiceAdvancedActivationHelp => '在阈值附近保持发送，避免切断轻声词尾。依据音量判断，并非语音识别。';
+
+  @override
+  String voiceReleaseDelay(int milliseconds) {
+    return '停止发送延迟：$milliseconds 毫秒';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

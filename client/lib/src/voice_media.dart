@@ -4,11 +4,13 @@ import 'dart:io';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import 'voice_network.dart';
+import 'voice_connection_info.dart';
 import 'voice_audio_native.dart';
 import 'voice_audio_settings.dart';
 import 'voice_transmission.dart';
+import 'voice_denoiser.dart';
 
-enum VoiceMediaStatus { connecting, connected, failed }
+enum VoiceMediaStatus { connecting, connected, failed, processingFailed }
 
 abstract interface class VoiceMedia {
   Stream<VoiceMediaStatus> get changes;
@@ -25,7 +27,8 @@ abstract interface class VoiceAudioMedia {
   Future<void> configureAudio(VoiceAudioSettings settings);
 }
 
-class NativeVoiceMedia implements VoiceMedia, VoiceAudioMedia {
+class NativeVoiceMedia
+    implements VoiceMedia, VoiceAudioMedia, VoiceConnectionMedia {
   NativeVoiceMedia({this.playbackVolume = 1.0});
   final double playbackVolume;
   bool _transmitting = false;
@@ -35,9 +38,18 @@ class NativeVoiceMedia implements VoiceMedia, VoiceAudioMedia {
   String? inputDeviceId;
   VoiceAudioSettings _audio = const VoiceAudioSettings();
   late final _transmission = VoiceTransmission(
-    level: VoiceAudioNative.level,
+    level: _level,
     transmit: _transmit,
   );
+
+  Future<double> _level() async {
+    try {
+      return await VoiceAudioNative.level();
+    } catch (_) {
+      if (!_closed) _changes.add(VoiceMediaStatus.processingFailed);
+      rethrow;
+    }
+  }
 
   void _transmit(bool enabled) {
     final revision = ++_transmissionRevision;
@@ -62,6 +74,7 @@ class NativeVoiceMedia implements VoiceMedia, VoiceAudioMedia {
   RTCPeerConnection? _peer;
   RTCRtpSender? _sender;
   MediaStream? _microphone;
+  VoiceDenoiser? _denoiser;
   final _remote = <MediaStreamTrack>[];
   bool _closed = false, _deafened = false;
   @override
@@ -176,6 +189,9 @@ class NativeVoiceMedia implements VoiceMedia, VoiceAudioMedia {
   @override
   Future<void> configureAudio(VoiceAudioSettings settings) async {
     if (_closed) return;
+    if (!_audio.sameProcessing(settings) && _microphone != null) {
+      await _stopMicrophone();
+    }
     await VoiceAudioNative.gain(settings.inputGain);
     if (_closed) return;
     _audio = settings;
@@ -210,6 +226,13 @@ class NativeVoiceMedia implements VoiceMedia, VoiceAudioMedia {
       return;
     }
     await VoiceAudioNative.transmission(false);
+    final denoiser = VoiceDenoiser();
+    _denoiser = denoiser;
+    await denoiser.open(_audio);
+    if (_closed || _deafened) {
+      await denoiser.close();
+      throw StateError('Включение микрофона отменено');
+    }
     final stream = await navigator.mediaDevices.getUserMedia(
       voiceMicrophoneConstraints(inputDeviceId, _audio),
     );
@@ -239,13 +262,18 @@ class NativeVoiceMedia implements VoiceMedia, VoiceAudioMedia {
     _transmission.stop();
     final stream = _microphone;
     _microphone = null;
-    if (stream == null) {
-      return;
-    }
+    final denoiser = _denoiser;
     try {
-      await _sender?.replaceTrack(null);
+      if (stream != null) {
+        try {
+          await _sender?.replaceTrack(null);
+        } finally {
+          await _stopStream(stream);
+        }
+      }
     } finally {
-      await _stopStream(stream);
+      await denoiser?.close();
+      if (_denoiser == denoiser) _denoiser = null;
     }
   }
 
@@ -283,6 +311,10 @@ class NativeVoiceMedia implements VoiceMedia, VoiceAudioMedia {
   }
 
   Future<List<StatsReport>> statistics() async => await _peer?.getStats() ?? [];
+
+  @override
+  Future<VoiceConnectionInfo> connectionInfo() async =>
+      VoiceConnectionInfo.fromStats(await statistics());
 }
 
 // Нативный desktop-плагин читает вход через optional.sourceId.
@@ -293,14 +325,16 @@ Map<String, dynamic> voiceMicrophoneConstraints(
 ]) => {
   'audio': {
     'echoCancellation': audio.echoCancellation,
-    'noiseSuppression': audio.noiseSuppression,
+    'noiseSuppression': audio.webRtcNoiseSuppression,
     'autoGainControl': audio.autoGainControl,
+    'highpassFilter': audio.highPassFilter,
     'channelCount': 1,
     'optional': [
       if (inputDeviceId != null) {'sourceId': inputDeviceId},
       {'googEchoCancellation': audio.echoCancellation},
-      {'googNoiseSuppression': audio.noiseSuppression},
+      {'googNoiseSuppression': audio.webRtcNoiseSuppression},
       {'googAutoGainControl': audio.autoGainControl},
+      {'googHighpassFilter': audio.highPassFilter},
     ],
   },
   'video': false,

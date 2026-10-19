@@ -78,7 +78,37 @@ void FlutterWebRTC::HandleMethodCall(
     return;
   }
   if (method_call.method_name() == "spaceVoiceLevel") {
+    if (!voice_processing_.healthy()) {
+      result->Error("VoiceProcessingFailed", "DeepFilterNet3 processing failed");
+      return;
+    }
     result->Success(EncodableValue(static_cast<double>(voice_processing_.signal.level())));
+    return;
+  }
+
+  if (method_call.method_name() == "spaceVoiceDenoiser") {
+    const auto args = method_call.arguments();
+    if (!args || !TypeIs<EncodableMap>(*args)) {
+      result->Error("InvalidDenoiser", "Expected denoiser arguments");
+      return;
+    }
+    const auto params = GetValue<EncodableMap>(*args);
+    const auto context = findLongInt(params, "context");
+    const auto callback = findLongInt(params, "callback");
+    const auto expected = findLongInt(params, "expected");
+    if (context < 0 || callback < 0 || expected < 0 ||
+        ((context == 0) != (callback == 0))) {
+      result->Error("InvalidDenoiser", "Invalid denoiser binding");
+      return;
+    }
+    if (!voice_processing_installed_) {
+      audio_processing()->SetCapturePostProcessing(&voice_processing_);
+      voice_processing_installed_ = true;
+    }
+    voice_processing_.Configure(reinterpret_cast<void*>(context),
+        reinterpret_cast<SpaceVoiceDenoiseFunction>(callback),
+        reinterpret_cast<void*>(expected));
+    result->Success();
     return;
   }
 

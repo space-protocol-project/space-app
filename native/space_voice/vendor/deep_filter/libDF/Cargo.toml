@@ -1,0 +1,37 @@
+[package]
+name = "deep_filter"
+version = "0.5.6"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+[lib]
+name = "df"
+path = "src/lib.rs"
+[features]
+default = []
+tract = ["transforms", "logging"]
+transforms = []
+logging = []
+default-model = []
+default-model-ll = []
+nightly-features = []
+dataset = []
+timings = []
+wav-utils = []
+bin = []
+[dependencies]
+rustfft = "6.1.0"
+realfft = "3.1.0"
+itertools = "0.10"
+num-complex = { version = "0.4", features = ["serde"] }
+log = "0.4"
+rubato = "0.14"
+thiserror = "1.0"
+ndarray = { version = "0.16", features = ["serde"] }
+anyhow = "1.0"
+rust-ini = "0.19"
+tract-core = "=0.22.3"
+tract-onnx = "=0.22.3"
+tract-pulse = "=0.22.3"
+tract-hir = "=0.22.3"
+flate2 = "1.0.24"
+tar = "0.4.38"
