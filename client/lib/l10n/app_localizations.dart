@@ -284,7 +284,7 @@ abstract class AppLocalizations {
   /// No description provided for @rooms.
   ///
   /// In ru, this message translates to:
-  /// **'Встречи'**
+  /// **'Комнаты'**
   String get rooms;
 
   /// No description provided for @identity.

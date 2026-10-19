@@ -103,7 +103,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get feed => '动态';
 
   @override
-  String get rooms => '会议';
+  String get rooms => '语音房间';
 
   @override
   String get identity => '我的访问权限与设备';

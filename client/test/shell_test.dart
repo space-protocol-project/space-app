@@ -45,6 +45,7 @@ void main() {
     );
     await tester.pumpWidget(SpaceApp(controller: controller));
     await tester.pumpAndSettle();
+    expect(find.widgetWithText(ListTile, 'Комнаты'), findsOneWidget);
     await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
     await tester.pumpAndSettle();
     final field = find.byKey(const ValueKey('chat-draft'));

@@ -11,6 +11,7 @@ import 'package:space_api/space_api.dart';
 import 'package:space_admin_ui/space_admin_ui.dart';
 
 import '../src/core.dart';
+import 'voice_room_management.dart';
 
 class NativeAdminGateway extends SpaceGateway {
   NativeAdminGateway(super.origin, this.session);
@@ -94,6 +95,9 @@ Widget serverAdministration(
         .copyWith(scaffoldBackgroundColor: Colors.transparent),
     child: AdminPage(
       autoConnect: true,
+      channelManagement: session is SpaceSession
+          ? VoiceRoomManagement(session: session)
+          : null,
       login: ({bool create = false}) => session.adminIdentity(),
       gateway: (uri) => NativeAdminGateway(uri, session),
       authorizeDevice: session is AdministrativeDeviceControl

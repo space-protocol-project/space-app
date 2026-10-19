@@ -58,7 +58,6 @@ class VoiceRoomsView extends StatelessWidget {
           label: Text(context.strings.voiceAudioDevices),
         ),
       ),
-      _createButton(context, connected),
       if (connected.voiceRooms.isEmpty)
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 24),
@@ -101,61 +100,6 @@ class VoiceRoomsView extends StatelessWidget {
         style: Theme.of(context).textTheme.bodySmall,
       ),
     ];
-  }
-
-  Widget _createButton(BuildContext context, SpaceSession connected) {
-    if (!['owner', 'admin'].contains(connected.role)) {
-      return const SizedBox.shrink();
-    }
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: OutlinedButton.icon(
-        onPressed: () => unawaited(_create(context, connected)),
-        icon: const Icon(Icons.add),
-        label: Text(context.strings.voiceCreate),
-      ),
-    );
-  }
-
-  Future<void> _create(BuildContext context, SpaceSession connected) async {
-    var enteredName = '';
-    final name = await showDialog<String>(
-      context: context,
-      builder: (dialog) => AlertDialog(
-        title: Text(context.strings.voiceCreate),
-        content: TextField(
-          onChanged: (value) => enteredName = value,
-          maxLength: 80,
-          autofocus: true,
-          decoration: InputDecoration(labelText: context.strings.voiceName),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialog),
-            child: Text(context.strings.voiceCancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (enteredName.trim().isNotEmpty) {
-                Navigator.pop(dialog, enteredName.trim());
-              }
-            },
-            child: Text(context.strings.voiceSave),
-          ),
-        ],
-      ),
-    );
-    if (name == null) {
-      return;
-    }
-    try {
-      await connected.createVoiceRoom(name);
-    } catch (error) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(error.toString())));
-      }
-    }
   }
 }
 

@@ -37,7 +37,9 @@ class AdminPage extends StatefulWidget {
     this.revokeDevice,
     this.authorizeDevice,
     this.onDeviceRevoked,
+    this.channelManagement,
   });
+  final Widget? channelManagement;
   final IdentityLogin login;
   final DeviceRevoke? revokeDevice;
   final Future<void> Function(String password)? authorizeDevice;
@@ -337,6 +339,10 @@ class _AdminPageState extends State<AdminPage> {
                   ),
                   call: call,
                 ),
+              ],
+              if (settings != null && widget.channelManagement != null) ...[
+                const SizedBox(height: 20),
+                widget.channelManagement!,
               ],
               if (settings != null) ...[
                 const SizedBox(height: 20),

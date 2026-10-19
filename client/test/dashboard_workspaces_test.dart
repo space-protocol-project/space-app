@@ -173,7 +173,8 @@ void main() {
             findsOneWidget,
           );
         }
-        for (final name in ['Обсуждения', 'Лента', 'Встречи']) {
+        expect(find.widgetWithText(ListTile, 'Комнаты'), findsOneWidget);
+        for (final name in ['Обсуждения', 'Лента']) {
           expect(find.widgetWithText(ListTile, name), findsNothing);
         }
         await tester.enterText(
