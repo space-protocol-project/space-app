@@ -261,7 +261,7 @@ void main() {
     expect(controller.state.room, 'room');
   });
 
-  test('Обрыв сети завершает медиа и таймер', () async {
+  test('Неповторяемая ошибка завершает медиа и таймер', () async {
     final log = <String>[];
     final api = FakeVoiceApi(log), media = FakeVoiceMedia(log);
     final controller = VoiceController(

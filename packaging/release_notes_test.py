@@ -1,4 +1,5 @@
 import runpy
+import re
 import unittest
 from pathlib import Path
 
@@ -6,6 +7,18 @@ notes = runpy.run_path(str(Path(__file__).with_name("release-notes.py")))["relea
 
 
 class ReleaseNotesTest(unittest.TestCase):
+    def test_prepared_stable_app_has_release_notes(self):
+        root = Path(__file__).resolve().parent.parent
+        source = (root / "client/pubspec.yaml").read_text(encoding="utf-8")
+        match = re.search(r"^version: ([^+\s]+)", source, re.MULTILINE)
+        self.assertIsNotNone(match)
+        tag = "v" + match.group(1)
+        metadata = runpy.run_path(str(root / "packaging/release-notes.py"))["tag_info"](tag)
+        if metadata["prerelease"]:
+            self.skipTest("Разработка предварительной версии может использовать Unreleased")
+        description = notes((root / "Changelog.md").read_text(encoding="utf-8"), tag)
+        self.assertLessEqual(len(description.encode("utf-8")), 8192)
+
     def test_selects_exact_section_and_preserves_newlines(self):
         text = "# Изменения\n\n## v0.1.0 — дата\n\nПервый абзац.\n\n- Пункт\n\n## v0.2.0\n\nСервер.\n"
         self.assertEqual(notes(text, "v0.1.0"), "Первый абзац.\n\n- Пункт\n")

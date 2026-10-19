@@ -4,9 +4,9 @@ on:
   push:
     branches: [main]
     tags: ['v*']
-    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_attachments.ps1', 'tools/check_desktop_chat_ci.ps1', 'tools/check_secure_storage.ps1', 'tools/check_linux_notification_activation.py', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
+    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_attachments.ps1', 'tools/check_desktop_chat_ci.ps1', 'tools/check_secure_storage.ps1', 'tools/check_voice_signal.py', 'tools/voice_signal_test.cpp', 'tools/check_webrtc_cache.py', 'tools/check_voice_probe_output.ps1', 'tools/voice_probe_output.ps1', 'tools/check_linux_notification_activation.py', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
   pull_request:
-    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_attachments.ps1', 'tools/check_desktop_chat_ci.ps1', 'tools/check_secure_storage.ps1', 'tools/check_linux_notification_activation.py', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
+    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_attachments.ps1', 'tools/check_desktop_chat_ci.ps1', 'tools/check_secure_storage.ps1', 'tools/check_voice_signal.py', 'tools/voice_signal_test.cpp', 'tools/check_webrtc_cache.py', 'tools/check_voice_probe_output.ps1', 'tools/voice_probe_output.ps1', 'tools/check_linux_notification_activation.py', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
 permissions:
   contents: read
 concurrency:
@@ -53,6 +53,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Смена версии кеша libwebrtc
+        if: runner.os != 'macOS'
+        run: python tools/check_webrtc_cache.py
+      - name: Чтение журналов двух клиентов при занятом пуле потоков
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./tools/check_voice_probe_output.ps1
       - name: Версия из тега
         if: startsWith(github.ref, 'refs/tags/v')
         shell: bash
@@ -76,7 +83,12 @@ jobs:
         run: flutter test test/composer_markdown_test.dart test/mls_view_test.dart
       - name: Голосовые комнаты и завершение захвата микрофона
         working-directory: client
-        run: flutter test test/voice_network_test.dart test/voice_controller_test.dart test/voice_widgets_test.dart test/channels_test.dart
+        run: flutter test test/voice_network_test.dart test/voice_audio_test.dart test/voice_transmission_test.dart test/voice_shortcut_test.dart test/voice_microphone_test.dart test/voice_devices_test.dart test/voice_device_call_test.dart test/voice_recovery_test.dart test/voice_controller_test.dart test/voice_widgets_test.dart test/voice_semantics_test.dart test/tooltip_semantics_test.dart test/channels_test.dart
+      - name: Полный перенос пространства и восстановление доступа
+        working-directory: client
+        run: flutter test test/migration_archive_test.dart test/home_migration_test.dart test/mls_migration_test.dart test/migration_password_dialog_test.dart test/recovery_spaces_test.dart test/device_recovery_batch_test.dart test/device_migration_test.dart test/device_migration_files_test.dart test/device_transfer_area_test.dart
+      - name: Нативное усиление и измеритель микрофона
+        run: python tools/check_voice_signal.py
       - name: Атомарная запись защищённого состояния Windows
         if: matrix.target == 'windows'
         shell: pwsh

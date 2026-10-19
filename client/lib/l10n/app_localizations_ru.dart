@@ -10,6 +10,56 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
+  String get voiceShortcutTitle => 'Клавиши рации';
+
+  @override
+  String get voiceShortcutScope =>
+      'Действуют в активном окне. При потере фокуса передача закрывается.';
+
+  @override
+  String get voiceShortcutPress =>
+      'Нажмите клавишу или сочетание с Ctrl, Alt, Shift или Meta. Отпустите клавиши перед сохранением. Escape — отмена.';
+
+  @override
+  String get voiceShortcutSave => 'Сохранить';
+
+  @override
+  String get deviceTransferTitle => 'Перенос устройства';
+
+  @override
+  String get deviceTransferHelp =>
+      'Два шага: сохраните один зашифрованный архив, затем перетащите его сюда на новом устройстве. Пространства, ключи, история, очереди, черновики, настройки и домашний Эфир переносятся вместе.';
+
+  @override
+  String get deviceTransferExport => 'Полный перенос';
+
+  @override
+  String get deviceTransferExportHelp =>
+      'Сохранить устройство целиком в один файл';
+
+  @override
+  String get deviceTransferRestore => 'Полное восстановление';
+
+  @override
+  String get deviceTransferRestoreHelp =>
+      'Перетащите архив сюда или нажмите, чтобы выбрать файл';
+
+  @override
+  String get deviceTransferOneFile =>
+      'Перетащите один файл полного переноса устройства.';
+
+  @override
+  String get deviceTransferPasswordHelp =>
+      'Архив защищён паролем от 12 символов. Полный перенос остановит все пространства и домашний сервер на исходном устройстве после проверки архива. Сохраните архив и пароль вне диска ОС. Восстановление выполняется в новой установке; после него перезапустите приложение. Не восстанавливайте один архив на нескольких устройствах. Для следующего переноса после продолжения переписки нужен новый архив.';
+
+  @override
+  String get deviceTransferFinished =>
+      'Сохраните архив и пароль. Закройте приложение; после восстановления откройте его заново. Прежнее устройство не используйте для продолжения переписки.';
+
+  @override
+  String get deviceTransferClose => 'Закрыть приложение';
+
+  @override
   String get failureConflict =>
       'Сообщение уже изменено. Закройте редактор и откройте актуальную версию; ваш текст можно скопировать перед закрытием.';
 
@@ -2003,6 +2053,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get voiceJoining => 'Подключаемся…';
 
   @override
+  String get voiceReconnecting =>
+      'Восстанавливаем соединение. Микрофон выключен.';
+
+  @override
   String get voiceConnected => 'В разговоре';
 
   @override
@@ -2048,4 +2102,150 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get voiceUpdateRuntime =>
       'Для голосовых комнат нужен новый runtime с поддержкой голоса. Обновите сервер в «Эфире».';
+
+  @override
+  String get voiceDeviceUnavailable =>
+      'Выбранное аудиоустройство отключено. Подключите его или выберите другое. Затем включите микрофон или звук вручную.';
+
+  @override
+  String get voiceDeviceDisconnected => 'Устройство отключено';
+
+  @override
+  String get voiceAudioDevices => 'Аудиоустройства';
+
+  @override
+  String get voiceSettingsTitle => 'Голос';
+
+  @override
+  String get voiceInputVolume => 'Громкость микрофона';
+
+  @override
+  String get voiceOutputVolume => 'Громкость звука';
+
+  @override
+  String get voiceProcessingTitle => 'Обработка звука';
+
+  @override
+  String get voiceInputProfile => 'Профиль микрофона';
+
+  @override
+  String get voiceProfileSpeech => 'Для разговора';
+
+  @override
+  String get voiceProfileStudio => 'Студия — без обработки';
+
+  @override
+  String get voiceProfileCustom => 'Пользовательский';
+
+  @override
+  String get voiceNoiseSuppression => 'Шумоподавление';
+
+  @override
+  String get voiceEchoCancellation => 'Эхоподавление';
+
+  @override
+  String get voiceAutoGain => 'Автоматическая регулировка усиления';
+
+  @override
+  String get voiceProcessingHint =>
+      'Изменение обработки выключает микрофон: включите его снова, чтобы применить настройки. Для профиля «Студия» используйте наушники.';
+
+  @override
+  String get voiceTestMicrophone => 'Проверка микрофона';
+
+  @override
+  String get voiceStopMicrophoneTest => 'Остановить проверку';
+
+  @override
+  String get voiceMicrophoneLevel => 'Уровень микрофона';
+
+  @override
+  String get voiceMicrophoneTestHint =>
+      'Вы услышите себя. Проверка работает локально до 60 секунд и не передаёт голос в комнату. Звук комнаты будет выключен. Закрытие настроек останавливает проверку.';
+
+  @override
+  String get voiceDevicesDescription =>
+      'Выберите, через что говорить и слушать. Настройки можно менять до входа в комнату и во время разговора.';
+
+  @override
+  String get voiceDevicesRemembered =>
+      'Выбор сохраняется на этом компьютере. Вход в комнату и восстановление настроек не включают микрофон.';
+
+  @override
+  String get voiceInputDevice => 'Микрофон';
+
+  @override
+  String get voiceOutputDevice => 'Вывод звука';
+
+  @override
+  String get voiceCurrentDevice => 'Текущее системное устройство';
+
+  @override
+  String get voiceRefreshDevices => 'Обновить устройства';
+
+  @override
+  String get voiceCloseDevices => 'Закрыть';
+
+  @override
+  String get voicePushToTalk => 'Режим рации';
+
+  @override
+  String get voicePushToTalkHint =>
+      'Включите микрофон в комнате и удерживайте выбранные клавиши для разговора. Работает, пока окно активно. Проверка микрофона воспроизводится непрерывно.';
+
+  @override
+  String get voiceAutomaticSensitivity =>
+      'Автоматическая чувствительность микрофона';
+
+  @override
+  String get voiceSensitivity => 'Порог срабатывания';
+
+  @override
+  String get recoveryIncludeSpaces => 'И пространства';
+
+  @override
+  String get recoveryIncludeSpacesHint =>
+      'Создать второй QR со списком пространств и их ключами доступа. Ключи MLS и история не входят.';
+
+  @override
+  String get recoveryAccessQr => 'Восстановление выбранного доступа';
+
+  @override
+  String get recoverySpacesQr => 'Пространства и доступ';
+
+  @override
+  String get recoverySpacesUseFile =>
+      'Набор не помещается в один QR. Сохраните зашифрованный файл.';
+
+  @override
+  String get recoverySaveSpacesQr => 'Сохранить QR пространств';
+
+  @override
+  String get recoverySaveSpacesFile => 'Сохранить пространства в файл';
+
+  @override
+  String recoverySpacesResult(int restored, int total) {
+    return 'Добавлено пространств: $restored. Всего в наборе: $total. Имеющиеся ключи сохранены без изменений. Для ошибок повторите импорт.';
+  }
+
+  @override
+  String get migrationTitle => 'Полный перенос пространства';
+
+  @override
+  String get migrationExportHelp =>
+      'Архив содержит сервер, ключи устройства, рабочее состояние MLS и локальную историю закрытых каналов. После сохранения прежний клиент прекратит работу с этим пространством. Сохраните архив вне этого диска и запомните пароль. При сбое проверьте файл .pending: он может содержать готовый перенос. После проверки архива рабочие ключи прежнего устройства будут заменены отметкой переноса в системном хранилище.';
+
+  @override
+  String get migrationImportHelp =>
+      'Восстановление продолжает работу прежнего устройства. Используйте архив только на одном новом устройстве. Старый сервер должен быть остановлен. Существующие ключи не заменяются.';
+
+  @override
+  String get migrationPassword => 'Пароль архива (от 12 символов)';
+
+  @override
+  String get migrationPasswordRepeat => 'Повторите пароль';
+
+  @override
+  String get migrationExported =>
+      'Перенос сохранён. Прежнее устройство остановлено. Сохраните архив и пароль перед переустановкой ОС.';
 }

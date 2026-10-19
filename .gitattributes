@@ -1,2 +1,4 @@
 # Пробел перед пустой строкой контекста — часть формата unified diff.
 docs/upstream/*.patch whitespace=-blank-at-eol
+# Сохраняем пробелы исходного стороннего пакета при импорте.
+client/vendor/flutter_webrtc/** whitespace=-blank-at-eol,-blank-at-eof

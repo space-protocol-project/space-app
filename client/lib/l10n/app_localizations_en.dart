@@ -10,6 +10,54 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get voiceShortcutTitle => 'Push-to-talk shortcut';
+
+  @override
+  String get voiceShortcutScope =>
+      'Active window only. Transmission closes on focus loss.';
+
+  @override
+  String get voiceShortcutPress =>
+      'Press a key or combine it with Ctrl, Alt, Shift or Meta. Release the keys before saving. Escape cancels.';
+
+  @override
+  String get voiceShortcutSave => 'Save';
+
+  @override
+  String get deviceTransferTitle => 'Device transfer';
+
+  @override
+  String get deviceTransferHelp =>
+      'Two steps: save one encrypted archive, then drop it here on the new device. Spaces, keys, history, queues, drafts, settings and the home server move together.';
+
+  @override
+  String get deviceTransferExport => 'Full transfer';
+
+  @override
+  String get deviceTransferExportHelp => 'Save the entire device in one file';
+
+  @override
+  String get deviceTransferRestore => 'Full restore';
+
+  @override
+  String get deviceTransferRestoreHelp =>
+      'Drop the archive here or click to select a file';
+
+  @override
+  String get deviceTransferOneFile => 'Drop one full device transfer file.';
+
+  @override
+  String get deviceTransferPasswordHelp =>
+      'The archive requires a password of at least 12 characters. After verification, full transfer stops all spaces and the home server on the source device. Keep the archive and password outside the OS disk. Restore into a fresh installation and restart the app. Do not restore one archive onto several devices. After resuming messages, create a fresh archive for the next move.';
+
+  @override
+  String get deviceTransferFinished =>
+      'Keep the archive and password. Close the app; open it again after restoring. Do not resume messaging on the source device.';
+
+  @override
+  String get deviceTransferClose => 'Close application';
+
+  @override
   String get failureConflict =>
       'The message has changed. Close the editor and open the latest version; you can copy your text before closing.';
 
@@ -1992,6 +2040,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voiceJoining => 'Connecting…';
 
   @override
+  String get voiceReconnecting => 'Reconnecting. Microphone is off.';
+
+  @override
   String get voiceConnected => 'Connected';
 
   @override
@@ -2037,4 +2088,149 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get voiceUpdateRuntime =>
       'Voice rooms require a runtime with voice support. Update your server in Broadcast.';
+
+  @override
+  String get voiceDeviceUnavailable =>
+      'A selected audio device is disconnected. Reconnect it or choose another device, then enable the microphone or sound manually.';
+
+  @override
+  String get voiceDeviceDisconnected => 'Device disconnected';
+
+  @override
+  String get voiceAudioDevices => 'Audio devices';
+
+  @override
+  String get voiceSettingsTitle => 'Voice';
+
+  @override
+  String get voiceInputVolume => 'Microphone volume';
+
+  @override
+  String get voiceOutputVolume => 'Output volume';
+
+  @override
+  String get voiceProcessingTitle => 'Audio processing';
+
+  @override
+  String get voiceInputProfile => 'Microphone profile';
+
+  @override
+  String get voiceProfileSpeech => 'Conversation';
+
+  @override
+  String get voiceProfileStudio => 'Studio — no processing';
+
+  @override
+  String get voiceProfileCustom => 'Custom';
+
+  @override
+  String get voiceNoiseSuppression => 'Noise suppression';
+
+  @override
+  String get voiceEchoCancellation => 'Echo cancellation';
+
+  @override
+  String get voiceAutoGain => 'Automatic gain control';
+
+  @override
+  String get voiceProcessingHint =>
+      'Changing processing turns off your microphone. Turn it on again to apply the settings. Use headphones with the Studio profile.';
+
+  @override
+  String get voiceTestMicrophone => 'Test microphone';
+
+  @override
+  String get voiceStopMicrophoneTest => 'Stop test';
+
+  @override
+  String get voiceMicrophoneLevel => 'Microphone level';
+
+  @override
+  String get voiceMicrophoneTestHint =>
+      'You will hear yourself. The test runs locally for up to 60 seconds and does not send audio to the room. Room audio will be turned off. Closing settings stops the test.';
+
+  @override
+  String get voiceDevicesDescription =>
+      'Choose your microphone and sound output. You can change devices before joining a room or during a conversation.';
+
+  @override
+  String get voiceDevicesRemembered =>
+      'Your choices are saved on this computer. Joining a room and restoring settings do not turn on your microphone.';
+
+  @override
+  String get voiceInputDevice => 'Microphone';
+
+  @override
+  String get voiceOutputDevice => 'Sound output';
+
+  @override
+  String get voiceCurrentDevice => 'Current system device';
+
+  @override
+  String get voiceRefreshDevices => 'Refresh devices';
+
+  @override
+  String get voiceCloseDevices => 'Close';
+
+  @override
+  String get voicePushToTalk => 'Push to talk';
+
+  @override
+  String get voicePushToTalkHint =>
+      'Enable the microphone in the room, then hold your chosen shortcut to speak. Works while this window has focus. The microphone test plays continuously.';
+
+  @override
+  String get voiceAutomaticSensitivity => 'Automatic input sensitivity';
+
+  @override
+  String get voiceSensitivity => 'Input threshold';
+
+  @override
+  String get recoveryIncludeSpaces => 'Include spaces';
+
+  @override
+  String get recoveryIncludeSpacesHint =>
+      'Create a second QR with saved spaces and their recovery keys. MLS keys and history are not included.';
+
+  @override
+  String get recoveryAccessQr => 'Selected access recovery';
+
+  @override
+  String get recoverySpacesQr => 'Spaces and access';
+
+  @override
+  String get recoverySpacesUseFile =>
+      'This set is too large for one QR. Save the encrypted file.';
+
+  @override
+  String get recoverySaveSpacesQr => 'Save spaces QR';
+
+  @override
+  String get recoverySaveSpacesFile => 'Save spaces to file';
+
+  @override
+  String recoverySpacesResult(int restored, int total) {
+    return 'Spaces added: $restored. Total in collection: $total. Existing keys were kept unchanged. Retry import for failures.';
+  }
+
+  @override
+  String get migrationTitle => 'Full space migration';
+
+  @override
+  String get migrationExportHelp =>
+      'The archive contains the server, device keys, working MLS state and local encrypted-channel history. After saving, this client will stop using this space. Keep the archive on another drive and remember the password. If interrupted, check the .pending file: it may contain the completed migration. After verification, the previous device working keys in system storage will be replaced with a migration marker.';
+
+  @override
+  String get migrationImportHelp =>
+      'Restoring continues the previous device. Use the archive on only one new device. The old server must be stopped. Existing keys are never replaced.';
+
+  @override
+  String get migrationPassword => 'Archive password (at least 12 characters)';
+
+  @override
+  String get migrationPasswordRepeat => 'Repeat password';
+
+  @override
+  String get migrationExported =>
+      'Migration saved. The previous device is stopped. Preserve the archive and password before reinstalling the OS.';
 }

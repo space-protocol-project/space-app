@@ -19,6 +19,7 @@ class KeyIdentityVault implements RotationJournalVault {
       'space.identity.v1.${url64((await Sha256().hash(utf8.encode(origin))).bytes)}';
   @override
   Future<DeviceRecord?> load(String origin) async {
+    await _requireActive(origin);
     final value = await _storage.read(key: await _key(origin));
     if (value == null) return null;
     final record = DeviceRecord.fromJson(
@@ -35,6 +36,7 @@ class KeyIdentityVault implements RotationJournalVault {
 
   @override
   Future<void> save(DeviceRecord record) async {
+    await _requireActive(record.origin);
     final key = await _key(record.origin);
     final encoded = jsonEncode(record.toJson());
     await _storage.write(key: key, value: encoded);
@@ -44,6 +46,102 @@ class KeyIdentityVault implements RotationJournalVault {
         'Системное хранилище не подтвердило сохранение ключей',
       );
     }
+  }
+
+  Future<void> _requireActive(String origin) async {
+    if (await _storage.read(key: 'space.device-migration.export') != null) {
+      throw StateError(
+        'Устройство перенесено. Продолжите работу на новом устройстве.',
+      );
+    }
+    if (await _storage.read(key: '${await _key(origin)}.transferred') != null) {
+      throw StateError(
+        'Устройство перенесено. Восстановите архив на новом устройстве.',
+      );
+    }
+  }
+
+  Future<void> retireForMigration(String origin, String transferId) async {
+    final key = '${await _key(origin)}.transferred';
+    await _storage.write(key: key, value: transferId);
+    if (await _storage.read(key: key) != transferId) {
+      throw StateError('Не удалось подтвердить остановку прежнего устройства');
+    }
+    final identityKey = await _key(origin);
+    final tombstone = jsonEncode({
+      'v': 'transferred',
+      'origin': origin,
+      'id': transferId,
+    });
+    await _storage.write(key: identityKey, value: tombstone);
+    if (await _storage.read(key: identityKey) != tombstone) {
+      throw StateError('Не удалось удалить рабочие ключи прежнего устройства');
+    }
+  }
+
+  Future<bool> retiredForMigration(String origin, String transferId) async =>
+      await _storage.read(key: '${await _key(origin)}.transferred') ==
+      transferId;
+
+  Future<DeviceRecord?> migrationSource(
+    String origin,
+    String transferId,
+  ) async {
+    final key = await _key(origin);
+    final retired = await _storage.read(key: '$key.transferred');
+    if (retired != null && retired != transferId) {
+      throw StateError('Начат другой перенос устройства');
+    }
+    final raw = await _storage.read(key: key);
+    if (raw == null) return null;
+    final data = jsonDecode(raw) as Map<String, dynamic>;
+    if (retired == transferId &&
+        data['v'] == 'transferred' &&
+        data['id'] == transferId) {
+      return null;
+    }
+    final record = DeviceRecord.fromJson(data);
+    if (record.origin != origin) {
+      throw StateError('Адрес устройства не совпадает');
+    }
+    return record;
+  }
+
+  Future<void> requireMigrationTarget(
+    String origin,
+    String transferId, {
+    DeviceRecord? expected,
+  }) async {
+    await _requireActive(origin);
+    final key = await _key(origin);
+    final receipt = await _storage.read(key: '$key.imported-transfer');
+    if (receipt != null && receipt != transferId ||
+        receipt == null && await _storage.read(key: key) != null) {
+      throw StateError(
+        'Перенос доступен только без существующего устройства этого пространства',
+      );
+    }
+    final existing = await _storage.read(key: key);
+    if (existing != null && expected != null) {
+      final record = DeviceRecord.fromJson(
+        jsonDecode(existing) as Map<String, dynamic>,
+      );
+      if (record.serverId != expected.serverId ||
+          record.serverKey != expected.serverKey ||
+          url64(record.deviceSeed) != url64(expected.deviceSeed)) {
+        throw StateError('На этом компьютере сохранено другое устройство');
+      }
+    }
+  }
+
+  Future<void> installMigration(DeviceRecord record, String transferId) async {
+    await requireMigrationTarget(record.origin, transferId, expected: record);
+    final key = await _key(record.origin);
+    await _storage.write(key: '$key.imported-transfer', value: transferId);
+    if (await _storage.read(key: '$key.imported-transfer') != transferId) {
+      throw StateError('Не удалось сохранить журнал переноса устройства');
+    }
+    if (await _storage.read(key: key) == null) await save(record);
   }
 
   @override

@@ -101,6 +101,90 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @voiceShortcutTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Клавиши рации'**
+  String get voiceShortcutTitle;
+
+  /// No description provided for @voiceShortcutScope.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действуют в активном окне. При потере фокуса передача закрывается.'**
+  String get voiceShortcutScope;
+
+  /// No description provided for @voiceShortcutPress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нажмите клавишу или сочетание с Ctrl, Alt, Shift или Meta. Отпустите клавиши перед сохранением. Escape — отмена.'**
+  String get voiceShortcutPress;
+
+  /// No description provided for @voiceShortcutSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить'**
+  String get voiceShortcutSave;
+
+  /// No description provided for @deviceTransferTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перенос устройства'**
+  String get deviceTransferTitle;
+
+  /// No description provided for @deviceTransferHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Два шага: сохраните один зашифрованный архив, затем перетащите его сюда на новом устройстве. Пространства, ключи, история, очереди, черновики, настройки и домашний Эфир переносятся вместе.'**
+  String get deviceTransferHelp;
+
+  /// No description provided for @deviceTransferExport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Полный перенос'**
+  String get deviceTransferExport;
+
+  /// No description provided for @deviceTransferExportHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить устройство целиком в один файл'**
+  String get deviceTransferExportHelp;
+
+  /// No description provided for @deviceTransferRestore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Полное восстановление'**
+  String get deviceTransferRestore;
+
+  /// No description provided for @deviceTransferRestoreHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перетащите архив сюда или нажмите, чтобы выбрать файл'**
+  String get deviceTransferRestoreHelp;
+
+  /// No description provided for @deviceTransferOneFile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перетащите один файл полного переноса устройства.'**
+  String get deviceTransferOneFile;
+
+  /// No description provided for @deviceTransferPasswordHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Архив защищён паролем от 12 символов. Полный перенос остановит все пространства и домашний сервер на исходном устройстве после проверки архива. Сохраните архив и пароль вне диска ОС. Восстановление выполняется в новой установке; после него перезапустите приложение. Не восстанавливайте один архив на нескольких устройствах. Для следующего переноса после продолжения переписки нужен новый архив.'**
+  String get deviceTransferPasswordHelp;
+
+  /// No description provided for @deviceTransferFinished.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохраните архив и пароль. Закройте приложение; после восстановления откройте его заново. Прежнее устройство не используйте для продолжения переписки.'**
+  String get deviceTransferFinished;
+
+  /// No description provided for @deviceTransferClose.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть приложение'**
+  String get deviceTransferClose;
+
   /// No description provided for @failureConflict.
   ///
   /// In ru, this message translates to:
@@ -3616,6 +3700,12 @@ abstract class AppLocalizations {
   /// **'Подключаемся…'**
   String get voiceJoining;
 
+  /// No description provided for @voiceReconnecting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстанавливаем соединение. Микрофон выключен.'**
+  String get voiceReconnecting;
+
   /// No description provided for @voiceConnected.
   ///
   /// In ru, this message translates to:
@@ -3699,6 +3789,270 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Для голосовых комнат нужен новый runtime с поддержкой голоса. Обновите сервер в «Эфире».'**
   String get voiceUpdateRuntime;
+
+  /// No description provided for @voiceDeviceUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбранное аудиоустройство отключено. Подключите его или выберите другое. Затем включите микрофон или звук вручную.'**
+  String get voiceDeviceUnavailable;
+
+  /// No description provided for @voiceDeviceDisconnected.
+  ///
+  /// In ru, this message translates to:
+  /// **'Устройство отключено'**
+  String get voiceDeviceDisconnected;
+
+  /// No description provided for @voiceAudioDevices.
+  ///
+  /// In ru, this message translates to:
+  /// **'Аудиоустройства'**
+  String get voiceAudioDevices;
+
+  /// No description provided for @voiceSettingsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Голос'**
+  String get voiceSettingsTitle;
+
+  /// No description provided for @voiceInputVolume.
+  ///
+  /// In ru, this message translates to:
+  /// **'Громкость микрофона'**
+  String get voiceInputVolume;
+
+  /// No description provided for @voiceOutputVolume.
+  ///
+  /// In ru, this message translates to:
+  /// **'Громкость звука'**
+  String get voiceOutputVolume;
+
+  /// No description provided for @voiceProcessingTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обработка звука'**
+  String get voiceProcessingTitle;
+
+  /// No description provided for @voiceInputProfile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Профиль микрофона'**
+  String get voiceInputProfile;
+
+  /// No description provided for @voiceProfileSpeech.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для разговора'**
+  String get voiceProfileSpeech;
+
+  /// No description provided for @voiceProfileStudio.
+  ///
+  /// In ru, this message translates to:
+  /// **'Студия — без обработки'**
+  String get voiceProfileStudio;
+
+  /// No description provided for @voiceProfileCustom.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пользовательский'**
+  String get voiceProfileCustom;
+
+  /// No description provided for @voiceNoiseSuppression.
+  ///
+  /// In ru, this message translates to:
+  /// **'Шумоподавление'**
+  String get voiceNoiseSuppression;
+
+  /// No description provided for @voiceEchoCancellation.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эхоподавление'**
+  String get voiceEchoCancellation;
+
+  /// No description provided for @voiceAutoGain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автоматическая регулировка усиления'**
+  String get voiceAutoGain;
+
+  /// No description provided for @voiceProcessingHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменение обработки выключает микрофон: включите его снова, чтобы применить настройки. Для профиля «Студия» используйте наушники.'**
+  String get voiceProcessingHint;
+
+  /// No description provided for @voiceTestMicrophone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверка микрофона'**
+  String get voiceTestMicrophone;
+
+  /// No description provided for @voiceStopMicrophoneTest.
+  ///
+  /// In ru, this message translates to:
+  /// **'Остановить проверку'**
+  String get voiceStopMicrophoneTest;
+
+  /// No description provided for @voiceMicrophoneLevel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уровень микрофона'**
+  String get voiceMicrophoneLevel;
+
+  /// No description provided for @voiceMicrophoneTestHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вы услышите себя. Проверка работает локально до 60 секунд и не передаёт голос в комнату. Звук комнаты будет выключен. Закрытие настроек останавливает проверку.'**
+  String get voiceMicrophoneTestHint;
+
+  /// No description provided for @voiceDevicesDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите, через что говорить и слушать. Настройки можно менять до входа в комнату и во время разговора.'**
+  String get voiceDevicesDescription;
+
+  /// No description provided for @voiceDevicesRemembered.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбор сохраняется на этом компьютере. Вход в комнату и восстановление настроек не включают микрофон.'**
+  String get voiceDevicesRemembered;
+
+  /// No description provided for @voiceInputDevice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Микрофон'**
+  String get voiceInputDevice;
+
+  /// No description provided for @voiceOutputDevice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вывод звука'**
+  String get voiceOutputDevice;
+
+  /// No description provided for @voiceCurrentDevice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Текущее системное устройство'**
+  String get voiceCurrentDevice;
+
+  /// No description provided for @voiceRefreshDevices.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить устройства'**
+  String get voiceRefreshDevices;
+
+  /// No description provided for @voiceCloseDevices.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть'**
+  String get voiceCloseDevices;
+
+  /// No description provided for @voicePushToTalk.
+  ///
+  /// In ru, this message translates to:
+  /// **'Режим рации'**
+  String get voicePushToTalk;
+
+  /// No description provided for @voicePushToTalkHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включите микрофон в комнате и удерживайте выбранные клавиши для разговора. Работает, пока окно активно. Проверка микрофона воспроизводится непрерывно.'**
+  String get voicePushToTalkHint;
+
+  /// No description provided for @voiceAutomaticSensitivity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автоматическая чувствительность микрофона'**
+  String get voiceAutomaticSensitivity;
+
+  /// No description provided for @voiceSensitivity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порог срабатывания'**
+  String get voiceSensitivity;
+
+  /// No description provided for @recoveryIncludeSpaces.
+  ///
+  /// In ru, this message translates to:
+  /// **'И пространства'**
+  String get recoveryIncludeSpaces;
+
+  /// No description provided for @recoveryIncludeSpacesHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать второй QR со списком пространств и их ключами доступа. Ключи MLS и история не входят.'**
+  String get recoveryIncludeSpacesHint;
+
+  /// No description provided for @recoveryAccessQr.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановление выбранного доступа'**
+  String get recoveryAccessQr;
+
+  /// No description provided for @recoverySpacesQr.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пространства и доступ'**
+  String get recoverySpacesQr;
+
+  /// No description provided for @recoverySpacesUseFile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Набор не помещается в один QR. Сохраните зашифрованный файл.'**
+  String get recoverySpacesUseFile;
+
+  /// No description provided for @recoverySaveSpacesQr.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить QR пространств'**
+  String get recoverySaveSpacesQr;
+
+  /// No description provided for @recoverySaveSpacesFile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить пространства в файл'**
+  String get recoverySaveSpacesFile;
+
+  /// No description provided for @recoverySpacesResult.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавлено пространств: {restored}. Всего в наборе: {total}. Имеющиеся ключи сохранены без изменений. Для ошибок повторите импорт.'**
+  String recoverySpacesResult(int restored, int total);
+
+  /// No description provided for @migrationTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Полный перенос пространства'**
+  String get migrationTitle;
+
+  /// No description provided for @migrationExportHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Архив содержит сервер, ключи устройства, рабочее состояние MLS и локальную историю закрытых каналов. После сохранения прежний клиент прекратит работу с этим пространством. Сохраните архив вне этого диска и запомните пароль. При сбое проверьте файл .pending: он может содержать готовый перенос. После проверки архива рабочие ключи прежнего устройства будут заменены отметкой переноса в системном хранилище.'**
+  String get migrationExportHelp;
+
+  /// No description provided for @migrationImportHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановление продолжает работу прежнего устройства. Используйте архив только на одном новом устройстве. Старый сервер должен быть остановлен. Существующие ключи не заменяются.'**
+  String get migrationImportHelp;
+
+  /// No description provided for @migrationPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль архива (от 12 символов)'**
+  String get migrationPassword;
+
+  /// No description provided for @migrationPasswordRepeat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторите пароль'**
+  String get migrationPasswordRepeat;
+
+  /// No description provided for @migrationExported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перенос сохранён. Прежнее устройство остановлено. Сохраните архив и пароль перед переустановкой ОС.'**
+  String get migrationExported;
 }
 
 class _AppLocalizationsDelegate

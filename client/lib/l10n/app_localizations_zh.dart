@@ -10,6 +10,51 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get voiceShortcutTitle => '按键通话快捷键';
+
+  @override
+  String get voiceShortcutScope => '仅在活动窗口中生效。失去焦点时停止传输。';
+
+  @override
+  String get voiceShortcutPress =>
+      '按下一个键或与 Ctrl、Alt、Shift、Meta 组合。保存前松开所有键。Escape 取消。';
+
+  @override
+  String get voiceShortcutSave => '保存';
+
+  @override
+  String get deviceTransferTitle => '迁移设备';
+
+  @override
+  String get deviceTransferHelp =>
+      '只需两步：保存一个加密归档，然后在新设备上将其拖入此处。空间、密钥、历史、队列、草稿、设置和家庭服务器一起迁移。';
+
+  @override
+  String get deviceTransferExport => '完整迁移';
+
+  @override
+  String get deviceTransferExportHelp => '将整个设备保存到一个文件';
+
+  @override
+  String get deviceTransferRestore => '完整恢复';
+
+  @override
+  String get deviceTransferRestoreHelp => '将归档拖入此处或点击选择文件';
+
+  @override
+  String get deviceTransferOneFile => '请拖入一个完整设备迁移文件。';
+
+  @override
+  String get deviceTransferPasswordHelp =>
+      '密码至少12个字符。归档验证后会停止原设备的所有空间和家庭服务器。请将归档和密码保存在系统磁盘之外。恢复到全新安装后重新启动应用。请勿将同一归档恢复到多台设备。继续通信后，下次迁移需要创建新归档。';
+
+  @override
+  String get deviceTransferFinished => '请保存归档和密码。关闭应用，恢复后重新打开。请勿在原设备上继续通信。';
+
+  @override
+  String get deviceTransferClose => '关闭应用';
+
+  @override
   String get failureConflict => '消息已更改。请关闭编辑器并打开最新版本；关闭前可以复制您输入的文本。';
 
   @override
@@ -1834,6 +1879,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get voiceJoining => '连接中…';
 
   @override
+  String get voiceReconnecting => '正在重新连接。麦克风已关闭。';
+
+  @override
   String get voiceConnected => '通话中';
 
   @override
@@ -1874,11 +1922,195 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get voiceUpdateRuntime => '语音房间需要支持语音的新运行时。请在“广播”中更新服务器。';
+
+  @override
+  String get voiceDeviceUnavailable => '所选音频设备已断开。请重新连接或选择其他设备，然后手动开启麦克风或声音。';
+
+  @override
+  String get voiceDeviceDisconnected => '设备已断开';
+
+  @override
+  String get voiceAudioDevices => '音频设备';
+
+  @override
+  String get voiceSettingsTitle => '语音';
+
+  @override
+  String get voiceInputVolume => '麦克风音量';
+
+  @override
+  String get voiceOutputVolume => '输出音量';
+
+  @override
+  String get voiceProcessingTitle => '音频处理';
+
+  @override
+  String get voiceInputProfile => '麦克风模式';
+
+  @override
+  String get voiceProfileSpeech => '对话';
+
+  @override
+  String get voiceProfileStudio => '录音室 — 无处理';
+
+  @override
+  String get voiceProfileCustom => '自定义';
+
+  @override
+  String get voiceNoiseSuppression => '降噪';
+
+  @override
+  String get voiceEchoCancellation => '回声消除';
+
+  @override
+  String get voiceAutoGain => '自动增益控制';
+
+  @override
+  String get voiceProcessingHint => '更改处理设置会关闭麦克风。请重新开启以应用设置。录音室模式建议使用耳机。';
+
+  @override
+  String get voiceTestMicrophone => '测试麦克风';
+
+  @override
+  String get voiceStopMicrophoneTest => '停止测试';
+
+  @override
+  String get voiceMicrophoneLevel => '麦克风电平';
+
+  @override
+  String get voiceMicrophoneTestHint =>
+      '您将听到自己的声音。测试仅在本地运行，最长60秒，不会向房间发送音频。房间声音将关闭。关闭设置会停止测试。';
+
+  @override
+  String get voiceDevicesDescription => '选择麦克风和声音输出设备。加入房间前或通话期间均可更改。';
+
+  @override
+  String get voiceDevicesRemembered => '选择会保存在此电脑上。加入房间和恢复设置不会自动开启麦克风。';
+
+  @override
+  String get voiceInputDevice => '麦克风';
+
+  @override
+  String get voiceOutputDevice => '声音输出';
+
+  @override
+  String get voiceCurrentDevice => '当前系统设备';
+
+  @override
+  String get voiceRefreshDevices => '刷新设备';
+
+  @override
+  String get voiceCloseDevices => '关闭';
+
+  @override
+  String get voicePushToTalk => '按键说话';
+
+  @override
+  String get voicePushToTalkHint =>
+      '先在房间中开启麦克风，再按住选定的快捷键说话。仅在窗口获得焦点时有效。麦克风测试连续播放。';
+
+  @override
+  String get voiceAutomaticSensitivity => '自动输入灵敏度';
+
+  @override
+  String get voiceSensitivity => '输入阈值';
+
+  @override
+  String get recoveryIncludeSpaces => '包含空间';
+
+  @override
+  String get recoveryIncludeSpacesHint =>
+      '创建第二个二维码，包含已保存的空间及其恢复密钥，不包含 MLS 密钥和历史记录。';
+
+  @override
+  String get recoveryAccessQr => '所选身份访问恢复';
+
+  @override
+  String get recoverySpacesQr => '空间与访问';
+
+  @override
+  String get recoverySpacesUseFile => '内容过大，无法放入一个二维码，请保存加密文件。';
+
+  @override
+  String get recoverySaveSpacesQr => '保存空间二维码';
+
+  @override
+  String get recoverySaveSpacesFile => '将空间保存到文件';
+
+  @override
+  String recoverySpacesResult(int restored, int total) {
+    return '已添加空间：$restored。集合总数：$total。现有密钥保持不变。失败的空间可重新导入。';
+  }
+
+  @override
+  String get migrationTitle => '完整迁移空间';
+
+  @override
+  String get migrationExportHelp =>
+      '归档包含服务器、设备密钥、当前 MLS 状态和加密频道本地历史。保存后，此客户端将停止使用该空间。请将归档保存在其他磁盘并记住密码。如果操作中断，请检查 .pending 文件，其中可能包含完整迁移。 验证归档后，系统存储中旧设备的工作密钥将被迁移标记替换。';
+
+  @override
+  String get migrationImportHelp =>
+      '恢复后将继续使用原设备身份。此归档只能用于一台新设备。旧服务器必须停止。现有密钥不会被替换。';
+
+  @override
+  String get migrationPassword => '归档密码（至少 12 个字符）';
+
+  @override
+  String get migrationPasswordRepeat => '再次输入密码';
+
+  @override
+  String get migrationExported => '迁移已保存，旧设备已停止。重装系统前请保管归档和密码。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
 class AppLocalizationsZhHans extends AppLocalizationsZh {
   AppLocalizationsZhHans() : super('zh_Hans');
+
+  @override
+  String get voiceShortcutTitle => '按键通话快捷键';
+
+  @override
+  String get voiceShortcutScope => '仅在活动窗口中生效。失去焦点时停止传输。';
+
+  @override
+  String get voiceShortcutPress =>
+      '按下一个键或与 Ctrl、Alt、Shift、Meta 组合。保存前松开所有键。Escape 取消。';
+
+  @override
+  String get voiceShortcutSave => '保存';
+
+  @override
+  String get deviceTransferTitle => '迁移设备';
+
+  @override
+  String get deviceTransferHelp =>
+      '只需两步：保存一个加密归档，然后在新设备上将其拖入此处。空间、密钥、历史、队列、草稿、设置和家庭服务器一起迁移。';
+
+  @override
+  String get deviceTransferExport => '完整迁移';
+
+  @override
+  String get deviceTransferExportHelp => '将整个设备保存到一个文件';
+
+  @override
+  String get deviceTransferRestore => '完整恢复';
+
+  @override
+  String get deviceTransferRestoreHelp => '将归档拖入此处或点击选择文件';
+
+  @override
+  String get deviceTransferOneFile => '请拖入一个完整设备迁移文件。';
+
+  @override
+  String get deviceTransferPasswordHelp =>
+      '密码至少12个字符。归档验证后会停止原设备的所有空间和家庭服务器。请将归档和密码保存在系统磁盘之外。恢复到全新安装后重新启动应用。请勿将同一归档恢复到多台设备。继续通信后，下次迁移需要创建新归档。';
+
+  @override
+  String get deviceTransferFinished => '请保存归档和密码。关闭应用，恢复后重新打开。请勿在原设备上继续通信。';
+
+  @override
+  String get deviceTransferClose => '关闭应用';
 
   @override
   String get attentionDescription => '可以在应用设置中启用通知。摄像头和麦克风仅在您操作时开启。';
@@ -2546,6 +2778,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get voiceJoining => '连接中…';
 
   @override
+  String get voiceReconnecting => '正在重新连接。麦克风已关闭。';
+
+  @override
   String get voiceConnected => '通话中';
 
   @override
@@ -2586,4 +2821,143 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get voiceUpdateRuntime => '语音房间需要支持语音的新运行时。请在“广播”中更新服务器。';
+
+  @override
+  String get voiceDeviceUnavailable => '所选音频设备已断开。请重新连接或选择其他设备，然后手动开启麦克风或声音。';
+
+  @override
+  String get voiceDeviceDisconnected => '设备已断开';
+
+  @override
+  String get voiceAudioDevices => '音频设备';
+
+  @override
+  String get voiceSettingsTitle => '语音';
+
+  @override
+  String get voiceInputVolume => '麦克风音量';
+
+  @override
+  String get voiceOutputVolume => '输出音量';
+
+  @override
+  String get voiceProcessingTitle => '音频处理';
+
+  @override
+  String get voiceInputProfile => '麦克风模式';
+
+  @override
+  String get voiceProfileSpeech => '对话';
+
+  @override
+  String get voiceProfileStudio => '录音室 — 无处理';
+
+  @override
+  String get voiceProfileCustom => '自定义';
+
+  @override
+  String get voiceNoiseSuppression => '降噪';
+
+  @override
+  String get voiceEchoCancellation => '回声消除';
+
+  @override
+  String get voiceAutoGain => '自动增益控制';
+
+  @override
+  String get voiceProcessingHint => '更改处理设置会关闭麦克风。请重新开启以应用设置。录音室模式建议使用耳机。';
+
+  @override
+  String get voiceTestMicrophone => '测试麦克风';
+
+  @override
+  String get voiceStopMicrophoneTest => '停止测试';
+
+  @override
+  String get voiceMicrophoneLevel => '麦克风电平';
+
+  @override
+  String get voiceMicrophoneTestHint =>
+      '您将听到自己的声音。测试仅在本地运行，最长60秒，不会向房间发送音频。房间声音将关闭。关闭设置会停止测试。';
+
+  @override
+  String get voiceDevicesDescription => '选择麦克风和声音输出设备。加入房间前或通话期间均可更改。';
+
+  @override
+  String get voiceDevicesRemembered => '选择会保存在此电脑上。加入房间和恢复设置不会自动开启麦克风。';
+
+  @override
+  String get voiceInputDevice => '麦克风';
+
+  @override
+  String get voiceOutputDevice => '声音输出';
+
+  @override
+  String get voiceCurrentDevice => '当前系统设备';
+
+  @override
+  String get voiceRefreshDevices => '刷新设备';
+
+  @override
+  String get voiceCloseDevices => '关闭';
+
+  @override
+  String get voicePushToTalk => '按键说话';
+
+  @override
+  String get voicePushToTalkHint =>
+      '先在房间中开启麦克风，再按住选定的快捷键说话。仅在窗口获得焦点时有效。麦克风测试连续播放。';
+
+  @override
+  String get voiceAutomaticSensitivity => '自动输入灵敏度';
+
+  @override
+  String get voiceSensitivity => '输入阈值';
+
+  @override
+  String get recoveryIncludeSpaces => '包含空间';
+
+  @override
+  String get recoveryIncludeSpacesHint =>
+      '创建第二个二维码，包含已保存的空间及其恢复密钥，不包含 MLS 密钥和历史记录。';
+
+  @override
+  String get recoveryAccessQr => '所选身份访问恢复';
+
+  @override
+  String get recoverySpacesQr => '空间与访问';
+
+  @override
+  String get recoverySpacesUseFile => '内容过大，无法放入一个二维码，请保存加密文件。';
+
+  @override
+  String get recoverySaveSpacesQr => '保存空间二维码';
+
+  @override
+  String get recoverySaveSpacesFile => '将空间保存到文件';
+
+  @override
+  String recoverySpacesResult(int restored, int total) {
+    return '已添加空间：$restored。集合总数：$total。现有密钥保持不变。失败的空间可重新导入。';
+  }
+
+  @override
+  String get migrationTitle => '完整迁移空间';
+
+  @override
+  String get migrationExportHelp =>
+      '归档包含服务器、设备密钥、当前 MLS 状态和加密频道本地历史。保存后，此客户端将停止使用该空间。请将归档保存在其他磁盘并记住密码。如果操作中断，请检查 .pending 文件，其中可能包含完整迁移。 验证归档后，系统存储中旧设备的工作密钥将被迁移标记替换。';
+
+  @override
+  String get migrationImportHelp =>
+      '恢复后将继续使用原设备身份。此归档只能用于一台新设备。旧服务器必须停止。现有密钥不会被替换。';
+
+  @override
+  String get migrationPassword => '归档密码（至少 12 个字符）';
+
+  @override
+  String get migrationPasswordRepeat => '再次输入密码';
+
+  @override
+  String get migrationExported => '迁移已保存，旧设备已停止。重装系统前请保管归档和密码。';
 }

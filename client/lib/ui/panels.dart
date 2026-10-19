@@ -1,4 +1,6 @@
 import 'mls_create.dart';
+import '../src/voice_devices.dart';
+import 'voice_shortcut_settings.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -151,11 +153,15 @@ class SettingsPanel extends StatelessWidget {
     this.updates,
     this.prepareInstall,
     this.requestNotificationPermission,
+    this.deviceTransfer,
+    this.voiceDevices,
   });
   final AppUpdates? updates;
   final Future<void> Function()? prepareInstall;
   final Future<bool> Function()? requestNotificationPermission;
   final AppPreferences preferences;
+  final Widget? deviceTransfer;
+  final VoiceDevices? voiceDevices;
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<AppPreferences, PreferencesState>(
@@ -244,6 +250,8 @@ class SettingsPanel extends StatelessWidget {
       ),
       const SizedBox(height: 24),
       ShortcutSettings(preferences: preferences, value: state.sendShortcut),
+      if (voiceDevices != null)
+        SurfaceCard(child: VoiceShortcutSettings(devices: voiceDevices!)),
       const SizedBox(height: 24),
       NotificationSettings(
         preferences: preferences,
@@ -258,6 +266,10 @@ class SettingsPanel extends StatelessWidget {
       ],
       const SizedBox(height: 24),
       AppUpdatesView(updates: updates, prepareInstall: prepareInstall),
+      if (deviceTransfer != null) ...[
+        const SizedBox(height: 24),
+        deviceTransfer!,
+      ],
     ],
   );
 }

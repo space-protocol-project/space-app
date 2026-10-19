@@ -4,13 +4,29 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/voice_controller.dart';
 import 'package:space_client/src/voice_media.dart';
 import 'package:space_client/src/voice_network.dart';
 import 'package:space_client/src/voice_signaling.dart';
+import 'package:space_client/src/voice_audio_settings.dart';
+import 'package:space_client/src/voice_device_preferences.dart';
+import 'package:space_client/src/voice_devices.dart';
+import 'package:space_client/src/voice_shortcut.dart';
 
 import 'home_vault.dart';
+part 'voice_desktop_checks.dart';
+
+class ProbePreferences implements VoiceDevicePreferences {
+  VoiceDeviceChoice value = const VoiceDeviceChoice();
+  @override
+  Future<VoiceDeviceChoice> load() async => value;
+  @override
+  Future<void> save(VoiceDeviceChoice choice) async {
+    value = choice;
+  }
+}
 
 class ProbeMedia extends NativeVoiceMedia {
   ProbeMedia(this.work, this.role) : super(playbackVolume: 0);
@@ -21,7 +37,9 @@ class ProbeMedia extends NativeVoiceMedia {
     VoiceNetworkSettings settings = const VoiceNetworkSettings.local(),
   ]) async {
     await flag(work, '$role-media', 'offer');
+    final clock = Stopwatch()..start();
     final result = await super.offer(settings);
+    await flag(work, '$role-offer-ms', '${clock.elapsedMilliseconds}');
     if (settings.relayOnly &&
         (!result.contains(' typ relay') || result.contains(' typ host'))) {
       throw StateError('Direct candidate in relay-only probe');
@@ -33,7 +51,9 @@ class ProbeMedia extends NativeVoiceMedia {
   @override
   Future<void> answer(String sdp) async {
     await flag(work, '$role-media', 'answer');
+    final clock = Stopwatch()..start();
     await super.answer(sdp);
+    await flag(work, '$role-answer-ms', '${clock.elapsedMilliseconds}');
     await flag(work, '$role-media', 'answered');
   }
 }
@@ -97,12 +117,27 @@ Future<void> scenario(Directory work, String origin, String role) async {
     throw StateError('Нет поддержки голоса');
   }
   final session = await SpaceSession.connect(server, HomeVault());
-  final media = ProbeMedia(work, role);
+  final mediaInstances = <ProbeMedia>[];
+  final devices = VoiceDevices(preferences: ProbePreferences());
   final controller = VoiceController(
-    mediaFactory: () => media,
+    mediaFactory: () {
+      final media = ProbeMedia(work, role);
+      mediaInstances.add(media);
+      return media;
+    },
+    audioDevices: devices,
     heartbeat: const Duration(milliseconds: 250),
   );
   try {
+    await devices.refresh();
+    final input = Platform.environment['SPACE_VOICE_INPUT_ID'];
+    if (input != null) {
+      final selected = devices.state.devices
+          .where((device) => device.input && device.id == input)
+          .firstOrNull;
+      if (selected == null) throw StateError('Указанный вход недоступен');
+      await devices.select(selected);
+    }
     await session.setNickname(role == 'A' ? 'Алиса' : 'Борис');
     String room;
     if (role == 'A') {
@@ -145,9 +180,15 @@ Future<void> scenario(Directory work, String origin, String role) async {
     }
     await flag(work, '$role-microphone', 'ready');
     await barrier(work, role == 'A' ? 'B-microphone' : 'A-microphone');
-    final counts = await waitForAudio(media);
+    final counts = await waitForAudio(mediaInstances.last);
     await flag(work, '$role-audio', jsonEncode(counts));
     await barrier(work, role == 'A' ? 'B-audio' : 'A-audio');
+    await checkPushToTalk(controller, mediaInstances.last);
+    await flag(work, '$role-ptt', 'passed');
+    await barrier(work, role == 'A' ? 'B-ptt' : 'A-ptt');
+    if (Platform.environment['SPACE_VOICE_RECOVERY_CHECK'] == '1') {
+      await checkReconnect(work, role, controller, mediaInstances);
+    }
     await flag(work, '$role-progress', 'controls');
     if (role == 'A') {
       await aliceControls(work, controller);
@@ -157,7 +198,15 @@ Future<void> scenario(Directory work, String origin, String role) async {
     await flag(
       work,
       '$role.json',
-      jsonEncode({'success': true, 'pid': pid, ...counts, 'role': role}),
+      jsonEncode({
+        'success': true,
+        'pid': pid,
+        ...counts,
+        'role': role,
+        'pushToTalk': true,
+        'input': devices.state.input,
+        'reconnected': mediaInstances.length > 1,
+      }),
     );
   } catch (error, stack) {
     await flag(work, '$role-failure', '$error\n$stack');
