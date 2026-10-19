@@ -71,12 +71,12 @@ void main() {
     expect(server.access['general']!.last['role'], 'reader');
     expect(server.access['general']!.first['permissions']['read'], false);
     expect(server.access['general']!.first['permissions']['write'], false);
-    await press(tester, 'Save channel');
+    await press(tester, 'Save chat');
     expect(server.channels['general']!['title'], 'Черновик 频道 draft');
     expect(server.channels['general']!['revision'], '3');
     locale.value = const Locale('zh');
     await tester.pumpAndSettle();
-    expect(find.text('频道设置已保存。'), findsOneWidget);
+    expect(find.text('聊天设置已保存。'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

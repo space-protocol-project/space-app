@@ -205,7 +205,7 @@ abstract class AdminLocalizations {
   /// No description provided for @authorizeDetails.
   ///
   /// In ru, this message translates to:
-  /// **'Вы явно разрешаете этому устройству менять настройки, каналы и доступ участников.'**
+  /// **'Вы явно разрешаете этому устройству менять настройки, чаты, голосовые комнаты и доступ участников.'**
   String get authorizeDetails;
 
   /// No description provided for @rootPassword.
@@ -349,43 +349,43 @@ abstract class AdminLocalizations {
   /// No description provided for @channelsTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Каналы и права'**
+  /// **'Чаты и права'**
   String get channelsTitle;
 
   /// No description provided for @channelsReload.
   ///
   /// In ru, this message translates to:
-  /// **'Обновить список каналов'**
+  /// **'Обновить список чатов'**
   String get channelsReload;
 
   /// No description provided for @channelsEmpty.
   ///
   /// In ru, this message translates to:
-  /// **'Каналов пока нет.'**
+  /// **'Чатов пока нет.'**
   String get channelsEmpty;
 
   /// No description provided for @channelCreateSection.
   ///
   /// In ru, this message translates to:
-  /// **'Создать чат-канал'**
+  /// **'Создать чат'**
   String get channelCreateSection;
 
   /// No description provided for @channelNewId.
   ///
   /// In ru, this message translates to:
-  /// **'Адрес нового канала'**
+  /// **'Адрес нового чата'**
   String get channelNewId;
 
   /// No description provided for @channelNewTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Название нового канала'**
+  /// **'Название нового чата'**
   String get channelNewTitle;
 
   /// No description provided for @channelNewOrder.
   ///
   /// In ru, this message translates to:
-  /// **'Порядок нового канала'**
+  /// **'Порядок'**
   String get channelNewOrder;
 
   /// No description provided for @channelDefaults.
@@ -397,25 +397,25 @@ abstract class AdminLocalizations {
   /// No description provided for @channelCreate.
   ///
   /// In ru, this message translates to:
-  /// **'Создать канал'**
+  /// **'Создать чат'**
   String get channelCreate;
 
   /// No description provided for @channelName.
   ///
   /// In ru, this message translates to:
-  /// **'Название канала'**
+  /// **'Название'**
   String get channelName;
 
   /// No description provided for @channelOrder.
   ///
   /// In ru, this message translates to:
-  /// **'Порядок канала'**
+  /// **'Порядок'**
   String get channelOrder;
 
   /// No description provided for @channelArchive.
   ///
   /// In ru, this message translates to:
-  /// **'Архивировать канал'**
+  /// **'Архивировать чат'**
   String get channelArchive;
 
   /// No description provided for @channelPublicPreview.
@@ -433,13 +433,13 @@ abstract class AdminLocalizations {
   /// No description provided for @channelSave.
   ///
   /// In ru, this message translates to:
-  /// **'Сохранить канал'**
+  /// **'Сохранить чат'**
   String get channelSave;
 
   /// No description provided for @channelReload.
   ///
   /// In ru, this message translates to:
-  /// **'Загрузить канал заново'**
+  /// **'Загрузить заново'**
   String get channelReload;
 
   /// No description provided for @channelAccessHelp.
@@ -517,7 +517,7 @@ abstract class AdminLocalizations {
   /// No description provided for @channelVisible.
   ///
   /// In ru, this message translates to:
-  /// **'Видеть канал'**
+  /// **'Видеть'**
   String get channelVisible;
 
   /// No description provided for @channelRead.
@@ -535,37 +535,37 @@ abstract class AdminLocalizations {
   /// No description provided for @channelManage.
   ///
   /// In ru, this message translates to:
-  /// **'Управлять каналом'**
+  /// **'Управлять'**
   String get channelManage;
 
   /// No description provided for @channelsLoaded.
   ///
   /// In ru, this message translates to:
-  /// **'Каналы загружены.'**
+  /// **'Список загружен.'**
   String get channelsLoaded;
 
   /// No description provided for @channelLoaded.
   ///
   /// In ru, this message translates to:
-  /// **'Канал и права загружены.'**
+  /// **'Настройки и права загружены.'**
   String get channelLoaded;
 
   /// No description provided for @channelCreated.
   ///
   /// In ru, this message translates to:
-  /// **'Канал создан.'**
+  /// **'Чат создан.'**
   String get channelCreated;
 
   /// No description provided for @channelSaved.
   ///
   /// In ru, this message translates to:
-  /// **'Настройки канала сохранены.'**
+  /// **'Настройки чата сохранены.'**
   String get channelSaved;
 
   /// No description provided for @channelAccessSaved.
   ///
   /// In ru, this message translates to:
-  /// **'Права канала сохранены.'**
+  /// **'Права сохранены.'**
   String get channelAccessSaved;
 
   /// No description provided for @channelRuleAdded.
@@ -577,13 +577,13 @@ abstract class AdminLocalizations {
   /// No description provided for @channelConflict.
   ///
   /// In ru, this message translates to:
-  /// **'Канал или права уже изменены. Загрузите их заново; несохранённые поля остаются в форме.'**
+  /// **'Настройки или права уже изменены. Загрузите их заново; несохранённые поля остаются в форме.'**
   String get channelConflict;
 
   /// No description provided for @channelChanged.
   ///
   /// In ru, this message translates to:
-  /// **'Канал изменился между загрузкой списка и прав'**
+  /// **'Настройки изменились между загрузкой списка и прав'**
   String get channelChanged;
 
   /// No description provided for @channelOrderInvalid.
@@ -607,13 +607,13 @@ abstract class AdminLocalizations {
   /// No description provided for @channelIdTaken.
   ///
   /// In ru, this message translates to:
-  /// **'Канал с таким адресом уже существует. Выберите другой адрес.'**
+  /// **'Этот адрес уже занят. Выберите другой.'**
   String get channelIdTaken;
 
   /// No description provided for @channelUnavailable.
   ///
   /// In ru, this message translates to:
-  /// **'Канал больше не доступен'**
+  /// **'Больше недоступно'**
   String get channelUnavailable;
 
   /// No description provided for @channelRulesLimit.
@@ -643,13 +643,13 @@ abstract class AdminLocalizations {
   /// No description provided for @channelRevision.
   ///
   /// In ru, this message translates to:
-  /// **'Канал {id} · версия {revision}'**
+  /// **'{id} · версия {revision}'**
   String channelRevision(String id, String revision);
 
   /// No description provided for @channelAccessRevision.
   ///
   /// In ru, this message translates to:
-  /// **'Права канала · версия {revision}'**
+  /// **'Права · версия {revision}'**
   String channelAccessRevision(String revision);
 
   /// No description provided for @channelArchivedSuffix.
@@ -1489,19 +1489,19 @@ abstract class AdminLocalizations {
   /// No description provided for @channelDelete.
   ///
   /// In ru, this message translates to:
-  /// **'Удалить канал'**
+  /// **'Удалить чат'**
   String get channelDelete;
 
   /// No description provided for @channelDeleteConfirm.
   ///
   /// In ru, this message translates to:
-  /// **'Удалить канал «{name}» и всю его историю? Это действие нельзя отменить.'**
+  /// **'Удалить чат «{name}» и всю его историю? Это действие нельзя отменить.'**
   String channelDeleteConfirm(String name);
 
   /// No description provided for @channelDeleted.
   ///
   /// In ru, this message translates to:
-  /// **'Канал удалён.'**
+  /// **'Чат удалён.'**
   String get channelDeleted;
 
   /// No description provided for @storageTitle.
@@ -1551,6 +1551,108 @@ abstract class AdminLocalizations {
   /// In ru, this message translates to:
   /// **'Если выключено, участники не могут прикреплять и скачивать файлы. Файловые функции скрываются в приложении этого пространства.'**
   String get attachmentsEnabledHelp;
+
+  /// No description provided for @voiceRoomsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Голосовые комнаты'**
+  String get voiceRoomsTitle;
+
+  /// No description provided for @voiceRoomsReload.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить список комнат'**
+  String get voiceRoomsReload;
+
+  /// No description provided for @voiceRoomsEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Комнат пока нет.'**
+  String get voiceRoomsEmpty;
+
+  /// No description provided for @voiceRoomCreate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать комнату'**
+  String get voiceRoomCreate;
+
+  /// No description provided for @voiceRoomNewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название новой комнаты'**
+  String get voiceRoomNewTitle;
+
+  /// No description provided for @voiceRoomDefaults.
+  ///
+  /// In ru, this message translates to:
+  /// **'Участники смогут слушать и говорить, читатели — слушать.'**
+  String get voiceRoomDefaults;
+
+  /// No description provided for @voiceRoomListen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Слушать'**
+  String get voiceRoomListen;
+
+  /// No description provided for @voiceRoomSpeak.
+  ///
+  /// In ru, this message translates to:
+  /// **'Говорить'**
+  String get voiceRoomSpeak;
+
+  /// No description provided for @voiceRoomAccessHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Индивидуальное правило заменяет правило роли. Владелец и администраторы сохраняют доступ. Читатель может слушать, но не говорить. «Управлять» меняет настройки комнаты, но не права.'**
+  String get voiceRoomAccessHelp;
+
+  /// No description provided for @voiceRoomArchive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Архивировать комнату'**
+  String get voiceRoomArchive;
+
+  /// No description provided for @voiceRoomArchiveHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Архивированная комната недоступна для новых подключений.'**
+  String get voiceRoomArchiveHelp;
+
+  /// No description provided for @voiceRoomSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить комнату'**
+  String get voiceRoomSave;
+
+  /// No description provided for @voiceRoomDelete.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить комнату'**
+  String get voiceRoomDelete;
+
+  /// No description provided for @voiceRoomDeleteConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить комнату «{name}»? Это действие нельзя отменить.'**
+  String voiceRoomDeleteConfirm(String name);
+
+  /// No description provided for @voiceRoomCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Комната создана.'**
+  String get voiceRoomCreated;
+
+  /// No description provided for @voiceRoomSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настройки комнаты сохранены.'**
+  String get voiceRoomSaved;
+
+  /// No description provided for @voiceRoomDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Комната удалена.'**
+  String get voiceRoomDeleted;
 }
 
 class _AdminLocalizationsDelegate

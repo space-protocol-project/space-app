@@ -130,7 +130,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chats => '聊天';
 
   @override
-  String get channels => '频道';
+  String get channels => '聊天';
 
   @override
   String get recentSpaces => '最近的空间';
@@ -151,7 +151,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutSpace => '关于此空间';
 
   @override
-  String get independentServer => '频道和访问权限由此服务器管理。';
+  String get independentServer => '聊天和访问权限由此服务器管理。';
 
   @override
   String get deviceSignedIn => '已使用设备密钥登录';
@@ -190,7 +190,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get welcome => '您的空间';
 
   @override
-  String get welcomeDescription => '服务器频道和资源。';
+  String get welcomeDescription => '服务器聊天和资源。';
 
   @override
   String get ideas => '让想法相聚。\n让人们相连。';
@@ -384,13 +384,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get connectionInformation => '连接信息';
 
   @override
-  String get channel => '频道';
+  String get channel => '聊天';
 
   @override
   String get noReading => '无阅读权限';
 
   @override
-  String get refreshChat => '刷新频道和聊天';
+  String get refreshChat => '刷新聊天和聊天';
 
   @override
   String get noMessageAccess => '无法访问消息';
@@ -402,7 +402,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get conversationStarts => '交流从这里开始';
 
   @override
-  String get contactOwner => '请选择其他频道或联系空间所有者。';
+  String get contactOwner => '请选择其他聊天或联系空间所有者。';
 
   @override
   String get emptyChat => '此聊天中还没有消息。';
@@ -417,7 +417,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get newMessages => '新消息';
 
   @override
-  String get cannotSend => '无法在此频道发送消息';
+  String get cannotSend => '无法在此聊天发送消息';
 
   @override
   String get messageHint => '有什么新鲜事？';
@@ -692,7 +692,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboardTitle => '您的所有空间，尽在一处。';
 
   @override
-  String get dashboardDescription => '服务器、频道和未读消息。';
+  String get dashboardDescription => '服务器、聊天和未读消息。';
 
   @override
   String get dashboardServers => '服务器';
@@ -701,7 +701,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboardOnline => '在线';
 
   @override
-  String get dashboardChannels => '可访问频道';
+  String get dashboardChannels => '可访问聊天';
 
   @override
   String get dashboardUnread => '未读消息';
@@ -716,7 +716,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboardEmptyHelp => '添加服务器或创建自己的服务器。';
 
   @override
-  String get dashboardCatalogUnknown => '连接后加载频道。';
+  String get dashboardCatalogUnknown => '连接后加载聊天。';
 
   @override
   String get dashboardAvailable => '可用';
@@ -728,7 +728,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboardOpen => '打开空间';
 
   @override
-  String get dashboardResourcesHelp => '总览包含您可访问的频道和未读消息。无法访问的服务器重新连接后，其数据将显示。';
+  String get dashboardResourcesHelp => '总览包含您可访问的聊天和未读消息。无法访问的服务器重新连接后，其数据将显示。';
 
   @override
   String get dashboardSpaces => '您的空间';
@@ -849,10 +849,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get failurePositionsSave => '阅读位置已更新，但无法保存到此设备。';
 
   @override
-  String get failureChannelChanged => '频道权限已更改。请刷新聊天后重试。';
+  String get failureChannelChanged => '聊天权限已更改。请刷新聊天后重试。';
 
   @override
-  String get failureChannelUnavailable => '此频道的访问权限已更改。请选择可访问的聊天。';
+  String get failureChannelUnavailable => '此聊天的访问权限已更改。请选择可访问的聊天。';
 
   @override
   String get failureEventsUnsupported => '此服务器尚不支持事件订阅。请更新服务器。';
@@ -1063,7 +1063,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverInAir => '服务器在线';
 
   @override
-  String get serverNoChannels => '暂无可用频道';
+  String get serverNoChannels => '暂无可用聊天';
 
   @override
   String get spacesTitle => '空间';
@@ -1217,7 +1217,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get downloadFailed => '无法下载文件';
 
   @override
-  String get noFilesInChannel => '此频道暂无您上传的文件';
+  String get noFilesInChannel => '此聊天暂无您上传的文件';
 
   @override
   String get loadMoreFiles => '加载更多';
@@ -1274,25 +1274,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get messageUnavailable => '消息不可用';
 
   @override
-  String get mlsTitle => '私密频道 · MLS';
+  String get mlsTitle => '私密聊天 · MLS';
 
   @override
   String get mlsExperimental => '实验性端到端加密';
 
   @override
-  String get mlsCreate => '创建私密频道';
+  String get mlsCreate => '创建私密聊天';
 
   @override
-  String get mlsChannelId => '频道标识';
+  String get mlsChannelId => '聊天标识';
 
   @override
-  String get mlsChannelTitle => '频道名称';
+  String get mlsChannelTitle => '聊天名称';
 
   @override
   String get mlsDeviceCode => '此设备的验证码';
 
   @override
-  String get mlsDevices => '频道设备';
+  String get mlsDevices => '聊天设备';
 
   @override
   String get mlsVerify => '验证设备';
@@ -1313,7 +1313,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mlsRetry => '刷新并重试发送';
 
   @override
-  String get mlsWaiting => '此设备尚未获邀或访问已被撤销。请将验证码提供给频道所有者。';
+  String get mlsWaiting => '此设备尚未获邀或访问已被撤销。请将验证码提供给聊天所有者。';
 
   @override
   String get mlsInput => '有什么新消息？';
@@ -1325,7 +1325,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mlsAttach => '添加文件';
 
   @override
-  String get mlsFiles => '频道文件';
+  String get mlsFiles => '聊天文件';
 
   @override
   String get mlsUnavailable => '消息不可用';
@@ -1337,7 +1337,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mlsTransfer => '移交管理权';
 
   @override
-  String get mlsTransferTitle => '移交频道管理权？';
+  String get mlsTransferTitle => '移交聊天管理权？';
 
   @override
   String mlsTransferHint(String device) {
@@ -1667,7 +1667,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get notificationsDescription =>
-      '桌面端：应用运行时接收已连接空间的普通频道和已加入的加密频道通知。预览会将文本传给操作系统。暂不支持退出应用后的通知。';
+      '桌面端：应用运行时接收已连接空间的普通聊天和已加入的加密聊天通知。预览会将文本传给操作系统。暂不支持退出应用后的通知。';
 
   @override
   String get notificationPermissionError => '无法启用通知。请检查系统设置。';
@@ -1676,7 +1676,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get newMessageNotification => '新消息';
 
   @override
-  String get messageSearchServer => '搜索当前频道历史记录';
+  String get messageSearchServer => '搜索当前聊天历史记录';
 
   @override
   String get messageSearchLocal => '仅在此设备搜索 · MLS';
@@ -1697,13 +1697,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get historyPageFailed => '无法加载历史记录。请重试。';
 
   @override
-  String get messageSearchAllChannels => '所有可用频道';
+  String get messageSearchAllChannels => '所有可用聊天';
 
   @override
-  String get messageSearchMixed => '私密频道仅在此设备上搜索';
+  String get messageSearchMixed => '私密聊天仅在此设备上搜索';
 
   @override
-  String get savedMlsSearchChannels => '已保存的私密频道';
+  String get savedMlsSearchChannels => '已保存的私密聊天';
 
   @override
   String get savedMlsMessagePreview => '已保存的消息 · 离线';
@@ -2047,7 +2047,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get migrationExportHelp =>
-      '归档包含服务器、设备密钥、当前 MLS 状态和加密频道本地历史。保存后，此客户端将停止使用该空间。请将归档保存在其他磁盘并记住密码。如果操作中断，请检查 .pending 文件，其中可能包含完整迁移。 验证归档后，系统存储中旧设备的工作密钥将被迁移标记替换。';
+      '归档包含服务器、设备密钥、当前 MLS 状态和加密聊天本地历史。保存后，此客户端将停止使用该空间。请将归档保存在其他磁盘并记住密码。如果操作中断，请检查 .pending 文件，其中可能包含完整迁移。 验证归档后，系统存储中旧设备的工作密钥将被迁移标记替换。';
 
   @override
   String get migrationImportHelp =>
@@ -2061,6 +2061,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get migrationExported => '迁移已保存，旧设备已停止。重装系统前请保管归档和密码。';
+
+  @override
+  String get voiceRefreshRooms => '刷新房间列表';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

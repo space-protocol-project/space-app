@@ -40,26 +40,35 @@ class NativeAdminGateway extends SpaceGateway {
     Map<String, dynamic>? body,
     String? method,
   }) async {
-    try {
-      return await session.adminRequest(path, body: body, method: method);
-    } on GrpcError catch (e) {
-      final status = switch (e.code) {
-        StatusCode.permissionDenied => 403,
-        StatusCode.aborted || StatusCode.alreadyExists => 409,
-        StatusCode.invalidArgument => 400,
-        StatusCode.notFound => 404,
-        StatusCode.resourceExhausted => 429,
-        StatusCode.failedPrecondition => 412,
-        StatusCode.unauthenticated => 401,
-        _ => 503,
-      };
-      throw SpaceApiError(
-        status,
-        e.code == StatusCode.permissionDenied
-            ? 'Устройству нужны права управления. Используйте сопряжение или recovery-карточку с разрешением space.manage.'
-            : e.message ?? 'Операция не выполнена',
-      );
-    }
+    return _nativeAdminRequest(session, path, body: body, method: method);
+  }
+}
+
+Future<Map<String, dynamic>> _nativeAdminRequest(
+  SpaceAdministration session,
+  String path, {
+  Map<String, dynamic>? body,
+  String? method,
+}) async {
+  try {
+    return await session.adminRequest(path, body: body, method: method);
+  } on GrpcError catch (e) {
+    final status = switch (e.code) {
+      StatusCode.permissionDenied => 403,
+      StatusCode.aborted || StatusCode.alreadyExists => 409,
+      StatusCode.invalidArgument => 400,
+      StatusCode.notFound => 404,
+      StatusCode.resourceExhausted => 429,
+      StatusCode.failedPrecondition => 412,
+      StatusCode.unauthenticated => 401,
+      _ => 503,
+    };
+    throw SpaceApiError(
+      status,
+      e.code == StatusCode.permissionDenied
+          ? 'Устройству нужны права управления. Используйте сопряжение или recovery-карточку с разрешением space.manage.'
+          : e.message ?? 'Операция не выполнена',
+    );
   }
 }
 
@@ -96,7 +105,15 @@ Widget serverAdministration(
     child: AdminPage(
       autoConnect: true,
       channelManagement: session is SpaceSession
-          ? VoiceRoomManagement(session: session)
+          ? VoiceRoomManagement(
+              session: session,
+              call: (path, {body, method}) => _nativeAdminRequest(
+                session,
+                path,
+                body: body,
+                method: method,
+              ),
+            )
           : null,
       login: ({bool create = false}) => session.adminIdentity(),
       gateway: (uri) => NativeAdminGateway(uri, session),

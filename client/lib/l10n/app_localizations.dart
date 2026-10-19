@@ -338,7 +338,7 @@ abstract class AppLocalizations {
   /// No description provided for @channels.
   ///
   /// In ru, this message translates to:
-  /// **'Каналы'**
+  /// **'Чаты'**
   String get channels;
 
   /// No description provided for @recentSpaces.
@@ -380,7 +380,7 @@ abstract class AppLocalizations {
   /// No description provided for @independentServer.
   ///
   /// In ru, this message translates to:
-  /// **'Каналы и доступ задаёт этот сервер.'**
+  /// **'Чаты и доступ задаёт этот сервер.'**
   String get independentServer;
 
   /// No description provided for @deviceSignedIn.
@@ -458,7 +458,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeDescription.
   ///
   /// In ru, this message translates to:
-  /// **'Каналы и ресурсы сервера.'**
+  /// **'Чаты и ресурсы сервера.'**
   String get welcomeDescription;
 
   /// No description provided for @ideas.
@@ -836,7 +836,7 @@ abstract class AppLocalizations {
   /// No description provided for @channel.
   ///
   /// In ru, this message translates to:
-  /// **'Канал'**
+  /// **'Чат'**
   String get channel;
 
   /// No description provided for @noReading.
@@ -848,7 +848,7 @@ abstract class AppLocalizations {
   /// No description provided for @refreshChat.
   ///
   /// In ru, this message translates to:
-  /// **'Обновить каналы и чат'**
+  /// **'Обновить чаты и чат'**
   String get refreshChat;
 
   /// No description provided for @noMessageAccess.
@@ -872,7 +872,7 @@ abstract class AppLocalizations {
   /// No description provided for @contactOwner.
   ///
   /// In ru, this message translates to:
-  /// **'Выберите другой канал или обратитесь к владельцу пространства.'**
+  /// **'Выберите другой чат или обратитесь к владельцу пространства.'**
   String get contactOwner;
 
   /// No description provided for @emptyChat.
@@ -902,7 +902,7 @@ abstract class AppLocalizations {
   /// No description provided for @cannotSend.
   ///
   /// In ru, this message translates to:
-  /// **'В этом канале нельзя отправлять сообщения'**
+  /// **'В этом чате нельзя отправлять сообщения'**
   String get cannotSend;
 
   /// No description provided for @messageHint.
@@ -1400,7 +1400,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardDescription.
   ///
   /// In ru, this message translates to:
-  /// **'Серверы, каналы и непрочитанные сообщения.'**
+  /// **'Серверы, чаты и непрочитанные сообщения.'**
   String get dashboardDescription;
 
   /// No description provided for @dashboardServers.
@@ -1418,7 +1418,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardChannels.
   ///
   /// In ru, this message translates to:
-  /// **'Доступные каналы'**
+  /// **'Доступные чаты'**
   String get dashboardChannels;
 
   /// No description provided for @dashboardUnread.
@@ -1448,7 +1448,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardCatalogUnknown.
   ///
   /// In ru, this message translates to:
-  /// **'Подключитесь, чтобы загрузить каналы.'**
+  /// **'Подключитесь, чтобы загрузить чаты.'**
   String get dashboardCatalogUnknown;
 
   /// No description provided for @dashboardAvailable.
@@ -1472,7 +1472,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardResourcesHelp.
   ///
   /// In ru, this message translates to:
-  /// **'Сводка учитывает доступные вам каналы и непрочитанные сообщения. Данные недоступных серверов появятся после подключения.'**
+  /// **'Сводка учитывает доступные вам чаты и непрочитанные сообщения. Данные недоступных серверов появятся после подключения.'**
   String get dashboardResourcesHelp;
 
   /// No description provided for @dashboardSpaces.
@@ -1712,13 +1712,13 @@ abstract class AppLocalizations {
   /// No description provided for @failureChannelChanged.
   ///
   /// In ru, this message translates to:
-  /// **'Права канала изменились. Обновите чат перед повтором.'**
+  /// **'Права чата изменились. Обновите чат перед повтором.'**
   String get failureChannelChanged;
 
   /// No description provided for @failureChannelUnavailable.
   ///
   /// In ru, this message translates to:
-  /// **'Доступ к этому каналу изменён. Выберите доступный чат.'**
+  /// **'Доступ к этому чату изменён. Выберите доступный чат.'**
   String get failureChannelUnavailable;
 
   /// No description provided for @failureEventsUnsupported.
@@ -2132,7 +2132,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverNoChannels.
   ///
   /// In ru, this message translates to:
-  /// **'Нет доступных каналов'**
+  /// **'Нет доступных чатов'**
   String get serverNoChannels;
 
   /// No description provided for @spacesTitle.
@@ -2426,7 +2426,7 @@ abstract class AppLocalizations {
   /// No description provided for @noFilesInChannel.
   ///
   /// In ru, this message translates to:
-  /// **'В этом канале пока нет ваших файлов'**
+  /// **'В этом чате пока нет ваших файлов'**
   String get noFilesInChannel;
 
   /// No description provided for @loadMoreFiles.
@@ -2540,7 +2540,7 @@ abstract class AppLocalizations {
   /// No description provided for @mlsTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Закрытый канал · MLS'**
+  /// **'Закрытый чат · MLS'**
   String get mlsTitle;
 
   /// No description provided for @mlsExperimental.
@@ -2552,19 +2552,19 @@ abstract class AppLocalizations {
   /// No description provided for @mlsCreate.
   ///
   /// In ru, this message translates to:
-  /// **'Создать закрытый канал'**
+  /// **'Создать закрытый чат'**
   String get mlsCreate;
 
   /// No description provided for @mlsChannelId.
   ///
   /// In ru, this message translates to:
-  /// **'Идентификатор канала'**
+  /// **'Идентификатор чата'**
   String get mlsChannelId;
 
   /// No description provided for @mlsChannelTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Название канала'**
+  /// **'Название чата'**
   String get mlsChannelTitle;
 
   /// No description provided for @mlsDeviceCode.
@@ -2576,7 +2576,7 @@ abstract class AppLocalizations {
   /// No description provided for @mlsDevices.
   ///
   /// In ru, this message translates to:
-  /// **'Устройства канала'**
+  /// **'Устройства чата'**
   String get mlsDevices;
 
   /// No description provided for @mlsVerify.
@@ -2618,7 +2618,7 @@ abstract class AppLocalizations {
   /// No description provided for @mlsWaiting.
   ///
   /// In ru, this message translates to:
-  /// **'Это устройство ещё не приглашено в канал или доступ отозван. Передайте его код владельцу канала.'**
+  /// **'Это устройство ещё не приглашено в чат или доступ отозван. Передайте его код владельцу чата.'**
   String get mlsWaiting;
 
   /// No description provided for @mlsInput.
@@ -2642,7 +2642,7 @@ abstract class AppLocalizations {
   /// No description provided for @mlsFiles.
   ///
   /// In ru, this message translates to:
-  /// **'Файлы канала'**
+  /// **'Файлы чата'**
   String get mlsFiles;
 
   /// No description provided for @mlsUnavailable.
@@ -2666,7 +2666,7 @@ abstract class AppLocalizations {
   /// No description provided for @mlsTransferTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Передать управление каналом?'**
+  /// **'Передать управление чатом?'**
   String get mlsTransferTitle;
 
   /// No description provided for @mlsTransferHint.
@@ -3296,7 +3296,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationsDescription.
   ///
   /// In ru, this message translates to:
-  /// **'На компьютере: Обычные и присоединённые закрытые каналы подключённых пространств, пока приложение запущено. Предпросмотр передаёт текст операционной системе. Доставка после закрытия приложения пока не поддерживается.'**
+  /// **'На компьютере: Обычные и присоединённые закрытые чаты подключённых пространств, пока приложение запущено. Предпросмотр передаёт текст операционной системе. Доставка после закрытия приложения пока не поддерживается.'**
   String get notificationsDescription;
 
   /// No description provided for @notificationPermissionError.
@@ -3314,7 +3314,7 @@ abstract class AppLocalizations {
   /// No description provided for @messageSearchServer.
   ///
   /// In ru, this message translates to:
-  /// **'Поиск в истории выбранного канала'**
+  /// **'Поиск в истории выбранного чата'**
   String get messageSearchServer;
 
   /// No description provided for @messageSearchLocal.
@@ -3356,19 +3356,19 @@ abstract class AppLocalizations {
   /// No description provided for @messageSearchAllChannels.
   ///
   /// In ru, this message translates to:
-  /// **'Во всех доступных каналах'**
+  /// **'Во всех доступных чатах'**
   String get messageSearchAllChannels;
 
   /// No description provided for @messageSearchMixed.
   ///
   /// In ru, this message translates to:
-  /// **'Закрытые каналы — поиск только на этом устройстве'**
+  /// **'Закрытые чаты — поиск только на этом устройстве'**
   String get messageSearchMixed;
 
   /// No description provided for @savedMlsSearchChannels.
   ///
   /// In ru, this message translates to:
-  /// **'Сохранённые закрытые каналы'**
+  /// **'Сохранённые закрытые чаты'**
   String get savedMlsSearchChannels;
 
   /// No description provided for @savedMlsMessagePreview.
@@ -4027,7 +4027,7 @@ abstract class AppLocalizations {
   /// No description provided for @migrationExportHelp.
   ///
   /// In ru, this message translates to:
-  /// **'Архив содержит сервер, ключи устройства, рабочее состояние MLS и локальную историю закрытых каналов. После сохранения прежний клиент прекратит работу с этим пространством. Сохраните архив вне этого диска и запомните пароль. При сбое проверьте файл .pending: он может содержать готовый перенос. После проверки архива рабочие ключи прежнего устройства будут заменены отметкой переноса в системном хранилище.'**
+  /// **'Архив содержит сервер, ключи устройства, рабочее состояние MLS и локальную историю закрытых чатов. После сохранения прежний клиент прекратит работу с этим пространством. Сохраните архив вне этого диска и запомните пароль. При сбое проверьте файл .pending: он может содержать готовый перенос. После проверки архива рабочие ключи прежнего устройства будут заменены отметкой переноса в системном хранилище.'**
   String get migrationExportHelp;
 
   /// No description provided for @migrationImportHelp.
@@ -4053,6 +4053,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Перенос сохранён. Прежнее устройство остановлено. Сохраните архив и пароль перед переустановкой ОС.'**
   String get migrationExported;
+
+  /// No description provided for @voiceRefreshRooms.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить список комнат'**
+  String get voiceRefreshRooms;
 }
 
 class _AppLocalizationsDelegate

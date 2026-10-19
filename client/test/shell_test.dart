@@ -119,7 +119,7 @@ void main() {
     expect(field.enabled, false);
     expect(
       field.decoration?.hintText,
-      'В этом канале нельзя отправлять сообщения',
+      'В этом чате нельзя отправлять сообщения',
     );
     final send = tester.widget<IconButton>(
       find.byWidgetPredicate(
@@ -214,7 +214,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Каналы и ресурсы сервера.'), findsOneWidget);
+    expect(find.text('Чаты и ресурсы сервера.'), findsOneWidget);
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox());
     controller.dispose();

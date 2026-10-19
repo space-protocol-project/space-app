@@ -61,6 +61,7 @@ class ChannelServer {
           'revision': '1',
           'archived': false,
           'publicPreview': false,
+          'views': [{'type': body['viewType'] ?? 'chat'}],
         };
         access[id] = defaults();
         return {'channel': copy(channels[id]!)};
@@ -148,7 +149,10 @@ void main() {
         find.byKey(const ValueKey('new-channel-title')),
         'Рабочая группа',
       );
-      await press(tester, strings.channelCreate);
+      final create = find.widgetWithText(FilledButton, strings.channelCreate);
+      await tester.ensureVisible(create);
+      await tester.tap(create);
+      await tester.pumpAndSettle();
       final id = server.channels.keys.singleWhere((id) => id != 'general');
       expect(RegExp(r'^[a-z][a-z0-9_-]{0,63}$').hasMatch(id), true);
       await toggle(tester, 'rule-0-read');

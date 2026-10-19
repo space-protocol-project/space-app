@@ -288,7 +288,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Поиск'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Сохранённые закрытые каналы'));
+    await tester.tap(find.text('Сохранённые закрытые чаты'));
     await tester.enterText(find.byType(TextField), 'Сообщение');
     await tester.pump(const Duration(milliseconds: 310));
     await tester.runAsync(

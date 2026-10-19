@@ -174,7 +174,7 @@ class _MessageSearchScope {
   }
 
   Future<MessageSearchPage> fetch(String query, String cursor) async {
-    if (!valid) throw StateError('Канал изменился');
+    if (!valid) throw StateError('Чат изменился');
     if (offline) {
       final page = await searchMlsDocument(
         await savedDocument(),
