@@ -77,6 +77,9 @@ jobs:
       - name: Голосовые комнаты и завершение захвата микрофона
         working-directory: client
         run: flutter test test/voice_network_test.dart test/voice_audio_test.dart test/voice_transmission_test.dart test/voice_microphone_test.dart test/voice_devices_test.dart test/voice_device_call_test.dart test/voice_recovery_test.dart test/voice_controller_test.dart test/voice_widgets_test.dart test/channels_test.dart
+      - name: Полный перенос пространства и восстановление доступа
+        working-directory: client
+        run: flutter test test/migration_archive_test.dart test/home_migration_test.dart test/mls_migration_test.dart test/migration_password_dialog_test.dart test/recovery_spaces_test.dart test/device_recovery_batch_test.dart
       - name: Нативное усиление и измеритель микрофона
         run: python tools/check_voice_signal.py
       - name: Атомарная запись защищённого состояния Windows
