@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import sys
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,6 +75,8 @@ def check_advisories():
 
 
 if __name__ == '__main__':
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
     parser = argparse.ArgumentParser()
     parser.add_argument('--advisories', action='store_true')
     args = parser.parse_args()
