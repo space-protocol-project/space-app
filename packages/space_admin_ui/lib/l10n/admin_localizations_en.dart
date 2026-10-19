@@ -67,7 +67,7 @@ class AdminLocalizationsEn extends AdminLocalizations {
 
   @override
   String get authorizeDetails =>
-      'You explicitly allow this device to change settings, channels and member access.';
+      'You explicitly allow this device to change settings, chats, voice rooms, and member access.';
 
   @override
   String get rootPassword => 'Root card password (JSON/PNG)';
@@ -146,41 +146,41 @@ class AdminLocalizationsEn extends AdminLocalizations {
   }
 
   @override
-  String get channelsTitle => 'Channels and permissions';
+  String get channelsTitle => 'Chats and permissions';
 
   @override
-  String get channelsReload => 'Refresh channels';
+  String get channelsReload => 'Refresh chats';
 
   @override
-  String get channelsEmpty => 'No channels yet.';
+  String get channelsEmpty => 'No chats yet.';
 
   @override
-  String get channelCreateSection => 'Create a chat channel';
+  String get channelCreateSection => 'Create a chat';
 
   @override
-  String get channelNewId => 'New channel address';
+  String get channelNewId => 'New chat address';
 
   @override
-  String get channelNewTitle => 'New channel name';
+  String get channelNewTitle => 'New chat name';
 
   @override
-  String get channelNewOrder => 'New channel order';
+  String get channelNewOrder => 'Order';
 
   @override
   String get channelDefaults =>
       'Members can read and send; readers can read. Public preview is disabled.';
 
   @override
-  String get channelCreate => 'Create channel';
+  String get channelCreate => 'Create chat';
 
   @override
-  String get channelName => 'Channel name';
+  String get channelName => 'Name';
 
   @override
-  String get channelOrder => 'Channel order';
+  String get channelOrder => 'Order';
 
   @override
-  String get channelArchive => 'Archive channel';
+  String get channelArchive => 'Archive chat';
 
   @override
   String get channelPublicPreview =>
@@ -191,10 +191,10 @@ class AdminLocalizationsEn extends AdminLocalizations {
       'Preview reveals the name and address, but no messages. Archiving preserves history and blocks new messages.';
 
   @override
-  String get channelSave => 'Save channel';
+  String get channelSave => 'Save chat';
 
   @override
-  String get channelReload => 'Reload channel';
+  String get channelReload => 'Reload';
 
   @override
   String get channelAccessHelp =>
@@ -235,7 +235,7 @@ class AdminLocalizationsEn extends AdminLocalizations {
   String get channelDeleteRule => 'Remove rule';
 
   @override
-  String get channelVisible => 'See channel';
+  String get channelVisible => 'Visible';
 
   @override
   String get channelRead => 'Read messages';
@@ -244,22 +244,22 @@ class AdminLocalizationsEn extends AdminLocalizations {
   String get channelWrite => 'Send messages';
 
   @override
-  String get channelManage => 'Manage channel';
+  String get channelManage => 'Manage';
 
   @override
-  String get channelsLoaded => 'Channels loaded.';
+  String get channelsLoaded => 'List loaded.';
 
   @override
-  String get channelLoaded => 'Channel and permissions loaded.';
+  String get channelLoaded => 'Settings and permissions loaded.';
 
   @override
-  String get channelCreated => 'Channel created.';
+  String get channelCreated => 'Chat created.';
 
   @override
-  String get channelSaved => 'Channel settings saved.';
+  String get channelSaved => 'Chat settings saved.';
 
   @override
-  String get channelAccessSaved => 'Channel permissions saved.';
+  String get channelAccessSaved => 'Permissions saved.';
 
   @override
   String get channelRuleAdded =>
@@ -267,10 +267,11 @@ class AdminLocalizationsEn extends AdminLocalizations {
 
   @override
   String get channelConflict =>
-      'The channel or permissions have changed. Reload them; unsaved fields remain in the form.';
+      'Settings or permissions have changed. Reload them; unsaved fields remain in the form.';
 
   @override
-  String get channelChanged => 'Channel changed while loading its permissions';
+  String get channelChanged =>
+      'Settings changed between loading the list and permissions';
 
   @override
   String get channelOrderInvalid => 'Order must be between 0 and 100000';
@@ -283,11 +284,10 @@ class AdminLocalizationsEn extends AdminLocalizations {
       'Address: Latin letters, digits, _ or -, starting with a letter';
 
   @override
-  String get channelIdTaken =>
-      'This channel address is already in use. Choose another.';
+  String get channelIdTaken => 'This address is already taken. Choose another.';
 
   @override
-  String get channelUnavailable => 'Channel is no longer available';
+  String get channelUnavailable => 'No longer available';
 
   @override
   String get channelRulesLimit => 'Limit: 100 rules';
@@ -305,12 +305,12 @@ class AdminLocalizationsEn extends AdminLocalizations {
 
   @override
   String channelRevision(String id, String revision) {
-    return 'Channel $id · revision $revision';
+    return '$id · revision $revision';
   }
 
   @override
   String channelAccessRevision(String revision) {
-    return 'Channel permissions · revision $revision';
+    return 'Permissions · revision $revision';
   }
 
   @override
@@ -774,7 +774,7 @@ class AdminLocalizationsEn extends AdminLocalizations {
       'This device has no recovery key. Use the original card.';
 
   @override
-  String get channelDelete => 'Delete channel';
+  String get channelDelete => 'Delete chat';
 
   @override
   String channelDeleteConfirm(String name) {
@@ -782,7 +782,7 @@ class AdminLocalizationsEn extends AdminLocalizations {
   }
 
   @override
-  String get channelDeleted => 'Channel deleted.';
+  String get channelDeleted => 'Chat deleted.';
 
   @override
   String get storageTitle => 'File storage';
@@ -809,4 +809,60 @@ class AdminLocalizationsEn extends AdminLocalizations {
   @override
   String get attachmentsEnabledHelp =>
       'When disabled, members cannot attach or download files. File features are hidden for this space.';
+
+  @override
+  String get voiceRoomsTitle => 'Voice rooms';
+
+  @override
+  String get voiceRoomsReload => 'Refresh rooms';
+
+  @override
+  String get voiceRoomsEmpty => 'No rooms yet.';
+
+  @override
+  String get voiceRoomCreate => 'Create room';
+
+  @override
+  String get voiceRoomNewTitle => 'New room name';
+
+  @override
+  String get voiceRoomDefaults =>
+      'Members can listen and speak; readers can listen.';
+
+  @override
+  String get voiceRoomListen => 'Listen';
+
+  @override
+  String get voiceRoomSpeak => 'Speak';
+
+  @override
+  String get voiceRoomAccessHelp =>
+      'An individual rule replaces the role rule. Owners and administrators retain access. Readers can listen but cannot speak. Manage changes room settings, not permissions.';
+
+  @override
+  String get voiceRoomArchive => 'Archive room';
+
+  @override
+  String get voiceRoomArchiveHelp =>
+      'Archived rooms cannot accept new connections.';
+
+  @override
+  String get voiceRoomSave => 'Save room';
+
+  @override
+  String get voiceRoomDelete => 'Delete room';
+
+  @override
+  String voiceRoomDeleteConfirm(String name) {
+    return 'Delete room “$name”? This cannot be undone.';
+  }
+
+  @override
+  String get voiceRoomCreated => 'Room created.';
+
+  @override
+  String get voiceRoomSaved => 'Room settings saved.';
+
+  @override
+  String get voiceRoomDeleted => 'Room deleted.';
 }

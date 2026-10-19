@@ -216,7 +216,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       Future<void> openConfirmation() async {
-        await tester.tap(find.byTooltip('Устройства канала'));
+        await tester.tap(find.byTooltip('Устройства чата'));
         await tester.pumpAndSettle();
         await tester.tap(
           find.descendant(
@@ -227,7 +227,7 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.text('Передать управление'));
         await tester.pumpAndSettle();
-        expect(find.text('Передать управление каналом?'), findsOneWidget);
+        expect(find.text('Передать управление чатом?'), findsOneWidget);
       }
 
       await openConfirmation();
@@ -264,7 +264,7 @@ void main() {
       expect(find.text('Сообщение 0'), findsOneWidget);
       expect(find.text('Файл-0.txt'), findsWidgets);
       expect(tester.takeException(), isNull);
-      await tester.tap(find.byTooltip('Файлы канала'));
+      await tester.tap(find.byTooltip('Файлы чата'));
       await tester.pumpAndSettle();
       await tester.pumpWidget(view(false));
       await tester.pumpAndSettle();

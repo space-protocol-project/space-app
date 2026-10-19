@@ -135,7 +135,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chats => 'Chats';
 
   @override
-  String get channels => 'Channels';
+  String get channels => 'Chats';
 
   @override
   String get recentSpaces => 'Recent spaces';
@@ -156,7 +156,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutSpace => 'About this space';
 
   @override
-  String get independentServer => 'This server controls channels and access.';
+  String get independentServer => 'This server controls chats and access.';
 
   @override
   String get deviceSignedIn => 'Signed in with a device key';
@@ -195,7 +195,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcome => 'Your space';
 
   @override
-  String get welcomeDescription => 'Server channels and resources.';
+  String get welcomeDescription => 'Server chats and resources.';
 
   @override
   String get ideas => 'A place for ideas.\nAnd the people behind them.';
@@ -394,13 +394,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get connectionInformation => 'Connection information';
 
   @override
-  String get channel => 'Channel';
+  String get channel => 'Chat';
 
   @override
   String get noReading => 'No read access';
 
   @override
-  String get refreshChat => 'Refresh channels and chat';
+  String get refreshChat => 'Refresh chats and chat';
 
   @override
   String get noMessageAccess => 'No access to messages';
@@ -412,8 +412,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get conversationStarts => 'The conversation starts here';
 
   @override
-  String get contactOwner =>
-      'Choose another channel or contact the space owner.';
+  String get contactOwner => 'Choose another chat or contact the space owner.';
 
   @override
   String get emptyChat => 'There are no messages in this chat yet.';
@@ -429,7 +428,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newMessages => 'New messages';
 
   @override
-  String get cannotSend => 'You cannot send messages in this channel';
+  String get cannotSend => 'You cannot send messages in this chat';
 
   @override
   String get messageHint => 'What’s new?';
@@ -733,7 +732,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardTitle => 'All your spaces, together.';
 
   @override
-  String get dashboardDescription => 'Servers, channels and unread messages.';
+  String get dashboardDescription => 'Servers, chats and unread messages.';
 
   @override
   String get dashboardServers => 'Servers';
@@ -742,7 +741,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardOnline => 'Online';
 
   @override
-  String get dashboardChannels => 'Accessible channels';
+  String get dashboardChannels => 'Accessible chats';
 
   @override
   String get dashboardUnread => 'Unread messages';
@@ -757,7 +756,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardEmptyHelp => 'Add a server or create your own.';
 
   @override
-  String get dashboardCatalogUnknown => 'Connect to load channels.';
+  String get dashboardCatalogUnknown => 'Connect to load chats.';
 
   @override
   String get dashboardAvailable => 'Available';
@@ -770,7 +769,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardResourcesHelp =>
-      'The overview includes accessible channels and unread messages. Data from unavailable servers appears after reconnection.';
+      'The overview includes accessible chats and unread messages. Data from unavailable servers appears after reconnection.';
 
   @override
   String get dashboardSpaces => 'Your spaces';
@@ -925,11 +924,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failureChannelChanged =>
-      'Channel permissions changed. Refresh the chat before retrying.';
+      'Chat permissions changed. Refresh the chat before retrying.';
 
   @override
   String get failureChannelUnavailable =>
-      'Access to this channel changed. Select an accessible chat.';
+      'Access to this chat changed. Select an accessible chat.';
 
   @override
   String get failureEventsUnsupported =>
@@ -1165,7 +1164,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverInAir => 'Server is online';
 
   @override
-  String get serverNoChannels => 'No available channels';
+  String get serverNoChannels => 'No available chats';
 
   @override
   String get spacesTitle => 'Spaces';
@@ -1326,7 +1325,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get downloadFailed => 'Could not download the file';
 
   @override
-  String get noFilesInChannel => 'You have no files in this channel yet';
+  String get noFilesInChannel => 'You have no files in this chat yet';
 
   @override
   String get loadMoreFiles => 'Load more';
@@ -1387,25 +1386,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get messageUnavailable => 'Message unavailable';
 
   @override
-  String get mlsTitle => 'Private channel · MLS';
+  String get mlsTitle => 'Private chat · MLS';
 
   @override
   String get mlsExperimental => 'Experimental E2EE';
 
   @override
-  String get mlsCreate => 'Create private channel';
+  String get mlsCreate => 'Create private chat';
 
   @override
-  String get mlsChannelId => 'Channel ID';
+  String get mlsChannelId => 'Chat ID';
 
   @override
-  String get mlsChannelTitle => 'Channel title';
+  String get mlsChannelTitle => 'Chat title';
 
   @override
   String get mlsDeviceCode => 'This device’s code';
 
   @override
-  String get mlsDevices => 'Channel devices';
+  String get mlsDevices => 'Chat devices';
 
   @override
   String get mlsVerify => 'Verify device';
@@ -1428,7 +1427,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mlsWaiting =>
-      'This device has not been invited or access was revoked. Share its code with the channel owner.';
+      'This device has not been invited or access was revoked. Share its code with the chat owner.';
 
   @override
   String get mlsInput => 'What’s new?';
@@ -1440,7 +1439,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mlsAttach => 'Attach file';
 
   @override
-  String get mlsFiles => 'Channel files';
+  String get mlsFiles => 'Chat files';
 
   @override
   String get mlsUnavailable => 'Message unavailable';
@@ -1452,7 +1451,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mlsTransfer => 'Transfer management';
 
   @override
-  String get mlsTransferTitle => 'Transfer channel management?';
+  String get mlsTransferTitle => 'Transfer chat management?';
 
   @override
   String mlsTransferHint(String device) {
@@ -1814,7 +1813,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationsDescription =>
-      'On desktop: Ordinary and joined encrypted channels in connected spaces while the app is running. Previews share text with the operating system. Delivery after quitting is not supported yet.';
+      'On desktop: Ordinary and joined encrypted chats in connected spaces while the app is running. Previews share text with the operating system. Delivery after quitting is not supported yet.';
 
   @override
   String get notificationPermissionError =>
@@ -1824,7 +1823,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newMessageNotification => 'New message';
 
   @override
-  String get messageSearchServer => 'Search the selected channel history';
+  String get messageSearchServer => 'Search the selected chat history';
 
   @override
   String get messageSearchLocal => 'Search on this device only · MLS';
@@ -1846,14 +1845,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get historyPageFailed => 'Could not load history. Please retry.';
 
   @override
-  String get messageSearchAllChannels => 'All available channels';
+  String get messageSearchAllChannels => 'All available chats';
 
   @override
   String get messageSearchMixed =>
-      'Private channels are searched only on this device';
+      'Private chats are searched only on this device';
 
   @override
-  String get savedMlsSearchChannels => 'Saved private channels';
+  String get savedMlsSearchChannels => 'Saved private chats';
 
   @override
   String get savedMlsMessagePreview => 'Saved message · offline';
@@ -2218,7 +2217,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get migrationExportHelp =>
-      'The archive contains the server, device keys, working MLS state and local encrypted-channel history. After saving, this client will stop using this space. Keep the archive on another drive and remember the password. If interrupted, check the .pending file: it may contain the completed migration. After verification, the previous device working keys in system storage will be replaced with a migration marker.';
+      'The archive contains the server, device keys, working MLS state and local encrypted-chat history. After saving, this client will stop using this space. Keep the archive on another drive and remember the password. If interrupted, check the .pending file: it may contain the completed migration. After verification, the previous device working keys in system storage will be replaced with a migration marker.';
 
   @override
   String get migrationImportHelp =>
@@ -2233,4 +2232,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get migrationExported =>
       'Migration saved. The previous device is stopped. Preserve the archive and password before reinstalling the OS.';
+
+  @override
+  String get voiceRefreshRooms => 'Refresh rooms';
 }

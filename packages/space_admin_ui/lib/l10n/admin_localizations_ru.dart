@@ -67,7 +67,7 @@ class AdminLocalizationsRu extends AdminLocalizations {
 
   @override
   String get authorizeDetails =>
-      'Вы явно разрешаете этому устройству менять настройки, каналы и доступ участников.';
+      'Вы явно разрешаете этому устройству менять настройки, чаты, голосовые комнаты и доступ участников.';
 
   @override
   String get rootPassword => 'Пароль корневой карточки JSON/PNG';
@@ -146,41 +146,41 @@ class AdminLocalizationsRu extends AdminLocalizations {
   }
 
   @override
-  String get channelsTitle => 'Каналы и права';
+  String get channelsTitle => 'Чаты и права';
 
   @override
-  String get channelsReload => 'Обновить список каналов';
+  String get channelsReload => 'Обновить список чатов';
 
   @override
-  String get channelsEmpty => 'Каналов пока нет.';
+  String get channelsEmpty => 'Чатов пока нет.';
 
   @override
-  String get channelCreateSection => 'Создать чат-канал';
+  String get channelCreateSection => 'Создать чат';
 
   @override
-  String get channelNewId => 'Адрес нового канала';
+  String get channelNewId => 'Адрес нового чата';
 
   @override
-  String get channelNewTitle => 'Название нового канала';
+  String get channelNewTitle => 'Название нового чата';
 
   @override
-  String get channelNewOrder => 'Порядок нового канала';
+  String get channelNewOrder => 'Порядок';
 
   @override
   String get channelDefaults =>
       'Участники смогут читать и писать, читатели — читать. Публичный предпросмотр выключен.';
 
   @override
-  String get channelCreate => 'Создать канал';
+  String get channelCreate => 'Создать чат';
 
   @override
-  String get channelName => 'Название канала';
+  String get channelName => 'Название';
 
   @override
-  String get channelOrder => 'Порядок канала';
+  String get channelOrder => 'Порядок';
 
   @override
-  String get channelArchive => 'Архивировать канал';
+  String get channelArchive => 'Архивировать чат';
 
   @override
   String get channelPublicPreview =>
@@ -191,10 +191,10 @@ class AdminLocalizationsRu extends AdminLocalizations {
       'Предпросмотр раскрывает название и адрес, но не сообщения. Архив сохраняет историю и запрещает новую запись.';
 
   @override
-  String get channelSave => 'Сохранить канал';
+  String get channelSave => 'Сохранить чат';
 
   @override
-  String get channelReload => 'Загрузить канал заново';
+  String get channelReload => 'Загрузить заново';
 
   @override
   String get channelAccessHelp =>
@@ -234,7 +234,7 @@ class AdminLocalizationsRu extends AdminLocalizations {
   String get channelDeleteRule => 'Удалить правило';
 
   @override
-  String get channelVisible => 'Видеть канал';
+  String get channelVisible => 'Видеть';
 
   @override
   String get channelRead => 'Читать сообщения';
@@ -243,22 +243,22 @@ class AdminLocalizationsRu extends AdminLocalizations {
   String get channelWrite => 'Отправлять сообщения';
 
   @override
-  String get channelManage => 'Управлять каналом';
+  String get channelManage => 'Управлять';
 
   @override
-  String get channelsLoaded => 'Каналы загружены.';
+  String get channelsLoaded => 'Список загружен.';
 
   @override
-  String get channelLoaded => 'Канал и права загружены.';
+  String get channelLoaded => 'Настройки и права загружены.';
 
   @override
-  String get channelCreated => 'Канал создан.';
+  String get channelCreated => 'Чат создан.';
 
   @override
-  String get channelSaved => 'Настройки канала сохранены.';
+  String get channelSaved => 'Настройки чата сохранены.';
 
   @override
-  String get channelAccessSaved => 'Права канала сохранены.';
+  String get channelAccessSaved => 'Права сохранены.';
 
   @override
   String get channelRuleAdded =>
@@ -266,10 +266,11 @@ class AdminLocalizationsRu extends AdminLocalizations {
 
   @override
   String get channelConflict =>
-      'Канал или права уже изменены. Загрузите их заново; несохранённые поля остаются в форме.';
+      'Настройки или права уже изменены. Загрузите их заново; несохранённые поля остаются в форме.';
 
   @override
-  String get channelChanged => 'Канал изменился между загрузкой списка и прав';
+  String get channelChanged =>
+      'Настройки изменились между загрузкой списка и прав';
 
   @override
   String get channelOrderInvalid => 'Порядок должен быть от 0 до 100000';
@@ -282,11 +283,10 @@ class AdminLocalizationsRu extends AdminLocalizations {
       'Адрес: латинские буквы, цифры, _ или -, начиная с буквы';
 
   @override
-  String get channelIdTaken =>
-      'Канал с таким адресом уже существует. Выберите другой адрес.';
+  String get channelIdTaken => 'Этот адрес уже занят. Выберите другой.';
 
   @override
-  String get channelUnavailable => 'Канал больше не доступен';
+  String get channelUnavailable => 'Больше недоступно';
 
   @override
   String get channelRulesLimit => 'Лимит: 100 правил';
@@ -305,12 +305,12 @@ class AdminLocalizationsRu extends AdminLocalizations {
 
   @override
   String channelRevision(String id, String revision) {
-    return 'Канал $id · версия $revision';
+    return '$id · версия $revision';
   }
 
   @override
   String channelAccessRevision(String revision) {
-    return 'Права канала · версия $revision';
+    return 'Права · версия $revision';
   }
 
   @override
@@ -775,15 +775,15 @@ class AdminLocalizationsRu extends AdminLocalizations {
       'На устройстве нет ключа восстановления. Используйте исходную карточку.';
 
   @override
-  String get channelDelete => 'Удалить канал';
+  String get channelDelete => 'Удалить чат';
 
   @override
   String channelDeleteConfirm(String name) {
-    return 'Удалить канал «$name» и всю его историю? Это действие нельзя отменить.';
+    return 'Удалить чат «$name» и всю его историю? Это действие нельзя отменить.';
   }
 
   @override
-  String get channelDeleted => 'Канал удалён.';
+  String get channelDeleted => 'Чат удалён.';
 
   @override
   String get storageTitle => 'Хранилище файлов';
@@ -810,4 +810,60 @@ class AdminLocalizationsRu extends AdminLocalizations {
   @override
   String get attachmentsEnabledHelp =>
       'Если выключено, участники не могут прикреплять и скачивать файлы. Файловые функции скрываются в приложении этого пространства.';
+
+  @override
+  String get voiceRoomsTitle => 'Голосовые комнаты';
+
+  @override
+  String get voiceRoomsReload => 'Обновить список комнат';
+
+  @override
+  String get voiceRoomsEmpty => 'Комнат пока нет.';
+
+  @override
+  String get voiceRoomCreate => 'Создать комнату';
+
+  @override
+  String get voiceRoomNewTitle => 'Название новой комнаты';
+
+  @override
+  String get voiceRoomDefaults =>
+      'Участники смогут слушать и говорить, читатели — слушать.';
+
+  @override
+  String get voiceRoomListen => 'Слушать';
+
+  @override
+  String get voiceRoomSpeak => 'Говорить';
+
+  @override
+  String get voiceRoomAccessHelp =>
+      'Индивидуальное правило заменяет правило роли. Владелец и администраторы сохраняют доступ. Читатель может слушать, но не говорить. «Управлять» меняет настройки комнаты, но не права.';
+
+  @override
+  String get voiceRoomArchive => 'Архивировать комнату';
+
+  @override
+  String get voiceRoomArchiveHelp =>
+      'Архивированная комната недоступна для новых подключений.';
+
+  @override
+  String get voiceRoomSave => 'Сохранить комнату';
+
+  @override
+  String get voiceRoomDelete => 'Удалить комнату';
+
+  @override
+  String voiceRoomDeleteConfirm(String name) {
+    return 'Удалить комнату «$name»? Это действие нельзя отменить.';
+  }
+
+  @override
+  String get voiceRoomCreated => 'Комната создана.';
+
+  @override
+  String get voiceRoomSaved => 'Настройки комнаты сохранены.';
+
+  @override
+  String get voiceRoomDeleted => 'Комната удалена.';
 }

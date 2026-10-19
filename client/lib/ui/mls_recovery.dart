@@ -97,7 +97,7 @@ Future<void> showMlsGroupCode(
           SelectableText(code['authenticator'] as String),
           const SizedBox(height: 16),
           const Text(
-            'Сверьте код и эпоху с участниками вне этого канала. '
+            'Сверьте код и эпоху с участниками вне этого чата. '
             'После изменения эпохи нужна новая сверка. Код не подтверждает полноту истории.',
           ),
         ],

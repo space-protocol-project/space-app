@@ -69,7 +69,7 @@ class _CreateMlsDialogState extends State<_CreateMlsDialog> {
       if (mounted) {
         setState(() {
           busy = false;
-          error = 'Не удалось создать закрытый канал. Проверьте подключение и версию сервера.';
+          error = 'Не удалось создать закрытый чат. Проверьте подключение и версию сервера.';
         });
       }
     }

@@ -10,6 +10,7 @@ import '../src/voice_controller.dart';
 import '../src/voice_devices.dart';
 import '../src/voice_signaling.dart';
 import '../src/generated/space/v1/voice.pb.dart';
+import '../src/generated/space/v1/space.pb.dart' show Channel;
 import 'components.dart';
 import 'voice_devices.dart';
 
@@ -18,8 +19,10 @@ class VoiceRoomsView extends StatelessWidget {
     super.key,
     required this.session,
     required this.controller,
+    this.roomId,
   });
   final SpaceSession? session;
+  final String? roomId;
   final VoiceController controller;
 
   @override
@@ -34,6 +37,10 @@ class VoiceRoomsView extends StatelessWidget {
     );
   }
 
+  List<Channel> _visibleRooms(SpaceSession connected) => connected.voiceRooms
+      .where((room) => roomId == null || room.id == roomId)
+      .toList(growable: false);
+
   List<Widget> _rooms(BuildContext context, SpaceSession connected) {
     if (Platform.isAndroid || Platform.isIOS) {
       return [Text(context.strings.voiceDesktopOnly)];
@@ -41,6 +48,7 @@ class VoiceRoomsView extends StatelessWidget {
     if (connected.server.voiceRoomsVersion != 3) {
       return [Text(context.strings.voiceUpdateRuntime)];
     }
+    final rooms = _visibleRooms(connected);
     return [
       Text(context.strings.voiceLimit),
       const SizedBox(height: 16),
@@ -58,12 +66,12 @@ class VoiceRoomsView extends StatelessWidget {
           label: Text(context.strings.voiceAudioDevices),
         ),
       ),
-      if (connected.voiceRooms.isEmpty)
+      if (rooms.isEmpty)
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 24),
           child: Text(context.strings.voiceEmpty),
         ),
-      for (final room in connected.voiceRooms)
+      for (final room in rooms)
         Padding(
           padding: const EdgeInsets.only(top: 12),
           child: SurfaceCard(

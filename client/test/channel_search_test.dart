@@ -169,7 +169,7 @@ void main() {
     expect(find.text('Общий · '), findsOneWidget);
     expect(find.text('Команда · '), findsOneWidget);
     expect(
-      find.text('Закрытые каналы — поиск только на этом устройстве'),
+      find.text('Закрытые чаты — поиск только на этом устройстве'),
       findsOneWidget,
     );
     await tester.pumpWidget(const SizedBox());

@@ -60,6 +60,16 @@ void main() {
         first: DashboardSession('Основа'),
         second: DashboardSession('Мастерская'),
       };
+      for (final session in sessions.values) {
+        session.availableChannels.addAll([
+          chat('voice_lounge')
+            ..title = 'Разговор · ${session.name}'
+            ..views.first.type = 'voice_room',
+          chat('voice_archive', archived: true)
+            ..title = 'Архивная комната'
+            ..views.first.type = 'voice_room',
+        ]);
+      }
       late ServerWorkspaces workspaces;
       await tester.runAsync(() async {
         workspaces = ServerWorkspaces(
@@ -174,6 +184,14 @@ void main() {
           );
         }
         expect(find.widgetWithText(ListTile, 'Комнаты'), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byKey(const ValueKey('server-voice-rooms')),
+            matching: find.text('Разговор · Основа'),
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Архивная комната'), findsNothing);
         for (final name in ['Обсуждения', 'Лента']) {
           expect(find.widgetWithText(ListTile, name), findsNothing);
         }

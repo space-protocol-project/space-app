@@ -21,8 +21,9 @@ typedef AdminCall = Future<Map<String, dynamic>> Function(
 });
 
 class ChannelsPanel extends StatefulWidget {
-  const ChannelsPanel({super.key, required this.call});
+  const ChannelsPanel({super.key, required this.call, this.voiceRooms = false});
   final AdminCall call;
+  final bool voiceRooms;
   @override
   State<ChannelsPanel> createState() => _ChannelsPanelState();
 }
@@ -40,9 +41,12 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
   String get localizedStatus => switch (statusKey) {
     'channelsLoaded' => strings.channelsLoaded,
     'channelLoaded' => strings.channelLoaded,
-    'channelCreated' => strings.channelCreated,
-    'channelSaved' => strings.channelSaved,
-    'channelDeleted' => strings.channelDeleted,
+    'channelCreated' =>
+      widget.voiceRooms ? strings.voiceRoomCreated : strings.channelCreated,
+    'channelSaved' =>
+      widget.voiceRooms ? strings.voiceRoomSaved : strings.channelSaved,
+    'channelDeleted' =>
+      widget.voiceRooms ? strings.voiceRoomDeleted : strings.channelDeleted,
     'channelAccessSaved' => strings.channelAccessSaved,
     'channelRuleAdded' => strings.channelRuleAdded,
     'channelConflict' => strings.channelConflict,
@@ -101,8 +105,15 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
   Future<void> load() async {
     final data = await widget.call('/api/v1/channels?includeArchived=true');
     if (!mounted) return;
-    channels = maps(data['channels']);
+    channels = maps(data['channels']).where(_matchesView).toList();
     statusKey = 'channelsLoaded';
+  }
+
+  bool _matchesView(Map<String, dynamic> channel) {
+    final views = channel['views'] as List?;
+    if (views == null || views.isEmpty) return !widget.voiceRooms;
+    final type = widget.voiceRooms ? 'voice_room' : 'chat';
+    return views.any((view) => view is Map && view['type'] == type);
   }
 
   Future<void> loadMembers({bool append = false}) async {
@@ -154,7 +165,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     final channelPosition = position(newOrder);
     if (newId.text.isEmpty) {
       newId.text =
-          'chat_${DateTime.now().microsecondsSinceEpoch.toRadixString(36)}';
+          '${widget.voiceRooms ? 'voice' : 'chat'}_${DateTime.now().microsecondsSinceEpoch.toRadixString(36)}';
     }
     final id = newId.text;
     late Map<String, dynamic> result;
@@ -166,7 +177,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
           'channelId': id,
           'title': channelName,
           'position': channelPosition,
-          'viewType': 'chat',
+          'viewType': widget.voiceRooms ? 'voice_room' : 'chat',
           'publicPreview': false,
         },
       );
@@ -187,8 +198,12 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(strings.channelDelete),
-        content: Text(strings.channelDeleteConfirm(channel['title'] as String)),
+        title: Text(_deleteLabel),
+        content: Text(
+          widget.voiceRooms
+              ? strings.voiceRoomDeleteConfirm(channel['title'] as String)
+              : strings.channelDeleteConfirm(channel['title'] as String),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -196,7 +211,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(strings.channelDelete),
+            child: Text(_deleteLabel),
           ),
         ],
       ),
@@ -351,8 +366,12 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
             Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
             for (final entry in {
               'visible': strings.channelVisible,
-              'read': strings.channelRead,
-              'write': strings.channelWrite,
+              'read': widget.voiceRooms
+                  ? strings.voiceRoomListen
+                  : strings.channelRead,
+              'write': widget.voiceRooms
+                  ? strings.voiceRoomSpeak
+                  : strings.channelWrite,
               'manage': strings.channelManage,
             }.entries)
               CheckboxListTile(
@@ -397,27 +416,25 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
           field(order, strings.channelOrder, number: true),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: Text(strings.channelArchive),
+            title: Text(
+              widget.voiceRooms
+                  ? strings.voiceRoomArchive
+                  : strings.channelArchive,
+            ),
             value: archived,
             onChanged: busy ? null : (v) => setState(() => archived = v),
           ),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(strings.channelPublicPreview),
-            value: preview,
-            onChanged: busy ? null : (v) => setState(() => preview = v),
-          ),
-          Text(strings.channelPreviewHelp),
+          ..._previewControls(),
           const SizedBox(height: 16),
           Wrap(
             spacing: 12,
             runSpacing: 12,
             children: [
-              action(strings.channelSave, saveChannel, primary: true),
+              action(_saveLabel, saveChannel, primary: true),
               action(strings.channelReload, reloadSelected),
               OutlinedButton(
                 onPressed: busy ? null : deleteChannel,
-                child: Text(strings.channelDelete),
+                child: Text(_deleteLabel),
               ),
             ],
           ),
@@ -426,7 +443,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
             strings.channelAccessRevision('$accessRevision'),
             style: const TextStyle(fontSize: 18),
           ),
-          Text(strings.channelAccessHelp),
+          Text(_accessHelp),
           if (rules.isEmpty)
             Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
@@ -468,6 +485,42 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     ),
   );
 
+  String get _panelTitle =>
+      widget.voiceRooms ? strings.voiceRoomsTitle : strings.channelsTitle;
+  String get _reloadLabel =>
+      widget.voiceRooms ? strings.voiceRoomsReload : strings.channelsReload;
+  String get _emptyLabel =>
+      widget.voiceRooms ? strings.voiceRoomsEmpty : strings.channelsEmpty;
+  String get _createSection => widget.voiceRooms
+      ? strings.voiceRoomCreate
+      : strings.channelCreateSection;
+  String get _newTitleLabel =>
+      widget.voiceRooms ? strings.voiceRoomNewTitle : strings.channelNewTitle;
+  String get _defaultsLabel =>
+      widget.voiceRooms ? strings.voiceRoomDefaults : strings.channelDefaults;
+  String get _createLabel =>
+      widget.voiceRooms ? strings.voiceRoomCreate : strings.channelCreate;
+  String get _saveLabel =>
+      widget.voiceRooms ? strings.voiceRoomSave : strings.channelSave;
+  String get _deleteLabel =>
+      widget.voiceRooms ? strings.voiceRoomDelete : strings.channelDelete;
+  String get _accessHelp => widget.voiceRooms
+      ? strings.voiceRoomAccessHelp
+      : strings.channelAccessHelp;
+
+  List<Widget> _previewControls() {
+    if (widget.voiceRooms) return [Text(strings.voiceRoomArchiveHelp)];
+    return [
+      SwitchListTile(
+        contentPadding: EdgeInsets.zero,
+        title: Text(strings.channelPublicPreview),
+        value: preview,
+        onChanged: busy ? null : (v) => setState(() => preview = v),
+      ),
+      Text(strings.channelPreviewHelp),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<AdminOperations, AdminOperationState>(
@@ -484,26 +537,26 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
                   runSpacing: 12,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Text(strings.channelsTitle, style: TextStyle(fontSize: 20)),
-                    action(strings.channelsReload, load),
+                    Text(_panelTitle, style: TextStyle(fontSize: 20)),
+                    action(_reloadLabel, load),
                   ],
                 ),
                 const SizedBox(height: 16),
                 for (final c in channels) ..._channelEntry(c),
-                if (channels.isEmpty && !busy) Text(strings.channelsEmpty),
+                if (channels.isEmpty && !busy) Text(_emptyLabel),
                 ExpansionTile(
                   tilePadding: EdgeInsets.zero,
-                  title: Text(strings.channelCreateSection),
+                  title: Text(_createSection),
                   children: [
                     field(
                       newTitle,
-                      strings.channelNewTitle,
+                      _newTitleLabel,
                       key: const ValueKey('new-channel-title'),
                     ),
                     field(newOrder, strings.channelNewOrder, number: true),
-                    Text(strings.channelDefaults),
+                    Text(_defaultsLabel),
                     const SizedBox(height: 16),
-                    action(strings.channelCreate, create, primary: true),
+                    action(_createLabel, create, primary: true),
                     const SizedBox(height: 24),
                   ],
                 ),

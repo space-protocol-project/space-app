@@ -137,7 +137,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get chats => 'Чаты';
 
   @override
-  String get channels => 'Каналы';
+  String get channels => 'Чаты';
 
   @override
   String get recentSpaces => 'Недавние серверы';
@@ -158,7 +158,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get aboutSpace => 'О пространстве';
 
   @override
-  String get independentServer => 'Каналы и доступ задаёт этот сервер.';
+  String get independentServer => 'Чаты и доступ задаёт этот сервер.';
 
   @override
   String get deviceSignedIn => 'Вход по ключу устройства выполнен';
@@ -197,7 +197,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get welcome => 'Ваше пространство';
 
   @override
-  String get welcomeDescription => 'Каналы и ресурсы сервера.';
+  String get welcomeDescription => 'Чаты и ресурсы сервера.';
 
   @override
   String get ideas => 'Место для идей.\nИ людей за ними.';
@@ -398,13 +398,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get connectionInformation => 'Информация о подключении';
 
   @override
-  String get channel => 'Канал';
+  String get channel => 'Чат';
 
   @override
   String get noReading => 'Нет чтения';
 
   @override
-  String get refreshChat => 'Обновить каналы и чат';
+  String get refreshChat => 'Обновить чаты и чат';
 
   @override
   String get noMessageAccess => 'Нет доступа к сообщениям';
@@ -417,7 +417,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get contactOwner =>
-      'Выберите другой канал или обратитесь к владельцу пространства.';
+      'Выберите другой чат или обратитесь к владельцу пространства.';
 
   @override
   String get emptyChat => 'В этом чате пока нет сообщений.';
@@ -433,7 +433,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get newMessages => 'Новые сообщения';
 
   @override
-  String get cannotSend => 'В этом канале нельзя отправлять сообщения';
+  String get cannotSend => 'В этом чате нельзя отправлять сообщения';
 
   @override
   String get messageHint => 'Что у вас нового?';
@@ -739,8 +739,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dashboardTitle => 'Все ваши пространства — рядом.';
 
   @override
-  String get dashboardDescription =>
-      'Серверы, каналы и непрочитанные сообщения.';
+  String get dashboardDescription => 'Серверы, чаты и непрочитанные сообщения.';
 
   @override
   String get dashboardServers => 'Серверы';
@@ -749,7 +748,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dashboardOnline => 'Онлайн';
 
   @override
-  String get dashboardChannels => 'Доступные каналы';
+  String get dashboardChannels => 'Доступные чаты';
 
   @override
   String get dashboardUnread => 'Непрочитанные';
@@ -764,7 +763,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dashboardEmptyHelp => 'Добавьте сервер или создайте свой.';
 
   @override
-  String get dashboardCatalogUnknown => 'Подключитесь, чтобы загрузить каналы.';
+  String get dashboardCatalogUnknown => 'Подключитесь, чтобы загрузить чаты.';
 
   @override
   String get dashboardAvailable => 'Доступен';
@@ -777,7 +776,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get dashboardResourcesHelp =>
-      'Сводка учитывает доступные вам каналы и непрочитанные сообщения. Данные недоступных серверов появятся после подключения.';
+      'Сводка учитывает доступные вам чаты и непрочитанные сообщения. Данные недоступных серверов появятся после подключения.';
 
   @override
   String get dashboardSpaces => 'Ваши пространства';
@@ -932,11 +931,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get failureChannelChanged =>
-      'Права канала изменились. Обновите чат перед повтором.';
+      'Права чата изменились. Обновите чат перед повтором.';
 
   @override
   String get failureChannelUnavailable =>
-      'Доступ к этому каналу изменён. Выберите доступный чат.';
+      'Доступ к этому чату изменён. Выберите доступный чат.';
 
   @override
   String get failureEventsUnsupported =>
@@ -1172,7 +1171,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get serverInAir => 'Сервер в эфире';
 
   @override
-  String get serverNoChannels => 'Нет доступных каналов';
+  String get serverNoChannels => 'Нет доступных чатов';
 
   @override
   String get spacesTitle => 'Пространства';
@@ -1334,7 +1333,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get downloadFailed => 'Не удалось скачать файл';
 
   @override
-  String get noFilesInChannel => 'В этом канале пока нет ваших файлов';
+  String get noFilesInChannel => 'В этом чате пока нет ваших файлов';
 
   @override
   String get loadMoreFiles => 'Загрузить ещё';
@@ -1396,25 +1395,25 @@ class AppLocalizationsRu extends AppLocalizations {
   String get messageUnavailable => 'Сообщение недоступно';
 
   @override
-  String get mlsTitle => 'Закрытый канал · MLS';
+  String get mlsTitle => 'Закрытый чат · MLS';
 
   @override
   String get mlsExperimental => 'Экспериментальный режим E2EE';
 
   @override
-  String get mlsCreate => 'Создать закрытый канал';
+  String get mlsCreate => 'Создать закрытый чат';
 
   @override
-  String get mlsChannelId => 'Идентификатор канала';
+  String get mlsChannelId => 'Идентификатор чата';
 
   @override
-  String get mlsChannelTitle => 'Название канала';
+  String get mlsChannelTitle => 'Название чата';
 
   @override
   String get mlsDeviceCode => 'Код этого устройства';
 
   @override
-  String get mlsDevices => 'Устройства канала';
+  String get mlsDevices => 'Устройства чата';
 
   @override
   String get mlsVerify => 'Проверить устройство';
@@ -1437,7 +1436,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get mlsWaiting =>
-      'Это устройство ещё не приглашено в канал или доступ отозван. Передайте его код владельцу канала.';
+      'Это устройство ещё не приглашено в чат или доступ отозван. Передайте его код владельцу чата.';
 
   @override
   String get mlsInput => 'Что у вас нового?';
@@ -1449,7 +1448,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get mlsAttach => 'Прикрепить файл';
 
   @override
-  String get mlsFiles => 'Файлы канала';
+  String get mlsFiles => 'Файлы чата';
 
   @override
   String get mlsUnavailable => 'Сообщение недоступно';
@@ -1461,7 +1460,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get mlsTransfer => 'Передать управление';
 
   @override
-  String get mlsTransferTitle => 'Передать управление каналом?';
+  String get mlsTransferTitle => 'Передать управление чатом?';
 
   @override
   String mlsTransferHint(String device) {
@@ -1824,7 +1823,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get notificationsDescription =>
-      'На компьютере: Обычные и присоединённые закрытые каналы подключённых пространств, пока приложение запущено. Предпросмотр передаёт текст операционной системе. Доставка после закрытия приложения пока не поддерживается.';
+      'На компьютере: Обычные и присоединённые закрытые чаты подключённых пространств, пока приложение запущено. Предпросмотр передаёт текст операционной системе. Доставка после закрытия приложения пока не поддерживается.';
 
   @override
   String get notificationPermissionError =>
@@ -1834,7 +1833,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get newMessageNotification => 'Новое сообщение';
 
   @override
-  String get messageSearchServer => 'Поиск в истории выбранного канала';
+  String get messageSearchServer => 'Поиск в истории выбранного чата';
 
   @override
   String get messageSearchLocal => 'Поиск только на этом устройстве · MLS';
@@ -1857,14 +1856,14 @@ class AppLocalizationsRu extends AppLocalizations {
       'Не удалось загрузить историю. Повторите попытку.';
 
   @override
-  String get messageSearchAllChannels => 'Во всех доступных каналах';
+  String get messageSearchAllChannels => 'Во всех доступных чатах';
 
   @override
   String get messageSearchMixed =>
-      'Закрытые каналы — поиск только на этом устройстве';
+      'Закрытые чаты — поиск только на этом устройстве';
 
   @override
-  String get savedMlsSearchChannels => 'Сохранённые закрытые каналы';
+  String get savedMlsSearchChannels => 'Сохранённые закрытые чаты';
 
   @override
   String get savedMlsMessagePreview =>
@@ -2233,7 +2232,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get migrationExportHelp =>
-      'Архив содержит сервер, ключи устройства, рабочее состояние MLS и локальную историю закрытых каналов. После сохранения прежний клиент прекратит работу с этим пространством. Сохраните архив вне этого диска и запомните пароль. При сбое проверьте файл .pending: он может содержать готовый перенос. После проверки архива рабочие ключи прежнего устройства будут заменены отметкой переноса в системном хранилище.';
+      'Архив содержит сервер, ключи устройства, рабочее состояние MLS и локальную историю закрытых чатов. После сохранения прежний клиент прекратит работу с этим пространством. Сохраните архив вне этого диска и запомните пароль. При сбое проверьте файл .pending: он может содержать готовый перенос. После проверки архива рабочие ключи прежнего устройства будут заменены отметкой переноса в системном хранилище.';
 
   @override
   String get migrationImportHelp =>
@@ -2248,4 +2247,7 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get migrationExported =>
       'Перенос сохранён. Прежнее устройство остановлено. Сохраните архив и пароль перед переустановкой ОС.';
+
+  @override
+  String get voiceRefreshRooms => 'Обновить список комнат';
 }

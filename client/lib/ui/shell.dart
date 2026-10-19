@@ -31,6 +31,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../src/chat_controller.dart';
 import '../src/voice_controller.dart';
 import 'voice_rooms.dart';
+import 'voice_room_navigation.dart';
 import '../src/preferences.dart';
 import '../src/app_updates.dart';
 import '../src/secure_vault.dart';
@@ -844,6 +845,9 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     select(Section.settings);
   }
 
+  final selectedVoiceRooms = <String, String>{};
+  String? get selectedVoiceRoom => selectedVoiceRooms[controller.knownOrigin];
+
   Section selected = Section.overview;
   Future<void> search() => openMessageSearch();
 
@@ -1023,6 +1027,24 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
       ],
     ),
   );
+  Widget voiceRoomGroup() => VoiceRoomNavigation(
+    rooms: controller.voiceRooms,
+    active: !applicationSettings && selected == Section.rooms,
+    selectedRoomId: selectedVoiceRoom,
+    busy: controller.busy,
+    onRefresh: controller.connected
+        ? () => unawaited(controller.refreshChannels())
+        : null,
+    onSelect: (id) {
+      if (id == null) {
+        selectedVoiceRooms.remove(controller.knownOrigin);
+      } else {
+        selectedVoiceRooms[controller.knownOrigin] = id;
+      }
+      select(Section.rooms);
+    },
+  );
+
   List<Widget> fileNavigation() {
     if (!controller.attachmentsEnabled) return [];
     final enabled =
@@ -1518,7 +1540,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             controller.mlsSession == null
                 ? const Center(
                     child: Text(
-                      'Подключитесь к пространству для открытия закрытого канала',
+                      'Подключитесь к пространству для открытия закрытого чата',
                     ),
                   )
                 : MlsChannelView(
@@ -1580,6 +1602,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             icon: Icons.view_agenda_outlined,
           ),
           Section.rooms => VoiceRoomsView(
+            roomId: selectedVoiceRoom,
             session: controller.mlsSession,
             controller: voice,
           ),
@@ -2054,6 +2077,12 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
       return Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: chatGroup(),
+      );
+    }
+    if (section == Section.rooms) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: voiceRoomGroup(),
       );
     }
     return Padding(

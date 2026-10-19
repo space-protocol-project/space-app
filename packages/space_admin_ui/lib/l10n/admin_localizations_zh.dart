@@ -61,7 +61,7 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String get authorizeConfirm => '允许管理服务器？';
 
   @override
-  String get authorizeDetails => '您明确允许此设备更改设置、频道及成员访问权限。';
+  String get authorizeDetails => '您明确允许此设备修改设置、聊天、语音房间和成员访问权限。';
 
   @override
   String get rootPassword => '根身份卡密码（JSON/PNG）';
@@ -135,40 +135,40 @@ class AdminLocalizationsZh extends AdminLocalizations {
   }
 
   @override
-  String get channelsTitle => '频道与权限';
+  String get channelsTitle => '聊天与权限';
 
   @override
-  String get channelsReload => '刷新频道列表';
+  String get channelsReload => '刷新聊天列表';
 
   @override
-  String get channelsEmpty => '暂无频道。';
+  String get channelsEmpty => '暂无聊天。';
 
   @override
-  String get channelCreateSection => '创建聊天频道';
+  String get channelCreateSection => '创建聊天';
 
   @override
-  String get channelNewId => '新频道地址';
+  String get channelNewId => '新聊天地址';
 
   @override
-  String get channelNewTitle => '新频道名称';
+  String get channelNewTitle => '新聊天名称';
 
   @override
-  String get channelNewOrder => '新频道顺序';
+  String get channelNewOrder => '顺序';
 
   @override
   String get channelDefaults => '成员可读取和发送，阅读者只能读取。公开预览已关闭。';
 
   @override
-  String get channelCreate => '创建频道';
+  String get channelCreate => '创建聊天';
 
   @override
-  String get channelName => '频道名称';
+  String get channelName => '名称';
 
   @override
-  String get channelOrder => '频道顺序';
+  String get channelOrder => '顺序';
 
   @override
-  String get channelArchive => '归档频道';
+  String get channelArchive => '归档聊天';
 
   @override
   String get channelPublicPreview => '向未登录访客显示名称';
@@ -177,10 +177,10 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String get channelPreviewHelp => '预览会显示名称和地址，但不显示消息。归档保留历史记录，并禁止发送新消息。';
 
   @override
-  String get channelSave => '保存频道';
+  String get channelSave => '保存聊天';
 
   @override
-  String get channelReload => '重新加载频道';
+  String get channelReload => '重新加载';
 
   @override
   String get channelAccessHelp =>
@@ -220,7 +220,7 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String get channelDeleteRule => '删除规则';
 
   @override
-  String get channelVisible => '查看频道';
+  String get channelVisible => '可见';
 
   @override
   String get channelRead => '读取消息';
@@ -229,31 +229,31 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String get channelWrite => '发送消息';
 
   @override
-  String get channelManage => '管理频道';
+  String get channelManage => '管理';
 
   @override
-  String get channelsLoaded => '频道已加载。';
+  String get channelsLoaded => '列表已加载。';
 
   @override
-  String get channelLoaded => '频道和权限已加载。';
+  String get channelLoaded => '设置和权限已加载。';
 
   @override
-  String get channelCreated => '频道已创建。';
+  String get channelCreated => '聊天已创建。';
 
   @override
-  String get channelSaved => '频道设置已保存。';
+  String get channelSaved => '聊天设置已保存。';
 
   @override
-  String get channelAccessSaved => '频道权限已保存。';
+  String get channelAccessSaved => '权限已保存。';
 
   @override
   String get channelRuleAdded => '规则已添加到表单。保存权限后才会生效。';
 
   @override
-  String get channelConflict => '频道或权限已更改。请重新加载，未保存的字段会保留在表单中。';
+  String get channelConflict => '设置或权限已更改。请重新加载；未保存的字段会保留在表单中。';
 
   @override
-  String get channelChanged => '加载权限期间频道已更改';
+  String get channelChanged => '设置在加载列表和权限期间发生了变化';
 
   @override
   String get channelOrderInvalid => '顺序必须在 0 到 100000 之间';
@@ -265,10 +265,10 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String get channelIdInvalid => '地址：使用拉丁字母、数字、_ 或 -，并以字母开头';
 
   @override
-  String get channelIdTaken => '该频道地址已被使用。请选择其他地址。';
+  String get channelIdTaken => '此地址已被占用，请选择其他地址。';
 
   @override
-  String get channelUnavailable => '频道已不可用';
+  String get channelUnavailable => '已不可用';
 
   @override
   String get channelRulesLimit => '最多 100 条规则';
@@ -284,12 +284,12 @@ class AdminLocalizationsZh extends AdminLocalizations {
 
   @override
   String channelRevision(String id, String revision) {
-    return '频道 $id · 版本 $revision';
+    return '$id · 版本 $revision';
   }
 
   @override
   String channelAccessRevision(String revision) {
-    return '频道权限 · 版本 $revision';
+    return '权限 · 版本 $revision';
   }
 
   @override
@@ -730,7 +730,7 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String get recoveryOriginalCardNeeded => '此设备没有恢复密钥。请使用原始恢复卡。';
 
   @override
-  String get channelDelete => '删除频道';
+  String get channelDelete => '删除聊天';
 
   @override
   String channelDeleteConfirm(String name) {
@@ -738,7 +738,7 @@ class AdminLocalizationsZh extends AdminLocalizations {
   }
 
   @override
-  String get channelDeleted => '频道已删除。';
+  String get channelDeleted => '聊天已删除。';
 
   @override
   String get storageTitle => '文件存储';
@@ -763,4 +763,58 @@ class AdminLocalizationsZh extends AdminLocalizations {
 
   @override
   String get attachmentsEnabledHelp => '关闭后，成员无法附加或下载文件，此空间的文件功能将被隐藏。';
+
+  @override
+  String get voiceRoomsTitle => '语音房间';
+
+  @override
+  String get voiceRoomsReload => '刷新房间列表';
+
+  @override
+  String get voiceRoomsEmpty => '暂无房间。';
+
+  @override
+  String get voiceRoomCreate => '创建房间';
+
+  @override
+  String get voiceRoomNewTitle => '新房间名称';
+
+  @override
+  String get voiceRoomDefaults => '成员可以收听和发言，读者只能收听。';
+
+  @override
+  String get voiceRoomListen => '收听';
+
+  @override
+  String get voiceRoomSpeak => '发言';
+
+  @override
+  String get voiceRoomAccessHelp =>
+      '个人规则替代角色规则。所有者和管理员保留访问权限。读者只能收听，不能发言。管理权限允许修改房间设置，但不能修改权限。';
+
+  @override
+  String get voiceRoomArchive => '归档房间';
+
+  @override
+  String get voiceRoomArchiveHelp => '已归档的房间无法接受新连接。';
+
+  @override
+  String get voiceRoomSave => '保存房间';
+
+  @override
+  String get voiceRoomDelete => '删除房间';
+
+  @override
+  String voiceRoomDeleteConfirm(String name) {
+    return '删除房间“$name”？此操作无法撤销。';
+  }
+
+  @override
+  String get voiceRoomCreated => '房间已创建。';
+
+  @override
+  String get voiceRoomSaved => '房间设置已保存。';
+
+  @override
+  String get voiceRoomDeleted => '房间已删除。';
 }

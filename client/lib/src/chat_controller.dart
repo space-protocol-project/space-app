@@ -540,6 +540,15 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       : (navigation?.availableChannels ?? _history?.channels ?? [])
             .where((c) => c.views.any((v) => v.type == 'chat'))
             .toList(growable: false);
+  List<Channel> get voiceRooms => !connected || accessRemoved
+      ? []
+      : (navigation?.availableChannels ?? [])
+            .where(
+              (channel) =>
+                  !channel.archived &&
+                  channel.views.any((view) => view.type == 'voice_room'),
+            )
+            .toList(growable: false);
   String get channelId =>
       navigation?.selectedChannelId ?? _history?.selected ?? 'general';
   bool get canRead =>
