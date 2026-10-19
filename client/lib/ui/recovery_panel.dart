@@ -32,10 +32,12 @@ class RecoveryPanel extends StatefulWidget {
     this.onRestored,
     this.identityOrigin,
     this.spaceOrigins,
+    this.onPendingChanged,
   });
   final ChatController controller;
   final String? identityOrigin;
   final List<String>? spaceOrigins;
+  final ValueChanged<bool>? onPendingChanged;
   final ChatController Function(String origin)? restoreController;
   final Future<void> Function(String origin, ChatController controller)?
   onRestored;
@@ -126,11 +128,15 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       failureCode = null;
     });
     try {
+      widget.onPendingChanged?.call(true);
       await action();
     } catch (error) {
       _showRecoveryError(error);
     } finally {
-      if (mounted) setState(() => pending = false);
+      if (mounted) {
+        setState(() => pending = false);
+        widget.onPendingChanged?.call(false);
+      }
     }
   }
 
@@ -301,11 +307,12 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     final pass = await password(false);
     if (pass == null) return;
     stage(2);
-    final records = await compute(restoreAccessInWorker, [
+    final restored = await compute(restoreAccessInWorker, [
       packet,
       pass,
     ]).timeout(const Duration(seconds: 60));
-    if (records.length == 1) {
+    final records = restored.records;
+    if (!restored.isSpaceCollection) {
       if (await _restoreRecord(records.single)) {
         await refresh();
         if (mounted) setState(() => messageKey = 'recoveryRestored');
@@ -323,7 +330,11 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     }
     var restored = 0;
     final failed = <String>[];
-    for (final record in records) {
+    final missing = await missingRecoverySpaces(
+      records,
+      widget.controller.vault,
+    );
+    for (final record in missing) {
       if (!mounted) return;
       try {
         if (!await _restoreRecord(record)) break;
@@ -338,6 +349,13 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       message = context.strings.recoverySpacesResult(restored, records.length);
       if (failed.isNotEmpty) message += '\n${failed.join('\n')}';
     });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          context.strings.recoverySpacesResult(restored, records.length),
+        ),
+      ),
+    );
     await refresh();
   }
 

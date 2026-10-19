@@ -304,7 +304,7 @@
   "recoverySpacesUseFile": "内容过大，无法放入一个二维码，请保存加密文件。",
   "recoverySaveSpacesQr": "保存空间二维码",
   "recoverySaveSpacesFile": "将空间保存到文件",
-  "recoverySpacesResult": "已恢复 {restored} 个空间，共 {total} 个。请重新导入其余空间。",
+  "recoverySpacesResult": "已添加空间：{restored}。集合总数：{total}。现有密钥保持不变。失败的空间可重新导入。",
   "@recoverySpacesResult": {
     "placeholders": {
       "restored": {

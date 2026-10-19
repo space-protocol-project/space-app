@@ -155,7 +155,7 @@ void main() {
       addTearDown(
         () => deleteTestDirectory(root, prefix: 'space-migration-flow-'),
       );
-      final device = await record(1);
+      var device = await record(1);
       final storage = MemoryMlsStorage(), targetStorage = MemoryMlsStorage();
       final vault = KeyIdentityVault(storage),
           targetVault = KeyIdentityVault(targetStorage);
@@ -175,6 +175,11 @@ void main() {
           ],
         },
       );
+      device = DeviceRecord.fromJson({
+        ...device.toJson(),
+        'deviceSeed': url64(List.filled(32, 77)),
+        'grantId': 'rotated-authentication-grant',
+      });
       await vault.save(device);
       final source = MigrationHome(
         await Directory('${root.path}/source').create(),

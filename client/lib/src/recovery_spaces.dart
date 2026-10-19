@@ -48,9 +48,15 @@ Future<Map<String, dynamic>> recoverySpacesPayload(
 }
 
 /// Все записи проверяются до сетевых запросов и изменения хранилища.
-Future<List<DeviceRecord>> restoreAccessInWorker(List<String> input) async {
+Future<({List<DeviceRecord> records, bool isSpaceCollection})>
+restoreAccessInWorker(List<String> input) async {
   final payload = await openRecoveryCard(input[0], input[1]);
-  if (!payload.containsKey('kind')) return [await recordFromRecovery(payload)];
+  if (!payload.containsKey('kind')) {
+    return (
+      records: [await recordFromRecovery(payload)],
+      isSpaceCollection: false,
+    );
+  }
   if (payload['kind'] != recoverySpacesKind || payload['v'] != 1) {
     throw const FormatException('Неподдерживаемый архив пространств');
   }
@@ -71,7 +77,18 @@ Future<List<DeviceRecord>> restoreAccessInWorker(List<String> input) async {
     }
     records.add(record);
   }
-  return records;
+  return (records: records, isSpaceCollection: true);
+}
+
+Future<List<DeviceRecord>> missingRecoverySpaces(
+  List<DeviceRecord> records,
+  IdentityVault vault,
+) async {
+  final missing = <DeviceRecord>[];
+  for (final record in records) {
+    if (await vault.load(record.origin) == null) missing.add(record);
+  }
+  return missing;
 }
 
 void _checkCount(int count) {

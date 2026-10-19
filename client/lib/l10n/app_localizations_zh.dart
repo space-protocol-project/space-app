@@ -1994,7 +1994,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String recoverySpacesResult(int restored, int total) {
-    return '已恢复 $restored 个空间，共 $total 个。请重新导入其余空间。';
+    return '已添加空间：$restored。集合总数：$total。现有密钥保持不变。失败的空间可重新导入。';
   }
 
   @override
@@ -2848,7 +2848,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String recoverySpacesResult(int restored, int total) {
-    return '已恢复 $restored 个空间，共 $total 个。请重新导入其余空间。';
+    return '已添加空间：$restored。集合总数：$total。现有密钥保持不变。失败的空间可重新导入。';
   }
 
   @override

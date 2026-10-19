@@ -8,6 +8,8 @@ import 'package:space_client/src/migration_archive.dart';
 import 'package:space_client/src/mls/local_store.dart';
 import 'package:space_client/src/mls/client.dart';
 import 'package:space_client/src/mls/native.dart';
+import 'package:space_client/src/root_rotation.dart' as rotation;
+import 'package:space_client/src/rpc_clients.dart' show AuthServiceClient;
 
 import '../../tool/home_transfer_drill.dart' as transfer;
 import '../mls_native_test.dart' show MemoryMlsStorage;
@@ -44,7 +46,7 @@ void main() {
           sourceVault,
           setupCode: running.setupCode,
         );
-        final mls = await live.client(session, sourceStorage);
+        var mls = await live.client(session, sourceStorage);
         await mls.createChannel('private', 'Полный перенос');
         await session.refreshChannels();
         final group = session.availableChannels
@@ -52,6 +54,18 @@ void main() {
             .mlsGroupId;
         await mls.send('private', 'Сообщение до переустановки');
         await seedRestorePeers(session, mls, [peer], running, group);
+        await mls.refresh('private', group);
+        final previousSeed = List<int>.from(session.record.deviceSeed);
+        await session.prepareRotation();
+        await rotation.finishRootRotation(
+          running.discovery,
+          sourceVault,
+          AuthServiceClient(session.channel),
+        );
+        await session.close();
+        session = await SpaceSession.connect(running.discovery, sourceVault);
+        expect(session.record.deviceSeed, isNot(previousSeed));
+        mls = await live.client(session, sourceStorage);
         await mls.refresh('private', group);
         final record = session.record;
         await session.close();

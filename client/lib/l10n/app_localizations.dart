@@ -3931,7 +3931,7 @@ abstract class AppLocalizations {
   /// No description provided for @recoverySpacesResult.
   ///
   /// In ru, this message translates to:
-  /// **'Восстановлено пространств: {restored} из {total}. Для остальных повторите импорт.'**
+  /// **'Добавлено пространств: {restored}. Всего в наборе: {total}. Имеющиеся ключи сохранены без изменений. Для ошибок повторите импорт.'**
   String recoverySpacesResult(int restored, int total);
 
   /// No description provided for @migrationTitle.

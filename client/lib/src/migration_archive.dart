@@ -133,18 +133,7 @@ class MigrationArchive {
       final payload = jsonDecode(utf8.decode(device)) as Map<String, dynamic>;
       device.fillRange(0, device.length, 0);
       await _readServer(input, server, lengths.$2, key, prefix, header);
-      final remaining = await input.length() - await input.position();
-      if (remaining == 0 && allowUncommitted) return payload;
-      if (remaining != _committed.length ||
-          utf8.decode(await _readExact(input, _committed.length)) !=
-              _committed) {
-        throw const FormatException(
-          'Перенос не завершён на исходном устройстве',
-        );
-      }
-      if (await input.position() != await input.length()) {
-        throw const FormatException('Лишние данные в архиве');
-      }
+      await _requireCompletion(input, allowUncommitted);
       return payload;
     } finally {
       await input.close();
@@ -156,11 +145,48 @@ class MigrationArchive {
   static Future<void> commit(File pending) async {
     final file = await pending.open(mode: FileMode.append);
     try {
+      final offset = await _completionOffset(file);
+      await file.setPosition(offset);
+      await _requireCompletion(file, true);
+      if (await file.length() == offset + _committed.length) return;
+      await file.truncate(offset);
+      await file.setPosition(offset);
       await file.writeFrom(utf8.encode(_committed));
       await file.flush();
     } finally {
       await file.close();
     }
+  }
+
+  static Future<void> _requireCompletion(
+    RandomAccessFile file,
+    bool allowUncommitted,
+  ) async {
+    final remaining = await file.length() - await file.position();
+    if (remaining < 0 || remaining > _committed.length) {
+      throw const FormatException('Лишние данные в архиве');
+    }
+    final tail = utf8.decode(await _readExact(file, remaining));
+    if (!_committed.startsWith(tail) ||
+        !allowUncommitted && remaining != _committed.length) {
+      throw const FormatException('Перенос не завершён на исходном устройстве');
+    }
+  }
+
+  static Future<int> _completionOffset(RandomAccessFile file) async {
+    await file.setPosition(0);
+    if (utf8.decode(await _readExact(file, magic.length)) != magic) {
+      throw const FormatException('Неизвестный архив переноса');
+    }
+    final size = _number(await _readExact(file, 4));
+    if (size < 1 || size > 1024) {
+      throw const FormatException('Повреждён заголовок');
+    }
+    final lengths = _lengths(
+      jsonDecode(utf8.decode(await _readExact(file, size))) as Map,
+    );
+    final blocks = (lengths.$2 + chunkBytes - 1) ~/ chunkBytes;
+    return await file.position() + lengths.$1 + 16 + lengths.$2 + blocks * 16;
   }
 
   static (int, int) _lengths(Map metadata) {

@@ -787,7 +787,7 @@
   "recoverySpacesUseFile": "This set is too large for one QR. Save the encrypted file.",
   "recoverySaveSpacesQr": "Save spaces QR",
   "recoverySaveSpacesFile": "Save spaces to file",
-  "recoverySpacesResult": "Spaces restored: {restored} of {total}. Retry import for the remaining spaces.",
+  "recoverySpacesResult": "Spaces added: {restored}. Total in collection: {total}. Existing keys were kept unchanged. Retry import for failures.",
   "@recoverySpacesResult": {
     "placeholders": {
       "restored": {

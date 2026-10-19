@@ -29,6 +29,30 @@ class DevicePanel extends StatefulWidget {
 
 class _DevicePanelState extends State<DevicePanel> {
   String? selected;
+  ChatController? operationController;
+  String? operationOrigin;
+  bool operationActive = false;
+
+  ({String? origin, ChatController controller}) _selection(
+    Map<String, ChatController> entries,
+  ) {
+    if (operationActive) {
+      return (origin: operationOrigin, controller: operationController!);
+    }
+    final origin = entries.containsKey(selected)
+        ? selected
+        : entries.keys.firstOrNull;
+    return (origin: origin, controller: entries[origin] ?? widget.fallback);
+  }
+
+  void _lockSelection(bool active, ChatController controller, String? origin) {
+    if (!mounted) return;
+    setState(() {
+      operationActive = active;
+      operationController = active ? controller : null;
+      operationOrigin = active ? origin : null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) =>
@@ -36,10 +60,9 @@ class _DevicePanelState extends State<DevicePanel> {
         bloc: widget.workspaces,
         builder: (context, _) {
           final entries = widget.workspaces.controllers;
-          final origin = entries.containsKey(selected)
-              ? selected
-              : entries.keys.firstOrNull;
-          final controller = entries[origin] ?? widget.fallback;
+          final selection = _selection(entries);
+          final origin = selection.origin;
+          final controller = selection.controller;
           return PageBody(
             title: context.strings.myDevice,
             description: context.strings.myDeviceDescription,
@@ -71,6 +94,8 @@ class _DevicePanelState extends State<DevicePanel> {
                 controller: controller,
                 identityOrigin: origin,
                 spaceOrigins: entries.keys.toList(),
+                onPendingChanged: (active) =>
+                    _lockSelection(active, controller, origin),
                 restoreController: widget.restoreController,
                 onRestored: (origin, target) async {
                   await widget.onRestored(origin, target);
@@ -108,12 +133,14 @@ class _DevicePanelState extends State<DevicePanel> {
               ),
             ),
         ],
-        onChanged: (value) => setState(() => selected = value),
+        onChanged: operationActive
+            ? null
+            : (value) => setState(() => selected = value),
       ),
       if (!controller.connected) ...[
         const SizedBox(height: 20),
         OutlinedButton.icon(
-          onPressed: controller.busy
+          onPressed: controller.busy || operationActive
               ? null
               : () => widget.workspaces.reconnect(origin!),
           icon: const Icon(Icons.link),

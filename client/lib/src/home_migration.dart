@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cryptography/cryptography.dart';
 import 'package:flutter/foundation.dart';
 
 import 'core.dart';
@@ -33,11 +32,10 @@ class HomeMigration {
       return null;
     }
     final identity = await record.identity();
-    final public = await (await Ed25519().newKeyPairFromSeed(record.deviceSeed))
-        .extractPublicKey();
+    // После смены root/device аутентификация использует новый ключ, а MLS
+    // сохраняет прежнюю привязку. Её подпись проверяет нативный модуль.
     if (scope['server_id'] != record.serverId ||
-        scope['principal_id'] != identity.principalId ||
-        jsonEncode(scope['public_key']) != jsonEncode(public.bytes)) {
+        scope['principal_id'] != identity.principalId) {
       throw const FormatException('Ключ MLS не соответствует устройству');
     }
     return MlsLocalStore(

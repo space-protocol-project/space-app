@@ -787,7 +787,7 @@
   "recoverySpacesUseFile": "Набор не помещается в один QR. Сохраните зашифрованный файл.",
   "recoverySaveSpacesQr": "Сохранить QR пространств",
   "recoverySaveSpacesFile": "Сохранить пространства в файл",
-  "recoverySpacesResult": "Восстановлено пространств: {restored} из {total}. Для остальных повторите импорт.",
+  "recoverySpacesResult": "Добавлено пространств: {restored}. Всего в наборе: {total}. Имеющиеся ключи сохранены без изменений. Для ошибок повторите импорт.",
   "@recoverySpacesResult": {
     "placeholders": {
       "restored": {

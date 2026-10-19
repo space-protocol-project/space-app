@@ -93,6 +93,18 @@ void main() {
         ),
         throwsA(anything),
       );
+      await damaged.writeAsBytes(encoded.sublist(0, encoded.length - 2));
+      expect(
+        await MigrationArchive.read(
+          source: damaged,
+          password: password,
+          allowUncommitted: true,
+        ),
+        device,
+      );
+      await MigrationArchive.commit(damaged);
+      await MigrationArchive.commit(damaged);
+      expect(await damaged.readAsBytes(), encoded);
       await damaged.writeAsBytes([...encoded, 0]);
       await expectLater(
         MigrationArchive.read(

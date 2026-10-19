@@ -2175,7 +2175,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String recoverySpacesResult(int restored, int total) {
-    return 'Восстановлено пространств: $restored из $total. Для остальных повторите импорт.';
+    return 'Добавлено пространств: $restored. Всего в наборе: $total. Имеющиеся ключи сохранены без изменений. Для ошибок повторите импорт.';
   }
 
   @override

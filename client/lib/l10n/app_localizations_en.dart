@@ -2162,7 +2162,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String recoverySpacesResult(int restored, int total) {
-    return 'Spaces restored: $restored of $total. Retry import for the remaining spaces.';
+    return 'Spaces added: $restored. Total in collection: $total. Existing keys were kept unchanged. Retry import for failures.';
   }
 
   @override
