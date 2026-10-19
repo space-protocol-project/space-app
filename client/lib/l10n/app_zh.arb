@@ -10,7 +10,7 @@
   "deviceTransferRestore": "完整恢复",
   "deviceTransferRestoreHelp": "将归档拖入此处或点击选择文件",
   "deviceTransferOneFile": "请拖入一个完整设备迁移文件。",
-  "deviceTransferPasswordHelp": "密码至少12个字符。归档验证后会停止原设备的所有空间和家庭服务器。请将归档和密码保存在系统磁盘之外。恢复到全新安装后重新启动应用。请勿将同一归档恢复到多台设备。继续通信后，下次迁移需要创建新归档。",
+  "deviceTransferPasswordHelp": "归档密码可以任意设置，也可以留空。归档验证后会停止原设备的所有空间和家庭服务器。请将归档和密码保存在系统磁盘之外。恢复到全新安装后重新启动应用。请勿将同一归档恢复到多台设备。继续通信后，下次迁移需要创建新归档。",
   "deviceTransferFinished": "请保存归档和密码。关闭应用，恢复后重新打开。请勿在原设备上继续通信。",
   "deviceTransferClose": "关闭应用",
   "failureConflict": "消息已更改。请关闭编辑器并打开最新版本；关闭前可以复制您输入的文本。",
@@ -815,7 +815,7 @@
   "migrationTitle": "完整迁移空间",
   "migrationExportHelp": "归档包含服务器、设备密钥、当前 MLS 状态和加密频道本地历史。保存后，此客户端将停止使用该空间。请将归档保存在其他磁盘并记住密码。如果操作中断，请检查 .pending 文件，其中可能包含完整迁移。 验证归档后，系统存储中旧设备的工作密钥将被迁移标记替换。",
   "migrationImportHelp": "恢复后将继续使用原设备身份。此归档只能用于一台新设备。旧服务器必须停止。现有密钥不会被替换。",
-  "migrationPassword": "归档密码（至少 12 个字符）",
+  "migrationPassword": "归档密码",
   "migrationPasswordRepeat": "再次输入密码",
   "migrationExported": "迁移已保存，旧设备已停止。重装系统前请保管归档和密码。"
 }

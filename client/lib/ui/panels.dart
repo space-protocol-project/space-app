@@ -249,9 +249,13 @@ class SettingsPanel extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 24),
-      ShortcutSettings(preferences: preferences, value: state.sendShortcut),
-      if (voiceDevices != null)
-        SurfaceCard(child: VoiceShortcutSettings(devices: voiceDevices!)),
+      ShortcutSettings(
+        preferences: preferences,
+        value: state.sendShortcut,
+        additionalShortcuts: voiceDevices == null
+            ? null
+            : VoiceShortcutSettings(devices: voiceDevices!),
+      ),
       const SizedBox(height: 24),
       NotificationSettings(
         preferences: preferences,

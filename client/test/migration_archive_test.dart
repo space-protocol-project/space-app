@@ -28,7 +28,7 @@ void main() {
         'secret': 'private-device-key',
         'mls': {'snapshot': 'private-mls-key'},
       };
-      const password = 'Длинный пароль переноса';
+      const password = '';
       await MigrationArchive.write(
         server: server,
         device: device,

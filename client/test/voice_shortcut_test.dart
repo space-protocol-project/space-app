@@ -149,7 +149,9 @@ void main() {
     await tester.pump();
     await tester.sendKeyEvent(LogicalKeyboardKey.keyX);
     await tester.pump();
-    expect(find.text('Ctrl + F9'), findsOneWidget);
+    expect(find.text('Ctrl'), findsOneWidget);
+    expect(find.text('F9'), findsOneWidget);
+    expect(find.text('+'), findsOneWidget);
     await tester.tap(find.text('Сохранить'));
     await tester.pumpAndSettle();
     expect(devices.state.audio.shortcut.key, LogicalKeyboardKey.f9);

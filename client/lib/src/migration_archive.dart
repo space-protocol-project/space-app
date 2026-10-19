@@ -30,9 +30,6 @@ class MigrationArchive {
     required String password,
     required File destination,
   }) async {
-    if (password.length < 12) {
-      throw StateError('Для переноса нужен пароль от 12 символов');
-    }
     final plain = utf8.encode(jsonEncode(device));
     final length = await server.length();
     if (plain.length > maxDeviceBytes ||

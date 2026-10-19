@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../l10n/strings.dart';
 import '../src/voice_devices.dart';
 import '../src/voice_shortcut.dart';
+import 'shortcut_settings.dart';
 
 class VoiceShortcutSettings extends StatefulWidget {
   const VoiceShortcutSettings({
@@ -53,18 +54,25 @@ class _VoiceShortcutSettingsState extends State<VoiceShortcutSettings> {
         builder: (context, state) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(context.strings.voiceShortcutTitle),
-            Text(context.strings.voiceShortcutScope),
-            const SizedBox(height: 8),
-            OutlinedButton.icon(
-              onPressed: state.busy ? null : () => _change(context),
-              icon: const Icon(Icons.keyboard_outlined),
-              label: Text(
-                state.audio.shortcut.label,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+            ShortcutSettingRow(
+              label: Text(context.strings.voiceShortcutTitle),
+              control: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: state.busy ? null : () => _change(context),
+                child: KeyCombination(keys: state.audio.shortcut.keys),
               ),
             ),
+            const SizedBox(height: 8),
+            Text(context.strings.voiceShortcutScope),
             if (widget.showError && state.error.isNotEmpty)
               Text(
                 state.error,
@@ -121,10 +129,7 @@ class _ShortcutDialogState extends State<_ShortcutDialog> {
           children: [
             Text(context.strings.voiceShortcutPress),
             const SizedBox(height: 20),
-            Text(
-              shortcut?.label ?? '…',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            KeyCombination(keys: shortcut?.keys ?? const ['…']),
           ],
         ),
       ),
@@ -135,7 +140,7 @@ class _ShortcutDialogState extends State<_ShortcutDialog> {
         ),
         TextButton(
           onPressed: () => Navigator.pop(context, const VoiceShortcut()),
-          child: const Text('F8'),
+          child: const KeyCombination(keys: ['F8']),
         ),
         FilledButton(
           onPressed: shortcut == null
