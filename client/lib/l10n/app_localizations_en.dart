@@ -1992,6 +1992,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voiceJoining => 'Connecting…';
 
   @override
+  String get voiceReconnecting => 'Reconnecting. Microphone is off.';
+
+  @override
   String get voiceConnected => 'Connected';
 
   @override
@@ -2037,4 +2040,100 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get voiceUpdateRuntime =>
       'Voice rooms require a runtime with voice support. Update your server in Broadcast.';
+
+  @override
+  String get voiceDeviceUnavailable =>
+      'A selected audio device is disconnected. Reconnect it or choose another device, then enable the microphone or sound manually.';
+
+  @override
+  String get voiceDeviceDisconnected => 'Device disconnected';
+
+  @override
+  String get voiceAudioDevices => 'Audio devices';
+
+  @override
+  String get voiceSettingsTitle => 'Voice';
+
+  @override
+  String get voiceInputVolume => 'Microphone volume';
+
+  @override
+  String get voiceOutputVolume => 'Output volume';
+
+  @override
+  String get voiceProcessingTitle => 'Audio processing';
+
+  @override
+  String get voiceInputProfile => 'Microphone profile';
+
+  @override
+  String get voiceProfileSpeech => 'Conversation';
+
+  @override
+  String get voiceProfileStudio => 'Studio — no processing';
+
+  @override
+  String get voiceProfileCustom => 'Custom';
+
+  @override
+  String get voiceNoiseSuppression => 'Noise suppression';
+
+  @override
+  String get voiceEchoCancellation => 'Echo cancellation';
+
+  @override
+  String get voiceAutoGain => 'Automatic gain control';
+
+  @override
+  String get voiceProcessingHint =>
+      'Changing processing turns off your microphone. Turn it on again to apply the settings. Use headphones with the Studio profile.';
+
+  @override
+  String get voiceTestMicrophone => 'Test microphone';
+
+  @override
+  String get voiceStopMicrophoneTest => 'Stop test';
+
+  @override
+  String get voiceMicrophoneLevel => 'Microphone level';
+
+  @override
+  String get voiceMicrophoneTestHint =>
+      'You will hear yourself. The test runs locally for up to 60 seconds and does not send audio to the room. Room audio will be turned off. Closing settings stops the test.';
+
+  @override
+  String get voiceDevicesDescription =>
+      'Choose your microphone and sound output. You can change devices before joining a room or during a conversation.';
+
+  @override
+  String get voiceDevicesRemembered =>
+      'Your choices are saved on this computer. Joining a room and restoring settings do not turn on your microphone.';
+
+  @override
+  String get voiceInputDevice => 'Microphone';
+
+  @override
+  String get voiceOutputDevice => 'Sound output';
+
+  @override
+  String get voiceCurrentDevice => 'Current system device';
+
+  @override
+  String get voiceRefreshDevices => 'Refresh devices';
+
+  @override
+  String get voiceCloseDevices => 'Close';
+
+  @override
+  String get voicePushToTalk => 'Push to talk';
+
+  @override
+  String get voicePushToTalkHint =>
+      'Enable the microphone in the room, then hold F8 to speak. Works while this window has focus. The microphone test plays continuously.';
+
+  @override
+  String get voiceAutomaticSensitivity => 'Automatic input sensitivity';
+
+  @override
+  String get voiceSensitivity => 'Input threshold';
 }

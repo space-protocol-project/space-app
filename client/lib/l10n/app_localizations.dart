@@ -3616,6 +3616,12 @@ abstract class AppLocalizations {
   /// **'Подключаемся…'**
   String get voiceJoining;
 
+  /// No description provided for @voiceReconnecting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстанавливаем соединение. Микрофон выключен.'**
+  String get voiceReconnecting;
+
   /// No description provided for @voiceConnected.
   ///
   /// In ru, this message translates to:
@@ -3699,6 +3705,186 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Для голосовых комнат нужен новый runtime с поддержкой голоса. Обновите сервер в «Эфире».'**
   String get voiceUpdateRuntime;
+
+  /// No description provided for @voiceDeviceUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбранное аудиоустройство отключено. Подключите его или выберите другое. Затем включите микрофон или звук вручную.'**
+  String get voiceDeviceUnavailable;
+
+  /// No description provided for @voiceDeviceDisconnected.
+  ///
+  /// In ru, this message translates to:
+  /// **'Устройство отключено'**
+  String get voiceDeviceDisconnected;
+
+  /// No description provided for @voiceAudioDevices.
+  ///
+  /// In ru, this message translates to:
+  /// **'Аудиоустройства'**
+  String get voiceAudioDevices;
+
+  /// No description provided for @voiceSettingsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Голос'**
+  String get voiceSettingsTitle;
+
+  /// No description provided for @voiceInputVolume.
+  ///
+  /// In ru, this message translates to:
+  /// **'Громкость микрофона'**
+  String get voiceInputVolume;
+
+  /// No description provided for @voiceOutputVolume.
+  ///
+  /// In ru, this message translates to:
+  /// **'Громкость звука'**
+  String get voiceOutputVolume;
+
+  /// No description provided for @voiceProcessingTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обработка звука'**
+  String get voiceProcessingTitle;
+
+  /// No description provided for @voiceInputProfile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Профиль микрофона'**
+  String get voiceInputProfile;
+
+  /// No description provided for @voiceProfileSpeech.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для разговора'**
+  String get voiceProfileSpeech;
+
+  /// No description provided for @voiceProfileStudio.
+  ///
+  /// In ru, this message translates to:
+  /// **'Студия — без обработки'**
+  String get voiceProfileStudio;
+
+  /// No description provided for @voiceProfileCustom.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пользовательский'**
+  String get voiceProfileCustom;
+
+  /// No description provided for @voiceNoiseSuppression.
+  ///
+  /// In ru, this message translates to:
+  /// **'Шумоподавление'**
+  String get voiceNoiseSuppression;
+
+  /// No description provided for @voiceEchoCancellation.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эхоподавление'**
+  String get voiceEchoCancellation;
+
+  /// No description provided for @voiceAutoGain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автоматическая регулировка усиления'**
+  String get voiceAutoGain;
+
+  /// No description provided for @voiceProcessingHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменение обработки выключает микрофон: включите его снова, чтобы применить настройки. Для профиля «Студия» используйте наушники.'**
+  String get voiceProcessingHint;
+
+  /// No description provided for @voiceTestMicrophone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверка микрофона'**
+  String get voiceTestMicrophone;
+
+  /// No description provided for @voiceStopMicrophoneTest.
+  ///
+  /// In ru, this message translates to:
+  /// **'Остановить проверку'**
+  String get voiceStopMicrophoneTest;
+
+  /// No description provided for @voiceMicrophoneLevel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уровень микрофона'**
+  String get voiceMicrophoneLevel;
+
+  /// No description provided for @voiceMicrophoneTestHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вы услышите себя. Проверка работает локально до 60 секунд и не передаёт голос в комнату. Звук комнаты будет выключен. Закрытие настроек останавливает проверку.'**
+  String get voiceMicrophoneTestHint;
+
+  /// No description provided for @voiceDevicesDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите, через что говорить и слушать. Настройки можно менять до входа в комнату и во время разговора.'**
+  String get voiceDevicesDescription;
+
+  /// No description provided for @voiceDevicesRemembered.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбор сохраняется на этом компьютере. Вход в комнату и восстановление настроек не включают микрофон.'**
+  String get voiceDevicesRemembered;
+
+  /// No description provided for @voiceInputDevice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Микрофон'**
+  String get voiceInputDevice;
+
+  /// No description provided for @voiceOutputDevice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вывод звука'**
+  String get voiceOutputDevice;
+
+  /// No description provided for @voiceCurrentDevice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Текущее системное устройство'**
+  String get voiceCurrentDevice;
+
+  /// No description provided for @voiceRefreshDevices.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить устройства'**
+  String get voiceRefreshDevices;
+
+  /// No description provided for @voiceCloseDevices.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть'**
+  String get voiceCloseDevices;
+
+  /// No description provided for @voicePushToTalk.
+  ///
+  /// In ru, this message translates to:
+  /// **'Режим рации'**
+  String get voicePushToTalk;
+
+  /// No description provided for @voicePushToTalkHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включите микрофон в комнате и удерживайте F8 для разговора. Работает, пока окно активно. Проверка микрофона воспроизводится непрерывно.'**
+  String get voicePushToTalkHint;
+
+  /// No description provided for @voiceAutomaticSensitivity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автоматическая чувствительность микрофона'**
+  String get voiceAutomaticSensitivity;
+
+  /// No description provided for @voiceSensitivity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порог срабатывания'**
+  String get voiceSensitivity;
 }
 
 class _AppLocalizationsDelegate

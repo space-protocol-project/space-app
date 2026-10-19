@@ -4,6 +4,9 @@ import 'dart:io';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import 'voice_network.dart';
+import 'voice_audio_native.dart';
+import 'voice_audio_settings.dart';
+import 'voice_transmission.dart';
 
 enum VoiceMediaStatus { connecting, connected, failed }
 
@@ -18,9 +21,33 @@ abstract interface class VoiceMedia {
   Future<void> close();
 }
 
-class NativeVoiceMedia implements VoiceMedia {
+abstract interface class VoiceAudioMedia {
+  Future<void> configureAudio(VoiceAudioSettings settings);
+}
+
+class NativeVoiceMedia implements VoiceMedia, VoiceAudioMedia {
   NativeVoiceMedia({this.playbackVolume = 1.0});
   final double playbackVolume;
+  String? inputDeviceId;
+  VoiceAudioSettings _audio = const VoiceAudioSettings();
+  late final _transmission = VoiceTransmission(
+    level: VoiceAudioNative.level,
+    transmit: _transmit,
+  );
+
+  void _transmit(bool enabled) {
+    unawaited(
+      VoiceAudioNative.transmission(enabled && !_closed && !_deafened)
+          .catchError((Object _) {
+            for (final track
+                in _microphone?.getAudioTracks() ?? <MediaStreamTrack>[]) {
+              track.enabled = false;
+            }
+            if (!_closed) _changes.add(VoiceMediaStatus.failed);
+          }),
+    );
+  }
+
   final _changes = StreamController<VoiceMediaStatus>.broadcast();
   RTCPeerConnection? _peer;
   RTCRtpSender? _sender;
@@ -115,7 +142,7 @@ class NativeVoiceMedia implements VoiceMedia {
       return;
     }
     _remote.add(event.track);
-    if (playbackVolume == 1.0) {
+    if (playbackVolume * _audio.outputGain == 1.0) {
       event.track.enabled = !_deafened;
       return;
     }
@@ -125,7 +152,7 @@ class NativeVoiceMedia implements VoiceMedia {
 
   Future<void> _configureVolume(MediaStreamTrack track) async {
     try {
-      await Helper.setVolume(playbackVolume, track);
+      await Helper.setVolume(playbackVolume * _audio.outputGain, track);
       if (!_closed) {
         track.enabled = !_deafened;
       }
@@ -133,6 +160,20 @@ class NativeVoiceMedia implements VoiceMedia {
       if (!_closed) {
         _changes.add(VoiceMediaStatus.failed);
       }
+    }
+  }
+
+  @override
+  Future<void> configureAudio(VoiceAudioSettings settings) async {
+    if (_closed) return;
+    await VoiceAudioNative.gain(settings.inputGain);
+    if (_closed) return;
+    _audio = settings;
+    _transmission.configure(settings);
+    for (final track in List.of(_remote)) {
+      track.enabled = false;
+      await Helper.setVolume(playbackVolume * settings.outputGain, track);
+      if (!_closed) track.enabled = !_deafened;
     }
   }
 
@@ -158,19 +199,17 @@ class NativeVoiceMedia implements VoiceMedia {
     if (_microphone != null) {
       return;
     }
-    final stream = await navigator.mediaDevices.getUserMedia({
-      'audio': {
-        'echoCancellation': true,
-        'noiseSuppression': true,
-        'autoGainControl': true,
-      },
-      'video': false,
-    });
+    await VoiceAudioNative.transmission(false);
+    final stream = await navigator.mediaDevices.getUserMedia(
+      voiceMicrophoneConstraints(inputDeviceId, _audio),
+    );
     if (_closed || _deafened) {
       await _stopStream(stream);
       throw StateError('Включение микрофона отменено');
     }
     _microphone = stream;
+    _transmit(false);
+    _transmission.start(_audio);
     try {
       await _sender!.replaceTrack(stream.getAudioTracks().single);
     } catch (_) {
@@ -187,6 +226,7 @@ class NativeVoiceMedia implements VoiceMedia {
   }
 
   Future<void> _stopMicrophone() async {
+    _transmission.stop();
     final stream = _microphone;
     _microphone = null;
     if (stream == null) {
@@ -234,3 +274,24 @@ class NativeVoiceMedia implements VoiceMedia {
 
   Future<List<StatsReport>> statistics() async => await _peer?.getStats() ?? [];
 }
+
+// Нативный desktop-плагин читает вход через optional.sourceId.
+// audio.deviceId в его C++ реализации выбирает устройство вывода.
+Map<String, dynamic> voiceMicrophoneConstraints(
+  String? inputDeviceId, [
+  VoiceAudioSettings audio = const VoiceAudioSettings(),
+]) => {
+  'audio': {
+    'echoCancellation': audio.echoCancellation,
+    'noiseSuppression': audio.noiseSuppression,
+    'autoGainControl': audio.autoGainControl,
+    'channelCount': 1,
+    'optional': [
+      if (inputDeviceId != null) {'sourceId': inputDeviceId},
+      {'googEchoCancellation': audio.echoCancellation},
+      {'googNoiseSuppression': audio.noiseSuppression},
+      {'googAutoGainControl': audio.autoGainControl},
+    ],
+  },
+  'video': false,
+};

@@ -1834,6 +1834,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get voiceJoining => '连接中…';
 
   @override
+  String get voiceReconnecting => '正在重新连接。麦克风已关闭。';
+
+  @override
   String get voiceConnected => '通话中';
 
   @override
@@ -1874,6 +1877,98 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get voiceUpdateRuntime => '语音房间需要支持语音的新运行时。请在“广播”中更新服务器。';
+
+  @override
+  String get voiceDeviceUnavailable => '所选音频设备已断开。请重新连接或选择其他设备，然后手动开启麦克风或声音。';
+
+  @override
+  String get voiceDeviceDisconnected => '设备已断开';
+
+  @override
+  String get voiceAudioDevices => '音频设备';
+
+  @override
+  String get voiceSettingsTitle => '语音';
+
+  @override
+  String get voiceInputVolume => '麦克风音量';
+
+  @override
+  String get voiceOutputVolume => '输出音量';
+
+  @override
+  String get voiceProcessingTitle => '音频处理';
+
+  @override
+  String get voiceInputProfile => '麦克风模式';
+
+  @override
+  String get voiceProfileSpeech => '对话';
+
+  @override
+  String get voiceProfileStudio => '录音室 — 无处理';
+
+  @override
+  String get voiceProfileCustom => '自定义';
+
+  @override
+  String get voiceNoiseSuppression => '降噪';
+
+  @override
+  String get voiceEchoCancellation => '回声消除';
+
+  @override
+  String get voiceAutoGain => '自动增益控制';
+
+  @override
+  String get voiceProcessingHint => '更改处理设置会关闭麦克风。请重新开启以应用设置。录音室模式建议使用耳机。';
+
+  @override
+  String get voiceTestMicrophone => '测试麦克风';
+
+  @override
+  String get voiceStopMicrophoneTest => '停止测试';
+
+  @override
+  String get voiceMicrophoneLevel => '麦克风电平';
+
+  @override
+  String get voiceMicrophoneTestHint =>
+      '您将听到自己的声音。测试仅在本地运行，最长60秒，不会向房间发送音频。房间声音将关闭。关闭设置会停止测试。';
+
+  @override
+  String get voiceDevicesDescription => '选择麦克风和声音输出设备。加入房间前或通话期间均可更改。';
+
+  @override
+  String get voiceDevicesRemembered => '选择会保存在此电脑上。加入房间和恢复设置不会自动开启麦克风。';
+
+  @override
+  String get voiceInputDevice => '麦克风';
+
+  @override
+  String get voiceOutputDevice => '声音输出';
+
+  @override
+  String get voiceCurrentDevice => '当前系统设备';
+
+  @override
+  String get voiceRefreshDevices => '刷新设备';
+
+  @override
+  String get voiceCloseDevices => '关闭';
+
+  @override
+  String get voicePushToTalk => '按键说话';
+
+  @override
+  String get voicePushToTalkHint =>
+      '先在房间中开启麦克风，再按住 F8 说话。仅在窗口获得焦点时有效。麦克风测试连续播放。';
+
+  @override
+  String get voiceAutomaticSensitivity => '自动输入灵敏度';
+
+  @override
+  String get voiceSensitivity => '输入阈值';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2546,6 +2641,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get voiceJoining => '连接中…';
 
   @override
+  String get voiceReconnecting => '正在重新连接。麦克风已关闭。';
+
+  @override
   String get voiceConnected => '通话中';
 
   @override
@@ -2586,4 +2684,96 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get voiceUpdateRuntime => '语音房间需要支持语音的新运行时。请在“广播”中更新服务器。';
+
+  @override
+  String get voiceDeviceUnavailable => '所选音频设备已断开。请重新连接或选择其他设备，然后手动开启麦克风或声音。';
+
+  @override
+  String get voiceDeviceDisconnected => '设备已断开';
+
+  @override
+  String get voiceAudioDevices => '音频设备';
+
+  @override
+  String get voiceSettingsTitle => '语音';
+
+  @override
+  String get voiceInputVolume => '麦克风音量';
+
+  @override
+  String get voiceOutputVolume => '输出音量';
+
+  @override
+  String get voiceProcessingTitle => '音频处理';
+
+  @override
+  String get voiceInputProfile => '麦克风模式';
+
+  @override
+  String get voiceProfileSpeech => '对话';
+
+  @override
+  String get voiceProfileStudio => '录音室 — 无处理';
+
+  @override
+  String get voiceProfileCustom => '自定义';
+
+  @override
+  String get voiceNoiseSuppression => '降噪';
+
+  @override
+  String get voiceEchoCancellation => '回声消除';
+
+  @override
+  String get voiceAutoGain => '自动增益控制';
+
+  @override
+  String get voiceProcessingHint => '更改处理设置会关闭麦克风。请重新开启以应用设置。录音室模式建议使用耳机。';
+
+  @override
+  String get voiceTestMicrophone => '测试麦克风';
+
+  @override
+  String get voiceStopMicrophoneTest => '停止测试';
+
+  @override
+  String get voiceMicrophoneLevel => '麦克风电平';
+
+  @override
+  String get voiceMicrophoneTestHint =>
+      '您将听到自己的声音。测试仅在本地运行，最长60秒，不会向房间发送音频。房间声音将关闭。关闭设置会停止测试。';
+
+  @override
+  String get voiceDevicesDescription => '选择麦克风和声音输出设备。加入房间前或通话期间均可更改。';
+
+  @override
+  String get voiceDevicesRemembered => '选择会保存在此电脑上。加入房间和恢复设置不会自动开启麦克风。';
+
+  @override
+  String get voiceInputDevice => '麦克风';
+
+  @override
+  String get voiceOutputDevice => '声音输出';
+
+  @override
+  String get voiceCurrentDevice => '当前系统设备';
+
+  @override
+  String get voiceRefreshDevices => '刷新设备';
+
+  @override
+  String get voiceCloseDevices => '关闭';
+
+  @override
+  String get voicePushToTalk => '按键说话';
+
+  @override
+  String get voicePushToTalkHint =>
+      '先在房间中开启麦克风，再按住 F8 说话。仅在窗口获得焦点时有效。麦克风测试连续播放。';
+
+  @override
+  String get voiceAutomaticSensitivity => '自动输入灵敏度';
+
+  @override
+  String get voiceSensitivity => '输入阈值';
 }

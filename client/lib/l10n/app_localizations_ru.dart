@@ -2003,6 +2003,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get voiceJoining => 'Подключаемся…';
 
   @override
+  String get voiceReconnecting =>
+      'Восстанавливаем соединение. Микрофон выключен.';
+
+  @override
   String get voiceConnected => 'В разговоре';
 
   @override
@@ -2048,4 +2052,101 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get voiceUpdateRuntime =>
       'Для голосовых комнат нужен новый runtime с поддержкой голоса. Обновите сервер в «Эфире».';
+
+  @override
+  String get voiceDeviceUnavailable =>
+      'Выбранное аудиоустройство отключено. Подключите его или выберите другое. Затем включите микрофон или звук вручную.';
+
+  @override
+  String get voiceDeviceDisconnected => 'Устройство отключено';
+
+  @override
+  String get voiceAudioDevices => 'Аудиоустройства';
+
+  @override
+  String get voiceSettingsTitle => 'Голос';
+
+  @override
+  String get voiceInputVolume => 'Громкость микрофона';
+
+  @override
+  String get voiceOutputVolume => 'Громкость звука';
+
+  @override
+  String get voiceProcessingTitle => 'Обработка звука';
+
+  @override
+  String get voiceInputProfile => 'Профиль микрофона';
+
+  @override
+  String get voiceProfileSpeech => 'Для разговора';
+
+  @override
+  String get voiceProfileStudio => 'Студия — без обработки';
+
+  @override
+  String get voiceProfileCustom => 'Пользовательский';
+
+  @override
+  String get voiceNoiseSuppression => 'Шумоподавление';
+
+  @override
+  String get voiceEchoCancellation => 'Эхоподавление';
+
+  @override
+  String get voiceAutoGain => 'Автоматическая регулировка усиления';
+
+  @override
+  String get voiceProcessingHint =>
+      'Изменение обработки выключает микрофон: включите его снова, чтобы применить настройки. Для профиля «Студия» используйте наушники.';
+
+  @override
+  String get voiceTestMicrophone => 'Проверка микрофона';
+
+  @override
+  String get voiceStopMicrophoneTest => 'Остановить проверку';
+
+  @override
+  String get voiceMicrophoneLevel => 'Уровень микрофона';
+
+  @override
+  String get voiceMicrophoneTestHint =>
+      'Вы услышите себя. Проверка работает локально до 60 секунд и не передаёт голос в комнату. Звук комнаты будет выключен. Закрытие настроек останавливает проверку.';
+
+  @override
+  String get voiceDevicesDescription =>
+      'Выберите, через что говорить и слушать. Настройки можно менять до входа в комнату и во время разговора.';
+
+  @override
+  String get voiceDevicesRemembered =>
+      'Выбор сохраняется на этом компьютере. Вход в комнату и восстановление настроек не включают микрофон.';
+
+  @override
+  String get voiceInputDevice => 'Микрофон';
+
+  @override
+  String get voiceOutputDevice => 'Вывод звука';
+
+  @override
+  String get voiceCurrentDevice => 'Текущее системное устройство';
+
+  @override
+  String get voiceRefreshDevices => 'Обновить устройства';
+
+  @override
+  String get voiceCloseDevices => 'Закрыть';
+
+  @override
+  String get voicePushToTalk => 'Режим рации';
+
+  @override
+  String get voicePushToTalkHint =>
+      'Включите микрофон в комнате и удерживайте F8 для разговора. Работает, пока окно активно. Проверка микрофона воспроизводится непрерывно.';
+
+  @override
+  String get voiceAutomaticSensitivity =>
+      'Автоматическая чувствительность микрофона';
+
+  @override
+  String get voiceSensitivity => 'Порог срабатывания';
 }

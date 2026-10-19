@@ -7,9 +7,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../l10n/strings.dart';
 import '../src/core.dart';
 import '../src/voice_controller.dart';
+import '../src/voice_devices.dart';
 import '../src/voice_signaling.dart';
 import '../src/generated/space/v1/voice.pb.dart';
 import 'components.dart';
+import 'voice_devices.dart';
 
 class VoiceRoomsView extends StatelessWidget {
   const VoiceRoomsView({
@@ -42,6 +44,20 @@ class VoiceRoomsView extends StatelessWidget {
     return [
       Text(context.strings.voiceLimit),
       const SizedBox(height: 16),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: TextButton.icon(
+          onPressed: () => unawaited(
+            showVoiceDevices(
+              context,
+              controller.devices,
+              controller.microphoneTest,
+            ),
+          ),
+          icon: const Icon(Icons.tune),
+          label: Text(context.strings.voiceAudioDevices),
+        ),
+      ),
       _createButton(context, connected),
       if (connected.voiceRooms.isEmpty)
         Padding(
@@ -216,6 +232,7 @@ class VoiceCallBar extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     _controls(context, state),
+                    _deviceWarning(),
                   ],
                 ),
               ),
@@ -228,11 +245,13 @@ class VoiceCallBar extends StatelessWidget {
     children: [
       Expanded(
         child: Text(
-          state.phase == VoicePhase.connected
-              ? '${context.strings.voiceConnected} · ${state.title}'
-              : state.active
-              ? context.strings.voiceJoining
-              : '',
+          switch (state.phase) {
+            VoicePhase.connected =>
+              '${context.strings.voiceConnected} · ${state.title}',
+            VoicePhase.reconnecting => context.strings.voiceReconnecting,
+            VoicePhase.joining => context.strings.voiceJoining,
+            _ => '',
+          },
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
@@ -264,11 +283,39 @@ class VoiceCallBar extends StatelessWidget {
         ),
       ),
       IconButton(
+        key: const ValueKey('voice-devices'),
+        tooltip: context.strings.voiceAudioDevices,
+        onPressed: state.busy || state.phase != VoicePhase.connected
+            ? null
+            : () => unawaited(
+                showVoiceDevices(
+                  context,
+                  controller.devices,
+                  controller.microphoneTest,
+                ),
+              ),
+        icon: const Icon(Icons.tune),
+      ),
+      IconButton(
         key: const ValueKey('voice-leave'),
         tooltip: context.strings.voiceLeave,
         onPressed: () => unawaited(controller.leave()),
         icon: Icon(Icons.call_end, color: Theme.of(context).colorScheme.error),
       ),
     ],
+  );
+
+  Widget _deviceWarning() => BlocBuilder<VoiceDevices, VoiceDevicesState>(
+    bloc: controller.devices,
+    builder: (context, state) {
+      if (state.error.isNotEmpty) return Text(state.error);
+      if (!state.inputUnavailable && !state.outputUnavailable) {
+        return const SizedBox.shrink();
+      }
+      return Text(
+        context.strings.voiceDeviceUnavailable,
+        style: Theme.of(context).textTheme.bodySmall,
+      );
+    },
   );
 }

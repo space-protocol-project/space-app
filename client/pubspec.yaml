@@ -1,5 +1,7 @@
 name: space_client
 dependency_overrides:
+  flutter_webrtc:
+    path: vendor/flutter_webrtc
   flutter_secure_storage_windows:
     path: vendor/flutter_secure_storage_windows
 description: "Клиент Space для локального протокольного прототипа."
