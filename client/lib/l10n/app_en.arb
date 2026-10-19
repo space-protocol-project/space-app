@@ -779,5 +779,29 @@
   "voicePushToTalk": "Push to talk",
   "voicePushToTalkHint": "Enable the microphone in the room, then hold F8 to speak. Works while this window has focus. The microphone test plays continuously.",
   "voiceAutomaticSensitivity": "Automatic input sensitivity",
-  "voiceSensitivity": "Input threshold"
+  "voiceSensitivity": "Input threshold",
+  "recoveryIncludeSpaces": "Include spaces",
+  "recoveryIncludeSpacesHint": "Create a second QR with saved spaces and their recovery keys. MLS keys and history are not included.",
+  "recoveryAccessQr": "Selected access recovery",
+  "recoverySpacesQr": "Spaces and access",
+  "recoverySpacesUseFile": "This set is too large for one QR. Save the encrypted file.",
+  "recoverySaveSpacesQr": "Save spaces QR",
+  "recoverySaveSpacesFile": "Save spaces to file",
+  "recoverySpacesResult": "Spaces restored: {restored} of {total}. Retry import for the remaining spaces.",
+  "@recoverySpacesResult": {
+    "placeholders": {
+      "restored": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "migrationTitle": "Full space migration",
+  "migrationExportHelp": "The archive contains the server, device keys, working MLS state and local encrypted-channel history. After saving, this client will stop using this space. Keep the archive on another drive and remember the password. If interrupted, check the .pending file: it may contain the completed migration. After verification, the previous device working keys in system storage will be replaced with a migration marker.",
+  "migrationImportHelp": "Restoring continues the previous device. Use the archive on only one new device. The old server must be stopped. Existing keys are never replaced.",
+  "migrationPassword": "Archive password (at least 12 characters)",
+  "migrationPasswordRepeat": "Repeat password",
+  "migrationExported": "Migration saved. The previous device is stopped. Preserve the archive and password before reinstalling the OS."
 }

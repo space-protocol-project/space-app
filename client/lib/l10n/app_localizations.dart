@@ -3885,6 +3885,90 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Порог срабатывания'**
   String get voiceSensitivity;
+
+  /// No description provided for @recoveryIncludeSpaces.
+  ///
+  /// In ru, this message translates to:
+  /// **'И пространства'**
+  String get recoveryIncludeSpaces;
+
+  /// No description provided for @recoveryIncludeSpacesHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать второй QR со списком пространств и их ключами доступа. Ключи MLS и история не входят.'**
+  String get recoveryIncludeSpacesHint;
+
+  /// No description provided for @recoveryAccessQr.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановление выбранного доступа'**
+  String get recoveryAccessQr;
+
+  /// No description provided for @recoverySpacesQr.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пространства и доступ'**
+  String get recoverySpacesQr;
+
+  /// No description provided for @recoverySpacesUseFile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Набор не помещается в один QR. Сохраните зашифрованный файл.'**
+  String get recoverySpacesUseFile;
+
+  /// No description provided for @recoverySaveSpacesQr.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить QR пространств'**
+  String get recoverySaveSpacesQr;
+
+  /// No description provided for @recoverySaveSpacesFile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить пространства в файл'**
+  String get recoverySaveSpacesFile;
+
+  /// No description provided for @recoverySpacesResult.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановлено пространств: {restored} из {total}. Для остальных повторите импорт.'**
+  String recoverySpacesResult(int restored, int total);
+
+  /// No description provided for @migrationTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Полный перенос пространства'**
+  String get migrationTitle;
+
+  /// No description provided for @migrationExportHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Архив содержит сервер, ключи устройства, рабочее состояние MLS и локальную историю закрытых каналов. После сохранения прежний клиент прекратит работу с этим пространством. Сохраните архив вне этого диска и запомните пароль. При сбое проверьте файл .pending: он может содержать готовый перенос. После проверки архива рабочие ключи прежнего устройства будут заменены отметкой переноса в системном хранилище.'**
+  String get migrationExportHelp;
+
+  /// No description provided for @migrationImportHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановление продолжает работу прежнего устройства. Используйте архив только на одном новом устройстве. Старый сервер должен быть остановлен. Существующие ключи не заменяются.'**
+  String get migrationImportHelp;
+
+  /// No description provided for @migrationPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль архива (от 12 символов)'**
+  String get migrationPassword;
+
+  /// No description provided for @migrationPasswordRepeat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторите пароль'**
+  String get migrationPasswordRepeat;
+
+  /// No description provided for @migrationExported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перенос сохранён. Прежнее устройство остановлено. Сохраните архив и пароль перед переустановкой ОС.'**
+  String get migrationExported;
 }
 
 class _AppLocalizationsDelegate

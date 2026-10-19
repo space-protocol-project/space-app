@@ -4,13 +4,13 @@ import 'dart:convert';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:cryptography/cryptography.dart';
 
 import '../src/chat_controller.dart';
 import '../src/core.dart';
 import '../src/generated/space/v1/space.pb.dart';
 import '../src/recovery_card.dart';
 import '../src/recovery_qr.dart';
+import '../src/recovery_spaces.dart';
 import '../src/pairing.dart';
 import '../src/root_rotation.dart' as rotation;
 import '../src/rpc_clients.dart' show AuthServiceClient;
@@ -31,9 +31,11 @@ class RecoveryPanel extends StatefulWidget {
     this.restoreController,
     this.onRestored,
     this.identityOrigin,
+    this.spaceOrigins,
   });
   final ChatController controller;
   final String? identityOrigin;
+  final List<String>? spaceOrigins;
   final ChatController Function(String origin)? restoreController;
   final Future<void> Function(String origin, ChatController controller)?
   onRestored;
@@ -44,6 +46,9 @@ class RecoveryPanel extends StatefulWidget {
 class _RecoveryPanelState extends State<RecoveryPanel> {
   Uint8List? qrBytes;
   String? cardPacket;
+  String? spacesPacket;
+  Uint8List? spacesQrBytes;
+  bool includeSpaces = true;
   bool localRoot = false;
   String? get identityOrigin =>
       widget.identityOrigin ?? widget.controller.preview?.origin.toString();
@@ -60,6 +65,8 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
         oldWidget.controller != widget.controller) {
       qrBytes = null;
       cardPacket = null;
+      spacesPacket = null;
+      spacesQrBytes = null;
       localRoot = false;
       loadLocalRoot();
     }
@@ -164,6 +171,12 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     }
     final pass = await password(true);
     if (pass == null) return;
+    setState(() {
+      qrBytes = null;
+      cardPacket = null;
+      spacesPacket = null;
+      spacesQrBytes = null;
+    });
     stage(5);
     final packet = await compute(sealCardInWorker, [
       await compute(rootCardPayloadInWorker, record),
@@ -177,21 +190,48 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     }
     final bytes = await compute(pngInWorker, packet);
     if (mounted) setState(() => qrBytes = bytes);
+    if (includeSpaces && widget.spaceOrigins != null) {
+      await _generateSpaces(pass);
+    }
   }
 
-  Future<void> export({bool json = false}) async {
-    final content = json && cardPacket != null
-        ? Uint8List.fromList(utf8.encode(cardPacket!))
+  Future<void> _generateSpaces(String password) async {
+    final records = <DeviceRecord>[];
+    for (final origin in widget.spaceOrigins!) {
+      final record = await widget.controller.vault.load(origin);
+      if (record == null) {
+        throw FormatException('Нет сохранённого доступа для $origin');
+      }
+      records.add(record);
+    }
+    final payload = await compute(recoverySpacesPayload, records);
+    final packet = await compute(sealCardInWorker, [payload, password]);
+    if (!mounted) return;
+    setState(() => spacesPacket = packet);
+    try {
+      final bytes = await compute(pngInWorker, packet);
+      if (mounted) setState(() => spacesQrBytes = bytes);
+    } on LocalFailure catch (error) {
+      if (error.code != LocalFailureCode.qrTooLarge) rethrow;
+    }
+  }
+
+  Future<void> export({bool json = false, bool spaces = false}) async {
+    final packet = spaces ? spacesPacket : cardPacket;
+    final content = json && packet != null
+        ? Uint8List.fromList(utf8.encode(packet))
+        : spaces
+        ? spacesQrBytes
         : qrBytes;
     if (content == null) return;
     final extension = json ? 'json' : 'png';
     if (!mounted) return;
     if (Platform.isWindows) {
-      await _exportOnWindows(content, extension, json);
+      await _exportOnWindows(content, extension, json, spaces);
       return;
     }
     final destination = await getSaveLocation(
-      suggestedName: 'space-recovery.$extension',
+      suggestedName: '${spaces ? 'space-spaces' : 'space-recovery'}.$extension',
       acceptedTypeGroups: [
         XTypeGroup(
           label: context.strings.recoveryFileLabel,
@@ -203,7 +243,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     await XFile.fromData(
       content,
       mimeType: json ? 'application/json' : 'image/png',
-      name: 'space-recovery.$extension',
+      name: '${spaces ? 'space-spaces' : 'space-recovery'}.$extension',
     ).saveTo(destination.path);
     if (mounted) {
       setState(() => messageKey = 'recoveryCardSaved');
@@ -214,10 +254,11 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     Uint8List content,
     String extension,
     bool json,
+    bool spaces,
   ) async {
     final selected = await pickRecoveryQrDestination(
       context,
-      name: 'space-recovery.$extension',
+      name: '${spaces ? 'space-spaces' : 'space-recovery'}.$extension',
       label: json ? 'JSON' : null,
     );
     if (selected == null || !mounted) return;
@@ -260,10 +301,47 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     final pass = await password(false);
     if (pass == null) return;
     stage(2);
-    final record = await compute(restoreRecordInWorker, [
+    final records = await compute(restoreAccessInWorker, [
       packet,
       pass,
     ]).timeout(const Duration(seconds: 60));
+    if (records.length == 1) {
+      if (await _restoreRecord(records.single)) {
+        await refresh();
+        if (mounted) setState(() => messageKey = 'recoveryRestored');
+      }
+      return;
+    }
+    await _restoreSpaces(records);
+  }
+
+  Future<void> _restoreSpaces(List<DeviceRecord> records) async {
+    if (widget.restoreController == null || widget.onRestored == null) {
+      throw const FormatException(
+        'Восстановите набор пространств на экране «Устройство»',
+      );
+    }
+    var restored = 0;
+    final failed = <String>[];
+    for (final record in records) {
+      if (!mounted) return;
+      try {
+        if (!await _restoreRecord(record)) break;
+        restored++;
+      } catch (_) {
+        failed.add(record.origin);
+      }
+    }
+    if (!mounted) return;
+    setState(() {
+      messageKey = null;
+      message = context.strings.recoverySpacesResult(restored, records.length);
+      if (failed.isNotEmpty) message += '\n${failed.join('\n')}';
+    });
+    await refresh();
+  }
+
+  Future<bool> _restoreRecord(DeviceRecord record) async {
     stage(3);
     final preview = widget.controller.preview;
     final endpoint = preview != null && preview.serverId == record.serverId
@@ -283,7 +361,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
             existing == null ? '' : strings.recoveryReplaceWarning,
           ),
         )) {
-      return;
+      return false;
     }
     final target =
         widget.restoreController?.call(record.origin) ?? widget.controller;
@@ -291,6 +369,8 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       setState(() {
         qrBytes = null;
         cardPacket = null;
+        spacesPacket = null;
+        spacesQrBytes = null;
       });
     }
     stage(4);
@@ -305,10 +385,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       throw RecoveryOperationError('recoveryConnectionDenied');
     }
     await widget.onRestored?.call(record.origin, target);
-    await refresh();
-    if (mounted) {
-      setState(() => messageKey = 'recoveryRestored');
-    }
+    return true;
   }
 
   Future<void> refresh() async {
@@ -321,6 +398,8 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       setState(() {
         qrBytes = null;
         cardPacket = null;
+        spacesPacket = null;
+        spacesQrBytes = null;
       });
     }
     final manager = widget.controller.deviceManagement;
@@ -354,6 +433,8 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       setState(() {
         qrBytes = null;
         cardPacket = null;
+        spacesPacket = null;
+        spacesQrBytes = null;
       });
     }
     final server = widget.controller.preview, vault = widget.controller.vault;
@@ -500,6 +581,23 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
 
   @override
   Widget build(BuildContext context) => RecoveryToolsView(
+    recoveryOptions: widget.spaceOrigins == null
+        ? null
+        : CheckboxListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(context.strings.recoveryIncludeSpaces),
+            subtitle: Text(context.strings.recoveryIncludeSpacesHint),
+            value: includeSpaces,
+            onChanged: pending
+                ? null
+                : (value) => setState(() {
+                    includeSpaces = value ?? true;
+                    qrBytes = null;
+                    cardPacket = null;
+                    spacesPacket = null;
+                    spacesQrBytes = null;
+                  }),
+          ),
     onExportJson: cardPacket == null
         ? null
         : () => run(() => export(json: true)),
@@ -507,16 +605,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
         localRoot ||
         widget.controller.deviceManagement?.hasRootAuthority == true,
     onCreateQr: () => run(generateQr),
-    qrPreview: qrBytes == null
-        ? null
-        : Center(
-            child: Image.memory(
-              qrBytes!,
-              width: 240,
-              height: 240,
-              filterQuality: FilterQuality.none,
-            ),
-          ),
+    qrPreview: qrBytes == null ? null : _qrPreviews(),
     progress: switch (restoreStage) {
       1 => context.strings.recoveryReadingFile,
       2 => context.strings.recoveryDecryptingCard,
@@ -566,30 +655,56 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     onRefreshDevices: () => run(refresh),
     onRevoke: (id) => run(() => revoke(devices.firstWhere((g) => g.id == id))),
   );
+
+  Widget _qrPreviews() => Column(
+    children: [
+      Text(context.strings.recoveryAccessQr),
+      Image.memory(
+        qrBytes!,
+        width: 240,
+        height: 240,
+        filterQuality: FilterQuality.none,
+      ),
+      if (spacesPacket != null) ...[
+        const SizedBox(height: 24),
+        Text(context.strings.recoverySpacesQr),
+        if (spacesQrBytes != null)
+          Image.memory(
+            spacesQrBytes!,
+            width: 240,
+            height: 240,
+            filterQuality: FilterQuality.none,
+          )
+        else
+          Text(context.strings.recoverySpacesUseFile),
+        Wrap(
+          spacing: 12,
+          children: [
+            if (spacesQrBytes != null)
+              OutlinedButton(
+                onPressed: pending
+                    ? null
+                    : () => run(() => export(spaces: true)),
+                child: Text(context.strings.recoverySaveSpacesQr),
+              ),
+            TextButton(
+              onPressed: pending
+                  ? null
+                  : () => run(() => export(spaces: true, json: true)),
+              child: Text(context.strings.recoverySaveSpacesFile),
+            ),
+          ],
+        ),
+      ],
+    ],
+  );
 }
 
 Future<DeviceRecord> restoreRecordInWorker(List<String> input) async =>
     recordFromRecovery(await openCardInWorker(input));
 
-Future<Map<String, dynamic>> rootCardPayloadInWorker(
-  DeviceRecord record,
-) async {
-  await record.identity();
-  final pair = await Ed25519().newKeyPairFromSeed(record.rootSeed);
-  return {
-    'v': record.rootHistory.isEmpty ? 1 : 2,
-    'origin': record.origin,
-    'endpoint': record.connectionAddress,
-    'server_id': record.serverId,
-    'server_key': record.serverKey,
-    if (record.tlsFingerprint.isNotEmpty)
-      'tls_fingerprint': record.tlsFingerprint,
-    'root_public_key': url64((await pair.extractPublicKey()).bytes),
-    'credential': 'root',
-    'secret': url64(record.rootSeed),
-    if (record.rootHistory.isNotEmpty) 'root_history': record.rootHistory,
-  };
-}
+Future<Map<String, dynamic>> rootCardPayloadInWorker(DeviceRecord record) =>
+    recoveryAccessPayload(record);
 
 class RecoveryOperationError implements Exception {
   const RecoveryOperationError(this.key);

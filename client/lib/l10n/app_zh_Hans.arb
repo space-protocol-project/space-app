@@ -296,5 +296,29 @@
   "voicePushToTalk": "按键说话",
   "voicePushToTalkHint": "先在房间中开启麦克风，再按住 F8 说话。仅在窗口获得焦点时有效。麦克风测试连续播放。",
   "voiceAutomaticSensitivity": "自动输入灵敏度",
-  "voiceSensitivity": "输入阈值"
+  "voiceSensitivity": "输入阈值",
+  "recoveryIncludeSpaces": "包含空间",
+  "recoveryIncludeSpacesHint": "创建第二个二维码，包含已保存的空间及其恢复密钥，不包含 MLS 密钥和历史记录。",
+  "recoveryAccessQr": "所选身份访问恢复",
+  "recoverySpacesQr": "空间与访问",
+  "recoverySpacesUseFile": "内容过大，无法放入一个二维码，请保存加密文件。",
+  "recoverySaveSpacesQr": "保存空间二维码",
+  "recoverySaveSpacesFile": "将空间保存到文件",
+  "recoverySpacesResult": "已恢复 {restored} 个空间，共 {total} 个。请重新导入其余空间。",
+  "@recoverySpacesResult": {
+    "placeholders": {
+      "restored": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "migrationTitle": "完整迁移空间",
+  "migrationExportHelp": "归档包含服务器、设备密钥、当前 MLS 状态和加密频道本地历史。保存后，此客户端将停止使用该空间。请将归档保存在其他磁盘并记住密码。如果操作中断，请检查 .pending 文件，其中可能包含完整迁移。 验证归档后，系统存储中旧设备的工作密钥将被迁移标记替换。",
+  "migrationImportHelp": "恢复后将继续使用原设备身份。此归档只能用于一台新设备。旧服务器必须停止。现有密钥不会被替换。",
+  "migrationPassword": "归档密码（至少 12 个字符）",
+  "migrationPasswordRepeat": "再次输入密码",
+  "migrationExported": "迁移已保存，旧设备已停止。重装系统前请保管归档和密码。"
 }

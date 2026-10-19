@@ -2136,4 +2136,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voiceSensitivity => 'Input threshold';
+
+  @override
+  String get recoveryIncludeSpaces => 'Include spaces';
+
+  @override
+  String get recoveryIncludeSpacesHint =>
+      'Create a second QR with saved spaces and their recovery keys. MLS keys and history are not included.';
+
+  @override
+  String get recoveryAccessQr => 'Selected access recovery';
+
+  @override
+  String get recoverySpacesQr => 'Spaces and access';
+
+  @override
+  String get recoverySpacesUseFile =>
+      'This set is too large for one QR. Save the encrypted file.';
+
+  @override
+  String get recoverySaveSpacesQr => 'Save spaces QR';
+
+  @override
+  String get recoverySaveSpacesFile => 'Save spaces to file';
+
+  @override
+  String recoverySpacesResult(int restored, int total) {
+    return 'Spaces restored: $restored of $total. Retry import for the remaining spaces.';
+  }
+
+  @override
+  String get migrationTitle => 'Full space migration';
+
+  @override
+  String get migrationExportHelp =>
+      'The archive contains the server, device keys, working MLS state and local encrypted-channel history. After saving, this client will stop using this space. Keep the archive on another drive and remember the password. If interrupted, check the .pending file: it may contain the completed migration. After verification, the previous device working keys in system storage will be replaced with a migration marker.';
+
+  @override
+  String get migrationImportHelp =>
+      'Restoring continues the previous device. Use the archive on only one new device. The old server must be stopped. Existing keys are never replaced.';
+
+  @override
+  String get migrationPassword => 'Archive password (at least 12 characters)';
+
+  @override
+  String get migrationPasswordRepeat => 'Repeat password';
+
+  @override
+  String get migrationExported =>
+      'Migration saved. The previous device is stopped. Preserve the archive and password before reinstalling the OS.';
 }

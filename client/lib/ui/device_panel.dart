@@ -70,6 +70,7 @@ class _DevicePanelState extends State<DevicePanel> {
                 key: ObjectKey(controller),
                 controller: controller,
                 identityOrigin: origin,
+                spaceOrigins: entries.keys.toList(),
                 restoreController: widget.restoreController,
                 onRestored: (origin, target) async {
                   await widget.onRestored(origin, target);

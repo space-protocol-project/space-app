@@ -2149,4 +2149,53 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get voiceSensitivity => 'Порог срабатывания';
+
+  @override
+  String get recoveryIncludeSpaces => 'И пространства';
+
+  @override
+  String get recoveryIncludeSpacesHint =>
+      'Создать второй QR со списком пространств и их ключами доступа. Ключи MLS и история не входят.';
+
+  @override
+  String get recoveryAccessQr => 'Восстановление выбранного доступа';
+
+  @override
+  String get recoverySpacesQr => 'Пространства и доступ';
+
+  @override
+  String get recoverySpacesUseFile =>
+      'Набор не помещается в один QR. Сохраните зашифрованный файл.';
+
+  @override
+  String get recoverySaveSpacesQr => 'Сохранить QR пространств';
+
+  @override
+  String get recoverySaveSpacesFile => 'Сохранить пространства в файл';
+
+  @override
+  String recoverySpacesResult(int restored, int total) {
+    return 'Восстановлено пространств: $restored из $total. Для остальных повторите импорт.';
+  }
+
+  @override
+  String get migrationTitle => 'Полный перенос пространства';
+
+  @override
+  String get migrationExportHelp =>
+      'Архив содержит сервер, ключи устройства, рабочее состояние MLS и локальную историю закрытых каналов. После сохранения прежний клиент прекратит работу с этим пространством. Сохраните архив вне этого диска и запомните пароль. При сбое проверьте файл .pending: он может содержать готовый перенос. После проверки архива рабочие ключи прежнего устройства будут заменены отметкой переноса в системном хранилище.';
+
+  @override
+  String get migrationImportHelp =>
+      'Восстановление продолжает работу прежнего устройства. Используйте архив только на одном новом устройстве. Старый сервер должен быть остановлен. Существующие ключи не заменяются.';
+
+  @override
+  String get migrationPassword => 'Пароль архива (от 12 символов)';
+
+  @override
+  String get migrationPasswordRepeat => 'Повторите пароль';
+
+  @override
+  String get migrationExported =>
+      'Перенос сохранён. Прежнее устройство остановлено. Сохраните архив и пароль перед переустановкой ОС.';
 }

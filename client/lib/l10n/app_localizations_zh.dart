@@ -1969,6 +1969,53 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get voiceSensitivity => '输入阈值';
+
+  @override
+  String get recoveryIncludeSpaces => '包含空间';
+
+  @override
+  String get recoveryIncludeSpacesHint =>
+      '创建第二个二维码，包含已保存的空间及其恢复密钥，不包含 MLS 密钥和历史记录。';
+
+  @override
+  String get recoveryAccessQr => '所选身份访问恢复';
+
+  @override
+  String get recoverySpacesQr => '空间与访问';
+
+  @override
+  String get recoverySpacesUseFile => '内容过大，无法放入一个二维码，请保存加密文件。';
+
+  @override
+  String get recoverySaveSpacesQr => '保存空间二维码';
+
+  @override
+  String get recoverySaveSpacesFile => '将空间保存到文件';
+
+  @override
+  String recoverySpacesResult(int restored, int total) {
+    return '已恢复 $restored 个空间，共 $total 个。请重新导入其余空间。';
+  }
+
+  @override
+  String get migrationTitle => '完整迁移空间';
+
+  @override
+  String get migrationExportHelp =>
+      '归档包含服务器、设备密钥、当前 MLS 状态和加密频道本地历史。保存后，此客户端将停止使用该空间。请将归档保存在其他磁盘并记住密码。如果操作中断，请检查 .pending 文件，其中可能包含完整迁移。 验证归档后，系统存储中旧设备的工作密钥将被迁移标记替换。';
+
+  @override
+  String get migrationImportHelp =>
+      '恢复后将继续使用原设备身份。此归档只能用于一台新设备。旧服务器必须停止。现有密钥不会被替换。';
+
+  @override
+  String get migrationPassword => '归档密码（至少 12 个字符）';
+
+  @override
+  String get migrationPasswordRepeat => '再次输入密码';
+
+  @override
+  String get migrationExported => '迁移已保存，旧设备已停止。重装系统前请保管归档和密码。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2776,4 +2823,51 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get voiceSensitivity => '输入阈值';
+
+  @override
+  String get recoveryIncludeSpaces => '包含空间';
+
+  @override
+  String get recoveryIncludeSpacesHint =>
+      '创建第二个二维码，包含已保存的空间及其恢复密钥，不包含 MLS 密钥和历史记录。';
+
+  @override
+  String get recoveryAccessQr => '所选身份访问恢复';
+
+  @override
+  String get recoverySpacesQr => '空间与访问';
+
+  @override
+  String get recoverySpacesUseFile => '内容过大，无法放入一个二维码，请保存加密文件。';
+
+  @override
+  String get recoverySaveSpacesQr => '保存空间二维码';
+
+  @override
+  String get recoverySaveSpacesFile => '将空间保存到文件';
+
+  @override
+  String recoverySpacesResult(int restored, int total) {
+    return '已恢复 $restored 个空间，共 $total 个。请重新导入其余空间。';
+  }
+
+  @override
+  String get migrationTitle => '完整迁移空间';
+
+  @override
+  String get migrationExportHelp =>
+      '归档包含服务器、设备密钥、当前 MLS 状态和加密频道本地历史。保存后，此客户端将停止使用该空间。请将归档保存在其他磁盘并记住密码。如果操作中断，请检查 .pending 文件，其中可能包含完整迁移。 验证归档后，系统存储中旧设备的工作密钥将被迁移标记替换。';
+
+  @override
+  String get migrationImportHelp =>
+      '恢复后将继续使用原设备身份。此归档只能用于一台新设备。旧服务器必须停止。现有密钥不会被替换。';
+
+  @override
+  String get migrationPassword => '归档密码（至少 12 个字符）';
+
+  @override
+  String get migrationPasswordRepeat => '再次输入密码';
+
+  @override
+  String get migrationExported => '迁移已保存，旧设备已停止。重装系统前请保管归档和密码。';
 }

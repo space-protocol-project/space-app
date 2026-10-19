@@ -16,6 +16,9 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../src/home_controller.dart';
+import '../src/home_migration.dart';
+import '../src/migration_archive.dart';
+import 'migration_password_dialog.dart';
 import '../src/local_failure.dart';
 import 'components.dart';
 import 'space_link_qr.dart';
@@ -29,11 +32,17 @@ class HomePanel extends StatefulWidget {
     required this.onStart,
     required this.onStop,
     required this.openAdministration,
+    this.migration,
+    this.onMigrationStop,
+    this.onMigrated,
   });
   final HomeController home;
   final Future<void> Function(String) onStart;
   final Future<void> Function() onStop;
   final VoidCallback openAdministration;
+  final HomeMigration? migration;
+  final Future<void> Function()? onMigrationStop;
+  final Future<void> Function(String)? onMigrated;
   @override
   State<HomePanel> createState() => _HomePanelState();
 }
@@ -136,10 +145,16 @@ class _HomePanelState extends State<HomePanel> {
       final path = importing ? await _importPath() : await _exportPath();
       if (path == null || !mounted) return;
       await _transferArchive(path, publicIP, importing);
-    } catch (_) {
+    } catch (problem) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.strings.homeTransferFailed)),
+          SnackBar(
+            content: Text(
+              problem is StateError
+                  ? '${context.strings.homeTransferFailed}\n${problem.message}'
+                  : context.strings.homeTransferFailed,
+            ),
+          ),
         );
       }
     } finally {
@@ -148,6 +163,19 @@ class _HomePanelState extends State<HomePanel> {
   }
 
   Future<void> _transferArchive(
+    String path,
+    String publicIP,
+    bool importing,
+  ) async {
+    if (widget.migration != null &&
+        (!importing || await MigrationArchive.recognizes(path))) {
+      await _transferFull(path, publicIP, importing);
+      return;
+    }
+    await _transferLegacy(path, publicIP, importing);
+  }
+
+  Future<void> _transferLegacy(
     String path,
     String publicIP,
     bool importing,
@@ -175,6 +203,46 @@ class _HomePanelState extends State<HomePanel> {
             importing
                 ? context.strings.homeImported
                 : context.strings.homeExported,
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _transferFull(
+    String path,
+    String publicIP,
+    bool importing,
+  ) async {
+    final password = await migrationPassword(context, importing: importing);
+    if (password == null || !mounted) return;
+    final migration = widget.migration!;
+    if (importing) {
+      final restored = await migration.import(
+        home: widget.home,
+        path: path,
+        password: password,
+        publicIP: publicIP,
+        confirm: (report) async =>
+            mounted && await confirmHomeArchive(context, report),
+        remember: (origin) async => widget.onMigrated?.call(origin),
+      );
+      if (!restored) return;
+    } else {
+      await migration.export(
+        home: widget.home,
+        path: path,
+        password: password,
+        stop: widget.onMigrationStop ?? widget.onStop,
+      );
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            importing
+                ? context.strings.homeImported
+                : context.strings.migrationExported,
           ),
         ),
       );
@@ -216,7 +284,13 @@ class _HomePanelState extends State<HomePanel> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(context.strings.homeTransferHelp),
+                Text(
+                  widget.migration == null
+                      ? context.strings.homeTransferHelp
+                      : (importing
+                            ? context.strings.migrationImportHelp
+                            : context.strings.migrationExportHelp),
+                ),
                 if (importing)
                   TextField(
                     onChanged: (value) => ip = value.trim(),
@@ -248,13 +322,17 @@ class _HomePanelState extends State<HomePanel> {
 
   Future<String?> _importPath() async => (await openFile(
     acceptedTypeGroups: const [
-      XTypeGroup(label: 'Space', extensions: ['zip']),
+      XTypeGroup(label: 'Space', extensions: ['spacebackup', 'pending', 'zip']),
     ],
   ))?.path;
   Future<String?> _exportPath() async => (await getSaveLocation(
-    suggestedName: 'space-export-${DateTime.now().millisecondsSinceEpoch}.zip',
-    acceptedTypeGroups: const [
-      XTypeGroup(label: 'Space', extensions: ['zip']),
+    suggestedName:
+        'space-export-${DateTime.now().millisecondsSinceEpoch}.${widget.migration == null ? 'zip' : 'spacebackup'}',
+    acceptedTypeGroups: [
+      XTypeGroup(
+        label: 'Space',
+        extensions: [widget.migration == null ? 'zip' : 'spacebackup'],
+      ),
     ],
   ))?.path;
 
@@ -274,7 +352,10 @@ class _HomePanelState extends State<HomePanel> {
         ),
         OutlinedButton.icon(
           key: const ValueKey('home-import'),
-          onPressed: view.busy || transferAction || view.ip.isNotEmpty
+          onPressed:
+              view.busy ||
+                  transferAction ||
+                  (view.ip.isNotEmpty && widget.migration == null)
               ? null
               : () => transferServer(importing: true),
           icon: const Icon(Icons.file_download_outlined),
@@ -315,82 +396,90 @@ class _HomePanelState extends State<HomePanel> {
   }
 
   @override
-  Widget build(BuildContext context) => BlocConsumer<HomeController, HomeState>(
-    listenWhen: (before, after) => before.ip != after.ip,
-    listener: (_, view) {
-      if (view.ip.isNotEmpty) address.text = view.ip;
-    },
-    bloc: widget.home,
-    builder: (context, view) {
-      final home = widget.home;
-      return SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.sensors),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        context.strings.homeTitle,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ),
-                    IconButton(
-                      tooltip: context.strings.close,
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
-                    ),
+  Widget build(BuildContext context) => PopScope(
+    canPop: !transferAction,
+    child: BlocConsumer<HomeController, HomeState>(
+      listenWhen: (before, after) => before.ip != after.ip,
+      listener: (_, view) {
+        if (view.ip.isNotEmpty) address.text = view.ip;
+      },
+      bloc: widget.home,
+      builder: (context, view) {
+        final home = widget.home;
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 720),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _header(context),
+                  const SizedBox(height: 16),
+                  Text(
+                    view.ip.isEmpty
+                        ? context.strings.homeFirstSetup
+                        : context.strings.homeReuse,
+                  ),
+                  const SizedBox(height: 20),
+                  HomeNetworkEditor(
+                    key: networkEditor,
+                    home: home,
+                    address: address,
+                    onDetect: detect,
+                    enabled: _canEditNetwork(view),
+                  ),
+                  if (detectionFailed) Text(context.strings.homeIPFailed),
+                  const SizedBox(height: 28),
+                  if (view.busy && view.error.isEmpty) ...[
+                    HomeOperationProgress(home: home),
+                    const SizedBox(height: 16),
                   ],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  view.ip.isEmpty
-                      ? context.strings.homeFirstSetup
-                      : context.strings.homeReuse,
-                ),
-                const SizedBox(height: 20),
-                HomeNetworkEditor(
-                  key: networkEditor,
-                  home: home,
-                  address: address,
-                  onDetect: detect,
-                  enabled: !view.running && !view.busy && !detecting,
-                ),
-                if (detectionFailed) Text(context.strings.homeIPFailed),
-                const SizedBox(height: 28),
-                if (view.busy && view.error.isEmpty) ...[
-                  HomeOperationProgress(home: home),
-                  const SizedBox(height: 16),
+                  if (!view.busy && view.phase != HomePhase.idle) ...[
+                    Text(view.phase.label(context)),
+                    const SizedBox(height: 16),
+                  ],
+                  ..._failureDetails(context, view),
+                  _powerControl(context, view),
+                  ..._transferControls(view),
+                  ..._updateControls(context, view),
+                  HomeDiskPanel(home: home, view: view),
+                  HomeBackupPanel(home: home, view: view),
+                  ..._connectionDetails(context, view),
+                  if (view.ip.isNotEmpty) ...[
+                    const SizedBox(height: 24),
+                    HomeDiagnosticsPanel(home: home, view: view),
+                  ],
                 ],
-                if (!view.busy && view.phase != HomePhase.idle) ...[
-                  Text(view.phase.label(context)),
-                  const SizedBox(height: 16),
-                ],
-                ..._failureDetails(context, view),
-                _powerControl(context, view),
-                ..._transferControls(view),
-                ..._updateControls(context, view),
-                HomeDiskPanel(home: home, view: view),
-                HomeBackupPanel(home: home, view: view),
-                ..._connectionDetails(context, view),
-                if (view.ip.isNotEmpty) ...[
-                  const SizedBox(height: 24),
-                  HomeDiagnosticsPanel(home: home, view: view),
-                ],
-              ],
+              ),
             ),
           ),
+        );
+      },
+    ),
+  );
+
+  bool _canEditNetwork(HomeState view) =>
+      !view.running && !view.busy && !detecting && !transferAction;
+
+  Widget _header(BuildContext context) => Row(
+    children: [
+      const Icon(Icons.sensors),
+      const SizedBox(width: 12),
+      Expanded(
+        child: Text(
+          context.strings.homeTitle,
+          style: Theme.of(context).textTheme.titleLarge,
         ),
-      );
-    },
+      ),
+      IconButton(
+        tooltip: context.strings.close,
+        onPressed: transferAction ? null : () => Navigator.pop(context),
+        icon: const Icon(Icons.close),
+      ),
+    ],
   );
 
   List<Widget> _failureDetails(BuildContext context, HomeState view) => [
@@ -487,7 +576,7 @@ class _HomePanelState extends State<HomePanel> {
             label: Text(context.strings.copyLink),
           ),
           FilledButton.icon(
-            onPressed: widget.openAdministration,
+            onPressed: transferAction ? null : widget.openAdministration,
             icon: const Icon(Icons.tune),
             label: Text(context.strings.manageServer),
           ),

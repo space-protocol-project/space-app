@@ -776,6 +776,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     _diagnostic = '';
     _update();
     try {
+      await _requireNotTransferred();
       final root = await _directory();
       _lock = await File('${root.path}/process.lock')
           .open(mode: FileMode.append);
@@ -861,6 +862,17 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
       busy = false;
       _endProgress();
       _update();
+    }
+  }
+
+  Future<void> _requireNotTransferred() async {
+    final marker = File(
+      '${(await directory()).path}/device-migration-exported.json',
+    );
+    if (await marker.exists()) {
+      throw StateError(
+        'Пространство перенесено. Восстановите сохранённый архив на новом компьютере.',
+      );
     }
   }
 

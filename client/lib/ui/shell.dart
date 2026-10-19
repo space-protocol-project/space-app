@@ -35,6 +35,8 @@ import '../src/preferences.dart';
 import '../src/app_updates.dart';
 import '../src/secure_vault.dart';
 import '../src/home_controller.dart';
+import '../src/home_migration.dart';
+import '../src/mls/platform_flutter.dart' as mls_platform;
 import '../src/server_presence.dart';
 import '../src/server_workspaces.dart';
 import 'dashboard.dart';
@@ -629,6 +631,13 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             home: home,
             onStart: startHome,
             onStop: stopHome,
+            migration: HomeMigration(
+              vault: SecureIdentityVault(),
+              storage: const PlatformKeyStorage(),
+              locks: mls_platform.lockDirectory,
+            ),
+            onMigrationStop: _stopForMigration,
+            onMigrated: widget.preferences.remember,
             openAdministration: () {
               final owner = workspaces[home.server?.publicOrigin ?? ''];
               if (owner != null) {
@@ -656,6 +665,19 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
         ),
       ),
     );
+  }
+
+  Future<void> _stopForMigration() async {
+    final origin = home.network?.identityOrigin;
+    final targets = {
+      initialController,
+      ...workspaces.controllers.values,
+      ...transientControllers,
+    };
+    for (final target in targets) {
+      if (target.knownOrigin == origin) await target.disconnect();
+    }
+    await stopHome();
   }
 
   Future<void> createOwnSpace() async {

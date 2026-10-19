@@ -31,6 +31,7 @@ class RecoveryToolsView extends StatelessWidget {
     this.canCreateQr = false,
     this.onCreateQr,
     this.qrPreview,
+    this.recoveryOptions,
     this.onExportJson,
     required this.message,
     required this.pairingCode,
@@ -63,6 +64,7 @@ class RecoveryToolsView extends StatelessWidget {
   final bool canCreateQr;
   final VoidCallback? onCreateQr;
   final Widget? qrPreview;
+  final Widget? recoveryOptions;
   final VoidCallback? onExportJson;
   final TextEditingController pairingCode, pairingEntered;
   final List<RecoveryDeviceView> devices;
@@ -197,6 +199,7 @@ class RecoveryToolsView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(strings.recoveryHelp),
+            if (recoveryOptions != null) recoveryOptions!,
             if (qrPreview != null) ...[const SizedBox(height: 16), qrPreview!],
             if (pending && progress.isNotEmpty) ...[
               const SizedBox(height: 12),
@@ -237,7 +240,8 @@ class RecoveryToolsView extends StatelessWidget {
               ],
             ),
             Text(strings.recoveryDevicesHelp),
-            for (final grant in devices) ..._recoveryDevice(context, strings, grant),
+            for (final grant in devices)
+              ..._recoveryDevice(context, strings, grant),
           ],
         ),
       );
