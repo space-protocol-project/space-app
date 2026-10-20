@@ -9,6 +9,7 @@ import 'voice_audio_native.dart';
 import 'voice_audio_settings.dart';
 import 'voice_transmission.dart';
 import 'voice_denoiser.dart';
+import 'voice_activity.dart';
 
 enum VoiceMediaStatus { connecting, connected, failed, processingFailed }
 
@@ -28,10 +29,16 @@ abstract interface class VoiceAudioMedia {
 }
 
 class NativeVoiceMedia
-    implements VoiceMedia, VoiceAudioMedia, VoiceConnectionMedia {
+    implements
+        VoiceMedia,
+        VoiceAudioMedia,
+        VoiceConnectionMedia,
+        VoiceActivityMedia {
   NativeVoiceMedia({this.playbackVolume = 1.0});
   final double playbackVolume;
   bool _transmitting = false;
+  double _inputLevel = 0;
+  final _audioLevels = VoiceAudioLevels();
   int _transmissionRevision = 0;
   // Подтверждённое нативным обработчиком состояние, без записи звука.
   bool get transmitting => _transmitting;
@@ -44,7 +51,8 @@ class NativeVoiceMedia
 
   Future<double> _level() async {
     try {
-      return await VoiceAudioNative.level();
+      _inputLevel = await VoiceAudioNative.level();
+      return _inputLevel;
     } catch (_) {
       if (!_closed) _changes.add(VoiceMediaStatus.processingFailed);
       rethrow;
@@ -260,6 +268,7 @@ class NativeVoiceMedia
 
   Future<void> _stopMicrophone() async {
     _transmission.stop();
+    _inputLevel = 0;
     final stream = _microphone;
     _microphone = null;
     final denoiser = _denoiser;
@@ -309,6 +318,17 @@ class NativeVoiceMedia
       }
     }
   }
+
+  @override
+  Future<VoiceAudioActivity> activity() async => VoiceAudioActivity(
+    local:
+        !_closed &&
+        !_deafened &&
+        _microphone != null &&
+        _transmitting &&
+        _inputLevel > .008,
+    remoteSlots: _audioLevels.read(await statistics()),
+  );
 
   Future<List<StatsReport>> statistics() async => await _peer?.getStats() ?? [];
 

@@ -211,7 +211,11 @@ void main() {
       messenger.setMockMethodCallHandler(events, null);
     });
     final probe = NativeVoiceMicrophoneProbe();
-    final opening = probe.open('mic', const VoiceAudioSettings());
+    // Здесь проверяется поздний поток; загрузка модели проверяется отдельно.
+    final opening = probe.open(
+      'mic',
+      const VoiceAudioSettings(noiseMode: VoiceNoiseSuppression.disabled),
+    );
     await waitFor(() => calls.contains('getUserMedia'));
     await probe.close();
     pending.complete({

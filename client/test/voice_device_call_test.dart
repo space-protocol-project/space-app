@@ -40,6 +40,25 @@ void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
   test(
+    'Смена аудиоустройства останавливает передачу и не включает её сама',
+    () async {
+      final call = DeviceCall();
+      addTearDown(call.close);
+      await call.join();
+      await call.controller.toggleMicrophone();
+      expect(call.controller.state.muted, false);
+      await call.controller.devices.select(call.backend.microphone);
+      expect(call.controller.state.muted, true);
+      expect(
+        call.log.lastIndexOf('microphone:false'),
+        greaterThan(call.log.lastIndexOf('microphone:true')),
+      );
+      await call.controller.devices.refresh();
+      expect(call.controller.state.muted, true);
+    },
+  );
+
+  test(
     'Microphone test deafens the room and never enables publishing or sound',
     () async {
       final probe = FakeMicrophoneProbe();

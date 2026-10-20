@@ -24,9 +24,9 @@ class VoiceShortcutSettings extends StatefulWidget {
 class _VoiceShortcutSettingsState extends State<VoiceShortcutSettings> {
   VoiceDevices get devices => widget.devices;
   @override
-  void initState() {
-    super.initState();
-    unawaited(devices.refresh());
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (TickerMode.valuesOf(context).enabled) unawaited(devices.refresh());
   }
 
   Future<void> _change(BuildContext context) async {

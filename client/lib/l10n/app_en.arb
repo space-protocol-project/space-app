@@ -849,5 +849,8 @@
         "type": "int"
       }
     }
-  }
+  },
+  "voiceRoomEmpty": "No one is in this room yet",
+  "voiceMicrophoneEnabled": "Microphone enabled",
+  "voiceActivityUpdateRuntime": "Update this space’s runtime to highlight speaking participants."
 }

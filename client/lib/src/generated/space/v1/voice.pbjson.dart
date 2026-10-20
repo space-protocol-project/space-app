@@ -25,6 +25,18 @@ const VoiceParticipant$json = {
     {'1': 'nickname', '3': 4, '4': 1, '5': 9, '10': 'nickname'},
     {'1': 'muted', '3': 5, '4': 1, '5': 8, '10': 'muted'},
     {'1': 'deafened', '3': 6, '4': 1, '5': 8, '10': 'deafened'},
+    {
+      '1': 'audio_slot',
+      '3': 7,
+      '4': 1,
+      '5': 13,
+      '9': 0,
+      '10': 'audioSlot',
+      '17': true
+    },
+  ],
+  '8': [
+    {'1': '_audio_slot'},
   ],
 };
 
@@ -33,7 +45,8 @@ final $typed_data.Uint8List voiceParticipantDescriptor = $convert.base64Decode(
     'ChBWb2ljZVBhcnRpY2lwYW50Eh0KCnNlc3Npb25faWQYASABKAlSCXNlc3Npb25JZBIhCgxwcm'
     'luY2lwYWxfaWQYAiABKAlSC3ByaW5jaXBhbElkEhsKCWRldmljZV9pZBgDIAEoCVIIZGV2aWNl'
     'SWQSGgoIbmlja25hbWUYBCABKAlSCG5pY2tuYW1lEhQKBW11dGVkGAUgASgIUgVtdXRlZBIaCg'
-    'hkZWFmZW5lZBgGIAEoCFIIZGVhZmVuZWQ=');
+    'hkZWFmZW5lZBgGIAEoCFIIZGVhZmVuZWQSIgoKYXVkaW9fc2xvdBgHIAEoDUgAUglhdWRpb1Ns'
+    'b3SIAQFCDQoLX2F1ZGlvX3Nsb3Q=');
 
 @$core.Deprecated('Use voiceRoomStateDescriptor instead')
 const VoiceRoomState$json = {

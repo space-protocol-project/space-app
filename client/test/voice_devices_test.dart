@@ -41,6 +41,35 @@ class FailingDevicePreferences extends SavedVoiceDevicePreferences {
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
+  test('Смена идентификатора восстанавливает только единственное устройство с прежним именем', () async {
+    await SavedVoiceDevicePreferences().save(
+      const VoiceDeviceChoice(input: 'old', inputLabel: 'Microphone'),
+    );
+    final backend = DevicesBackend();
+    final devices = VoiceDevices(backend: backend);
+    await devices.refresh();
+    expect(devices.state.input, 'mic');
+    expect((await SavedVoiceDevicePreferences().load()).input, 'mic');
+    expect(backend.selected.single.id, 'mic');
+    await devices.close();
+  });
+
+  test('Одинаковые имена не приводят к выбору чужого микрофона', () async {
+    await SavedVoiceDevicePreferences().save(
+      const VoiceDeviceChoice(input: 'old', inputLabel: 'Microphone'),
+    );
+    final backend = DevicesBackend()
+      ..available = [
+        const VoiceDevice('new-1', 'Microphone', input: true),
+        const VoiceDevice('new-2', 'Microphone', input: true),
+      ];
+    final devices = VoiceDevices(backend: backend);
+    await devices.refresh();
+    expect(devices.state.inputUnavailable, true);
+    expect(backend.selected, isEmpty);
+    await devices.close();
+  });
+
   test(
     'Save failure keeps active selection and warning until a successful save',
     () async {

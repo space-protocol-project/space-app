@@ -849,5 +849,8 @@
         "type": "int"
       }
     }
-  }
+  },
+  "voiceRoomEmpty": "房间里暂时没有人",
+  "voiceMicrophoneEnabled": "麦克风已开启",
+  "voiceActivityUpdateRuntime": "请更新空间运行时以突出显示正在说话的参与者。"
 }

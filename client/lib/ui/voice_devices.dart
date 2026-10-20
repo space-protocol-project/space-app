@@ -17,7 +17,7 @@ Future<void> showVoiceDevices(
   builder: (_) => VoiceDevicesDialog(devices: devices, microphoneTest: test),
 );
 
-class VoiceDevicesDialog extends StatefulWidget {
+class VoiceDevicesDialog extends StatelessWidget {
   const VoiceDevicesDialog({
     super.key,
     required this.devices,
@@ -25,87 +25,128 @@ class VoiceDevicesDialog extends StatefulWidget {
   });
   final VoiceDevices devices;
   final VoiceMicrophoneTest? microphoneTest;
-
-  @override
-  State<VoiceDevicesDialog> createState() => _VoiceDevicesDialogState();
-}
-
-class _VoiceDevicesDialogState extends State<VoiceDevicesDialog>
-    with WidgetsBindingObserver {
-  VoiceDevices get devices => widget.devices;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    unawaited(devices.refresh());
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state != AppLifecycleState.resumed) {
-      unawaited(widget.microphoneTest?.stop());
-    }
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    unawaited(widget.microphoneTest?.stop());
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) => AlertDialog(
     title: Text(context.strings.voiceSettingsTitle),
     content: SizedBox(
       width: 720,
-      child: BlocBuilder<VoiceDevices, VoiceDevicesState>(
-        bloc: devices,
-        builder: (context, state) => SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                context.strings.voiceDevicesDescription,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                height: 4,
-                child: state.busy ? const LinearProgressIndicator() : null,
-              ),
-              const SizedBox(height: 12),
-              _deviceGroups(state),
-              if (widget.microphoneTest != null)
-                VoiceMicrophoneTestControls(
-                  test: widget.microphoneTest!,
-                  devices: devices,
-                ),
-              VoiceProcessingControls(devices: devices, state: state),
-              const SizedBox(height: 24),
-              if (state.error.isNotEmpty) _notice(state.error, error: true),
-              if (state.inputUnavailable || state.outputUnavailable)
-                _notice(context.strings.voiceDeviceUnavailable, error: true),
-              _notice(context.strings.voiceDevicesRemembered),
-            ],
-          ),
+      child: SingleChildScrollView(
+        child: VoiceDevicesSettings(
+          devices: devices,
+          microphoneTest: microphoneTest,
         ),
       ),
     ),
     actions: [
-      TextButton.icon(
-        onPressed: () => unawaited(devices.refresh()),
-        icon: const Icon(Icons.refresh),
-        label: Text(context.strings.voiceRefreshDevices),
-      ),
       FilledButton(
         onPressed: () => Navigator.pop(context),
         child: Text(context.strings.voiceCloseDevices),
       ),
     ],
   );
+}
+
+class VoiceDevicesSettings extends StatefulWidget {
+  const VoiceDevicesSettings({
+    super.key,
+    required this.devices,
+    this.microphoneTest,
+  });
+  final VoiceDevices devices;
+  final VoiceMicrophoneTest? microphoneTest;
+  @override
+  State<VoiceDevicesSettings> createState() => _VoiceDevicesSettingsState();
+}
+
+class _VoiceDevicesSettingsState extends State<VoiceDevicesSettings>
+    with WidgetsBindingObserver {
+  VoiceDevices get devices => widget.devices;
+  Timer? _timer;
+  bool _resumed = true;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _monitor();
+  }
+
+  void _monitor() {
+    _timer?.cancel();
+    if (!_resumed || !TickerMode.valuesOf(context).enabled) {
+      unawaited(widget.microphoneTest?.stop());
+      return;
+    }
+    unawaited(devices.refresh());
+    if (devices.backend is NativeVoiceDeviceBackend) {
+      _timer = Timer.periodic(
+        const Duration(seconds: 5),
+        (_) => unawaited(devices.refresh()),
+      );
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _resumed = state == AppLifecycleState.resumed;
+    _monitor();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    unawaited(widget.microphoneTest?.stop());
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      BlocBuilder<VoiceDevices, VoiceDevicesState>(
+        bloc: devices,
+        builder: (context, state) => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              context.strings.voiceSettingsTitle,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              context.strings.voiceDevicesDescription,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 4,
+              child: state.busy ? const LinearProgressIndicator() : null,
+            ),
+            const SizedBox(height: 12),
+            _deviceGroups(state),
+            if (widget.microphoneTest != null)
+              VoiceMicrophoneTestControls(
+                test: widget.microphoneTest!,
+                devices: devices,
+              ),
+            VoiceProcessingControls(devices: devices, state: state),
+            const SizedBox(height: 24),
+            if (state.error.isNotEmpty) _notice(state.error, error: true),
+            if (state.inputUnavailable || state.outputUnavailable)
+              _notice(context.strings.voiceDeviceUnavailable, error: true),
+            _notice(context.strings.voiceDevicesRemembered),
+
+            TextButton.icon(
+              onPressed: state.busy ? null : () => unawaited(devices.refresh()),
+              icon: const Icon(Icons.refresh),
+              label: Text(context.strings.voiceRefreshDevices),
+            ),
+          ],
+        ),
+      );
 
   Widget _deviceGroups(VoiceDevicesState state) => LayoutBuilder(
     builder: (context, constraints) {

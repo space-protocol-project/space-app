@@ -181,6 +181,19 @@ Future<void> scenario(Directory work, String origin, String role) async {
     await flag(work, '$role-microphone', 'ready');
     await barrier(work, role == 'A' ? 'B-microphone' : 'A-microphone');
     final counts = await waitForAudio(mediaInstances.last);
+    final statistics = await mediaInstances.last.statistics();
+    await flag(
+      work,
+      '$role-inbound-stats',
+      jsonEncode([
+        for (final report in statistics.where((r) => r.type == 'inbound-rtp'))
+          {'id': report.id, 'type': report.type, ...report.values},
+      ]),
+    );
+    final people = controller.state.roster!.participants;
+    if (people.any((person) => !person.hasAudioSlot())) {
+      throw StateError('Сервер не передал места участников');
+    }
     await flag(work, '$role-audio', jsonEncode(counts));
     await barrier(work, role == 'A' ? 'B-audio' : 'A-audio');
     await checkPushToTalk(controller, mediaInstances.last);

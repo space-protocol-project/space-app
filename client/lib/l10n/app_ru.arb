@@ -849,5 +849,8 @@
         "type": "int"
       }
     }
-  }
+  },
+  "voiceRoomEmpty": "В комнате пока никого нет",
+  "voiceMicrophoneEnabled": "Микрофон включён",
+  "voiceActivityUpdateRuntime": "Для подсветки говорящих собеседников обновите runtime пространства."
 }

@@ -42,5 +42,6 @@ class _RetainedPageState extends State<_RetainedPage> {
   }
 
   @override
-  Widget build(BuildContext context) => _child;
+  Widget build(BuildContext context) =>
+      TickerMode(enabled: widget.active, child: _child);
 }

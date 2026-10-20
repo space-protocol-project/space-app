@@ -71,7 +71,7 @@ class _AdminPageState extends State<AdminPage> {
   bool busy = false,
       initialized = true,
       enabled = true,
-      attachmentsEnabled = true;
+      attachmentsEnabled = false;
   String status = '', policy = 'open';
   String? statusKey;
   String get localizedStatus => switch (statusKey) {
@@ -159,7 +159,7 @@ class _AdminPageState extends State<AdminPage> {
     title.text = settings!['title'] as String;
     chat.text = settings!['chatTitle'] as String;
     enabled = settings!['chatEnabled'] == true;
-    attachmentsEnabled = settings!['attachmentsEnabled'] != false;
+    attachmentsEnabled = settings!['attachmentsEnabled'] == true;
     policy = settings!['registrationPolicy'] as String;
     storage.text =
         ((int.tryParse('${settings!['storageLimitBytes']}') ?? 1073741824) ~/

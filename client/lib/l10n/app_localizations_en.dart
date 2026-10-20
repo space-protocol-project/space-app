@@ -2296,4 +2296,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String voiceReleaseDelay(int milliseconds) {
     return 'Transmission release delay: $milliseconds ms';
   }
+
+  @override
+  String get voiceRoomEmpty => 'No one is in this room yet';
+
+  @override
+  String get voiceMicrophoneEnabled => 'Microphone enabled';
+
+  @override
+  String get voiceActivityUpdateRuntime =>
+      'Update this space’s runtime to highlight speaking participants.';
 }

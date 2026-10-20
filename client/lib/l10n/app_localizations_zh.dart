@@ -2120,6 +2120,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String voiceReleaseDelay(int milliseconds) {
     return '停止发送延迟：$milliseconds 毫秒';
   }
+
+  @override
+  String get voiceRoomEmpty => '房间里暂时没有人';
+
+  @override
+  String get voiceMicrophoneEnabled => '麦克风已开启';
+
+  @override
+  String get voiceActivityUpdateRuntime => '请更新空间运行时以突出显示正在说话的参与者。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

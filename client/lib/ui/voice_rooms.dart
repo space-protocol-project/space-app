@@ -9,11 +9,11 @@ import '../src/core.dart';
 import '../src/voice_controller.dart';
 import '../src/voice_devices.dart';
 import '../src/voice_signaling.dart';
-import '../src/generated/space/v1/voice.pb.dart';
 import '../src/generated/space/v1/space.pb.dart' show Channel;
 import 'components.dart';
-import 'voice_devices.dart';
 import 'voice_connection_info.dart';
+import 'voice_room_details.dart';
+import 'voice_roster.dart';
 
 class VoiceRoomsView extends StatelessWidget {
   const VoiceRoomsView({
@@ -38,9 +38,14 @@ class VoiceRoomsView extends StatelessWidget {
     );
   }
 
-  List<Channel> _visibleRooms(SpaceSession connected) => connected.voiceRooms
-      .where((room) => roomId == null || room.id == roomId)
-      .toList(growable: false);
+  List<Channel> _visibleRooms(SpaceSession connected) {
+    if (roomId != null)
+      return connected.voiceRooms.where((r) => r.id == roomId).toList();
+    return connected.voiceRooms
+        .where((r) => r.permissions.read)
+        .take(1)
+        .toList();
+  }
 
   List<Widget> _rooms(BuildContext context, SpaceSession connected) {
     if (Platform.isAndroid || Platform.isIOS) {
@@ -53,20 +58,6 @@ class VoiceRoomsView extends StatelessWidget {
     return [
       Text(context.strings.voiceLimit),
       const SizedBox(height: 16),
-      Align(
-        alignment: Alignment.centerLeft,
-        child: TextButton.icon(
-          onPressed: () => unawaited(
-            showVoiceDevices(
-              context,
-              controller.devices,
-              controller.microphoneTest,
-            ),
-          ),
-          icon: const Icon(Icons.tune),
-          label: Text(context.strings.voiceAudioDevices),
-        ),
-      ),
       if (rooms.isEmpty)
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 24),
@@ -75,35 +66,16 @@ class VoiceRoomsView extends StatelessWidget {
       for (final room in rooms)
         Padding(
           padding: const EdgeInsets.only(top: 12),
-          child: SurfaceCard(
-            child: Row(
-              children: [
-                const Icon(Icons.headphones_outlined),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Text(
-                    room.title,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                FilledButton.tonal(
-                  key: ValueKey('voice-join-${room.id}'),
-                  onPressed: () => unawaited(
-                    controller.join(
-                      SessionVoiceSignaling(connected),
-                      room.id,
-                      room.title,
-                    ),
-                  ),
-                  child: Text(context.strings.voiceJoin),
-                ),
-              ],
-            ),
+          child: VoiceRoomDetails(
+            key: ValueKey((connected, room.id)),
+            room: room,
+            controller: controller,
+            api: SessionVoiceSignaling(connected),
+            load: () => connected.getVoiceRoom(room.id),
           ),
         ),
       const SizedBox(height: 20),
-      VoiceParticipants(controller: controller),
-      const SizedBox(height: 20),
+
       Text(
         context.strings.voicePrivacy,
         style: Theme.of(context).textTheme.bodySmall,
@@ -131,27 +103,15 @@ class VoiceParticipants extends StatelessWidget {
                   '${context.strings.voiceParticipants} · ${state.title}',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                for (final person in state.roster?.participants ?? [])
-                  _person(context, person),
+                VoiceRoster(
+                  people: state.roster?.participants ?? [],
+                  speaking: state.speaking,
+                ),
               ],
             ),
           );
         },
       );
-  Widget _person(BuildContext context, VoiceParticipant person) => ListTile(
-    leading: Icon(person.muted ? Icons.mic_off_outlined : Icons.mic_none),
-    title: Text(person.nickname.isEmpty ? person.principalId : person.nickname),
-    subtitle: Text(_status(context, person)),
-  );
-
-  String _status(BuildContext context, VoiceParticipant person) {
-    if (person.deafened) {
-      return context.strings.voiceDeafened;
-    }
-    return person.muted
-        ? context.strings.voiceMuted
-        : context.strings.voiceSpeaking;
-  }
 }
 
 class VoiceCallBar extends StatelessWidget {
@@ -236,20 +196,6 @@ class VoiceCallBar extends StatelessWidget {
         icon: Icon(
           state.deafened ? Icons.headset_off_outlined : Icons.headset_outlined,
         ),
-      ),
-      IconButton(
-        key: const ValueKey('voice-devices'),
-        tooltip: context.strings.voiceAudioDevices,
-        onPressed: state.busy || state.phase != VoicePhase.connected
-            ? null
-            : () => unawaited(
-                showVoiceDevices(
-                  context,
-                  controller.devices,
-                  controller.microphoneTest,
-                ),
-              ),
-        icon: const Icon(Icons.tune),
       ),
       IconButton(
         key: const ValueKey('voice-leave'),

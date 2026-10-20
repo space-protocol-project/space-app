@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
@@ -16,10 +18,21 @@ abstract interface class VoiceDeviceBackend {
 }
 
 class NativeVoiceDeviceBackend implements VoiceDeviceBackend {
+  Future<List<VoiceDevice>>? _listing;
+
   @override
-  Future<List<VoiceDevice>> devices() async {
+  Future<List<VoiceDevice>> devices() =>
+      _listing ??= _enumerate().whenComplete(() => _listing = null);
+
+  Future<List<VoiceDevice>> _enumerate() async {
     await WebRTC.initialize(options: {'logSeverity': 'error'});
-    final devices = await navigator.mediaDevices.enumerateDevices();
+    var devices = await navigator.mediaDevices.enumerateDevices();
+    if (!devices.any(
+      (d) => d.kind == 'audioinput' || d.kind == 'audiooutput',
+    )) {
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      devices = await navigator.mediaDevices.enumerateDevices();
+    }
     return devices
         .where((device) => ['audioinput', 'audiooutput'].contains(device.kind))
         .map(
@@ -111,7 +124,9 @@ class VoiceDevices extends Cubit<VoiceDevicesState> {
     try {
       _choice ??= await preferences.load();
       if (isClosed) return;
-      final devices = _unique(await backend.devices());
+      final devices = _unique(
+        await backend.devices().timeout(const Duration(seconds: 2)),
+      );
       if (isClosed) return;
       _publish(devices: devices, busy: true);
       await _restore(devices, _choice!.input, true);
@@ -136,14 +151,25 @@ class VoiceDevices extends Cubit<VoiceDevicesState> {
     String? id,
     bool input,
   ) async {
-    final available = devices.where((d) => d.id == id && d.input == input);
+    var available = devices.where((d) => d.id == id && d.input == input);
+    final label = input ? _choice?.inputLabel : _choice?.outputLabel;
+    if (available.isEmpty && label != null && label.isNotEmpty) {
+      final matching = devices.where(
+        (d) => d.label == label && d.input == input,
+      );
+      if (matching.length == 1) available = matching;
+    }
     if (available.isEmpty) {
       _applied.remove(input);
       return;
     }
-    if (_applied[input] == id) return;
-    await backend.select(available.first);
-    _applied[input] = id!;
+    final device = available.first;
+    if (_applied[input] == device.id) return;
+    await beforeDeviceChanged?.call();
+    await backend.select(device).timeout(const Duration(seconds: 2));
+    _applied[input] = device.id;
+    _choice = _choice!.change(device.id, input: input, label: device.label);
+    await _saveChoice();
   }
 
   Future<void> select(VoiceDevice device) async {
@@ -153,12 +179,13 @@ class VoiceDevices extends Cubit<VoiceDevicesState> {
     _publish(busy: true);
     try {
       await beforeDeviceChanged?.call();
-      await backend.select(device);
+      await backend.select(device).timeout(const Duration(seconds: 2));
       if (isClosed) return;
       _applied[device.input] = device.id;
       _choice = (_choice ?? const VoiceDeviceChoice()).change(
         device.id,
         input: device.input,
+        label: device.label,
       );
       // Выбор уже применён. Ошибка записи не должна скрывать активное устройство.
       await _saveChoice();

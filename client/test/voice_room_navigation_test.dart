@@ -6,6 +6,44 @@ import 'package:space_client/ui/voice_room_navigation.dart';
 import 'channels_test.dart' show chat;
 
 void main() {
+  testWidgets(
+    'Один клик открывает, двойной входит; заголовок пропускает закрытую комнату',
+    (tester) async {
+      final selected = <String?>[], joined = <String>[];
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ru'),
+          home: Scaffold(
+            body: VoiceRoomNavigation(
+              rooms: [
+                chat('locked')..permissions.read = false,
+                chat('first')..title = 'Первая',
+                chat('second')..title = 'Вторая',
+              ],
+              onSelect: selected.add,
+              onJoin: (room) => joined.add(room.id),
+              onRefresh: null,
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Комнаты'));
+      expect(selected, ['first']);
+      await tester.tap(find.text('Вторая'));
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(selected, ['first', 'second']);
+      expect(joined, isEmpty);
+      await tester.tap(find.text('Первая'));
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.tap(find.text('Первая'));
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(joined, ['first']);
+      expect(selected, ['first', 'second']);
+    },
+  );
+
   for (final width in [390.0, 1280.0]) {
     testWidgets('Комнаты внутри общей области, выбор и обновление: $width', (
       tester,
@@ -59,7 +97,7 @@ void main() {
       await tester.tap(find.text('Игры'));
       expect(selections, ['games']);
       await tester.tap(find.text('Комнаты'));
-      expect(selections, ['games', null]);
+      expect(selections, ['games', 'lounge']);
       await tester.tap(find.byTooltip('Обновить список комнат'));
       expect(refreshed, 1);
       expect(tester.takeException(), isNull);

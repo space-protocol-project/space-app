@@ -155,6 +155,7 @@ class SettingsPanel extends StatelessWidget {
     this.requestNotificationPermission,
     this.deviceTransfer,
     this.voiceDevices,
+    this.voiceSettings,
   });
   final AppUpdates? updates;
   final Future<void> Function()? prepareInstall;
@@ -162,6 +163,7 @@ class SettingsPanel extends StatelessWidget {
   final AppPreferences preferences;
   final Widget? deviceTransfer;
   final VoiceDevices? voiceDevices;
+  final Widget? voiceSettings;
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<AppPreferences, PreferencesState>(
@@ -257,6 +259,10 @@ class SettingsPanel extends StatelessWidget {
             : VoiceShortcutSettings(devices: voiceDevices!),
       ),
       const SizedBox(height: 24),
+      if (voiceSettings != null) ...[
+        SurfaceCard(child: voiceSettings!),
+        const SizedBox(height: 24),
+      ],
       NotificationSettings(
         preferences: preferences,
         requestPermission: requestNotificationPermission,

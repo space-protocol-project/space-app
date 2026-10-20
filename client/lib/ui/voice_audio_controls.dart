@@ -47,6 +47,7 @@ class _VoiceGainSliderState extends State<VoiceGainSlider> {
         ),
         // Локальный Overlay удерживает узлы индикатора Slider внутри диалога.
         Overlay.wrap(
+          key: ValueKey(widget.label),
           alwaysSizeToContent: true,
           clipBehavior: Clip.none,
           child: Slider(

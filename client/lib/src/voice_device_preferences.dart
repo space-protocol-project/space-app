@@ -8,20 +8,30 @@ class VoiceDeviceChoice {
   const VoiceDeviceChoice({
     this.input,
     this.output,
+    this.inputLabel,
+    this.outputLabel,
     this.audio = const VoiceAudioSettings(),
   });
-  final String? input, output;
+  final String? input, output, inputLabel, outputLabel;
   final VoiceAudioSettings audio;
 
-  VoiceDeviceChoice change(String id, {required bool input}) =>
+  VoiceDeviceChoice change(String id, {required bool input, String? label}) =>
       VoiceDeviceChoice(
         input: input ? id : this.input,
         output: input ? output : id,
+        inputLabel: input ? label : inputLabel,
+        outputLabel: input ? outputLabel : label,
         audio: audio,
       );
 
   VoiceDeviceChoice changeAudio(VoiceAudioSettings settings) =>
-      VoiceDeviceChoice(input: input, output: output, audio: settings);
+      VoiceDeviceChoice(
+        input: input,
+        output: output,
+        inputLabel: inputLabel,
+        outputLabel: outputLabel,
+        audio: settings,
+      );
 }
 
 abstract interface class VoiceDevicePreferences {
@@ -50,6 +60,8 @@ class SavedVoiceDevicePreferences implements VoiceDevicePreferences {
     return VoiceDeviceChoice(
       input: _deviceId(value['input']),
       output: _deviceId(value['output']),
+      inputLabel: _deviceId(value['inputLabel']),
+      outputLabel: _deviceId(value['outputLabel']),
       audio: VoiceAudioSettings.fromJson(value['audio']),
     );
   }
@@ -70,6 +82,8 @@ class SavedVoiceDevicePreferences implements VoiceDevicePreferences {
       jsonEncode({
         'input': choice.input,
         'output': choice.output,
+        'inputLabel': choice.inputLabel,
+        'outputLabel': choice.outputLabel,
         'audio': choice.audio.toJson(),
       }),
     );

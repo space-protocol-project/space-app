@@ -26,6 +26,7 @@ class VoiceParticipant extends $pb.GeneratedMessage {
     $core.String? nickname,
     $core.bool? muted,
     $core.bool? deafened,
+    $core.int? audioSlot,
   }) {
     final result = VoiceParticipant._();
     if (sessionId != null) result.sessionId = sessionId;
@@ -34,6 +35,7 @@ class VoiceParticipant extends $pb.GeneratedMessage {
     if (nickname != null) result.nickname = nickname;
     if (muted != null) result.muted = muted;
     if (deafened != null) result.deafened = deafened;
+    if (audioSlot != null) result.audioSlot = audioSlot;
     return result;
   }
 
@@ -56,6 +58,7 @@ class VoiceParticipant extends $pb.GeneratedMessage {
     ..aOS(4, _omitFieldNames ? '' : 'nickname')
     ..aOB(5, _omitFieldNames ? '' : 'muted')
     ..aOB(6, _omitFieldNames ? '' : 'deafened')
+    ..aI(7, _omitFieldNames ? '' : 'audioSlot', fieldType: $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -133,6 +136,16 @@ class VoiceParticipant extends $pb.GeneratedMessage {
   $core.bool hasDeafened() => $_has(5);
   @$pb.TagNumber(6)
   void clearDeafened() => $_clearField(6);
+
+  /// Стабильное место участника в комнате (0..7), не состояние микрофона.
+  @$pb.TagNumber(7)
+  $core.int get audioSlot => $_getIZ(6);
+  @$pb.TagNumber(7)
+  set audioSlot($core.int value) => $_setUnsignedInt32(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasAudioSlot() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearAudioSlot() => $_clearField(7);
 }
 
 class VoiceRoomState extends $pb.GeneratedMessage {

@@ -11,6 +11,7 @@ class VoiceRoomNavigation extends StatelessWidget {
     required this.onSelect,
     required this.onRefresh,
     this.selectedRoomId,
+    this.onJoin,
     this.active = false,
     this.busy = false,
   });
@@ -18,6 +19,7 @@ class VoiceRoomNavigation extends StatelessWidget {
   final ValueChanged<String?> onSelect;
   final VoidCallback? onRefresh;
   final String? selectedRoomId;
+  final ValueChanged<Channel>? onJoin;
   final bool active, busy;
 
   @override
@@ -36,7 +38,7 @@ class VoiceRoomNavigation extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           selectedTileColor: Theme.of(context).colorScheme.primaryContainer,
-          onTap: () => onSelect(null),
+          onTap: () => onSelect(_firstReadable),
           trailing: onRefresh == null
               ? null
               : IconButton(
@@ -50,17 +52,31 @@ class VoiceRoomNavigation extends StatelessWidget {
     ),
   );
 
-  Widget _room(BuildContext context, Channel room) => ListTile(
-    key: ValueKey('sidebar-voice-room-${room.id}'),
-    dense: true,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    selected: active && selectedRoomId == room.id,
-    leading: Icon(
-      room.permissions.read ? Icons.headphones_outlined : Icons.lock_outline,
-      size: 18,
+  String? get _firstReadable {
+    for (final room in rooms) {
+      if (room.permissions.read) return room.id;
+    }
+    return null;
+  }
+
+  Widget _room(BuildContext context, Channel room) => GestureDetector(
+    onDoubleTap: busy || !room.permissions.read || onJoin == null
+        ? null
+        : () => onJoin!(room),
+    child: ListTile(
+      key: ValueKey('sidebar-voice-room-${room.id}'),
+      dense: true,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      selected: active && selectedRoomId == room.id,
+      leading: Icon(
+        room.permissions.read ? Icons.headphones_outlined : Icons.lock_outline,
+        size: 18,
+      ),
+      title: Text(room.title, overflow: TextOverflow.ellipsis),
+      subtitle: room.permissions.read
+          ? null
+          : Text(context.strings.noReadAccess),
+      onTap: busy ? null : () => onSelect(room.id),
     ),
-    title: Text(room.title, overflow: TextOverflow.ellipsis),
-    subtitle: room.permissions.read ? null : Text(context.strings.noReadAccess),
-    onTap: busy ? null : () => onSelect(room.id),
   );
 }

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'generated/space/v1/voice.pb.dart';
 import 'voice_media.dart';
 import 'voice_connection_info.dart';
+import 'voice_activity.dart';
 import 'voice_devices.dart';
 import 'voice_signaling.dart';
 import 'voice_recovery.dart';
@@ -30,6 +31,7 @@ class VoiceState {
     this.busy = false,
     this.error = '',
     this.roster,
+    this.speaking = const {},
     this.canPublish = false,
     this.connection = const VoiceConnectionInfo(),
   });
@@ -37,6 +39,7 @@ class VoiceState {
   final String title, room, error;
   final bool muted, deafened, busy, canPublish;
   final VoiceRoomState? roster;
+  final Set<String> speaking;
   final VoiceConnectionInfo connection;
   bool get active =>
       phase == VoicePhase.joining ||
@@ -60,7 +63,7 @@ class VoiceController extends Cubit<VoiceState> {
        _recovery = VoiceRecovery(retryDelays),
        super(const VoiceState()) {
     devices.onAudioChanged = _changeAudio;
-    devices.beforeDeviceChanged = this.microphoneTest.stop;
+    devices.beforeDeviceChanged = _prepareDeviceChange;
     this.microphoneTest.prepare = _prepareMicrophoneTest;
     this.microphoneTest.validate = _validateMicrophoneTest;
   }
@@ -77,6 +80,7 @@ class VoiceController extends Cubit<VoiceState> {
   StreamSubscription<void>? _disconnected;
   Future<Object?>? _leaving;
   Timer? _timer;
+  VoiceActivityMonitor? _activity;
   Timer? _connectionDeadline;
   String _id = '';
   int _generation = 0;
@@ -84,7 +88,20 @@ class VoiceController extends Cubit<VoiceState> {
   int? _pollingGeneration, _connectingGeneration;
   int? _statisticsGeneration;
 
+  String get localSessionId => _id;
+
+  bool matches(VoiceSignaling api, String room) {
+    final current = _target?.api;
+    final same =
+        identical(api, current) ||
+        (api is SessionVoiceSignaling &&
+            current is SessionVoiceSignaling &&
+            identical(api.session, current.session));
+    return same && state.room == room && state.active;
+  }
+
   Future<void> join(VoiceSignaling api, String room, String title) async {
+    if (matches(api, room)) return;
     if (_closed || (_connectingGeneration == _generation && _target != null)) {
       return;
     }
@@ -215,6 +232,13 @@ class VoiceController extends Cubit<VoiceState> {
     await media.deafen(true);
   }
 
+  Future<void> _prepareDeviceChange() async {
+    await microphoneTest.stop();
+    if (state.phase == VoicePhase.connected && !state.muted) {
+      await _changeMicrophone();
+    }
+  }
+
   Future<void> _prepareMicrophoneTest() async {
     if (_closed ||
         state.busy ||
@@ -317,6 +341,7 @@ class VoiceController extends Cubit<VoiceState> {
       _recovery.reset();
       _publish(phase: VoicePhase.connected);
       unawaited(_refreshConnection(generation));
+      _startActivity(generation);
     }
   }
 
@@ -327,6 +352,7 @@ class VoiceController extends Cubit<VoiceState> {
     bool? deafened,
     bool? busy,
     VoiceConnectionInfo? connection,
+    Set<String>? speaking,
     String error = '',
   }) {
     if (_closed) {
@@ -345,9 +371,51 @@ class VoiceController extends Cubit<VoiceState> {
         roster: roomState,
         canPublish: roomState?.canPublish ?? false,
         connection: connection ?? state.connection,
+        speaking: speaking ?? state.speaking,
       ),
     );
   }
+
+  void _startActivity(int generation) {
+    final media = _media;
+    if (media is! VoiceActivityMedia || _activity != null) return;
+    _activity = VoiceActivityMonitor(
+      read: (media as VoiceActivityMedia).activity,
+      publish: (value) {
+        if (generation == _generation && state.phase == VoicePhase.connected) {
+          _publish(speaking: _speakers(value));
+        }
+      },
+    );
+  }
+
+  Set<String> _speakers(VoiceAudioActivity activity) {
+    final people = state.roster?.participants ?? [];
+    final local = people.where((p) => p.sessionId == _id).firstOrNull;
+    final result = <String>{};
+    if (activity.local && !state.muted && !state.deafened) result.add(_id);
+    if (local == null || !local.hasAudioSlot() || local.audioSlot > 7)
+      return result;
+    for (final person in people) {
+      if (!_audibleRemote(person)) continue;
+      if (_remoteSpeaking(person.audioSlot, local.audioSlot, activity)) {
+        result.add(person.sessionId);
+      }
+    }
+    return Set.unmodifiable(result);
+  }
+
+  bool _remoteSpeaking(int slot, int local, VoiceAudioActivity activity) {
+    if (slot > 7 || slot == local) return false;
+    final output = slot > local ? slot - 1 : slot;
+    return activity.remoteSlots.contains(output);
+  }
+
+  bool _audibleRemote(VoiceParticipant person) =>
+      person.sessionId != _id &&
+      !person.muted &&
+      !person.deafened &&
+      person.hasAudioSlot();
 
   Future<void> _refresh(int generation) async {
     unawaited(_refreshConnection(generation));
@@ -600,6 +668,8 @@ class VoiceController extends Cubit<VoiceState> {
   Future<Object?> _release() async {
     _timer?.cancel();
     _timer = null;
+    _activity?.close();
+    _activity = null;
     _connectionDeadline?.cancel();
     _connectionDeadline = null;
     final media = _media, api = _api, id = _id, room = state.room;

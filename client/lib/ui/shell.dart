@@ -30,6 +30,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../src/chat_controller.dart';
 import '../src/voice_controller.dart';
+import '../src/voice_signaling.dart';
+import 'voice_devices.dart';
 import 'voice_rooms.dart';
 import 'voice_room_navigation.dart';
 import '../src/preferences.dart';
@@ -1035,15 +1037,25 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     onRefresh: controller.connected
         ? () => unawaited(controller.refreshChannels())
         : null,
-    onSelect: (id) {
-      if (id == null) {
-        selectedVoiceRooms.remove(controller.knownOrigin);
-      } else {
-        selectedVoiceRooms[controller.knownOrigin] = id;
-      }
-      select(Section.rooms);
+    onSelect: openVoiceRoom,
+    onJoin: (room) {
+      openVoiceRoom(room.id);
+      final session = controller.mlsSession;
+      if (session == null) return;
+      unawaited(
+        voice.join(SessionVoiceSignaling(session), room.id, room.title),
+      );
     },
   );
+
+  void openVoiceRoom(String? id) {
+    if (id == null) {
+      selectedVoiceRooms.remove(controller.knownOrigin);
+    } else {
+      selectedVoiceRooms[controller.knownOrigin] = id;
+    }
+    select(Section.rooms);
+  }
 
   List<Widget> fileNavigation() {
     if (!controller.attachmentsEnabled) return [];
@@ -1857,6 +1869,10 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
                               preferences: widget.preferences,
                               deviceTransfer: deviceTransferArea(),
                               voiceDevices: voice.devices,
+                              voiceSettings: VoiceDevicesSettings(
+                                devices: voice.devices,
+                                microphoneTest: voice.microphoneTest,
+                              ),
                               requestNotificationPermission:
                                   systemNotifications.requestPermission,
                               updates: updates,

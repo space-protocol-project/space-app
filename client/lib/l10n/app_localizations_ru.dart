@@ -2311,4 +2311,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String voiceReleaseDelay(int milliseconds) {
     return 'Задержка закрытия передачи: $milliseconds мс';
   }
+
+  @override
+  String get voiceRoomEmpty => 'В комнате пока никого нет';
+
+  @override
+  String get voiceMicrophoneEnabled => 'Микрофон включён';
+
+  @override
+  String get voiceActivityUpdateRuntime =>
+      'Для подсветки говорящих собеседников обновите runtime пространства.';
 }

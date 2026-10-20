@@ -4161,6 +4161,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Задержка закрытия передачи: {milliseconds} мс'**
   String voiceReleaseDelay(int milliseconds);
+
+  /// No description provided for @voiceRoomEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'В комнате пока никого нет'**
+  String get voiceRoomEmpty;
+
+  /// No description provided for @voiceMicrophoneEnabled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Микрофон включён'**
+  String get voiceMicrophoneEnabled;
+
+  /// No description provided for @voiceActivityUpdateRuntime.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для подсветки говорящих собеседников обновите runtime пространства.'**
+  String get voiceActivityUpdateRuntime;
 }
 
 class _AppLocalizationsDelegate
