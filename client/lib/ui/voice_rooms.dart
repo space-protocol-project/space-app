@@ -39,8 +39,9 @@ class VoiceRoomsView extends StatelessWidget {
   }
 
   List<Channel> _visibleRooms(SpaceSession connected) {
-    if (roomId != null)
+    if (roomId != null) {
       return connected.voiceRooms.where((r) => r.id == roomId).toList();
+    }
     return connected.voiceRooms
         .where((r) => r.permissions.read)
         .take(1)

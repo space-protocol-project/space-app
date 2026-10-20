@@ -56,8 +56,9 @@ class _VoiceRoomDetailsState extends State<VoiceRoomDetails>
     _timer?.cancel();
     if (!_resumed ||
         !TickerMode.valuesOf(context).enabled ||
-        !widget.room.permissions.read)
+        !widget.room.permissions.read) {
       return;
+    }
     unawaited(_refresh());
     _timer = Timer.periodic(
       const Duration(seconds: 2),
@@ -79,17 +80,19 @@ class _VoiceRoomDetailsState extends State<VoiceRoomDetails>
     );
     try {
       final roster = await pending.timeout(const Duration(seconds: 5));
-      if (mounted)
+      if (mounted) {
         setState(() {
           _roster = roster;
           _error = '';
         });
+      }
     } catch (error) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _roster = null;
           _error = error.toString();
         });
+      }
     }
   }
 

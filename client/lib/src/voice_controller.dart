@@ -394,8 +394,9 @@ class VoiceController extends Cubit<VoiceState> {
     final local = people.where((p) => p.sessionId == _id).firstOrNull;
     final result = <String>{};
     if (activity.local && !state.muted && !state.deafened) result.add(_id);
-    if (local == null || !local.hasAudioSlot() || local.audioSlot > 7)
+    if (local == null || !local.hasAudioSlot() || local.audioSlot > 7) {
       return result;
+    }
     for (final person in people) {
       if (!_audibleRemote(person)) continue;
       if (_remoteSpeaking(person.audioSlot, local.audioSlot, activity)) {
