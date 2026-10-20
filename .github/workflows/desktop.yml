@@ -245,8 +245,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: space-protocol-project/space-server
-          # Совместимая версия runtime v0.7.1, схема 23.
-          ref: 6bfd9a44d911ea318a8366f8718479034add6371
+          # Совместимая версия runtime v0.7.5, схема 24.
+          ref: b411181d6bda2c9d53abc3fd9de0ed490c0072c0
           path: space-server
       - uses: actions/setup-go@v5
         with:
