@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/l10n/app_localizations.dart';
@@ -17,6 +19,23 @@ class ActivityMedia extends FakeVoiceMedia implements VoiceActivityMedia {
   Future<VoiceAudioActivity> activity() async => value;
 }
 
+class DelayedAnswerMedia extends ActivityMedia {
+  DelayedAnswerMedia(super.log);
+  final answered = Completer<void>();
+  int reads = 0;
+  @override
+  Future<void> answer(String sdp) async {
+    await super.answer(sdp);
+    await answered.future;
+  }
+
+  @override
+  Future<VoiceAudioActivity> activity() async {
+    reads++;
+    return value;
+  }
+}
+
 class SlottedApi extends FakeVoiceApi {
   SlottedApi(super.log);
   @override
@@ -29,6 +48,26 @@ class SlottedApi extends FakeVoiceApi {
 }
 
 void main() {
+  testWidgets('Диагностика и микрофон не запускаются до применения SDP', (
+    tester,
+  ) async {
+    final log = <String>[];
+    final api = SlottedApi(log), media = DelayedAnswerMedia(log);
+    final controller = VoiceController(mediaFactory: () => media);
+    final joining = controller.join(api, 'room', 'Комната');
+    await tester.pump();
+    expect(controller.state.phase, VoicePhase.joining);
+    expect(media.reads, 0);
+    await controller.toggleMicrophone();
+    expect(log, isNot(contains('microphone:true')));
+    media.answered.complete();
+    await joining;
+    await tester.pump();
+    expect(controller.state.phase, VoicePhase.connected);
+    expect(media.reads, greaterThan(0));
+    await controller.close();
+  });
+
   testWidgets(
     'Просмотр комнаты показывает участников без входа и захвата микрофона',
     (tester) async {

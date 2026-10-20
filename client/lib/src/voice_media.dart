@@ -213,6 +213,7 @@ class NativeVoiceMedia
 
   @override
   Future<void> answer(String sdp) async {
+    _audioLevels.configure(sdp);
     if (_closed || sdp.length > 65536) {
       throw StateError('Подключение закрыто');
     }

@@ -15,12 +15,50 @@ abstract interface class VoiceActivityMedia {
 
 class VoiceAudioLevels {
   final _previous = <String, (double, double, double)>{};
+  Map<String, int> _midSlots = const {};
+
+  void configure(String sdp) {
+    _previous.clear();
+    final entries = sdp
+        .split(RegExp(r'(?=^m=)', multiLine: true))
+        .map(_mediaSlot)
+        .whereType<(String, int)>()
+        .toList();
+    _midSlots = {
+      for (final entry in entries)
+        if (_uniqueEntry(entry, entries)) entry.$1: entry.$2,
+    };
+  }
+
+  bool _uniqueEntry((String, int) entry, List<(String, int)> entries) =>
+      entries
+          .where((other) => other.$1 == entry.$1 || other.$2 == entry.$2)
+          .length ==
+      1;
+
+  (String, int)? _mediaSlot(String section) {
+    if (!section.startsWith('m=audio ')) return null;
+    final mid = RegExp(
+      r'^a=mid:([^\r\n ]+)',
+      multiLine: true,
+    ).firstMatch(section);
+    final tracks = RegExp(
+      r'^a=msid:[^\r\n ]+ speaker-([0-6])\r?$',
+      multiLine: true,
+    ).allMatches(section).map((match) => int.parse(match[1]!)).toSet();
+    if (mid == null || tracks.length != 1) return null;
+    return (mid[1]!, tracks.single);
+  }
+
+  int? outputSlot(StatsReport report) =>
+      _slot(report.values['trackIdentifier']) ??
+      _midSlots[report.values['mid']];
 
   Set<int> read(List<StatsReport> reports) {
     final active = <int>{};
     final present = <String>{};
     for (final report in reports.where((r) => r.type == 'inbound-rtp')) {
-      final slot = _slot(report.values['trackIdentifier']);
+      final slot = outputSlot(report);
       if (slot == null) continue;
       present.add(report.id);
       if (_level(report) > .008) active.add(slot);

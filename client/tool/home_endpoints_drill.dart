@@ -17,6 +17,7 @@ import 'package:space_client/src/mls/local_store.dart';
 import 'package:space_client/src/mls/native.dart';
 
 import 'home_vault.dart';
+import 'attachment_policy_fixture.dart';
 
 class _MlsMemory implements SecureKeyStorage {
   final data = <String, String>{};
@@ -195,6 +196,7 @@ Future<void> main(List<String> arguments) async {
       vault,
       setupCode: state['setup_code'] as String,
     );
+    await enableFixtureAttachments(local);
     await Future<void>.delayed(const Duration(seconds: 1));
     await verifyDoctor(runtime, root, managed.serverId, fingerprint);
     final link = spaceEndpointLink(

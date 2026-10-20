@@ -87,6 +87,7 @@ class VoiceController extends Cubit<VoiceState> {
   bool _closed = false;
   int? _pollingGeneration, _connectingGeneration;
   int? _statisticsGeneration;
+  int? _answeredGeneration, _connectedGeneration;
 
   String get localSessionId => _id;
 
@@ -196,6 +197,8 @@ class VoiceController extends Cubit<VoiceState> {
     await media.answer(reply.answerSdp).timeout(signalingTimeout);
     if (generation != _generation) return;
     _publish(roster: reply.state);
+    _answeredGeneration = generation;
+    _completeConnection(generation);
     _timer = Timer.periodic(heartbeat, (_) => unawaited(_refresh(generation)));
   }
 
@@ -336,13 +339,23 @@ class VoiceController extends Cubit<VoiceState> {
       return;
     }
     if (status == VoiceMediaStatus.connected) {
-      _connectionDeadline?.cancel();
-      _connectionDeadline = null;
-      _recovery.reset();
-      _publish(phase: VoicePhase.connected);
-      unawaited(_refreshConnection(generation));
-      _startActivity(generation);
+      _connectedGeneration = generation;
+      _completeConnection(generation);
     }
+  }
+
+  void _completeConnection(int generation) {
+    if (generation != _generation ||
+        _answeredGeneration != generation ||
+        _connectedGeneration != generation) {
+      return;
+    }
+    _connectionDeadline?.cancel();
+    _connectionDeadline = null;
+    _recovery.reset();
+    _publish(phase: VoicePhase.connected);
+    unawaited(_refreshConnection(generation));
+    _startActivity(generation);
   }
 
   void _publish({

@@ -46,7 +46,7 @@ class VoiceRoster extends StatelessWidget {
             ),
             child: CircleAvatar(
               radius: 27,
-              backgroundColor: colors.surfaceContainerHighest,
+              backgroundColor: colors.surfaceContainerLow,
               child: const Icon(Icons.person_outline, size: 30),
             ),
           ),

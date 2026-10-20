@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/voice_controller.dart';
+import 'package:space_client/src/voice_activity.dart';
 import 'package:space_client/src/voice_media.dart';
 import 'package:space_client/src/voice_network.dart';
 import 'package:space_client/src/voice_signaling.dart';
@@ -32,6 +33,7 @@ class ProbeMedia extends NativeVoiceMedia {
   ProbeMedia(this.work, this.role) : super(playbackVolume: 0);
   final Directory work;
   final String role;
+  final levels = VoiceAudioLevels();
   @override
   Future<String> offer([
     VoiceNetworkSettings settings = const VoiceNetworkSettings.local(),
@@ -59,6 +61,20 @@ class ProbeMedia extends NativeVoiceMedia {
 
   @override
   Future<void> answer(String sdp) async {
+    levels.configure(sdp);
+    await flag(
+      work,
+      '$role-answer-tracks',
+      sdp
+          .split('\n')
+          .where(
+            (line) =>
+                line.startsWith('m=') ||
+                line.startsWith('a=mid:') ||
+                line.startsWith('a=msid:'),
+          )
+          .join('\n'),
+    );
     await flag(work, '$role-media', 'answer');
     final clock = Stopwatch()..start();
     await super.answer(sdp);
@@ -199,6 +215,15 @@ Future<void> scenario(Directory work, String origin, String role) async {
           {'id': report.id, 'type': report.type, ...report.values},
       ]),
     );
+    final incoming = statistics
+        .where((report) => report.type == 'inbound-rtp')
+        .toList();
+    if (incoming.isEmpty ||
+        incoming.any(
+          (report) => mediaInstances.last.levels.outputSlot(report) == null,
+        )) {
+      throw StateError('Не удалось сопоставить полученные дорожки участникам');
+    }
     final people = controller.state.roster!.participants;
     if (people.any((person) => !person.hasAudioSlot())) {
       throw StateError('Сервер не передал места участников');

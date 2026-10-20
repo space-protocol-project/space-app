@@ -7,6 +7,7 @@ import 'package:space_client/src/mls/client.dart';
 import 'package:space_client/src/mls/files.dart';
 
 import '../../tool/home_transfer_drill.dart' as transfer;
+import '../../tool/attachment_policy_fixture.dart';
 import '../mls_native_test.dart' show MemoryMlsStorage;
 import 'mls_server_test.dart' as live;
 
@@ -40,6 +41,7 @@ Future<void> seedRestorePeers(
   transfer.RunningSpace space,
   List<int> group,
 ) async {
+  await enableFixtureAttachments(owner);
   for (final peer in peers) {
     final invite = await owner.adminRequest(
       '/api/v1/space/invites',

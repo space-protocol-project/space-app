@@ -35,6 +35,7 @@ import 'package:space_client/src/mls/native.dart';
 import 'package:space_client/src/mls/history_archive.dart';
 
 import '../mls_native_test.dart' show MemoryMlsStorage;
+import '../../tool/attachment_policy_fixture.dart';
 import '../support/rpc_fault_proxy.dart';
 
 class _Identity implements RotationJournalVault {
@@ -103,6 +104,7 @@ void main() {
       final server = await discover(origin);
       final owner = await SpaceSession.connect(server, sharedOwnerVault);
       addTearDown(owner.close);
+      await enableFixtureAttachments(owner);
       final memberVault = _Identity();
       var member = await SpaceSession.connect(server, memberVault);
       addTearDown(member.close);

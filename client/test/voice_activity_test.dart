@@ -15,6 +15,31 @@ StatsReport audio(double energy, double seconds, int packets) =>
     });
 
 void main() {
+  test('Windows UUID связывается с дорожкой по mid из SDP', () {
+    final levels = VoiceAudioLevels();
+    levels.configure(
+      'm=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=mid:voice\r\na=msid:speaker-2 speaker-2\r\n',
+    );
+    final report = StatsReport('remote', 'inbound-rtp', 0, {
+      ...audio(0, 1, 10).values,
+      'trackIdentifier': 'random-windows-uuid',
+      'mid': 'voice',
+    });
+    expect(levels.outputSlot(report), 2);
+    expect(levels.read([report]), isEmpty);
+    final speaking = StatsReport('remote', 'inbound-rtp', 0, {
+      ...report.values,
+      'totalAudioEnergy': .01,
+      'totalSamplesDuration': 2,
+      'packetsReceived': 20,
+    });
+    expect(levels.read([speaking]), {2});
+    levels.configure(
+      'm=video 9 UDP/TLS/RTP/SAVPF 111\r\na=mid:voice\r\na=msid:speaker-2 speaker-2\r\n',
+    );
+    expect(levels.outputSlot(report), isNull);
+  });
+
   test('Речь определяется свежей энергией, тишина и старые пакеты не подсвечиваются', () {
     final levels = VoiceAudioLevels();
     expect(levels.read([audio(0, 1, 10)]), isEmpty);

@@ -7,6 +7,7 @@ import 'package:crypto/crypto.dart';
 import 'package:space_client/src/home_archive_inspection.dart';
 
 import 'home_transfer_assets.dart';
+import 'attachment_policy_fixture.dart';
 
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/root_rotation.dart';
@@ -128,6 +129,7 @@ Future<Map<String, dynamic>> seedSpace(
   );
   SpaceSession? member;
   try {
+    await enableFixtureAttachments(owner);
     final invitation = await owner.adminRequest(
       '/api/v1/space/invites',
       method: 'POST',
