@@ -1,8 +1,10 @@
 # Голосовые комнаты: настольный срез
 
-Настройки голоса, восстановление соединения и настраиваемая рация включены в [v0.7.2](https://github.com/space-protocol-project/space-app/releases/tag/v0.7.2). Совместимый runtime — v0.7.1, схема 23, голосовой профиль 3. Выпуск основан на автоматических проверках; ручные Р1–Р12 остаются открытыми в [TODO](https://github.com/space-protocol-project/space-protocol/blob/codex/voice-rooms/TODO.md). Ниже сохранены результаты и границы отдельных прогонов.
+Голосовые комнаты и настройки звука выпущены в [клиенте v0.7.9](https://github.com/space-protocol-project/space-app/releases/tag/v0.7.9) с [runtime v0.7.5](https://github.com/space-protocol-project/space-server/releases/tag/v0.7.5), схемой 24 и голосовым профилем 3. Ниже приведены результаты автоматических проверок и их границы. Разговор людей на слух, физические горячие клавиши, устройства macOS/Linux и публичный TURN остаются отдельными пунктами ручной приёмки в [TODO](https://github.com/space-protocol-project/space-protocol/blob/codex/voice-rooms/TODO.md).
 
 ## Проверки v0.7.9 и runtime v0.7.5 — 20 октября
+
+Оба выпуска опубликованы как Latest, не draft и не prerelease. [CI клиента 39441248529](https://github.com/space-protocol-project/space-app/actions/runs/39441248529) и [CI runtime 39437492845](https://github.com/space-protocol-project/space-server/actions/runs/39437492845) полностью успешны. Через API GitHub подтверждены четыре установщика клиента, три runtime-архива, JSON-метаданные и SHA256SUMS: uploaded, ненулевые размеры, SHA-256 digest. Установщики и архивы локально не скачивались; только маленькие JSON-метаданные runtime получены для manifest.
 
 В настройках приложения собраны аудиоустройства, громкость, проверка микрофона, обработка и рация. Один клик по комнате открывает участников без подключения микрофона; двойной входит в голос. Заголовок «Комнаты» выбирает первую комнату с правом чтения.
 
