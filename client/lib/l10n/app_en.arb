@@ -753,7 +753,7 @@
   "voiceConnected": "Connected",
   "voiceParticipants": "Participants",
   "voiceMuted": "Microphone off",
-  "voiceSpeaking": "Microphone on",
+  "voiceSpeaking": "Speaking",
   "voiceDeafened": "Sound off",
   "voiceEmpty": "No voice rooms yet. An owner or administrator can create one.",
   "voiceConnectFirst": "Connect to a space to open voice rooms.",

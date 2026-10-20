@@ -2065,7 +2065,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get voiceMuted => 'Микрофон выключен';
 
   @override
-  String get voiceSpeaking => 'Микрофон включён';
+  String get voiceSpeaking => 'Говорит';
 
   @override
   String get voiceDeafened => 'Звук выключен';

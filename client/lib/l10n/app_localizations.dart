@@ -3727,7 +3727,7 @@ abstract class AppLocalizations {
   /// No description provided for @voiceSpeaking.
   ///
   /// In ru, this message translates to:
-  /// **'Микрофон включён'**
+  /// **'Говорит'**
   String get voiceSpeaking;
 
   /// No description provided for @voiceDeafened.

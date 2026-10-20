@@ -1891,7 +1891,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get voiceMuted => '麦克风已关闭';
 
   @override
-  String get voiceSpeaking => '麦克风已开启';
+  String get voiceSpeaking => '正在说话';
 
   @override
   String get voiceDeafened => '声音已关闭';
@@ -2858,7 +2858,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get voiceMuted => '麦克风已关闭';
 
   @override
-  String get voiceSpeaking => '麦克风已开启';
+  String get voiceSpeaking => '正在说话';
 
   @override
   String get voiceDeafened => '声音已关闭';

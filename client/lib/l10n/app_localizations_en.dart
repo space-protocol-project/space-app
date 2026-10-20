@@ -2051,7 +2051,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voiceMuted => 'Microphone off';
 
   @override
-  String get voiceSpeaking => 'Microphone on';
+  String get voiceSpeaking => 'Speaking';
 
   @override
   String get voiceDeafened => 'Sound off';

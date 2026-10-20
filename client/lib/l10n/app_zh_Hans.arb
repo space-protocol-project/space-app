@@ -270,7 +270,7 @@
   "voiceConnected": "通话中",
   "voiceParticipants": "参与者",
   "voiceMuted": "麦克风已关闭",
-  "voiceSpeaking": "麦克风已开启",
+  "voiceSpeaking": "正在说话",
   "voiceDeafened": "声音已关闭",
   "voiceEmpty": "还没有语音房间。所有者或管理员可以创建第一个房间。",
   "voiceConnectFirst": "请先连接空间以打开语音房间。",

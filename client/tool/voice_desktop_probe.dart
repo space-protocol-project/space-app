@@ -40,9 +40,18 @@ class ProbeMedia extends NativeVoiceMedia {
     final clock = Stopwatch()..start();
     final result = await super.offer(settings);
     await flag(work, '$role-offer-ms', '${clock.elapsedMilliseconds}');
-    if (settings.relayOnly &&
-        (!result.contains(' typ relay') || result.contains(' typ host'))) {
-      throw StateError('Direct candidate in relay-only probe');
+    final types = RegExp(r' typ ([a-z]+)')
+        .allMatches(result)
+        .map((match) => match[1]!)
+        .toSet();
+    await flag(work, '$role-candidate-types', types.join(','));
+    if (settings.relayOnly && types.any((type) => type != 'relay')) {
+      throw StateError('Прямой кандидат в режиме только TURN: $types');
+    }
+    if (settings.relayOnly && !types.contains('relay')) {
+      throw StateError(
+        'TURN не выдал relay-кандидат; проверьте сетевой интерфейс и доступность ретранслятора',
+      );
     }
     await flag(work, '$role-media', 'offered');
     return result;
