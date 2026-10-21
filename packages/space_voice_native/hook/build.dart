@@ -23,6 +23,12 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
         compiler
             .resolve('$triple${config.android.targetNdkApi}-clang$suffix')
             .toFilePath();
+    environment['CC_${target.replaceAll('-', '_')}'] = compiler
+        .resolve('$triple${config.android.targetNdkApi}-clang$suffix')
+        .toFilePath();
+    environment['AR_${target.replaceAll('-', '_')}'] = compiler
+        .resolve(Platform.isWindows ? 'llvm-ar.exe' : 'llvm-ar')
+        .toFilePath();
   }
   await ensureToolchain(root, environment);
   await run(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../l10n/strings.dart';
 import '../src/voice_audio_settings.dart';
+import '../src/voice_platform.dart';
 import '../src/voice_devices.dart';
 import '../src/voice_microphone_test.dart';
 import 'voice_shortcut_settings.dart';
@@ -93,7 +95,7 @@ class VoiceProcessingControls extends StatelessWidget {
       const Divider(height: 32),
       _inputMode(context),
       if (!state.audio.pushToTalk) _activation(context),
-      if (state.audio.pushToTalk)
+      if (state.audio.pushToTalk && !Platform.isAndroid)
         VoiceShortcutSettings(devices: devices, showError: false),
       const Divider(height: 32),
       _noiseSuppression(context),
@@ -115,7 +117,15 @@ class VoiceProcessingControls extends StatelessWidget {
     groupValue: state.audio.profile,
     onChanged: (profile) {
       if (!state.busy && profile != null) {
-        _update(state.audio.withProfile(profile));
+        final audio = state.audio.withProfile(profile);
+        _update(
+          profile == VoiceInputProfile.speech
+              ? audio.copyWith(
+                  noiseMode: voiceDefaultAudio.noiseMode,
+                  customProfile: false,
+                )
+              : audio,
+        );
       }
     },
     child: Column(
@@ -175,7 +185,11 @@ class VoiceProcessingControls extends StatelessWidget {
           value: true,
           enabled: !state.busy,
           title: Text(context.strings.voicePushToTalk),
-          subtitle: Text(context.strings.voicePushToTalkHint),
+          subtitle: Text(
+            Platform.isAndroid
+                ? context.strings.voiceTouchToTalkHint
+                : context.strings.voicePushToTalkHint,
+          ),
         ),
       ],
     ),
@@ -200,7 +214,9 @@ class VoiceProcessingControls extends StatelessWidget {
       isExpanded: true,
       decoration: InputDecoration(
         labelText: context.strings.voiceNoiseSuppression,
-        helperText: context.strings.voiceNoiseSuppressionHelp,
+        helperText: Platform.isAndroid
+            ? context.strings.voiceAndroidNoiseHelp
+            : context.strings.voiceNoiseSuppressionHelp,
         helperMaxLines: 4,
         border: const OutlineInputBorder(),
       ),

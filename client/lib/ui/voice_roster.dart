@@ -15,14 +15,25 @@ class VoiceRoster extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (people.isEmpty) return Text(context.strings.voiceRoomEmpty);
-    return Wrap(
-      spacing: 16,
-      runSpacing: 20,
-      children: [for (final person in people) _person(context, person)],
+    return LayoutBuilder(
+      builder: (context, constraints) => Wrap(
+        spacing: 16,
+        runSpacing: 20,
+        children: [
+          for (final person in people)
+            _person(context, person, _tileWidth(constraints.maxWidth)),
+        ],
+      ),
     );
   }
 
-  Widget _person(BuildContext context, VoiceParticipant person) {
+  double _tileWidth(double available) {
+    if (available >= 280) return 132;
+    if (available < 208) return available.clamp(0, 132);
+    return (available - 16) / 2;
+  }
+
+  Widget _person(BuildContext context, VoiceParticipant person, double width) {
     final active =
         !person.muted &&
         !person.deafened &&
@@ -30,7 +41,7 @@ class VoiceRoster extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return SizedBox(
       key: ValueKey('voice-person-${person.sessionId}'),
-      width: 132,
+      width: width,
       child: Column(
         children: [
           AnimatedContainer(

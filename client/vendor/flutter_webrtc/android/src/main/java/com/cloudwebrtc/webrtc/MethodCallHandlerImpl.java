@@ -25,6 +25,7 @@ import androidx.annotation.RequiresApi;
 
 import com.cloudwebrtc.webrtc.audio.AudioDeviceKind;
 import com.cloudwebrtc.webrtc.audio.AudioProcessingController;
+import com.cloudwebrtc.webrtc.audio.SpaceVoiceProcessing;
 import com.cloudwebrtc.webrtc.audio.AudioSwitchManager;
 import com.cloudwebrtc.webrtc.audio.AudioUtils;
 import com.cloudwebrtc.webrtc.audio.LocalAudioTrack;
@@ -145,6 +146,7 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
   private CustomVideoDecoderFactory videoDecoderFactory;
 
   public AudioProcessingController audioProcessingController;
+  private final SpaceVoiceProcessing spaceVoice = new SpaceVoiceProcessing();
 
   // WARP (WebRTC Abridged Roundtrip Protocol, draft-uberti-tsvwg-warp) is opted
   // into through the `enableWARP` initialize() option. The part of it that
@@ -401,6 +403,10 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
     videoEncoderFactory.setForceSWCodecList(forceSWCodecList);
 
     audioProcessingController = new AudioProcessingController();
+    audioProcessingController.capturePostProcessing.addProcessor(spaceVoice);
+    AudioSwitchManager.instance.audioFocusChangeListener = focus -> {
+      if (focus < 0) spaceVoice.interrupt();
+    };
 
     factoryBuilder.setAudioProcessingFactory(audioProcessingController.externalAudioProcessingFactory);
 
@@ -415,6 +421,42 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
 
     final AnyThreadResult result = new AnyThreadResult(notSafeResult);
     switch (call.method) {
+      case "spaceVoiceProcessingStats": {
+        result.success(spaceVoice.statistics());
+        break;
+      }
+      case "spaceVoiceGain": {
+        Number gain = call.argument("gain");
+        if (gain == null || !Double.isFinite(gain.doubleValue()) || gain.doubleValue() < 0 || gain.doubleValue() > 2) {
+          result.error("invalid_gain", "Invalid microphone gain", null);
+        } else { spaceVoice.gain(gain.doubleValue()); result.success(null); }
+        break;
+      }
+      case "spaceVoiceTransmit": {
+        spaceVoice.transmit(Boolean.TRUE.equals(call.argument("enabled")));
+        result.success(null);
+        break;
+      }
+      case "spaceVoiceCapture": {
+        spaceVoice.capture(Boolean.TRUE.equals(call.argument("enabled")));
+        result.success(null);
+        break;
+      }
+      case "spaceVoiceLevel": {
+        if (spaceVoice.failed()) result.error("voice_processing", "Noise suppression failed", null);
+        else if (spaceVoice.interrupted()) result.error("audio_interrupted", "Audio focus lost", null);
+        else result.success(spaceVoice.level());
+        break;
+      }
+      case "spaceVoiceDenoiser": {
+        Number context = call.argument("context"), expected = call.argument("expected");
+        try {
+          if (context == null || expected == null || !spaceVoice.denoiser(context.longValue(), expected.longValue())) {
+            result.error("voice_context", "Noise suppression context changed", null);
+          } else result.success(null);
+        } catch (LinkageError error) { result.error("voice_library", "Noise suppression library unavailable", null); }
+        break;
+      }
       case "initialize": {
         int networkIgnoreMask = Options.ADAPTER_TYPE_UNKNOWN;
         Map<String, Object> options = call.argument("options");

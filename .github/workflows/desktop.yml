@@ -100,7 +100,7 @@ jobs:
         run: flutter test test/composer_markdown_test.dart test/mls_view_test.dart
       - name: Голосовые комнаты и завершение захвата микрофона
         working-directory: client
-        run: flutter test test/voice_network_test.dart test/voice_audio_test.dart test/voice_transmission_test.dart test/voice_shortcut_test.dart test/voice_microphone_test.dart test/voice_devices_test.dart test/voice_device_call_test.dart test/voice_recovery_test.dart test/voice_controller_test.dart test/voice_widgets_test.dart test/voice_semantics_test.dart test/tooltip_semantics_test.dart test/channels_test.dart
+        run: flutter test test/voice_android_test.dart test/voice_network_test.dart test/voice_audio_test.dart test/voice_transmission_test.dart test/voice_shortcut_test.dart test/voice_microphone_test.dart test/voice_devices_test.dart test/voice_device_call_test.dart test/voice_recovery_test.dart test/voice_controller_test.dart test/voice_widgets_test.dart test/voice_semantics_test.dart test/tooltip_semantics_test.dart test/channels_test.dart
       - name: Полный перенос пространства и восстановление доступа
         working-directory: client
         run: flutter test test/migration_archive_test.dart test/home_migration_test.dart test/mls_migration_test.dart test/migration_password_dialog_test.dart test/recovery_spaces_test.dart test/device_recovery_batch_test.dart test/device_migration_test.dart test/device_migration_files_test.dart test/device_transfer_area_test.dart
@@ -226,7 +226,7 @@ jobs:
           fi
       - name: Совместимость приватного push runtime и Android
         working-directory: client/android
-        run: ./gradlew :app:testDebugUnitTest
+        run: ./gradlew :app:testDebugUnitTest :flutter_webrtc:testDebugUnitTest
       - uses: actions/upload-artifact@v4
         if: startsWith(github.ref, 'refs/tags/v')
         with:

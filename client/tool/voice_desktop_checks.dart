@@ -34,7 +34,7 @@ Future<void> checkPushToTalk(
     AppLifecycleState.resumed,
   );
   await controller.devices.updateAudio(
-    const VoiceAudioSettings(pushToTalk: true),
+    voiceDefaultAudio.copyWith(pushToTalk: true),
   );
   if (!controller.devices.state.audio.pushToTalk || controller.state.muted) {
     throw StateError(
@@ -61,7 +61,7 @@ Future<void> checkPushToTalk(
   await expectTransmission(media, false);
   probeKey(LogicalKeyboardKey.f8, PhysicalKeyboardKey.f8, false);
   await controller.devices.updateAudio(
-    const VoiceAudioSettings(
+    voiceDefaultAudio.copyWith(
       pushToTalk: true,
       shortcut: VoiceShortcut(key: LogicalKeyboardKey.f9, control: true),
     ),
@@ -83,7 +83,7 @@ Future<void> checkPushToTalk(
   );
   await expectTransmission(media, false);
   probeKey(LogicalKeyboardKey.f9, PhysicalKeyboardKey.f9, false);
-  await controller.devices.updateAudio(const VoiceAudioSettings());
+  await controller.devices.updateAudio(voiceDefaultAudio);
 }
 
 Future<void> checkReconnect(
@@ -101,7 +101,7 @@ Future<void> checkReconnect(
   });
   try {
     await controller.devices.updateAudio(
-      const VoiceAudioSettings(pushToTalk: true),
+      voiceDefaultAudio.copyWith(pushToTalk: true),
     );
     WidgetsBinding.instance.handleAppLifecycleStateChanged(
       AppLifecycleState.resumed,
@@ -118,6 +118,7 @@ Future<void> checkReconnect(
       throw StateError('Переподключение не остановило микрофон');
     }
     await flag(work, '$role-recovered', 'ready');
+    if (Platform.isAndroid) await androidProbeBarrier('foreground-restored');
     await barrier(work, role == 'A' ? 'B-recovered' : 'A-recovered');
     if (role == 'B') await barrier(work, 'A-resumed-microphone');
     await controller.toggleMicrophone();
@@ -133,7 +134,7 @@ Future<void> checkReconnect(
     await expectTransmission(media.last, true);
     probeKey(LogicalKeyboardKey.f8, PhysicalKeyboardKey.f8, false);
     await expectTransmission(media.last, false);
-    await controller.devices.updateAudio(const VoiceAudioSettings());
+    await controller.devices.updateAudio(voiceDefaultAudio);
     await flag(work, '$role-resumed-microphone', 'ready');
     await barrier(
       work,

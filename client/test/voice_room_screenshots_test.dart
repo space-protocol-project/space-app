@@ -8,6 +8,7 @@ import 'package:space_client/src/preferences.dart';
 import 'package:space_client/src/voice_controller.dart';
 import 'package:space_client/ui/shell.dart';
 import 'package:space_client/ui/voice_room_details.dart';
+import 'package:space_client/ui/voice_rooms.dart';
 
 import 'channels_test.dart' show chat;
 import 'chat_examples_screenshots_test.dart' show captureExample;
@@ -82,12 +83,12 @@ class ScreenshotVoice extends VoiceController {
 }
 
 void main() {
-  for (final width in [1440.0, 1100.0]) {
+  for (final width in [1440.0, 1100.0, 360.0, 390.0]) {
     testWidgets('Полный интерфейс приложения с голосовой комнатой: $width', (
       tester,
     ) async {
       SharedPreferences.setMockInitialValues({'space.ui.dark': true});
-      tester.view.physicalSize = Size(width, 1000);
+      tester.view.physicalSize = Size(width, width < 760 ? 820 : 1000);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
@@ -118,6 +119,10 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      if (width < 760) {
+        await tester.tap(find.byKey(const ValueKey('navigation-menu-button')));
+        await tester.pumpAndSettle();
+      }
       await tester.tap(find.text('Комнаты').first);
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.byType(VoiceRoomDetails), findsOneWidget);
@@ -126,7 +131,14 @@ void main() {
         find.byKey(const ValueKey('voice-avatar-local-true')),
         findsOneWidget,
       );
-      expect(find.text('Управление пространством'), findsOneWidget);
+      if (width >= 760) {
+        expect(find.text('Управление пространством'), findsOneWidget);
+      } else {
+        final controls = tester.getTopLeft(find.byType(VoiceCallBar)).dy;
+        for (final name in ['Алиса', 'Борис', 'София', 'Максим']) {
+          expect(tester.getBottomLeft(find.text(name)).dy, lessThan(controls));
+        }
+      }
       expect(tester.takeException(), isNull);
       await captureExample(
         tester,

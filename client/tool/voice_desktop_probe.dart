@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/voice_controller.dart';
@@ -15,12 +15,17 @@ import 'package:space_client/src/voice_audio_settings.dart';
 import 'package:space_client/src/voice_device_preferences.dart';
 import 'package:space_client/src/voice_devices.dart';
 import 'package:space_client/src/voice_shortcut.dart';
+import 'package:space_client/src/voice_platform.dart';
+import 'package:space_client/src/voice_transmission.dart';
+import 'package:space_client/ui/voice_rooms.dart';
+import 'package:space_client/l10n/app_localizations.dart';
 
 import 'home_vault.dart';
 part 'voice_desktop_checks.dart';
+part 'voice_android_checks.dart';
 
 class ProbePreferences implements VoiceDevicePreferences {
-  VoiceDeviceChoice value = const VoiceDeviceChoice();
+  VoiceDeviceChoice value = VoiceDeviceChoice(audio: voiceDefaultAudio);
   @override
   Future<VoiceDeviceChoice> load() async => value;
   @override
@@ -40,7 +45,9 @@ class ProbeMedia extends NativeVoiceMedia {
   ]) async {
     await flag(work, '$role-media', 'offer');
     final clock = Stopwatch()..start();
-    final result = await super.offer(settings);
+    final result = await super.offer(
+      Platform.isAndroid ? AndroidUsbVoiceNetwork(settings) : settings,
+    );
     await flag(work, '$role-offer-ms', '${clock.elapsedMilliseconds}');
     final types = RegExp(r' typ ([a-z]+)')
         .allMatches(result)
@@ -84,7 +91,7 @@ class ProbeMedia extends NativeVoiceMedia {
 }
 
 Future<void> waitUntil(bool Function() ready) async {
-  final deadline = DateTime.now().add(const Duration(seconds: 25));
+  final deadline = DateTime.now().add(const Duration(seconds: 60));
   while (!ready()) {
     if (DateTime.now().isAfter(deadline)) {
       throw StateError('Истекло ожидание проверки');
@@ -94,12 +101,20 @@ Future<void> waitUntil(bool Function() ready) async {
 }
 
 Future<void> flag(Directory work, String name, String value) async {
+  if (Platform.isAndroid) {
+    await androidProbeRequest(name, value: value);
+    return;
+  }
   final temporary = File('${work.path}/$name.tmp');
   await temporary.writeAsString(value, flush: true);
   await temporary.rename('${work.path}/$name');
 }
 
 Future<void> barrier(Directory work, String name) async {
+  if (Platform.isAndroid) {
+    await androidProbeBarrier(name);
+    return;
+  }
   await waitUntil(() => File('${work.path}/$name').existsSync());
 }
 
@@ -173,7 +188,9 @@ Future<void> scenario(Directory work, String origin, String role) async {
       await flag(work, 'room', room);
     } else {
       await barrier(work, 'room');
-      room = await File('${work.path}/room').readAsString();
+      room = Platform.isAndroid
+          ? (await androidProbeRequest('room'))!
+          : await File('${work.path}/room').readAsString();
     }
     await flag(work, '$role-progress', 'join');
     await controller
@@ -193,6 +210,7 @@ Future<void> scenario(Directory work, String origin, String role) async {
     await flag(work, '$role-joined', 'ready');
     await barrier(work, role == 'A' ? 'B-joined' : 'A-joined');
     await waitUntil(() => controller.state.roster?.participants.length == 2);
+    if (Platform.isAndroid) showAndroidProbe(controller);
     await flag(work, '$role-progress', 'microphone');
     // Оба процесса используют один физический аудиодрайвер стенда.
     // Разрешения открываем по очереди, затем передаём одновременно.
@@ -231,9 +249,13 @@ Future<void> scenario(Directory work, String origin, String role) async {
     await flag(work, '$role-audio', jsonEncode(counts));
     await barrier(work, role == 'A' ? 'B-audio' : 'A-audio');
     await checkPushToTalk(controller, mediaInstances.last);
+    if (Platform.isAndroid) {
+      await checkAndroidAudio(work, controller, mediaInstances.last);
+    }
     await flag(work, '$role-ptt', 'passed');
     await barrier(work, role == 'A' ? 'B-ptt' : 'A-ptt');
-    if (Platform.environment['SPACE_VOICE_RECOVERY_CHECK'] == '1') {
+    if (Platform.environment['SPACE_VOICE_RECOVERY_CHECK'] == '1' ||
+        androidProbeRecovery) {
       await checkReconnect(work, role, controller, mediaInstances);
     }
     await flag(work, '$role-progress', 'controls');
@@ -308,9 +330,17 @@ Future<void> borisControls(Directory work, VoiceController controller) async {
 
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.environment['SPACE_VOICE_DESKTOP_CHECK'] != '1' ||
-      !Platform.isWindows ||
-      args.length != 3) {
+  if (Platform.isAndroid &&
+      const bool.fromEnvironment('SPACE_VOICE_ANDROID_CHECK')) {
+    args = await androidProbeArguments();
+  }
+  if (!(Platform.isAndroid &&
+          const bool.fromEnvironment('SPACE_VOICE_ANDROID_CHECK')) &&
+      (Platform.environment['SPACE_VOICE_DESKTOP_CHECK'] != '1' ||
+          !Platform.isWindows)) {
+    exit(2);
+  }
+  if (args.length != 3) {
     exit(2);
   }
   final uri = Uri.parse(args[0]), work = Directory(args[1]), role = args[2];

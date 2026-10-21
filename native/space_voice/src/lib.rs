@@ -1,28 +1,20 @@
 //! Модель создаётся вне аудиопотока; обработчик получает только блоки по 10 мс.
-#[cfg(not(target_os = "android"))]
 mod processor;
-#[cfg(not(target_os = "android"))]
 mod worker;
 
 use std::ffi::c_void;
-#[cfg(not(target_os = "android"))]
 use worker::Worker;
 
 #[unsafe(no_mangle)]
 pub extern "C" fn space_voice_create() -> *mut c_void {
-    #[cfg(not(target_os = "android"))]
-    {
-        match std::panic::catch_unwind(Worker::new) {
-            Ok(Ok(state)) => Box::into_raw(Box::new(state)).cast(),
-            Ok(Err(error)) => {
-                eprintln!("DeepFilterNet3 initialization failed: {error:?}");
-                std::ptr::null_mut()
-            }
-            Err(_) => std::ptr::null_mut(),
+    match std::panic::catch_unwind(Worker::new) {
+        Ok(Ok(state)) => Box::into_raw(Box::new(state)).cast(),
+        Ok(Err(error)) => {
+            eprintln!("DeepFilterNet3 initialization failed: {error:?}");
+            std::ptr::null_mut()
         }
+        Err(_) => std::ptr::null_mut(),
     }
-    #[cfg(target_os = "android")]
-    std::ptr::null_mut()
 }
 
 /// Контекст принадлежит одному захвату. Вызывающая сторона сериализует process/free.
@@ -38,18 +30,15 @@ pub unsafe extern "C" fn space_voice_process(
     if state.is_null() || samples.is_null() || frames <= 0 || frames > 480 {
         return 0;
     }
-    #[cfg(not(target_os = "android"))]
-    {
-        let buffer = unsafe { std::slice::from_raw_parts_mut(samples, frames as usize) };
-        let processor = unsafe { &mut *state.cast::<Worker>() };
-        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            processor.process(buffer, rate)
-        }));
-        if matches!(result, Ok(Ok(()))) {
-            return 1;
-        }
-        buffer.fill(0.);
+    let buffer = unsafe { std::slice::from_raw_parts_mut(samples, frames as usize) };
+    let processor = unsafe { &mut *state.cast::<Worker>() };
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        processor.process(buffer, rate)
+    }));
+    if matches!(result, Ok(Ok(()))) {
+        return 1;
     }
+    buffer.fill(0.);
     0
 }
 
@@ -57,10 +46,35 @@ pub unsafe extern "C" fn space_voice_process(
 /// state создан create, отсоединён от callback и освобождается ровно один раз.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn space_voice_free(state: *mut c_void) {
-    #[cfg(not(target_os = "android"))]
     if !state.is_null() {
         drop(unsafe { Box::from_raw(state.cast::<Worker>()) });
     }
+}
+
+/// JNI читает только прямой буфер одного монофонического блока WebRTC.
+/// Контекст отсоединяется под тем же Java-монитором до вызова free из Dart.
+/// # Safety
+/// env и buffer предоставляет JVM, state создан space_voice_create.
+#[cfg(target_os = "android")]
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_cloudwebrtc_webrtc_audio_SpaceVoiceProcessing_processDenoiser(
+    env: *mut jni_sys::JNIEnv,
+    _class: jni_sys::jclass,
+    state: jni_sys::jlong,
+    buffer: jni_sys::jobject,
+    frames: jni_sys::jint,
+    rate: jni_sys::jint,
+) -> jni_sys::jint {
+    if env.is_null() || buffer.is_null() || frames <= 0 || frames > 480 {
+        return 0;
+    }
+    let table = unsafe { &**env };
+    let capacity = unsafe { table.GetDirectBufferCapacity.unwrap()(env, buffer) };
+    if capacity < i64::from(frames) * 4 {
+        return 0;
+    }
+    let samples = unsafe { table.GetDirectBufferAddress.unwrap()(env, buffer) };
+    unsafe { space_voice_process(state as usize as *mut c_void, samples.cast(), frames, rate) }
 }
 
 #[cfg(all(test, not(target_os = "android")))]

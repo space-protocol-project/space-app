@@ -1,4 +1,4 @@
-﻿param([Parameter(Mandatory=$true)][string]$Runtime,[switch]$PostgresOnly,[ValidateSet('direct','udp','tcp')][string]$Relay='direct',[switch]$Recovery)
+﻿param([Parameter(Mandatory=$true)][string]$Runtime,[switch]$PostgresOnly,[ValidateSet('direct','udp','tcp')][string]$Relay='direct',[switch]$Recovery,[string]$AndroidApk)
 $ErrorActionPreference='Stop'
 $appRoot=Split-Path $PSScriptRoot -Parent
 . (Join-Path $PSScriptRoot 'voice_probe_output.ps1')
@@ -28,6 +28,15 @@ $env:SPACE_VOICE_RELAY_ONLY=$null
 $workers=@()
 $captures=@()
 $copies=@()
+$androidHelper=$null
+$adb=Join-Path (Split-Path $appRoot -Parent) 'android/sdk/platform-tools/adb.exe'
+$androidPackage='org.spaceprotocol.space_client.voice_test'
+$androidPorts=@()
+if($AndroidApk -and $Relay -ne 'tcp'){throw 'Android-стенд сейчас требует -Relay tcp'}
+if($AndroidApk){
+ $userState=& $adb shell dumpsys user
+ if(($userState -join "`n") -notmatch 'State: RUNNING_UNLOCKED'){throw 'Разблокируйте телефон после перезагрузки перед проверкой'}
+}
 function Free-Port {
  $socket=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,0)
  $socket.Start();$result=$socket.LocalEndpoint.Port;$socket.Stop();return $result
@@ -74,6 +83,25 @@ try {
   $env:SPACE_VOICE_RELAY_ONLY='true'
  }
  $origin="http://127.0.0.1:$httpPort"
+ if($AndroidApk){
+  $aapt=Join-Path (Split-Path $appRoot -Parent) 'android/sdk/build-tools/36.0.0/aapt.exe'
+  $metadata=& $aapt dump badging $AndroidApk
+  if($LASTEXITCODE -ne 0 -or $metadata[0] -notmatch "^package: name='$([regex]::Escape($androidPackage))'"){throw 'APK обязан иметь отдельный тестовый applicationId'}
+  & $adb install -r -g $AndroidApk
+  if($LASTEXITCODE -ne 0){throw 'Не удалось установить тестовый APK'}
+  $turnMatch=[regex]::Match($turnConfig.tcp,'^turn:([^:]+):(\d+)\?transport=tcp$')
+  if(!$turnMatch.Success){throw 'Неизвестный адрес тестового TURN'}
+  $turnHost=$turnMatch.Groups[1].Value;$turnPort=[int]$turnMatch.Groups[2].Value
+  @{id=$id;origin=$origin;recovery=[bool]$Recovery}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $work 'config') -Encoding utf8NoBOM
+  $python=(Get-Command python).Source
+  $fixture=Join-Path $PSScriptRoot 'voice_android_fixture.py'
+  $androidHelper=Start-Process $python -ArgumentList @('-u',('"'+$fixture+'"'),('"'+$work+'"'),'--turn-host',$turnHost,'--turn-port',"$turnPort") -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $work 'android-fixture.log') -RedirectStandardError (Join-Path $work 'android-fixture.stderr.log')
+  foreach($port in @($httpPort,8766,$turnPort)){
+   & $adb reverse "tcp:$port" "tcp:$port"
+   if($LASTEXITCODE -ne 0){throw 'Не удалось настроить USB-туннель'}
+   $androidPorts+=$port
+  }
+ }
  $server=Start-Process -FilePath $serverExe -ArgumentList @('-http',"127.0.0.1:$httpPort",'-grpc',"127.0.0.1:$grpcPort",'-origin',$origin) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $work 'server.stdout.log') -RedirectStandardError (Join-Path $work 'server.stderr.log')
  $ready=[Diagnostics.Stopwatch]::StartNew()
  while($true){
@@ -82,7 +110,10 @@ try {
   if($ready.Elapsed.TotalSeconds -gt 30){throw 'Server timeout'}
   Start-Sleep -Milliseconds 100
  }
- . (Join-Path $PSScriptRoot 'mls_environment.ps1')
+ # После очистки переносимого Rust используем обычную установленную цепочку.
+ if(Test-Path -LiteralPath (Join-Path $appRoot '.local/mls/space-mls-tools/cargo/bin/rustup.exe')){
+  . (Join-Path $PSScriptRoot 'mls_environment.ps1')
+ }
  Push-Location (Join-Path $appRoot 'client')
  try {
   flutter build windows --release --no-pub --target tool/voice_desktop_probe.dart > (Join-Path $work 'flutter-build.log') 2>&1
@@ -91,6 +122,12 @@ try {
  $bundle=Join-Path $appRoot 'client/build/windows/x64/runner/Release'
  $env:SPACE_VOICE_DESKTOP_CHECK='1'
  foreach($role in @('A','B')){
+  if($AndroidApk -and $role -eq 'B'){
+   & $adb shell am force-stop $androidPackage
+   & $adb shell am start -n "$androidPackage/org.spaceprotocol.space_client.MainActivity"
+   if($LASTEXITCODE -ne 0){throw 'Не удалось запустить Android-клиент'}
+   continue
+  }
   $exe=Join-Path $bundle "voice-check-$id-$role.exe"
   Copy-Item -LiteralPath (Join-Path $bundle 'space_client.exe') -Destination $exe
   $copies+=$exe
@@ -119,6 +156,26 @@ try {
    }
   }
  }
+ if($AndroidApk){
+  $ready.Restart()
+  while(!(Test-Path -LiteralPath (Join-Path $work 'B-background-ready'))){
+   if((Test-Path -LiteralPath (Join-Path $work 'B-failure')) -or $ready.Elapsed.TotalSeconds -gt 75){throw "Android-проверка остановилась; журналы: $work"}
+   Start-Sleep -Milliseconds 100
+  }
+  & $adb shell input keyevent KEYCODE_HOME
+  & $adb shell dumpsys activity services $androidPackage > (Join-Path $work 'android-background-service.log')
+  Set-Content -LiteralPath (Join-Path $work 'background-started') -Value ready
+  $ready.Restart()
+  while(!(Test-Path -LiteralPath (Join-Path $work 'B-background-pass'))){
+   if($ready.Elapsed.TotalSeconds -gt 15){throw "Разговор в фоне не подтверждён: $work"}
+   Start-Sleep -Milliseconds 100
+  }
+  if($Recovery){Set-Content -LiteralPath (Join-Path $work 'background-checked') -Value ready}
+  else {
+   & $adb shell am start -n "$androidPackage/org.spaceprotocol.space_client.MainActivity"
+   Set-Content -LiteralPath (Join-Path $work 'foreground-restored') -Value ready
+  }
+ }
  if($Recovery){
   foreach($phase in @('recovery-ready','reconnecting')){
    $ready.Restart()
@@ -130,14 +187,34 @@ try {
    if($phase -eq 'recovery-ready'){$server.Kill();$server.WaitForExit()}
   }
   $server=Start-Process -FilePath $serverExe -ArgumentList @('-http',"127.0.0.1:$httpPort",'-grpc',"127.0.0.1:$grpcPort",'-origin',$origin) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $work 'server-restarted.stdout.log') -RedirectStandardError (Join-Path $work 'server-restarted.stderr.log')
+  if($AndroidApk){
+   $ready.Restart()
+   while(!(Test-Path -LiteralPath (Join-Path $work 'B-recovered'))){
+    if($ready.Elapsed.TotalSeconds -gt 60){throw "Android не переподключился в фоне: $work"}
+    Start-Sleep -Milliseconds 100
+   }
+   & $adb shell dumpsys activity services $androidPackage > (Join-Path $work 'android-recovered-service.log')
+   & $adb shell am start -n "$androidPackage/org.spaceprotocol.space_client.MainActivity"
+   Set-Content -LiteralPath (Join-Path $work 'foreground-restored') -Value ready
+  }
  }
  foreach($worker in $workers){if(!$worker.WaitForExit(90000)){throw 'Voice client timeout'};if($worker.ExitCode -ne 0){throw "Voice client failed; logs: $work"}}
+ if($AndroidApk){
+  $ready.Restart()
+  while(!(Test-Path -LiteralPath (Join-Path $work 'B.json'))){
+   if($ready.Elapsed.TotalSeconds -gt 10){throw "Нет Android-отчёта: $work"}
+   Start-Sleep -Milliseconds 100
+  }
+ }
  $reports=@('A','B')|ForEach-Object {Get-Content -LiteralPath (Join-Path $work "$_.json") -Raw|ConvertFrom-Json}
  if(!$reports[0].success -or !$reports[1].success -or $reports[0].pid -eq $reports[1].pid){throw 'Two independent clients were not verified'}
  if($Recovery -and (!$reports[0].reconnected -or !$reports[1].reconnected)){throw 'Recovery was not verified'}
  $reports|Select-Object role,pid,sent,received,samples|Format-Table
  Write-Output "Voice check passed: $work"
 } finally {
+ if($AndroidApk){& $adb shell am force-stop $androidPackage}
+ foreach($port in $androidPorts){& $adb reverse --remove "tcp:$port"}
+ if($androidHelper -and !$androidHelper.HasExited){$androidHelper.Kill();$androidHelper.WaitForExit()}
  foreach($worker in $workers){if(!$worker.HasExited){$worker.Kill();$worker.WaitForExit()}}
  foreach($capture in $captures){
   try{$null=$capture.outTask.GetAwaiter().GetResult();$null=$capture.errTask.GetAwaiter().GetResult()}

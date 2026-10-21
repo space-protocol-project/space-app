@@ -830,7 +830,7 @@
       }
     }
   },
-  "voiceProfileSpeechHelp": "DeepFilterNet3 降噪、回声消除、自动增益和高通滤波。",
+  "voiceProfileSpeechHelp": "降噪、回声消除、自动增益控制和高通滤波。",
   "voiceProfileStudioHelp": "不处理麦克风音频。适合音乐和已处理的输入；请使用耳机。",
   "voiceProfileCustomHelp": "单独调整各项音频处理设置。",
   "voiceActivity": "语音激活",
@@ -852,5 +852,8 @@
   },
   "voiceRoomEmpty": "房间里暂时没有人",
   "voiceMicrophoneEnabled": "麦克风已开启",
-  "voiceActivityUpdateRuntime": "请更新空间运行时以突出显示正在说话的参与者。"
+  "voiceActivityUpdateRuntime": "请更新空间运行时以突出显示正在说话的参与者。",
+  "voiceHoldToTalk": "按住说话",
+  "voiceTouchToTalkHint": "在房间中开启麦克风，然后按住通话按钮。应用进入后台时会松开按钮。",
+  "voiceAndroidNoiseHelp": "默认启用 DeepFilterNet3。WebRTC 是负载较低的选项，也可以关闭处理。音频在手机上处理。"
 }

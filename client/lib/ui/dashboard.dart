@@ -292,6 +292,7 @@ class _DashboardMetrics extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, box) {
+      if (box.maxWidth < 120) return const SizedBox.shrink();
       final columns = box.maxWidth < 700 ? 2 : 4;
       final width = (box.maxWidth - (columns - 1) * 12) / columns;
       return Wrap(

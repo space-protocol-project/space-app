@@ -2267,7 +2267,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get voiceProfileSpeechHelp =>
-      'Шумоподавление DeepFilterNet3, подавление эха, выравнивание громкости и фильтр гула.';
+      'Шумоподавление, подавление эха, выравнивание громкости и фильтр гула.';
 
   @override
   String get voiceProfileStudioHelp =>
@@ -2321,4 +2321,15 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get voiceActivityUpdateRuntime =>
       'Для подсветки говорящих собеседников обновите runtime пространства.';
+
+  @override
+  String get voiceHoldToTalk => 'Удерживайте, чтобы говорить';
+
+  @override
+  String get voiceTouchToTalkHint =>
+      'Включите микрофон в комнате и удерживайте кнопку разговора. При сворачивании приложения кнопка отпускается.';
+
+  @override
+  String get voiceAndroidNoiseHelp =>
+      'DeepFilterNet3 включён по умолчанию. WebRTC — более лёгкий вариант; обработку можно отключить. Звук обрабатывается на телефоне.';
 }

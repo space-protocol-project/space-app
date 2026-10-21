@@ -1,0 +1,4 @@
+<resources>
+    <string name="voice_channel">Voice room</string>
+    <string name="voice_ongoing">Conversation in progress. Tap to open Space.</string>
+</resources>

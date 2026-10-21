@@ -28,6 +28,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["appLabel"] = "Space"
     }
 
     signingConfigs {
@@ -41,6 +42,12 @@ android {
         }
     }
     buildTypes {
+        debug {
+            if (providers.gradleProperty("SPACE_TEST_APP").orNull == "true") {
+                applicationIdSuffix = ".voice_test"
+                manifestPlaceholders["appLabel"] = "Space Voice Test"
+            }
+        }
         release {
             signingConfig = signingConfigs.getByName("release")
         }

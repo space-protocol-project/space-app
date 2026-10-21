@@ -150,7 +150,7 @@ public class AudioSwitchManager {
             audioSwitch = new AudioSwitch(
                     context,
                     loggingEnabled,
-                    audioFocusChangeListener,
+                    focus -> audioFocusChangeListener.onAudioFocusChange(focus),
                     preferredDeviceList
             );
             audioSwitch.setManageAudioFocus(manageAudioFocus);

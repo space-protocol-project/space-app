@@ -7,10 +7,13 @@ publish = false
 [lib]
 crate-type = ["cdylib", "rlib"]
 
-[target.'cfg(not(target_os = "android"))'.dependencies]
+[dependencies]
 deep_filter = { path = "vendor/deep_filter/libDF", default-features = false, features = ["tract", "default-model"] }
 ndarray = "=0.16.1"
 rubato = "=0.14.1"
+
+[target.'cfg(target_os = "android")'.dependencies]
+jni-sys = "=0.3.0"
 
 [profile.release]
 debug = 0

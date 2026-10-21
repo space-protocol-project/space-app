@@ -1,0 +1,4 @@
+<resources>
+    <string name="voice_channel">Голосовая комната</string>
+    <string name="voice_ongoing">Идёт разговор. Нажмите, чтобы открыть Space.</string>
+</resources>

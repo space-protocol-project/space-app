@@ -8,9 +8,16 @@ import 'package:flutter/widgets.dart';
 import 'voice_audio_settings.dart';
 import 'voice_shortcut.dart';
 
+final voiceTouchTransmission = ValueNotifier(false);
+
 /// Разрешение передачи применяется только к уже включённому микрофону.
 class VoiceTransmission with WidgetsBindingObserver {
-  VoiceTransmission({required this.level, required this.transmit});
+  VoiceTransmission({
+    required this.level,
+    required this.transmit,
+    this.allowTouch = false,
+  });
+  final bool allowTouch;
   final Future<double> Function() level;
   final void Function(bool) transmit;
   VoiceAudioSettings settings = const VoiceAudioSettings();
@@ -29,6 +36,7 @@ class VoiceTransmission with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     HardwareKeyboard.instance.addHandler(_key);
     voiceShortcutRecording.addListener(_shortcutRecordingChanged);
+    voiceTouchTransmission.addListener(_touchChanged);
     transmit(false);
     _timer = Timer.periodic(const Duration(milliseconds: 50), (_) => _sample());
   }
@@ -69,6 +77,11 @@ class VoiceTransmission with WidgetsBindingObserver {
     if (_active) transmit(false);
   }
 
+  void _touchChanged() {
+    if (!allowTouch || !settings.pushToTalk) return;
+    transmit(_active && _focused && voiceTouchTransmission.value);
+  }
+
   @override
   void didChangeViewFocus(ViewFocusEvent event) =>
       _focus(event.state == ViewFocusState.focused);
@@ -81,6 +94,7 @@ class VoiceTransmission with WidgetsBindingObserver {
     _focused = value;
     _held = false;
     _tail = 0;
+    if (!value) voiceTouchTransmission.value = false;
     if (_active) transmit(false);
   }
 
@@ -136,6 +150,8 @@ class VoiceTransmission with WidgetsBindingObserver {
     _held = false;
     HardwareKeyboard.instance.removeHandler(_key);
     voiceShortcutRecording.removeListener(_shortcutRecordingChanged);
+    voiceTouchTransmission.removeListener(_touchChanged);
+    voiceTouchTransmission.value = false;
     WidgetsBinding.instance.removeObserver(this);
     transmit(false);
   }

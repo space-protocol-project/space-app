@@ -5,6 +5,8 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import 'voice_device_preferences.dart';
 import 'voice_audio_settings.dart';
+import 'voice_platform.dart';
+import 'voice_audio_native.dart';
 
 class VoiceDevice {
   const VoiceDevice(this.id, this.label, {required this.input});
@@ -25,7 +27,7 @@ class NativeVoiceDeviceBackend implements VoiceDeviceBackend {
       _listing ??= _enumerate().whenComplete(() => _listing = null);
 
   Future<List<VoiceDevice>> _enumerate() async {
-    await WebRTC.initialize(options: {'logSeverity': 'error'});
+    await VoiceAudioNative.initialize();
     var devices = await navigator.mediaDevices.enumerateDevices();
     if (!devices.any(
       (d) => d.kind == 'audioinput' || d.kind == 'audiooutput',
@@ -107,7 +109,7 @@ class VoiceDevices extends Cubit<VoiceDevicesState> {
         ready: ready ?? state.ready,
         input: _choice?.input,
         output: _choice?.output,
-        audio: _choice?.audio ?? const VoiceAudioSettings(),
+        audio: _choice?.audio ?? voiceDefaultAudio,
       ),
     );
   }

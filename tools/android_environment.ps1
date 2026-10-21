@@ -1,5 +1,10 @@
+param([string]$AndroidRoot)
 $project = Split-Path $PSScriptRoot -Parent
-$android = Join-Path $project '.local/android'
+$android = $AndroidRoot
+if (-not $android) { $android = Join-Path $project '.local/android' }
+if (-not (Test-Path -LiteralPath $android)) {
+    $android = Join-Path (Split-Path $project -Parent) 'android'
+}
 $env:ANDROID_HOME = Join-Path $android 'sdk'
 $env:ANDROID_SDK_ROOT = $env:ANDROID_HOME
 $env:JAVA_HOME = Join-Path $android 'java/jdk-21.0.12.1+1'

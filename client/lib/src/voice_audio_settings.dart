@@ -38,7 +38,7 @@ class VoiceAudioSettings {
 
   VoiceInputProfile get profile {
     if (customProfile) return VoiceInputProfile.custom;
-    if (noiseMode == VoiceNoiseSuppression.deepFilter &&
+    if (noiseSuppression &&
         echoCancellation &&
         autoGainControl &&
         highPassFilter) {

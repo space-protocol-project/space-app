@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import 'voice_network.dart';
@@ -10,8 +11,15 @@ import 'voice_audio_settings.dart';
 import 'voice_transmission.dart';
 import 'voice_denoiser.dart';
 import 'voice_activity.dart';
+import 'voice_android_session.dart';
 
-enum VoiceMediaStatus { connecting, connected, failed, processingFailed }
+enum VoiceMediaStatus {
+  connecting,
+  connected,
+  failed,
+  processingFailed,
+  microphoneInterrupted,
+}
 
 abstract interface class VoiceMedia {
   Stream<VoiceMediaStatus> get changes;
@@ -40,23 +48,50 @@ class NativeVoiceMedia
   double _inputLevel = 0;
   final _audioLevels = VoiceAudioLevels();
   int _transmissionRevision = 0;
+  bool _interruptionReported = false;
   // Подтверждённое нативным обработчиком состояние, без записи звука.
   bool get transmitting => _transmitting;
   String? inputDeviceId;
   VoiceAudioSettings _audio = const VoiceAudioSettings();
+  var _androidSession = VoiceAndroidSession();
+  bool _ownsAndroidSession = true;
+
+  // Служба принадлежит всему разговору и переживает замену WebRTC-соединения.
+  void bindAndroidSession(VoiceAndroidSession session) {
+    if (_peer != null || _microphone != null || _closed) {
+      throw StateError('Нельзя заменить службу начатого разговора');
+    }
+    _androidSession = session;
+    _ownsAndroidSession = false;
+  }
+
   late final _transmission = VoiceTransmission(
     level: _level,
     transmit: _transmit,
+    allowTouch: Platform.isAndroid,
   );
 
   Future<double> _level() async {
     try {
       _inputLevel = await VoiceAudioNative.level();
       return _inputLevel;
+    } on PlatformException catch (error) {
+      if (error.code == 'audio_interrupted') {
+        _reportInterruption();
+      } else if (!_closed) {
+        _changes.add(VoiceMediaStatus.processingFailed);
+      }
+      rethrow;
     } catch (_) {
       if (!_closed) _changes.add(VoiceMediaStatus.processingFailed);
       rethrow;
     }
+  }
+
+  void _reportInterruption() {
+    if (_closed || _interruptionReported) return;
+    _interruptionReported = true;
+    _changes.add(VoiceMediaStatus.microphoneInterrupted);
   }
 
   void _transmit(bool enabled) {
@@ -92,10 +127,11 @@ class NativeVoiceMedia
   Future<String> offer([
     VoiceNetworkSettings settings = const VoiceNetworkSettings.local(),
   ]) async {
-    if (!(Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
+    if (Platform.isIOS) {
       throw UnsupportedError('Голосовой срез доступен на компьютере');
     }
-    await WebRTC.initialize(options: {'logSeverity': 'error'});
+    await VoiceAudioNative.initialize();
+    await _androidSession.start();
     final peer = await createPeerConnection(settings.peerConfiguration);
     if (_closed) {
       await peer.close();
@@ -234,12 +270,22 @@ class NativeVoiceMedia
     if (_microphone != null) {
       return;
     }
-    await VoiceAudioNative.transmission(false);
-    final denoiser = VoiceDenoiser();
-    _denoiser = denoiser;
-    await denoiser.open(_audio);
+    try {
+      _interruptionReported = false;
+      await VoiceAudioNative.capture(true);
+      await VoiceAudioNative.transmission(false);
+      final denoiser = VoiceDenoiser();
+      _denoiser = denoiser;
+      await denoiser.open(_audio);
+      await _openMicrophone();
+    } catch (_) {
+      await _stopMicrophone();
+      rethrow;
+    }
+  }
+
+  Future<void> _openMicrophone() async {
     if (_closed || _deafened) {
-      await denoiser.close();
       throw StateError('Включение микрофона отменено');
     }
     final stream = await navigator.mediaDevices.getUserMedia(
@@ -250,6 +296,7 @@ class NativeVoiceMedia
       throw StateError('Включение микрофона отменено');
     }
     _microphone = stream;
+    await _androidSession.capture(true);
     _transmit(false);
     _transmission.start(_audio);
     try {
@@ -282,8 +329,15 @@ class NativeVoiceMedia
         }
       }
     } finally {
-      await denoiser?.close();
-      if (_denoiser == denoiser) _denoiser = null;
+      try {
+        await denoiser?.close();
+        if (_denoiser == denoiser) _denoiser = null;
+      } finally {
+        await VoiceAudioNative.capture(false);
+        if (!_closed || !_ownsAndroidSession) {
+          await _androidSession.capture(false);
+        }
+      }
     }
   }
 
@@ -313,6 +367,7 @@ class NativeVoiceMedia
         try {
           await _peer?.dispose();
         } finally {
+          if (_ownsAndroidSession) await _androidSession.close();
           _remote.clear();
           unawaited(_changes.close());
         }

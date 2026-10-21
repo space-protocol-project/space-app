@@ -2080,7 +2080,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get voiceProfileSpeechHelp => 'DeepFilterNet3 降噪、回声消除、自动增益和高通滤波。';
+  String get voiceProfileSpeechHelp => '降噪、回声消除、自动增益控制和高通滤波。';
 
   @override
   String get voiceProfileStudioHelp => '不处理麦克风音频。适合音乐和已处理的输入；请使用耳机。';
@@ -2129,6 +2129,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get voiceActivityUpdateRuntime => '请更新空间运行时以突出显示正在说话的参与者。';
+
+  @override
+  String get voiceHoldToTalk => '按住说话';
+
+  @override
+  String get voiceTouchToTalkHint => '在房间中开启麦克风，然后按住通话按钮。应用进入后台时会松开按钮。';
+
+  @override
+  String get voiceAndroidNoiseHelp =>
+      '默认启用 DeepFilterNet3。WebRTC 是负载较低的选项，也可以关闭处理。音频在手机上处理。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

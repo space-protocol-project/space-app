@@ -830,7 +830,7 @@
       }
     }
   },
-  "voiceProfileSpeechHelp": "DeepFilterNet3 noise suppression, echo cancellation, automatic gain and high-pass filter.",
+  "voiceProfileSpeechHelp": "Noise suppression, echo cancellation, automatic gain control and a high-pass filter.",
   "voiceProfileStudioHelp": "Unprocessed microphone audio. For music and prepared input; use headphones.",
   "voiceProfileCustomHelp": "Adjust each processing option separately.",
   "voiceActivity": "Voice activity",
@@ -852,5 +852,8 @@
   },
   "voiceRoomEmpty": "No one is in this room yet",
   "voiceMicrophoneEnabled": "Microphone enabled",
-  "voiceActivityUpdateRuntime": "Update this space’s runtime to highlight speaking participants."
+  "voiceActivityUpdateRuntime": "Update this space’s runtime to highlight speaking participants.",
+  "voiceHoldToTalk": "Hold to talk",
+  "voiceTouchToTalkHint": "Enable the microphone in the room and hold the talk button. The button is released when the app goes into the background.",
+  "voiceAndroidNoiseHelp": "DeepFilterNet3 is enabled by default. WebRTC is a lighter option; processing can also be disabled. Audio is processed on your phone."
 }

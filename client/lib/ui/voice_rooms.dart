@@ -14,6 +14,7 @@ import 'components.dart';
 import 'voice_connection_info.dart';
 import 'voice_room_details.dart';
 import 'voice_roster.dart';
+import 'voice_touch_button.dart';
 
 class VoiceRoomsView extends StatelessWidget {
   const VoiceRoomsView({
@@ -49,16 +50,19 @@ class VoiceRoomsView extends StatelessWidget {
   }
 
   List<Widget> _rooms(BuildContext context, SpaceSession connected) {
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (Platform.isIOS) {
       return [Text(context.strings.voiceDesktopOnly)];
     }
     if (connected.server.voiceRoomsVersion != 3) {
       return [Text(context.strings.voiceUpdateRuntime)];
     }
     final rooms = _visibleRooms(connected);
+    final compact = MediaQuery.sizeOf(context).width < 600;
     return [
-      Text(context.strings.voiceLimit),
-      const SizedBox(height: 16),
+      if (!compact) ...[
+        Text(context.strings.voiceLimit),
+        const SizedBox(height: 16),
+      ],
       if (rooms.isEmpty)
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 24),
@@ -76,7 +80,10 @@ class VoiceRoomsView extends StatelessWidget {
           ),
         ),
       const SizedBox(height: 20),
-
+      if (compact) ...[
+        Text(context.strings.voiceLimit),
+        const SizedBox(height: 16),
+      ],
       Text(
         context.strings.voicePrivacy,
         style: Theme.of(context).textTheme.bodySmall,
@@ -146,6 +153,8 @@ class VoiceCallBar extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     _controls(context, state),
+                    if (Platform.isAndroid && !state.muted && !state.busy)
+                      _touchControl(),
                     if (state.phase == VoicePhase.connected)
                       VoiceConnectionDetails(info: state.connection),
                     _deviceWarning(),
@@ -219,5 +228,12 @@ class VoiceCallBar extends StatelessWidget {
         style: Theme.of(context).textTheme.bodySmall,
       );
     },
+  );
+
+  Widget _touchControl() => BlocBuilder<VoiceDevices, VoiceDevicesState>(
+    bloc: controller.devices,
+    builder: (context, state) => state.audio.pushToTalk
+        ? const VoiceTouchButton()
+        : const SizedBox.shrink(),
   );
 }

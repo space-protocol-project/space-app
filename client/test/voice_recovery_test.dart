@@ -131,6 +131,24 @@ class VoiceHarness {
 }
 
 void main() {
+  test('Потеря аудиофокуса выключает микрофон без выхода из комнаты', () {
+    fakeAsync((clock) {
+      final h = VoiceHarness(clock)..start();
+      unawaited(h.controller.toggleMicrophone());
+      clock.flushMicrotasks();
+      expect(h.controller.state.muted, false);
+      h.media.single.stream.add(VoiceMediaStatus.microphoneInterrupted);
+      clock.flushMicrotasks();
+      expect(h.controller.state.muted, true);
+      expect(h.controller.state.phase, VoicePhase.connected);
+      expect(h.controller.state.error, contains('Аудиофокус'));
+      expect(h.media.single.closed, false);
+      clock.elapse(const Duration(seconds: 2));
+      expect(h.controller.state.muted, true);
+      expect(h.media.length, 1);
+      h.dispose();
+    });
+  });
   test('Ошибка обработки закрывает захват без повторного входа', () {
     fakeAsync((clock) {
       final h = VoiceHarness(clock)..start();

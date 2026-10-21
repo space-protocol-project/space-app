@@ -4087,7 +4087,7 @@ abstract class AppLocalizations {
   /// No description provided for @voiceProfileSpeechHelp.
   ///
   /// In ru, this message translates to:
-  /// **'Шумоподавление DeepFilterNet3, подавление эха, выравнивание громкости и фильтр гула.'**
+  /// **'Шумоподавление, подавление эха, выравнивание громкости и фильтр гула.'**
   String get voiceProfileSpeechHelp;
 
   /// No description provided for @voiceProfileStudioHelp.
@@ -4179,6 +4179,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Для подсветки говорящих собеседников обновите runtime пространства.'**
   String get voiceActivityUpdateRuntime;
+
+  /// No description provided for @voiceHoldToTalk.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удерживайте, чтобы говорить'**
+  String get voiceHoldToTalk;
+
+  /// No description provided for @voiceTouchToTalkHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включите микрофон в комнате и удерживайте кнопку разговора. При сворачивании приложения кнопка отпускается.'**
+  String get voiceTouchToTalkHint;
+
+  /// No description provided for @voiceAndroidNoiseHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'DeepFilterNet3 включён по умолчанию. WebRTC — более лёгкий вариант; обработку можно отключить. Звук обрабатывается на телефоне.'**
+  String get voiceAndroidNoiseHelp;
 }
 
 class _AppLocalizationsDelegate

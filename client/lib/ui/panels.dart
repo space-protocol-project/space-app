@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'mls_create.dart';
 import '../src/voice_devices.dart';
 import 'voice_shortcut_settings.dart';
@@ -254,7 +256,7 @@ class SettingsPanel extends StatelessWidget {
       ShortcutSettings(
         preferences: preferences,
         value: state.sendShortcut,
-        additionalShortcuts: voiceDevices == null
+        additionalShortcuts: voiceDevices == null || Platform.isAndroid
             ? null
             : VoiceShortcutSettings(devices: voiceDevices!),
       ),

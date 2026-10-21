@@ -1,13 +1,28 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 class VoiceAudioNative {
   static const _channel = MethodChannel('FlutterWebRTC.Method');
+  static Future<void> initialize() => WebRTC.initialize(
+    options: {
+      'logSeverity': 'error',
+      'androidUseHardwareAudioProcessing': false,
+    },
+  );
+  static Future<void> capture(bool enabled) async {
+    if (!Platform.isAndroid) return;
+    await _channel.invokeMethod<void>('spaceVoiceCapture', {
+      'enabled': enabled,
+    });
+  }
+
   static Future<void> gain(double value) async {
     if (!value.isFinite || value < 0 || value > 2) {
       throw ArgumentError.value(value);
     }
-    await WebRTC.initialize(options: {'logSeverity': 'error'});
+    await initialize();
     await _channel.invokeMethod<void>('spaceVoiceGain', {'gain': value});
   }
 

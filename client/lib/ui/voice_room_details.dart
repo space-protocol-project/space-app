@@ -114,37 +114,37 @@ class _VoiceRoomDetailsState extends State<VoiceRoomDetails>
     final active = widget.controller.matches(widget.api, widget.room.id);
     final roster = active && state.roster != null ? state.roster : _roster;
     return SurfaceCard(
+      padding: EdgeInsets.all(MediaQuery.sizeOf(context).width < 600 ? 16 : 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const Icon(Icons.headphones_outlined),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Text(
-                  widget.room.title,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-              FilledButton.tonal(
-                key: ValueKey('voice-join-${widget.room.id}'),
-                onPressed: active || !widget.room.permissions.read
-                    ? null
-                    : () => unawaited(
-                        widget.controller.join(
-                          widget.api,
-                          widget.room.id,
-                          widget.room.title,
-                        ),
-                      ),
-                child: Text(
-                  active
-                      ? context.strings.voiceConnected
-                      : context.strings.voiceJoin,
-                ),
-              ),
-            ],
+          SizedBox(
+            width: double.infinity,
+            child: Text(
+              widget.room.title,
+              key: ValueKey('voice-room-title-${widget.room.id}'),
+              softWrap: true,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
+          const SizedBox(height: 12),
+          FilledButton.tonalIcon(
+            key: ValueKey('voice-join-${widget.room.id}'),
+            onPressed: active || !widget.room.permissions.read
+                ? null
+                : () => unawaited(
+                    widget.controller.join(
+                      widget.api,
+                      widget.room.id,
+                      widget.room.title,
+                    ),
+                  ),
+            icon: const Icon(Icons.headphones_outlined),
+            label: Text(
+              active
+                  ? context.strings.voiceConnected
+                  : context.strings.voiceJoin,
+            ),
           ),
           const SizedBox(height: 24),
           if (!widget.room.permissions.read)

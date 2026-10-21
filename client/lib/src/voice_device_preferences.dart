@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'voice_audio_settings.dart';
+import 'voice_platform.dart';
 
 class VoiceDeviceChoice {
   const VoiceDeviceChoice({
@@ -46,23 +47,27 @@ class SavedVoiceDevicePreferences implements VoiceDevicePreferences {
   Future<VoiceDeviceChoice> load() async {
     final preferences = await SharedPreferences.getInstance();
     final saved = preferences.get(key);
-    if (saved is! String) return const VoiceDeviceChoice();
+    if (saved is! String) return VoiceDeviceChoice(audio: voiceDefaultAudio);
     try {
       return _decode(saved);
     } on FormatException {
-      return const VoiceDeviceChoice();
+      return VoiceDeviceChoice(audio: voiceDefaultAudio);
     }
   }
 
   VoiceDeviceChoice _decode(String saved) {
     final value = jsonDecode(saved);
-    if (value is! Map<String, dynamic>) return const VoiceDeviceChoice();
+    if (value is! Map<String, dynamic>) {
+      return VoiceDeviceChoice(audio: voiceDefaultAudio);
+    }
     return VoiceDeviceChoice(
       input: _deviceId(value['input']),
       output: _deviceId(value['output']),
       inputLabel: _deviceId(value['inputLabel']),
       outputLabel: _deviceId(value['outputLabel']),
-      audio: VoiceAudioSettings.fromJson(value['audio']),
+      audio: value['audio'] is Map<String, dynamic>
+          ? VoiceAudioSettings.fromJson(value['audio'])
+          : voiceDefaultAudio,
     );
   }
 

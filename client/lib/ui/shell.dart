@@ -1236,7 +1236,8 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             title: Text(context.strings.spacesTitle),
             onTap: showServers,
           ),
-          if (controller.preview != null || controller.connected) chatGroup(),
+          if (controller.preview != null || controller.connected)
+            _sidebarSection(Section.chat),
           _sidebarSection(Section.rooms),
           ListTile(
             leading: const Icon(Icons.bookmark_border),
@@ -2093,7 +2094,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   Widget _sidebarSection(Section section) {
     if (section == Section.chat) {
       return Padding(
-        padding: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.only(bottom: 16),
         child: chatGroup(),
       );
     }

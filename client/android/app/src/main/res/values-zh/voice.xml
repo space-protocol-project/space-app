@@ -1,0 +1,4 @@
+<resources>
+    <string name="voice_channel">语音房间</string>
+    <string name="voice_ongoing">通话进行中。点按打开 Space。</string>
+</resources>

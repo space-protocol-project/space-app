@@ -33,6 +33,7 @@ class NativeVoiceMicrophoneProbe implements VoiceMicrophoneProbe {
   Future<void> open(String? device, VoiceAudioSettings settings) async {
     _check();
     await VoiceAudioNative.gain(settings.inputGain);
+    await VoiceAudioNative.capture(true);
     await VoiceAudioNative.transmission(true);
     await _denoiser.open(settings);
     _check();
@@ -186,7 +187,12 @@ class NativeVoiceMicrophoneProbe implements VoiceMicrophoneProbe {
         try {
           await _closePeer(_receiver);
         } finally {
-          await _denoiser.close();
+          try {
+            await _denoiser.close();
+          } finally {
+            await VoiceAudioNative.transmission(false);
+            await VoiceAudioNative.capture(false);
+          }
         }
       }
     }

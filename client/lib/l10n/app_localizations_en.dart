@@ -2252,7 +2252,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voiceProfileSpeechHelp =>
-      'DeepFilterNet3 noise suppression, echo cancellation, automatic gain and high-pass filter.';
+      'Noise suppression, echo cancellation, automatic gain control and a high-pass filter.';
 
   @override
   String get voiceProfileStudioHelp =>
@@ -2306,4 +2306,15 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get voiceActivityUpdateRuntime =>
       'Update this space’s runtime to highlight speaking participants.';
+
+  @override
+  String get voiceHoldToTalk => 'Hold to talk';
+
+  @override
+  String get voiceTouchToTalkHint =>
+      'Enable the microphone in the room and hold the talk button. The button is released when the app goes into the background.';
+
+  @override
+  String get voiceAndroidNoiseHelp =>
+      'DeepFilterNet3 is enabled by default. WebRTC is a lighter option; processing can also be disabled. Audio is processed on your phone.';
 }

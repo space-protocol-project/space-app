@@ -11,6 +11,7 @@ import 'voice_signaling.dart';
 import 'voice_recovery.dart';
 import 'voice_audio_settings.dart';
 import 'voice_microphone_test.dart';
+import 'voice_android_session.dart';
 
 enum VoicePhase { idle, joining, reconnecting, connected, failed }
 
@@ -19,6 +20,7 @@ class _VoiceTarget {
   final VoiceSignaling api;
   final String room, title;
   bool deafened = false;
+  final androidSession = VoiceAndroidSession();
 }
 
 class VoiceState {
@@ -148,6 +150,9 @@ class VoiceController extends Cubit<VoiceState> {
     bool reconnecting,
   ) async {
     final media = mediaFactory();
+    if (media is NativeVoiceMedia) {
+      media.bindAndroidSession(target.androidSession);
+    }
     _media = media;
     _api = target.api;
     emit(
@@ -320,6 +325,10 @@ class VoiceController extends Cubit<VoiceState> {
     if (generation != _generation || _closed) {
       return;
     }
+    if (status == VoiceMediaStatus.microphoneInterrupted) {
+      unawaited(_interruptedMicrophone(generation));
+      return;
+    }
     if (status == VoiceMediaStatus.processingFailed) {
       unawaited(
         _fail(
@@ -343,6 +352,18 @@ class VoiceController extends Cubit<VoiceState> {
       _completeConnection(generation);
     }
   }
+
+  Future<void> _interruptedMicrophone(int generation) => _microphoneFailed(
+    StateError(
+      'Аудиофокус потерян. Включите микрофон снова после завершения другого звонка.',
+    ),
+    _api!,
+    _media!,
+    state.room,
+    _id,
+    generation,
+    state.deafened,
+  );
 
   void _completeConnection(int generation) {
     if (generation != _generation ||
@@ -656,6 +677,7 @@ class VoiceController extends Cubit<VoiceState> {
 
   Future<void> leave() async {
     if (!_closed && state.active) _publish(busy: true, muted: true);
+    final target = _target;
     _target = null;
     _recovery.reset();
     _cancel(_disconnected);
@@ -663,14 +685,28 @@ class VoiceController extends Cubit<VoiceState> {
     final testCleanup = microphoneTest.stop();
     final cleanup = _disconnectMedia();
     final generation = _generation;
-    final failure = await cleanup;
-    await testCleanup;
+    var failure = await cleanup;
+    try {
+      await testCleanup;
+    } finally {
+      final serviceFailure = await _stopAndroidSession(target);
+      failure ??= serviceFailure;
+    }
     if (!_closed && generation == _generation) {
       emit(
         failure == null
             ? const VoiceState()
             : VoiceState(phase: VoicePhase.failed, error: failure.toString()),
       );
+    }
+  }
+
+  Future<Object?> _stopAndroidSession(_VoiceTarget? target) async {
+    try {
+      await target?.androidSession.close();
+      return null;
+    } catch (error) {
+      return error;
     }
   }
 

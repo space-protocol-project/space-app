@@ -74,7 +74,7 @@ class NotificationsBridge(private val activity: MainActivity, private val channe
     private fun clear() = synchronized(PushStore.lock) {
         val store = PushStore(activity); val root = store.read(); root.remove("targets"); store.write(root)
         val manager = activity.getSystemService(NotificationManager::class.java)
-        manager.activeNotifications.filter { it.id != 1 }.forEach { manager.cancel(it.tag,it.id) }
+        manager.activeNotifications.filter { it.id != 1 && it.id != VoiceService.NOTIFICATION_ID }.forEach { manager.cancel(it.tag,it.id) }
     }
     private fun identity(id: String): Map<String,String> = synchronized(PushStore.lock) {
         require(id.length <= 2048)
