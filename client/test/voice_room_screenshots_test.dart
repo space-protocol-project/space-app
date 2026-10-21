@@ -1,28 +1,78 @@
-import 'dart:io';
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:space_client/l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:space_client/src/core.dart';
+import 'package:space_client/src/generated/space/v1/space.pb.dart' show Channel;
 import 'package:space_client/src/generated/space/v1/voice.pb.dart';
 import 'package:space_client/src/preferences.dart';
 import 'package:space_client/src/voice_controller.dart';
+import 'package:space_client/ui/shell.dart';
 import 'package:space_client/ui/voice_room_details.dart';
-import 'package:space_client/ui/voice_room_navigation.dart';
-import 'package:space_client/ui/voice_rooms.dart';
 
 import 'channels_test.dart' show chat;
-import 'redesign_golden_test.dart' show loadFonts;
-import 'voice_controller_test.dart' show FakeVoiceApi, FakeVoiceMedia;
+import 'chat_examples_screenshots_test.dart' show captureExample;
 
-class ScreenshotController extends VoiceController {
-  ScreenshotController() : super(mediaFactory: () => FakeVoiceMedia([]));
-  void show(VoiceRoomState roster) => emit(
+import 'package:space_client/l10n/app_localizations.dart';
+import 'package:space_admin_ui/space_admin_ui.dart';
+import 'package:space_client/src/voice_signaling.dart';
+
+import 'voice_controller_test.dart' show FakeVoiceMedia;
+import 'redesign_golden_test.dart' show loadFonts;
+import 'support/chat_examples.dart' show ExampleController, ExampleFiles;
+
+final room = chat('room')
+  ..title = 'Поговорение'
+  ..views.first.type = 'voice_room';
+final roster = VoiceRoomState(
+  capacity: 8,
+  canPublish: true,
+  participants: [
+    VoiceParticipant(sessionId: 'local', nickname: 'Алиса', audioSlot: 0),
+    VoiceParticipant(sessionId: 'other', nickname: 'Борис', audioSlot: 1),
+    VoiceParticipant(sessionId: 'third', nickname: 'София', audioSlot: 2),
+    VoiceParticipant(
+      sessionId: 'fourth',
+      nickname: 'Максим',
+      audioSlot: 3,
+      muted: true,
+    ),
+  ],
+);
+
+class ScreenshotSession implements SpaceSession {
+  @override
+  final server = Discovery(
+    localOrigin('http://127.0.0.1:8080'),
+    'srv_voice_demo',
+    List.filled(32, 1),
+    voiceRoomsVersion: 3,
+  );
+  @override
+  List<Channel> get availableChannels => [chat('general'), room];
+  @override
+  bool get mlsSupported => false;
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class ScreenshotController extends ExampleController {
+  ScreenshotController() : super('reactions', ExampleFiles());
+  final session = ScreenshotSession();
+  @override
+  List<Channel> get voiceRooms => [room];
+  @override
+  SpaceSession get mlsSession => session;
+}
+
+class ScreenshotVoice extends VoiceController {
+  ScreenshotVoice() : super(mediaFactory: () => FakeVoiceMedia([]));
+  @override
+  bool matches(VoiceSignaling api, String id) => id == room.id && state.active;
+  void show() => emit(
     VoiceState(
       phase: VoicePhase.connected,
-      title: 'Поговорение',
-      room: 'room',
+      title: room.title,
+      room: room.id,
       muted: false,
       canPublish: true,
       roster: roster,
@@ -32,107 +82,60 @@ class ScreenshotController extends VoiceController {
 }
 
 void main() {
-  for (final width in [1280.0, 430.0]) {
-    testWidgets('Снимок комнаты с демонстрационным разговором: $width', (
+  for (final width in [1440.0, 1100.0]) {
+    testWidgets('Полный интерфейс приложения с голосовой комнатой: $width', (
       tester,
     ) async {
-      tester.view.physicalSize = Size(width, 900);
+      SharedPreferences.setMockInitialValues({'space.ui.dark': true});
+      tester.view.physicalSize = Size(width, 1000);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       await tester.runAsync(loadFonts);
-      final controller = ScreenshotController();
-      final api = FakeVoiceApi([]);
-      await controller.join(api, 'room', 'Поговорение');
-      final roster = VoiceRoomState(
-        capacity: 8,
-        canPublish: true,
-        participants: [
-          VoiceParticipant(sessionId: 'local', nickname: 'Алиса', audioSlot: 0),
-          VoiceParticipant(sessionId: 'other', nickname: 'Борис', audioSlot: 1),
-          VoiceParticipant(sessionId: 'third', nickname: 'София', audioSlot: 2),
-          VoiceParticipant(
-            sessionId: 'fourth',
-            nickname: 'Максим',
-            audioSlot: 3,
-            muted: true,
-          ),
-        ],
-      );
-      controller.show(roster);
       final preferences = AppPreferences();
-      final room = chat('room')..title = 'Поговорение';
-      const key = ValueKey('room-screenshot');
+      final controller = ScreenshotController()..connected = true;
+      controller.server(controller.session.server);
+      final voice = ScreenshotVoice()..show();
+      final boundary = GlobalKey();
       await tester.pumpWidget(
         RepaintBoundary(
-          key: key,
+          key: boundary,
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
-            locale: const Locale('ru'),
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
             theme: preferences.theme,
-            home: Scaffold(
-              appBar: AppBar(title: const Text('Голосовая комната')),
-              body: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (width > 700)
-                    SizedBox(
-                      width: 260,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: VoiceRoomNavigation(
-                          rooms: [room],
-                          active: true,
-                          selectedRoomId: 'room',
-                          onSelect: (_) {},
-                          onRefresh: () {},
-                        ),
-                      ),
-                    ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: VoiceRoomDetails(
-                          room: room,
-                          controller: controller,
-                          api: api,
-                          load: () async => roster,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              bottomNavigationBar: VoiceCallBar(controller: controller),
+            locale: const Locale('ru'),
+            supportedLocales: AppLocalizations.supportedLocales,
+            localizationsDelegates: [
+              AdminLocalizations.delegate,
+              ...AppLocalizations.localizationsDelegates,
+            ],
+            home: SpaceShell(
+              preferences: preferences,
+              controller: controller,
+              voiceController: voice,
             ),
           ),
         ),
       );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Комнаты').first);
       await tester.pump(const Duration(milliseconds: 300));
+      expect(find.byType(VoiceRoomDetails), findsOneWidget);
       expect(find.byType(CircleAvatar), findsNWidgets(4));
       expect(
         find.byKey(const ValueKey('voice-avatar-local-true')),
         findsOneWidget,
       );
+      expect(find.text('Управление пространством'), findsOneWidget);
       expect(tester.takeException(), isNull);
-      final boundary = tester.renderObject<RenderRepaintBoundary>(
-        find.byKey(key),
+      await captureExample(
+        tester,
+        boundary,
+        '../.local/voice-room-screenshots/voice-room-speaking-${width.toInt()}.png',
       );
-      await tester.runAsync(() async {
-        final image = await boundary.toImage();
-        final data = await image.toByteData(format: ui.ImageByteFormat.png);
-        final file = File(
-          '../.local/voice-room-screenshots/voice-room-speaking-${width.toInt()}.png',
-        );
-        await file.parent.create(recursive: true);
-        await file.writeAsBytes(data!.buffer.asUint8List());
-        image.dispose();
-      });
       await tester.pumpWidget(const SizedBox.shrink());
-      await controller.close();
+      await tester.runAsync(controller.close);
+      await voice.close();
       preferences.dispose();
     });
   }

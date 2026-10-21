@@ -97,6 +97,7 @@ class SpaceShell extends StatefulWidget {
     super.key,
     required this.preferences,
     this.controller,
+    this.voiceController,
     this.presence,
     this.workspaces,
     this.updates,
@@ -110,6 +111,7 @@ class SpaceShell extends StatefulWidget {
   final SystemNotifications? notifications;
   final Future<void>? startupReady;
   final ChatController? controller;
+  final VoiceController? voiceController;
   final ServerPresence? presence;
   final ServerWorkspaces? workspaces;
   @override
@@ -119,7 +121,7 @@ class SpaceShell extends StatefulWidget {
 class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   late final systemNotifications =
       widget.notifications ?? SystemNotifications();
-  final voice = VoiceController();
+  late final voice = widget.voiceController ?? VoiceController();
   final notificationTracker = ChatNotificationTracker();
   StreamSubscription<String>? notificationTaps;
   Future<void> notificationJobs = Future.value();
@@ -901,7 +903,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    unawaited(voice.close());
+    if (widget.voiceController == null) unawaited(voice.close());
     mlsNotificationTimer?.cancel();
     mlsNotificationWatcher.dispose();
     WidgetsBinding.instance.removeObserver(this);
