@@ -1,6 +1,6 @@
-# Голосовые комнаты: настольный срез
+# Голосовые комнаты: компьютеры и Android
 
-Голосовые комнаты и настройки звука выпущены в [клиенте v0.7.10](https://github.com/space-protocol-project/space-app/releases/tag/v0.7.10) с [runtime v0.7.5](https://github.com/space-protocol-project/space-server/releases/tag/v0.7.5), схемой 24 и голосовым профилем 3. Ниже приведены результаты автоматических проверок и их границы. Разговор людей на слух, физические горячие клавиши, устройства macOS/Linux и публичный TURN остаются отдельными пунктами ручной приёмки в [TODO](https://github.com/space-protocol-project/space-protocol/blob/codex/voice-rooms/TODO.md).
+Голосовые комнаты и настройки звука выпущены в [клиенте v0.7.11](https://github.com/space-protocol-project/space-app/releases/tag/v0.7.11) с [runtime v0.7.7](https://github.com/space-protocol-project/space-server/releases/tag/v0.7.7), схемой 24 и голосовым профилем 3. Ниже приведены результаты автоматических проверок и их границы. Разговор людей на слух, физические горячие клавиши, устройства macOS/Linux и публичный TURN остаются отдельными пунктами ручной приёмки в [TODO](https://github.com/space-protocol-project/space-protocol/blob/codex/voice-rooms/TODO.md).
 
 ## Android: опубликованный v0.7.10 — 21 октября
 
