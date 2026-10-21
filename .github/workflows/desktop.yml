@@ -104,6 +104,12 @@ jobs:
       - name: Полный перенос пространства и восстановление доступа
         working-directory: client
         run: flutter test test/migration_archive_test.dart test/home_migration_test.dart test/mls_migration_test.dart test/migration_password_dialog_test.dart test/recovery_spaces_test.dart test/device_recovery_batch_test.dart test/device_migration_test.dart test/device_migration_files_test.dart test/device_transfer_area_test.dart
+      - name: Установка закреплённого runtime из опубликованного выпуска
+        if: startsWith(github.ref, 'refs/tags/v')
+        working-directory: client
+        env:
+          SPACE_HOME_INSTALL_CHECK: '1'
+        run: flutter test --no-pub test/home_runtime_install_test.dart
       - name: Нативное усиление и измеритель микрофона
         run: python tools/check_voice_signal.py
       - name: Атомарная запись защищённого состояния Windows
@@ -245,8 +251,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: space-protocol-project/space-server
-          # Совместимая версия runtime v0.7.5, схема 24.
-          ref: b411181d6bda2c9d53abc3fd9de0ed490c0072c0
+          # Совместимая версия runtime v0.7.7 на Go 1.27.3, схема 24.
+          ref: 9665dfcbd37dd4de9ecbb034e5034d9ccaac4f60
           path: space-server
       - uses: actions/setup-go@v5
         with:
