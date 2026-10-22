@@ -4776,6 +4776,7 @@ class Channel extends $pb.GeneratedMessage {
     $core.bool? publicPreview,
     $fixnum.Int64? latestMessageSequence,
     $core.List<$core.int>? mlsGroupId,
+    $core.int? voiceCapacity,
   }) {
     final result = Channel._();
     if (id != null) result.id = id;
@@ -4789,6 +4790,7 @@ class Channel extends $pb.GeneratedMessage {
     if (latestMessageSequence != null)
       result.latestMessageSequence = latestMessageSequence;
     if (mlsGroupId != null) result.mlsGroupId = mlsGroupId;
+    if (voiceCapacity != null) result.voiceCapacity = voiceCapacity;
     return result;
   }
 
@@ -4818,6 +4820,7 @@ class Channel extends $pb.GeneratedMessage {
     ..aInt64(9, _omitFieldNames ? '' : 'latestMessageSequence')
     ..a<$core.List<$core.int>>(
         10, _omitFieldNames ? '' : 'mlsGroupId', $pb.PbFieldType.OY)
+    ..aI(11, _omitFieldNames ? '' : 'voiceCapacity')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -4926,6 +4929,15 @@ class Channel extends $pb.GeneratedMessage {
   $core.bool hasMlsGroupId() => $_has(9);
   @$pb.TagNumber(10)
   void clearMlsGroupId() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $core.int get voiceCapacity => $_getIZ(10);
+  @$pb.TagNumber(11)
+  set voiceCapacity($core.int value) => $_setSignedInt32(10, value);
+  @$pb.TagNumber(11)
+  $core.bool hasVoiceCapacity() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearVoiceCapacity() => $_clearField(11);
 }
 
 /// write требует read, read и manage требуют visible.
@@ -5226,6 +5238,7 @@ class CreateChannelRequest extends $pb.GeneratedMessage {
     $core.int? position,
     $core.bool? publicPreview,
     $core.List<$core.int>? mlsGroupId,
+    $core.int? voiceCapacity,
   }) {
     final result = CreateChannelRequest._();
     if (channelId != null) result.channelId = channelId;
@@ -5234,6 +5247,7 @@ class CreateChannelRequest extends $pb.GeneratedMessage {
     if (position != null) result.position = position;
     if (publicPreview != null) result.publicPreview = publicPreview;
     if (mlsGroupId != null) result.mlsGroupId = mlsGroupId;
+    if (voiceCapacity != null) result.voiceCapacity = voiceCapacity;
     return result;
   }
 
@@ -5257,6 +5271,7 @@ class CreateChannelRequest extends $pb.GeneratedMessage {
     ..aOB(5, _omitFieldNames ? '' : 'publicPreview')
     ..a<$core.List<$core.int>>(
         6, _omitFieldNames ? '' : 'mlsGroupId', $pb.PbFieldType.OY)
+    ..aI(7, _omitFieldNames ? '' : 'voiceCapacity')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -5335,6 +5350,16 @@ class CreateChannelRequest extends $pb.GeneratedMessage {
   $core.bool hasMlsGroupId() => $_has(5);
   @$pb.TagNumber(6)
   void clearMlsGroupId() => $_clearField(6);
+
+  /// 0 сохраняет значение по умолчанию: 8. Только для voice_room.
+  @$pb.TagNumber(7)
+  $core.int get voiceCapacity => $_getIZ(6);
+  @$pb.TagNumber(7)
+  set voiceCapacity($core.int value) => $_setSignedInt32(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasVoiceCapacity() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearVoiceCapacity() => $_clearField(7);
 }
 
 class UpdateChannelRequest extends $pb.GeneratedMessage {
@@ -5345,6 +5370,7 @@ class UpdateChannelRequest extends $pb.GeneratedMessage {
     $core.bool? archived,
     $core.bool? publicPreview,
     $fixnum.Int64? expectedRevision,
+    $core.int? voiceCapacity,
   }) {
     final result = UpdateChannelRequest._();
     if (channelId != null) result.channelId = channelId;
@@ -5353,6 +5379,7 @@ class UpdateChannelRequest extends $pb.GeneratedMessage {
     if (archived != null) result.archived = archived;
     if (publicPreview != null) result.publicPreview = publicPreview;
     if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    if (voiceCapacity != null) result.voiceCapacity = voiceCapacity;
     return result;
   }
 
@@ -5375,6 +5402,7 @@ class UpdateChannelRequest extends $pb.GeneratedMessage {
     ..aOB(4, _omitFieldNames ? '' : 'archived')
     ..aOB(5, _omitFieldNames ? '' : 'publicPreview')
     ..aInt64(6, _omitFieldNames ? '' : 'expectedRevision')
+    ..aI(7, _omitFieldNames ? '' : 'voiceCapacity')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -5453,6 +5481,16 @@ class UpdateChannelRequest extends $pb.GeneratedMessage {
   $core.bool hasExpectedRevision() => $_has(5);
   @$pb.TagNumber(6)
   void clearExpectedRevision() => $_clearField(6);
+
+  /// 0 оставляет прежний лимит. Допустимо 2..32.
+  @$pb.TagNumber(7)
+  $core.int get voiceCapacity => $_getIZ(6);
+  @$pb.TagNumber(7)
+  set voiceCapacity($core.int value) => $_setSignedInt32(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasVoiceCapacity() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearVoiceCapacity() => $_clearField(7);
 }
 
 class DeleteChannelRequest extends $pb.GeneratedMessage {

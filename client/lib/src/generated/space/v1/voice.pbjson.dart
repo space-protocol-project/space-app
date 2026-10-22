@@ -244,15 +244,16 @@ const GetVoiceConfigurationResponse$json = {
     },
     {'1': 'relay_only', '3': 2, '4': 1, '5': 8, '10': 'relayOnly'},
     {'1': 'expires_at_unix', '3': 3, '4': 1, '5': 3, '10': 'expiresAtUnix'},
+    {'1': 'media_capacity', '3': 4, '4': 1, '5': 5, '10': 'mediaCapacity'},
   ],
 };
 
 /// Descriptor for `GetVoiceConfigurationResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getVoiceConfigurationResponseDescriptor =
-    $convert.base64Decode(
-        'Ch1HZXRWb2ljZUNvbmZpZ3VyYXRpb25SZXNwb25zZRI5CgtpY2Vfc2VydmVycxgBIAMoCzIYLn'
-        'NwYWNlLnYxLlZvaWNlSWNlU2VydmVyUgppY2VTZXJ2ZXJzEh0KCnJlbGF5X29ubHkYAiABKAhS'
-        'CXJlbGF5T25seRImCg9leHBpcmVzX2F0X3VuaXgYAyABKANSDWV4cGlyZXNBdFVuaXg=');
+final $typed_data.Uint8List getVoiceConfigurationResponseDescriptor = $convert.base64Decode(
+    'Ch1HZXRWb2ljZUNvbmZpZ3VyYXRpb25SZXNwb25zZRI5CgtpY2Vfc2VydmVycxgBIAMoCzIYLn'
+    'NwYWNlLnYxLlZvaWNlSWNlU2VydmVyUgppY2VTZXJ2ZXJzEh0KCnJlbGF5X29ubHkYAiABKAhS'
+    'CXJlbGF5T25seRImCg9leHBpcmVzX2F0X3VuaXgYAyABKANSDWV4cGlyZXNBdFVuaXgSJQoObW'
+    'VkaWFfY2FwYWNpdHkYBCABKAVSDW1lZGlhQ2FwYWNpdHk=');
 
 const $core.Map<$core.String, $core.dynamic> VoiceServiceBase$json = {
   '1': 'VoiceService',

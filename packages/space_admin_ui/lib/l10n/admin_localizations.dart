@@ -1653,6 +1653,24 @@ abstract class AdminLocalizations {
   /// In ru, this message translates to:
   /// **'Комната удалена.'**
   String get voiceRoomDeleted;
+
+  /// No description provided for @voiceRoomCapacity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лимит участников'**
+  String get voiceRoomCapacity;
+
+  /// No description provided for @voiceRoomCapacityHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'От 2 до 32, по умолчанию 8. Уменьшение лимита не отключает участников. Для изменения лимита нужны актуальные приложения у всех участников.'**
+  String get voiceRoomCapacityHelp;
+
+  /// No description provided for @voiceRoomCapacityInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите целое число участников от 2 до 32.'**
+  String get voiceRoomCapacityInvalid;
 }
 
 class _AdminLocalizationsDelegate

@@ -137,7 +137,7 @@ class VoiceParticipant extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   void clearDeafened() => $_clearField(6);
 
-  /// Стабильное место участника в комнате (0..7), не состояние микрофона.
+  /// Стабильное место участника в комнате (0..31), не состояние микрофона.
   @$pb.TagNumber(7)
   $core.int get audioSlot => $_getIZ(6);
   @$pb.TagNumber(7)
@@ -915,11 +915,13 @@ class GetVoiceConfigurationResponse extends $pb.GeneratedMessage {
     $core.Iterable<VoiceIceServer>? iceServers,
     $core.bool? relayOnly,
     $fixnum.Int64? expiresAtUnix,
+    $core.int? mediaCapacity,
   }) {
     final result = GetVoiceConfigurationResponse._();
     if (iceServers != null) result.iceServers.addAll(iceServers);
     if (relayOnly != null) result.relayOnly = relayOnly;
     if (expiresAtUnix != null) result.expiresAtUnix = expiresAtUnix;
+    if (mediaCapacity != null) result.mediaCapacity = mediaCapacity;
     return result;
   }
 
@@ -940,6 +942,7 @@ class GetVoiceConfigurationResponse extends $pb.GeneratedMessage {
         subBuilder: VoiceIceServer.$_createMessage)
     ..aOB(2, _omitFieldNames ? '' : 'relayOnly')
     ..aInt64(3, _omitFieldNames ? '' : 'expiresAtUnix')
+    ..aI(4, _omitFieldNames ? '' : 'mediaCapacity')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -990,6 +993,16 @@ class GetVoiceConfigurationResponse extends $pb.GeneratedMessage {
   $core.bool hasExpiresAtUnix() => $_has(2);
   @$pb.TagNumber(3)
   void clearExpiresAtUnix() => $_clearField(3);
+
+  /// Число участников, для которого клиент готовит аудиопотоки; 0 означает 8.
+  @$pb.TagNumber(4)
+  $core.int get mediaCapacity => $_getIZ(3);
+  @$pb.TagNumber(4)
+  set mediaCapacity($core.int value) => $_setSignedInt32(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasMediaCapacity() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearMediaCapacity() => $_clearField(4);
 }
 
 /// Голос передаётся WebRTC, через RPC проходит только управление и SDP.

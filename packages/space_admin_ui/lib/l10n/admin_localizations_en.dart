@@ -865,4 +865,15 @@ class AdminLocalizationsEn extends AdminLocalizations {
 
   @override
   String get voiceRoomDeleted => 'Room deleted.';
+
+  @override
+  String get voiceRoomCapacity => 'Participant limit';
+
+  @override
+  String get voiceRoomCapacityHelp =>
+      'From 2 to 32, default 8. Lowering the limit does not disconnect participants. Changing the limit requires up-to-date apps for all participants.';
+
+  @override
+  String get voiceRoomCapacityInvalid =>
+      'Enter a whole number of participants from 2 to 32.';
 }

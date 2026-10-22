@@ -141,7 +141,7 @@ class NativeVoiceMedia
     _peer = peer;
     peer.onConnectionState = _connectionChanged;
     peer.onTrack = _track;
-    _sender = await _prepareAudio(peer);
+    _sender = await _prepareAudio(peer, settings.mediaCapacity);
     final gathered = Completer<void>();
     peer.onIceGatheringState = (state) {
       if (state == RTCIceGatheringState.RTCIceGatheringStateComplete &&
@@ -174,12 +174,15 @@ class NativeVoiceMedia
     return sdp;
   }
 
-  Future<RTCRtpSender> _prepareAudio(RTCPeerConnection peer) async {
+  Future<RTCRtpSender> _prepareAudio(
+    RTCPeerConnection peer,
+    int capacity,
+  ) async {
     final outgoing = await peer.addTransceiver(
       kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
       init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendRecv),
     );
-    for (var index = 1; index < 7; index++) {
+    for (var index = 1; index < capacity - 1; index++) {
       await peer.addTransceiver(
         kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
         init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly),

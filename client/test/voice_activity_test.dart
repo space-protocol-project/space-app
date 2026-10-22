@@ -15,6 +15,28 @@ StatsReport audio(double energy, double seconds, int packets) =>
     });
 
 void main() {
+  test('Распознаются последние дорожки комнаты на 32 участника', () {
+    final levels = VoiceAudioLevels();
+    for (final slot in [7, 15, 29, 30]) {
+      expect(
+        levels.outputSlot(
+          StatsReport('remote', 'inbound-rtp', 0, {
+            'trackIdentifier': 'speaker-$slot',
+          }),
+        ),
+        slot,
+      );
+    }
+    expect(
+      levels.outputSlot(
+        StatsReport('remote', 'inbound-rtp', 0, {
+          'trackIdentifier': 'speaker-31',
+        }),
+      ),
+      isNull,
+    );
+  });
+
   test('Windows UUID связывается с дорожкой по mid из SDP', () {
     final levels = VoiceAudioLevels();
     levels.configure(
@@ -26,6 +48,13 @@ void main() {
       'mid': 'voice',
     });
     expect(levels.outputSlot(report), 2);
+    levels.configure(
+      'm=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=mid:voice\r\na=msid:speaker-30 speaker-30\r\n',
+    );
+    expect(levels.outputSlot(report), 30);
+    levels.configure(
+      'm=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=mid:voice\r\na=msid:speaker-2 speaker-2\r\n',
+    );
     expect(levels.read([report]), isEmpty);
     final speaking = StatsReport('remote', 'inbound-rtp', 0, {
       ...report.values,

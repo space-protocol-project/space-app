@@ -190,7 +190,9 @@ class VoiceController extends Cubit<VoiceState> {
       throw StateError('Некорректный ответ голосового сервера');
     }
     _id = reply.sessionId;
-    if (!reply.hasState() || reply.state.capacity != 8) {
+    if (!reply.hasState() ||
+        reply.state.capacity < 2 ||
+        reply.state.capacity > 32) {
       throw StateError('Некорректный ответ голосового сервера');
     }
     if (target.deafened) {
@@ -428,7 +430,7 @@ class VoiceController extends Cubit<VoiceState> {
     final local = people.where((p) => p.sessionId == _id).firstOrNull;
     final result = <String>{};
     if (activity.local && !state.muted && !state.deafened) result.add(_id);
-    if (local == null || !local.hasAudioSlot() || local.audioSlot > 7) {
+    if (local == null || !local.hasAudioSlot() || local.audioSlot > 31) {
       return result;
     }
     for (final person in people) {
@@ -441,7 +443,7 @@ class VoiceController extends Cubit<VoiceState> {
   }
 
   bool _remoteSpeaking(int slot, int local, VoiceAudioActivity activity) {
-    if (slot > 7 || slot == local) return false;
+    if (slot > 31 || slot == local) return false;
     final output = slot > local ? slot - 1 : slot;
     return activity.remoteSlots.contains(output);
   }

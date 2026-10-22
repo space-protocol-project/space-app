@@ -1299,6 +1299,7 @@ const Channel$json = {
       '10': 'latestMessageSequence'
     },
     {'1': 'mls_group_id', '3': 10, '4': 1, '5': 12, '10': 'mlsGroupId'},
+    {'1': 'voice_capacity', '3': 11, '4': 1, '5': 5, '10': 'voiceCapacity'},
   ],
 };
 
@@ -1310,7 +1311,8 @@ final $typed_data.Uint8List channelDescriptor = $convert.base64Decode(
     'lvbhI+CgtwZXJtaXNzaW9ucxgHIAEoCzIcLnNwYWNlLnYxLkNoYW5uZWxQZXJtaXNzaW9uc1IL'
     'cGVybWlzc2lvbnMSJQoOcHVibGljX3ByZXZpZXcYCCABKAhSDXB1YmxpY1ByZXZpZXcSNgoXbG'
     'F0ZXN0X21lc3NhZ2Vfc2VxdWVuY2UYCSABKANSFWxhdGVzdE1lc3NhZ2VTZXF1ZW5jZRIgCgxt'
-    'bHNfZ3JvdXBfaWQYCiABKAxSCm1sc0dyb3VwSWQ=');
+    'bHNfZ3JvdXBfaWQYCiABKAxSCm1sc0dyb3VwSWQSJQoOdm9pY2VfY2FwYWNpdHkYCyABKAVSDX'
+    'ZvaWNlQ2FwYWNpdHk=');
 
 @$core.Deprecated('Use channelPermissionsDescriptor instead')
 const ChannelPermissions$json = {
@@ -1395,6 +1397,7 @@ const CreateChannelRequest$json = {
     {'1': 'position', '3': 4, '4': 1, '5': 5, '10': 'position'},
     {'1': 'public_preview', '3': 5, '4': 1, '5': 8, '10': 'publicPreview'},
     {'1': 'mls_group_id', '3': 6, '4': 1, '5': 12, '10': 'mlsGroupId'},
+    {'1': 'voice_capacity', '3': 7, '4': 1, '5': 5, '10': 'voiceCapacity'},
   ],
 };
 
@@ -1403,7 +1406,8 @@ final $typed_data.Uint8List createChannelRequestDescriptor = $convert.base64Deco
     'ChRDcmVhdGVDaGFubmVsUmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSWQSFA'
     'oFdGl0bGUYAiABKAlSBXRpdGxlEhsKCXZpZXdfdHlwZRgDIAEoCVIIdmlld1R5cGUSGgoIcG9z'
     'aXRpb24YBCABKAVSCHBvc2l0aW9uEiUKDnB1YmxpY19wcmV2aWV3GAUgASgIUg1wdWJsaWNQcm'
-    'V2aWV3EiAKDG1sc19ncm91cF9pZBgGIAEoDFIKbWxzR3JvdXBJZA==');
+    'V2aWV3EiAKDG1sc19ncm91cF9pZBgGIAEoDFIKbWxzR3JvdXBJZBIlCg52b2ljZV9jYXBhY2l0'
+    'eRgHIAEoBVINdm9pY2VDYXBhY2l0eQ==');
 
 @$core.Deprecated('Use updateChannelRequestDescriptor instead')
 const UpdateChannelRequest$json = {
@@ -1421,6 +1425,7 @@ const UpdateChannelRequest$json = {
       '5': 3,
       '10': 'expectedRevision'
     },
+    {'1': 'voice_capacity', '3': 7, '4': 1, '5': 5, '10': 'voiceCapacity'},
   ],
 };
 
@@ -1429,7 +1434,8 @@ final $typed_data.Uint8List updateChannelRequestDescriptor = $convert.base64Deco
     'ChRVcGRhdGVDaGFubmVsUmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSWQSFA'
     'oFdGl0bGUYAiABKAlSBXRpdGxlEhoKCHBvc2l0aW9uGAMgASgFUghwb3NpdGlvbhIaCghhcmNo'
     'aXZlZBgEIAEoCFIIYXJjaGl2ZWQSJQoOcHVibGljX3ByZXZpZXcYBSABKAhSDXB1YmxpY1ByZX'
-    'ZpZXcSKwoRZXhwZWN0ZWRfcmV2aXNpb24YBiABKANSEGV4cGVjdGVkUmV2aXNpb24=');
+    'ZpZXcSKwoRZXhwZWN0ZWRfcmV2aXNpb24YBiABKANSEGV4cGVjdGVkUmV2aXNpb24SJQoOdm9p'
+    'Y2VfY2FwYWNpdHkYByABKAVSDXZvaWNlQ2FwYWNpdHk=');
 
 @$core.Deprecated('Use deleteChannelRequestDescriptor instead')
 const DeleteChannelRequest$json = {

@@ -43,7 +43,7 @@ class VoiceAudioLevels {
       multiLine: true,
     ).firstMatch(section);
     final tracks = RegExp(
-      r'^a=msid:[^\r\n ]+ speaker-([0-6])\r?$',
+      r'^a=msid:[^\r\n ]+ speaker-([0-9]|[12][0-9]|30)\r?$',
       multiLine: true,
     ).allMatches(section).map((match) => int.parse(match[1]!)).toSet();
     if (mid == null || tracks.length != 1) return null;
@@ -68,7 +68,8 @@ class VoiceAudioLevels {
   }
 
   int? _slot(Object? value) {
-    final match = RegExp(r'^speaker-([0-6])$').firstMatch('$value');
+    final match = RegExp(r'^speaker-([0-9]|[12][0-9]|30)$')
+        .firstMatch('$value');
     return match == null ? null : int.parse(match[1]!);
   }
 

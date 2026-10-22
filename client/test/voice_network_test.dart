@@ -4,6 +4,26 @@ import 'package:space_client/src/generated/space/v1/voice.pb.dart';
 import 'package:space_client/src/voice_network.dart';
 
 void main() {
+  test('Согласование 32 участников и совместимость с прежним сервером', () {
+    expect(
+      VoiceNetworkSettings.fromReply(GetVoiceConfigurationResponse())
+          .mediaCapacity,
+      8,
+    );
+    expect(
+      VoiceNetworkSettings.fromReply(
+        GetVoiceConfigurationResponse(mediaCapacity: 32),
+      ).mediaCapacity,
+      32,
+    );
+    expect(
+      () => VoiceNetworkSettings.fromReply(
+        GetVoiceConfigurationResponse(mediaCapacity: 33),
+      ),
+      throwsStateError,
+    );
+  });
+
   GetVoiceConfigurationResponse turn() => GetVoiceConfigurationResponse(
     relayOnly: true,
     expiresAtUnix: Int64(DateTime.now().millisecondsSinceEpoch ~/ 1000 + 3600),

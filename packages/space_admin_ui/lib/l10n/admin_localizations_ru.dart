@@ -866,4 +866,15 @@ class AdminLocalizationsRu extends AdminLocalizations {
 
   @override
   String get voiceRoomDeleted => 'Комната удалена.';
+
+  @override
+  String get voiceRoomCapacity => 'Лимит участников';
+
+  @override
+  String get voiceRoomCapacityHelp =>
+      'От 2 до 32, по умолчанию 8. Уменьшение лимита не отключает участников. Для изменения лимита нужны актуальные приложения у всех участников.';
+
+  @override
+  String get voiceRoomCapacityInvalid =>
+      'Укажите целое число участников от 2 до 32.';
 }

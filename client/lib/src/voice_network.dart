@@ -4,15 +4,18 @@ class VoiceNetworkSettings {
   const VoiceNetworkSettings.local()
     : iceServers = const [],
       relayOnly = false,
-      expiresAtUnix = 0;
+      expiresAtUnix = 0,
+      mediaCapacity = 8;
   const VoiceNetworkSettings._(
     this.iceServers,
     this.relayOnly,
     this.expiresAtUnix,
+    this.mediaCapacity,
   );
   final List<Map<String, dynamic>> iceServers;
   final bool relayOnly;
   final int expiresAtUnix;
+  final int mediaCapacity;
 
   factory VoiceNetworkSettings.fromReply(GetVoiceConfigurationResponse reply) {
     if (reply.iceServers.length > 2) {
@@ -26,7 +29,11 @@ class VoiceNetworkSettings {
         (hasTurn && (expiry < now + 30 || expiry > now + 87000))) {
       throw StateError('Недействительный срок доступа к TURN');
     }
-    return VoiceNetworkSettings._(entries, reply.relayOnly, expiry);
+    final capacity = reply.mediaCapacity == 0 ? 8 : reply.mediaCapacity;
+    if (capacity != 8 && capacity != 32) {
+      throw StateError('Некорректная вместимость голосового сервера');
+    }
+    return VoiceNetworkSettings._(entries, reply.relayOnly, expiry, capacity);
   }
 
   static Map<String, dynamic> _entry(VoiceIceServer entry) {

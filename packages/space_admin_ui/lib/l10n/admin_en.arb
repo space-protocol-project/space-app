@@ -361,5 +361,8 @@
   "voiceRoomCreated": "Room created.",
   "voiceRoomSaved": "Room settings saved.",
   "voiceRoomDeleted": "Room deleted.",
-  "@voiceRoomDeleteConfirm": {"placeholders": {"name": {"type": "String"}}}
+  "@voiceRoomDeleteConfirm": {"placeholders": {"name": {"type": "String"}}},
+  "voiceRoomCapacity": "Participant limit",
+  "voiceRoomCapacityHelp": "From 2 to 32, default 8. Lowering the limit does not disconnect participants. Changing the limit requires up-to-date apps for all participants.",
+  "voiceRoomCapacityInvalid": "Enter a whole number of participants from 2 to 32."
 }

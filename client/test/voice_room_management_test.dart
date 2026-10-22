@@ -67,7 +67,13 @@ void main() {
           find.byKey(const ValueKey('channel-title')),
           'Новая комната',
         );
+        final limit = find.widgetWithText(TextField, strings.voiceRoomCapacity);
+        await tester.enterText(limit, '33');
         await press(tester, strings.voiceRoomSave);
+        expect(find.text(strings.voiceRoomCapacityInvalid), findsOneWidget);
+        await tester.enterText(limit, '32');
+        await press(tester, strings.voiceRoomSave);
+        expect(server.channels['voice_lounge']!['voiceCapacity'], 32);
         expect(server.channels['voice_lounge']!['title'], 'Новая комната');
         await toggle(tester, 'rule-0-write');
         await press(tester, strings.channelSaveAccess);
@@ -110,6 +116,7 @@ void main() {
           {'type': 'voice_room'},
         ]);
         expect(created['id'], startsWith('voice_'));
+        expect(created['voiceCapacity'], 8);
         expect(
           find.widgetWithText(ListTile, 'Новая голосовая'),
           findsOneWidget,

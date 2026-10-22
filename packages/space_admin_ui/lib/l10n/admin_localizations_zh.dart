@@ -817,4 +817,14 @@ class AdminLocalizationsZh extends AdminLocalizations {
 
   @override
   String get voiceRoomDeleted => '房间已删除。';
+
+  @override
+  String get voiceRoomCapacity => '参与人数上限';
+
+  @override
+  String get voiceRoomCapacityHelp =>
+      '2 至 32 人，默认为 8 人。降低上限不会断开现有参与者。更改上限需要所有参与者使用最新应用。';
+
+  @override
+  String get voiceRoomCapacityInvalid => '请输入 2 至 32 之间的整数。';
 }

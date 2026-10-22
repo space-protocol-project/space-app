@@ -53,6 +53,8 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     _ => status,
   };
   bool archived = false, preview = false;
+  final newCapacity = TextEditingController(text: '8'),
+      capacity = TextEditingController(text: '8');
   final newId = TextEditingController(),
       newTitle = TextEditingController(),
       newOrder = TextEditingController(text: '10');
@@ -70,6 +72,8 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
   @override
   void dispose() {
     for (final c in [
+      newCapacity,
+      capacity,
       newId,
       newTitle,
       newOrder,
@@ -138,12 +142,31 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     selected = Map<String, dynamic>.from(channel);
     title.text = channel['title'] as String;
     order.text = '${channel['position'] ?? 0}';
+    capacity.text = '${channel['voiceCapacity'] ?? 8}';
     archived = channel['archived'] == true;
     preview = channel['publicPreview'] == true;
     rules = maps(jsonDecode(jsonEncode(access['rules'] ?? [])));
     accessRevision = access['revision'] as String;
     statusKey = 'channelLoaded';
     if (members.isEmpty) await loadMembers();
+  }
+
+  Map<String, dynamic> _capacityBody(TextEditingController controller) {
+    if (!widget.voiceRooms) return const {};
+    final value = int.tryParse(controller.text);
+    if (value == null || value < 2 || value > 32) {
+      throw StateError(strings.voiceRoomCapacityInvalid);
+    }
+    return {'voiceCapacity': value};
+  }
+
+  List<Widget> _capacityControls(TextEditingController controller) {
+    if (!widget.voiceRooms) return const [];
+    return [
+      field(controller, strings.voiceRoomCapacity, number: true),
+      Text(strings.voiceRoomCapacityHelp),
+      const SizedBox(height: 16),
+    ];
   }
 
   int position(TextEditingController c) {
@@ -179,6 +202,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
           'position': channelPosition,
           'viewType': widget.voiceRooms ? 'voice_room' : 'chat',
           'publicPreview': false,
+          ..._capacityBody(newCapacity),
         },
       );
     } on SpaceApiError catch (e) {
@@ -241,6 +265,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
         'archived': archived,
         'publicPreview': preview,
         'expectedRevision': c['revision'],
+        ..._capacityBody(capacity),
       },
     );
     if (!mounted) return;
@@ -414,6 +439,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
             key: const ValueKey('channel-title'),
           ),
           field(order, strings.channelOrder, number: true),
+          ..._capacityControls(capacity),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             title: Text(
@@ -554,6 +580,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
                       key: const ValueKey('new-channel-title'),
                     ),
                     field(newOrder, strings.channelNewOrder, number: true),
+                    ..._capacityControls(newCapacity),
                     Text(_defaultsLabel),
                     const SizedBox(height: 16),
                     action(_createLabel, create, primary: true),

@@ -61,7 +61,10 @@ class ChannelServer {
           'revision': '1',
           'archived': false,
           'publicPreview': false,
-          'views': [{'type': body['viewType'] ?? 'chat'}],
+          'views': [
+            {'type': body['viewType'] ?? 'chat'},
+          ],
+          'voiceCapacity': body['voiceCapacity'] ?? 8,
         };
         access[id] = defaults();
         return {'channel': copy(channels[id]!)};
@@ -90,6 +93,8 @@ class ChannelServer {
           'position': body['position'],
           'archived': body['archived'],
           'publicPreview': body['publicPreview'],
+          if (body.containsKey('voiceCapacity'))
+            'voiceCapacity': body['voiceCapacity'],
         });
       } else {
         access[id] = (jsonDecode(jsonEncode(body['rules'])) as List)

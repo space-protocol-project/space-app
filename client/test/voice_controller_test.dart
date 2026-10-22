@@ -125,9 +125,23 @@ Future<void> waitFor(bool Function() condition) async {
 }
 
 void main() {
+  for (final capacity in [2, 16, 32]) {
+    test('Подключение при лимите $capacity', () async {
+      final log = <String>[];
+      final api = FakeVoiceApi(log)..capacity = capacity;
+      final controller = VoiceController(
+        mediaFactory: () => FakeVoiceMedia(log),
+      );
+      addTearDown(controller.close);
+      await controller.join(api, 'room', 'Комната');
+      expect(controller.state.phase, VoicePhase.connected);
+      expect(controller.state.roster?.capacity, capacity);
+    });
+  }
+
   test('Несовместимая вместимость закрывает медиа и серверный сеанс', () async {
     final log = <String>[];
-    final api = FakeVoiceApi(log)..capacity = 2;
+    final api = FakeVoiceApi(log)..capacity = 33;
     final media = FakeVoiceMedia(log);
     final controller = VoiceController(mediaFactory: () => media);
     addTearDown(controller.close);

@@ -361,5 +361,8 @@
   "voiceRoomCreated": "Комната создана.",
   "voiceRoomSaved": "Настройки комнаты сохранены.",
   "voiceRoomDeleted": "Комната удалена.",
-  "@voiceRoomDeleteConfirm": {"placeholders": {"name": {"type": "String"}}}
+  "@voiceRoomDeleteConfirm": {"placeholders": {"name": {"type": "String"}}},
+  "voiceRoomCapacity": "Лимит участников",
+  "voiceRoomCapacityHelp": "От 2 до 32, по умолчанию 8. Уменьшение лимита не отключает участников. Для изменения лимита нужны актуальные приложения у всех участников.",
+  "voiceRoomCapacityInvalid": "Укажите целое число участников от 2 до 32."
 }
