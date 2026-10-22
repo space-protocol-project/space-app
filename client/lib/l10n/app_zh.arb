@@ -897,5 +897,15 @@
   "forumClosedHeading": "主题已关闭",
   "forumClosedDescription": "无法添加新回复，仍可阅读此讨论。",
   "forumPrivacyShort": "访问由版块权限控制。不支持端到端加密。",
-  "forumOrder": "按顺序"
+  "forumOrder": "按顺序",
+  "forumPin": "置顶主题",
+  "forumUnpin": "取消置顶",
+  "forumPinned": "已置顶",
+  "forumUnread": "未读",
+  "forumReadShown": "将已显示消息标为已读",
+  "forumAuthorizeDevice": "授权此设备管理论坛",
+  "forumDevicePermissionInfo": "您的根身份将为此设备签署 space.manage 授权。它仅启用已有的管理权限，不授予角色或其他版块访问权。若此设备没有根密钥，请选择您自己的根卡。",
+  "forumRootPassword": "根卡密码",
+  "forumFirstUnread": "第一条未读回复",
+  "forumRepliesFromStart": "从头查看回复"
 }

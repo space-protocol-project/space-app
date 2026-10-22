@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:grpc/grpc.dart';
 import 'package:space_admin_ui/space_admin_ui.dart'
@@ -10,10 +11,13 @@ import '../l10n/strings.dart';
 import '../src/core.dart';
 import '../src/forum_api.dart';
 import '../src/forum_controller.dart';
+import '../src/generated/space/v1/forum.pb.dart' show ForumReply;
 import '../src/generated/space/v1/space.pb.dart' show Asset;
 import 'components.dart';
 import 'forum_composer.dart';
+import 'forum_device_permission.dart';
 import 'forum_widgets.dart';
+import 'forum_read_tracker.dart';
 
 class ForumView extends StatefulWidget {
   const ForumView({
@@ -46,6 +50,10 @@ class _ForumViewState extends State<ForumView> {
       key: ObjectKey(connected),
       api: SessionForumApi(connected),
       sendWithShift: widget.sendWithShift,
+      active: widget.active,
+      authorize: connected.record.administrative
+          ? null
+          : () => authorizeForumDevice(context, connected),
       manage: connected.canManageSpace
           ? () => _manage(context, connected)
           : null,
@@ -85,25 +93,51 @@ class ForumArea extends StatefulWidget {
     super.key,
     required this.api,
     this.manage,
+    this.authorize,
+    this.active = true,
     this.sendWithShift = false,
   });
   final ForumApi api;
-  final bool sendWithShift;
-  final Future<void> Function()? manage;
+  final bool sendWithShift, active;
+  final Future<void> Function()? manage, authorize;
   @override
   State<ForumArea> createState() => _ForumAreaState();
 }
 
-class _ForumAreaState extends State<ForumArea> {
+class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
+  final readTracker = ForumReadTracker();
+  Timer? synchronization;
+  bool foreground = true, authorizing = false;
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    foreground = state == AppLifecycleState.resumed;
+    if (foreground && widget.active) unawaited(controller.synchronize());
+  }
+
   late final controller = ForumController(widget.api);
   @override
   void initState() {
     super.initState();
     unawaited(controller.refresh());
+    foreground =
+        WidgetsBinding.instance.lifecycleState == null ||
+        WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
+    WidgetsBinding.instance.addObserver(this);
+    synchronization = Timer.periodic(const Duration(seconds: 10), (_) {
+      if (widget.active && foreground) unawaited(controller.synchronize());
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant ForumArea oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.active && !oldWidget.active) unawaited(controller.synchronize());
   }
 
   @override
   void dispose() {
+    synchronization?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     unawaited(controller.close());
     super.dispose();
   }
@@ -196,40 +230,57 @@ class _ForumAreaState extends State<ForumArea> {
           builder: (context, constraints) {
             final wide = constraints.maxWidth >= 1000;
             final padding = constraints.maxWidth < 600 ? 18.0 : 28.0;
-            return SingleChildScrollView(
-              primary: false,
-              padding: EdgeInsets.fromLTRB(
-                padding,
-                24 + SpaceContentInsets.topOf(context),
-                padding,
-                28,
-              ),
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1180),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _heading(state),
-                      if (state.busy)
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          child: LinearProgressIndicator(),
-                        ),
-                      if (state.error != null)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          child: Text(
-                            errorText(state.error!),
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.error,
+            readTracker.select(state.topic?.id ?? '');
+            readTracker.schedule(
+              context,
+              () => widget.active && foreground && !controller.state.busy,
+              (sequence) => unawaited(controller.markVisible(sequence)),
+            );
+            return NotificationListener<ScrollNotification>(
+              onNotification: (_) {
+                readTracker.schedule(
+                  context,
+                  () => widget.active && foreground && !controller.state.busy,
+                  (sequence) => unawaited(controller.markVisible(sequence)),
+                );
+                return false;
+              },
+              child: SingleChildScrollView(
+                key: readTracker.viewport,
+                primary: false,
+                padding: EdgeInsets.fromLTRB(
+                  padding,
+                  24 + SpaceContentInsets.topOf(context),
+                  padding,
+                  28,
+                ),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1180),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _heading(state),
+                        if (state.busy)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            child: LinearProgressIndicator(),
+                          ),
+                        if (state.error != null)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Text(
+                              errorText(state.error!),
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.error,
+                              ),
                             ),
                           ),
-                        ),
-                      const SizedBox(height: 24),
-                      _content(state, wide),
-                    ],
+                        const SizedBox(height: 24),
+                        _content(state, wide),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -331,17 +382,36 @@ class _ForumAreaState extends State<ForumArea> {
             },
     ),
   );
+  bool _canClose(ForumState state) =>
+      state.topic != null &&
+      state.section!.permissions.manage &&
+      !state.topic!.closed;
+
   Widget _menu(ForumState state) => PopupMenuButton<String>(
     key: const ValueKey('forum-actions'),
     tooltip: context.strings.forumActions,
-    enabled: !state.busy,
+    enabled: !state.busy && !authorizing,
     icon: const Icon(Icons.more_horiz),
     onSelected: (action) => _action(action),
     itemBuilder: (context) => [
+      if (_canClose(state))
+        PopupMenuItem(value: 'close', child: Text(context.strings.forumClose)),
       if (state.topic != null &&
           state.section!.permissions.manage &&
-          !state.topic!.closed)
-        PopupMenuItem(value: 'close', child: Text(context.strings.forumClose)),
+          controller.navigation != null)
+        PopupMenuItem(
+          value: 'pin',
+          child: Text(
+            state.topic!.pinned
+                ? context.strings.forumUnpin
+                : context.strings.forumPin,
+          ),
+        ),
+      if (widget.authorize != null)
+        PopupMenuItem(
+          value: 'authorize',
+          child: Text(context.strings.forumAuthorizeDevice),
+        ),
       PopupMenuItem(
         value: 'refresh',
         child: Text(context.strings.forumRefresh),
@@ -359,6 +429,10 @@ class _ForumAreaState extends State<ForumArea> {
   );
   void _action(String action) {
     switch (action) {
+      case 'pin':
+        unawaited(controller.pinTopic());
+      case 'authorize':
+        unawaited(_authorize());
       case 'close':
         unawaited(closeTopic());
       case 'refresh':
@@ -381,6 +455,23 @@ class _ForumAreaState extends State<ForumArea> {
             ),
           ),
         );
+    }
+  }
+
+  Future<void> _authorize() async {
+    if (authorizing) return;
+    setState(() => authorizing = true);
+    try {
+      await widget.authorize!();
+      if (mounted) await controller.refresh();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.strings.forumFailure)));
+      }
+    } finally {
+      if (mounted) setState(() => authorizing = false);
     }
   }
 
@@ -510,6 +601,15 @@ class _ForumAreaState extends State<ForumArea> {
               '${context.strings.forumReplies}: ${topic.replyCount}',
               style: Theme.of(context).textTheme.bodySmall,
             ),
+            if (topic.pinned) ...[
+              const Icon(Icons.push_pin_outlined, size: 14),
+              Text(context.strings.forumPinned),
+            ],
+            if (topic.readStateSupported && topic.unreadCount > Int64.ZERO)
+              Text(
+                '${context.strings.forumUnread}: ${topic.unreadCount}',
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
+              ),
             if (topic.closed) ...[
               const Icon(Icons.lock_outline, size: 14),
               Text(
@@ -523,6 +623,30 @@ class _ForumAreaState extends State<ForumArea> {
     );
   }
 
+  Widget _replyMessage(ForumState state, ForumReply reply) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      if (state.topic!.readStateSupported &&
+          state.topic!.unreadCount > Int64.ZERO &&
+          reply.sequence == state.topic!.readSequence + Int64.ONE)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Text(
+            context.strings.forumFirstUnread,
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+          ),
+        ),
+      ForumMessage(
+        author: reply.authorName,
+        authorId: reply.authorId,
+        text: reply.text,
+        timestamp: reply.createdAtUnix.toInt(),
+        assets: _visibleAssets(reply.attachments),
+        session: media?.attachmentSession,
+      ),
+    ],
+  );
+
   Widget _topic(ForumState state) {
     final topic = state.topic!;
     return Align(
@@ -532,14 +656,17 @@ class _ForumAreaState extends State<ForumArea> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ForumMessage(
-              author: topic.authorName,
-              authorId: topic.authorId,
-              text: topic.text,
-              timestamp: topic.createdAtUnix.toInt(),
-              original: true,
-              assets: _visibleAssets(topic.attachments),
-              session: media?.attachmentSession,
+            readTracker.track(
+              0,
+              ForumMessage(
+                author: topic.authorName,
+                authorId: topic.authorId,
+                text: topic.text,
+                timestamp: topic.createdAtUnix.toInt(),
+                original: true,
+                assets: _visibleAssets(topic.attachments),
+                session: media?.attachmentSession,
+              ),
             ),
             const SizedBox(height: 24),
             Row(
@@ -550,22 +677,37 @@ class _ForumAreaState extends State<ForumArea> {
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
-                Text(
-                  context.strings.forumOrder,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+                if (state.replies.isNotEmpty &&
+                    state.replies.first.sequence > Int64.ONE)
+                  Flexible(
+                    child: TextButton(
+                      onPressed: state.busy ? null : controller.fromBeginning,
+                      child: Text(context.strings.forumRepliesFromStart),
+                    ),
+                  )
+                else
+                  Text(
+                    context.strings.forumOrder,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
               ],
             ),
             const SizedBox(height: 12),
             const Divider(height: 1),
             for (final reply in state.replies)
-              ForumMessage(
-                author: reply.authorName,
-                authorId: reply.authorId,
-                text: reply.text,
-                timestamp: reply.createdAtUnix.toInt(),
-                assets: _visibleAssets(reply.attachments),
-                session: media?.attachmentSession,
+              readTracker.track(
+                reply.sequence.toInt(),
+                _replyMessage(state, reply),
+              ),
+            if (controller.navigation != null && topic.unreadCount > Int64.ZERO)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: OutlinedButton.icon(
+                  key: const ValueKey('forum-mark-read'),
+                  onPressed: state.busy ? null : controller.markRead,
+                  icon: const Icon(Icons.done_all, size: 18),
+                  label: Text(context.strings.forumReadShown),
+                ),
               ),
             if (state.nextReplies != 0)
               OutlinedButton(

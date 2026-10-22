@@ -9,13 +9,15 @@ import 'package:space_client/l10n/app_localizations.dart';
 import 'package:space_client/src/generated/space/v1/forum.pb.dart';
 import 'package:space_client/src/preferences.dart';
 import 'package:space_client/ui/forum.dart';
+import 'package:space_client/ui/forum_device_permission.dart';
 
 import 'chat_examples_screenshots_test.dart' show captureExample;
 import 'redesign_golden_test.dart' show loadFonts;
 import 'forum_test.dart' show FakeForum;
+import 'forum_navigation_test.dart' show NavigationForum;
 
 Future<FakeForum> exampleForum() async {
-  final api = FakeForum();
+  final api = NavigationForum();
   api.sections.single.title = 'Обсуждения сообщества';
   final topic = await api.create(
     'forum',
@@ -44,6 +46,7 @@ Future<FakeForum> exampleForum() async {
   third.authorName = 'Максим';
   third.closed = true;
   third.createdAtUnix = Int64(1792652400);
+  third.pinned = true;
   api.topics[2] = third;
   for (final entry in [
     'Как вы организуете свои проекты?',
@@ -77,6 +80,7 @@ Future<FakeForum> exampleForum() async {
       createdAtUnix: Int64(1792660800),
     ),
   ]);
+  topic.pinned = true;
   topic.replyCount = Int64(2);
   topic.revision = Int64(3);
   return api;
@@ -96,10 +100,13 @@ void main() {
       final api = await exampleForum();
       api.pageSize = 50;
       final boundary = GlobalKey();
+      final navigator = GlobalKey<NavigatorState>();
+      final password = TextEditingController();
       await tester.pumpWidget(
         RepaintBoundary(
           key: boundary,
           child: MaterialApp(
+            navigatorKey: navigator,
             debugShowCheckedModeBanner: false,
             theme: preferences.theme,
             locale: const Locale('ru'),
@@ -108,7 +115,18 @@ void main() {
               AdminLocalizations.delegate,
               ...AppLocalizations.localizationsDelegates,
             ],
-            home: Scaffold(body: ForumArea(api: api)),
+            home: Scaffold(
+              body: ForumArea(
+                api: api,
+                authorize: () => showDialog<void>(
+                  context: navigator.currentContext!,
+                  builder: (_) => ForumDevicePermissionDialog(
+                    password: password,
+                    requiresCard: true,
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       );
@@ -130,7 +148,19 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Тема закрыта'), findsWidgets);
       await captureExample(tester, boundary, '$output/forum-closed-$size.png');
+      await tester.tap(find.byKey(const ValueKey('forum-actions')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Разрешить модерацию на устройстве'));
+      await tester.pumpAndSettle();
+      await captureExample(
+        tester,
+        boundary,
+        '$output/forum-device-permission-$size.png',
+      );
+      await tester.tap(find.text('Отмена'));
+      await tester.pumpAndSettle();
       await tester.pumpWidget(const SizedBox.shrink());
+      password.dispose();
       preferences.dispose();
     }, skip: output == null);
   }

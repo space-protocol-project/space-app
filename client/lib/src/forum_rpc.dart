@@ -1,6 +1,6 @@
 part of 'core.dart';
 
-class SessionForumApi implements ForumApi, ForumMedia {
+class SessionForumApi implements ForumApi, ForumMedia, ForumNavigation {
   SessionForumApi(this.session);
   final SpaceSession session;
   @override
@@ -112,6 +112,67 @@ class SessionForumApi implements ForumApi, ForumMedia {
         channelId: channel,
         threadId: id,
         expectedRevision: revision,
+      ),
+      options: session._options,
+    );
+    return response.thread;
+  }
+
+  @override
+  bool get navigationSupported => session.forumNavigationSupported;
+  @override
+  Future<forum.ListForumThreadsResponse> navigationPage(
+    String channel,
+    Int64 after,
+    bool afterPinned,
+  ) async {
+    await session._ensureSession();
+    return session.channel.unary(
+      forum_specs.ForumService.listForumThreads,
+      forum.ListForumThreadsRequest(
+        channelId: channel,
+        afterSequence: after,
+        pinnedFirst: true,
+        afterPinned: afterPinned,
+      ),
+      options: session._options,
+    );
+  }
+
+  @override
+  Future<forum.ForumThread> pinTopic(
+    String channel,
+    String id,
+    bool pinned,
+    Int64 revision,
+  ) async {
+    await session._ensureSession();
+    final response = await session.channel.unary(
+      forum_specs.ForumService.setForumThreadPinned,
+      forum.SetForumThreadPinnedRequest(
+        channelId: channel,
+        threadId: id,
+        pinned: pinned,
+        expectedRevision: revision,
+      ),
+      options: session._options,
+    );
+    return response.thread;
+  }
+
+  @override
+  Future<forum.ForumThread> markRead(
+    String channel,
+    String id,
+    Int64 through,
+  ) async {
+    await session._ensureSession();
+    final response = await session.channel.unary(
+      forum_specs.ForumService.markForumThreadRead,
+      forum.MarkForumThreadReadRequest(
+        channelId: channel,
+        threadId: id,
+        throughSequence: through,
       ),
       options: session._options,
     );

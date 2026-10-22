@@ -2454,4 +2454,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forumOrder => 'In order';
+
+  @override
+  String get forumPin => 'Pin topic';
+
+  @override
+  String get forumUnpin => 'Unpin topic';
+
+  @override
+  String get forumPinned => 'Pinned';
+
+  @override
+  String get forumUnread => 'Unread';
+
+  @override
+  String get forumReadShown => 'Mark displayed messages as read';
+
+  @override
+  String get forumAuthorizeDevice => 'Authorize moderation on this device';
+
+  @override
+  String get forumDevicePermissionInfo =>
+      'Your root identity signs a space.manage grant for this device. It enables existing moderation permissions; it does not grant a role or access to other sections. If the key is not on this device, choose your root card.';
+
+  @override
+  String get forumRootPassword => 'Root card password';
+
+  @override
+  String get forumFirstUnread => 'First unread reply';
+
+  @override
+  String get forumRepliesFromStart => 'Show replies from the beginning';
 }

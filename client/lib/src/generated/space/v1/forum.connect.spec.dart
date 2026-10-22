@@ -39,6 +39,20 @@ abstract final class ForumService {
     spacev1forum.ReplyForumThreadResponse.new,
   );
 
+  static const setForumThreadPinned = connect.Spec(
+    '/$name/SetForumThreadPinned',
+    connect.StreamType.unary,
+    spacev1forum.SetForumThreadPinnedRequest.new,
+    spacev1forum.SetForumThreadPinnedResponse.new,
+  );
+
+  static const markForumThreadRead = connect.Spec(
+    '/$name/MarkForumThreadRead',
+    connect.StreamType.unary,
+    spacev1forum.MarkForumThreadReadRequest.new,
+    spacev1forum.MarkForumThreadReadResponse.new,
+  );
+
   static const closeForumThread = connect.Spec(
     '/$name/CloseForumThread',
     connect.StreamType.unary,

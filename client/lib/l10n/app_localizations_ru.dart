@@ -2471,4 +2471,35 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get forumOrder => 'По порядку';
+
+  @override
+  String get forumPin => 'Закрепить тему';
+
+  @override
+  String get forumUnpin => 'Открепить тему';
+
+  @override
+  String get forumPinned => 'Закреплено';
+
+  @override
+  String get forumUnread => 'Непрочитано';
+
+  @override
+  String get forumReadShown => 'Отметить показанное прочитанным';
+
+  @override
+  String get forumAuthorizeDevice => 'Разрешить модерацию на устройстве';
+
+  @override
+  String get forumDevicePermissionInfo =>
+      'Корневая карточка вашей личности подпишет разрешение space.manage для этого устройства. Оно позволяет использовать уже назначенные права модератора, но не выдаёт роль или доступ к другим разделам. Если ключа нет на устройстве, выберите свою корневую карточку.';
+
+  @override
+  String get forumRootPassword => 'Пароль корневой карточки';
+
+  @override
+  String get forumFirstUnread => 'Первый непрочитанный ответ';
+
+  @override
+  String get forumRepliesFromStart => 'Показать ответы сначала';
 }

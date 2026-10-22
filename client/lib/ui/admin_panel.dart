@@ -72,7 +72,7 @@ Future<Map<String, dynamic>> _nativeAdminRequest(
   }
 }
 
-Future<DeviceRecord> _openAuthorityCard(String password, String label) async {
+Future<DeviceRecord> openAuthorityCard(String password, String label) async {
   final file = await openFile(
     acceptedTypeGroups: [
       XTypeGroup(label: label, extensions: ['json', 'png']),
@@ -121,7 +121,7 @@ Widget serverAdministration(
           ? (password) async {
               DeviceRecord? authority;
               if (!(session as DeviceManagement).hasRootAuthority) {
-                authority = await _openAuthorityCard(
+                authority = await openAuthorityCard(
                   password,
                   'Корневая карточка Space',
                 );
@@ -136,10 +136,7 @@ Widget serverAdministration(
               DeviceRecord? authority;
               if (!manager.hasRootAuthority &&
                   grant['id'] != manager.currentGrantId) {
-                authority = await _openAuthorityCard(
-                  password,
-                  'Карточка Space',
-                );
+                authority = await openAuthorityCard(password, 'Карточка Space');
               }
               await manager.revokeDevice(
                 DeviceGrant()..mergeFromProto3Json(grant),

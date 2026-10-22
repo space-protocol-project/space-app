@@ -791,6 +791,7 @@ class SpaceSession
   bool attachmentsEnabled = false;
   bool mlsSupported = false;
   bool forumSupported = false;
+  bool forumNavigationSupported = false;
   bool forumAttachmentsSupported = false;
   @override
   bool repliesSupported = false;
@@ -847,6 +848,9 @@ class SpaceSession
     mlsSupported = manifest.mlsSupported;
     repliesSupported = manifest.ordinaryRepliesSupported;
     forumSupported = manifest.capabilities.contains('core.forum.v1');
+    forumNavigationSupported = manifest.capabilities.contains(
+      'core.forum.navigation.v1',
+    );
     forumAttachmentsSupported = manifest.capabilities.contains(
       'core.forum.attachments.v1',
     );
@@ -1237,6 +1241,9 @@ class SpaceSession
       );
       session.repliesSupported = manifest.ordinaryRepliesSupported;
       session.forumSupported = manifest.capabilities.contains('core.forum.v1');
+      session.forumNavigationSupported = manifest.capabilities.contains(
+        'core.forum.navigation.v1',
+      );
       session.forumAttachmentsSupported = manifest.capabilities.contains(
         'core.forum.attachments.v1',
       );
@@ -1995,12 +2002,8 @@ class SpaceSession
     _needsOwnerSetup = !(await AdminServiceClient(
       channel,
     ).getSetupStatus(GetSetupStatusRequest(), options: _options)).initialized;
-    if (!canManageSpace && !needsOwnerSetup) {
-      throw const LocalFailure(
-        LocalFailureCode.permissionDenied,
-        'Нужна роль владельца или администратора',
-      );
-    }
+    // Scope разрешает устройству использовать уже выданные ACL, а не выдаёт роль.
+    // Регистрация по-прежнему требует подписи корневым ключом этой личности.
     final grants = await listDevices();
     final current = grants.where((g) => g.id == record.grantId).firstOrNull;
     if (current == null || current.revoked) {

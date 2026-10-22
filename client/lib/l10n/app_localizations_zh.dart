@@ -2265,6 +2265,37 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get forumOrder => '按顺序';
+
+  @override
+  String get forumPin => '置顶主题';
+
+  @override
+  String get forumUnpin => '取消置顶';
+
+  @override
+  String get forumPinned => '已置顶';
+
+  @override
+  String get forumUnread => '未读';
+
+  @override
+  String get forumReadShown => '将已显示消息标为已读';
+
+  @override
+  String get forumAuthorizeDevice => '授权此设备管理论坛';
+
+  @override
+  String get forumDevicePermissionInfo =>
+      '您的根身份将为此设备签署 space.manage 授权。它仅启用已有的管理权限，不授予角色或其他版块访问权。若此设备没有根密钥，请选择您自己的根卡。';
+
+  @override
+  String get forumRootPassword => '根卡密码';
+
+  @override
+  String get forumFirstUnread => '第一条未读回复';
+
+  @override
+  String get forumRepliesFromStart => '从头查看回复';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

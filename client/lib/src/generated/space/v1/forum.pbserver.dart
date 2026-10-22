@@ -29,6 +29,10 @@ abstract class ForumServiceBase extends $pb.GeneratedService {
       $pb.ServerContext ctx, $1.CreateForumThreadRequest request);
   $async.Future<$1.ReplyForumThreadResponse> replyForumThread(
       $pb.ServerContext ctx, $1.ReplyForumThreadRequest request);
+  $async.Future<$1.SetForumThreadPinnedResponse> setForumThreadPinned(
+      $pb.ServerContext ctx, $1.SetForumThreadPinnedRequest request);
+  $async.Future<$1.MarkForumThreadReadResponse> markForumThreadRead(
+      $pb.ServerContext ctx, $1.MarkForumThreadReadRequest request);
   $async.Future<$1.CloseForumThreadResponse> closeForumThread(
       $pb.ServerContext ctx, $1.CloseForumThreadRequest request);
 
@@ -42,6 +46,10 @@ abstract class ForumServiceBase extends $pb.GeneratedService {
         return $1.CreateForumThreadRequest();
       case 'ReplyForumThread':
         return $1.ReplyForumThreadRequest();
+      case 'SetForumThreadPinned':
+        return $1.SetForumThreadPinnedRequest();
+      case 'MarkForumThreadRead':
+        return $1.MarkForumThreadReadRequest();
       case 'CloseForumThread':
         return $1.CloseForumThreadRequest();
       default:
@@ -60,6 +68,12 @@ abstract class ForumServiceBase extends $pb.GeneratedService {
         return createForumThread(ctx, request as $1.CreateForumThreadRequest);
       case 'ReplyForumThread':
         return replyForumThread(ctx, request as $1.ReplyForumThreadRequest);
+      case 'SetForumThreadPinned':
+        return setForumThreadPinned(
+            ctx, request as $1.SetForumThreadPinnedRequest);
+      case 'MarkForumThreadRead':
+        return markForumThreadRead(
+            ctx, request as $1.MarkForumThreadReadRequest);
       case 'CloseForumThread':
         return closeForumThread(ctx, request as $1.CloseForumThreadRequest);
       default:

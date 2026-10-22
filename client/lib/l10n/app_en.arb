@@ -897,5 +897,15 @@
   "forumClosedHeading": "Topic closed",
   "forumClosedDescription": "New replies are disabled. You can still read the discussion.",
   "forumPrivacyShort": "Section permissions control access. End-to-end encryption is unavailable.",
-  "forumOrder": "In order"
+  "forumOrder": "In order",
+  "forumPin": "Pin topic",
+  "forumUnpin": "Unpin topic",
+  "forumPinned": "Pinned",
+  "forumUnread": "Unread",
+  "forumReadShown": "Mark displayed messages as read",
+  "forumAuthorizeDevice": "Authorize moderation on this device",
+  "forumDevicePermissionInfo": "Your root identity signs a space.manage grant for this device. It enables existing moderation permissions; it does not grant a role or access to other sections. If the key is not on this device, choose your root card.",
+  "forumRootPassword": "Root card password",
+  "forumFirstUnread": "First unread reply",
+  "forumRepliesFromStart": "Show replies from the beginning"
 }

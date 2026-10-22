@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fixnum/fixnum.dart';
 
 import '../l10n/strings.dart';
 import '../src/core.dart' show AttachmentSession;
@@ -73,8 +74,11 @@ class ForumTopicList extends StatelessWidget {
               children: [
                 Text(
                   topic.title,
-                  style: Theme.of(context).textTheme.titleSmall
-                      ?.copyWith(fontWeight: FontWeight.w600),
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: topic.unreadCount > Int64.ZERO
+                        ? FontWeight.w800
+                        : FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 _metadata(context, topic),
@@ -102,6 +106,21 @@ class ForumTopicList extends StatelessWidget {
       runSpacing: 4,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
+        if (topic.pinned) ...[
+          const Icon(Icons.push_pin_outlined, size: 12),
+          Text(context.strings.forumPinned),
+          const Text('·'),
+        ],
+        if (topic.readStateSupported && topic.unreadCount > Int64.ZERO) ...[
+          Text(
+            '${context.strings.forumUnread}: ${topic.unreadCount}',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const Text('·'),
+        ],
         Tooltip(
           message: topic.authorId,
           child: Text(forumAuthor(topic.authorName, topic.authorId)),

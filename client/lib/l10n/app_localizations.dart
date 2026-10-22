@@ -4449,6 +4449,66 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'По порядку'**
   String get forumOrder;
+
+  /// No description provided for @forumPin.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрепить тему'**
+  String get forumPin;
+
+  /// No description provided for @forumUnpin.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открепить тему'**
+  String get forumUnpin;
+
+  /// No description provided for @forumPinned.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закреплено'**
+  String get forumPinned;
+
+  /// No description provided for @forumUnread.
+  ///
+  /// In ru, this message translates to:
+  /// **'Непрочитано'**
+  String get forumUnread;
+
+  /// No description provided for @forumReadShown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметить показанное прочитанным'**
+  String get forumReadShown;
+
+  /// No description provided for @forumAuthorizeDevice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разрешить модерацию на устройстве'**
+  String get forumAuthorizeDevice;
+
+  /// No description provided for @forumDevicePermissionInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корневая карточка вашей личности подпишет разрешение space.manage для этого устройства. Оно позволяет использовать уже назначенные права модератора, но не выдаёт роль или доступ к другим разделам. Если ключа нет на устройстве, выберите свою корневую карточку.'**
+  String get forumDevicePermissionInfo;
+
+  /// No description provided for @forumRootPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль корневой карточки'**
+  String get forumRootPassword;
+
+  /// No description provided for @forumFirstUnread.
+  ///
+  /// In ru, this message translates to:
+  /// **'Первый непрочитанный ответ'**
+  String get forumFirstUnread;
+
+  /// No description provided for @forumRepliesFromStart.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показать ответы сначала'**
+  String get forumRepliesFromStart;
 }
 
 class _AppLocalizationsDelegate

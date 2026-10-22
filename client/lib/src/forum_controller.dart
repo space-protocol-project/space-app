@@ -16,10 +16,11 @@ class ForumState {
     this.topic,
     this.replies = const [],
     this.nextThreads = 0,
+    this.nextPinned = false,
     this.nextReplies = 0,
     this.error,
   });
-  final bool busy, supported;
+  final bool busy, supported, nextPinned;
   final List<Channel> sections;
   final Channel? section;
   final List<ForumThread> threads;
@@ -33,6 +34,7 @@ class ForumState {
     ForumThread? topic,
     List<ForumReply>? replies,
     int? nextThreads,
+    bool? nextPinned,
     int? nextReplies,
     Object? error,
     bool clearTopic = false,
@@ -45,6 +47,7 @@ class ForumState {
     topic: clearTopic ? null : topic ?? this.topic,
     replies: clearTopic ? const [] : replies ?? this.replies,
     nextThreads: nextThreads ?? this.nextThreads,
+    nextPinned: nextPinned ?? this.nextPinned,
     nextReplies: clearTopic ? 0 : nextReplies ?? this.nextReplies,
     error: error,
   );
@@ -53,6 +56,21 @@ class ForumState {
 class ForumController extends Cubit<ForumState> {
   ForumController(this.api) : super(const ForumState());
   final ForumApi api;
+  ForumNavigation? get navigation {
+    final source = api;
+    return source is ForumNavigation &&
+            (source as ForumNavigation).navigationSupported
+        ? source as ForumNavigation
+        : null;
+  }
+
+  Future<ListForumThreadsResponse> _page(
+    String channel,
+    Int64 after,
+    bool pinned,
+  ) =>
+      navigation?.navigationPage(channel, after, pinned) ??
+      api.threads(channel, after);
 
   Future<bool> _run(Future<void> Function() action) async {
     if (state.busy || isClosed) return false;
@@ -84,6 +102,7 @@ class ForumController extends Cubit<ForumState> {
   Future<bool> refresh() => _run(() async {
     final previousChannel = state.section?.id;
     final previousTopic = state.topic?.id;
+    failedRead = '';
     await api.refresh();
     if (isClosed) return;
     final sections = api.sections;
@@ -113,7 +132,7 @@ class ForumController extends Cubit<ForumState> {
         section: section,
       );
     }
-    final page = await api.threads(section.id, Int64.ZERO);
+    final page = await _page(section.id, Int64.ZERO, false);
     GetForumThreadResponse? detail;
     if (previousTopic != null && section.id == previousChannel) {
       detail = await api.thread(section.id, previousTopic, Int64.ZERO);
@@ -124,6 +143,7 @@ class ForumController extends Cubit<ForumState> {
       section: section,
       threads: page.threads,
       nextThreads: page.nextSequence.toInt(),
+      nextPinned: page.nextPinned,
       topic: detail?.thread,
       replies: detail?.replies ?? const [],
       nextReplies: detail?.nextSequence.toInt() ?? 0,
@@ -138,15 +158,23 @@ class ForumController extends Cubit<ForumState> {
   Future<void> _loadThreads(bool append) async {
     final channel = state.section;
     if (channel == null) return;
-    final page = await api.threads(
+    final page = await _page(
       channel.id,
       Int64(append ? state.nextThreads : 0),
+      append && state.nextPinned,
     );
     if (isClosed) return;
     emit(
       state.copy(
-        threads: [if (append) ...state.threads, ...page.threads],
+        threads: {
+          for (final topic in [
+            ...(append ? state.threads : <ForumThread>[]),
+            ...page.threads,
+          ])
+            topic.id: topic,
+        }.values.toList()..sort(compareTopics),
         nextThreads: page.nextSequence.toInt(),
+        nextPinned: page.nextPinned,
       ),
     );
   }
@@ -170,9 +198,29 @@ class ForumController extends Cubit<ForumState> {
   }
 
   Future<bool> openTopic(String id) => _run(() async {
+    final listed = state.threads.where((t) => t.id == id).firstOrNull;
     emit(state.copy(clearTopic: true));
-    await _loadTopic(id, false);
+    final after =
+        listed != null && listed.seen && listed.unreadCount > Int64.ZERO
+        ? listed.readSequence
+        : Int64.ZERO;
+    await _openFrom(id, after);
   });
+  Future<void> _openFrom(String id, Int64 after) async {
+    final page = await api.thread(state.section!.id, id, after);
+    if (!isClosed) {
+      emit(
+        state.copy(
+          topic: page.thread,
+          replies: page.replies,
+          nextReplies: page.nextSequence.toInt(),
+        ),
+      );
+    }
+  }
+
+  Future<bool> fromBeginning() =>
+      _run(() => _openFrom(state.topic!.id, Int64.ZERO));
   Future<bool> moreReplies() => _run(() => _loadTopic(state.topic!.id, true));
   void back() {
     if (!state.busy) emit(state.copy(clearTopic: true));
@@ -195,7 +243,7 @@ class ForumController extends Cubit<ForumState> {
     // Повтор с тем же ключом возвращает ту же тему, не дублируя список.
     final threads = state.threads.where((t) => t.id != topic.id).toList();
     if (state.nextThreads == 0) threads.add(topic);
-    threads.sort((a, b) => a.sequence.compareTo(b.sequence));
+    threads.sort(compareTopics);
     emit(
       state.copy(
         threads: threads,
@@ -233,6 +281,114 @@ class ForumController extends Cubit<ForumState> {
     if (isClosed) return;
     _replaceTopic(closed);
   });
+  static int compareTopics(ForumThread a, ForumThread b) {
+    if (a.pinned != b.pinned) return a.pinned ? -1 : 1;
+    return a.sequence.compareTo(b.sequence);
+  }
+
+  Future<bool> pinTopic() => _run(() async {
+    final topic = state.topic!;
+    final updated = await navigation!.pinTopic(
+      state.section!.id,
+      topic.id,
+      !topic.pinned,
+      topic.revision,
+    );
+    if (isClosed) return;
+    _replaceTopic(updated);
+    await _loadThreads(false);
+  });
+  Future<bool> markRead() => _run(() async {
+    final through = state.replies.isEmpty
+        ? Int64.ZERO
+        : state.replies.last.sequence;
+    final updated = await navigation!.markRead(
+      state.section!.id,
+      state.topic!.id,
+      through,
+    );
+    if (!isClosed) _replaceTopic(updated);
+  });
+  String failedRead = '';
+  Future<void> markVisible(int sequence) async {
+    final topic = state.topic;
+    if (state.busy || isClosed || navigation == null || topic == null) return;
+    if (topic.seen && topic.readSequence >= Int64(sequence)) return;
+    final attempt = '${topic.id}:$sequence';
+    if (failedRead == attempt) return;
+    final success = await _run(() async {
+      final updated = await navigation!.markRead(
+        state.section!.id,
+        topic.id,
+        Int64(sequence),
+      );
+      if (!isClosed) _replaceTopic(updated);
+    });
+    failedRead = success ? '' : attempt;
+  }
+
+  bool syncing = false;
+  Future<void> synchronize() async {
+    if (syncing ||
+        state.busy ||
+        isClosed ||
+        navigation == null ||
+        state.section == null) {
+      return;
+    }
+    syncing = true;
+    final previous = state;
+    try {
+      final threads = <ForumThread>[];
+      var after = Int64.ZERO;
+      var pinned = false;
+      ListForumThreadsResponse page;
+      do {
+        page = await _page(previous.section!.id, after, pinned);
+        threads.addAll(page.threads);
+        after = page.nextSequence;
+        pinned = page.nextPinned;
+      } while (after != Int64.ZERO &&
+          page.threads.isNotEmpty &&
+          threads.length < previous.threads.length);
+      GetForumThreadResponse? detail;
+      if (previous.topic != null) {
+        detail = await api.thread(
+          previous.section!.id,
+          previous.topic!.id,
+          previous.topic!.replyCount,
+        );
+      }
+      if (!isClosed && identical(state, previous)) {
+        failedRead = '';
+        emit(
+          state.copy(
+            threads: threads,
+            topic: detail?.thread,
+            replies: synchronizedReplies(previous, detail),
+            nextReplies: previous.nextReplies != 0
+                ? previous.nextReplies
+                : detail?.nextSequence.toInt(),
+            nextThreads: after.toInt(),
+            nextPinned: pinned,
+          ),
+        );
+      }
+    } catch (error) {
+      if (!isClosed && identical(state, previous)) _failure(error);
+    } finally {
+      syncing = false;
+    }
+  }
+
+  List<ForumReply> synchronizedReplies(
+    ForumState previous,
+    GetForumThreadResponse? detail,
+  ) {
+    if (detail == null || previous.nextReplies != 0) return previous.replies;
+    return [...previous.replies, ...detail.replies];
+  }
+
   void _replaceTopic(ForumThread topic) => emit(
     state.copy(
       topic: topic,

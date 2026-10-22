@@ -77,6 +77,40 @@ extension type ForumServiceClient (connect.Transport _transport) {
     );
   }
 
+  Future<spacev1forum.SetForumThreadPinnedResponse> setForumThreadPinned(
+    spacev1forum.SetForumThreadPinnedRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ForumService.setForumThreadPinned,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1forum.MarkForumThreadReadResponse> markForumThreadRead(
+    spacev1forum.MarkForumThreadReadRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ForumService.markForumThreadRead,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
   Future<spacev1forum.CloseForumThreadResponse> closeForumThread(
     spacev1forum.CloseForumThreadRequest input, {
     connect.Headers? headers,

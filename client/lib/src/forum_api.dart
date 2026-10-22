@@ -32,3 +32,19 @@ abstract interface class ForumMedia {
   AttachmentSession? get attachmentSession;
   bool get attachmentsEnabled;
 }
+
+abstract interface class ForumNavigation {
+  bool get navigationSupported;
+  Future<ListForumThreadsResponse> navigationPage(
+    String channel,
+    Int64 after,
+    bool afterPinned,
+  );
+  Future<ForumThread> pinTopic(
+    String channel,
+    String id,
+    bool pinned,
+    Int64 revision,
+  );
+  Future<ForumThread> markRead(String channel, String id, Int64 through);
+}

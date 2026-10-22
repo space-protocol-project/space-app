@@ -34,6 +34,11 @@ class ForumThread extends $pb.GeneratedMessage {
     $core.bool? closed,
     $fixnum.Int64? replyCount,
     $core.Iterable<$0.Asset>? attachments,
+    $core.bool? pinned,
+    $core.bool? readStateSupported,
+    $core.bool? seen,
+    $fixnum.Int64? readSequence,
+    $fixnum.Int64? unreadCount,
   }) {
     final result = ForumThread._();
     if (id != null) result.id = id;
@@ -48,6 +53,12 @@ class ForumThread extends $pb.GeneratedMessage {
     if (closed != null) result.closed = closed;
     if (replyCount != null) result.replyCount = replyCount;
     if (attachments != null) result.attachments.addAll(attachments);
+    if (pinned != null) result.pinned = pinned;
+    if (readStateSupported != null)
+      result.readStateSupported = readStateSupported;
+    if (seen != null) result.seen = seen;
+    if (readSequence != null) result.readSequence = readSequence;
+    if (unreadCount != null) result.unreadCount = unreadCount;
     return result;
   }
 
@@ -77,6 +88,11 @@ class ForumThread extends $pb.GeneratedMessage {
     ..aInt64(11, _omitFieldNames ? '' : 'replyCount')
     ..pPM<$0.Asset>(12, _omitFieldNames ? '' : 'attachments',
         subBuilder: $0.Asset.$_createMessage)
+    ..aOB(13, _omitFieldNames ? '' : 'pinned')
+    ..aOB(14, _omitFieldNames ? '' : 'readStateSupported')
+    ..aOB(15, _omitFieldNames ? '' : 'seen')
+    ..aInt64(16, _omitFieldNames ? '' : 'readSequence')
+    ..aInt64(17, _omitFieldNames ? '' : 'unreadCount')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -202,6 +218,51 @@ class ForumThread extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(12)
   $pb.PbList<$0.Asset> get attachments => $_getList(11);
+
+  @$pb.TagNumber(13)
+  $core.bool get pinned => $_getBF(12);
+  @$pb.TagNumber(13)
+  set pinned($core.bool value) => $_setBool(12, value);
+  @$pb.TagNumber(13)
+  $core.bool hasPinned() => $_has(12);
+  @$pb.TagNumber(13)
+  void clearPinned() => $_clearField(13);
+
+  @$pb.TagNumber(14)
+  $core.bool get readStateSupported => $_getBF(13);
+  @$pb.TagNumber(14)
+  set readStateSupported($core.bool value) => $_setBool(13, value);
+  @$pb.TagNumber(14)
+  $core.bool hasReadStateSupported() => $_has(13);
+  @$pb.TagNumber(14)
+  void clearReadStateSupported() => $_clearField(14);
+
+  @$pb.TagNumber(15)
+  $core.bool get seen => $_getBF(14);
+  @$pb.TagNumber(15)
+  set seen($core.bool value) => $_setBool(14, value);
+  @$pb.TagNumber(15)
+  $core.bool hasSeen() => $_has(14);
+  @$pb.TagNumber(15)
+  void clearSeen() => $_clearField(15);
+
+  @$pb.TagNumber(16)
+  $fixnum.Int64 get readSequence => $_getI64(15);
+  @$pb.TagNumber(16)
+  set readSequence($fixnum.Int64 value) => $_setInt64(15, value);
+  @$pb.TagNumber(16)
+  $core.bool hasReadSequence() => $_has(15);
+  @$pb.TagNumber(16)
+  void clearReadSequence() => $_clearField(16);
+
+  @$pb.TagNumber(17)
+  $fixnum.Int64 get unreadCount => $_getI64(16);
+  @$pb.TagNumber(17)
+  set unreadCount($fixnum.Int64 value) => $_setInt64(16, value);
+  @$pb.TagNumber(17)
+  $core.bool hasUnreadCount() => $_has(16);
+  @$pb.TagNumber(17)
+  void clearUnreadCount() => $_clearField(17);
 }
 
 class ForumReply extends $pb.GeneratedMessage {
@@ -344,11 +405,15 @@ class ListForumThreadsRequest extends $pb.GeneratedMessage {
     $core.String? channelId,
     $fixnum.Int64? afterSequence,
     $core.int? limit,
+    $core.bool? pinnedFirst,
+    $core.bool? afterPinned,
   }) {
     final result = ListForumThreadsRequest._();
     if (channelId != null) result.channelId = channelId;
     if (afterSequence != null) result.afterSequence = afterSequence;
     if (limit != null) result.limit = limit;
+    if (pinnedFirst != null) result.pinnedFirst = pinnedFirst;
+    if (afterPinned != null) result.afterPinned = afterPinned;
     return result;
   }
 
@@ -368,6 +433,8 @@ class ListForumThreadsRequest extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'channelId')
     ..aInt64(2, _omitFieldNames ? '' : 'afterSequence')
     ..aI(3, _omitFieldNames ? '' : 'limit')
+    ..aOB(4, _omitFieldNames ? '' : 'pinnedFirst')
+    ..aOB(5, _omitFieldNames ? '' : 'afterPinned')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -420,16 +487,36 @@ class ListForumThreadsRequest extends $pb.GeneratedMessage {
   $core.bool hasLimit() => $_has(2);
   @$pb.TagNumber(3)
   void clearLimit() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get pinnedFirst => $_getBF(3);
+  @$pb.TagNumber(4)
+  set pinnedFirst($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasPinnedFirst() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearPinnedFirst() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get afterPinned => $_getBF(4);
+  @$pb.TagNumber(5)
+  set afterPinned($core.bool value) => $_setBool(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasAfterPinned() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearAfterPinned() => $_clearField(5);
 }
 
 class ListForumThreadsResponse extends $pb.GeneratedMessage {
   factory ListForumThreadsResponse({
     $core.Iterable<ForumThread>? threads,
     $fixnum.Int64? nextSequence,
+    $core.bool? nextPinned,
   }) {
     final result = ListForumThreadsResponse._();
     if (threads != null) result.threads.addAll(threads);
     if (nextSequence != null) result.nextSequence = nextSequence;
+    if (nextPinned != null) result.nextPinned = nextPinned;
     return result;
   }
 
@@ -449,6 +536,7 @@ class ListForumThreadsResponse extends $pb.GeneratedMessage {
     ..pPM<ForumThread>(1, _omitFieldNames ? '' : 'threads',
         subBuilder: ForumThread.$_createMessage)
     ..aInt64(2, _omitFieldNames ? '' : 'nextSequence')
+    ..aOB(3, _omitFieldNames ? '' : 'nextPinned')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -487,6 +575,15 @@ class ListForumThreadsResponse extends $pb.GeneratedMessage {
   $core.bool hasNextSequence() => $_has(1);
   @$pb.TagNumber(2)
   void clearNextSequence() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get nextPinned => $_getBF(2);
+  @$pb.TagNumber(3)
+  set nextPinned($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasNextPinned() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearNextPinned() => $_clearField(3);
 }
 
 class GetForumThreadRequest extends $pb.GeneratedMessage {
@@ -1159,6 +1256,325 @@ class CloseForumThreadResponse extends $pb.GeneratedMessage {
   ForumThread ensureThread() => $_ensure(0);
 }
 
+/// core.forum.navigation.v1. Закрепление требует read/manage и scope space.manage.
+class SetForumThreadPinnedRequest extends $pb.GeneratedMessage {
+  factory SetForumThreadPinnedRequest({
+    $core.String? channelId,
+    $core.String? threadId,
+    $core.bool? pinned,
+    $fixnum.Int64? expectedRevision,
+  }) {
+    final result = SetForumThreadPinnedRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (threadId != null) result.threadId = threadId;
+    if (pinned != null) result.pinned = pinned;
+    if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    return result;
+  }
+
+  SetForumThreadPinnedRequest._();
+
+  factory SetForumThreadPinnedRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetForumThreadPinnedRequest()..mergeFromBuffer(data, registry);
+  factory SetForumThreadPinnedRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetForumThreadPinnedRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'SetForumThreadPinnedRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: SetForumThreadPinnedRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'threadId')
+    ..aOB(3, _omitFieldNames ? '' : 'pinned')
+    ..aInt64(4, _omitFieldNames ? '' : 'expectedRevision')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetForumThreadPinnedRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetForumThreadPinnedRequest copyWith(
+          void Function(SetForumThreadPinnedRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as SetForumThreadPinnedRequest))
+          as SetForumThreadPinnedRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use SetForumThreadPinnedRequest() / SetForumThreadPinnedRequest.new instead')
+  static SetForumThreadPinnedRequest create() =>
+      SetForumThreadPinnedRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      SetForumThreadPinnedRequest._();
+  @$core.override
+  SetForumThreadPinnedRequest createEmptyInstance() =>
+      SetForumThreadPinnedRequest._();
+  @$core.pragma('dart2js:noInline')
+  static SetForumThreadPinnedRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SetForumThreadPinnedRequest>(
+          SetForumThreadPinnedRequest.$_createMessage);
+  static SetForumThreadPinnedRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get threadId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set threadId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasThreadId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearThreadId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get pinned => $_getBF(2);
+  @$pb.TagNumber(3)
+  set pinned($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasPinned() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearPinned() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get expectedRevision => $_getI64(3);
+  @$pb.TagNumber(4)
+  set expectedRevision($fixnum.Int64 value) => $_setInt64(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasExpectedRevision() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearExpectedRevision() => $_clearField(4);
+}
+
+class SetForumThreadPinnedResponse extends $pb.GeneratedMessage {
+  factory SetForumThreadPinnedResponse({
+    ForumThread? thread,
+  }) {
+    final result = SetForumThreadPinnedResponse._();
+    if (thread != null) result.thread = thread;
+    return result;
+  }
+
+  SetForumThreadPinnedResponse._();
+
+  factory SetForumThreadPinnedResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetForumThreadPinnedResponse()..mergeFromBuffer(data, registry);
+  factory SetForumThreadPinnedResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetForumThreadPinnedResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'SetForumThreadPinnedResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: SetForumThreadPinnedResponse.$_createMessage)
+    ..aOM<ForumThread>(1, _omitFieldNames ? '' : 'thread',
+        subBuilder: ForumThread.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetForumThreadPinnedResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetForumThreadPinnedResponse copyWith(
+          void Function(SetForumThreadPinnedResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as SetForumThreadPinnedResponse))
+          as SetForumThreadPinnedResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use SetForumThreadPinnedResponse() / SetForumThreadPinnedResponse.new instead')
+  static SetForumThreadPinnedResponse create() =>
+      SetForumThreadPinnedResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      SetForumThreadPinnedResponse._();
+  @$core.override
+  SetForumThreadPinnedResponse createEmptyInstance() =>
+      SetForumThreadPinnedResponse._();
+  @$core.pragma('dart2js:noInline')
+  static SetForumThreadPinnedResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SetForumThreadPinnedResponse>(
+          SetForumThreadPinnedResponse.$_createMessage);
+  static SetForumThreadPinnedResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ForumThread get thread => $_getN(0);
+  @$pb.TagNumber(1)
+  set thread(ForumThread value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasThread() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearThread() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ForumThread ensureThread() => $_ensure(0);
+}
+
+/// Курсор чтения относится к principal сессии, монотонный; 0 отмечает первое сообщение.
+class MarkForumThreadReadRequest extends $pb.GeneratedMessage {
+  factory MarkForumThreadReadRequest({
+    $core.String? channelId,
+    $core.String? threadId,
+    $fixnum.Int64? throughSequence,
+  }) {
+    final result = MarkForumThreadReadRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (threadId != null) result.threadId = threadId;
+    if (throughSequence != null) result.throughSequence = throughSequence;
+    return result;
+  }
+
+  MarkForumThreadReadRequest._();
+
+  factory MarkForumThreadReadRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      MarkForumThreadReadRequest()..mergeFromBuffer(data, registry);
+  factory MarkForumThreadReadRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      MarkForumThreadReadRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'MarkForumThreadReadRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: MarkForumThreadReadRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'threadId')
+    ..aInt64(3, _omitFieldNames ? '' : 'throughSequence')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MarkForumThreadReadRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MarkForumThreadReadRequest copyWith(
+          void Function(MarkForumThreadReadRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as MarkForumThreadReadRequest))
+          as MarkForumThreadReadRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use MarkForumThreadReadRequest() / MarkForumThreadReadRequest.new instead')
+  static MarkForumThreadReadRequest create() => MarkForumThreadReadRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      MarkForumThreadReadRequest._();
+  @$core.override
+  MarkForumThreadReadRequest createEmptyInstance() =>
+      MarkForumThreadReadRequest._();
+  @$core.pragma('dart2js:noInline')
+  static MarkForumThreadReadRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<MarkForumThreadReadRequest>(
+          MarkForumThreadReadRequest.$_createMessage);
+  static MarkForumThreadReadRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get threadId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set threadId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasThreadId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearThreadId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get throughSequence => $_getI64(2);
+  @$pb.TagNumber(3)
+  set throughSequence($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasThroughSequence() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearThroughSequence() => $_clearField(3);
+}
+
+class MarkForumThreadReadResponse extends $pb.GeneratedMessage {
+  factory MarkForumThreadReadResponse({
+    ForumThread? thread,
+  }) {
+    final result = MarkForumThreadReadResponse._();
+    if (thread != null) result.thread = thread;
+    return result;
+  }
+
+  MarkForumThreadReadResponse._();
+
+  factory MarkForumThreadReadResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      MarkForumThreadReadResponse()..mergeFromBuffer(data, registry);
+  factory MarkForumThreadReadResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      MarkForumThreadReadResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'MarkForumThreadReadResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: MarkForumThreadReadResponse.$_createMessage)
+    ..aOM<ForumThread>(1, _omitFieldNames ? '' : 'thread',
+        subBuilder: ForumThread.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MarkForumThreadReadResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MarkForumThreadReadResponse copyWith(
+          void Function(MarkForumThreadReadResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as MarkForumThreadReadResponse))
+          as MarkForumThreadReadResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use MarkForumThreadReadResponse() / MarkForumThreadReadResponse.new instead')
+  static MarkForumThreadReadResponse create() =>
+      MarkForumThreadReadResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      MarkForumThreadReadResponse._();
+  @$core.override
+  MarkForumThreadReadResponse createEmptyInstance() =>
+      MarkForumThreadReadResponse._();
+  @$core.pragma('dart2js:noInline')
+  static MarkForumThreadReadResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<MarkForumThreadReadResponse>(
+          MarkForumThreadReadResponse.$_createMessage);
+  static MarkForumThreadReadResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ForumThread get thread => $_getN(0);
+  @$pb.TagNumber(1)
+  set thread(ForumThread value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasThread() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearThread() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ForumThread ensureThread() => $_ensure(0);
+}
+
 /// core.forum.v1: отдельные открытые форумные разделы с ACL канала.
 class ForumServiceApi {
   final $pb.RpcClient _client;
@@ -1181,6 +1597,14 @@ class ForumServiceApi {
           $pb.ClientContext? ctx, ReplyForumThreadRequest request) =>
       _client.invoke<ReplyForumThreadResponse>(ctx, 'ForumService',
           'ReplyForumThread', request, ReplyForumThreadResponse());
+  $async.Future<SetForumThreadPinnedResponse> setForumThreadPinned(
+          $pb.ClientContext? ctx, SetForumThreadPinnedRequest request) =>
+      _client.invoke<SetForumThreadPinnedResponse>(ctx, 'ForumService',
+          'SetForumThreadPinned', request, SetForumThreadPinnedResponse());
+  $async.Future<MarkForumThreadReadResponse> markForumThreadRead(
+          $pb.ClientContext? ctx, MarkForumThreadReadRequest request) =>
+      _client.invoke<MarkForumThreadReadResponse>(ctx, 'ForumService',
+          'MarkForumThreadRead', request, MarkForumThreadReadResponse());
   $async.Future<CloseForumThreadResponse> closeForumThread(
           $pb.ClientContext? ctx, CloseForumThreadRequest request) =>
       _client.invoke<CloseForumThreadResponse>(ctx, 'ForumService',
