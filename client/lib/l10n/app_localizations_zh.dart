@@ -2139,6 +2139,132 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get voiceAndroidNoiseHelp =>
       '默认启用 DeepFilterNet3。WebRTC 是负载较低的选项，也可以关闭处理。音频在手机上处理。';
+
+  @override
+  String get forumConnectFirst => '连接空间以打开论坛。';
+
+  @override
+  String get forumUpdateRuntime => '论坛需要支持 core.forum.v1 的运行时。请在广播中更新服务器。';
+
+  @override
+  String get forumPrivacy => '论坛消息存储在服务器上，未端到端加密。访问由版块权限控制。';
+
+  @override
+  String get forumSections => '论坛版块';
+
+  @override
+  String get forumManage => '版块与权限';
+
+  @override
+  String get forumEmptySections => '没有可用的论坛版块。管理员可以创建版块并分配权限。';
+
+  @override
+  String get forumRefresh => '刷新';
+
+  @override
+  String get forumNewTopic => '创建主题';
+
+  @override
+  String get forumTopicTitle => '主题标题';
+
+  @override
+  String get forumText => '消息';
+
+  @override
+  String get forumSend => '发送';
+
+  @override
+  String get forumReply => '回复';
+
+  @override
+  String get forumClosed => '主题已关闭，无法添加新回复。';
+
+  @override
+  String get forumClose => '关闭主题';
+
+  @override
+  String get forumCloseConfirm => '关闭此主题？所有成员将无法添加新回复。';
+
+  @override
+  String get forumCancel => '取消';
+
+  @override
+  String get forumBack => '返回主题';
+
+  @override
+  String get forumMore => '加载更多';
+
+  @override
+  String get forumEmptyTopics => '此版块尚无主题。';
+
+  @override
+  String get forumReadOnly => '您可以阅读此版块。发布需要写入权限。';
+
+  @override
+  String get forumInvalidText => '请输入文本或添加附件。标题最多 320 UTF-8 字节。';
+
+  @override
+  String get forumConflict => '主题已更改。请刷新后重试。';
+
+  @override
+  String get forumDenied => '访问权限已撤销或版块不可用。请刷新论坛。';
+
+  @override
+  String get forumFailure => '操作失败。请检查连接后重试。';
+
+  @override
+  String get forumWriteUnavailable => '回复未发送：主题已关闭或版块已归档。请刷新论坛。';
+
+  @override
+  String get forumListTitle => '讨论';
+
+  @override
+  String get forumListDescription => '社区交流';
+
+  @override
+  String get forumReplies => '回复';
+
+  @override
+  String get forumAboutSection => '关于此版块';
+
+  @override
+  String get forumAboutTopic => '关于此主题';
+
+  @override
+  String get forumState => '状态';
+
+  @override
+  String get forumOpen => '开放';
+
+  @override
+  String get forumClosedLabel => '已关闭';
+
+  @override
+  String get forumAuthor => '作者';
+
+  @override
+  String get forumCreated => '创建时间';
+
+  @override
+  String get forumTopicAuthor => '主题作者';
+
+  @override
+  String get forumAllTopics => '此版块的所有主题';
+
+  @override
+  String get forumActions => '主题操作';
+
+  @override
+  String get forumClosedHeading => '主题已关闭';
+
+  @override
+  String get forumClosedDescription => '无法添加新回复，仍可阅读此讨论。';
+
+  @override
+  String get forumPrivacyShort => '访问由版块权限控制。不支持端到端加密。';
+
+  @override
+  String get forumOrder => '按顺序';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

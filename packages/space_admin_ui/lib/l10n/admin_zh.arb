@@ -361,9 +361,18 @@
   "voiceRoomCreated": "房间已创建。",
   "voiceRoomSaved": "房间设置已保存。",
   "voiceRoomDeleted": "房间已删除。",
-  "@voiceRoomDeleteConfirm": {"placeholders": {"name": {"type": "String"}}}
-,
+  "@voiceRoomDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "voiceRoomCapacity": "参与人数上限",
   "voiceRoomCapacityHelp": "2 至 32 人，默认为 8 人。降低上限不会断开现有参与者。更改上限需要所有参与者使用最新应用。",
-  "voiceRoomCapacityInvalid": "请输入 2 至 32 之间的整数。"
+  "voiceRoomCapacityInvalid": "请输入 2 至 32 之间的整数。",
+  "forumSectionsTitle": "论坛版块与权限",
+  "forumSectionDefaults": "成员可以阅读、创建主题和回复；只读成员只能阅读。",
+  "forumSectionAccessHelp": "管理和读取权限允许关闭主题。设备需要管理访问权限。仅作为作者无法关闭主题。",
+  "forumSectionPrivacy": "论坛版块不支持公开预览和端到端加密。已归档版块为只读。"
 }

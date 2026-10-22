@@ -21,9 +21,15 @@ typedef AdminCall = Future<Map<String, dynamic>> Function(
 });
 
 class ChannelsPanel extends StatefulWidget {
-  const ChannelsPanel({super.key, required this.call, this.voiceRooms = false});
+  const ChannelsPanel({
+    super.key,
+    required this.call,
+    this.voiceRooms = false,
+    this.forum = false,
+  });
   final AdminCall call;
   final bool voiceRooms;
+  final bool forum;
   @override
   State<ChannelsPanel> createState() => _ChannelsPanelState();
 }
@@ -31,6 +37,11 @@ class ChannelsPanel extends StatefulWidget {
 class _ChannelsPanelState extends State<ChannelsPanel> {
   final operations = AdminOperations();
   bool get busy => operations.state.busy;
+  String get viewType => widget.forum
+      ? 'forum'
+      : widget.voiceRooms
+      ? 'voice_room'
+      : 'chat';
   AdminLocalizations get strings =>
       AdminLocalizations.of(context) ??
       lookupAdminLocalizations(const Locale('ru'));
@@ -115,8 +126,8 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
 
   bool _matchesView(Map<String, dynamic> channel) {
     final views = channel['views'] as List?;
-    if (views == null || views.isEmpty) return !widget.voiceRooms;
-    final type = widget.voiceRooms ? 'voice_room' : 'chat';
+    if (views == null || views.isEmpty) return viewType == 'chat';
+    final type = viewType;
     return views.any((view) => view is Map && view['type'] == type);
   }
 
@@ -188,7 +199,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     final channelPosition = position(newOrder);
     if (newId.text.isEmpty) {
       newId.text =
-          '${widget.voiceRooms ? 'voice' : 'chat'}_${DateTime.now().microsecondsSinceEpoch.toRadixString(36)}';
+          '${viewType}_${DateTime.now().microsecondsSinceEpoch.toRadixString(36)}';
     }
     final id = newId.text;
     late Map<String, dynamic> result;
@@ -200,7 +211,7 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
           'channelId': id,
           'title': channelName,
           'position': channelPosition,
-          'viewType': widget.voiceRooms ? 'voice_room' : 'chat',
+          'viewType': viewType,
           'publicPreview': false,
           ..._capacityBody(newCapacity),
         },
@@ -511,8 +522,11 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     ),
   );
 
-  String get _panelTitle =>
-      widget.voiceRooms ? strings.voiceRoomsTitle : strings.channelsTitle;
+  String get _panelTitle => widget.forum
+      ? strings.forumSectionsTitle
+      : widget.voiceRooms
+      ? strings.voiceRoomsTitle
+      : strings.channelsTitle;
   String get _reloadLabel =>
       widget.voiceRooms ? strings.voiceRoomsReload : strings.channelsReload;
   String get _emptyLabel =>
@@ -522,19 +536,25 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
       : strings.channelCreateSection;
   String get _newTitleLabel =>
       widget.voiceRooms ? strings.voiceRoomNewTitle : strings.channelNewTitle;
-  String get _defaultsLabel =>
-      widget.voiceRooms ? strings.voiceRoomDefaults : strings.channelDefaults;
+  String get _defaultsLabel => widget.forum
+      ? strings.forumSectionDefaults
+      : widget.voiceRooms
+      ? strings.voiceRoomDefaults
+      : strings.channelDefaults;
   String get _createLabel =>
       widget.voiceRooms ? strings.voiceRoomCreate : strings.channelCreate;
   String get _saveLabel =>
       widget.voiceRooms ? strings.voiceRoomSave : strings.channelSave;
   String get _deleteLabel =>
       widget.voiceRooms ? strings.voiceRoomDelete : strings.channelDelete;
-  String get _accessHelp => widget.voiceRooms
+  String get _accessHelp => widget.forum
+      ? strings.forumSectionAccessHelp
+      : widget.voiceRooms
       ? strings.voiceRoomAccessHelp
       : strings.channelAccessHelp;
 
   List<Widget> _previewControls() {
+    if (widget.forum) return [Text(strings.forumSectionPrivacy)];
     if (widget.voiceRooms) return [Text(strings.voiceRoomArchiveHelp)];
     return [
       SwitchListTile(

@@ -827,4 +827,16 @@ class AdminLocalizationsZh extends AdminLocalizations {
 
   @override
   String get voiceRoomCapacityInvalid => '请输入 2 至 32 之间的整数。';
+
+  @override
+  String get forumSectionsTitle => '论坛版块与权限';
+
+  @override
+  String get forumSectionDefaults => '成员可以阅读、创建主题和回复；只读成员只能阅读。';
+
+  @override
+  String get forumSectionAccessHelp => '管理和读取权限允许关闭主题。设备需要管理访问权限。仅作为作者无法关闭主题。';
+
+  @override
+  String get forumSectionPrivacy => '论坛版块不支持公开预览和端到端加密。已归档版块为只读。';
 }

@@ -361,8 +361,18 @@
   "voiceRoomCreated": "Room created.",
   "voiceRoomSaved": "Room settings saved.",
   "voiceRoomDeleted": "Room deleted.",
-  "@voiceRoomDeleteConfirm": {"placeholders": {"name": {"type": "String"}}},
+  "@voiceRoomDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "voiceRoomCapacity": "Participant limit",
   "voiceRoomCapacityHelp": "From 2 to 32, default 8. Lowering the limit does not disconnect participants. Changing the limit requires up-to-date apps for all participants.",
-  "voiceRoomCapacityInvalid": "Enter a whole number of participants from 2 to 32."
+  "voiceRoomCapacityInvalid": "Enter a whole number of participants from 2 to 32.",
+  "forumSectionsTitle": "Forum sections and permissions",
+  "forumSectionDefaults": "Members can read, create topics and reply; readers can only read.",
+  "forumSectionAccessHelp": "Manage and Read permissions allow closing topics. The device needs administrative access. Authorship alone does not allow closing.",
+  "forumSectionPrivacy": "Forum sections do not support public previews or end-to-end encryption. Archived sections are read-only."
 }

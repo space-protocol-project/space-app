@@ -5,7 +5,7 @@ import 'package:flutter/rendering.dart' show ScrollDirection;
 
 import 'message_reply.dart';
 import 'outbox_panel.dart';
-import 'emoji_picker.dart';
+import 'message_composer_controls.dart';
 import 'message_reactions.dart';
 import 'message_context_menu.dart';
 
@@ -440,20 +440,6 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     }
   }
 
-  void _insertDraftNewline() {
-    final value = draft.value;
-    final selection = value.selection;
-    final start = selection.isValid ? selection.start : value.text.length;
-    final end = selection.isValid ? selection.end : value.text.length;
-    final updated = value.text.replaceRange(start, end, '\n');
-    if (updated.characters.length <= 1024) {
-      draft.value = TextEditingValue(
-        text: updated,
-        selection: TextSelection.collapsed(offset: start + 1),
-      );
-    }
-  }
-
   KeyEventResult _draftKeyEvent(FocusNode node, KeyEvent event) {
     if (editing != null &&
         event is KeyDownEvent &&
@@ -462,26 +448,13 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       setState(finishEditing);
       return KeyEventResult.handled;
     }
-    final keyboard = HardwareKeyboard.instance;
-    if (event is KeyUpEvent ||
-        ![
-          LogicalKeyboardKey.enter,
-          LogicalKeyboardKey.numpadEnter,
-        ].contains(event.logicalKey) ||
-        keyboard.isControlPressed ||
-        keyboard.isAltPressed ||
-        keyboard.isMetaPressed ||
-        (draft.value.composing.isValid && !draft.value.composing.isCollapsed)) {
-      return KeyEventResult.ignored;
-    }
-    if (event is KeyDownEvent) {
-      if (keyboard.isShiftPressed == widget.sendWithShift) {
-        unawaited(send());
-      } else {
-        _insertDraftNewline();
-      }
-    }
-    return KeyEventResult.handled;
+    return messageDraftKeyEvent(
+      event,
+      draft,
+      sendWithShift: widget.sendWithShift,
+      send: () => unawaited(send()),
+      maxLength: editing == null ? 1024 : 4096,
+    );
   }
 
   String _authorName(BuildContext context, Content message, bool mine) {
@@ -965,21 +938,17 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     return Focus(
       canRequestFocus: false,
       onKeyEvent: _draftKeyEvent,
-      child: TextField(
-        key: const ValueKey('chat-draft'),
+      child: MessageDraftField(
+        fieldKey: const ValueKey('chat-draft'),
         focusNode: draftFocus,
         controller: draft,
         enabled: editing == null
             ? view.canQueue
             : widget.controller.canChangeMessage(editing!),
-        minLines: 3,
-        maxLines: null,
         maxLength: editing == null ? 1024 : 4096,
-        decoration: messageInputDecoration(
-          view.connected && !view.canWrite
-              ? context.strings.cannotSend
-              : context.strings.messageHint,
-        ),
+        hint: view.connected && !view.canWrite
+            ? context.strings.cannotSend
+            : context.strings.messageHint,
       ),
     );
   }
@@ -989,24 +958,13 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     final enabled = editing == null
         ? view.canQueue
         : widget.controller.canChangeMessage(editing!);
-    return Row(
-      key: const ValueKey('composer-actions'),
-      children: [
-        if (editing == null && widget.controller.canAttachFiles)
-          AttachFileButton(queue: attachmentQueue, enabled: enabled),
-        EmojiButton(controller: draft, enabled: enabled),
-        const Spacer(),
-        IconButton.filled(
-          onPressed: enabled ? send : null,
-          tooltip: editing == null
-              ? context.strings.sendMessage
-              : context.strings.saveMessage,
-          style: IconButton.styleFrom(
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-          ),
-          icon: Icon(editing == null ? Icons.arrow_upward : Icons.check),
-        ),
-      ],
+    return MessageComposerActions(
+      controller: draft,
+      enabled: enabled,
+      send: send,
+      queue: attachmentQueue,
+      canAttach: editing == null && widget.controller.canAttachFiles,
+      editing: editing != null,
     );
   }
 

@@ -2317,4 +2317,141 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get voiceAndroidNoiseHelp =>
       'DeepFilterNet3 is enabled by default. WebRTC is a lighter option; processing can also be disabled. Audio is processed on your phone.';
+
+  @override
+  String get forumConnectFirst => 'Connect to a space to open the forum.';
+
+  @override
+  String get forumUpdateRuntime =>
+      'The forum requires a runtime supporting core.forum.v1. Update the server in Broadcast.';
+
+  @override
+  String get forumPrivacy =>
+      'Forum messages are stored on the server without end-to-end encryption. Section permissions control access.';
+
+  @override
+  String get forumSections => 'Forum section';
+
+  @override
+  String get forumManage => 'Sections and permissions';
+
+  @override
+  String get forumEmptySections =>
+      'No forum sections are available. An administrator can create a section and assign permissions.';
+
+  @override
+  String get forumRefresh => 'Refresh';
+
+  @override
+  String get forumNewTopic => 'Create topic';
+
+  @override
+  String get forumTopicTitle => 'Topic title';
+
+  @override
+  String get forumText => 'Message';
+
+  @override
+  String get forumSend => 'Send';
+
+  @override
+  String get forumReply => 'Reply';
+
+  @override
+  String get forumClosed => 'This topic is closed. New replies are disabled.';
+
+  @override
+  String get forumClose => 'Close topic';
+
+  @override
+  String get forumCloseConfirm =>
+      'Close this topic? New replies will be disabled for everyone.';
+
+  @override
+  String get forumCancel => 'Cancel';
+
+  @override
+  String get forumBack => 'Back to topics';
+
+  @override
+  String get forumMore => 'Load more';
+
+  @override
+  String get forumEmptyTopics => 'There are no topics in this section yet.';
+
+  @override
+  String get forumReadOnly =>
+      'You can read this section. Writing permission is required to post.';
+
+  @override
+  String get forumInvalidText =>
+      'Enter text or attach a file. Title: up to 320 UTF-8 bytes.';
+
+  @override
+  String get forumConflict => 'The topic changed. Refresh it and try again.';
+
+  @override
+  String get forumDenied =>
+      'Access was revoked or the section is unavailable. Refresh the forum.';
+
+  @override
+  String get forumFailure =>
+      'The action failed. Check your connection and try again.';
+
+  @override
+  String get forumWriteUnavailable =>
+      'Reply was not sent: the topic is closed or the section is archived. Refresh the forum.';
+
+  @override
+  String get forumListTitle => 'Discussions';
+
+  @override
+  String get forumListDescription => 'Conversations in our community';
+
+  @override
+  String get forumReplies => 'Replies';
+
+  @override
+  String get forumAboutSection => 'About this section';
+
+  @override
+  String get forumAboutTopic => 'About this topic';
+
+  @override
+  String get forumState => 'Status';
+
+  @override
+  String get forumOpen => 'Open';
+
+  @override
+  String get forumClosedLabel => 'Closed';
+
+  @override
+  String get forumAuthor => 'Author';
+
+  @override
+  String get forumCreated => 'Created';
+
+  @override
+  String get forumTopicAuthor => 'Topic author';
+
+  @override
+  String get forumAllTopics => 'All topics in this section';
+
+  @override
+  String get forumActions => 'Topic actions';
+
+  @override
+  String get forumClosedHeading => 'Topic closed';
+
+  @override
+  String get forumClosedDescription =>
+      'New replies are disabled. You can still read the discussion.';
+
+  @override
+  String get forumPrivacyShort =>
+      'Section permissions control access. End-to-end encryption is unavailable.';
+
+  @override
+  String get forumOrder => 'In order';
 }

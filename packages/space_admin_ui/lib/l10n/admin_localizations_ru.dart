@@ -877,4 +877,19 @@ class AdminLocalizationsRu extends AdminLocalizations {
   @override
   String get voiceRoomCapacityInvalid =>
       'Укажите целое число участников от 2 до 32.';
+
+  @override
+  String get forumSectionsTitle => 'Разделы форума и права';
+
+  @override
+  String get forumSectionDefaults =>
+      'Участники смогут читать, создавать темы и отвечать; читатели — только читать.';
+
+  @override
+  String get forumSectionAccessHelp =>
+      'Право «Управление» вместе с чтением разрешает закрывать темы. Нужен административный доступ устройства. Автор темы без этого права закрыть её не может.';
+
+  @override
+  String get forumSectionPrivacy =>
+      'Форум не поддерживает публичное превью и сквозное шифрование. Архивный раздел доступен только для чтения.';
 }

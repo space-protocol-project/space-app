@@ -4631,6 +4631,7 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     $core.bool? attachmentsEnabled,
     $core.bool? mlsSupported,
     $core.bool? ordinaryRepliesSupported,
+    $core.Iterable<$core.String>? capabilities,
   }) {
     final result = GetManifestResponse._();
     if (protocolVersion != null) result.protocolVersion = protocolVersion;
@@ -4643,6 +4644,7 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     if (mlsSupported != null) result.mlsSupported = mlsSupported;
     if (ordinaryRepliesSupported != null)
       result.ordinaryRepliesSupported = ordinaryRepliesSupported;
+    if (capabilities != null) result.capabilities.addAll(capabilities);
     return result;
   }
 
@@ -4669,6 +4671,7 @@ class GetManifestResponse extends $pb.GeneratedMessage {
     ..aOB(6, _omitFieldNames ? '' : 'attachmentsEnabled')
     ..aOB(7, _omitFieldNames ? '' : 'mlsSupported')
     ..aOB(8, _omitFieldNames ? '' : 'ordinaryRepliesSupported')
+    ..pPS(9, _omitFieldNames ? '' : 'capabilities')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -4762,6 +4765,10 @@ class GetManifestResponse extends $pb.GeneratedMessage {
   $core.bool hasOrdinaryRepliesSupported() => $_has(7);
   @$pb.TagNumber(8)
   void clearOrdinaryRepliesSupported() => $_clearField(8);
+
+  /// Поддерживаемые расширения, например core.forum.v1.
+  @$pb.TagNumber(9)
+  $pb.PbList<$core.String> get capabilities => $_getList(8);
 }
 
 class Channel extends $pb.GeneratedMessage {

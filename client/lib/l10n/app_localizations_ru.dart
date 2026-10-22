@@ -2332,4 +2332,143 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get voiceAndroidNoiseHelp =>
       'DeepFilterNet3 включён по умолчанию. WebRTC — более лёгкий вариант; обработку можно отключить. Звук обрабатывается на телефоне.';
+
+  @override
+  String get forumConnectFirst =>
+      'Подключитесь к пространству, чтобы открыть форум.';
+
+  @override
+  String get forumUpdateRuntime =>
+      'Для форума нужен новый runtime с поддержкой core.forum.v1. Обновите сервер через «Эфир».';
+
+  @override
+  String get forumPrivacy =>
+      'Сообщения форума хранятся на сервере без сквозного шифрования. Доступ определяется правами раздела.';
+
+  @override
+  String get forumSections => 'Раздел форума';
+
+  @override
+  String get forumManage => 'Разделы и права';
+
+  @override
+  String get forumEmptySections =>
+      'Нет доступных форумных разделов. Администратор может создать раздел и назначить права.';
+
+  @override
+  String get forumRefresh => 'Обновить';
+
+  @override
+  String get forumNewTopic => 'Создать тему';
+
+  @override
+  String get forumTopicTitle => 'Заголовок темы';
+
+  @override
+  String get forumText => 'Сообщение';
+
+  @override
+  String get forumSend => 'Отправить';
+
+  @override
+  String get forumReply => 'Ответить';
+
+  @override
+  String get forumClosed => 'Тема закрыта. Новые ответы запрещены.';
+
+  @override
+  String get forumClose => 'Закрыть тему';
+
+  @override
+  String get forumCloseConfirm =>
+      'Закрыть тему? Новые ответы станут недоступны всем участникам.';
+
+  @override
+  String get forumCancel => 'Отмена';
+
+  @override
+  String get forumBack => 'К темам';
+
+  @override
+  String get forumMore => 'Загрузить ещё';
+
+  @override
+  String get forumEmptyTopics => 'В этом разделе пока нет тем.';
+
+  @override
+  String get forumReadOnly =>
+      'У вас есть право чтения. Для публикации нужно право записи в раздел.';
+
+  @override
+  String get forumInvalidText =>
+      'Введите текст или прикрепите файл. Заголовок — до 320 байт UTF-8.';
+
+  @override
+  String get forumConflict =>
+      'Тема изменилась. Обновите её и повторите действие.';
+
+  @override
+  String get forumDenied =>
+      'Доступ отозван или раздел недоступен. Обновите форум.';
+
+  @override
+  String get forumFailure =>
+      'Не удалось выполнить действие. Проверьте подключение и повторите попытку.';
+
+  @override
+  String get forumWriteUnavailable =>
+      'Ответ не отправлен: тема закрыта или раздел архивирован. Обновите форум.';
+
+  @override
+  String get forumListTitle => 'Обсуждения';
+
+  @override
+  String get forumListDescription => 'Разговоры нашего сообщества';
+
+  @override
+  String get forumReplies => 'Ответы';
+
+  @override
+  String get forumAboutSection => 'Об этом разделе';
+
+  @override
+  String get forumAboutTopic => 'О теме';
+
+  @override
+  String get forumState => 'Состояние';
+
+  @override
+  String get forumOpen => 'Открыта';
+
+  @override
+  String get forumClosedLabel => 'Закрыта';
+
+  @override
+  String get forumAuthor => 'Автор';
+
+  @override
+  String get forumCreated => 'Создана';
+
+  @override
+  String get forumTopicAuthor => 'Автор темы';
+
+  @override
+  String get forumAllTopics => 'Все темы раздела';
+
+  @override
+  String get forumActions => 'Действия с темой';
+
+  @override
+  String get forumClosedHeading => 'Тема закрыта';
+
+  @override
+  String get forumClosedDescription =>
+      'Новые ответы недоступны. Обсуждение можно читать.';
+
+  @override
+  String get forumPrivacyShort =>
+      'Доступ определяется правами раздела. Сквозное шифрование недоступно.';
+
+  @override
+  String get forumOrder => 'По порядку';
 }

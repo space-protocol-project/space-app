@@ -876,4 +876,19 @@ class AdminLocalizationsEn extends AdminLocalizations {
   @override
   String get voiceRoomCapacityInvalid =>
       'Enter a whole number of participants from 2 to 32.';
+
+  @override
+  String get forumSectionsTitle => 'Forum sections and permissions';
+
+  @override
+  String get forumSectionDefaults =>
+      'Members can read, create topics and reply; readers can only read.';
+
+  @override
+  String get forumSectionAccessHelp =>
+      'Manage and Read permissions allow closing topics. The device needs administrative access. Authorship alone does not allow closing.';
+
+  @override
+  String get forumSectionPrivacy =>
+      'Forum sections do not support public previews or end-to-end encryption. Archived sections are read-only.';
 }

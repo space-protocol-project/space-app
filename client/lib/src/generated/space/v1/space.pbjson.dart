@@ -1218,6 +1218,7 @@ final $typed_data.Uint8List getManifestRequestDescriptor =
 const GetManifestResponse$json = {
   '1': 'GetManifestResponse',
   '2': [
+    {'1': 'capabilities', '3': 9, '4': 3, '5': 9, '10': 'capabilities'},
     {
       '1': 'ordinary_replies_supported',
       '3': 8,
@@ -1257,13 +1258,14 @@ const GetManifestResponse$json = {
 
 /// Descriptor for `GetManifestResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List getManifestResponseDescriptor = $convert.base64Decode(
-    'ChNHZXRNYW5pZmVzdFJlc3BvbnNlEjwKGm9yZGluYXJ5X3JlcGxpZXNfc3VwcG9ydGVkGAggAS'
-    'gIUhhvcmRpbmFyeVJlcGxpZXNTdXBwb3J0ZWQSIwoNbWxzX3N1cHBvcnRlZBgHIAEoCFIMbWxz'
-    'U3VwcG9ydGVkEi8KE2F0dGFjaG1lbnRzX2VuYWJsZWQYBiABKAhSEmF0dGFjaG1lbnRzRW5hYm'
-    'xlZBIpChBwcm90b2NvbF92ZXJzaW9uGAEgASgJUg9wcm90b2NvbFZlcnNpb24SGwoJc2VydmVy'
-    'X2lkGAIgASgJUghzZXJ2ZXJJZBItCghjaGFubmVscxgDIAMoCzIRLnNwYWNlLnYxLkNoYW5uZW'
-    'xSCGNoYW5uZWxzEhQKBXRpdGxlGAQgASgJUgV0aXRsZRIoCgRpY29uGAUgASgLMhQuc3BhY2Uu'
-    'djEuU2VydmVySWNvblIEaWNvbg==');
+    'ChNHZXRNYW5pZmVzdFJlc3BvbnNlEiIKDGNhcGFiaWxpdGllcxgJIAMoCVIMY2FwYWJpbGl0aW'
+    'VzEjwKGm9yZGluYXJ5X3JlcGxpZXNfc3VwcG9ydGVkGAggASgIUhhvcmRpbmFyeVJlcGxpZXNT'
+    'dXBwb3J0ZWQSIwoNbWxzX3N1cHBvcnRlZBgHIAEoCFIMbWxzU3VwcG9ydGVkEi8KE2F0dGFjaG'
+    '1lbnRzX2VuYWJsZWQYBiABKAhSEmF0dGFjaG1lbnRzRW5hYmxlZBIpChBwcm90b2NvbF92ZXJz'
+    'aW9uGAEgASgJUg9wcm90b2NvbFZlcnNpb24SGwoJc2VydmVyX2lkGAIgASgJUghzZXJ2ZXJJZB'
+    'ItCghjaGFubmVscxgDIAMoCzIRLnNwYWNlLnYxLkNoYW5uZWxSCGNoYW5uZWxzEhQKBXRpdGxl'
+    'GAQgASgJUgV0aXRsZRIoCgRpY29uGAUgASgLMhQuc3BhY2UudjEuU2VydmVySWNvblIEaWNvbg'
+    '==');
 
 @$core.Deprecated('Use channelDescriptor instead')
 const Channel$json = {

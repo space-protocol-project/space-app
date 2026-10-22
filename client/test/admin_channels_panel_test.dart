@@ -126,6 +126,45 @@ Future<void> toggle(WidgetTester tester, String key) async {
 }
 
 void main() {
+  testWidgets('Форум: создание отдельного раздела и права модератора', (
+    tester,
+  ) async {
+    final server = ChannelServer();
+    final strings = lookupAdminLocalizations(const Locale('ru'));
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ru'),
+        supportedLocales: AdminLocalizations.supportedLocales,
+        localizationsDelegates: AdminLocalizations.localizationsDelegates,
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: ChannelsPanel(call: server.call, forum: true),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Общий чат'), findsNothing);
+    await press(tester, strings.channelCreateSection);
+    await tester.enterText(
+      find.byKey(const ValueKey('new-channel-title')),
+      'Форум сообщества',
+    );
+    final create = find.widgetWithText(FilledButton, strings.channelCreate);
+    await tester.ensureVisible(create);
+    await tester.tap(create);
+    await tester.pumpAndSettle();
+    final id = server.channels.keys.singleWhere((id) => id != 'general');
+    expect(server.channels[id]!['views'], [
+      {'type': 'forum'},
+    ]);
+    expect(server.channels[id]!['publicPreview'], false);
+    expect(find.text(strings.channelPublicPreview), findsNothing);
+    await toggle(tester, 'rule-0-manage');
+    await press(tester, strings.channelSaveAccess);
+    expect(server.access[id]!.first['permissions']['manage'], true);
+  });
+
   for (final language in ['ru', 'zh', 'en']) {
     final strings = lookupAdminLocalizations(Locale(language));
     testWidgets('Каналы: создание, права, архив и конфликт: $language', (

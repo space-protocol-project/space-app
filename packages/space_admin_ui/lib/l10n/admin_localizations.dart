@@ -1671,6 +1671,30 @@ abstract class AdminLocalizations {
   /// In ru, this message translates to:
   /// **'Укажите целое число участников от 2 до 32.'**
   String get voiceRoomCapacityInvalid;
+
+  /// No description provided for @forumSectionsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разделы форума и права'**
+  String get forumSectionsTitle;
+
+  /// No description provided for @forumSectionDefaults.
+  ///
+  /// In ru, this message translates to:
+  /// **'Участники смогут читать, создавать темы и отвечать; читатели — только читать.'**
+  String get forumSectionDefaults;
+
+  /// No description provided for @forumSectionAccessHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Право «Управление» вместе с чтением разрешает закрывать темы. Нужен административный доступ устройства. Автор темы без этого права закрыть её не может.'**
+  String get forumSectionAccessHelp;
+
+  /// No description provided for @forumSectionPrivacy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Форум не поддерживает публичное превью и сквозное шифрование. Архивный раздел доступен только для чтения.'**
+  String get forumSectionPrivacy;
 }
 
 class _AdminLocalizationsDelegate

@@ -1,0 +1,601 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grpc/grpc.dart';
+import 'package:space_admin_ui/space_admin_ui.dart'
+    show ChannelsPanel, SpaceContentInsets;
+
+import '../l10n/strings.dart';
+import '../src/core.dart';
+import '../src/forum_api.dart';
+import '../src/forum_controller.dart';
+import '../src/generated/space/v1/space.pb.dart' show Asset;
+import 'components.dart';
+import 'forum_composer.dart';
+import 'forum_widgets.dart';
+
+class ForumView extends StatefulWidget {
+  const ForumView({
+    super.key,
+    required this.session,
+    this.active = true,
+    this.sendWithShift = false,
+  });
+  final SpaceSession? session;
+  final bool active, sendWithShift;
+  @override
+  State<ForumView> createState() => _ForumViewState();
+}
+
+class _ForumViewState extends State<ForumView> {
+  bool visited = false;
+  @override
+  Widget build(BuildContext context) {
+    visited = visited || widget.active;
+    if (!visited) return const SizedBox.shrink();
+    final connected = widget.session;
+    if (connected == null) {
+      return PageBody(
+        title: context.strings.forumTitle,
+        description: context.strings.forumDescription,
+        children: [Text(context.strings.forumConnectFirst)],
+      );
+    }
+    return ForumArea(
+      key: ObjectKey(connected),
+      api: SessionForumApi(connected),
+      sendWithShift: widget.sendWithShift,
+      manage: connected.canManageSpace
+          ? () => _manage(context, connected)
+          : null,
+    );
+  }
+
+  Future<void> _manage(BuildContext context, SpaceSession connected) =>
+      showDialog<void>(
+        context: context,
+        builder: (context) => Dialog(
+          child: SizedBox(
+            width: 760,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      tooltip: context.strings.forumBack,
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close),
+                    ),
+                  ),
+                  ChannelsPanel(call: connected.adminRequest, forum: true),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+}
+
+class ForumArea extends StatefulWidget {
+  const ForumArea({
+    super.key,
+    required this.api,
+    this.manage,
+    this.sendWithShift = false,
+  });
+  final ForumApi api;
+  final bool sendWithShift;
+  final Future<void> Function()? manage;
+  @override
+  State<ForumArea> createState() => _ForumAreaState();
+}
+
+class _ForumAreaState extends State<ForumArea> {
+  late final controller = ForumController(widget.api);
+  @override
+  void initState() {
+    super.initState();
+    unawaited(controller.refresh());
+  }
+
+  @override
+  void dispose() {
+    unawaited(controller.close());
+    super.dispose();
+  }
+
+  Future<void> manage() async {
+    await widget.manage!();
+    if (mounted) await controller.refresh();
+  }
+
+  Future<void> create() async {
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.strings.forumNewTopic),
+        content: SizedBox(
+          width: 560,
+          child: SingleChildScrollView(
+            child: ForumComposer(
+              sendWithShift: widget.sendWithShift,
+              newTopic: true,
+              session: media?.attachmentSession,
+              attachmentsEnabled: media?.attachmentsEnabled ?? false,
+              channelId: controller.state.section!.id,
+              submit: (title, text, key, attachments) async {
+                final success = await controller.create(
+                  title,
+                  text,
+                  key,
+                  attachments,
+                );
+                if (success && context.mounted) Navigator.pop(context);
+                return success;
+              },
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(context.strings.forumCancel),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> closeTopic() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.strings.forumClose),
+        content: Text(context.strings.forumCloseConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(context.strings.forumCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(context.strings.forumClose),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) await controller.closeTopic();
+  }
+
+  String errorText(Object error) {
+    if (error is! GrpcError) return context.strings.forumFailure;
+    return switch (error.code) {
+      StatusCode.aborted => context.strings.forumConflict,
+      StatusCode.permissionDenied ||
+      StatusCode.notFound ||
+      StatusCode.unauthenticated => context.strings.forumDenied,
+      StatusCode.failedPrecondition => context.strings.forumWriteUnavailable,
+      StatusCode.unimplemented => context.strings.forumUpdateRuntime,
+      StatusCode.invalidArgument => context.strings.forumInvalidText,
+      _ => context.strings.forumFailure,
+    };
+  }
+
+  ForumMedia? get media =>
+      widget.api is ForumMedia ? widget.api as ForumMedia : null;
+
+  @override
+  Widget build(BuildContext context) =>
+      BlocBuilder<ForumController, ForumState>(
+        bloc: controller,
+        builder: (context, state) => LayoutBuilder(
+          builder: (context, constraints) {
+            final wide = constraints.maxWidth >= 1000;
+            final padding = constraints.maxWidth < 600 ? 18.0 : 28.0;
+            return SingleChildScrollView(
+              primary: false,
+              padding: EdgeInsets.fromLTRB(
+                padding,
+                24 + SpaceContentInsets.topOf(context),
+                padding,
+                28,
+              ),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1180),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _heading(state),
+                      if (state.busy)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          child: LinearProgressIndicator(),
+                        ),
+                      if (state.error != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Text(
+                            errorText(state.error!),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 24),
+                      _content(state, wide),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+
+  Widget _heading(ForumState state) {
+    if (state.topic != null) return _topicHeading(state);
+    if (state.section == null) {
+      return Text(
+        context.strings.forumListTitle,
+        style: Theme.of(context).textTheme.headlineSmall,
+      );
+    }
+    return LayoutBuilder(
+      builder: (context, constraints) =>
+          _listHeading(state, constraints.maxWidth < 560),
+    );
+  }
+
+  Widget _listHeading(ForumState state, bool narrow) {
+    final title = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionPicker(state),
+        const SizedBox(height: 4),
+        Text(
+          context.strings.forumListDescription,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
+    );
+    if (narrow) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(child: title),
+              const SizedBox(width: 8),
+              _menu(state),
+            ],
+          ),
+          if (state.section!.permissions.write)
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: _createButton(state),
+              ),
+            ),
+        ],
+      );
+    }
+    return Row(
+      children: [
+        Expanded(child: title),
+        const SizedBox(width: 16),
+        if (state.section!.permissions.write) _createButton(state),
+        _menu(state),
+      ],
+    );
+  }
+
+  Widget _createButton(ForumState state) => FilledButton.icon(
+    onPressed: state.busy ? null : create,
+    icon: const Icon(Icons.add, size: 18),
+    label: Text(context.strings.forumNewTopic),
+  );
+  Widget _sectionPicker(ForumState state) => DropdownButtonHideUnderline(
+    child: DropdownButton<String>(
+      key: const ValueKey('forum-section-picker'),
+      value: state.section!.id,
+      isExpanded: true,
+      style: Theme.of(context).textTheme.titleLarge
+          ?.copyWith(fontWeight: FontWeight.w700),
+      items: state.sections
+          .map(
+            (section) => DropdownMenuItem(
+              value: section.id,
+              child: Text(
+                section.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          )
+          .toList(),
+      onChanged: state.busy
+          ? null
+          : (id) {
+              if (id != null) {
+                controller.selectSection(
+                  state.sections.firstWhere((c) => c.id == id),
+                );
+              }
+            },
+    ),
+  );
+  Widget _menu(ForumState state) => PopupMenuButton<String>(
+    key: const ValueKey('forum-actions'),
+    tooltip: context.strings.forumActions,
+    enabled: !state.busy,
+    icon: const Icon(Icons.more_horiz),
+    onSelected: (action) => _action(action),
+    itemBuilder: (context) => [
+      if (state.topic != null &&
+          state.section!.permissions.manage &&
+          !state.topic!.closed)
+        PopupMenuItem(value: 'close', child: Text(context.strings.forumClose)),
+      PopupMenuItem(
+        value: 'refresh',
+        child: Text(context.strings.forumRefresh),
+      ),
+      if (widget.manage != null)
+        PopupMenuItem(
+          value: 'manage',
+          child: Text(context.strings.forumManage),
+        ),
+      PopupMenuItem(
+        value: 'privacy',
+        child: Text(context.strings.forumAboutSection),
+      ),
+    ],
+  );
+  void _action(String action) {
+    switch (action) {
+      case 'close':
+        unawaited(closeTopic());
+      case 'refresh':
+        unawaited(controller.refresh());
+      case 'manage':
+        unawaited(manage());
+      case 'privacy':
+        unawaited(
+          showDialog<void>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(context.strings.forumAboutSection),
+              content: Text(context.strings.forumPrivacy),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(context.strings.forumBack),
+                ),
+              ],
+            ),
+          ),
+        );
+    }
+  }
+
+  Widget _content(ForumState state, bool wide) {
+    if (!state.supported) return Text(context.strings.forumUpdateRuntime);
+    if (state.section == null) return _empty(state);
+    final content = state.topic == null ? _topics(state) : _topic(state);
+    if (!wide) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          content,
+          const SizedBox(height: 28),
+          const Divider(height: 32),
+          const ForumPrivacy(),
+        ],
+      );
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: content),
+        const SizedBox(width: 30),
+        SizedBox(
+          width: 190,
+          child: ForumAbout(
+            topic: state.topic,
+            manage: widget.manage == null ? null : manage,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _empty(ForumState state) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(context.strings.forumEmptySections),
+      const SizedBox(height: 16),
+      OutlinedButton(
+        onPressed: state.busy ? null : controller.refresh,
+        child: Text(context.strings.forumRefresh),
+      ),
+      if (widget.manage != null && state.supported)
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: FilledButton(
+            onPressed: state.busy ? null : manage,
+            child: Text(context.strings.forumManage),
+          ),
+        ),
+    ],
+  );
+  Widget _topics(ForumState state) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      ForumTopicList(
+        topics: state.threads,
+        busy: state.busy,
+        open: controller.openTopic,
+      ),
+      if (state.threads.isEmpty && !state.busy)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          child: Text(context.strings.forumEmptyTopics),
+        ),
+      const SizedBox(height: 16),
+      Row(
+        children: [
+          Expanded(
+            child: Text(
+              context.strings.forumAllTopics,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+          TextButton.icon(
+            onPressed: state.busy ? null : controller.refresh,
+            icon: const Icon(Icons.refresh, size: 16),
+            label: Text(context.strings.forumRefresh),
+          ),
+        ],
+      ),
+      if (state.nextThreads != 0)
+        OutlinedButton(
+          onPressed: state.busy ? null : controller.moreThreads,
+          child: Text(context.strings.forumMore),
+        ),
+    ],
+  );
+  Widget _topicHeading(ForumState state) {
+    final topic = state.topic!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextButton.icon(
+          onPressed: state.busy ? null : controller.back,
+          icon: const Icon(Icons.arrow_back, size: 17),
+          label: Text(state.section!.title),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                topic.title,
+                style: Theme.of(context).textTheme.headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.w700),
+              ),
+            ),
+            const SizedBox(width: 12),
+            _menu(state),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          runSpacing: 6,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(
+              forumDate(context, topic.createdAtUnix.toInt()),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const Text('·'),
+            Text(
+              '${context.strings.forumReplies}: ${topic.replyCount}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            if (topic.closed) ...[
+              const Icon(Icons.lock_outline, size: 14),
+              Text(
+                context.strings.forumClosedLabel,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _topic(ForumState state) {
+    final topic = state.topic!;
+    return Align(
+      alignment: Alignment.topLeft,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 740),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ForumMessage(
+              author: topic.authorName,
+              authorId: topic.authorId,
+              text: topic.text,
+              timestamp: topic.createdAtUnix.toInt(),
+              original: true,
+              assets: _visibleAssets(topic.attachments),
+              session: media?.attachmentSession,
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${context.strings.forumReplies}  ${topic.replyCount}',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                Text(
+                  context.strings.forumOrder,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Divider(height: 1),
+            for (final reply in state.replies)
+              ForumMessage(
+                author: reply.authorName,
+                authorId: reply.authorId,
+                text: reply.text,
+                timestamp: reply.createdAtUnix.toInt(),
+                assets: _visibleAssets(reply.attachments),
+                session: media?.attachmentSession,
+              ),
+            if (state.nextReplies != 0)
+              OutlinedButton(
+                onPressed: state.busy ? null : controller.moreReplies,
+                child: Text(context.strings.forumMore),
+              ),
+            const SizedBox(height: 24),
+            _replyArea(state),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Asset> _visibleAssets(List<Asset> assets) =>
+      media?.attachmentsEnabled == false ? const [] : assets;
+  Widget _replyArea(ForumState state) {
+    if (state.topic!.closed) return const ForumClosedNotice();
+    if (!state.section!.permissions.write) {
+      return Text(context.strings.forumReadOnly);
+    }
+    return ForumComposer(
+      sendWithShift: widget.sendWithShift,
+      key: ValueKey(state.topic!.id),
+      disabled: state.busy,
+      channelId: state.section!.id,
+      session: media?.attachmentSession,
+      attachmentsEnabled: media?.attachmentsEnabled ?? false,
+      submit: (_, text, key, attachments) =>
+          controller.reply(text, key, attachments),
+    );
+  }
+}

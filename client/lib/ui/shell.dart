@@ -33,6 +33,7 @@ import '../src/voice_controller.dart';
 import '../src/voice_signaling.dart';
 import 'voice_devices.dart';
 import 'voice_rooms.dart';
+import 'forum.dart';
 import 'voice_room_navigation.dart';
 import '../src/preferences.dart';
 import '../src/app_updates.dart';
@@ -1606,10 +1607,10 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             sendWithShift: widget.preferences.sendShortcut == 'shiftEnter',
             openConnection: () => connection(),
           ),
-          Section.forum => UnavailablePanel(
-            title: context.strings.forumTitle,
-            description: context.strings.forumDescription,
-            icon: Icons.forum_outlined,
+          Section.forum => ForumView(
+            sendWithShift: widget.preferences.sendShortcut == 'shiftEnter',
+            session: controller.mlsSession,
+            active: selected == Section.forum,
           ),
           Section.feed => UnavailablePanel(
             title: context.strings.feedTitle,

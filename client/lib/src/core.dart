@@ -32,6 +32,9 @@ import 'root_adoption.dart';
 import 'root_device_proof.dart';
 import 'origin_binding.dart';
 import 'rpc_connection.dart';
+import 'forum_api.dart';
+import 'generated/space/v1/forum.pb.dart' as forum;
+import 'generated/space/v1/forum.connect.spec.dart' as forum_specs;
 import 'generated/space/v1/voice.pb.dart' as voice;
 import 'generated/space/v1/voice.connect.spec.dart' as voice_specs;
 import 'rpc_http.dart' show pinnedRpcClient;
@@ -40,6 +43,7 @@ import 'root_rotation.dart' as rotation;
 part 'queued_mutation_rpc.dart';
 part 'push_registration.dart';
 part 'voice_rpc.dart';
+part 'forum_rpc.dart';
 
 String url64(List<int> value) => base64Url.encode(value).replaceAll('=', '');
 
@@ -786,6 +790,8 @@ class SpaceSession
   @override
   bool attachmentsEnabled = false;
   bool mlsSupported = false;
+  bool forumSupported = false;
+  bool forumAttachmentsSupported = false;
   @override
   bool repliesSupported = false;
   @override
@@ -840,6 +846,10 @@ class SpaceSession
     await _pinMlsCatalog(result.channels);
     mlsSupported = manifest.mlsSupported;
     repliesSupported = manifest.ordinaryRepliesSupported;
+    forumSupported = manifest.capabilities.contains('core.forum.v1');
+    forumAttachmentsSupported = manifest.capabilities.contains(
+      'core.forum.attachments.v1',
+    );
     _applyCatalog(
       result.channels,
       manifest.title,
@@ -864,7 +874,9 @@ class SpaceSession
           !seen.add(c.id) ||
           c.title.isEmpty ||
           c.latestMessageSequence.isNegative ||
-          !c.views.any((v) => ['chat', 'voice_room'].contains(v.type)) ||
+          !c.views.any(
+            (v) => ['chat', 'voice_room', 'forum'].contains(v.type),
+          ) ||
           !c.hasPermissions()) {
         throw const LocalFailure(
           LocalFailureCode.protocolInvalid,
@@ -1224,6 +1236,10 @@ class SpaceSession
         options: RpcOptions(timeout: const Duration(seconds: 10)),
       );
       session.repliesSupported = manifest.ordinaryRepliesSupported;
+      session.forumSupported = manifest.capabilities.contains('core.forum.v1');
+      session.forumAttachmentsSupported = manifest.capabilities.contains(
+        'core.forum.attachments.v1',
+      );
       session.spaceTitle = manifest.title;
       session.serverIcon = manifest.hasIcon() ? manifest.icon : null;
       session.chatTitle =

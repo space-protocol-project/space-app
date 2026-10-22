@@ -4197,6 +4197,258 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'DeepFilterNet3 включён по умолчанию. WebRTC — более лёгкий вариант; обработку можно отключить. Звук обрабатывается на телефоне.'**
   String get voiceAndroidNoiseHelp;
+
+  /// No description provided for @forumConnectFirst.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключитесь к пространству, чтобы открыть форум.'**
+  String get forumConnectFirst;
+
+  /// No description provided for @forumUpdateRuntime.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для форума нужен новый runtime с поддержкой core.forum.v1. Обновите сервер через «Эфир».'**
+  String get forumUpdateRuntime;
+
+  /// No description provided for @forumPrivacy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщения форума хранятся на сервере без сквозного шифрования. Доступ определяется правами раздела.'**
+  String get forumPrivacy;
+
+  /// No description provided for @forumSections.
+  ///
+  /// In ru, this message translates to:
+  /// **'Раздел форума'**
+  String get forumSections;
+
+  /// No description provided for @forumManage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разделы и права'**
+  String get forumManage;
+
+  /// No description provided for @forumEmptySections.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет доступных форумных разделов. Администратор может создать раздел и назначить права.'**
+  String get forumEmptySections;
+
+  /// No description provided for @forumRefresh.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить'**
+  String get forumRefresh;
+
+  /// No description provided for @forumNewTopic.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать тему'**
+  String get forumNewTopic;
+
+  /// No description provided for @forumTopicTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заголовок темы'**
+  String get forumTopicTitle;
+
+  /// No description provided for @forumText.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщение'**
+  String get forumText;
+
+  /// No description provided for @forumSend.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправить'**
+  String get forumSend;
+
+  /// No description provided for @forumReply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ответить'**
+  String get forumReply;
+
+  /// No description provided for @forumClosed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тема закрыта. Новые ответы запрещены.'**
+  String get forumClosed;
+
+  /// No description provided for @forumClose.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть тему'**
+  String get forumClose;
+
+  /// No description provided for @forumCloseConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть тему? Новые ответы станут недоступны всем участникам.'**
+  String get forumCloseConfirm;
+
+  /// No description provided for @forumCancel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отмена'**
+  String get forumCancel;
+
+  /// No description provided for @forumBack.
+  ///
+  /// In ru, this message translates to:
+  /// **'К темам'**
+  String get forumBack;
+
+  /// No description provided for @forumMore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загрузить ещё'**
+  String get forumMore;
+
+  /// No description provided for @forumEmptyTopics.
+  ///
+  /// In ru, this message translates to:
+  /// **'В этом разделе пока нет тем.'**
+  String get forumEmptyTopics;
+
+  /// No description provided for @forumReadOnly.
+  ///
+  /// In ru, this message translates to:
+  /// **'У вас есть право чтения. Для публикации нужно право записи в раздел.'**
+  String get forumReadOnly;
+
+  /// No description provided for @forumInvalidText.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите текст или прикрепите файл. Заголовок — до 320 байт UTF-8.'**
+  String get forumInvalidText;
+
+  /// No description provided for @forumConflict.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тема изменилась. Обновите её и повторите действие.'**
+  String get forumConflict;
+
+  /// No description provided for @forumDenied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ отозван или раздел недоступен. Обновите форум.'**
+  String get forumDenied;
+
+  /// No description provided for @forumFailure.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось выполнить действие. Проверьте подключение и повторите попытку.'**
+  String get forumFailure;
+
+  /// No description provided for @forumWriteUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ответ не отправлен: тема закрыта или раздел архивирован. Обновите форум.'**
+  String get forumWriteUnavailable;
+
+  /// No description provided for @forumListTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обсуждения'**
+  String get forumListTitle;
+
+  /// No description provided for @forumListDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разговоры нашего сообщества'**
+  String get forumListDescription;
+
+  /// No description provided for @forumReplies.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ответы'**
+  String get forumReplies;
+
+  /// No description provided for @forumAboutSection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Об этом разделе'**
+  String get forumAboutSection;
+
+  /// No description provided for @forumAboutTopic.
+  ///
+  /// In ru, this message translates to:
+  /// **'О теме'**
+  String get forumAboutTopic;
+
+  /// No description provided for @forumState.
+  ///
+  /// In ru, this message translates to:
+  /// **'Состояние'**
+  String get forumState;
+
+  /// No description provided for @forumOpen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыта'**
+  String get forumOpen;
+
+  /// No description provided for @forumClosedLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыта'**
+  String get forumClosedLabel;
+
+  /// No description provided for @forumAuthor.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автор'**
+  String get forumAuthor;
+
+  /// No description provided for @forumCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создана'**
+  String get forumCreated;
+
+  /// No description provided for @forumTopicAuthor.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автор темы'**
+  String get forumTopicAuthor;
+
+  /// No description provided for @forumAllTopics.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все темы раздела'**
+  String get forumAllTopics;
+
+  /// No description provided for @forumActions.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действия с темой'**
+  String get forumActions;
+
+  /// No description provided for @forumClosedHeading.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тема закрыта'**
+  String get forumClosedHeading;
+
+  /// No description provided for @forumClosedDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новые ответы недоступны. Обсуждение можно читать.'**
+  String get forumClosedDescription;
+
+  /// No description provided for @forumPrivacyShort.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ определяется правами раздела. Сквозное шифрование недоступно.'**
+  String get forumPrivacyShort;
+
+  /// No description provided for @forumOrder.
+  ///
+  /// In ru, this message translates to:
+  /// **'По порядку'**
+  String get forumOrder;
 }
 
 class _AppLocalizationsDelegate
