@@ -14,6 +14,8 @@
 - [Сервер и runtime](https://github.com/space-protocol-project/space-server).
 - [Протокол, архитектура и промосайт](https://github.com/space-protocol-project/space-protocol).
 
+Оба выпуска опубликованы как Latest. [CI клиента](https://github.com/space-protocol-project/space-app/actions/runs/39987080393) и [CI runtime](https://github.com/space-protocol-project/space-server/actions/runs/39983388046) успешны. Четыре установщика, три runtime-архива, три JSON-дескриптора и SHA256SUMS.txt полностью скачаны: размеры и SHA-256 совпали с GitHub API и контрольными суммами.
+
 ## Возможности
 
 Android: установите `Space-android.apk` из выпуска. Мобильное приложение
