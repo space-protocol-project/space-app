@@ -11,6 +11,27 @@ abstract final class ForumService {
   /// Fully-qualified name of the ForumService service.
   static const name = 'space.v1.ForumService';
 
+  static const reportForumContent = connect.Spec(
+    '/$name/ReportForumContent',
+    connect.StreamType.unary,
+    spacev1forum.ReportForumContentRequest.new,
+    spacev1forum.ReportForumContentResponse.new,
+  );
+
+  static const listForumReports = connect.Spec(
+    '/$name/ListForumReports',
+    connect.StreamType.unary,
+    spacev1forum.ListForumReportsRequest.new,
+    spacev1forum.ListForumReportsResponse.new,
+  );
+
+  static const resolveForumReport = connect.Spec(
+    '/$name/ResolveForumReport',
+    connect.StreamType.unary,
+    spacev1forum.ResolveForumReportRequest.new,
+    spacev1forum.ResolveForumReportResponse.new,
+  );
+
   static const listForumThreads = connect.Spec(
     '/$name/ListForumThreads',
     connect.StreamType.unary,

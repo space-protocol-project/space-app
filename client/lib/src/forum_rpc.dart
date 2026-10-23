@@ -1,7 +1,12 @@
 part of 'core.dart';
 
 class SessionForumApi
-    implements ForumApi, ForumMedia, ForumNavigation, ForumModeration {
+    implements
+        ForumApi,
+        ForumMedia,
+        ForumNavigation,
+        ForumModeration,
+        ForumReports {
   SessionForumApi(this.session);
   final SpaceSession session;
   @override
@@ -242,6 +247,68 @@ class SessionForumApi
         channelId: channel,
         threadId: thread,
         afterId: after,
+      ),
+      options: session._options,
+    );
+  }
+
+  @override
+  bool get reportsSupported => session.forumReportsSupported;
+  @override
+  Future<void> reportContent(
+    String channel,
+    String thread,
+    String reply,
+    String reason,
+  ) async {
+    await session._ensureSession();
+    await session.channel.unary(
+      forum_specs.ForumService.reportForumContent,
+      forum.ReportForumContentRequest(
+        channelId: channel,
+        threadId: thread,
+        replyId: reply,
+        reason: reason,
+      ),
+      options: session._options,
+    );
+  }
+
+  @override
+  Future<forum.ListForumReportsResponse> reports(
+    String channel,
+    Int64 after,
+    bool resolved,
+  ) async {
+    await session._ensureSession();
+    return session.channel.unary(
+      forum_specs.ForumService.listForumReports,
+      forum.ListForumReportsRequest(
+        channelId: channel,
+        afterId: after,
+        resolved: resolved,
+      ),
+      options: session._options,
+    );
+  }
+
+  @override
+  Future<void> resolveReport(
+    String channel,
+    Int64 id,
+    String decision,
+    String reason,
+    Int64 revision,
+  ) async {
+    await session._ensureSession();
+    await session.channel.unary(
+      forum_specs.ForumService.resolveForumReport,
+      forum.ResolveForumReportRequest(
+        channelId: channel,
+        reportId: id,
+        decision: decision,
+        reason: reason,
+        expectedRevision: revision,
       ),
       options: session._options,
     );

@@ -793,6 +793,7 @@ class SpaceSession
   bool forumSupported = false;
   bool forumNavigationSupported = false;
   bool forumModerationSupported = false;
+  bool forumReportsSupported = false;
   bool forumAttachmentsSupported = false;
   @override
   bool repliesSupported = false;
@@ -851,6 +852,9 @@ class SpaceSession
     forumSupported = manifest.capabilities.contains('core.forum.v1');
     forumModerationSupported = manifest.capabilities.contains(
       'core.forum.moderation.v1',
+    );
+    forumReportsSupported = manifest.capabilities.contains(
+      'core.forum.reports.v1',
     );
     forumNavigationSupported = manifest.capabilities.contains(
       'core.forum.navigation.v1',
@@ -1247,6 +1251,9 @@ class SpaceSession
       session.forumSupported = manifest.capabilities.contains('core.forum.v1');
       session.forumModerationSupported = manifest.capabilities.contains(
         'core.forum.moderation.v1',
+      );
+      session.forumReportsSupported = manifest.capabilities.contains(
+        'core.forum.reports.v1',
       );
       session.forumNavigationSupported = manifest.capabilities.contains(
         'core.forum.navigation.v1',

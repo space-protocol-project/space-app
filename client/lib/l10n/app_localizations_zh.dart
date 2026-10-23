@@ -2335,6 +2335,42 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get forumApply => '确认';
+
+  @override
+  String get forumReport => '举报';
+
+  @override
+  String get forumReportNotice => '请说明违规原因。举报内容仅供版主审核，不显示举报人。同一内容不会重复举报。';
+
+  @override
+  String get forumReportsQueue => '举报队列';
+
+  @override
+  String get forumReportsPending => '待处理';
+
+  @override
+  String get forumReportsResolved => '已处理';
+
+  @override
+  String get forumReportsEmpty => '暂无举报';
+
+  @override
+  String get forumReportDismiss => '驳回举报';
+
+  @override
+  String get forumReportHide => '隐藏内容';
+
+  @override
+  String get forumReportDecisionNotice => '请说明处理原因。决定及原因将保存到审核日志。';
+
+  @override
+  String get forumReportOpen => '打开讨论';
+
+  @override
+  String get forumReportTopic => '主题举报';
+
+  @override
+  String get forumReportReply => '回复举报';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

@@ -2542,4 +2542,42 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get forumApply => 'Подтвердить';
+
+  @override
+  String get forumReport => 'Пожаловаться';
+
+  @override
+  String get forumReportNotice =>
+      'Опишите нарушение. Жалоба доступна модераторам; данные заявителя не показываются. Повторная жалоба на этот объект не создаётся.';
+
+  @override
+  String get forumReportsQueue => 'Очередь жалоб';
+
+  @override
+  String get forumReportsPending => 'Ожидают';
+
+  @override
+  String get forumReportsResolved => 'Решения';
+
+  @override
+  String get forumReportsEmpty => 'Жалоб пока нет';
+
+  @override
+  String get forumReportDismiss => 'Отклонить жалобу';
+
+  @override
+  String get forumReportHide => 'Скрыть содержимое';
+
+  @override
+  String get forumReportDecisionNotice =>
+      'Укажите причину решения. Решение и причина сохранятся в журнале модерации.';
+
+  @override
+  String get forumReportOpen => 'Открыть обсуждение';
+
+  @override
+  String get forumReportTopic => 'Жалоба на тему';
+
+  @override
+  String get forumReportReply => 'Жалоба на ответ';
 }

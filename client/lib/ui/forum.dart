@@ -19,6 +19,7 @@ import 'forum_device_permission.dart';
 import 'forum_widgets.dart';
 import 'forum_read_tracker.dart';
 import 'forum_moderation.dart';
+import 'forum_reports.dart';
 import 'page_transition.dart';
 
 class ForumView extends StatefulWidget {
@@ -457,25 +458,90 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
     );
   }
 
+  ForumReports? get reports {
+    final api = widget.api;
+    return api is ForumReports && (api as ForumReports).reportsSupported
+        ? api as ForumReports
+        : null;
+  }
+
+  Future<void> _report([ForumReply? reply]) async {
+    final state = controller.state;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => ForumModerationDialog(
+        title: context.strings.forumReport,
+        notice: context.strings.forumReportNotice,
+        submit: (reason) async {
+          await reports!.reportContent(
+            state.section!.id,
+            state.topic!.id,
+            reply?.id ?? '',
+            reason,
+          );
+          return true;
+        },
+      ),
+    );
+  }
+
+  Future<void> _reportsQueue() async {
+    final state = controller.state;
+    await showDialog<void>(
+      context: context,
+      builder: (_) => ForumReportsQueue(
+        api: reports!,
+        forum: widget.api,
+        channel: state.section!.id,
+        open: (id) async {
+          await controller.openTopic(id);
+        },
+      ),
+    );
+    if (mounted) await controller.synchronize();
+  }
+
   Widget? _replyActions(ForumState state, ForumReply reply) {
-    if (!state.section!.permissions.manage || controller.moderation == null) {
-      return null;
-    }
+    final moderate =
+        state.section!.permissions.manage && controller.moderation != null;
+    final report = reports != null && !reply.hidden && !state.topic!.hidden;
+    if (!moderate && !report) return null;
     final action = reply.hidden ? 'restore_reply' : 'hide_reply';
     return PopupMenuButton<String>(
       key: ValueKey('forum-reply-actions-${reply.id}'),
       tooltip: context.strings.forumActions,
       enabled: !state.busy,
-      onSelected: (_) => unawaited(_moderate(action, reply)),
+      onSelected: (selected) => unawaited(
+        selected == 'report' ? _report(reply) : _moderate(action, reply),
+      ),
       itemBuilder: (_) => [
-        PopupMenuItem(
-          value: action,
-          child: Text(forumModerationLabel(context, action)),
-        ),
+        if (report)
+          PopupMenuItem(
+            value: 'report',
+            child: Text(context.strings.forumReport),
+          ),
+        if (moderate)
+          PopupMenuItem(
+            value: action,
+            child: Text(forumModerationLabel(context, action)),
+          ),
       ],
       icon: const Icon(Icons.more_horiz, size: 18),
     );
   }
+
+  List<PopupMenuEntry<String>> _reportMenu(ForumState state) => [
+    if (reports != null &&
+        state.section != null &&
+        state.section!.permissions.manage)
+      PopupMenuItem(
+        value: 'reports',
+        child: Text(context.strings.forumReportsQueue),
+      ),
+    if (reports != null && state.topic != null && !state.topic!.hidden)
+      PopupMenuItem(value: 'report', child: Text(context.strings.forumReport)),
+  ];
 
   Widget _menu(ForumState state) => PopupMenuButton<String>(
     key: const ValueKey('forum-actions'),
@@ -485,6 +551,7 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
     onSelected: (action) => _action(action),
     itemBuilder: (context) => [
       ..._moderationMenu(state),
+      ..._reportMenu(state),
       if (_canClose(state))
         PopupMenuItem(value: 'close', child: Text(context.strings.forumClose)),
       if (state.topic != null &&
@@ -520,6 +587,10 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
   );
   void _action(String action) {
     switch (action) {
+      case 'report':
+        unawaited(_report());
+      case 'reports':
+        unawaited(_reportsQueue());
       case 'hide' || 'restore' || 'reopen':
         unawaited(_moderate(action));
       case 'audit':

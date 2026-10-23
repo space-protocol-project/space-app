@@ -920,5 +920,17 @@
   "forumModerationNotice": "Hidden content and its files remain unavailable until restored. The reason is saved in the moderation log.",
   "forumModerationLog": "Moderation log",
   "forumModerationEmpty": "No moderation actions yet",
-  "forumApply": "Confirm"
+  "forumApply": "Confirm",
+  "forumReport": "Report",
+  "forumReportNotice": "Describe the violation. Moderators can review the report; the reporter is not identified. Duplicate reports are not created.",
+  "forumReportsQueue": "Report queue",
+  "forumReportsPending": "Pending",
+  "forumReportsResolved": "Decisions",
+  "forumReportsEmpty": "No reports",
+  "forumReportDismiss": "Dismiss report",
+  "forumReportHide": "Hide content",
+  "forumReportDecisionNotice": "Provide a reason. The decision and reason will be recorded in the moderation log.",
+  "forumReportOpen": "Open discussion",
+  "forumReportTopic": "Topic report",
+  "forumReportReply": "Reply report"
 }

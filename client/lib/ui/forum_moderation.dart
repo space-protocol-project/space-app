@@ -9,6 +9,8 @@ import 'forum_widgets.dart' show forumDate, forumAuthor;
 
 String forumModerationLabel(BuildContext context, String action) =>
     switch (action) {
+      'report_dismiss' => context.strings.forumReportDismiss,
+      'report_hide' => context.strings.forumReportHide,
       'reopen' => context.strings.forumReopen,
       'hide' => context.strings.forumHideTopic,
       'restore' => context.strings.forumRestoreTopic,
@@ -22,8 +24,10 @@ class ForumModerationDialog extends StatefulWidget {
     super.key,
     required this.title,
     required this.submit,
+    this.notice,
   });
   final String title;
+  final String? notice;
   final Future<bool> Function(String reason) submit;
   @override
   State<ForumModerationDialog> createState() => _ForumModerationDialogState();
@@ -76,7 +80,7 @@ class _ForumModerationDialogState extends State<ForumModerationDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(context.strings.forumModerationNotice),
+                Text(widget.notice ?? context.strings.forumModerationNotice),
                 const SizedBox(height: 20),
                 TextFormField(
                   key: const ValueKey('forum-moderation-reason'),
@@ -206,7 +210,7 @@ class _ForumModerationLogState extends State<ForumModerationLog> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          forumModerationLabel(context, event.action),
+          '${forumModerationLabel(context, event.action)}${event.reportId == Int64.ZERO ? '' : ' · #${event.reportId}'}',
           style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 6),

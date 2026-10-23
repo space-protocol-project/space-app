@@ -2525,4 +2525,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forumApply => 'Confirm';
+
+  @override
+  String get forumReport => 'Report';
+
+  @override
+  String get forumReportNotice =>
+      'Describe the violation. Moderators can review the report; the reporter is not identified. Duplicate reports are not created.';
+
+  @override
+  String get forumReportsQueue => 'Report queue';
+
+  @override
+  String get forumReportsPending => 'Pending';
+
+  @override
+  String get forumReportsResolved => 'Decisions';
+
+  @override
+  String get forumReportsEmpty => 'No reports';
+
+  @override
+  String get forumReportDismiss => 'Dismiss report';
+
+  @override
+  String get forumReportHide => 'Hide content';
+
+  @override
+  String get forumReportDecisionNotice =>
+      'Provide a reason. The decision and reason will be recorded in the moderation log.';
+
+  @override
+  String get forumReportOpen => 'Open discussion';
+
+  @override
+  String get forumReportTopic => 'Topic report';
+
+  @override
+  String get forumReportReply => 'Reply report';
 }

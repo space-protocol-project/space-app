@@ -21,6 +21,12 @@ import 'forum.pbjson.dart';
 export 'forum.pb.dart';
 
 abstract class ForumServiceBase extends $pb.GeneratedService {
+  $async.Future<$1.ReportForumContentResponse> reportForumContent(
+      $pb.ServerContext ctx, $1.ReportForumContentRequest request);
+  $async.Future<$1.ListForumReportsResponse> listForumReports(
+      $pb.ServerContext ctx, $1.ListForumReportsRequest request);
+  $async.Future<$1.ResolveForumReportResponse> resolveForumReport(
+      $pb.ServerContext ctx, $1.ResolveForumReportRequest request);
   $async.Future<$1.ListForumThreadsResponse> listForumThreads(
       $pb.ServerContext ctx, $1.ListForumThreadsRequest request);
   $async.Future<$1.GetForumThreadResponse> getForumThread(
@@ -44,6 +50,12 @@ abstract class ForumServiceBase extends $pb.GeneratedService {
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
+      case 'ReportForumContent':
+        return $1.ReportForumContentRequest();
+      case 'ListForumReports':
+        return $1.ListForumReportsRequest();
+      case 'ResolveForumReport':
+        return $1.ResolveForumReportRequest();
       case 'ListForumThreads':
         return $1.ListForumThreadsRequest();
       case 'GetForumThread':
@@ -72,6 +84,12 @@ abstract class ForumServiceBase extends $pb.GeneratedService {
   $async.Future<$pb.GeneratedMessage> handleCall($pb.ServerContext ctx,
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
+      case 'ReportForumContent':
+        return reportForumContent(ctx, request as $1.ReportForumContentRequest);
+      case 'ListForumReports':
+        return listForumReports(ctx, request as $1.ListForumReportsRequest);
+      case 'ResolveForumReport':
+        return resolveForumReport(ctx, request as $1.ResolveForumReportRequest);
       case 'ListForumThreads':
         return listForumThreads(ctx, request as $1.ListForumThreadsRequest);
       case 'GetForumThread':

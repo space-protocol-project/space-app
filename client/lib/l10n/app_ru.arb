@@ -920,5 +920,17 @@
   "forumModerationNotice": "Скрытое содержимое и его файлы недоступны до восстановления. Причина сохраняется в журнале модерации.",
   "forumModerationLog": "Журнал модерации",
   "forumModerationEmpty": "Действий модерации пока нет",
-  "forumApply": "Подтвердить"
+  "forumApply": "Подтвердить",
+  "forumReport": "Пожаловаться",
+  "forumReportNotice": "Опишите нарушение. Жалоба доступна модераторам; данные заявителя не показываются. Повторная жалоба на этот объект не создаётся.",
+  "forumReportsQueue": "Очередь жалоб",
+  "forumReportsPending": "Ожидают",
+  "forumReportsResolved": "Решения",
+  "forumReportsEmpty": "Жалоб пока нет",
+  "forumReportDismiss": "Отклонить жалобу",
+  "forumReportHide": "Скрыть содержимое",
+  "forumReportDecisionNotice": "Укажите причину решения. Решение и причина сохранятся в журнале модерации.",
+  "forumReportOpen": "Открыть обсуждение",
+  "forumReportTopic": "Жалоба на тему",
+  "forumReportReply": "Жалоба на ответ"
 }

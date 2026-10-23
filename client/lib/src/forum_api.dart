@@ -72,3 +72,25 @@ abstract interface class ForumModeration {
     Int64 after,
   );
 }
+
+abstract interface class ForumReports {
+  bool get reportsSupported;
+  Future<void> reportContent(
+    String channel,
+    String thread,
+    String reply,
+    String reason,
+  );
+  Future<ListForumReportsResponse> reports(
+    String channel,
+    Int64 after,
+    bool resolved,
+  );
+  Future<void> resolveReport(
+    String channel,
+    Int64 id,
+    String decision,
+    String reason,
+    Int64 revision,
+  );
+}

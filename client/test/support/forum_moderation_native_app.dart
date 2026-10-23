@@ -252,7 +252,9 @@ Future<void> captureSize(
   if (navigator.mounted) navigator.pop();
 }
 
-Future<void> main() async {
+Future<void> runNativeForum(
+  Future<void> Function(SpaceSession owner, SpaceSession peer) screenshots,
+) async {
   WidgetsFlutterBinding.ensureInitialized();
   final origin = const String.fromEnvironment('SPACE_FORUM_NATIVE_ORIGIN');
   final expected = const String.fromEnvironment('SPACE_FORUM_NATIVE_SERVER_ID');
@@ -310,17 +312,7 @@ Future<void> main() async {
   );
   await windowManager.show();
   await waitFor(() => stateOf(SpaceShell) != null);
-  await captureSize(owner, 'desktop', const Size(1440, 1000));
-  await captureOverview('desktop');
-  await captureSize(owner, 'compact', const Size(500, 1200));
-  await captureOverview('compact');
-  final dynamic shell = stateOf(SpaceShell);
-  shell.openForumSection('forum');
-  await waitFor(() => stateOf(ForumArea) != null);
-  await captureNavigation();
-  debugPrint(
-    'FORUM_NATIVE_READY: 15 снимков полного приложения; скрытый файл проверен реальным RPC',
-  );
+  await screenshots(owner, peer);
   await peer.close();
 }
 
@@ -344,3 +336,17 @@ Future<void> recaptureCompact() async {
   await captureNavigation();
   debugPrint('FORUM_NATIVE_COMPACT_READY');
 }
+
+Future<void> main() => runNativeForum((owner, peer) async {
+  await captureSize(owner, 'desktop', const Size(1440, 1000));
+  await captureOverview('desktop');
+  await captureSize(owner, 'compact', const Size(500, 1200));
+  await captureOverview('compact');
+  final dynamic shell = stateOf(SpaceShell);
+  shell.openForumSection('forum');
+  await waitFor(() => stateOf(ForumArea) != null);
+  await captureNavigation();
+  debugPrint(
+    'FORUM_NATIVE_READY: 15 снимков полного приложения; скрытый файл проверен реальным RPC',
+  );
+});

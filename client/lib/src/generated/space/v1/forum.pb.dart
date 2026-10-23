@@ -2100,6 +2100,7 @@ class ForumModerationEvent extends $pb.GeneratedMessage {
     $core.String? actorId,
     $fixnum.Int64? revision,
     $fixnum.Int64? createdAtUnix,
+    $fixnum.Int64? reportId,
   }) {
     final result = ForumModerationEvent._();
     if (id != null) result.id = id;
@@ -2110,6 +2111,7 @@ class ForumModerationEvent extends $pb.GeneratedMessage {
     if (actorId != null) result.actorId = actorId;
     if (revision != null) result.revision = revision;
     if (createdAtUnix != null) result.createdAtUnix = createdAtUnix;
+    if (reportId != null) result.reportId = reportId;
     return result;
   }
 
@@ -2134,6 +2136,7 @@ class ForumModerationEvent extends $pb.GeneratedMessage {
     ..aOS(6, _omitFieldNames ? '' : 'actorId')
     ..aInt64(7, _omitFieldNames ? '' : 'revision')
     ..aInt64(8, _omitFieldNames ? '' : 'createdAtUnix')
+    ..aInt64(9, _omitFieldNames ? '' : 'reportId')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -2230,6 +2233,15 @@ class ForumModerationEvent extends $pb.GeneratedMessage {
   $core.bool hasCreatedAtUnix() => $_has(7);
   @$pb.TagNumber(8)
   void clearCreatedAtUnix() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $fixnum.Int64 get reportId => $_getI64(8);
+  @$pb.TagNumber(9)
+  set reportId($fixnum.Int64 value) => $_setInt64(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasReportId() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearReportId() => $_clearField(9);
 }
 
 class ListForumModerationResponse extends $pb.GeneratedMessage {
@@ -2302,12 +2314,669 @@ class ListForumModerationResponse extends $pb.GeneratedMessage {
   void clearNextId() => $_clearField(2);
 }
 
+/// core.forum.reports.v1: сведения о заявителе не возвращаются клиентам.
+class ForumReport extends $pb.GeneratedMessage {
+  factory ForumReport({
+    $fixnum.Int64? id,
+    $core.String? threadId,
+    $core.String? replyId,
+    $core.String? reason,
+    $core.String? decision,
+    $core.String? decisionReason,
+    $core.String? moderatorId,
+    $fixnum.Int64? createdAtUnix,
+    $fixnum.Int64? resolvedAtUnix,
+    $core.String? threadTitle,
+  }) {
+    final result = ForumReport._();
+    if (id != null) result.id = id;
+    if (threadId != null) result.threadId = threadId;
+    if (replyId != null) result.replyId = replyId;
+    if (reason != null) result.reason = reason;
+    if (decision != null) result.decision = decision;
+    if (decisionReason != null) result.decisionReason = decisionReason;
+    if (moderatorId != null) result.moderatorId = moderatorId;
+    if (createdAtUnix != null) result.createdAtUnix = createdAtUnix;
+    if (resolvedAtUnix != null) result.resolvedAtUnix = resolvedAtUnix;
+    if (threadTitle != null) result.threadTitle = threadTitle;
+    return result;
+  }
+
+  ForumReport._();
+
+  factory ForumReport.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ForumReport()..mergeFromBuffer(data, registry);
+  factory ForumReport.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ForumReport()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ForumReport',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ForumReport.$_createMessage)
+    ..aInt64(1, _omitFieldNames ? '' : 'id')
+    ..aOS(2, _omitFieldNames ? '' : 'threadId')
+    ..aOS(3, _omitFieldNames ? '' : 'replyId')
+    ..aOS(4, _omitFieldNames ? '' : 'reason')
+    ..aOS(5, _omitFieldNames ? '' : 'decision')
+    ..aOS(6, _omitFieldNames ? '' : 'decisionReason')
+    ..aOS(7, _omitFieldNames ? '' : 'moderatorId')
+    ..aInt64(8, _omitFieldNames ? '' : 'createdAtUnix')
+    ..aInt64(9, _omitFieldNames ? '' : 'resolvedAtUnix')
+    ..aOS(10, _omitFieldNames ? '' : 'threadTitle')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ForumReport clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ForumReport copyWith(void Function(ForumReport) updates) =>
+      super.copyWith((message) => updates(message as ForumReport))
+          as ForumReport;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ForumReport() / ForumReport.new instead')
+  static ForumReport create() => ForumReport._();
+  static $pb.GeneratedMessage $_createMessage() => ForumReport._();
+  @$core.override
+  ForumReport createEmptyInstance() => ForumReport._();
+  @$core.pragma('dart2js:noInline')
+  static ForumReport getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ForumReport>(
+          ForumReport.$_createMessage);
+  static ForumReport? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $fixnum.Int64 get id => $_getI64(0);
+  @$pb.TagNumber(1)
+  set id($fixnum.Int64 value) => $_setInt64(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get threadId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set threadId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasThreadId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearThreadId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get replyId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set replyId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasReplyId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearReplyId() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get reason => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set reason($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasReason() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearReason() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get decision => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set decision($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasDecision() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearDecision() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get decisionReason => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set decisionReason($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasDecisionReason() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearDecisionReason() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.String get moderatorId => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set moderatorId($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasModeratorId() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearModeratorId() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $fixnum.Int64 get createdAtUnix => $_getI64(7);
+  @$pb.TagNumber(8)
+  set createdAtUnix($fixnum.Int64 value) => $_setInt64(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasCreatedAtUnix() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearCreatedAtUnix() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $fixnum.Int64 get resolvedAtUnix => $_getI64(8);
+  @$pb.TagNumber(9)
+  set resolvedAtUnix($fixnum.Int64 value) => $_setInt64(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasResolvedAtUnix() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearResolvedAtUnix() => $_clearField(9);
+
+  @$pb.TagNumber(10)
+  $core.String get threadTitle => $_getSZ(9);
+  @$pb.TagNumber(10)
+  set threadTitle($core.String value) => $_setString(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasThreadTitle() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearThreadTitle() => $_clearField(10);
+}
+
+class ReportForumContentRequest extends $pb.GeneratedMessage {
+  factory ReportForumContentRequest({
+    $core.String? channelId,
+    $core.String? threadId,
+    $core.String? replyId,
+    $core.String? reason,
+  }) {
+    final result = ReportForumContentRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (threadId != null) result.threadId = threadId;
+    if (replyId != null) result.replyId = replyId;
+    if (reason != null) result.reason = reason;
+    return result;
+  }
+
+  ReportForumContentRequest._();
+
+  factory ReportForumContentRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ReportForumContentRequest()..mergeFromBuffer(data, registry);
+  factory ReportForumContentRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ReportForumContentRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ReportForumContentRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ReportForumContentRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'threadId')
+    ..aOS(3, _omitFieldNames ? '' : 'replyId')
+    ..aOS(4, _omitFieldNames ? '' : 'reason')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ReportForumContentRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ReportForumContentRequest copyWith(
+          void Function(ReportForumContentRequest) updates) =>
+      super.copyWith((message) => updates(message as ReportForumContentRequest))
+          as ReportForumContentRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ReportForumContentRequest() / ReportForumContentRequest.new instead')
+  static ReportForumContentRequest create() => ReportForumContentRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ReportForumContentRequest._();
+  @$core.override
+  ReportForumContentRequest createEmptyInstance() =>
+      ReportForumContentRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ReportForumContentRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ReportForumContentRequest>(
+          ReportForumContentRequest.$_createMessage);
+  static ReportForumContentRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get threadId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set threadId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasThreadId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearThreadId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get replyId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set replyId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasReplyId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearReplyId() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get reason => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set reason($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasReason() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearReason() => $_clearField(4);
+}
+
+class ReportForumContentResponse extends $pb.GeneratedMessage {
+  factory ReportForumContentResponse() => ReportForumContentResponse._();
+
+  ReportForumContentResponse._();
+
+  factory ReportForumContentResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ReportForumContentResponse()..mergeFromBuffer(data, registry);
+  factory ReportForumContentResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ReportForumContentResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ReportForumContentResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ReportForumContentResponse.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ReportForumContentResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ReportForumContentResponse copyWith(
+          void Function(ReportForumContentResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as ReportForumContentResponse))
+          as ReportForumContentResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ReportForumContentResponse() / ReportForumContentResponse.new instead')
+  static ReportForumContentResponse create() => ReportForumContentResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ReportForumContentResponse._();
+  @$core.override
+  ReportForumContentResponse createEmptyInstance() =>
+      ReportForumContentResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ReportForumContentResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ReportForumContentResponse>(
+          ReportForumContentResponse.$_createMessage);
+  static ReportForumContentResponse? _defaultInstance;
+}
+
+class ListForumReportsRequest extends $pb.GeneratedMessage {
+  factory ListForumReportsRequest({
+    $core.String? channelId,
+    $fixnum.Int64? afterId,
+    $core.int? limit,
+    $core.bool? resolved,
+  }) {
+    final result = ListForumReportsRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (afterId != null) result.afterId = afterId;
+    if (limit != null) result.limit = limit;
+    if (resolved != null) result.resolved = resolved;
+    return result;
+  }
+
+  ListForumReportsRequest._();
+
+  factory ListForumReportsRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListForumReportsRequest()..mergeFromBuffer(data, registry);
+  factory ListForumReportsRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListForumReportsRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListForumReportsRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListForumReportsRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aInt64(2, _omitFieldNames ? '' : 'afterId')
+    ..aI(3, _omitFieldNames ? '' : 'limit')
+    ..aOB(4, _omitFieldNames ? '' : 'resolved')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListForumReportsRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListForumReportsRequest copyWith(
+          void Function(ListForumReportsRequest) updates) =>
+      super.copyWith((message) => updates(message as ListForumReportsRequest))
+          as ListForumReportsRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListForumReportsRequest() / ListForumReportsRequest.new instead')
+  static ListForumReportsRequest create() => ListForumReportsRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ListForumReportsRequest._();
+  @$core.override
+  ListForumReportsRequest createEmptyInstance() => ListForumReportsRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ListForumReportsRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListForumReportsRequest>(
+          ListForumReportsRequest.$_createMessage);
+  static ListForumReportsRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get afterId => $_getI64(1);
+  @$pb.TagNumber(2)
+  set afterId($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasAfterId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAfterId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.int get limit => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set limit($core.int value) => $_setSignedInt32(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasLimit() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearLimit() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get resolved => $_getBF(3);
+  @$pb.TagNumber(4)
+  set resolved($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasResolved() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearResolved() => $_clearField(4);
+}
+
+class ListForumReportsResponse extends $pb.GeneratedMessage {
+  factory ListForumReportsResponse({
+    $core.Iterable<ForumReport>? reports,
+    $fixnum.Int64? nextId,
+  }) {
+    final result = ListForumReportsResponse._();
+    if (reports != null) result.reports.addAll(reports);
+    if (nextId != null) result.nextId = nextId;
+    return result;
+  }
+
+  ListForumReportsResponse._();
+
+  factory ListForumReportsResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListForumReportsResponse()..mergeFromBuffer(data, registry);
+  factory ListForumReportsResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListForumReportsResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListForumReportsResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListForumReportsResponse.$_createMessage)
+    ..pPM<ForumReport>(1, _omitFieldNames ? '' : 'reports',
+        subBuilder: ForumReport.$_createMessage)
+    ..aInt64(2, _omitFieldNames ? '' : 'nextId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListForumReportsResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListForumReportsResponse copyWith(
+          void Function(ListForumReportsResponse) updates) =>
+      super.copyWith((message) => updates(message as ListForumReportsResponse))
+          as ListForumReportsResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListForumReportsResponse() / ListForumReportsResponse.new instead')
+  static ListForumReportsResponse create() => ListForumReportsResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ListForumReportsResponse._();
+  @$core.override
+  ListForumReportsResponse createEmptyInstance() =>
+      ListForumReportsResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ListForumReportsResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListForumReportsResponse>(
+          ListForumReportsResponse.$_createMessage);
+  static ListForumReportsResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<ForumReport> get reports => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get nextId => $_getI64(1);
+  @$pb.TagNumber(2)
+  set nextId($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasNextId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearNextId() => $_clearField(2);
+}
+
+class ResolveForumReportRequest extends $pb.GeneratedMessage {
+  factory ResolveForumReportRequest({
+    $core.String? channelId,
+    $fixnum.Int64? reportId,
+    $core.String? decision,
+    $core.String? reason,
+    $fixnum.Int64? expectedRevision,
+  }) {
+    final result = ResolveForumReportRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (reportId != null) result.reportId = reportId;
+    if (decision != null) result.decision = decision;
+    if (reason != null) result.reason = reason;
+    if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    return result;
+  }
+
+  ResolveForumReportRequest._();
+
+  factory ResolveForumReportRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ResolveForumReportRequest()..mergeFromBuffer(data, registry);
+  factory ResolveForumReportRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ResolveForumReportRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ResolveForumReportRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ResolveForumReportRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aInt64(2, _omitFieldNames ? '' : 'reportId')
+    ..aOS(3, _omitFieldNames ? '' : 'decision')
+    ..aOS(4, _omitFieldNames ? '' : 'reason')
+    ..aInt64(5, _omitFieldNames ? '' : 'expectedRevision')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ResolveForumReportRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ResolveForumReportRequest copyWith(
+          void Function(ResolveForumReportRequest) updates) =>
+      super.copyWith((message) => updates(message as ResolveForumReportRequest))
+          as ResolveForumReportRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ResolveForumReportRequest() / ResolveForumReportRequest.new instead')
+  static ResolveForumReportRequest create() => ResolveForumReportRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ResolveForumReportRequest._();
+  @$core.override
+  ResolveForumReportRequest createEmptyInstance() =>
+      ResolveForumReportRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ResolveForumReportRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ResolveForumReportRequest>(
+          ResolveForumReportRequest.$_createMessage);
+  static ResolveForumReportRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get reportId => $_getI64(1);
+  @$pb.TagNumber(2)
+  set reportId($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasReportId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearReportId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get decision => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set decision($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasDecision() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearDecision() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get reason => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set reason($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasReason() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearReason() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get expectedRevision => $_getI64(4);
+  @$pb.TagNumber(5)
+  set expectedRevision($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasExpectedRevision() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearExpectedRevision() => $_clearField(5);
+}
+
+class ResolveForumReportResponse extends $pb.GeneratedMessage {
+  factory ResolveForumReportResponse({
+    ForumReport? report,
+  }) {
+    final result = ResolveForumReportResponse._();
+    if (report != null) result.report = report;
+    return result;
+  }
+
+  ResolveForumReportResponse._();
+
+  factory ResolveForumReportResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ResolveForumReportResponse()..mergeFromBuffer(data, registry);
+  factory ResolveForumReportResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ResolveForumReportResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ResolveForumReportResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ResolveForumReportResponse.$_createMessage)
+    ..aOM<ForumReport>(1, _omitFieldNames ? '' : 'report',
+        subBuilder: ForumReport.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ResolveForumReportResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ResolveForumReportResponse copyWith(
+          void Function(ResolveForumReportResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as ResolveForumReportResponse))
+          as ResolveForumReportResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ResolveForumReportResponse() / ResolveForumReportResponse.new instead')
+  static ResolveForumReportResponse create() => ResolveForumReportResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ResolveForumReportResponse._();
+  @$core.override
+  ResolveForumReportResponse createEmptyInstance() =>
+      ResolveForumReportResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ResolveForumReportResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ResolveForumReportResponse>(
+          ResolveForumReportResponse.$_createMessage);
+  static ResolveForumReportResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ForumReport get report => $_getN(0);
+  @$pb.TagNumber(1)
+  set report(ForumReport value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasReport() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearReport() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ForumReport ensureReport() => $_ensure(0);
+}
+
 /// core.forum.v1: отдельные открытые форумные разделы с ACL канала.
 class ForumServiceApi {
   final $pb.RpcClient _client;
 
   ForumServiceApi(this._client);
 
+  $async.Future<ReportForumContentResponse> reportForumContent(
+          $pb.ClientContext? ctx, ReportForumContentRequest request) =>
+      _client.invoke<ReportForumContentResponse>(ctx, 'ForumService',
+          'ReportForumContent', request, ReportForumContentResponse());
+  $async.Future<ListForumReportsResponse> listForumReports(
+          $pb.ClientContext? ctx, ListForumReportsRequest request) =>
+      _client.invoke<ListForumReportsResponse>(ctx, 'ForumService',
+          'ListForumReports', request, ListForumReportsResponse());
+  $async.Future<ResolveForumReportResponse> resolveForumReport(
+          $pb.ClientContext? ctx, ResolveForumReportRequest request) =>
+      _client.invoke<ResolveForumReportResponse>(ctx, 'ForumService',
+          'ResolveForumReport', request, ResolveForumReportResponse());
   $async.Future<ListForumThreadsResponse> listForumThreads(
           $pb.ClientContext? ctx, ListForumThreadsRequest request) =>
       _client.invoke<ListForumThreadsResponse>(ctx, 'ForumService',

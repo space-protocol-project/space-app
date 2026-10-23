@@ -9,6 +9,57 @@ import "forum.connect.spec.dart" as specs;
 
 /// core.forum.v1: отдельные открытые форумные разделы с ACL канала.
 extension type ForumServiceClient (connect.Transport _transport) {
+  Future<spacev1forum.ReportForumContentResponse> reportForumContent(
+    spacev1forum.ReportForumContentRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ForumService.reportForumContent,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1forum.ListForumReportsResponse> listForumReports(
+    spacev1forum.ListForumReportsRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ForumService.listForumReports,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1forum.ResolveForumReportResponse> resolveForumReport(
+    spacev1forum.ResolveForumReportRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ForumService.resolveForumReport,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
   Future<spacev1forum.ListForumThreadsResponse> listForumThreads(
     spacev1forum.ListForumThreadsRequest input, {
     connect.Headers? headers,
