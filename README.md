@@ -14,7 +14,9 @@
 - [Сервер и runtime](https://github.com/space-protocol-project/space-server).
 - [Протокол, архитектура и промосайт](https://github.com/space-protocol-project/space-protocol).
 
-Клиент **v0.7.17** использует опубликованный [runtime **v0.7.14**](https://github.com/space-protocol-project/space-server/releases/tag/v0.7.14): упрощён код, состояния переведены на BLoC/Freezed, обновлены Flutter 3.47.8 / Dart 3.13.7 и зависимости. Схема 30 и голосовой профиль 3 сохранены. Локальные проверки: 801 Flutter-тест, 86 нативных тестов камеры, анализ и Windows Release. [Изменения](Changelog.md), [отчёт обновления](docs/DEPENDENCY_UPDATES.md).
+Опубликован [клиент **v0.7.17**](https://github.com/space-protocol-project/space-app/releases/tag/v0.7.17) с [runtime **v0.7.14**](https://github.com/space-protocol-project/space-server/releases/tag/v0.7.14): упрощён код, состояния переведены на BLoC/Freezed, обновлены Flutter 3.47.8 / Dart 3.13.7 и зависимости. Схема 30 и голосовой профиль 3 сохранены. [Изменения](Changelog.md), [отчёт обновления](docs/DEPENDENCY_UPDATES.md).
+
+Оба выпуска опубликованы как Latest, не draft и не prerelease. [CI клиента](https://github.com/space-protocol-project/space-app/actions/runs/40022134389) и [CI runtime](https://github.com/space-protocol-project/space-server/actions/runs/40019247321) полностью успешны. Четыре установщика, три runtime-архива, три JSON-дескриптора и оба SHA256SUMS.txt полностью скачаны: размеры и SHA-256 совпали с GitHub API и контрольными суммами. [Установка опубликованного runtime из приложения](https://github.com/space-protocol-project/space-app/actions/runs/40022134632) прошла на Windows, Linux и macOS; [публичный Linux-установщик](https://github.com/space-protocol-project/space-server/actions/runs/40022024509) также проверен.
 
 ## Возможности
 
