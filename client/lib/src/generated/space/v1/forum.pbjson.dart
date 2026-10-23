@@ -21,6 +21,7 @@ import 'space.pbjson.dart' as $0;
 const ForumThread$json = {
   '1': 'ForumThread',
   '2': [
+    {'1': 'hidden', '3': 18, '4': 1, '5': 8, '10': 'hidden'},
     {'1': 'pinned', '3': 13, '4': 1, '5': 8, '10': 'pinned'},
     {
       '1': 'read_state_supported',
@@ -56,21 +57,24 @@ const ForumThread$json = {
 
 /// Descriptor for `ForumThread`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List forumThreadDescriptor = $convert.base64Decode(
-    'CgtGb3J1bVRocmVhZBIWCgZwaW5uZWQYDSABKAhSBnBpbm5lZBIwChRyZWFkX3N0YXRlX3N1cH'
-    'BvcnRlZBgOIAEoCFIScmVhZFN0YXRlU3VwcG9ydGVkEhIKBHNlZW4YDyABKAhSBHNlZW4SIwoN'
-    'cmVhZF9zZXF1ZW5jZRgQIAEoA1IMcmVhZFNlcXVlbmNlEiEKDHVucmVhZF9jb3VudBgRIAEoA1'
-    'ILdW5yZWFkQ291bnQSMQoLYXR0YWNobWVudHMYDCADKAsyDy5zcGFjZS52MS5Bc3NldFILYXR0'
-    'YWNobWVudHMSDgoCaWQYASABKAlSAmlkEh0KCmNoYW5uZWxfaWQYAiABKAlSCWNoYW5uZWxJZB'
-    'IbCglhdXRob3JfaWQYAyABKAlSCGF1dGhvcklkEh8KC2F1dGhvcl9uYW1lGAQgASgJUgphdXRo'
-    'b3JOYW1lEhQKBXRpdGxlGAUgASgJUgV0aXRsZRISCgR0ZXh0GAYgASgJUgR0ZXh0EiYKD2NyZW'
-    'F0ZWRfYXRfdW5peBgHIAEoA1INY3JlYXRlZEF0VW5peBIaCghzZXF1ZW5jZRgIIAEoA1IIc2Vx'
-    'dWVuY2USGgoIcmV2aXNpb24YCSABKANSCHJldmlzaW9uEhYKBmNsb3NlZBgKIAEoCFIGY2xvc2'
-    'VkEh8KC3JlcGx5X2NvdW50GAsgASgDUgpyZXBseUNvdW50');
+    'CgtGb3J1bVRocmVhZBIWCgZoaWRkZW4YEiABKAhSBmhpZGRlbhIWCgZwaW5uZWQYDSABKAhSBn'
+    'Bpbm5lZBIwChRyZWFkX3N0YXRlX3N1cHBvcnRlZBgOIAEoCFIScmVhZFN0YXRlU3VwcG9ydGVk'
+    'EhIKBHNlZW4YDyABKAhSBHNlZW4SIwoNcmVhZF9zZXF1ZW5jZRgQIAEoA1IMcmVhZFNlcXVlbm'
+    'NlEiEKDHVucmVhZF9jb3VudBgRIAEoA1ILdW5yZWFkQ291bnQSMQoLYXR0YWNobWVudHMYDCAD'
+    'KAsyDy5zcGFjZS52MS5Bc3NldFILYXR0YWNobWVudHMSDgoCaWQYASABKAlSAmlkEh0KCmNoYW'
+    '5uZWxfaWQYAiABKAlSCWNoYW5uZWxJZBIbCglhdXRob3JfaWQYAyABKAlSCGF1dGhvcklkEh8K'
+    'C2F1dGhvcl9uYW1lGAQgASgJUgphdXRob3JOYW1lEhQKBXRpdGxlGAUgASgJUgV0aXRsZRISCg'
+    'R0ZXh0GAYgASgJUgR0ZXh0EiYKD2NyZWF0ZWRfYXRfdW5peBgHIAEoA1INY3JlYXRlZEF0VW5p'
+    'eBIaCghzZXF1ZW5jZRgIIAEoA1IIc2VxdWVuY2USGgoIcmV2aXNpb24YCSABKANSCHJldmlzaW'
+    '9uEhYKBmNsb3NlZBgKIAEoCFIGY2xvc2VkEh8KC3JlcGx5X2NvdW50GAsgASgDUgpyZXBseUNv'
+    'dW50');
 
 @$core.Deprecated('Use forumReplyDescriptor instead')
 const ForumReply$json = {
   '1': 'ForumReply',
   '2': [
+    {'1': 'hidden', '3': 9, '4': 1, '5': 8, '10': 'hidden'},
+    {'1': 'revision', '3': 10, '4': 1, '5': 3, '10': 'revision'},
     {
       '1': 'attachments',
       '3': 8,
@@ -91,11 +95,12 @@ const ForumReply$json = {
 
 /// Descriptor for `ForumReply`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List forumReplyDescriptor = $convert.base64Decode(
-    'CgpGb3J1bVJlcGx5EjEKC2F0dGFjaG1lbnRzGAggAygLMg8uc3BhY2UudjEuQXNzZXRSC2F0dG'
-    'FjaG1lbnRzEg4KAmlkGAEgASgJUgJpZBIbCgl0aHJlYWRfaWQYAiABKAlSCHRocmVhZElkEhsK'
-    'CWF1dGhvcl9pZBgDIAEoCVIIYXV0aG9ySWQSHwoLYXV0aG9yX25hbWUYBCABKAlSCmF1dGhvck'
-    '5hbWUSEgoEdGV4dBgFIAEoCVIEdGV4dBImCg9jcmVhdGVkX2F0X3VuaXgYBiABKANSDWNyZWF0'
-    'ZWRBdFVuaXgSGgoIc2VxdWVuY2UYByABKANSCHNlcXVlbmNl');
+    'CgpGb3J1bVJlcGx5EhYKBmhpZGRlbhgJIAEoCFIGaGlkZGVuEhoKCHJldmlzaW9uGAogASgDUg'
+    'hyZXZpc2lvbhIxCgthdHRhY2htZW50cxgIIAMoCzIPLnNwYWNlLnYxLkFzc2V0UgthdHRhY2ht'
+    'ZW50cxIOCgJpZBgBIAEoCVICaWQSGwoJdGhyZWFkX2lkGAIgASgJUgh0aHJlYWRJZBIbCglhdX'
+    'Rob3JfaWQYAyABKAlSCGF1dGhvcklkEh8KC2F1dGhvcl9uYW1lGAQgASgJUgphdXRob3JOYW1l'
+    'EhIKBHRleHQYBSABKAlSBHRleHQSJgoPY3JlYXRlZF9hdF91bml4GAYgASgDUg1jcmVhdGVkQX'
+    'RVbml4EhoKCHNlcXVlbmNlGAcgASgDUghzZXF1ZW5jZQ==');
 
 @$core.Deprecated('Use listForumThreadsRequestDescriptor instead')
 const ListForumThreadsRequest$json = {
@@ -400,6 +405,171 @@ final $typed_data.Uint8List markForumThreadReadResponseDescriptor =
         'ChtNYXJrRm9ydW1UaHJlYWRSZWFkUmVzcG9uc2USLQoGdGhyZWFkGAEgASgLMhUuc3BhY2Uudj'
         'EuRm9ydW1UaHJlYWRSBnRocmVhZA==');
 
+@$core.Deprecated('Use moderateForumThreadRequestDescriptor instead')
+const ModerateForumThreadRequest$json = {
+  '1': 'ModerateForumThreadRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'thread_id', '3': 2, '4': 1, '5': 9, '10': 'threadId'},
+    {'1': 'action', '3': 3, '4': 1, '5': 9, '10': 'action'},
+    {'1': 'reason', '3': 4, '4': 1, '5': 9, '10': 'reason'},
+    {
+      '1': 'expected_revision',
+      '3': 5,
+      '4': 1,
+      '5': 3,
+      '10': 'expectedRevision'
+    },
+  ],
+};
+
+/// Descriptor for `ModerateForumThreadRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List moderateForumThreadRequestDescriptor = $convert.base64Decode(
+    'ChpNb2RlcmF0ZUZvcnVtVGhyZWFkUmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubm'
+    'VsSWQSGwoJdGhyZWFkX2lkGAIgASgJUgh0aHJlYWRJZBIWCgZhY3Rpb24YAyABKAlSBmFjdGlv'
+    'bhIWCgZyZWFzb24YBCABKAlSBnJlYXNvbhIrChFleHBlY3RlZF9yZXZpc2lvbhgFIAEoA1IQZX'
+    'hwZWN0ZWRSZXZpc2lvbg==');
+
+@$core.Deprecated('Use moderateForumThreadResponseDescriptor instead')
+const ModerateForumThreadResponse$json = {
+  '1': 'ModerateForumThreadResponse',
+  '2': [
+    {
+      '1': 'thread',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.ForumThread',
+      '10': 'thread'
+    },
+  ],
+};
+
+/// Descriptor for `ModerateForumThreadResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List moderateForumThreadResponseDescriptor =
+    $convert.base64Decode(
+        'ChtNb2RlcmF0ZUZvcnVtVGhyZWFkUmVzcG9uc2USLQoGdGhyZWFkGAEgASgLMhUuc3BhY2Uudj'
+        'EuRm9ydW1UaHJlYWRSBnRocmVhZA==');
+
+@$core.Deprecated('Use moderateForumReplyRequestDescriptor instead')
+const ModerateForumReplyRequest$json = {
+  '1': 'ModerateForumReplyRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'thread_id', '3': 2, '4': 1, '5': 9, '10': 'threadId'},
+    {'1': 'reply_id', '3': 3, '4': 1, '5': 9, '10': 'replyId'},
+    {'1': 'hidden', '3': 4, '4': 1, '5': 8, '10': 'hidden'},
+    {'1': 'reason', '3': 5, '4': 1, '5': 9, '10': 'reason'},
+    {
+      '1': 'expected_revision',
+      '3': 6,
+      '4': 1,
+      '5': 3,
+      '10': 'expectedRevision'
+    },
+  ],
+};
+
+/// Descriptor for `ModerateForumReplyRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List moderateForumReplyRequestDescriptor = $convert.base64Decode(
+    'ChlNb2RlcmF0ZUZvcnVtUmVwbHlSZXF1ZXN0Eh0KCmNoYW5uZWxfaWQYASABKAlSCWNoYW5uZW'
+    'xJZBIbCgl0aHJlYWRfaWQYAiABKAlSCHRocmVhZElkEhkKCHJlcGx5X2lkGAMgASgJUgdyZXBs'
+    'eUlkEhYKBmhpZGRlbhgEIAEoCFIGaGlkZGVuEhYKBnJlYXNvbhgFIAEoCVIGcmVhc29uEisKEW'
+    'V4cGVjdGVkX3JldmlzaW9uGAYgASgDUhBleHBlY3RlZFJldmlzaW9u');
+
+@$core.Deprecated('Use moderateForumReplyResponseDescriptor instead')
+const ModerateForumReplyResponse$json = {
+  '1': 'ModerateForumReplyResponse',
+  '2': [
+    {
+      '1': 'reply',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.ForumReply',
+      '10': 'reply'
+    },
+    {
+      '1': 'thread',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.ForumThread',
+      '10': 'thread'
+    },
+  ],
+};
+
+/// Descriptor for `ModerateForumReplyResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List moderateForumReplyResponseDescriptor =
+    $convert.base64Decode(
+        'ChpNb2RlcmF0ZUZvcnVtUmVwbHlSZXNwb25zZRIqCgVyZXBseRgBIAEoCzIULnNwYWNlLnYxLk'
+        'ZvcnVtUmVwbHlSBXJlcGx5Ei0KBnRocmVhZBgCIAEoCzIVLnNwYWNlLnYxLkZvcnVtVGhyZWFk'
+        'UgZ0aHJlYWQ=');
+
+@$core.Deprecated('Use listForumModerationRequestDescriptor instead')
+const ListForumModerationRequest$json = {
+  '1': 'ListForumModerationRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'thread_id', '3': 2, '4': 1, '5': 9, '10': 'threadId'},
+    {'1': 'after_id', '3': 3, '4': 1, '5': 3, '10': 'afterId'},
+    {'1': 'limit', '3': 4, '4': 1, '5': 5, '10': 'limit'},
+  ],
+};
+
+/// Descriptor for `ListForumModerationRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listForumModerationRequestDescriptor =
+    $convert.base64Decode(
+        'ChpMaXN0Rm9ydW1Nb2RlcmF0aW9uUmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubm'
+        'VsSWQSGwoJdGhyZWFkX2lkGAIgASgJUgh0aHJlYWRJZBIZCghhZnRlcl9pZBgDIAEoA1IHYWZ0'
+        'ZXJJZBIUCgVsaW1pdBgEIAEoBVIFbGltaXQ=');
+
+@$core.Deprecated('Use forumModerationEventDescriptor instead')
+const ForumModerationEvent$json = {
+  '1': 'ForumModerationEvent',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 3, '10': 'id'},
+    {'1': 'thread_id', '3': 2, '4': 1, '5': 9, '10': 'threadId'},
+    {'1': 'reply_id', '3': 3, '4': 1, '5': 9, '10': 'replyId'},
+    {'1': 'action', '3': 4, '4': 1, '5': 9, '10': 'action'},
+    {'1': 'reason', '3': 5, '4': 1, '5': 9, '10': 'reason'},
+    {'1': 'actor_id', '3': 6, '4': 1, '5': 9, '10': 'actorId'},
+    {'1': 'revision', '3': 7, '4': 1, '5': 3, '10': 'revision'},
+    {'1': 'created_at_unix', '3': 8, '4': 1, '5': 3, '10': 'createdAtUnix'},
+  ],
+};
+
+/// Descriptor for `ForumModerationEvent`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List forumModerationEventDescriptor = $convert.base64Decode(
+    'ChRGb3J1bU1vZGVyYXRpb25FdmVudBIOCgJpZBgBIAEoA1ICaWQSGwoJdGhyZWFkX2lkGAIgAS'
+    'gJUgh0aHJlYWRJZBIZCghyZXBseV9pZBgDIAEoCVIHcmVwbHlJZBIWCgZhY3Rpb24YBCABKAlS'
+    'BmFjdGlvbhIWCgZyZWFzb24YBSABKAlSBnJlYXNvbhIZCghhY3Rvcl9pZBgGIAEoCVIHYWN0b3'
+    'JJZBIaCghyZXZpc2lvbhgHIAEoA1IIcmV2aXNpb24SJgoPY3JlYXRlZF9hdF91bml4GAggASgD'
+    'Ug1jcmVhdGVkQXRVbml4');
+
+@$core.Deprecated('Use listForumModerationResponseDescriptor instead')
+const ListForumModerationResponse$json = {
+  '1': 'ListForumModerationResponse',
+  '2': [
+    {
+      '1': 'events',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.ForumModerationEvent',
+      '10': 'events'
+    },
+    {'1': 'next_id', '3': 2, '4': 1, '5': 3, '10': 'nextId'},
+  ],
+};
+
+/// Descriptor for `ListForumModerationResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listForumModerationResponseDescriptor =
+    $convert.base64Decode(
+        'ChtMaXN0Rm9ydW1Nb2RlcmF0aW9uUmVzcG9uc2USNgoGZXZlbnRzGAEgAygLMh4uc3BhY2Uudj'
+        'EuRm9ydW1Nb2RlcmF0aW9uRXZlbnRSBmV2ZW50cxIXCgduZXh0X2lkGAIgASgDUgZuZXh0SWQ=');
+
 const $core.Map<$core.String, $core.dynamic> ForumServiceBase$json = {
   '1': 'ForumService',
   '2': [
@@ -438,6 +608,21 @@ const $core.Map<$core.String, $core.dynamic> ForumServiceBase$json = {
       '2': '.space.v1.CloseForumThreadRequest',
       '3': '.space.v1.CloseForumThreadResponse'
     },
+    {
+      '1': 'ModerateForumThread',
+      '2': '.space.v1.ModerateForumThreadRequest',
+      '3': '.space.v1.ModerateForumThreadResponse'
+    },
+    {
+      '1': 'ModerateForumReply',
+      '2': '.space.v1.ModerateForumReplyRequest',
+      '3': '.space.v1.ModerateForumReplyResponse'
+    },
+    {
+      '1': 'ListForumModeration',
+      '2': '.space.v1.ListForumModerationRequest',
+      '3': '.space.v1.ListForumModerationResponse'
+    },
   ],
 };
 
@@ -461,6 +646,13 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
   '.space.v1.MarkForumThreadReadResponse': MarkForumThreadReadResponse$json,
   '.space.v1.CloseForumThreadRequest': CloseForumThreadRequest$json,
   '.space.v1.CloseForumThreadResponse': CloseForumThreadResponse$json,
+  '.space.v1.ModerateForumThreadRequest': ModerateForumThreadRequest$json,
+  '.space.v1.ModerateForumThreadResponse': ModerateForumThreadResponse$json,
+  '.space.v1.ModerateForumReplyRequest': ModerateForumReplyRequest$json,
+  '.space.v1.ModerateForumReplyResponse': ModerateForumReplyResponse$json,
+  '.space.v1.ListForumModerationRequest': ListForumModerationRequest$json,
+  '.space.v1.ListForumModerationResponse': ListForumModerationResponse$json,
+  '.space.v1.ForumModerationEvent': ForumModerationEvent$json,
 };
 
 /// Descriptor for `ForumService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
@@ -477,4 +669,9 @@ final $typed_data.Uint8List forumServiceDescriptor = $convert.base64Decode(
     'FkEiQuc3BhY2UudjEuTWFya0ZvcnVtVGhyZWFkUmVhZFJlcXVlc3QaJS5zcGFjZS52MS5NYXJr'
     'Rm9ydW1UaHJlYWRSZWFkUmVzcG9uc2USWQoQQ2xvc2VGb3J1bVRocmVhZBIhLnNwYWNlLnYxLk'
     'Nsb3NlRm9ydW1UaHJlYWRSZXF1ZXN0GiIuc3BhY2UudjEuQ2xvc2VGb3J1bVRocmVhZFJlc3Bv'
-    'bnNl');
+    'bnNlEmIKE01vZGVyYXRlRm9ydW1UaHJlYWQSJC5zcGFjZS52MS5Nb2RlcmF0ZUZvcnVtVGhyZW'
+    'FkUmVxdWVzdBolLnNwYWNlLnYxLk1vZGVyYXRlRm9ydW1UaHJlYWRSZXNwb25zZRJfChJNb2Rl'
+    'cmF0ZUZvcnVtUmVwbHkSIy5zcGFjZS52MS5Nb2RlcmF0ZUZvcnVtUmVwbHlSZXF1ZXN0GiQuc3'
+    'BhY2UudjEuTW9kZXJhdGVGb3J1bVJlcGx5UmVzcG9uc2USYgoTTGlzdEZvcnVtTW9kZXJhdGlv'
+    'bhIkLnNwYWNlLnYxLkxpc3RGb3J1bU1vZGVyYXRpb25SZXF1ZXN0GiUuc3BhY2UudjEuTGlzdE'
+    'ZvcnVtTW9kZXJhdGlvblJlc3BvbnNl');

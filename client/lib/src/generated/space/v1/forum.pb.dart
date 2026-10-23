@@ -39,6 +39,7 @@ class ForumThread extends $pb.GeneratedMessage {
     $core.bool? seen,
     $fixnum.Int64? readSequence,
     $fixnum.Int64? unreadCount,
+    $core.bool? hidden,
   }) {
     final result = ForumThread._();
     if (id != null) result.id = id;
@@ -59,6 +60,7 @@ class ForumThread extends $pb.GeneratedMessage {
     if (seen != null) result.seen = seen;
     if (readSequence != null) result.readSequence = readSequence;
     if (unreadCount != null) result.unreadCount = unreadCount;
+    if (hidden != null) result.hidden = hidden;
     return result;
   }
 
@@ -93,6 +95,7 @@ class ForumThread extends $pb.GeneratedMessage {
     ..aOB(15, _omitFieldNames ? '' : 'seen')
     ..aInt64(16, _omitFieldNames ? '' : 'readSequence')
     ..aInt64(17, _omitFieldNames ? '' : 'unreadCount')
+    ..aOB(18, _omitFieldNames ? '' : 'hidden')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -263,6 +266,15 @@ class ForumThread extends $pb.GeneratedMessage {
   $core.bool hasUnreadCount() => $_has(16);
   @$pb.TagNumber(17)
   void clearUnreadCount() => $_clearField(17);
+
+  @$pb.TagNumber(18)
+  $core.bool get hidden => $_getBF(17);
+  @$pb.TagNumber(18)
+  set hidden($core.bool value) => $_setBool(17, value);
+  @$pb.TagNumber(18)
+  $core.bool hasHidden() => $_has(17);
+  @$pb.TagNumber(18)
+  void clearHidden() => $_clearField(18);
 }
 
 class ForumReply extends $pb.GeneratedMessage {
@@ -275,6 +287,8 @@ class ForumReply extends $pb.GeneratedMessage {
     $fixnum.Int64? createdAtUnix,
     $fixnum.Int64? sequence,
     $core.Iterable<$0.Asset>? attachments,
+    $core.bool? hidden,
+    $fixnum.Int64? revision,
   }) {
     final result = ForumReply._();
     if (id != null) result.id = id;
@@ -285,6 +299,8 @@ class ForumReply extends $pb.GeneratedMessage {
     if (createdAtUnix != null) result.createdAtUnix = createdAtUnix;
     if (sequence != null) result.sequence = sequence;
     if (attachments != null) result.attachments.addAll(attachments);
+    if (hidden != null) result.hidden = hidden;
+    if (revision != null) result.revision = revision;
     return result;
   }
 
@@ -310,6 +326,8 @@ class ForumReply extends $pb.GeneratedMessage {
     ..aInt64(7, _omitFieldNames ? '' : 'sequence')
     ..pPM<$0.Asset>(8, _omitFieldNames ? '' : 'attachments',
         subBuilder: $0.Asset.$_createMessage)
+    ..aOB(9, _omitFieldNames ? '' : 'hidden')
+    ..aInt64(10, _omitFieldNames ? '' : 'revision')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -397,6 +415,24 @@ class ForumReply extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(8)
   $pb.PbList<$0.Asset> get attachments => $_getList(7);
+
+  @$pb.TagNumber(9)
+  $core.bool get hidden => $_getBF(8);
+  @$pb.TagNumber(9)
+  set hidden($core.bool value) => $_setBool(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasHidden() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearHidden() => $_clearField(9);
+
+  @$pb.TagNumber(10)
+  $fixnum.Int64 get revision => $_getI64(9);
+  @$pb.TagNumber(10)
+  set revision($fixnum.Int64 value) => $_setInt64(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasRevision() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearRevision() => $_clearField(10);
 }
 
 /// Курсоры — sequence последней записи; 0 начинает чтение, limit 1..50 (0 = 50).
@@ -1575,6 +1611,697 @@ class MarkForumThreadReadResponse extends $pb.GeneratedMessage {
   ForumThread ensureThread() => $_ensure(0);
 }
 
+/// core.forum.moderation.v1. Все операции требуют read/manage и scope space.manage.
+/// Причина 1..1024 байт UTF-8 обязательна; скрытое содержимое не возвращается даже автору.
+class ModerateForumThreadRequest extends $pb.GeneratedMessage {
+  factory ModerateForumThreadRequest({
+    $core.String? channelId,
+    $core.String? threadId,
+    $core.String? action,
+    $core.String? reason,
+    $fixnum.Int64? expectedRevision,
+  }) {
+    final result = ModerateForumThreadRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (threadId != null) result.threadId = threadId;
+    if (action != null) result.action = action;
+    if (reason != null) result.reason = reason;
+    if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    return result;
+  }
+
+  ModerateForumThreadRequest._();
+
+  factory ModerateForumThreadRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ModerateForumThreadRequest()..mergeFromBuffer(data, registry);
+  factory ModerateForumThreadRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ModerateForumThreadRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ModerateForumThreadRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ModerateForumThreadRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'threadId')
+    ..aOS(3, _omitFieldNames ? '' : 'action')
+    ..aOS(4, _omitFieldNames ? '' : 'reason')
+    ..aInt64(5, _omitFieldNames ? '' : 'expectedRevision')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ModerateForumThreadRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ModerateForumThreadRequest copyWith(
+          void Function(ModerateForumThreadRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as ModerateForumThreadRequest))
+          as ModerateForumThreadRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ModerateForumThreadRequest() / ModerateForumThreadRequest.new instead')
+  static ModerateForumThreadRequest create() => ModerateForumThreadRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ModerateForumThreadRequest._();
+  @$core.override
+  ModerateForumThreadRequest createEmptyInstance() =>
+      ModerateForumThreadRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ModerateForumThreadRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ModerateForumThreadRequest>(
+          ModerateForumThreadRequest.$_createMessage);
+  static ModerateForumThreadRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get threadId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set threadId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasThreadId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearThreadId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get action => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set action($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAction() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAction() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get reason => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set reason($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasReason() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearReason() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get expectedRevision => $_getI64(4);
+  @$pb.TagNumber(5)
+  set expectedRevision($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasExpectedRevision() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearExpectedRevision() => $_clearField(5);
+}
+
+class ModerateForumThreadResponse extends $pb.GeneratedMessage {
+  factory ModerateForumThreadResponse({
+    ForumThread? thread,
+  }) {
+    final result = ModerateForumThreadResponse._();
+    if (thread != null) result.thread = thread;
+    return result;
+  }
+
+  ModerateForumThreadResponse._();
+
+  factory ModerateForumThreadResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ModerateForumThreadResponse()..mergeFromBuffer(data, registry);
+  factory ModerateForumThreadResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ModerateForumThreadResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ModerateForumThreadResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ModerateForumThreadResponse.$_createMessage)
+    ..aOM<ForumThread>(1, _omitFieldNames ? '' : 'thread',
+        subBuilder: ForumThread.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ModerateForumThreadResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ModerateForumThreadResponse copyWith(
+          void Function(ModerateForumThreadResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as ModerateForumThreadResponse))
+          as ModerateForumThreadResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ModerateForumThreadResponse() / ModerateForumThreadResponse.new instead')
+  static ModerateForumThreadResponse create() =>
+      ModerateForumThreadResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ModerateForumThreadResponse._();
+  @$core.override
+  ModerateForumThreadResponse createEmptyInstance() =>
+      ModerateForumThreadResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ModerateForumThreadResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ModerateForumThreadResponse>(
+          ModerateForumThreadResponse.$_createMessage);
+  static ModerateForumThreadResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ForumThread get thread => $_getN(0);
+  @$pb.TagNumber(1)
+  set thread(ForumThread value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasThread() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearThread() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ForumThread ensureThread() => $_ensure(0);
+}
+
+/// action темы: reopen, hide, restore. Ответы сохраняют последовательность при скрытии.
+class ModerateForumReplyRequest extends $pb.GeneratedMessage {
+  factory ModerateForumReplyRequest({
+    $core.String? channelId,
+    $core.String? threadId,
+    $core.String? replyId,
+    $core.bool? hidden,
+    $core.String? reason,
+    $fixnum.Int64? expectedRevision,
+  }) {
+    final result = ModerateForumReplyRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (threadId != null) result.threadId = threadId;
+    if (replyId != null) result.replyId = replyId;
+    if (hidden != null) result.hidden = hidden;
+    if (reason != null) result.reason = reason;
+    if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    return result;
+  }
+
+  ModerateForumReplyRequest._();
+
+  factory ModerateForumReplyRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ModerateForumReplyRequest()..mergeFromBuffer(data, registry);
+  factory ModerateForumReplyRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ModerateForumReplyRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ModerateForumReplyRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ModerateForumReplyRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'threadId')
+    ..aOS(3, _omitFieldNames ? '' : 'replyId')
+    ..aOB(4, _omitFieldNames ? '' : 'hidden')
+    ..aOS(5, _omitFieldNames ? '' : 'reason')
+    ..aInt64(6, _omitFieldNames ? '' : 'expectedRevision')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ModerateForumReplyRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ModerateForumReplyRequest copyWith(
+          void Function(ModerateForumReplyRequest) updates) =>
+      super.copyWith((message) => updates(message as ModerateForumReplyRequest))
+          as ModerateForumReplyRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ModerateForumReplyRequest() / ModerateForumReplyRequest.new instead')
+  static ModerateForumReplyRequest create() => ModerateForumReplyRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ModerateForumReplyRequest._();
+  @$core.override
+  ModerateForumReplyRequest createEmptyInstance() =>
+      ModerateForumReplyRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ModerateForumReplyRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ModerateForumReplyRequest>(
+          ModerateForumReplyRequest.$_createMessage);
+  static ModerateForumReplyRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get threadId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set threadId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasThreadId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearThreadId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get replyId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set replyId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasReplyId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearReplyId() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get hidden => $_getBF(3);
+  @$pb.TagNumber(4)
+  set hidden($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasHidden() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearHidden() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get reason => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set reason($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasReason() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearReason() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $fixnum.Int64 get expectedRevision => $_getI64(5);
+  @$pb.TagNumber(6)
+  set expectedRevision($fixnum.Int64 value) => $_setInt64(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasExpectedRevision() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearExpectedRevision() => $_clearField(6);
+}
+
+class ModerateForumReplyResponse extends $pb.GeneratedMessage {
+  factory ModerateForumReplyResponse({
+    ForumReply? reply,
+    ForumThread? thread,
+  }) {
+    final result = ModerateForumReplyResponse._();
+    if (reply != null) result.reply = reply;
+    if (thread != null) result.thread = thread;
+    return result;
+  }
+
+  ModerateForumReplyResponse._();
+
+  factory ModerateForumReplyResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ModerateForumReplyResponse()..mergeFromBuffer(data, registry);
+  factory ModerateForumReplyResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ModerateForumReplyResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ModerateForumReplyResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ModerateForumReplyResponse.$_createMessage)
+    ..aOM<ForumReply>(1, _omitFieldNames ? '' : 'reply',
+        subBuilder: ForumReply.$_createMessage)
+    ..aOM<ForumThread>(2, _omitFieldNames ? '' : 'thread',
+        subBuilder: ForumThread.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ModerateForumReplyResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ModerateForumReplyResponse copyWith(
+          void Function(ModerateForumReplyResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as ModerateForumReplyResponse))
+          as ModerateForumReplyResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ModerateForumReplyResponse() / ModerateForumReplyResponse.new instead')
+  static ModerateForumReplyResponse create() => ModerateForumReplyResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ModerateForumReplyResponse._();
+  @$core.override
+  ModerateForumReplyResponse createEmptyInstance() =>
+      ModerateForumReplyResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ModerateForumReplyResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ModerateForumReplyResponse>(
+          ModerateForumReplyResponse.$_createMessage);
+  static ModerateForumReplyResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ForumReply get reply => $_getN(0);
+  @$pb.TagNumber(1)
+  set reply(ForumReply value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasReply() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearReply() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ForumReply ensureReply() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  ForumThread get thread => $_getN(1);
+  @$pb.TagNumber(2)
+  set thread(ForumThread value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasThread() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearThread() => $_clearField(2);
+  @$pb.TagNumber(2)
+  ForumThread ensureThread() => $_ensure(1);
+}
+
+/// Журнал виден только модератору. Курсор id последней записи, 0 начинает чтение.
+class ListForumModerationRequest extends $pb.GeneratedMessage {
+  factory ListForumModerationRequest({
+    $core.String? channelId,
+    $core.String? threadId,
+    $fixnum.Int64? afterId,
+    $core.int? limit,
+  }) {
+    final result = ListForumModerationRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (threadId != null) result.threadId = threadId;
+    if (afterId != null) result.afterId = afterId;
+    if (limit != null) result.limit = limit;
+    return result;
+  }
+
+  ListForumModerationRequest._();
+
+  factory ListForumModerationRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListForumModerationRequest()..mergeFromBuffer(data, registry);
+  factory ListForumModerationRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListForumModerationRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListForumModerationRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListForumModerationRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'threadId')
+    ..aInt64(3, _omitFieldNames ? '' : 'afterId')
+    ..aI(4, _omitFieldNames ? '' : 'limit')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListForumModerationRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListForumModerationRequest copyWith(
+          void Function(ListForumModerationRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as ListForumModerationRequest))
+          as ListForumModerationRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListForumModerationRequest() / ListForumModerationRequest.new instead')
+  static ListForumModerationRequest create() => ListForumModerationRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ListForumModerationRequest._();
+  @$core.override
+  ListForumModerationRequest createEmptyInstance() =>
+      ListForumModerationRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ListForumModerationRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListForumModerationRequest>(
+          ListForumModerationRequest.$_createMessage);
+  static ListForumModerationRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get threadId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set threadId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasThreadId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearThreadId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get afterId => $_getI64(2);
+  @$pb.TagNumber(3)
+  set afterId($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAfterId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAfterId() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.int get limit => $_getIZ(3);
+  @$pb.TagNumber(4)
+  set limit($core.int value) => $_setSignedInt32(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasLimit() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearLimit() => $_clearField(4);
+}
+
+class ForumModerationEvent extends $pb.GeneratedMessage {
+  factory ForumModerationEvent({
+    $fixnum.Int64? id,
+    $core.String? threadId,
+    $core.String? replyId,
+    $core.String? action,
+    $core.String? reason,
+    $core.String? actorId,
+    $fixnum.Int64? revision,
+    $fixnum.Int64? createdAtUnix,
+  }) {
+    final result = ForumModerationEvent._();
+    if (id != null) result.id = id;
+    if (threadId != null) result.threadId = threadId;
+    if (replyId != null) result.replyId = replyId;
+    if (action != null) result.action = action;
+    if (reason != null) result.reason = reason;
+    if (actorId != null) result.actorId = actorId;
+    if (revision != null) result.revision = revision;
+    if (createdAtUnix != null) result.createdAtUnix = createdAtUnix;
+    return result;
+  }
+
+  ForumModerationEvent._();
+
+  factory ForumModerationEvent.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ForumModerationEvent()..mergeFromBuffer(data, registry);
+  factory ForumModerationEvent.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ForumModerationEvent()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ForumModerationEvent',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ForumModerationEvent.$_createMessage)
+    ..aInt64(1, _omitFieldNames ? '' : 'id')
+    ..aOS(2, _omitFieldNames ? '' : 'threadId')
+    ..aOS(3, _omitFieldNames ? '' : 'replyId')
+    ..aOS(4, _omitFieldNames ? '' : 'action')
+    ..aOS(5, _omitFieldNames ? '' : 'reason')
+    ..aOS(6, _omitFieldNames ? '' : 'actorId')
+    ..aInt64(7, _omitFieldNames ? '' : 'revision')
+    ..aInt64(8, _omitFieldNames ? '' : 'createdAtUnix')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ForumModerationEvent clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ForumModerationEvent copyWith(void Function(ForumModerationEvent) updates) =>
+      super.copyWith((message) => updates(message as ForumModerationEvent))
+          as ForumModerationEvent;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ForumModerationEvent() / ForumModerationEvent.new instead')
+  static ForumModerationEvent create() => ForumModerationEvent._();
+  static $pb.GeneratedMessage $_createMessage() => ForumModerationEvent._();
+  @$core.override
+  ForumModerationEvent createEmptyInstance() => ForumModerationEvent._();
+  @$core.pragma('dart2js:noInline')
+  static ForumModerationEvent getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ForumModerationEvent>(
+          ForumModerationEvent.$_createMessage);
+  static ForumModerationEvent? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $fixnum.Int64 get id => $_getI64(0);
+  @$pb.TagNumber(1)
+  set id($fixnum.Int64 value) => $_setInt64(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get threadId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set threadId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasThreadId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearThreadId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get replyId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set replyId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasReplyId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearReplyId() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get action => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set action($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasAction() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearAction() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get reason => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set reason($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasReason() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearReason() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get actorId => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set actorId($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasActorId() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearActorId() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $fixnum.Int64 get revision => $_getI64(6);
+  @$pb.TagNumber(7)
+  set revision($fixnum.Int64 value) => $_setInt64(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasRevision() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearRevision() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $fixnum.Int64 get createdAtUnix => $_getI64(7);
+  @$pb.TagNumber(8)
+  set createdAtUnix($fixnum.Int64 value) => $_setInt64(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasCreatedAtUnix() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearCreatedAtUnix() => $_clearField(8);
+}
+
+class ListForumModerationResponse extends $pb.GeneratedMessage {
+  factory ListForumModerationResponse({
+    $core.Iterable<ForumModerationEvent>? events,
+    $fixnum.Int64? nextId,
+  }) {
+    final result = ListForumModerationResponse._();
+    if (events != null) result.events.addAll(events);
+    if (nextId != null) result.nextId = nextId;
+    return result;
+  }
+
+  ListForumModerationResponse._();
+
+  factory ListForumModerationResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListForumModerationResponse()..mergeFromBuffer(data, registry);
+  factory ListForumModerationResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListForumModerationResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListForumModerationResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListForumModerationResponse.$_createMessage)
+    ..pPM<ForumModerationEvent>(1, _omitFieldNames ? '' : 'events',
+        subBuilder: ForumModerationEvent.$_createMessage)
+    ..aInt64(2, _omitFieldNames ? '' : 'nextId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListForumModerationResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListForumModerationResponse copyWith(
+          void Function(ListForumModerationResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as ListForumModerationResponse))
+          as ListForumModerationResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListForumModerationResponse() / ListForumModerationResponse.new instead')
+  static ListForumModerationResponse create() =>
+      ListForumModerationResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ListForumModerationResponse._();
+  @$core.override
+  ListForumModerationResponse createEmptyInstance() =>
+      ListForumModerationResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ListForumModerationResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListForumModerationResponse>(
+          ListForumModerationResponse.$_createMessage);
+  static ListForumModerationResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<ForumModerationEvent> get events => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get nextId => $_getI64(1);
+  @$pb.TagNumber(2)
+  set nextId($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasNextId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearNextId() => $_clearField(2);
+}
+
 /// core.forum.v1: отдельные открытые форумные разделы с ACL канала.
 class ForumServiceApi {
   final $pb.RpcClient _client;
@@ -1609,6 +2336,18 @@ class ForumServiceApi {
           $pb.ClientContext? ctx, CloseForumThreadRequest request) =>
       _client.invoke<CloseForumThreadResponse>(ctx, 'ForumService',
           'CloseForumThread', request, CloseForumThreadResponse());
+  $async.Future<ModerateForumThreadResponse> moderateForumThread(
+          $pb.ClientContext? ctx, ModerateForumThreadRequest request) =>
+      _client.invoke<ModerateForumThreadResponse>(ctx, 'ForumService',
+          'ModerateForumThread', request, ModerateForumThreadResponse());
+  $async.Future<ModerateForumReplyResponse> moderateForumReply(
+          $pb.ClientContext? ctx, ModerateForumReplyRequest request) =>
+      _client.invoke<ModerateForumReplyResponse>(ctx, 'ForumService',
+          'ModerateForumReply', request, ModerateForumReplyResponse());
+  $async.Future<ListForumModerationResponse> listForumModeration(
+          $pb.ClientContext? ctx, ListForumModerationRequest request) =>
+      _client.invoke<ListForumModerationResponse>(ctx, 'ForumService',
+          'ListForumModeration', request, ListForumModerationResponse());
 }
 
 const $core.bool _omitFieldNames =

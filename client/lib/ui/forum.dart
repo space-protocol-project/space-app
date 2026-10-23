@@ -18,6 +18,8 @@ import 'forum_composer.dart';
 import 'forum_device_permission.dart';
 import 'forum_widgets.dart';
 import 'forum_read_tracker.dart';
+import 'forum_moderation.dart';
+import 'page_transition.dart';
 
 class ForumView extends StatefulWidget {
   const ForumView({
@@ -25,8 +27,10 @@ class ForumView extends StatefulWidget {
     required this.session,
     this.active = true,
     this.sendWithShift = false,
+    this.sectionId,
   });
   final SpaceSession? session;
+  final String? sectionId;
   final bool active, sendWithShift;
   @override
   State<ForumView> createState() => _ForumViewState();
@@ -49,6 +53,7 @@ class _ForumViewState extends State<ForumView> {
     return ForumArea(
       key: ObjectKey(connected),
       api: SessionForumApi(connected),
+      sectionId: widget.sectionId,
       sendWithShift: widget.sendWithShift,
       active: widget.active,
       authorize: connected.record.administrative
@@ -96,8 +101,10 @@ class ForumArea extends StatefulWidget {
     this.authorize,
     this.active = true,
     this.sendWithShift = false,
+    this.sectionId,
   });
   final ForumApi api;
+  final String? sectionId;
   final bool sendWithShift, active;
   final Future<void> Function()? manage, authorize;
   @override
@@ -118,7 +125,7 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    unawaited(controller.refresh());
+    unawaited(loadSection());
     foreground =
         WidgetsBinding.instance.lifecycleState == null ||
         WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
@@ -126,6 +133,17 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
     synchronization = Timer.periodic(const Duration(seconds: 10), (_) {
       if (widget.active && foreground) unawaited(controller.synchronize());
     });
+  }
+
+  Future<void> loadSection() async {
+    await controller.refresh();
+    if (!mounted) return;
+    final section = controller.state.sections
+        .where((value) => value.id == widget.sectionId)
+        .firstOrNull;
+    if (section != null && section.id != controller.state.section?.id) {
+      await controller.selectSection(section);
+    }
   }
 
   @override
@@ -385,7 +403,79 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
   bool _canClose(ForumState state) =>
       state.topic != null &&
       state.section!.permissions.manage &&
+      !state.topic!.hidden &&
       !state.topic!.closed;
+
+  List<PopupMenuEntry<String>> _moderationMenu(ForumState state) {
+    final topic = state.topic;
+    if (topic == null ||
+        !state.section!.permissions.manage ||
+        controller.moderation == null) {
+      return const [];
+    }
+    return [
+      if (topic.closed && !topic.hidden)
+        PopupMenuItem(
+          value: 'reopen',
+          child: Text(context.strings.forumReopen),
+        ),
+      PopupMenuItem(
+        value: topic.hidden ? 'restore' : 'hide',
+        child: Text(
+          topic.hidden
+              ? context.strings.forumRestoreTopic
+              : context.strings.forumHideTopic,
+        ),
+      ),
+      PopupMenuItem(
+        value: 'audit',
+        child: Text(context.strings.forumModerationLog),
+      ),
+    ];
+  }
+
+  Future<void> _moderate(String action, [ForumReply? reply]) =>
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => ForumModerationDialog(
+          title: forumModerationLabel(context, action),
+          submit: (reason) => reply == null
+              ? controller.moderateTopic(action, reason)
+              : controller.moderateReply(reply, reason),
+        ),
+      );
+  Future<void> _audit() {
+    final state = controller.state;
+    final channel = state.section!.id, thread = state.topic!.id;
+    return showDialog<void>(
+      context: context,
+      builder: (_) => ForumModerationLog(
+        load: (after) =>
+            controller.moderation!.moderationLog(channel, thread, after),
+      ),
+    );
+  }
+
+  Widget? _replyActions(ForumState state, ForumReply reply) {
+    if (!state.section!.permissions.manage || controller.moderation == null) {
+      return null;
+    }
+    final action = reply.hidden ? 'restore_reply' : 'hide_reply';
+    return PopupMenuButton<String>(
+      key: ValueKey('forum-reply-actions-${reply.id}'),
+      tooltip: context.strings.forumActions,
+      enabled: !state.busy,
+      onSelected: (_) => unawaited(_moderate(action, reply)),
+      itemBuilder: (_) => [
+        PopupMenuItem(
+          value: action,
+          child: Text(forumModerationLabel(context, action)),
+        ),
+      ],
+      icon: const Icon(Icons.more_horiz, size: 18),
+    );
+  }
 
   Widget _menu(ForumState state) => PopupMenuButton<String>(
     key: const ValueKey('forum-actions'),
@@ -394,6 +484,7 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
     icon: const Icon(Icons.more_horiz),
     onSelected: (action) => _action(action),
     itemBuilder: (context) => [
+      ..._moderationMenu(state),
       if (_canClose(state))
         PopupMenuItem(value: 'close', child: Text(context.strings.forumClose)),
       if (state.topic != null &&
@@ -429,6 +520,10 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
   );
   void _action(String action) {
     switch (action) {
+      case 'hide' || 'restore' || 'reopen':
+        unawaited(_moderate(action));
+      case 'audit':
+        unawaited(_audit());
       case 'pin':
         unawaited(controller.pinTopic());
       case 'authorize':
@@ -478,7 +573,10 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
   Widget _content(ForumState state, bool wide) {
     if (!state.supported) return Text(context.strings.forumUpdateRuntime);
     if (state.section == null) return _empty(state);
-    final content = state.topic == null ? _topics(state) : _topic(state);
+    final content = PageTransition(
+      transitionKey: (state.section?.id, state.topic?.id, state.topic?.hidden),
+      child: state.topic == null ? _topics(state) : _topic(state),
+    );
     if (!wide) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -577,7 +675,7 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
           children: [
             Expanded(
               child: Text(
-                topic.title,
+                topic.hidden ? context.strings.forumHiddenTopic : topic.title,
                 style: Theme.of(context).textTheme.headlineSmall
                     ?.copyWith(fontWeight: FontWeight.w700),
               ),
@@ -623,32 +721,42 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
     );
   }
 
-  Widget _replyMessage(ForumState state, ForumReply reply) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      if (state.topic!.readStateSupported &&
-          state.topic!.unreadCount > Int64.ZERO &&
-          reply.sequence == state.topic!.readSequence + Int64.ONE)
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Text(
-            context.strings.forumFirstUnread,
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+  Widget _replyMessage(ForumState state, ForumReply reply) {
+    if (reply.hidden) {
+      return ForumHiddenNotice(
+        reply: true,
+        action: _replyActions(state, reply),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (state.topic!.readStateSupported &&
+            state.topic!.unreadCount > Int64.ZERO &&
+            reply.sequence == state.topic!.readSequence + Int64.ONE)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Text(
+              context.strings.forumFirstUnread,
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            ),
           ),
+        ForumMessage(
+          author: reply.authorName,
+          authorId: reply.authorId,
+          text: reply.text,
+          timestamp: reply.createdAtUnix.toInt(),
+          assets: _visibleAssets(reply.attachments),
+          session: media?.attachmentSession,
+          trailing: _replyActions(state, reply),
         ),
-      ForumMessage(
-        author: reply.authorName,
-        authorId: reply.authorId,
-        text: reply.text,
-        timestamp: reply.createdAtUnix.toInt(),
-        assets: _visibleAssets(reply.attachments),
-        session: media?.attachmentSession,
-      ),
-    ],
-  );
+      ],
+    );
+  }
 
   Widget _topic(ForumState state) {
     final topic = state.topic!;
+    if (topic.hidden) return const ForumHiddenNotice();
     return Align(
       alignment: Alignment.topLeft,
       child: ConstrainedBox(

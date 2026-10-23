@@ -170,13 +170,7 @@ void main() {
           });
           await tester.pumpAndSettle();
         }
-        if (width < 760) {
-          await tester.tap(find.byType(NavigationDestination).last);
-        } else {
-          await tester.tap(
-            find.widgetWithText(ListTile, 'Управление пространством'),
-          );
-        }
+        await openManagement(tester, width);
         await tester.runAsync(() async {
           await Future<void>.delayed(Duration.zero);
         });
@@ -200,9 +194,7 @@ void main() {
             await Future<void>.delayed(Duration.zero);
           });
           await tester.pumpAndSettle();
-          await tester.tap(
-            find.widgetWithText(ListTile, 'Управление пространством'),
-          );
+          await openManagement(tester, width);
           await tester.runAsync(() async {
             await Future<void>.delayed(Duration.zero);
           });
@@ -225,4 +217,16 @@ void main() {
       },
     );
   }
+}
+
+Future<void> openManagement(WidgetTester tester, double width) async {
+  if (width < 760) {
+    await tester.tap(find.byKey(const ValueKey('navigation-menu-button')));
+    await tester.pumpAndSettle();
+  }
+  await tester.tap(
+    find.widgetWithText(ListTile, '\u041e\u0431\u0437\u043e\u0440').last,
+  );
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const ValueKey('overview-manage-space')));
 }

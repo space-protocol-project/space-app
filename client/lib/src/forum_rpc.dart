@@ -1,6 +1,7 @@
 part of 'core.dart';
 
-class SessionForumApi implements ForumApi, ForumMedia, ForumNavigation {
+class SessionForumApi
+    implements ForumApi, ForumMedia, ForumNavigation, ForumModeration {
   SessionForumApi(this.session);
   final SpaceSession session;
   @override
@@ -177,6 +178,73 @@ class SessionForumApi implements ForumApi, ForumMedia, ForumNavigation {
       options: session._options,
     );
     return response.thread;
+  }
+
+  @override
+  bool get moderationSupported => session.forumModerationSupported;
+  @override
+  Future<forum.ForumThread> moderateTopic(
+    String channel,
+    String id,
+    String action,
+    String reason,
+    Int64 revision,
+  ) async {
+    await session._ensureSession();
+    final response = await session.channel.unary(
+      forum_specs.ForumService.moderateForumThread,
+      forum.ModerateForumThreadRequest(
+        channelId: channel,
+        threadId: id,
+        action: action,
+        reason: reason,
+        expectedRevision: revision,
+      ),
+      options: session._options,
+    );
+    return response.thread;
+  }
+
+  @override
+  Future<forum.ModerateForumReplyResponse> moderateReply(
+    String channel,
+    String thread,
+    String reply,
+    bool hidden,
+    String reason,
+    Int64 revision,
+  ) async {
+    await session._ensureSession();
+    return session.channel.unary(
+      forum_specs.ForumService.moderateForumReply,
+      forum.ModerateForumReplyRequest(
+        channelId: channel,
+        threadId: thread,
+        replyId: reply,
+        hidden: hidden,
+        reason: reason,
+        expectedRevision: revision,
+      ),
+      options: session._options,
+    );
+  }
+
+  @override
+  Future<forum.ListForumModerationResponse> moderationLog(
+    String channel,
+    String thread,
+    Int64 after,
+  ) async {
+    await session._ensureSession();
+    return session.channel.unary(
+      forum_specs.ForumService.listForumModeration,
+      forum.ListForumModerationRequest(
+        channelId: channel,
+        threadId: thread,
+        afterId: after,
+      ),
+      options: session._options,
+    );
   }
 
   void _checkAttachments(List<String> attachments) {

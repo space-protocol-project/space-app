@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:space_client/src/generated/space/v1/space.pb.dart' show Channel;
+
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -45,6 +47,8 @@ class _Session extends DashboardSession implements MessageSearchSession {
 }
 
 class _LocalSession implements SpaceSession {
+  @override
+  List<Channel> get availableChannels => const [];
   _LocalSession(this.client);
   final MlsClient client;
   @override

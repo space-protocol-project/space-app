@@ -158,6 +158,28 @@ class FakeForum implements ForumApi, ForumMedia {
 }
 
 void main() {
+  testWidgets('переход из навигации открывает выбранный раздел форума', (
+    tester,
+  ) async {
+    final api = FakeForum();
+    api.sections.add(
+      api.sections.first.deepCopy()
+        ..id = 'second'
+        ..title = 'Второй раздел',
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ForumArea(api: api, sectionId: 'second'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final dynamic area = tester.state(find.byType(ForumArea));
+    expect((area.controller as ForumController).state.section?.id, 'second');
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+  });
   test('старый runtime не вызывает форумный RPC', () async {
     final api = FakeForum()..supported = false;
     final c = ForumController(api);

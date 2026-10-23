@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/strings.dart';
 import '../src/generated/space/v1/space.pb.dart' show Channel;
 import 'components.dart';
+import 'navigation_group_header.dart';
 
 class VoiceRoomNavigation extends StatelessWidget {
   const VoiceRoomNavigation({
@@ -30,22 +31,13 @@ class VoiceRoomNavigation extends StatelessWidget {
     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
     child: Column(
       children: [
-        ListTile(
-          leading: const Icon(Icons.headset_mic_outlined, size: 20),
-          title: Text(context.strings.rooms),
+        NavigationGroupHeader(
+          icon: Icons.headset_mic_outlined,
+          title: context.strings.rooms,
+          refreshTooltip: context.strings.voiceRefreshRooms,
           selected: active && selectedRoomId == null,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          selectedTileColor: Theme.of(context).colorScheme.primaryContainer,
           onTap: () => onSelect(_firstReadable),
-          trailing: onRefresh == null
-              ? null
-              : IconButton(
-                  tooltip: context.strings.voiceRefreshRooms,
-                  onPressed: busy ? null : onRefresh,
-                  icon: const Icon(Icons.refresh, size: 20),
-                ),
+          onRefresh: busy ? null : onRefresh,
         ),
         for (final room in rooms) _room(context, room),
       ],

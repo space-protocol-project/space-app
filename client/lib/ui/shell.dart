@@ -19,7 +19,7 @@ import 'package:crypto/crypto.dart';
 import '../src/chat_notifications.dart';
 import '../src/message_search.dart';
 import '../src/channel_search.dart';
-import '../src/core.dart' show SpaceSession;
+import '../src/core.dart' show SpaceSession, SessionForumApi;
 import '../src/system_notifications.dart';
 import '../src/android_push.dart';
 import '../src/mls/notifications.dart';
@@ -35,6 +35,7 @@ import 'voice_devices.dart';
 import 'voice_rooms.dart';
 import 'forum.dart';
 import 'voice_room_navigation.dart';
+import 'navigation_group_header.dart';
 import '../src/preferences.dart';
 import '../src/app_updates.dart';
 import '../src/secure_vault.dart';
@@ -868,7 +869,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
       ? 0
       : switch (selected) {
           Section.chat => 1,
-          Section.settings => 3,
+          Section.settings => 0,
           _ => 0,
         };
   void showApplicationSettings() {
@@ -1011,22 +1012,17 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
     child: Column(
       children: [
-        ListTile(
-          leading: const Icon(Icons.forum_outlined, size: 20),
-          title: Text(context.strings.chats),
+        NavigationGroupHeader(
+          icon: Icons.forum_outlined,
+          title: context.strings.chats,
+          refreshTooltip: context.strings.refreshChat,
           onTap: () => select(Section.chat),
-          trailing: controller.channels.isEmpty
+          onRefresh: controller.channels.isEmpty || controller.busy
               ? null
-              : IconButton(
-                  tooltip: context.strings.refreshChat,
-                  onPressed: controller.busy
-                      ? null
-                      : () {
-                          controller.selectChannel(controller.channelId);
-                          select(Section.chat);
-                        },
-                  icon: const Icon(Icons.refresh, size: 20),
-                ),
+              : () {
+                  controller.selectChannel(controller.channelId);
+                  select(Section.chat);
+                },
         ),
         for (final channel in controller.channels) _channelTile(channel),
       ],
@@ -1050,6 +1046,74 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
       );
     },
   );
+
+  String? selectedForumSection;
+  int forumNavigationRequest = 0;
+
+  Widget forumGroup() {
+    final session = controller.mlsSession;
+    final sections = session == null
+        ? <Channel>[]
+        : SessionForumApi(session).sections;
+    return SurfaceCard(
+      key: const ValueKey('server-discussions'),
+      color: Theme.of(context).colorScheme.surfaceContainerHigh,
+      hoverBorder: true,
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      child: Column(
+        children: [
+          NavigationGroupHeader(
+            icon: Icons.forum_outlined,
+            leadingInset: 12,
+            title: context.strings.forum,
+            refreshTooltip: context.strings.forumRefresh,
+            onTap: () => openForumSection(null),
+            onRefresh: controller.connected && !controller.busy
+                ? () => unawaited(controller.refreshChannels())
+                : null,
+          ),
+          for (final channel in sections)
+            ListTile(
+              key: ValueKey('forum-section-${channel.id}'),
+              dense: true,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              selected:
+                  selected == Section.forum &&
+                  selectedForumSection == channel.id,
+              leading: const Icon(Icons.chat_bubble_outline, size: 18),
+              title: Text(channel.title, overflow: TextOverflow.ellipsis),
+              onTap: controller.busy
+                  ? null
+                  : () => openForumSection(channel.id),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void openForumSection(String? id) {
+    selectedForumSection = id;
+    forumNavigationRequest++;
+    select(Section.forum);
+  }
+
+  List<Widget> overviewActions() => [
+    ListTile(
+      key: const ValueKey('overview-manage-space'),
+      leading: const Icon(Icons.settings_suggest_outlined),
+      title: Text(context.strings.manageSpace),
+      enabled: controller.administration != null && !controller.busy,
+      onTap: () => select(Section.settings),
+    ),
+    ListTile(
+      leading: const Icon(Icons.bookmark_border),
+      title: Text(context.strings.favoriteMessages),
+      onTap: showFavorites,
+    ),
+    ...fileNavigation(),
+  ];
 
   void openVoiceRoom(String? id) {
     if (id == null) {
@@ -1146,15 +1210,9 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             Section.overview,
             Section.chat,
             Section.rooms,
-            Section.settings,
+            Section.forum,
           ])
             _sidebarSection(section),
-          ListTile(
-            leading: const Icon(Icons.bookmark_border),
-            title: Text(context.strings.favoriteMessages),
-            onTap: showFavorites,
-          ),
-          ...fileNavigation(),
         ],
       ),
     ),
@@ -1238,20 +1296,11 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             onTap: showServers,
           ),
           if (controller.preview != null || controller.connected)
+            _sidebarSection(Section.overview),
+          if (controller.preview != null || controller.connected)
             _sidebarSection(Section.chat),
           _sidebarSection(Section.rooms),
-          ListTile(
-            leading: const Icon(Icons.bookmark_border),
-            title: Text(context.strings.favoriteMessages),
-            onTap: showFavorites,
-          ),
-          ...fileNavigation(),
-          ListTile(
-            leading: const Icon(Icons.settings_suggest_outlined),
-            title: Text(context.strings.manageSpace),
-            enabled: controller.administration != null && !controller.busy,
-            onTap: () => select(Section.settings),
-          ),
+          _sidebarSection(Section.forum),
           const Divider(),
           ListTile(
             key: const ValueKey('my-device-tab'),
@@ -1546,6 +1595,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
         switch (section) {
           Section.overview => OverviewPanel(
             controller: controller,
+            actions: overviewActions(),
             openChannel: (id) {
               unawaited(controller.selectChannel(id));
               select(Section.chat);
@@ -1608,6 +1658,12 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             openConnection: () => connection(),
           ),
           Section.forum => ForumView(
+            key: ValueKey((
+              controller.mlsSession,
+              selectedForumSection,
+              forumNavigationRequest,
+            )),
+            sectionId: selectedForumSection,
             sendWithShift: widget.preferences.sendShortcut == 'shiftEnter',
             session: controller.mlsSession,
             active: selected == Section.forum,
@@ -1941,11 +1997,6 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
         icon: Icon(Icons.computer_outlined),
         label: context.strings.myDevice,
       ),
-      NavigationDestination(
-        icon: const Icon(Icons.settings_suggest_outlined),
-        label: context.strings.managementTab,
-        enabled: controller.administration != null && !controller.busy,
-      ),
     ],
   );
 
@@ -1957,8 +2008,6 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
         showServers();
       case 2:
         select(Section.identity);
-      case 3:
-        select(Section.settings);
     }
   }
 
@@ -2093,16 +2142,23 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   );
 
   Widget _sidebarSection(Section section) {
-    if (section == Section.chat) {
+    final group = switch (section) {
+      Section.chat => chatGroup(),
+      Section.rooms => voiceRoomGroup(),
+      Section.forum => forumGroup(),
+      _ => null,
+    };
+    if (group != null) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 16),
-        child: chatGroup(),
-      );
-    }
-    if (section == Section.rooms) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: voiceRoomGroup(),
+        child: AnimatedSize(
+          duration: MediaQuery.of(context).disableAnimations
+              ? Duration.zero
+              : const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          alignment: Alignment.topCenter,
+          child: group,
+        ),
       );
     }
     return Padding(

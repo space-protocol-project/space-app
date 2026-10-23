@@ -431,7 +431,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cannotSend => 'You cannot send messages in this chat';
 
   @override
-  String get messageHint => 'What’s new?';
+  String get messageHint => '';
 
   @override
   String get sendMessage => 'Send';
@@ -1430,7 +1430,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'This device has not been invited or access was revoked. Share its code with the chat owner.';
 
   @override
-  String get mlsInput => 'What’s new?';
+  String get mlsInput => '';
 
   @override
   String get mlsSend => 'Send';
@@ -2485,4 +2485,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forumRepliesFromStart => 'Show replies from the beginning';
+
+  @override
+  String get forumReopen => 'Reopen topic';
+
+  @override
+  String get forumHideTopic => 'Hide topic';
+
+  @override
+  String get forumRestoreTopic => 'Restore topic';
+
+  @override
+  String get forumHideReply => 'Hide reply';
+
+  @override
+  String get forumRestoreReply => 'Restore reply';
+
+  @override
+  String get forumHiddenTopic => 'Topic hidden by a moderator';
+
+  @override
+  String get forumHiddenReply => 'Reply hidden by a moderator';
+
+  @override
+  String get forumReason => 'Reason for this action';
+
+  @override
+  String get forumReasonRequired => 'Enter a reason, up to 1024 bytes';
+
+  @override
+  String get forumModerationNotice =>
+      'Hidden content and its files remain unavailable until restored. The reason is saved in the moderation log.';
+
+  @override
+  String get forumModerationLog => 'Moderation log';
+
+  @override
+  String get forumModerationEmpty => 'No moderation actions yet';
+
+  @override
+  String get forumApply => 'Confirm';
 }

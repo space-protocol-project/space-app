@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+import 'page_transition.dart';
+
 /// Сохраняет страницы и не передаёт скрытым страницам обновления родителя.
 class RetainedIndexedStack extends StatelessWidget {
   const RetainedIndexedStack({
@@ -12,12 +14,15 @@ class RetainedIndexedStack extends StatelessWidget {
   final List<Widget> children;
 
   @override
-  Widget build(BuildContext context) => IndexedStack(
-    index: index,
-    children: [
-      for (var i = 0; i < children.length; i++)
-        _RetainedPage(active: i == index, child: children[i]),
-    ],
+  Widget build(BuildContext context) => PageTransition(
+    transitionKey: index,
+    child: IndexedStack(
+      index: index,
+      children: [
+        for (var i = 0; i < children.length; i++)
+          _RetainedPage(active: i == index, child: children[i]),
+      ],
+    ),
   );
 }
 

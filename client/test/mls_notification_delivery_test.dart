@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:space_client/src/generated/space/v1/space.pb.dart' show Channel;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +23,8 @@ import 'mls_view_test.dart' show entry;
 import 'support/chat_outbox.dart';
 
 class _Session implements SpaceSession {
+  @override
+  List<Channel> get availableChannels => const [];
   _Session(this.client);
   final MlsClient client;
   @override

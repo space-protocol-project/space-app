@@ -48,3 +48,27 @@ abstract interface class ForumNavigation {
   );
   Future<ForumThread> markRead(String channel, String id, Int64 through);
 }
+
+abstract interface class ForumModeration {
+  bool get moderationSupported;
+  Future<ForumThread> moderateTopic(
+    String channel,
+    String id,
+    String action,
+    String reason,
+    Int64 revision,
+  );
+  Future<ModerateForumReplyResponse> moderateReply(
+    String channel,
+    String thread,
+    String reply,
+    bool hidden,
+    String reason,
+    Int64 revision,
+  );
+  Future<ListForumModerationResponse> moderationLog(
+    String channel,
+    String thread,
+    Int64 after,
+  );
+}

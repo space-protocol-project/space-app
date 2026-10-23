@@ -35,6 +35,12 @@ abstract class ForumServiceBase extends $pb.GeneratedService {
       $pb.ServerContext ctx, $1.MarkForumThreadReadRequest request);
   $async.Future<$1.CloseForumThreadResponse> closeForumThread(
       $pb.ServerContext ctx, $1.CloseForumThreadRequest request);
+  $async.Future<$1.ModerateForumThreadResponse> moderateForumThread(
+      $pb.ServerContext ctx, $1.ModerateForumThreadRequest request);
+  $async.Future<$1.ModerateForumReplyResponse> moderateForumReply(
+      $pb.ServerContext ctx, $1.ModerateForumReplyRequest request);
+  $async.Future<$1.ListForumModerationResponse> listForumModeration(
+      $pb.ServerContext ctx, $1.ListForumModerationRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
@@ -52,6 +58,12 @@ abstract class ForumServiceBase extends $pb.GeneratedService {
         return $1.MarkForumThreadReadRequest();
       case 'CloseForumThread':
         return $1.CloseForumThreadRequest();
+      case 'ModerateForumThread':
+        return $1.ModerateForumThreadRequest();
+      case 'ModerateForumReply':
+        return $1.ModerateForumReplyRequest();
+      case 'ListForumModeration':
+        return $1.ListForumModerationRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -76,6 +88,14 @@ abstract class ForumServiceBase extends $pb.GeneratedService {
             ctx, request as $1.MarkForumThreadReadRequest);
       case 'CloseForumThread':
         return closeForumThread(ctx, request as $1.CloseForumThreadRequest);
+      case 'ModerateForumThread':
+        return moderateForumThread(
+            ctx, request as $1.ModerateForumThreadRequest);
+      case 'ModerateForumReply':
+        return moderateForumReply(ctx, request as $1.ModerateForumReplyRequest);
+      case 'ListForumModeration':
+        return listForumModeration(
+            ctx, request as $1.ListForumModerationRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }

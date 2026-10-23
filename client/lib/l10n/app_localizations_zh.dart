@@ -420,7 +420,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cannotSend => '无法在此聊天发送消息';
 
   @override
-  String get messageHint => '有什么新鲜事？';
+  String get messageHint => '';
 
   @override
   String get sendMessage => '发送';
@@ -1316,7 +1316,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mlsWaiting => '此设备尚未获邀或访问已被撤销。请将验证码提供给聊天所有者。';
 
   @override
-  String get mlsInput => '有什么新消息？';
+  String get mlsInput => '';
 
   @override
   String get mlsSend => '发送';
@@ -2296,6 +2296,45 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get forumRepliesFromStart => '从头查看回复';
+
+  @override
+  String get forumReopen => '重新开放主题';
+
+  @override
+  String get forumHideTopic => '隐藏主题';
+
+  @override
+  String get forumRestoreTopic => '恢复主题';
+
+  @override
+  String get forumHideReply => '隐藏回复';
+
+  @override
+  String get forumRestoreReply => '恢复回复';
+
+  @override
+  String get forumHiddenTopic => '主题已被管理员隐藏';
+
+  @override
+  String get forumHiddenReply => '回复已被管理员隐藏';
+
+  @override
+  String get forumReason => '操作原因';
+
+  @override
+  String get forumReasonRequired => '请填写原因，最多 1024 字节';
+
+  @override
+  String get forumModerationNotice => '隐藏内容及其文件在恢复前不可访问。原因将保存到管理日志。';
+
+  @override
+  String get forumModerationLog => '管理日志';
+
+  @override
+  String get forumModerationEmpty => '暂无管理操作';
+
+  @override
+  String get forumApply => '确认';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

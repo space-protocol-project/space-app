@@ -908,7 +908,7 @@ abstract class AppLocalizations {
   /// No description provided for @messageHint.
   ///
   /// In ru, this message translates to:
-  /// **'Что у вас нового?'**
+  /// **''**
   String get messageHint;
 
   /// No description provided for @sendMessage.
@@ -2624,7 +2624,7 @@ abstract class AppLocalizations {
   /// No description provided for @mlsInput.
   ///
   /// In ru, this message translates to:
-  /// **'Что у вас нового?'**
+  /// **''**
   String get mlsInput;
 
   /// No description provided for @mlsSend.
@@ -4509,6 +4509,84 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Показать ответы сначала'**
   String get forumRepliesFromStart;
+
+  /// No description provided for @forumReopen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть тему снова'**
+  String get forumReopen;
+
+  /// No description provided for @forumHideTopic.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скрыть тему'**
+  String get forumHideTopic;
+
+  /// No description provided for @forumRestoreTopic.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановить тему'**
+  String get forumRestoreTopic;
+
+  /// No description provided for @forumHideReply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скрыть ответ'**
+  String get forumHideReply;
+
+  /// No description provided for @forumRestoreReply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановить ответ'**
+  String get forumRestoreReply;
+
+  /// No description provided for @forumHiddenTopic.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тема скрыта модератором'**
+  String get forumHiddenTopic;
+
+  /// No description provided for @forumHiddenReply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ответ скрыт модератором'**
+  String get forumHiddenReply;
+
+  /// No description provided for @forumReason.
+  ///
+  /// In ru, this message translates to:
+  /// **'Причина действия'**
+  String get forumReason;
+
+  /// No description provided for @forumReasonRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите причину, не более 1024 байт'**
+  String get forumReasonRequired;
+
+  /// No description provided for @forumModerationNotice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скрытое содержимое и его файлы недоступны до восстановления. Причина сохраняется в журнале модерации.'**
+  String get forumModerationNotice;
+
+  /// No description provided for @forumModerationLog.
+  ///
+  /// In ru, this message translates to:
+  /// **'Журнал модерации'**
+  String get forumModerationLog;
+
+  /// No description provided for @forumModerationEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действий модерации пока нет'**
+  String get forumModerationEmpty;
+
+  /// No description provided for @forumApply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подтвердить'**
+  String get forumApply;
 }
 
 class _AppLocalizationsDelegate

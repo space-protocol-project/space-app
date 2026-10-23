@@ -436,7 +436,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get cannotSend => 'В этом чате нельзя отправлять сообщения';
 
   @override
-  String get messageHint => 'Что у вас нового?';
+  String get messageHint => '';
 
   @override
   String get sendMessage => 'Отправить';
@@ -1439,7 +1439,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Это устройство ещё не приглашено в чат или доступ отозван. Передайте его код владельцу чата.';
 
   @override
-  String get mlsInput => 'Что у вас нового?';
+  String get mlsInput => '';
 
   @override
   String get mlsSend => 'Отправить';
@@ -2502,4 +2502,44 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get forumRepliesFromStart => 'Показать ответы сначала';
+
+  @override
+  String get forumReopen => 'Открыть тему снова';
+
+  @override
+  String get forumHideTopic => 'Скрыть тему';
+
+  @override
+  String get forumRestoreTopic => 'Восстановить тему';
+
+  @override
+  String get forumHideReply => 'Скрыть ответ';
+
+  @override
+  String get forumRestoreReply => 'Восстановить ответ';
+
+  @override
+  String get forumHiddenTopic => 'Тема скрыта модератором';
+
+  @override
+  String get forumHiddenReply => 'Ответ скрыт модератором';
+
+  @override
+  String get forumReason => 'Причина действия';
+
+  @override
+  String get forumReasonRequired => 'Укажите причину, не более 1024 байт';
+
+  @override
+  String get forumModerationNotice =>
+      'Скрытое содержимое и его файлы недоступны до восстановления. Причина сохраняется в журнале модерации.';
+
+  @override
+  String get forumModerationLog => 'Журнал модерации';
+
+  @override
+  String get forumModerationEmpty => 'Действий модерации пока нет';
+
+  @override
+  String get forumApply => 'Подтвердить';
 }

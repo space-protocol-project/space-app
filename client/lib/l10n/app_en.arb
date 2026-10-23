@@ -148,7 +148,7 @@
   "you": "You",
   "newMessages": "New messages",
   "cannotSend": "You cannot send messages in this chat",
-  "messageHint": "What’s new?",
+  "messageHint": "",
   "sendMessage": "Send",
   "newMessagesCount": "New messages: {count}",
   "@newMessagesCount": {
@@ -540,7 +540,7 @@
   "mlsRemove": "Remove device",
   "mlsRetry": "Refresh and retry delivery",
   "mlsWaiting": "This device has not been invited or access was revoked. Share its code with the chat owner.",
-  "mlsInput": "What’s new?",
+  "mlsInput": "",
   "mlsSend": "Send",
   "mlsAttach": "Attach file",
   "mlsFiles": "Chat files",
@@ -907,5 +907,18 @@
   "forumDevicePermissionInfo": "Your root identity signs a space.manage grant for this device. It enables existing moderation permissions; it does not grant a role or access to other sections. If the key is not on this device, choose your root card.",
   "forumRootPassword": "Root card password",
   "forumFirstUnread": "First unread reply",
-  "forumRepliesFromStart": "Show replies from the beginning"
+  "forumRepliesFromStart": "Show replies from the beginning",
+  "forumReopen": "Reopen topic",
+  "forumHideTopic": "Hide topic",
+  "forumRestoreTopic": "Restore topic",
+  "forumHideReply": "Hide reply",
+  "forumRestoreReply": "Restore reply",
+  "forumHiddenTopic": "Topic hidden by a moderator",
+  "forumHiddenReply": "Reply hidden by a moderator",
+  "forumReason": "Reason for this action",
+  "forumReasonRequired": "Enter a reason, up to 1024 bytes",
+  "forumModerationNotice": "Hidden content and its files remain unavailable until restored. The reason is saved in the moderation log.",
+  "forumModerationLog": "Moderation log",
+  "forumModerationEmpty": "No moderation actions yet",
+  "forumApply": "Confirm"
 }

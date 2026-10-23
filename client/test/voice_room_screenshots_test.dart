@@ -132,7 +132,7 @@ void main() {
         findsOneWidget,
       );
       if (width >= 760) {
-        expect(find.text('Управление пространством'), findsOneWidget);
+        expect(find.text('Управление пространством'), findsNothing);
       } else {
         final controls = tester.getTopLeft(find.byType(VoiceCallBar)).dy;
         for (final name in ['Алиса', 'Борис', 'София', 'Максим']) {

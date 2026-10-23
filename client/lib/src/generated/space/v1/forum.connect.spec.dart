@@ -59,4 +59,25 @@ abstract final class ForumService {
     spacev1forum.CloseForumThreadRequest.new,
     spacev1forum.CloseForumThreadResponse.new,
   );
+
+  static const moderateForumThread = connect.Spec(
+    '/$name/ModerateForumThread',
+    connect.StreamType.unary,
+    spacev1forum.ModerateForumThreadRequest.new,
+    spacev1forum.ModerateForumThreadResponse.new,
+  );
+
+  static const moderateForumReply = connect.Spec(
+    '/$name/ModerateForumReply',
+    connect.StreamType.unary,
+    spacev1forum.ModerateForumReplyRequest.new,
+    spacev1forum.ModerateForumReplyResponse.new,
+  );
+
+  static const listForumModeration = connect.Spec(
+    '/$name/ListForumModeration',
+    connect.StreamType.unary,
+    spacev1forum.ListForumModerationRequest.new,
+    spacev1forum.ListForumModerationResponse.new,
+  );
 }

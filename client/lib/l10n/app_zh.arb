@@ -148,7 +148,7 @@
   "you": "你",
   "newMessages": "新消息",
   "cannotSend": "无法在此聊天发送消息",
-  "messageHint": "有什么新鲜事？",
+  "messageHint": "",
   "sendMessage": "发送",
   "newMessagesCount": "新消息：{count}",
   "@newMessagesCount": {
@@ -540,7 +540,7 @@
   "mlsRemove": "移除设备",
   "mlsRetry": "刷新并重试发送",
   "mlsWaiting": "此设备尚未获邀或访问已被撤销。请将验证码提供给聊天所有者。",
-  "mlsInput": "有什么新消息？",
+  "mlsInput": "",
   "mlsSend": "发送",
   "mlsAttach": "添加文件",
   "mlsFiles": "聊天文件",
@@ -907,5 +907,18 @@
   "forumDevicePermissionInfo": "您的根身份将为此设备签署 space.manage 授权。它仅启用已有的管理权限，不授予角色或其他版块访问权。若此设备没有根密钥，请选择您自己的根卡。",
   "forumRootPassword": "根卡密码",
   "forumFirstUnread": "第一条未读回复",
-  "forumRepliesFromStart": "从头查看回复"
+  "forumRepliesFromStart": "从头查看回复",
+  "forumReopen": "重新开放主题",
+  "forumHideTopic": "隐藏主题",
+  "forumRestoreTopic": "恢复主题",
+  "forumHideReply": "隐藏回复",
+  "forumRestoreReply": "恢复回复",
+  "forumHiddenTopic": "主题已被管理员隐藏",
+  "forumHiddenReply": "回复已被管理员隐藏",
+  "forumReason": "操作原因",
+  "forumReasonRequired": "请填写原因，最多 1024 字节",
+  "forumModerationNotice": "隐藏内容及其文件在恢复前不可访问。原因将保存到管理日志。",
+  "forumModerationLog": "管理日志",
+  "forumModerationEmpty": "暂无管理操作",
+  "forumApply": "确认"
 }

@@ -146,6 +146,8 @@ void main() {
         await tester.tap(find.byKey(const ValueKey('navigation-menu-button')));
         await tester.pumpAndSettle();
       }
+      await tester.tap(find.widgetWithText(ListTile, 'Обзор').last);
+      await tester.pumpAndSettle();
       final mine = find.byKey(const ValueKey('sidebar-my-files'));
       await tester.ensureVisible(mine);
       await tester.tap(mine);
@@ -153,10 +155,6 @@ void main() {
       expect(find.byType(MyFilesDialog), findsOneWidget);
       await tester.tap(find.widgetWithText(TextButton, 'Закрыть').last);
       await tester.pumpAndSettle();
-      if (width < 760) {
-        await tester.tap(find.byKey(const ValueKey('navigation-menu-button')));
-        await tester.pumpAndSettle();
-      }
       final allFiles = find.byKey(const ValueKey('sidebar-channel-files'));
       await tester.ensureVisible(allFiles);
       await tester.tap(allFiles);
@@ -169,6 +167,12 @@ void main() {
         findsOneWidget,
       );
       await tester.tap(find.widgetWithText(TextButton, 'Закрыть').last);
+      await tester.pumpAndSettle();
+      if (width < 760) {
+        await tester.tap(find.byKey(const ValueKey('navigation-menu-button')));
+        await tester.pumpAndSettle();
+      }
+      await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
       await tester.pumpAndSettle();
       controller.allowFiles = false;
       controller.publishState();

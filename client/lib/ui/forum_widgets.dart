@@ -73,7 +73,7 @@ class ForumTopicList extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  topic.title,
+                  topic.hidden ? context.strings.forumHiddenTopic : topic.title,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: topic.unreadCount > Int64.ZERO
                         ? FontWeight.w800
@@ -147,12 +147,14 @@ class ForumMessage extends StatelessWidget {
     this.original = false,
     this.assets = const [],
     this.session,
+    this.trailing,
   });
   final String author, authorId, text;
   final int timestamp;
   final bool original;
   final List<Asset> assets;
   final AttachmentSession? session;
+  final Widget? trailing;
   @override
   Widget build(BuildContext context) {
     final appearance = SpaceAppearance.of(context);
@@ -218,6 +220,7 @@ class ForumMessage extends StatelessWidget {
             ),
           ),
         ),
+        ?trailing,
       ],
     );
   }
@@ -326,15 +329,18 @@ class ForumAbout extends StatelessWidget {
       _detail(
         context,
         context.strings.forumState,
-        value.closed
+        value.hidden
+            ? context.strings.forumHiddenTopic
+            : value.closed
             ? context.strings.forumClosedLabel
             : context.strings.forumOpen,
       ),
-      _detail(
-        context,
-        context.strings.forumAuthor,
-        forumAuthor(value.authorName, value.authorId),
-      ),
+      if (!value.hidden)
+        _detail(
+          context,
+          context.strings.forumAuthor,
+          forumAuthor(value.authorName, value.authorId),
+        ),
       _detail(context, context.strings.forumReplies, '${value.replyCount}'),
       _detail(
         context,

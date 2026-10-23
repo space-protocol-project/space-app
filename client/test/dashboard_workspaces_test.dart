@@ -192,9 +192,8 @@ void main() {
           findsOneWidget,
         );
         expect(find.text('Архивная комната'), findsNothing);
-        for (final name in ['Обсуждения', 'Лента']) {
-          expect(find.widgetWithText(ListTile, name), findsNothing);
-        }
+        expect(find.widgetWithText(ListTile, 'Обсуждения'), findsOneWidget);
+        expect(find.widgetWithText(ListTile, 'Лента'), findsNothing);
         await tester.enterText(
           find.byKey(const ValueKey('chat-draft')),
           'Черновик сервера A',

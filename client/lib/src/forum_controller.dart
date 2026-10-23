@@ -56,6 +56,96 @@ class ForumState {
 class ForumController extends Cubit<ForumState> {
   ForumController(this.api) : super(const ForumState());
   final ForumApi api;
+  ForumModeration? get moderation {
+    final source = api;
+    return source is ForumModeration &&
+            (source as ForumModeration).moderationSupported
+        ? source as ForumModeration
+        : null;
+  }
+
+  Future<bool> moderateTopic(String action, String reason) => _run(() async {
+    final previous = state;
+    final topic = state.topic!;
+    final updated = await moderation!.moderateTopic(
+      state.section!.id,
+      topic.id,
+      action,
+      reason,
+      topic.revision,
+    );
+    if (isClosed) return;
+    _replaceTopic(updated);
+    await _refreshModeratedDiscussion(previous);
+  });
+  Future<bool> moderateReply(ForumReply reply, String reason) => _run(() async {
+    final previous = state;
+    final updated = await moderation!.moderateReply(
+      state.section!.id,
+      state.topic!.id,
+      reply.id,
+      !reply.hidden,
+      reason,
+      reply.revision,
+    );
+    if (isClosed) return;
+    _replaceTopic(updated.thread);
+    emit(
+      state.copy(
+        replies: state.replies
+            .map((r) => r.id == updated.reply.id ? updated.reply : r)
+            .toList(),
+      ),
+    );
+    await _refreshModeratedDiscussion(previous);
+  });
+  Future<void> _refreshModeratedDiscussion(ForumState previous) async {
+    final detail = await _moderationDetail(previous);
+    if (!isClosed) {
+      emit(
+        state.copy(
+          topic: detail.thread,
+          replies: detail.replies,
+          nextReplies: detail.nextSequence.toInt(),
+        ),
+      );
+    }
+  }
+
+  Future<GetForumThreadResponse> _moderationDetail(ForumState previous) async {
+    var after = previous.replies.isEmpty
+        ? Int64.ZERO
+        : previous.replies.first.sequence - Int64.ONE;
+    final replies = <ForumReply>[];
+    GetForumThreadResponse detail;
+    do {
+      detail = await api.thread(
+        previous.section!.id,
+        previous.topic!.id,
+        after,
+      );
+      replies.addAll(detail.replies);
+      after = detail.nextSequence;
+    } while (after != Int64.ZERO &&
+        detail.replies.isNotEmpty &&
+        replies.length < previous.replies.length);
+    return GetForumThreadResponse(
+      thread: detail.thread,
+      replies: replies,
+      nextSequence: detail.nextSequence,
+    );
+  }
+
+  Future<GetForumThreadResponse?> _syncDetail(ForumState previous) async {
+    if (previous.topic == null) return null;
+    if (moderation != null) return _moderationDetail(previous);
+    return api.thread(
+      previous.section!.id,
+      previous.topic!.id,
+      previous.topic!.replyCount,
+    );
+  }
+
   ForumNavigation? get navigation {
     final source = api;
     return source is ForumNavigation &&
@@ -351,14 +441,7 @@ class ForumController extends Cubit<ForumState> {
       } while (after != Int64.ZERO &&
           page.threads.isNotEmpty &&
           threads.length < previous.threads.length);
-      GetForumThreadResponse? detail;
-      if (previous.topic != null) {
-        detail = await api.thread(
-          previous.section!.id,
-          previous.topic!.id,
-          previous.topic!.replyCount,
-        );
-      }
+      final detail = await _syncDetail(previous);
       if (!isClosed && identical(state, previous)) {
         failedRead = '';
         emit(
@@ -366,9 +449,7 @@ class ForumController extends Cubit<ForumState> {
             threads: threads,
             topic: detail?.thread,
             replies: synchronizedReplies(previous, detail),
-            nextReplies: previous.nextReplies != 0
-                ? previous.nextReplies
-                : detail?.nextSequence.toInt(),
+            nextReplies: _synchronizedNext(previous, detail),
             nextThreads: after.toInt(),
             nextPinned: pinned,
           ),
@@ -385,8 +466,16 @@ class ForumController extends Cubit<ForumState> {
     ForumState previous,
     GetForumThreadResponse? detail,
   ) {
+    if (moderation != null && detail != null) return detail.replies;
     if (detail == null || previous.nextReplies != 0) return previous.replies;
     return [...previous.replies, ...detail.replies];
+  }
+
+  int? _synchronizedNext(ForumState previous, GetForumThreadResponse? detail) {
+    if (moderation != null) return detail?.nextSequence.toInt();
+    return previous.nextReplies != 0
+        ? previous.nextReplies
+        : detail?.nextSequence.toInt();
   }
 
   void _replaceTopic(ForumThread topic) => emit(

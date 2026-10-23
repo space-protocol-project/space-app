@@ -27,10 +27,19 @@ class OverviewPanel extends StatelessWidget {
     required this.controller,
     required this.openChat,
     required this.openChannel,
+    this.actions = const [],
   });
   final ChatController controller;
   final VoidCallback openChat;
   final ValueChanged<String> openChannel;
+  final List<Widget> actions;
+
+  Widget navigationActions() => actions.isEmpty
+      ? const SizedBox.shrink()
+      : Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: SurfaceCard(child: Column(children: actions)),
+        );
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +71,7 @@ class OverviewPanel extends StatelessWidget {
           : controller.spaceTitle,
       description: context.strings.welcomeDescription,
       children: [
+        navigationActions(),
         SurfaceCard(
           hoverBorder: true,
           child: Column(
