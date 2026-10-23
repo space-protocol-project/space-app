@@ -419,6 +419,12 @@ abstract class AppLocalizations {
   /// **'Открыть навигацию'**
   String get openNavigation;
 
+  /// No description provided for @closeNavigation.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть навигацию'**
+  String get closeNavigation;
+
   /// No description provided for @reconnecting.
   ///
   /// In ru, this message translates to:

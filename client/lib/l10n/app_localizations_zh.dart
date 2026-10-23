@@ -172,6 +172,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get openNavigation => '打开导航';
 
   @override
+  String get closeNavigation => '关闭导航';
+
+  @override
   String get reconnecting => '正在重新连接';
 
   @override

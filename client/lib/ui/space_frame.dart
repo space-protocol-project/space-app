@@ -29,124 +29,153 @@ class SpaceFrame extends StatelessWidget {
         children: [
           if (!compact) SizedBox(width: SpaceAppearance.railWidth, child: rail),
           Expanded(
+            key: const ValueKey('space-workspace'),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(
                 compact ? 0 : SpaceAppearance.radius,
               ),
-              child: Stack(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (!compact) sidebar,
-                      Expanded(
-                        key: const ValueKey('space-content'),
-                        child: ExcludeFocus(
-                          excluding: compact && navigationOpen,
-                          child: IgnorePointer(
-                            ignoring: compact && navigationOpen,
-                            child: ColoredBox(
-                              color: SpaceAppearance.of(context).main,
-                              child: content,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (compact)
-                    Positioned.fill(
-                      child: _NavigationOverlay(
-                        open: navigationOpen,
-                        onOpen: openNavigation,
-                        onClose: closeNavigation,
-                        child: sidebar,
-                      ),
-                    ),
-                ],
-              ),
+              child: LayoutBuilder(builder: _layout),
             ),
           ),
         ],
       ),
     ),
   );
-}
 
-class _NavigationOverlay extends StatelessWidget {
-  const _NavigationOverlay({
-    required this.open,
-    required this.child,
-    this.onOpen,
-    this.onClose,
-  });
-  final bool open;
-  final Widget child;
-  final VoidCallback? onOpen, onClose;
-  @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, box) {
-      final reduced = MediaQuery.disableAnimationsOf(context);
-      return ClipRect(
-        child: Stack(
-          children: [
-            if (open)
-              Positioned.fill(
-                child: GestureDetector(
-                  onTap: onClose,
-                  child: ColoredBox(color: Colors.black.withValues(alpha: .35)),
-                ),
-              ),
-            if (!open && onOpen != null)
-              Positioned(
-                top: 0,
-                bottom: 0,
-                left: 0,
-                width: 24,
-                child: _NavigationSwipe(
-                  opening: true,
-                  onSwipe: onOpen!,
-                  child: const SizedBox.expand(),
-                ),
-              ),
+  Widget _layout(BuildContext context, BoxConstraints box) {
+    final desiredWidth = compact ? 320.0 : SpaceAppearance.sidebarWidth;
+    final availableWidth = (box.maxWidth - 56).clamp(0.0, double.infinity);
+    final navigationWidth = desiredWidth.clamp(0.0, availableWidth);
+    return ClipRect(
+      child: Stack(
+        children: [
+          Positioned(
+            top: 0,
+            bottom: 0,
+            left: 0,
+            width: navigationWidth,
+            child: _navigation(),
+          ),
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: navigationOpen ? 1 : 0),
+            duration: MediaQuery.disableAnimationsOf(context)
+                ? Duration.zero
+                : const Duration(milliseconds: 280),
+            curve: Curves.easeOutCubic,
+            builder: (context, progress, child) => _foreground(
+              context,
+              box,
+              navigationWidth * progress,
+              progress,
+              child!,
+            ),
+            child: content,
+          ),
+          if (compact && !navigationOpen && openNavigation != null)
             Positioned(
               top: 0,
               bottom: 0,
               left: 0,
-              width: (box.maxWidth - 48).clamp(0, 320),
-              child: IgnorePointer(
-                ignoring: !open,
-                child: ExcludeFocus(
-                  excluding: !open,
-                  child: ExcludeSemantics(
-                    excluding: !open,
-                    child: AnimatedSlide(
-                      offset: open ? Offset.zero : const Offset(-1, 0),
-                      duration: reduced
-                          ? Duration.zero
-                          : const Duration(milliseconds: 280),
-                      curve: Curves.easeOutCubic,
-                      child: AnimatedOpacity(
-                        opacity: open ? 1 : 0,
-                        duration: reduced
-                            ? Duration.zero
-                            : const Duration(milliseconds: 200),
-                        child: _NavigationSwipe(
-                          opening: false,
-                          onSwipe: onClose ?? () {},
-                          child: child,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+              width: 24,
+              child: _NavigationSwipe(
+                opening: true,
+                onSwipe: openNavigation!,
+                child: const SizedBox.expand(),
               ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _navigation() => ClipRect(
+    child: IgnorePointer(
+      ignoring: !navigationOpen,
+      child: ExcludeFocus(
+        excluding: !navigationOpen,
+        child: ExcludeSemantics(
+          excluding: !navigationOpen,
+          child: _NavigationSwipe(
+            opening: false,
+            onSwipe: closeNavigation ?? () {},
+            child: sidebar,
+          ),
+        ),
+      ),
+    ),
+  );
+
+  Widget _foreground(
+    BuildContext context,
+    BoxConstraints box,
+    double offset,
+    double progress,
+    Widget child,
+  ) {
+    final radius = BorderRadius.circular(
+      compact ? SpaceAppearance.radius * progress : 0,
+    );
+    return Positioned(
+      top: 0,
+      bottom: 0,
+      left: offset,
+      width: compact ? box.maxWidth : box.maxWidth - offset,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: radius,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(
+                alpha: compact ? .16 * progress : 0,
+              ),
+              blurRadius: 24,
+              offset: const Offset(-4, 0),
             ),
           ],
         ),
-      );
-    },
-  );
+        child: ClipRRect(
+          borderRadius: radius,
+          child: ColoredBox(
+            key: const ValueKey('space-content'),
+            color: SpaceAppearance.of(context).main,
+            child: _content(context, child),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _content(BuildContext context, Widget child) {
+    final modal = compact && navigationOpen;
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        ExcludeFocus(
+          excluding: modal,
+          child: ExcludeSemantics(
+            excluding: modal,
+            child: IgnorePointer(ignoring: modal, child: child),
+          ),
+        ),
+        if (modal)
+          _NavigationSwipe(
+            opening: false,
+            onSwipe: closeNavigation ?? () {},
+            child: Semantics(
+              button: true,
+              label: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+              onDismiss: closeNavigation,
+              child: GestureDetector(
+                key: const ValueKey('navigation-dismiss'),
+                behavior: HitTestBehavior.opaque,
+                onTap: closeNavigation,
+                child: ColoredBox(color: Colors.black.withValues(alpha: .12)),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
 }
 
 class _NavigationSwipe extends StatefulWidget {

@@ -179,6 +179,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get openNavigation => 'Открыть навигацию';
 
   @override
+  String get closeNavigation => 'Закрыть навигацию';
+
+  @override
   String get reconnecting => 'Восстанавливаем соединение';
 
   @override

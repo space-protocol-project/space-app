@@ -47,7 +47,7 @@ void main() {
       );
       expect(find.byKey(const ValueKey('import-space-entry')), findsNothing);
       expect(find.text('Создать пространство'), findsNothing);
-      await tester.tap(find.text('Добавить пространство').first);
+      await tester.tap(find.text('Добавить пространство').hitTestable().first);
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('space-qr-camera')), findsOneWidget);
       expect(find.byKey(const ValueKey('space-qr-image')), findsOneWidget);

@@ -105,6 +105,9 @@ jobs:
       - name: Markdown и раскладка обычного и MLS-чата
         working-directory: client
         run: flutter test test/composer_markdown_test.dart test/mls_view_test.dart
+      - name: Навигация, фокус и сохранение черновика
+        working-directory: client
+        run: flutter test test/navigation_reveal_test.dart test/mobile_navigation_test.dart test/mobile_client_test.dart test/redesign_test.dart
       - name: Голосовые комнаты и завершение захвата микрофона
         working-directory: client
         run: flutter test test/voice_android_test.dart test/voice_network_test.dart test/voice_audio_test.dart test/voice_transmission_test.dart test/voice_shortcut_test.dart test/voice_microphone_test.dart test/voice_devices_test.dart test/voice_device_call_test.dart test/voice_recovery_test.dart test/voice_controller_test.dart test/voice_widgets_test.dart test/voice_semantics_test.dart test/tooltip_semantics_test.dart test/channels_test.dart
@@ -126,7 +129,7 @@ jobs:
       - name: Эталонные изображения Windows
         if: matrix.target == 'windows'
         working-directory: client
-        run: flutter test test/redesign_golden_test.dart
+        run: flutter test test/redesign_golden_test.dart test/navigation_reveal_golden_test.dart
       - name: Различия эталонных изображений
         if: failure() && matrix.target == 'windows'
         uses: actions/upload-artifact@v4

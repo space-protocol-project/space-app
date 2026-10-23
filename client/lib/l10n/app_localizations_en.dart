@@ -177,6 +177,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openNavigation => 'Open navigation';
 
   @override
+  String get closeNavigation => 'Close navigation';
+
+  @override
   String get reconnecting => 'Reconnecting';
 
   @override

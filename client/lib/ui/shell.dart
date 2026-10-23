@@ -164,6 +164,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   bool devicePage = false;
   bool serverList = false;
   bool drawerOpen = false;
+  bool desktopNavigationOpen = true;
   final menuButtonFocus = FocusNode();
   final menuFocus = FocusScopeNode();
   FocusNode? returnFocus;
@@ -188,6 +189,20 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     setState(() => drawerOpen = true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && drawerOpen) menuFocus.requestFocus();
+    });
+  }
+
+  void closeDesktopNavigation() {
+    if (!desktopNavigationOpen) return;
+    setState(() => desktopNavigationOpen = false);
+    menuButtonFocus.requestFocus();
+  }
+
+  void toggleDesktopNavigation() {
+    if (desktopNavigationOpen) return closeDesktopNavigation();
+    setState(() => desktopNavigationOpen = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && desktopNavigationOpen) menuFocus.requestFocus();
     });
   }
 
@@ -1729,14 +1744,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
         ? (compact ? spaceLabel : context.strings.chatDescription)
         : null,
     leading: [
-      if (compact)
-        IconButton(
-          key: const ValueKey('navigation-menu-button'),
-          tooltip: context.strings.openNavigation,
-          focusNode: menuButtonFocus,
-          onPressed: drawerOpen ? closeNavigation : openNavigation,
-          icon: const Icon(Icons.menu),
-        ),
+      _navigationButton(compact),
       if (!compact) ...[
         IgnorePointer(child: Icon(_headerIcon, size: 22)),
         const SizedBox(width: 12),
@@ -1770,6 +1778,24 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
       ),
     ],
   );
+
+  Widget _navigationButton(bool compact) {
+    final open = compact ? drawerOpen : desktopNavigationOpen;
+    return Semantics(
+      expanded: open,
+      child: IconButton(
+        key: const ValueKey('navigation-menu-button'),
+        tooltip: open
+            ? context.strings.closeNavigation
+            : context.strings.openNavigation,
+        focusNode: menuButtonFocus,
+        onPressed: compact
+            ? (drawerOpen ? closeNavigation : openNavigation)
+            : toggleDesktopNavigation,
+        icon: Icon(open ? Icons.menu_open : Icons.menu),
+      ),
+    );
+  }
 
   Widget _connectionButton() => IconButton(
     tooltip: dashboard
@@ -2015,7 +2041,9 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     }
     return CallbackShortcuts(
       bindings: {
-        const SingleActivator(LogicalKeyboardKey.escape): closeNavigation,
+        const SingleActivator(LogicalKeyboardKey.escape): compact
+            ? closeNavigation
+            : closeDesktopNavigation,
         const SingleActivator(LogicalKeyboardKey.keyK, control: true): () =>
             unawaited(search()),
         const SingleActivator(LogicalKeyboardKey.keyK, meta: true): () =>
@@ -2045,11 +2073,15 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
                 : null,
             body: SpaceFrame(
               compact: compact,
-              navigationOpen: drawerOpen,
-              closeNavigation: closeNavigation,
+              navigationOpen: compact ? drawerOpen : desktopNavigationOpen,
+              closeNavigation: compact
+                  ? closeNavigation
+                  : closeDesktopNavigation,
               openNavigation: openNavigation,
               rail: rail(),
-              sidebar: compact ? mobileNavigation() : navigationSidebar(),
+              sidebar: compact
+                  ? mobileNavigation()
+                  : FocusScope(node: menuFocus, child: navigationSidebar()),
               content: _workspaceContent(context, box),
             ),
           ),

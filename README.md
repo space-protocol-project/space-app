@@ -14,9 +14,9 @@
 - [Сервер и runtime](https://github.com/space-protocol-project/space-server).
 - [Протокол, архитектура и промосайт](https://github.com/space-protocol-project/space-protocol).
 
-Опубликован [клиент **v0.7.17**](https://github.com/space-protocol-project/space-app/releases/tag/v0.7.17) с [runtime **v0.7.14**](https://github.com/space-protocol-project/space-server/releases/tag/v0.7.14): упрощён код, состояния переведены на BLoC/Freezed, обновлены Flutter 3.47.8 / Dart 3.13.7 и зависимости. Схема 30 и голосовой профиль 3 сохранены. [Изменения](Changelog.md), [отчёт обновления](docs/DEPENDENCY_UPDATES.md).
+Подготовлен клиент **v0.7.18** с runtime **v0.7.14**: меню сворачивается при любой ширине окна, на компьютере сохраняется полоса пространств, на телефоне меню раскрывается под основной областью. Переключения сохраняют чат и черновик. Схема PostgreSQL 30 и голосовой профиль 3 не изменены. [Изменения](Changelog.md).
 
-Оба выпуска опубликованы как Latest, не draft и не prerelease. [CI клиента](https://github.com/space-protocol-project/space-app/actions/runs/40022134389) и [CI runtime](https://github.com/space-protocol-project/space-server/actions/runs/40019247321) полностью успешны. Четыре установщика, три runtime-архива, три JSON-дескриптора и оба SHA256SUMS.txt полностью скачаны: размеры и SHA-256 совпали с GitHub API и контрольными суммами. [Установка опубликованного runtime из приложения](https://github.com/space-protocol-project/space-app/actions/runs/40022134632) прошла на Windows, Linux и macOS; [публичный Linux-установщик](https://github.com/space-protocol-project/space-server/actions/runs/40022024509) также проверен.
+Новые сценарии навигации, фокуса и визуальные эталоны включены в CI. Основные экраны промогалереи можно воспроизвести в светлой и тёмной теме: задайте `SPACE_SITE_GALLERY_OUTPUT` и запустите из `client` `flutter test test/site_gallery_test.dart`. Это снимки полного SpaceShell с демонстрационной сессией, полученные widget-тестами.
 
 ## Возможности
 
@@ -81,7 +81,7 @@ flutter test --no-pub
 
 Windows прошла нативные стенды аудио и переподключения. Ручные акустика, физические клавиши/гарнитуры, публичный TURN/TLS, перенос на чистую ОС и приёмка на реальном оборудовании macOS/Linux ещё не завершены; Android 10 проверен на Honor PCT-L29 вместе с Windows через TURN TCP, включая фон и восстановление. Android 12+/14+, Bluetooth и длительная нагрузка ещё требуют проверки. Эти ограничения не закрываются зелёным CI: [открытая матрица Р1–Р12](https://github.com/space-protocol-project/space-protocol/blob/codex/voice-rooms/TODO.md). DMG пока без подписи Apple и notarization. Звук доступен runtime и не является MLS/E2EE; экспериментальные ограничения MLS сохраняются.
 
-Вложения до пяти файлов по 20 МиБ, независимая политика файлов и квоты каждого сервера, а также уникальное имя участника доступны начиная с v0.3.0. Для клиента v0.7.16 используйте runtime v0.7.13 со схемой 30; прежняя рекомендация runtime v0.3.0 относится к историческому выпуску.
+Вложения до пяти файлов по 20 МиБ, независимая политика файлов и квоты каждого сервера, а также уникальное имя участника доступны начиная с v0.3.0. Для клиента v0.7.18 используйте runtime v0.7.14 со схемой 30; прежняя рекомендация runtime v0.3.0 относится к историческому выпуску.
 
 [Резервные копии по расписанию и настройки хранения](docs/SCHEDULED-BACKUPS.md).
 
