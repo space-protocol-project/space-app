@@ -65,7 +65,7 @@ Upstream `camera_windows 0.3.0+1` исправляет выбор потока �
 
 Разбор изменений API: [desktop_drop](https://pub.dev/packages/desktop_drop/changelog), [screen_retriever](https://pub.dev/packages/screen_retriever/changelog), [code_assets](https://pub.dev/packages/code_assets/changelog). Ограничения не обходятся принудительными переопределениями версий. Следующее обновление этих пакетов следует начинать с проверки выпусков их родительских зависимостей.
 
-## Проверка
+## Локальная проверка
 
 - Анализ клиента, `space_admin_ui`, `space_api`, `space_mls_native` и `space_voice_native` прошёл без замечаний.
 - `dart run build_runner build` успешно пересоздал 11 файлов Freezed; их SHA-256 совпали с результатами до обновления SDK.
@@ -78,3 +78,7 @@ Upstream `camera_windows 0.3.0+1` исправляет выбор потока �
 - Все 9 тестов инструмента контроля сложности прошли.
 
 `flutter doctor` подтверждает готовность Windows и Visual Studio. Android SDK локально не установлен; сборка и аппаратная проверка Android, а также сборки Linux/macOS в этот локальный проход не входят. Исторические версии SDK в старых отчётах и описаниях выпусков не переписываются.
+
+## CI и публикация
+
+Опубликован [runtime v0.7.14](https://github.com/space-protocol-project/space-server/releases/tag/v0.7.14). [Релизный CI](https://github.com/space-protocol-project/space-server/actions/runs/40019247321) прошёл на Windows x64, Linux x64 и macOS arm64, включая перезапуск, TLS, обновление и восстановление данных, перенос пространства и восстановление MLS. Три архива, три JSON-дескриптора и SHA256SUMS.txt полностью скачаны; размеры и SHA-256 совпали с GitHub API и контрольными суммами. Проверенные дескрипторы закреплены в `client/assets/home/runtime-manifest.json`.

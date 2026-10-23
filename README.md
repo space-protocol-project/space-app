@@ -14,7 +14,7 @@
 - [Сервер и runtime](https://github.com/space-protocol-project/space-server).
 - [Протокол, архитектура и промосайт](https://github.com/space-protocol-project/space-protocol).
 
-Готовится клиент **v0.7.17** с runtime **v0.7.14**: упрощение кода, состояния BLoC/Freezed, Flutter 3.47.8 / Dart 3.13.7 и обновлённые зависимости. Схема 30 и голосовой профиль 3 сохранены. Локальные проверки: 801 Flutter-тест, 86 нативных тестов камеры, анализ и Windows Release. [Изменения](Changelog.md), [отчёт обновления](docs/DEPENDENCY_UPDATES.md).
+Клиент **v0.7.17** использует опубликованный [runtime **v0.7.14**](https://github.com/space-protocol-project/space-server/releases/tag/v0.7.14): упрощён код, состояния переведены на BLoC/Freezed, обновлены Flutter 3.47.8 / Dart 3.13.7 и зависимости. Схема 30 и голосовой профиль 3 сохранены. Локальные проверки: 801 Flutter-тест, 86 нативных тестов камеры, анализ и Windows Release. [Изменения](Changelog.md), [отчёт обновления](docs/DEPENDENCY_UPDATES.md).
 
 ## Возможности
 
