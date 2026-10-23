@@ -20,7 +20,7 @@ def source_files(root):
 def handwritten(path):
     if "generated" in path.parts or "vendor" in path.parts:
         return False
-    return "localizations" not in path.name and not path.name.endswith(".g.dart")
+    return "localizations" not in path.name and not path.name.endswith((".g.dart", ".freezed.dart"))
 
 
 def default_tools():

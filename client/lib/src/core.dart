@@ -1437,6 +1437,28 @@ class SpaceSession
     }
   }
 
+  String _authorityPurpose(
+    DeviceRecord credentials,
+    String purpose, {
+    required bool hasRoot,
+  }) {
+    if (!hasRoot && purpose == 'device.register') {
+      purpose = 'device.delegate';
+    }
+    if (!hasRoot && purpose == 'device.revoke') {
+      purpose = 'recovery.device.revoke';
+    }
+    if (!hasRoot &&
+        credentials.recoverySeed.isEmpty &&
+        purpose != "auth.login") {
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        "Откройте карточку для управления устройствами",
+      );
+    }
+    return purpose;
+  }
+
   Future<CompleteChallengeResponse> _authorize(
     String purpose, {
     String invitationToken = '',
@@ -1457,20 +1479,7 @@ class SpaceSession
         pairing?.publicKey ??
         target?.publicKey ??
         (await device.extractPublicKey()).bytes;
-    if (root == null && purpose == 'device.register') {
-      purpose = 'device.delegate';
-    }
-    if (root == null && purpose == 'device.revoke') {
-      purpose = 'recovery.device.revoke';
-    }
-    if (root == null &&
-        credentials.recoverySeed.isEmpty &&
-        purpose != "auth.login") {
-      throw const LocalFailure(
-        LocalFailureCode.identityInvalid,
-        "Откройте карточку для управления устройствами",
-      );
-    }
+    purpose = _authorityPurpose(credentials, purpose, hasRoot: root != null);
     final delegated =
         purpose == 'device.delegate' || purpose == 'recovery.device.revoke';
     final grantId = target?.id ?? credentials.grantId;
@@ -2301,13 +2310,7 @@ Future<String> pairVerificationCode(
 }
 
 Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
-  if ((payload['v'] != 1 && payload['v'] != 2) ||
-      !['root', 'recovery'].contains(payload['credential'])) {
-    throw const LocalFailure(
-      LocalFailureCode.protocolInvalid,
-      'Неподдерживаемая карточка',
-    );
-  }
+  _validateRecoveryCardVersion(payload);
   final origin = localOrigin(payload['origin'] as String).toString();
   final endpoint = localOrigin(payload['endpoint'] as String? ?? origin)
       .toString();
@@ -2343,9 +2346,7 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
   final record = DeviceRecord(
     origin: origin,
     endpoint: endpoint,
-    endpoints: (payload['endpoints'] as List? ?? []).isEmpty
-        ? const []
-        : parseEndpoints(payload['endpoints']),
+    endpoints: _recoveryEndpoints(payload),
     endpointRevision: payload['endpoint_revision'] as int? ?? 0,
     endpointDigest: payload['endpoint_digest'] as String? ?? '',
     serverId: serverId,
@@ -2361,6 +2362,21 @@ Future<DeviceRecord> recordFromRecovery(Map<String, dynamic> payload) async {
   );
   await record.identity();
   return DeviceRecord.fromJson(record.toJson());
+}
+
+List<ServerEndpoint> _recoveryEndpoints(Map<String, dynamic> payload) {
+  if ((payload['endpoints'] as List? ?? []).isEmpty) return const [];
+  return parseEndpoints(payload['endpoints']);
+}
+
+void _validateRecoveryCardVersion(Map<String, dynamic> payload) {
+  if ((payload['v'] != 1 && payload['v'] != 2) ||
+      !['root', 'recovery'].contains(payload['credential'])) {
+    throw const LocalFailure(
+      LocalFailureCode.protocolInvalid,
+      'Неподдерживаемая карточка',
+    );
+  }
 }
 
 List<Map<String, dynamic>> _recoveryHistory(Map<String, dynamic> payload) {

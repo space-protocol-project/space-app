@@ -14,7 +14,7 @@
 - [Сервер и runtime](https://github.com/space-protocol-project/space-server).
 - [Протокол, архитектура и промосайт](https://github.com/space-protocol-project/space-protocol).
 
-Оба выпуска v0.7.16 / v0.7.13 опубликованы как Latest. [CI клиента](https://github.com/space-protocol-project/space-app/actions/runs/40002385514) и [CI runtime](https://github.com/space-protocol-project/space-server/actions/runs/39997805449) успешны. Четыре установщика, три runtime-архива, три JSON-дескриптора и SHA256SUMS.txt полностью скачаны: размеры и SHA-256 совпали с GitHub API и контрольными суммами. [Установка опубликованного runtime](https://github.com/space-protocol-project/space-app/actions/runs/40002391668) прошла на трёх ОС.
+Готовится клиент **v0.7.17** с runtime **v0.7.14**: упрощение кода, состояния BLoC/Freezed, Flutter 3.47.8 / Dart 3.13.7 и обновлённые зависимости. Схема 30 и голосовой профиль 3 сохранены. Локальные проверки: 801 Flutter-тест, 86 нативных тестов камеры, анализ и Windows Release. [Изменения](Changelog.md), [отчёт обновления](docs/DEPENDENCY_UPDATES.md).
 
 ## Возможности
 
@@ -40,16 +40,19 @@ Android: установите `Space-android.apk` из выпуска. Моби�
 
 Оболочка по согласованному концепту: кнопки пространств без фоновой панели, скруглённый слева список каналов с прямым стыком чата, компактная карточка справа и входящие/исходящие пузырьки. Снимок получен из настоящих Flutter-виджетов с демонстрационными данными, а не из работающего сообщества. Палитры, логотип и локальные шрифты сохранены. Снимок иллюстрирует интерфейс с демонстрационным разговором.
 
-Flutter 3.47.7 (версия закреплена в CI). Из каталога `client`:
+Flutter 3.47.8 и входящий в него Dart 3.13.7 (Flutter закреплён в CI). Используем свежие стабильные совместимые версии; [результаты обновления и ограничения зависимостей](docs/DEPENDENCY_UPDATES.md). Из каталога `client`:
 
 ```powershell
 flutter pub get
+dart run build_runner build
 flutter run -d windows
 flutter analyze --no-pub
 flutter test --no-pub
 ```
 
 Общие пакеты находятся в `packages/`. Исходники сервера здесь не дублируются. Протокол лежит в `space-protocol`; сгенерированные Dart bindings сохраняются в `client/lib/src/generated`. Из корня этого репозитория генерация: `buf generate ../space-protocol/protocol/proto --template client/buf.gen.yaml`.
+
+Состояние приложения организовано через BLoC/Cubit; 11 моделей состояний генерируются Freezed. [Правила читаемости и проверки](docs/READABILITY.md), [аудит и результаты рефакторинга от 23 октября](docs/READABILITY_AUDIT.md).
 
 ## Публикация
 

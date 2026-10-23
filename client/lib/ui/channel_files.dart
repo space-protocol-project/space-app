@@ -3,83 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../l10n/strings.dart';
 import '../src/core.dart';
-import '../src/rpc_clients.dart';
+import '../src/channel_files_controller.dart';
+import '../src/generated/space/v1/space.pb.dart' show Asset;
 import 'attachment_widgets.dart';
 
-class ChannelFilesState {
-  const ChannelFilesState({
-    this.files = const [],
-    this.authors = const {},
-    this.author = '',
-    this.cursor = '',
-    this.busy = false,
-    this.error = '',
-    this.more = true,
-  });
-  final List<Asset> files;
-  final Map<String, String> authors;
-  final String author, cursor, error;
-  final bool busy, more;
-}
-
-class ChannelFilesController extends Cubit<ChannelFilesState> {
-  ChannelFilesController(this.session, this.channel)
-    : super(const ChannelFilesState());
-  final AttachmentSession session;
-  final String channel;
-  int generation = 0;
-
-  Future<void> selectAuthor(String author) async {
-    generation++;
-    emit(ChannelFilesState(author: author, authors: state.authors));
-    await load();
-  }
-
-  Future<void> load() async {
-    if (state.busy || !state.more) return;
-    final before = state;
-    final requestGeneration = generation;
-    emit(
-      ChannelFilesState(
-        files: before.files,
-        authors: before.authors,
-        author: before.author,
-        cursor: before.cursor,
-        busy: true,
-      ),
-    );
-    try {
-      final reply = await session.listChannelAssets(
-        ListChannelAssetsRequest(
-          channelId: channel,
-          authorId: before.author,
-          after: before.cursor,
-        ),
-      );
-      if (isClosed || requestGeneration != generation) return;
-      emit(
-        ChannelFilesState(
-          files: [...before.files, ...reply.assets],
-          authors: reply.authors,
-          author: before.author,
-          cursor: reply.nextCursor,
-          more: reply.nextCursor.isNotEmpty,
-        ),
-      );
-    } catch (error) {
-      if (isClosed || requestGeneration != generation) return;
-      emit(
-        ChannelFilesState(
-          files: before.files,
-          authors: before.authors,
-          author: before.author,
-          cursor: before.cursor,
-          error: error.toString(),
-        ),
-      );
-    }
-  }
-}
+export '../src/channel_files_controller.dart';
 
 class ChannelFilesPanel extends StatefulWidget {
   const ChannelFilesPanel({

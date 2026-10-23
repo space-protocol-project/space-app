@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter/foundation.dart' show mapEquals;
 import 'package:flutter/material.dart';
@@ -8,6 +10,8 @@ import 'package:space_admin_ui/space_admin_ui.dart' show validatedServerIcon;
 
 import 'event_controller.dart';
 import '../ui/space_appearance.dart';
+
+part 'preferences.freezed.dart';
 
 part 'preferences_events.dart';
 part 'preferences_state.dart';

@@ -537,31 +537,11 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     if (pair.state != 'pending') {
       throw RecoveryOperationError('pairingAlreadyUsed');
     }
-    if (!await confirm(
-      (strings) => strings.pairingPrepareConfirm(
-        pair.deviceName,
-        pair.administrative
-            ? strings.pairingManageRequest
-            : strings.pairingChatRequest,
-      ),
-    )) {
-      return;
-    }
+    if (!await _confirmPairing(pair)) return;
     DeviceRecord? authority;
     if (!manager.hasRootAuthority) {
-      final file = await openFile(acceptedTypeGroups: files);
-      if (file == null) return;
-      if (await file.length() > maxRecoveryImageBytes) {
-        throw RecoveryOperationError('recoveryTooLarge');
-      }
-      final pass = await password(false);
-      if (pass == null) return;
-      authority = await recordFromRecovery(
-        await compute(openCardInWorker, [
-          await compute(artifactInWorker, await file.readAsBytes()),
-          pass,
-        ]),
-      );
+      authority = await _readPairingAuthority();
+      if (authority == null) return;
     }
     final code = await manager.preparePairing(pair, authority: authority);
     if (mounted) {
@@ -573,6 +553,31 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
         messageKey = 'pairingReady';
       });
     }
+  }
+
+  Future<bool> _confirmPairing(Pairing pair) => confirm(
+    (strings) => strings.pairingPrepareConfirm(
+      pair.deviceName,
+      pair.administrative
+          ? strings.pairingManageRequest
+          : strings.pairingChatRequest,
+    ),
+  );
+
+  Future<DeviceRecord?> _readPairingAuthority() async {
+    final file = await openFile(acceptedTypeGroups: files);
+    if (file == null) return null;
+    if (await file.length() > maxRecoveryImageBytes) {
+      throw RecoveryOperationError('recoveryTooLarge');
+    }
+    final pass = await password(false);
+    if (pass == null) return null;
+    return recordFromRecovery(
+      await compute(openCardInWorker, [
+        await compute(artifactInWorker, await file.readAsBytes()),
+        pass,
+      ]),
+    );
   }
 
   Future<void> finishPairing() async {

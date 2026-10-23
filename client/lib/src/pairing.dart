@@ -107,72 +107,78 @@ class PendingPairing {
     RootIdentity identity,
     bool delegated,
   ) async {
-    List<int> signer = response.rootPublicKey;
-    if (delegated) {
-      if (response.parentTranscript.isEmpty ||
-          response.parentSignature.length != 64 ||
-          response.parentGrantId != transcript['authorizer_grant_id']) {
-        throw const LocalFailure(
-          LocalFailureCode.identityInvalid,
-          'Нет доказательства recovery authority',
-        );
-      }
-      final parent = jsonDecode(
-        utf8.decode(response.parentTranscript),
-      ) as Map<String, dynamic>;
-      signer = base64Url.decode(
-        base64Url.normalize(parent['device_public_key'] as String),
+    if (!delegated) {
+      _requireRootPairingSignature(response);
+      return response.rootPublicKey;
+    }
+    if (response.parentTranscript.isEmpty ||
+        response.parentSignature.length != 64 ||
+        response.parentGrantId != transcript['authorizer_grant_id']) {
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Нет доказательства recovery authority',
       );
-      final scopes = (parent['scopes'] as List).cast<String>();
-      final managed = scopes.contains('space.manage');
-      if (parent['grant_id'] != response.parentGrantId ||
-          !scopes.contains('identity.recover') ||
-          (p.administrative && !managed) ||
-          (parent['issued_at'] as int) > (transcript['issued_at'] as int) + 5 ||
-          (parent['grant_expires_at'] as int) <
-              (transcript['grant_expires_at'] as int)) {
-        throw const LocalFailure(
-          LocalFailureCode.identityInvalid,
-          'Неподходящая цепочка recovery',
-        );
-      }
-      final parentSigning = await checkedSigningBytes(
-        CreateChallengeResponse(
-          challengeId: parent['challenge_id'] as String,
-          transcript: response.parentTranscript,
-        ),
-        server,
-        response.rootPublicKey,
-        signer,
-        'device.register',
-        '',
-        expectedScopes: [
-          'chat.read',
-          'chat.write',
-          if (managed) 'space.manage',
-          'identity.recover',
-        ],
-        allowHistorical: true,
-        registrationDays: 3650,
-        expectedPrincipal: identity.principalId,
-        expectedEpoch: identity.epoch,
+    }
+    final parent = jsonDecode(
+      utf8.decode(response.parentTranscript),
+    ) as Map<String, dynamic>;
+    final signer = base64Url.decode(
+      base64Url.normalize(parent['device_public_key'] as String),
+    );
+    final scopes = (parent['scopes'] as List).cast<String>();
+    final managed = scopes.contains('space.manage');
+    if (parent['grant_id'] != response.parentGrantId ||
+        !scopes.contains('identity.recover') ||
+        (p.administrative && !managed) ||
+        (parent['issued_at'] as int) > (transcript['issued_at'] as int) + 5 ||
+        (parent['grant_expires_at'] as int) <
+            (transcript['grant_expires_at'] as int)) {
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Неподходящая цепочка recovery',
       );
-      if (!await Ed25519().verify(
-        parentSigning,
-        signature: Signature(
-          response.parentSignature,
-          publicKey: SimplePublicKey(
-            response.rootPublicKey,
-            type: KeyPairType.ed25519,
-          ),
+    }
+    final parentSigning = await checkedSigningBytes(
+      CreateChallengeResponse(
+        challengeId: parent['challenge_id'] as String,
+        transcript: response.parentTranscript,
+      ),
+      server,
+      response.rootPublicKey,
+      signer,
+      'device.register',
+      '',
+      expectedScopes: [
+        'chat.read',
+        'chat.write',
+        if (managed) 'space.manage',
+        'identity.recover',
+      ],
+      allowHistorical: true,
+      registrationDays: 3650,
+      expectedPrincipal: identity.principalId,
+      expectedEpoch: identity.epoch,
+    );
+    if (!await Ed25519().verify(
+      parentSigning,
+      signature: Signature(
+        response.parentSignature,
+        publicKey: SimplePublicKey(
+          response.rootPublicKey,
+          type: KeyPairType.ed25519,
         ),
-      )) {
-        throw const LocalFailure(
-          LocalFailureCode.identityInvalid,
-          'Root-подпись recovery не прошла проверку',
-        );
-      }
-    } else if (response.parentGrantId.isNotEmpty ||
+      ),
+    )) {
+      throw const LocalFailure(
+        LocalFailureCode.identityInvalid,
+        'Root-подпись recovery не прошла проверку',
+      );
+    }
+    return signer;
+  }
+
+  void _requireRootPairingSignature(PollPairingResponse response) {
+    if (response.parentGrantId.isNotEmpty ||
         response.parentTranscript.isNotEmpty ||
         response.parentSignature.isNotEmpty) {
       throw const LocalFailure(
@@ -180,7 +186,6 @@ class PendingPairing {
         'Неожиданная цепочка подписи',
       );
     }
-    return signer;
   }
 
   Future<DeviceRecord> verifiedRecord(PollPairingResponse response) async {

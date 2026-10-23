@@ -120,15 +120,35 @@ Future<Discovery> selectEndpoint(
   if (targets.isEmpty || targets.length > 8) {
     throw const FormatException('Нужно от 1 до 8 адресов');
   }
+  return _EndpointRace(targets, probe).run(stagger, timeout);
+}
+
+class _EndpointRace {
+  _EndpointRace(this.targets, this.probe);
+  final List<Uri> targets;
+  final EndpointProbe probe;
   final result = Completer<Discovery>();
   final cancelled = Completer<void>();
-  var next = 0;
-  var stopped = false;
-  var workers = 2;
+  int next = 0;
+  int workers = 2;
+  bool stopped = false;
   Object lastError = const SocketException('Нет доступных адресов');
-  Future<void> worker(Duration delay) async {
+  bool get accepting => !stopped && !result.isCompleted;
+
+  Future<Discovery> run(Duration stagger, Duration timeout) async {
+    unawaited(_worker(Duration.zero));
+    unawaited(_worker(stagger));
+    try {
+      return await result.future.timeout(timeout);
+    } finally {
+      stopped = true;
+      cancelled.complete();
+    }
+  }
+
+  Future<void> _worker(Duration delay) async {
     await Future<void>.delayed(delay);
-    while (!stopped && !result.isCompleted && next < targets.length) {
+    while (accepting && next < targets.length) {
       final index = next++;
       try {
         final server = await probe(
@@ -136,24 +156,13 @@ Future<Discovery> selectEndpoint(
           cancelled.future,
           index == 0,
         );
-        if (!stopped && !result.isCompleted) result.complete(server);
+        if (accepting) result.complete(server);
       } catch (error) {
         lastError = error;
       }
     }
     workers--;
-    if (workers == 0 && !stopped && !result.isCompleted) {
-      result.completeError(lastError);
-    }
-  }
-
-  unawaited(worker(Duration.zero));
-  unawaited(worker(stagger));
-  try {
-    return await result.future.timeout(timeout);
-  } finally {
-    stopped = true;
-    cancelled.complete();
+    if (workers == 0 && accepting) result.completeError(lastError);
   }
 }
 

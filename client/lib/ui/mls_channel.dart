@@ -518,6 +518,27 @@ class _MlsConversationState extends State<_MlsConversation> {
     );
   }
 
+  bool _canSubmit(MlsState state) =>
+      !state.busy &&
+      !state.recoveryRequired &&
+      state.data?.channel['revocation_pending'] != true &&
+      !submitting &&
+      state.data?.joined == true &&
+      widget.canWrite;
+
+  Widget _attachmentChips(MlsState state) => Wrap(
+    children: files
+        .map(
+          (file) => InputChip(
+            label: Text(file.name),
+            onDeleted: state.busy
+                ? null
+                : () => setState(() => files.remove(file)),
+          ),
+        )
+        .toList(),
+  );
+
   Widget composer(MlsState state) => Padding(
     padding: const EdgeInsets.all(16),
     child: MessageInputSurface(
@@ -526,18 +547,7 @@ class _MlsConversationState extends State<_MlsConversation> {
         children: [
           if (replyTarget != null) replyPreview(replyTarget!, cancel: true),
           if (widget.attachmentsEnabled && files.isNotEmpty)
-            Wrap(
-              children: files
-                  .map(
-                    (file) => InputChip(
-                      label: Text(file.name),
-                      onDeleted: state.busy
-                          ? null
-                          : () => setState(() => files.remove(file)),
-                    ),
-                  )
-                  .toList(),
-            ),
+            _attachmentChips(state),
           ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: MediaQuery.sizeOf(context).height / 3,
@@ -546,13 +556,7 @@ class _MlsConversationState extends State<_MlsConversation> {
               controller: draft,
               minLines: 3,
               maxLines: null,
-              enabled:
-                  !state.busy &&
-                  !state.recoveryRequired &&
-                  state.data?.channel['revocation_pending'] != true &&
-                  !submitting &&
-                  state.data?.joined == true &&
-                  widget.canWrite,
+              enabled: _canSubmit(state),
               decoration: messageInputDecoration(context.strings.mlsInput),
             ),
           ),
@@ -577,15 +581,7 @@ class _MlsConversationState extends State<_MlsConversation> {
               ),
               const Spacer(),
               IconButton.filled(
-                onPressed:
-                    state.busy ||
-                        state.recoveryRequired ||
-                        state.data?.channel['revocation_pending'] == true ||
-                        submitting ||
-                        state.data?.joined != true ||
-                        !widget.canWrite
-                    ? null
-                    : submit,
+                onPressed: _canSubmit(state) ? submit : null,
                 tooltip: context.strings.mlsSend,
                 style: IconButton.styleFrom(
                   foregroundColor: Theme.of(context).colorScheme.onPrimary,

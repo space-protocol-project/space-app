@@ -1,0 +1,16 @@
+targets:
+  $default:
+    builders:
+      freezed:
+        generate_for:
+          - lib/src/attachments.dart
+          - lib/src/channel_files_controller.dart
+          - lib/src/chat_controller.dart
+          - lib/src/home_controller.dart
+          - lib/src/message_search_controller.dart
+          - lib/src/preferences.dart
+          - lib/src/server_presence.dart
+          - lib/src/server_workspaces.dart
+          - lib/src/voice_controller.dart
+          - lib/src/voice_devices.dart
+          - lib/src/voice_microphone_test.dart

@@ -44,19 +44,7 @@ Future<Map<String, dynamic>> prepareRootRotation(
     );
   }
   checkTrust(server, current);
-  final existing = await vault.loadRotation(current.origin);
-  if (existing != null && !renew) {
-    throw const LocalFailure(
-      LocalFailureCode.identityInvalid,
-      'Сначала завершите предыдущую ротацию',
-    );
-  }
-  if (renew && existing == null) {
-    throw const LocalFailure(
-      LocalFailureCode.identityInvalid,
-      'Нет сохранённого запроса ротации',
-    );
-  }
+  final existing = await _loadRotation(vault, current.origin, renew);
   final identity = await current.identity();
   if (current.rootHistory.length >= 16) {
     throw const LocalFailure(
@@ -72,12 +60,8 @@ Future<Map<String, dynamic>> prepareRootRotation(
   if (saved != null) {
     await _validateSavedRotation(server, saved, current, existing!, identity);
   }
-  final newRoot = saved == null
-          ? await algorithm.newKeyPair()
-          : await algorithm.newKeyPairFromSeed(saved.rootSeed),
-      device = saved == null
-          ? await algorithm.newKeyPair()
-          : await algorithm.newKeyPairFromSeed(saved.deviceSeed);
+  final newRoot = await _rotationKey(algorithm, saved?.rootSeed);
+  final device = await _rotationKey(algorithm, saved?.deviceSeed);
   final public = (await newRoot.extractPublicKey()).bytes;
   final devicePublic = (await device.extractPublicKey()).bytes;
   final operation = _rotationOperation(saved);
@@ -152,6 +136,30 @@ Future<Map<String, dynamic>> prepareRootRotation(
   return pending;
 }
 
+Future<SimpleKeyPair> _rotationKey(Ed25519 algorithm, List<int>? seed) =>
+    seed == null ? algorithm.newKeyPair() : algorithm.newKeyPairFromSeed(seed);
+
+Future<Map<String, dynamic>?> _loadRotation(
+  RotationJournalVault vault,
+  String origin,
+  bool renew,
+) async {
+  final existing = await vault.loadRotation(origin);
+  if (existing != null && !renew) {
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Сначала завершите предыдущую ротацию',
+    );
+  }
+  if (renew && existing == null) {
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'Нет сохранённого запроса ротации',
+    );
+  }
+  return existing;
+}
+
 Future<DeviceRecord?> finishRootRotation(
   Discovery server,
   RotationJournalVault vault,
@@ -187,6 +195,30 @@ Future<DeviceRecord?> finishRootRotation(
     );
   }
   final current = await _currentRotationRecord(server, vault, next);
+  final activeGrant = await _activeRotationGrant(current, next, pending);
+  final receipt = await auth.completeRootRotation(
+    CompleteRootRotationRequest(
+      challengeId: t['challenge_id'] as String,
+      oldSignature: _decode(proof['old_signature'] as String),
+      newSignature: _decode(proof['new_signature'] as String),
+    ),
+    options: RpcOptions(timeout: const Duration(seconds: 10)),
+  );
+  _validateRotationReceipt(receipt, proof, identity, activeGrant);
+  next.grantId = receipt.grantId;
+  next.mlsChannels.addAll(current?.mlsChannels ?? {});
+  next.mlsIdentity ??= current?.mlsIdentity;
+  // Если запись или очистка завершатся ошибкой, журнал остаётся для повторного commit.
+  await vault.save(next);
+  await vault.clearRotation(next.origin);
+  return next;
+}
+
+Future<String?> _activeRotationGrant(
+  DeviceRecord? current,
+  DeviceRecord next,
+  Map<String, dynamic> pending,
+) async {
   final oldState =
       current == null || await _digest(current) == pending['old_digest'];
   final alreadyActivated =
@@ -201,33 +233,27 @@ Future<DeviceRecord?> finishRootRotation(
       'Хранилище изменилось; автоматическая ротация остановлена',
     );
   }
-  final receipt = await auth.completeRootRotation(
-    CompleteRootRotationRequest(
-      challengeId: t['challenge_id'] as String,
-      oldSignature: _decode(proof['old_signature'] as String),
-      newSignature: _decode(proof['new_signature'] as String),
-    ),
-    options: RpcOptions(timeout: const Duration(seconds: 10)),
-  );
+  return alreadyActivated ? current.grantId : null;
+}
+
+void _validateRotationReceipt(
+  CompleteRootRotationResponse receipt,
+  Map<String, dynamic> proof,
+  RootIdentity identity,
+  String? activeGrant,
+) {
   if (url64(receipt.transcript) != proof['transcript'] ||
       url64(receipt.oldSignature) != proof['old_signature'] ||
       url64(receipt.newSignature) != proof['new_signature'] ||
       receipt.principalId != identity.principalId ||
       receipt.authEpoch.toInt() != identity.epoch ||
       !RegExp(r'^dg_[A-Za-z0-9_-]{43}$').hasMatch(receipt.grantId) ||
-      (alreadyActivated && receipt.grantId != current.grantId)) {
+      (activeGrant != null && receipt.grantId != activeGrant)) {
     throw const LocalFailure(
       LocalFailureCode.identityInvalid,
       'Ответ ротации не соответствует сохранённому доказательству',
     );
   }
-  next.grantId = receipt.grantId;
-  next.mlsChannels.addAll(current?.mlsChannels ?? {});
-  next.mlsIdentity ??= current?.mlsIdentity;
-  // Если запись или очистка завершатся ошибкой, журнал остаётся для повторного commit.
-  await vault.save(next);
-  await vault.clearRotation(next.origin);
-  return next;
 }
 
 void _validateRotationChallenge(

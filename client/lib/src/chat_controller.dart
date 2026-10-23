@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'package:flutter/foundation.dart' show VoidCallback, listEquals;
 import 'package:grpc/grpc.dart';
 
@@ -24,6 +26,8 @@ import 'mls/local_store.dart';
 import 'event_controller.dart';
 import 'generated/space/v1/space.pb.dart';
 import 'local_failure.dart';
+
+part 'chat_controller.freezed.dart';
 
 part 'chat_events.dart';
 part 'chat_state.dart';
@@ -1080,8 +1084,11 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     return;
   }
 
+  bool get _canSelectCachedChannel =>
+      (!connected || reconnecting) && _history != null && !accessRemoved;
+
   Future<void> _selectChannel(String id) async {
-    if ((!connected || reconnecting) && _history != null && !accessRemoved) {
+    if (_canSelectCachedChannel) {
       await _selectCachedChannel(id);
       return;
     }
@@ -1108,15 +1115,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       cursor = _cursors[nextId] ?? '';
       final initial = await _initialHistory(session);
       if (_disposed) return;
-      for (final m in initial) {
-        if (m.channelId != nextId) {
-          throw const LocalFailure(
-            LocalFailureCode.protocolInvalid,
-            'История другого канала',
-          );
-        }
-        _mergeMessage(m);
-      }
+      _mergeChannelHistory(initial, nextId);
       connected = true;
       await _savePositions();
       if (canRead && !encryptedChannel) {
@@ -1128,6 +1127,18 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     } finally {
       busy = false;
       _update();
+    }
+  }
+
+  void _mergeChannelHistory(List<Content> messages, String nextId) {
+    for (final message in messages) {
+      if (message.channelId != nextId) {
+        throw const LocalFailure(
+          LocalFailureCode.protocolInvalid,
+          'История другого канала',
+        );
+      }
+      _mergeMessage(message);
     }
   }
 

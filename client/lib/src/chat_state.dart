@@ -1,43 +1,46 @@
 part of 'chat_controller.dart';
 
-final class ChatState {
-  const ChatState({
-    this.historyLoading = false,
-    this.hasOlderHistory = false,
-    this.historyError = '',
-    this.busy = false,
-    this.connected = false,
-    this.reconnecting = false,
-    this.accessRemoved = false,
-    this.canRead = false,
-    this.canWrite = false,
-    this.error = '',
-    this.cacheError = '',
-    this.fingerprint = '',
-    this.cursor = '',
-    this.origin = '',
-    this.principalId = '',
-    this.channelId = 'general',
-    this.spaceTitle = '',
-    this.chatTitle = '',
-    this.readThrough = '',
-    this.failureCode,
-    this.failureRetry = false,
-    this.invitationRole = '',
-    this.initialSetup = false,
-    this.preview,
-    this.serverIcon,
-    this.messages = const [],
-    this.channels = const [],
-    this.favorites = const {},
-    this.unreadCounts = const {},
-    this.sendStatus = MessageSendStatus.idle,
-    this.canQueue = false,
-    this.pendingMessages = const [],
-    this.outboxError = '',
-    this.outboxSources = const [],
-    this.outboxRecoveryTarget = '',
-  });
+// fromController уже замораживает protobuf и коллекции; сохраняем их идентичность.
+@Freezed(equal: false, makeCollectionsUnmodifiable: false)
+abstract class ChatState with _$ChatState {
+  const ChatState._();
+  const factory ChatState({
+    @Default(false) bool historyLoading,
+    @Default(false) bool hasOlderHistory,
+    @Default('') String historyError,
+    @Default(false) bool busy,
+    @Default(false) bool connected,
+    @Default(false) bool reconnecting,
+    @Default(false) bool accessRemoved,
+    @Default(false) bool canRead,
+    @Default(false) bool canWrite,
+    @Default('') String error,
+    @Default('') String cacheError,
+    @Default('') String fingerprint,
+    @Default('') String cursor,
+    @Default('') String origin,
+    @Default('') String principalId,
+    @Default('general') String channelId,
+    @Default('') String spaceTitle,
+    @Default('') String chatTitle,
+    @Default('') String readThrough,
+    LocalFailureCode? failureCode,
+    @Default(false) bool failureRetry,
+    @Default('') String invitationRole,
+    @Default(false) bool initialSetup,
+    Discovery? preview,
+    ServerIcon? serverIcon,
+    @Default([]) List<Content> messages,
+    @Default([]) List<Channel> channels,
+    @Default({}) Set<String> favorites,
+    @Default({}) Map<String, int> unreadCounts,
+    @Default(MessageSendStatus.idle) MessageSendStatus sendStatus,
+    @Default(false) bool canQueue,
+    @Default([]) List<PendingMessage> pendingMessages,
+    @Default('') String outboxError,
+    @Default([]) List<OutboxScope> outboxSources,
+    @Default('') String outboxRecoveryTarget,
+  }) = _ChatState;
 
   factory ChatState.fromController(ChatController controller) {
     final messages = controller.messages;
@@ -93,40 +96,6 @@ final class ChatState {
     );
   }
 
-  final bool historyLoading, hasOlderHistory;
-  final String historyError;
-  final bool busy,
-      connected,
-      reconnecting,
-      accessRemoved,
-      canRead,
-      canWrite,
-      failureRetry;
-  final String error,
-      cacheError,
-      fingerprint,
-      cursor,
-      origin,
-      principalId,
-      channelId,
-      spaceTitle,
-      chatTitle,
-      readThrough,
-      invitationRole;
-  final LocalFailureCode? failureCode;
-  final bool initialSetup;
-  final Discovery? preview;
-  final ServerIcon? serverIcon;
-  final List<Content> messages;
-  final List<Channel> channels;
-  final Set<String> favorites;
-  final Map<String, int> unreadCounts;
-  final MessageSendStatus sendStatus;
-  final bool canQueue;
-  final String outboxError;
-  final List<OutboxScope> outboxSources;
-  final String outboxRecoveryTarget;
-  final List<PendingMessage> pendingMessages;
   bool isFavorite(Content message) =>
       favorites.contains('${message.channelId}/${message.id}');
   int unreadCount(String channelId) => unreadCounts[channelId] ?? 0;

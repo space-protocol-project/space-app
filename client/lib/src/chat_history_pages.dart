@@ -28,6 +28,13 @@ extension _ChatHistoryPages on ChatController {
     _pagedHistory = true;
     _historyNextBefore = page.nextBefore;
     _historyFloor = page.messages.firstOrNull?.sequence.toInt() ?? 0;
+    cursor = _historyCursor(id, page.eventCursor);
+    _cursors[id] = cursor;
+    _queuePositions();
+    return page.messages;
+  }
+
+  String _historyCursor(String id, String eventCursor) {
     final cached =
         _history?.entries.values.any(
           (entry) => entry.content.channelId == id,
@@ -43,10 +50,7 @@ extension _ChatHistoryPages on ChatController {
           );
       if (lastCached + 1 < _historyFloor) _historyFloor = lastCached + 1;
     }
-    cursor = cached ? _history!.eventCursors[id] ?? '' : page.eventCursor;
-    _cursors[id] = cursor;
-    _queuePositions();
-    return page.messages;
+    return cached ? _history!.eventCursors[id] ?? '' : eventCursor;
   }
 
   Future<void> _loadOlderHistory() async {

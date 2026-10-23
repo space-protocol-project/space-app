@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'recovery_panel.dart';
 
 import '../src/chat_controller.dart';
+import '../src/generated/space/v1/space.pb.dart' show Channel;
 import '../src/preferences.dart';
 import '../src/app_updates.dart';
 import 'components.dart';
@@ -41,6 +42,23 @@ class OverviewPanel extends StatelessWidget {
           child: SurfaceCard(child: Column(children: actions)),
         );
 
+  String _connectionStatus(BuildContext context) {
+    if (controller.reconnecting) return context.strings.reconnecting;
+    if (controller.connected) return context.strings.connected;
+    return context.strings.serverOffline;
+  }
+
+  Widget _metric(BuildContext context, String label, int count) => SurfaceCard(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('$count', style: Theme.of(context).textTheme.headlineMedium),
+        const SizedBox(height: 12),
+        Text(label),
+      ],
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     final channels = controller.channels
@@ -50,21 +68,7 @@ class OverviewPanel extends StatelessWidget {
       0,
       (total, c) => total + controller.unreadCount(c.id),
     );
-    final status = controller.reconnecting
-        ? context.strings.reconnecting
-        : controller.connected
-        ? context.strings.connected
-        : context.strings.serverOffline;
-    Widget metric(String label, int count) => SurfaceCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('$count', style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: 12),
-          Text(label),
-        ],
-      ),
-    );
+    final status = _connectionStatus(context);
     return PageBody(
       title: controller.spaceTitle.isEmpty
           ? context.strings.welcome
@@ -113,8 +117,12 @@ class OverviewPanel extends StatelessWidget {
         ],
         AdaptiveCards(
           children: [
-            metric(context.strings.dashboardChannels, channels.length),
-            metric(context.strings.dashboardUnread, unread),
+            _metric(
+              context,
+              context.strings.dashboardChannels,
+              channels.length,
+            ),
+            _metric(context, context.strings.dashboardUnread, unread),
           ],
         ),
         const SizedBox(height: 24),
@@ -129,19 +137,7 @@ class OverviewPanel extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               if (channels.isEmpty) Text(context.strings.serverNoChannels),
-              for (final channel in channels)
-                ListTile(
-                  key: ValueKey('overview-channel-${channel.id}'),
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.tag),
-                  title: Text(channel.title),
-                  trailing: controller.unreadCount(channel.id) > 0
-                      ? Badge(
-                          label: Text('${controller.unreadCount(channel.id)}'),
-                        )
-                      : const Icon(Icons.chevron_right),
-                  onTap: () => openChannel(channel.id),
-                ),
+              for (final channel in channels) _channelTile(context, channel),
             ],
           ),
         ),
@@ -156,6 +152,17 @@ class OverviewPanel extends StatelessWidget {
       ],
     );
   }
+
+  Widget _channelTile(BuildContext context, Channel channel) => ListTile(
+    key: ValueKey('overview-channel-${channel.id}'),
+    contentPadding: EdgeInsets.zero,
+    leading: const Icon(Icons.tag),
+    title: Text(channel.title),
+    trailing: controller.unreadCount(channel.id) > 0
+        ? Badge(label: Text('${controller.unreadCount(channel.id)}'))
+        : const Icon(Icons.chevron_right),
+    onTap: () => openChannel(channel.id),
+  );
 }
 
 class SettingsPanel extends StatelessWidget {

@@ -4,6 +4,8 @@ import 'server_endpoints.dart';
 import 'endpoint_connection.dart';
 export 'server_endpoints.dart';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -27,6 +29,8 @@ export 'home_backup_policy.dart';
 import 'home_update_executor.dart';
 import 'home_update_journal.dart';
 import 'local_failure.dart';
+
+part 'home_controller.freezed.dart';
 
 part 'home_events.dart';
 part 'home_state.dart';
@@ -784,18 +788,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
       await HomeUpdateJournal(root).requireSettled();
       await _prepareConfiguration(root, address);
       final runtime = await _install(root);
-      final capabilities = await runHomeTool(runtime, ['-runtime-info']);
-      if (capabilities['endpointSetVersion'] != 1) {
-        throw const FormatException(
-          'Обновите runtime: требуется поддержка нескольких адресов пространства',
-        );
-      }
-      if ((network!.autoPortMapping || network!.autoPublicIP) &&
-          capabilities['automaticNetworkVersion'] != 1) {
-        throw const FormatException(
-          'Обновите runtime: требуется поддержка автоматических сетевых настроек',
-        );
-      }
+      await _checkRuntimeCapabilities(runtime);
       if (_disposed) {
         throw const FormatException('Запуск отменён при закрытии приложения');
       }
@@ -847,21 +840,40 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
       _watchNetwork(root, process);
       return server;
     } catch (e) {
-      failureCode = e is LocalFailure
-          ? e.code
-          : LocalFailureCode.homeStartFailed;
-      error = e.toString().replaceFirst('FormatException: ', '');
-      try {
-        await _stop();
-      } catch (_) {
-        failureCode = LocalFailureCode.homeStopFailed;
-        error += ' Сервер не подтвердил остановку.';
-      }
+      await _handleStartFailure(e);
       return null;
     } finally {
       busy = false;
       _endProgress();
       _update();
+    }
+  }
+
+  Future<void> _handleStartFailure(Object error) async {
+    failureCode = error is LocalFailure
+        ? error.code
+        : LocalFailureCode.homeStartFailed;
+    this.error = error.toString().replaceFirst('FormatException: ', '');
+    try {
+      await _stop();
+    } catch (_) {
+      failureCode = LocalFailureCode.homeStopFailed;
+      this.error += ' Сервер не подтвердил остановку.';
+    }
+  }
+
+  Future<void> _checkRuntimeCapabilities(Directory runtime) async {
+    final capabilities = await runHomeTool(runtime, ['-runtime-info']);
+    if (capabilities['endpointSetVersion'] != 1) {
+      throw const FormatException(
+        'Обновите runtime: требуется поддержка нескольких адресов пространства',
+      );
+    }
+    if ((network!.autoPortMapping || network!.autoPublicIP) &&
+        capabilities['automaticNetworkVersion'] != 1) {
+      throw const FormatException(
+        'Обновите runtime: требуется поддержка автоматических сетевых настроек',
+      );
     }
   }
 

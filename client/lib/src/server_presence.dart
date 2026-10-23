@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'package:flutter/foundation.dart';
 
 import 'core.dart';
 import 'event_controller.dart';
+
+part 'server_presence.freezed.dart';
 
 part 'presence_events.dart';
 part 'presence_state.dart';

@@ -120,47 +120,54 @@ class _MemberProfileFormState extends State<_MemberProfileForm> {
         bloc: profile,
         listenWhen: (before, after) => before.loading && after.loaded,
         listener: (context, state) => nickname.text = state.nickname,
-        builder: (context, state) => SurfaceCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                key: const ValueKey('member-nickname'),
-                controller: nickname,
-                onChanged: (_) => profile.edited(),
-                enabled: state.loaded && !state.saving,
-                maxLength: 40,
-                decoration: InputDecoration(
-                  labelText: context.strings.serverNickname,
-                  helperText: context.strings.nicknameUniqueHelp,
-                  helperMaxLines: 3,
-                ),
+        builder: _profileForm,
+      );
+
+  Widget _profileForm(BuildContext context, MemberProfileState state) =>
+      SurfaceCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              key: const ValueKey('member-nickname'),
+              controller: nickname,
+              onChanged: (_) => profile.edited(),
+              enabled: state.loaded && !state.saving,
+              maxLength: 40,
+              decoration: InputDecoration(
+                labelText: context.strings.serverNickname,
+                helperText: context.strings.nicknameUniqueHelp,
+                helperMaxLines: 3,
               ),
-              const SizedBox(height: 12),
-              if (state.loading || state.saving)
-                const LinearProgressIndicator(),
-              if (state.problem != ProfileProblem.none)
-                Text(
-                  problemText(context, state.problem),
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
-              if (state.saved) Text(context.strings.nicknameSaved),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: state.loaded && !state.saving
-                    ? () => profile.save(nickname.text)
-                    : null,
-                child: Text(context.strings.saveNickname),
+            ),
+            const SizedBox(height: 12),
+            ..._profileStatus(context, state),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: state.loaded && !state.saving
+                  ? () => profile.save(nickname.text)
+                  : null,
+              child: Text(context.strings.saveNickname),
+            ),
+            if (!state.loaded && !state.loading)
+              TextButton(
+                onPressed: profile.load,
+                child: Text(context.strings.retryProfile),
               ),
-              if (!state.loaded && !state.loading)
-                TextButton(
-                  onPressed: profile.load,
-                  child: Text(context.strings.retryProfile),
-                ),
-            ],
-          ),
+          ],
         ),
       );
+
+  List<Widget> _profileStatus(BuildContext context, MemberProfileState state) =>
+      [
+        if (state.loading || state.saving) const LinearProgressIndicator(),
+        if (state.problem != ProfileProblem.none)
+          Text(
+            problemText(context, state.problem),
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        if (state.saved) Text(context.strings.nicknameSaved),
+      ];
 
   String problemText(BuildContext context, ProfileProblem problem) =>
       switch (problem) {

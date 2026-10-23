@@ -77,23 +77,11 @@ class _RecoveryFilePickerState extends State<RecoveryFilePicker> {
     try {
       final result = await Directory(value)
           .list(followLinks: false)
-          .where(
-            (entry) =>
-                entry is Directory ||
-                entry is File &&
-                    RegExp(
-                      r'\.(png|json)$',
-                      caseSensitive: false,
-                    ).hasMatch(entry.path),
-          )
+          .where(_selectableEntry)
           .take(1000)
           .toList()
           .timeout(const Duration(seconds: 10));
-      result.sort((a, b) {
-        if (a is Directory && b is! Directory) return -1;
-        if (b is Directory && a is! Directory) return 1;
-        return a.path.toLowerCase().compareTo(b.path.toLowerCase());
-      });
+      result.sort(_compareEntries);
       if (mounted && id == request) {
         setState(() {
           directory = value;
@@ -107,6 +95,17 @@ class _RecoveryFilePickerState extends State<RecoveryFilePicker> {
     } finally {
       if (mounted && id == request) setState(() => loading = false);
     }
+  }
+
+  bool _selectableEntry(FileSystemEntity entry) =>
+      entry is Directory ||
+      entry is File &&
+          RegExp(r'\.(png|json)$', caseSensitive: false).hasMatch(entry.path);
+
+  int _compareEntries(FileSystemEntity a, FileSystemEntity b) {
+    if (a is Directory && b is! Directory) return -1;
+    if (b is Directory && a is! Directory) return 1;
+    return a.path.toLowerCase().compareTo(b.path.toLowerCase());
   }
 
   void navigate(String value) {

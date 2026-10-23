@@ -280,24 +280,7 @@ class _AdminPageState extends State<AdminPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    bottomNavigationBar: localizedStatus.isEmpty && !busy
-        ? null
-        : SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Semantics(
-                container: true,
-                liveRegion: true,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (busy && !confirming) const LinearProgressIndicator(),
-                    Text(localizedStatus, key: const ValueKey('admin-status')),
-                  ],
-                ),
-              ),
-            ),
-          ),
+    bottomNavigationBar: _statusBar(),
     body: SafeArea(
       child: Center(
         child: ConstrainedBox(
@@ -390,6 +373,25 @@ class _AdminPageState extends State<AdminPage> {
       ),
     ),
   );
+  Widget? _statusBar() => localizedStatus.isEmpty && !busy
+      ? null
+      : SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Semantics(
+              container: true,
+              liveRegion: true,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (busy && !confirming) const LinearProgressIndicator(),
+                  Text(localizedStatus, key: const ValueKey('admin-status')),
+                ],
+              ),
+            ),
+          ),
+        );
+
   Widget _spaceSettings() => card([
     Text(
       strings.settingsRevision('${settings!['revision']}'),

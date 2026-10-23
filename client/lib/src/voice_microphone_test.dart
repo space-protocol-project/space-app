@@ -1,20 +1,23 @@
 import 'dart:async';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'voice_audio_settings.dart';
 import 'voice_microphone_probe.dart';
 
-class VoiceMicrophoneTestState {
-  const VoiceMicrophoneTestState({
-    this.active = false,
-    this.busy = false,
-    this.level = 0,
-    this.error = '',
-  });
-  final bool active, busy;
-  final double level;
-  final String error;
+part 'voice_microphone_test.freezed.dart';
+
+@Freezed(equal: false)
+abstract class VoiceMicrophoneTestState with _$VoiceMicrophoneTestState {
+  const VoiceMicrophoneTestState._();
+  const factory VoiceMicrophoneTestState({
+    @Default(false) bool active,
+    @Default(false) bool busy,
+    @Default(0) double level,
+    @Default('') String error,
+  }) = _VoiceMicrophoneTestState;
 }
 
 class VoiceMicrophoneTest extends Cubit<VoiceMicrophoneTestState> {

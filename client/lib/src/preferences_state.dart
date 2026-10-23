@@ -1,19 +1,21 @@
 part of 'preferences.dart';
 
-final class PreferencesState {
-  const PreferencesState({
-    this.notificationMode = 0,
-    this.uiScale = 1,
-    this.dark = true,
-    this.effects = true,
-    this.palette = 'gruvbox',
-    this.language = 'ru',
-    this.sendShortcut = 'enter',
-    this.error = '',
-    this.origins = const [],
-    this.serverIcons = const {},
-    this.theme,
-  });
+@Freezed(equal: false)
+abstract class PreferencesState with _$PreferencesState {
+  const PreferencesState._();
+  const factory PreferencesState({
+    @Default(0) int notificationMode,
+    @Default(1) double uiScale,
+    @Default(true) bool dark,
+    @Default(true) bool effects,
+    @Default('gruvbox') String palette,
+    @Default('ru') String language,
+    @Default('enter') String sendShortcut,
+    @Default('') String error,
+    @Default([]) List<String> origins,
+    @Default({}) Map<String, Map<String, dynamic>> serverIcons,
+    ThemeData? theme,
+  }) = _PreferencesState;
   factory PreferencesState.fromController(AppPreferences controller) =>
       PreferencesState(
         notificationMode: controller.notificationMode,
@@ -33,13 +35,6 @@ final class PreferencesState {
         ),
         theme: controller.theme,
       );
-  final double uiScale;
-  final int notificationMode;
-  final bool dark, effects;
-  final String palette, language, sendShortcut, error;
-  final List<String> origins;
-  final Map<String, Map<String, dynamic>> serverIcons;
-  final ThemeData? theme;
   Locale get locale => language == 'zh-Hans'
       ? const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans')
       : Locale(language);

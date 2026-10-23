@@ -157,40 +157,7 @@ Future<void> downloadHomeRelease(
   final client = HttpClient()..connectionTimeout = const Duration(seconds: 15);
   IOSink? sink;
   try {
-    var url = release.url;
-    HttpClientResponse? response;
-    for (var redirects = 0; redirects < 5; redirects++) {
-      if (url.scheme != 'https' ||
-          ![
-            'github.com',
-            'release-assets.githubusercontent.com',
-            'objects.githubusercontent.com',
-          ].contains(url.host)) {
-        throw const LocalFailure(
-          LocalFailureCode.downloadAddress,
-          'Недопустимый адрес загрузки выпуска',
-        );
-      }
-      final request = await client.getUrl(url);
-      request.followRedirects = false;
-      response = await request.close().timeout(const Duration(seconds: 30));
-      if (response.statusCode == 200) break;
-      if (![301, 302, 303, 307, 308].contains(response.statusCode) ||
-          response.headers.value('location') == null) {
-        throw const LocalFailure(
-          LocalFailureCode.downloadFailed,
-          'Не удалось скачать выпуск сервера',
-        );
-      }
-      url = url.resolve(response.headers.value('location')!);
-      await response.drain<void>();
-    }
-    if (response == null || response.statusCode != 200) {
-      throw const LocalFailure(
-        LocalFailureCode.redirectLimit,
-        'Слишком много перенаправлений',
-      );
-    }
+    final response = await _openHomeRelease(client, release.url);
     sink = output.openWrite();
     var received = 0;
     await for (final chunk in response.timeout(const Duration(seconds: 30))) {
@@ -216,6 +183,47 @@ Future<void> downloadHomeRelease(
     await sink?.close();
     client.close(force: true);
   }
+}
+
+Future<HttpClientResponse> _openHomeRelease(
+  HttpClient client,
+  Uri initialUrl,
+) async {
+  var url = initialUrl;
+  HttpClientResponse? response;
+  for (var redirects = 0; redirects < 5; redirects++) {
+    if (url.scheme != 'https' ||
+        ![
+          'github.com',
+          'release-assets.githubusercontent.com',
+          'objects.githubusercontent.com',
+        ].contains(url.host)) {
+      throw const LocalFailure(
+        LocalFailureCode.downloadAddress,
+        'Недопустимый адрес загрузки выпуска',
+      );
+    }
+    final request = await client.getUrl(url);
+    request.followRedirects = false;
+    response = await request.close().timeout(const Duration(seconds: 30));
+    if (response.statusCode == 200) break;
+    if (![301, 302, 303, 307, 308].contains(response.statusCode) ||
+        response.headers.value('location') == null) {
+      throw const LocalFailure(
+        LocalFailureCode.downloadFailed,
+        'Не удалось скачать выпуск сервера',
+      );
+    }
+    url = url.resolve(response.headers.value('location')!);
+    await response.drain<void>();
+  }
+  if (response == null || response.statusCode != 200) {
+    throw const LocalFailure(
+      LocalFailureCode.redirectLimit,
+      'Слишком много перенаправлений',
+    );
+  }
+  return response;
 }
 
 // Проверка выполняется до записи любого файла из архива.

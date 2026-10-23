@@ -473,7 +473,9 @@ void main() {
       keys.fail = true;
       await tester.runAsync(() async {
         await tester.tap(find.byTooltip(strings.saveMessage));
-        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await eventually(
+          () => !controller.busy && controller.outboxError.isNotEmpty,
+        );
       });
       await tester.pumpAndSettle();
       expect(tester.widget<TextField>(field).controller!.text, 'Новая правка');
@@ -483,7 +485,11 @@ void main() {
       await tester.pumpAndSettle();
       await tester.runAsync(() async {
         await tester.tap(find.byTooltip(strings.saveMessage));
-        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await eventually(
+          () =>
+              tester.widget<TextField>(field).controller!.text ==
+              'Отдельный черновик',
+        );
       });
       await tester.pumpAndSettle();
       expect(

@@ -13,7 +13,7 @@ def category(path):
     parts = path.parts
     if "vendor" in parts:
         return "vendor"
-    if "generated" in parts or "gen" in parts or "generated_" in path.name or path.name.startswith("app_localizations") or ".g." in path.name:
+    if "generated" in parts or "gen" in parts or "generated_" in path.name or path.name.startswith("app_localizations") or ".g." in path.name or path.name.endswith(".freezed.dart"):
         return "generated"
     if "test" in parts or path.name.endswith(("_test.go", "_test.py")):
         return "test"

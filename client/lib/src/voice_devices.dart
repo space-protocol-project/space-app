@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
@@ -7,6 +9,8 @@ import 'voice_device_preferences.dart';
 import 'voice_audio_settings.dart';
 import 'voice_platform.dart';
 import 'voice_audio_native.dart';
+
+part 'voice_devices.freezed.dart';
 
 class VoiceDevice {
   const VoiceDevice(this.id, this.label, {required this.input});
@@ -53,22 +57,18 @@ class NativeVoiceDeviceBackend implements VoiceDeviceBackend {
       : Helper.selectAudioOutput(device.id);
 }
 
-class VoiceDevicesState {
-  const VoiceDevicesState({
-    this.devices = const [],
-    this.busy = false,
-    this.error = '',
-    this.input,
-    this.output,
-    this.ready = false,
-    this.audio = const VoiceAudioSettings(),
-  });
-  final List<VoiceDevice> devices;
-  final bool busy;
-  final bool ready;
-  final String error;
-  final String? input, output;
-  final VoiceAudioSettings audio;
+@Freezed(equal: false)
+abstract class VoiceDevicesState with _$VoiceDevicesState {
+  const VoiceDevicesState._();
+  const factory VoiceDevicesState({
+    @Default([]) List<VoiceDevice> devices,
+    @Default(false) bool busy,
+    @Default('') String error,
+    String? input,
+    String? output,
+    @Default(false) bool ready,
+    @Default(VoiceAudioSettings()) VoiceAudioSettings audio,
+  }) = _VoiceDevicesState;
 
   bool get inputUnavailable => _unavailable(input, true);
   bool get outputUnavailable => _unavailable(output, false);

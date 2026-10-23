@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'generated/space/v1/voice.pb.dart';
@@ -13,6 +15,8 @@ import 'voice_audio_settings.dart';
 import 'voice_microphone_test.dart';
 import 'voice_android_session.dart';
 
+part 'voice_controller.freezed.dart';
+
 enum VoicePhase { idle, joining, reconnecting, connected, failed }
 
 class _VoiceTarget {
@@ -23,26 +27,22 @@ class _VoiceTarget {
   final androidSession = VoiceAndroidSession();
 }
 
-class VoiceState {
-  const VoiceState({
-    this.phase = VoicePhase.idle,
-    this.title = '',
-    this.room = '',
-    this.muted = true,
-    this.deafened = false,
-    this.busy = false,
-    this.error = '',
-    this.roster,
-    this.speaking = const {},
-    this.canPublish = false,
-    this.connection = const VoiceConnectionInfo(),
-  });
-  final VoicePhase phase;
-  final String title, room, error;
-  final bool muted, deafened, busy, canPublish;
-  final VoiceRoomState? roster;
-  final Set<String> speaking;
-  final VoiceConnectionInfo connection;
+@Freezed(equal: false)
+abstract class VoiceState with _$VoiceState {
+  const VoiceState._();
+  const factory VoiceState({
+    @Default(VoicePhase.idle) VoicePhase phase,
+    @Default('') String title,
+    @Default('') String room,
+    @Default(true) bool muted,
+    @Default(false) bool deafened,
+    @Default(false) bool busy,
+    @Default('') String error,
+    VoiceRoomState? roster,
+    @Default({}) Set<String> speaking,
+    @Default(false) bool canPublish,
+    @Default(VoiceConnectionInfo()) VoiceConnectionInfo connection,
+  }) = _VoiceState;
   bool get active =>
       phase == VoicePhase.joining ||
       phase == VoicePhase.reconnecting ||
@@ -149,6 +149,48 @@ class VoiceController extends Cubit<VoiceState> {
     int generation,
     bool reconnecting,
   ) async {
+    final media = _prepareMedia(target, generation, reconnecting);
+    if (target.deafened) await media.deafen(true);
+    if (generation != _generation) return;
+    final offer = await _offer(target, media, generation);
+    if (offer == null || generation != _generation) return;
+    final reply = await _joinRoom(target, offer);
+    if (generation != _generation) {
+      await _quietLeave(target.api, target.room, reply.sessionId);
+      return;
+    }
+    _acceptRoomSession(reply);
+    if (target.deafened) {
+      await target.api
+          .update(target.room, _id, true, true)
+          .timeout(signalingTimeout);
+    }
+    if (generation != _generation) return;
+    await media.answer(reply.answerSdp).timeout(signalingTimeout);
+    if (generation != _generation) return;
+    _publish(roster: reply.state);
+    _answeredGeneration = generation;
+    _completeConnection(generation);
+    _timer = Timer.periodic(heartbeat, (_) => unawaited(_refresh(generation)));
+  }
+
+  void _acceptRoomSession(JoinVoiceRoomResponse reply) {
+    if (reply.sessionId.isEmpty) {
+      throw StateError('Некорректный ответ голосового сервера');
+    }
+    _id = reply.sessionId;
+    if (!reply.hasState() ||
+        reply.state.capacity < 2 ||
+        reply.state.capacity > 32) {
+      throw StateError('Некорректный ответ голосового сервера');
+    }
+  }
+
+  VoiceMedia _prepareMedia(
+    _VoiceTarget target,
+    int generation,
+    bool reconnecting,
+  ) {
     final media = mediaFactory();
     if (media is NativeVoiceMedia) {
       media.bindAndroidSession(target.androidSession);
@@ -177,36 +219,7 @@ class VoiceController extends Cubit<VoiceState> {
         );
       }
     });
-    if (target.deafened) await media.deafen(true);
-    if (generation != _generation) return;
-    final offer = await _offer(target, media, generation);
-    if (offer == null || generation != _generation) return;
-    final reply = await _joinRoom(target, offer);
-    if (generation != _generation) {
-      await _quietLeave(target.api, target.room, reply.sessionId);
-      return;
-    }
-    if (reply.sessionId.isEmpty) {
-      throw StateError('Некорректный ответ голосового сервера');
-    }
-    _id = reply.sessionId;
-    if (!reply.hasState() ||
-        reply.state.capacity < 2 ||
-        reply.state.capacity > 32) {
-      throw StateError('Некорректный ответ голосового сервера');
-    }
-    if (target.deafened) {
-      await target.api
-          .update(target.room, _id, true, true)
-          .timeout(signalingTimeout);
-    }
-    if (generation != _generation) return;
-    await media.answer(reply.answerSdp).timeout(signalingTimeout);
-    if (generation != _generation) return;
-    _publish(roster: reply.state);
-    _answeredGeneration = generation;
-    _completeConnection(generation);
-    _timer = Timer.periodic(heartbeat, (_) => unawaited(_refresh(generation)));
+    return media;
   }
 
   Future<String?> _offer(
@@ -396,10 +409,8 @@ class VoiceController extends Cubit<VoiceState> {
     }
     final roomState = roster ?? state.roster;
     emit(
-      VoiceState(
+      state.copyWith(
         phase: phase ?? state.phase,
-        title: state.title,
-        room: state.room,
         muted: muted ?? state.muted,
         deafened: deafened ?? state.deafened,
         busy: busy ?? state.busy,

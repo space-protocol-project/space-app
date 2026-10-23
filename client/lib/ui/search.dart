@@ -1,10 +1,10 @@
-import 'dart:async';
-
 import '../src/message_search.dart';
+import '../src/message_search_controller.dart';
 import '../src/message_summary.dart';
 import '../l10n/strings.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../src/generated/space/v1/space.pb.dart';
 
@@ -37,75 +37,39 @@ class SpaceSearchPanel extends StatefulWidget {
 
 class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
   final input = TextEditingController();
-  String query = '';
-  String next = '';
-  String failure = '';
-  List<Content> found = [];
-  bool loading = false;
-  bool allChannels = false;
-  int generation = 0;
-  Timer? debounce;
+  late final search = MessageSearchController(
+    searchMessages: widget.searchMessages,
+    searchAllChannels: widget.searchAllChannels,
+  );
 
-  void changeQuery(String value) {
-    debounce?.cancel();
-    generation++;
-    setState(() {
-      query = value;
-      found = [];
-      next = '';
-      failure = '';
-      loading = false;
-    });
-    if (activeSearch == null || value.trim().runes.length < 2) return;
-    debounce = Timer(const Duration(milliseconds: 300), () => load());
+  @override
+  void didUpdateWidget(covariant SpaceSearchPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    search.searchMessages = widget.searchMessages;
+    search.searchAllChannels = widget.searchAllChannels;
   }
 
-  Future<MessageSearchPage> Function(String, String)? get activeSearch =>
-      allChannels ? widget.searchAllChannels : widget.searchMessages;
-
-  Future<void> load({bool more = false}) async {
-    if (loading || activeSearch == null) return;
-    final current = generation;
-    final term = query.trim();
-    setState(() {
-      loading = true;
-      failure = '';
-    });
-    try {
-      final page = await activeSearch!(term, more ? next : '');
-      if (!mounted || generation != current) return;
-      setState(() {
-        found = {
-          for (final item in [
-            ...(more ? found : <Content>[]),
-            ...page.messages,
-          ])
-            (item.channelId, item.id): item,
-        }.values.take(200).toList();
-        next = page.next;
-      });
-    } catch (_) {
-      if (mounted && generation == current) {
-        setState(() => failure = context.strings.messageSearchFailed);
-      }
-    } finally {
-      if (mounted && generation == current) setState(() => loading = false);
+  String searchSource(BuildContext context, MessageSearchState state) {
+    if (state.allChannels && !widget.allChannelsLocalOnly) {
+      return context.strings.messageSearchMixed;
     }
+    if (widget.localOnly || state.allChannels && widget.allChannelsLocalOnly) {
+      return context.strings.messageSearchLocal;
+    }
+    return context.strings.messageSearchServer;
   }
 
-  Widget searchStatus(BuildContext context) => Column(
+  Widget searchStatus(BuildContext context, MessageSearchState state) => Column(
     children: [
-      Text(
-        allChannels && !widget.allChannelsLocalOnly
-            ? context.strings.messageSearchMixed
-            : widget.localOnly || allChannels && widget.allChannelsLocalOnly
-            ? context.strings.messageSearchLocal
-            : context.strings.messageSearchServer,
-      ),
-      if (loading) const LinearProgressIndicator(),
-      if (failure.isNotEmpty)
-        TextButton(onPressed: () => load(), child: Text(failure)),
-      if (found.length >= 200) Text(context.strings.messageSearchLimit),
+      Text(searchSource(context, state)),
+      if (state.loading) const LinearProgressIndicator(),
+      if (state.failed)
+        TextButton(
+          onPressed: search.load,
+          child: Text(context.strings.messageSearchFailed),
+        ),
+      if (state.messages.length >= MessageSearchController.resultLimit)
+        Text(context.strings.messageSearchLimit),
     ],
   );
 
@@ -116,101 +80,106 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
 
   @override
   void dispose() {
-    debounce?.cancel();
+    search.close();
     input.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxHeight: 520),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
+  Widget build(BuildContext context) =>
+      BlocBuilder<MessageSearchController, MessageSearchState>(
+        bloc: search,
+        builder: (context, state) => searchPanel(context, state),
+      );
+
+  Widget searchPanel(BuildContext context, MessageSearchState state) =>
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 520),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: TextField(
-                key: const ValueKey('space-search-input'),
-                controller: input,
-                autofocus: true,
-                onChanged: changeQuery,
-                maxLength: 128,
-                decoration: InputDecoration(
-                  hintText: activeSearch == null
-                      ? context.strings.searchHint
-                      : context.strings.search,
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: IconButton(
-                    tooltip: context.strings.clearSearch,
-                    onPressed: () {
-                      input.clear();
-                      changeQuery('');
-                    },
-                    icon: const Icon(Icons.clear),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    key: const ValueKey('space-search-input'),
+                    controller: input,
+                    autofocus: true,
+                    onChanged: search.changeQuery,
+                    maxLength: 128,
+                    decoration: InputDecoration(
+                      hintText: search.activeSearch == null
+                          ? context.strings.searchHint
+                          : context.strings.search,
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: IconButton(
+                        tooltip: context.strings.clearSearch,
+                        onPressed: () {
+                          input.clear();
+                          search.changeQuery('');
+                        },
+                        icon: const Icon(Icons.clear),
+                      ),
+                    ),
                   ),
                 ),
+                IconButton(
+                  tooltip: context.strings.close,
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (widget.searchAllChannels != null)
+              CheckboxListTile(
+                key: const ValueKey('search-all-channels'),
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                title: Text(
+                  widget.allChannelsLabel ??
+                      context.strings.messageSearchAllChannels,
+                ),
+                value: state.allChannels,
+                onChanged: (value) => search.selectAllChannels(value ?? false),
               ),
-            ),
-            IconButton(
-              tooltip: context.strings.close,
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.close),
-            ),
+            if (search.activeSearch != null) searchStatus(context, state),
+            Flexible(child: results(context, state)),
           ],
         ),
-        const SizedBox(height: 12),
-        if (widget.searchAllChannels != null)
-          CheckboxListTile(
-            key: const ValueKey('search-all-channels'),
-            dense: true,
-            contentPadding: EdgeInsets.zero,
-            title: Text(
-              widget.allChannelsLabel ??
-                  context.strings.messageSearchAllChannels,
-            ),
-            value: allChannels,
-            onChanged: (value) {
-              setState(() => allChannels = value ?? false);
-              changeQuery(query);
-            },
-          ),
-        if (activeSearch != null) searchStatus(context),
-        Flexible(child: results(context)),
-      ],
-    ),
-  );
+      );
   String resultSubtitle(BuildContext context, Content message) {
-    if (activeSearch == null) return context.strings.loadedMessage;
-    if (!allChannels) return message.authorId;
+    if (search.activeSearch == null) return context.strings.loadedMessage;
+    if (!search.state.allChannels) return message.authorId;
     return '${widget.channelNames[message.channelId] ?? message.channelId} · ${message.authorId}';
   }
 
-  Widget results(BuildContext context) {
-    final term = query.toLowerCase().trim();
+  List<Content> matchingMessages(String term, MessageSearchState state) {
+    if (term.isEmpty) return [];
+    if (search.activeSearch != null) return state.messages;
+    return widget.messages
+        .where(
+          (message) => messageSummary(message).toLowerCase().contains(term),
+        )
+        .take(20)
+        .toList();
+  }
+
+  Widget results(BuildContext context, MessageSearchState state) {
+    final term = state.query.toLowerCase().trim();
     final matching = widget.sections.entries
         .where((entry) => entry.value.toLowerCase().contains(term))
         .toList();
-    final contents = term.isEmpty
-        ? <Content>[]
-        : activeSearch != null
-        ? found
-        : widget.messages
-              .where(
-                (message) =>
-                    messageSummary(message).toLowerCase().contains(term),
-              )
-              .take(20)
-              .toList();
+    final contents = matchingMessages(term, state);
     return ListView(
       primary: false,
       shrinkWrap: true,
       children: [
         if (matching.isEmpty &&
             contents.isEmpty &&
-            !loading &&
-            failure.isEmpty &&
-            next.isEmpty)
+            !state.loading &&
+            !state.failed &&
+            state.next.isEmpty)
           Padding(
             padding: EdgeInsets.all(28),
             child: Text(context.strings.nothingFound),
@@ -233,9 +202,10 @@ class _SpaceSearchPanelState extends State<SpaceSearchPanel> {
             subtitle: Text(resultSubtitle(context, message)),
             onTap: () => selectMessage(context, message),
           ),
-        if (next.isNotEmpty && found.length < 200)
+        if (state.next.isNotEmpty &&
+            state.messages.length < MessageSearchController.resultLimit)
           TextButton(
-            onPressed: loading ? null : () => load(more: true),
+            onPressed: state.loading ? null : () => search.load(more: true),
             child: Text(context.strings.messageSearchMore),
           ),
       ],

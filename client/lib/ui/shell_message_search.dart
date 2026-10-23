@@ -241,6 +241,15 @@ extension _ShellMessageSearch on _SpaceShellState {
     } finally {
       unawaited(subscription.cancel());
     }
+    await _openMessageSearchResult(scope, route, hit, valid);
+  }
+
+  Future<void> _openMessageSearchResult(
+    _MessageSearchScope scope,
+    String? route,
+    Content? hit,
+    bool Function() valid,
+  ) async {
     if (!mounted || route == null || route.isEmpty) return;
     if (!route.startsWith('message:')) {
       select(Section.values.firstWhere((section) => section.name == route));
@@ -249,10 +258,10 @@ extension _ShellMessageSearch on _SpaceShellState {
     if (!valid()) return;
     if (hit == null) return;
     if (scope.offline) {
-      await openSavedSearchHit(scope, hit!);
+      await openSavedSearchHit(scope, hit);
       return;
     }
-    await openSearchHit(scope, hit!);
+    await openSearchHit(scope, hit);
   }
 
   Future<void> openSavedSearchHit(

@@ -24,65 +24,68 @@ class MessageReactionBar extends StatelessWidget {
     runSpacing: 4,
     crossAxisAlignment: WrapCrossAlignment.center,
     children: [
-      for (final reaction in reactions)
-        InputChip(
-          shape: const StadiumBorder(),
-          selected: reaction.principalIds.contains(principalId),
-          showCheckmark: false,
-          label: ReactionPeople(reaction: reaction, authorName: authorName),
-          onPressed: onSet == null
-              ? null
-              : () => onSet!(
-                  reaction.emoji,
-                  !reaction.principalIds.contains(principalId),
-                ),
-          deleteIcon: const Icon(Icons.expand_more, size: 16),
-          deleteButtonTooltipMessage: context.strings.reactionParticipants,
-          onDeleted: () => showDialog<void>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text(
-                '${reaction.emoji} · ${context.strings.reactionParticipants}',
-              ),
-              content: SizedBox(
-                width: 320,
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    for (final id in reaction.principalIds)
-                      ListTile(title: Text(authorName?.call(id) ?? id)),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(
-                    MaterialLocalizations.of(context).closeButtonTooltip,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      for (final reaction in reactions) _reactionChip(context, reaction),
       if (onSet != null && reactions.isEmpty)
         IconButton(
           visualDensity: VisualDensity.compact,
           tooltip: context.strings.addReaction,
           icon: const Icon(Icons.add_reaction_outlined, size: 18),
-          onPressed: () async {
-            final emoji = await pickEmoji(context);
-            if (emoji != null && context.mounted) {
-              onSet!(
-                emoji,
-                !reactions.any(
-                  (r) =>
-                      r.emoji == emoji && r.principalIds.contains(principalId),
-                ),
-              );
-            }
-          },
+          onPressed: () => _addReaction(context),
         ),
     ],
   );
+
+  Widget _reactionChip(BuildContext context, Reaction reaction) => InputChip(
+    shape: const StadiumBorder(),
+    selected: reaction.principalIds.contains(principalId),
+    showCheckmark: false,
+    label: ReactionPeople(reaction: reaction, authorName: authorName),
+    onPressed: onSet == null
+        ? null
+        : () => onSet!(
+            reaction.emoji,
+            !reaction.principalIds.contains(principalId),
+          ),
+    deleteIcon: const Icon(Icons.expand_more, size: 16),
+    deleteButtonTooltipMessage: context.strings.reactionParticipants,
+    onDeleted: () => _showPeople(context, reaction),
+  );
+
+  Future<void> _showPeople(BuildContext context, Reaction reaction) =>
+      showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            '${reaction.emoji} · ${context.strings.reactionParticipants}',
+          ),
+          content: SizedBox(
+            width: 320,
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                for (final id in reaction.principalIds)
+                  ListTile(title: Text(authorName?.call(id) ?? id)),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(MaterialLocalizations.of(context).closeButtonTooltip),
+            ),
+          ],
+        ),
+      );
+
+  Future<void> _addReaction(BuildContext context) async {
+    final emoji = await pickEmoji(context);
+    if (emoji != null && context.mounted) {
+      onSet!(
+        emoji,
+        !reactions.any(
+          (r) => r.emoji == emoji && r.principalIds.contains(principalId),
+        ),
+      );
+    }
+  }
 }

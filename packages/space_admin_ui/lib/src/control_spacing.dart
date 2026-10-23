@@ -36,22 +36,7 @@ Widget spaceControls(Widget child) {
     final current = child.children[i];
     final previous = i > 0 ? child.children[i - 1] : null;
     final next = i + 1 < child.children.length ? child.children[i + 1] : null;
-    if (current is SizedBox &&
-        current.height != null &&
-        _besideControl(previous, next)) {
-      children.add(
-        SizedBox(
-          width: current.width,
-          height: current.height! < 16 ? 16 : current.height,
-          child: current.child,
-        ),
-      );
-    } else {
-      if (_needsControlGap(previous, current)) {
-        children.add(const SizedBox(height: 16));
-      }
-      children.add(current);
-    }
+    children.addAll(_spacedControl(previous, current, next));
   }
   return Column(
     key: child.key,
@@ -63,6 +48,27 @@ Widget spaceControls(Widget child) {
     textBaseline: child.textBaseline,
     children: children,
   );
+}
+
+List<Widget> _spacedControl(Widget? previous, Widget current, Widget? next) {
+  final result = <Widget>[];
+  if (current is SizedBox &&
+      current.height != null &&
+      _besideControl(previous, next)) {
+    result.add(
+      SizedBox(
+        width: current.width,
+        height: current.height! < 16 ? 16 : current.height,
+        child: current.child,
+      ),
+    );
+  } else {
+    if (_needsControlGap(previous, current)) {
+      result.add(const SizedBox(height: 16));
+    }
+    result.add(current);
+  }
+  return result;
 }
 
 bool _needsControlGap(Widget? previous, Widget current) =>

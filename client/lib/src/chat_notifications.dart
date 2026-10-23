@@ -102,25 +102,39 @@ class ChatNotificationTracker {
       final sequence = channel.latestMessageSequence.toInt();
       final before = previous?[channel.id];
       current[channel.id] = sequence > (before ?? 0) ? sequence : before ?? 0;
-      if (before == null ||
-          sequence <= before ||
-          state.unreadCount(channel.id) == 0) {
-        continue;
-      }
-      final message = state.messages
-          .where(
-            (m) => m.channelId == channel.id && m.sequence.toInt() == sequence,
-          )
-          .firstOrNull;
-      if (message?.authorId == state.principalId || message?.deleted == true) {
-        continue;
-      }
-      notices.add(
-        ChatNotice(state.origin, state.principalId, channel, sequence, message),
-      );
+      final notice = _noticeForChannel(state, channel, sequence, before);
+      if (notice != null) notices.add(notice);
     }
     _latest[scope] = current;
     return notices;
+  }
+
+  ChatNotice? _noticeForChannel(
+    ChatState state,
+    Channel channel,
+    int sequence,
+    int? before,
+  ) {
+    if (before == null ||
+        sequence <= before ||
+        state.unreadCount(channel.id) == 0) {
+      return null;
+    }
+    final message = state.messages
+        .where(
+          (m) => m.channelId == channel.id && m.sequence.toInt() == sequence,
+        )
+        .firstOrNull;
+    if (message?.authorId == state.principalId || message?.deleted == true) {
+      return null;
+    }
+    return ChatNotice(
+      state.origin,
+      state.principalId,
+      channel,
+      sequence,
+      message,
+    );
   }
 
   bool _readable(Channel channel) =>

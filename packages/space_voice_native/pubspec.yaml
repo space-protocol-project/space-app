@@ -3,7 +3,7 @@ description: Локальное шумоподавление DeepFilterNet3 дл
 version: 0.1.0
 publish_to: none
 environment:
-  sdk: ^3.13.5
+  sdk: ^3.13.7
 dependencies:
-  hooks: 2.0.2
-  code_assets: 1.2.1
+  hooks: ^2.2.0
+  code_assets: ^2.1.0

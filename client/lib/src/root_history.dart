@@ -65,13 +65,7 @@ Future<RootIdentity> verifyRootHistory(
     final newRoot = _bytes(t['new_root_public_key'], 32);
     final device = _bytes(t['new_device_public_key'], 32);
     principal ??= await rootPrincipal(oldRoot);
-    if (index == 0) seenRoots.add(_url(oldRoot));
-    if (!seenRoots.add(_url(newRoot))) {
-      throw const LocalFailure(
-        LocalFailureCode.identityInvalid,
-        'История повторно использует прежний root',
-      );
-    }
+    _rememberRoot(seenRoots, oldRoot, newRoot, index);
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final scopes = jsonEncode(t['scopes']);
     if (!_validRotationTranscript(
@@ -85,17 +79,7 @@ Future<RootIdentity> verifyRootHistory(
           serverId,
         ) ||
         !_validSuccessorKeys(oldRoot, newRoot, device, previous) ||
-        t['issued_at'] < issuedBefore ||
-        t['issued_at'] > now + 5 ||
-        t['expires_at'] <= t['issued_at'] ||
-        t['expires_at'] - t['issued_at'] > 120 ||
-        !RegExp(r'^rc_[A-Za-z0-9_-]{43}$')
-            .hasMatch(t['challenge_id'] as String) ||
-        !RegExp(r'^ro_[A-Za-z0-9_-]{43}$')
-            .hasMatch(t['operation_id'] as String) ||
-        _bytes(t['nonce'], 32).length != 32 ||
-        (scopes != '["chat.read","chat.write"]' &&
-            scopes != '["chat.read","chat.write","space.manage"]')) {
+        !_validRotationMetadata(t, issuedBefore, now, scopes)) {
       throw const LocalFailure(
         LocalFailureCode.identityInvalid,
         'Цепочка смены root не соответствует идентичности',
@@ -113,6 +97,39 @@ Future<RootIdentity> verifyRootHistory(
   }
   return RootIdentity(principal!, history.length + 1, currentRoot);
 }
+
+void _rememberRoot(
+  Set<String> seenRoots,
+  List<int> oldRoot,
+  List<int> newRoot,
+  int index,
+) {
+  if (index == 0) seenRoots.add(_url(oldRoot));
+  if (!seenRoots.add(_url(newRoot))) {
+    throw const LocalFailure(
+      LocalFailureCode.identityInvalid,
+      'История повторно использует прежний root',
+    );
+  }
+}
+
+bool _validRotationMetadata(
+  Map<String, dynamic> t,
+  int issuedBefore,
+  int now,
+  String scopes,
+) =>
+    !(t['issued_at'] < issuedBefore ||
+        t['issued_at'] > now + 5 ||
+        t['expires_at'] <= t['issued_at'] ||
+        t['expires_at'] - t['issued_at'] > 120 ||
+        !RegExp(r'^rc_[A-Za-z0-9_-]{43}$')
+            .hasMatch(t['challenge_id'] as String) ||
+        !RegExp(r'^ro_[A-Za-z0-9_-]{43}$')
+            .hasMatch(t['operation_id'] as String) ||
+        _bytes(t['nonce'], 32).length != 32 ||
+        (scopes != '["chat.read","chat.write"]' &&
+            scopes != '["chat.read","chat.write","space.manage"]'));
 
 bool _validSuccessorKeys(
   List<int> oldRoot,

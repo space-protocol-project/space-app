@@ -1847,54 +1847,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             top: headerHeight,
             child: Column(
               children: [
-                if (!dashboard &&
-                    selected == Section.chat &&
-                    (controller.reconnecting ||
-                        controller.busy ||
-                        controller.error.isNotEmpty))
-                  SizedBox(height: headerHeight),
-                if (!dashboard && controller.reconnecting)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: Row(
-                      children: [
-                        const SizedBox(
-                          width: 14,
-                          height: 14,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            context.strings.recoveringEvents,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                if (!dashboard && controller.busy)
-                  const LinearProgressIndicator(minHeight: 2),
-                if (!applicationSettings &&
-                    !dashboard &&
-                    controller.error.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Text(
-                      chatFailureText(context, controller),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    ),
-                  ),
+                ..._connectionStatus(context),
                 Expanded(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1980,6 +1933,48 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
       ],
     );
   }
+
+  List<Widget> _connectionStatus(BuildContext context) => [
+    if (!dashboard &&
+        selected == Section.chat &&
+        (controller.reconnecting ||
+            controller.busy ||
+            controller.error.isNotEmpty))
+      SizedBox(height: headerHeight),
+    if (!dashboard && controller.reconnecting)
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          children: [
+            const SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                context.strings.recoveringEvents,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    if (!dashboard && controller.busy)
+      const LinearProgressIndicator(minHeight: 2),
+    if (!applicationSettings && !dashboard && controller.error.isNotEmpty)
+      Padding(
+        padding: const EdgeInsets.all(12),
+        child: Text(
+          chatFailureText(context, controller),
+          style: TextStyle(color: Theme.of(context).colorScheme.error),
+        ),
+      ),
+  ];
 
   Widget _bottomNavigation(BuildContext context) => NavigationBar(
     selectedIndex: bottomIndex,

@@ -177,20 +177,24 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
         setState(() => error = LocalFailureCode.cameraFrame);
       }
     } finally {
-      if (photo != null) {
-        final path = File(photo.path).absolute.path;
-        final root =
-            '${Directory.systemTemp.absolute.path}${Platform.pathSeparator}';
-        if (path
-            .replaceAll('/', Platform.pathSeparator)
-            .toLowerCase()
-            .startsWith(
-              root.replaceAll('/', Platform.pathSeparator).toLowerCase(),
-            )) {
-          try {
-            await File(path).delete();
-          } catch (_) {}
-        }
+      await _deleteTemporaryPhoto(photo);
+    }
+  }
+
+  Future<void> _deleteTemporaryPhoto(XFile? photo) async {
+    if (photo != null) {
+      final path = File(photo.path).absolute.path;
+      final root =
+          '${Directory.systemTemp.absolute.path}${Platform.pathSeparator}';
+      if (path
+          .replaceAll('/', Platform.pathSeparator)
+          .toLowerCase()
+          .startsWith(
+            root.replaceAll('/', Platform.pathSeparator).toLowerCase(),
+          )) {
+        try {
+          await File(path).delete();
+        } catch (_) {}
       }
     }
   }

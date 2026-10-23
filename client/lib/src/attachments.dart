@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:file_selector/file_selector.dart';
 import 'package:fixnum/fixnum.dart';
@@ -8,6 +10,8 @@ import 'package:grpc/grpc.dart';
 
 import 'core.dart';
 import 'rpc_clients.dart';
+
+part 'attachments.freezed.dart';
 
 const maxAttachmentSize = 20 * 1024 * 1024;
 const maxAttachments = 5;
@@ -23,19 +27,16 @@ class PendingAttachment {
   String? hash;
 }
 
-class AttachmentState {
-  const AttachmentState({
-    this.files = const [],
-    this.busy = false,
-    this.progress = 0,
-    this.error = '',
-    this.problem,
-  });
-  final List<PendingAttachment> files;
-  final bool busy;
-  final double progress;
-  final String error;
-  final Object? problem;
+@Freezed(equal: false)
+abstract class AttachmentState with _$AttachmentState {
+  const AttachmentState._();
+  const factory AttachmentState({
+    @Default([]) List<PendingAttachment> files,
+    @Default(false) bool busy,
+    @Default(0) double progress,
+    @Default('') String error,
+    Object? problem,
+  }) = _AttachmentState;
 }
 
 sealed class AttachmentEvent {}
@@ -196,22 +197,7 @@ class AttachmentQueue extends Cubit<AttachmentState> {
       throw StateError('Некорректный ответ загрузки');
     }
     try {
-      while (offset < bytes.length) {
-        _checkCancelled();
-        final end = (offset + started.chunkSize).clamp(0, bytes.length);
-        final reply = await session.uploadChunk(
-          UploadChunkRequest(
-            assetId: started.asset.id,
-            offset: Int64(offset),
-            data: Uint8List.sublistView(bytes, offset, end),
-          ),
-        );
-        if (reply.receivedBytes.toInt() != end) {
-          throw StateError('Нарушен порядок частей файла');
-        }
-        offset = end;
-        progress(offset / bytes.length);
-      }
+      await _uploadChunks(session, started, bytes, offset, progress);
       _checkCancelled();
       return await _completeFile(
         session,
@@ -221,15 +207,44 @@ class AttachmentQueue extends Cubit<AttachmentState> {
         hash,
       );
     } catch (_) {
-      if (_cancelled) {
-        try {
-          await session.cancelUpload(
-            CancelUploadRequest(assetId: started.asset.id),
-          );
-        } catch (_) {}
-      }
+      await _cancelUploadIfRequested(session, started.asset.id);
       rethrow;
     }
+  }
+
+  Future<void> _uploadChunks(
+    AttachmentSession session,
+    BeginUploadResponse started,
+    Uint8List bytes,
+    int offset,
+    void Function(double) progress,
+  ) async {
+    while (offset < bytes.length) {
+      _checkCancelled();
+      final end = (offset + started.chunkSize).clamp(0, bytes.length);
+      final reply = await session.uploadChunk(
+        UploadChunkRequest(
+          assetId: started.asset.id,
+          offset: Int64(offset),
+          data: Uint8List.sublistView(bytes, offset, end),
+        ),
+      );
+      if (reply.receivedBytes.toInt() != end) {
+        throw StateError('Нарушен порядок частей файла');
+      }
+      offset = end;
+      progress(offset / bytes.length);
+    }
+  }
+
+  Future<void> _cancelUploadIfRequested(
+    AttachmentSession session,
+    String id,
+  ) async {
+    if (!_cancelled) return;
+    try {
+      await session.cancelUpload(CancelUploadRequest(assetId: id));
+    } catch (_) {}
   }
 
   @override

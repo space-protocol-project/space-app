@@ -1,31 +1,33 @@
 part of 'home_controller.dart';
 
-final class HomeState {
-  const HomeState({
-    this.busy = false,
-    this.running = false,
-    this.pendingUpdate = false,
-    this.recoveryBlocked = false,
-    this.updateAvailable = false,
-    this.ip = '',
-    this.network,
-    this.diagnosis,
-    this.diagnosisError,
-    this.diagnosing = false,
-    this.error = '',
-    this.installedVersion = '',
-    this.availableVersion = '',
-    this.availableReleaseNotes = '',
-    this.recoverySummary = '',
-    this.phase = HomePhase.idle,
-    this.progress = 0,
-    this.operationProgress = .01,
-    this.elapsed = Duration.zero,
-    this.downloadSecondsRemaining,
-    this.server,
-    this.failureCode,
-    this.spaceReport,
-  });
+@Freezed(equal: false)
+abstract class HomeState with _$HomeState {
+  const HomeState._();
+  const factory HomeState({
+    @Default(false) bool busy,
+    @Default(false) bool running,
+    @Default(false) bool pendingUpdate,
+    @Default(false) bool recoveryBlocked,
+    @Default(false) bool updateAvailable,
+    @Default('') String ip,
+    HomeNetwork? network,
+    HomeDiagnosis? diagnosis,
+    HomeDiagnosisError? diagnosisError,
+    @Default(false) bool diagnosing,
+    @Default('') String error,
+    @Default('') String installedVersion,
+    @Default('') String availableVersion,
+    @Default('') String availableReleaseNotes,
+    @Default('') String recoverySummary,
+    @Default(HomePhase.idle) HomePhase phase,
+    @Default(0) double progress,
+    @Default(.01) double operationProgress,
+    @Default(Duration.zero) Duration elapsed,
+    int? downloadSecondsRemaining,
+    HomeServerState? server,
+    LocalFailureCode? failureCode,
+    HomeSpaceReport? spaceReport,
+  }) = _HomeState;
   factory HomeState.fromController(HomeController controller) => HomeState(
     busy: controller.busy,
     running: controller.running,
@@ -51,22 +53,4 @@ final class HomeState {
     failureCode: controller.failureCode,
     spaceReport: controller.spaceReport,
   );
-  final bool busy, running, pendingUpdate, recoveryBlocked, updateAvailable;
-  final String ip,
-      error,
-      installedVersion,
-      availableVersion,
-      availableReleaseNotes,
-      recoverySummary;
-  final HomeNetwork? network;
-  final HomeDiagnosis? diagnosis;
-  final HomeDiagnosisError? diagnosisError;
-  final bool diagnosing;
-  final HomePhase phase;
-  final double progress, operationProgress;
-  final Duration elapsed;
-  final int? downloadSecondsRemaining;
-  final HomeServerState? server;
-  final LocalFailureCode? failureCode;
-  final HomeSpaceReport? spaceReport;
 }

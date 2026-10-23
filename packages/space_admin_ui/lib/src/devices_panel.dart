@@ -113,13 +113,7 @@ class _DevicesPanelState extends State<DevicesPanel> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    grant['recovery'] == true
-                        ? strings.deviceRecoveryWarning
-                        : current
-                        ? strings.deviceCurrentWarning
-                        : strings.deviceOtherWarning,
-                  ),
+                  Text(_revokeWarning(strings, grant, current)),
                   if (needsCard) ...[
                     const SizedBox(height: 16),
                     Text(strings.deviceCardHelp),
@@ -167,6 +161,16 @@ class _DevicesPanelState extends State<DevicesPanel> {
       await load();
     }
     statusKey = 'deviceRevokedStatus';
+  }
+
+  String _revokeWarning(
+    AdminLocalizations strings,
+    Map<String, dynamic> grant,
+    bool current,
+  ) {
+    if (grant['recovery'] == true) return strings.deviceRecoveryWarning;
+    if (current) return strings.deviceCurrentWarning;
+    return strings.deviceOtherWarning;
   }
 
   String expiry(Map<String, dynamic> grant) {

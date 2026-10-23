@@ -1,7 +1,10 @@
 part of 'server_presence.dart';
 
-final class PresenceState {
-  const PresenceState({this.online = const {}, this.change});
-  final Map<String, bool> online;
-  final ServerPresenceChange? change;
+@Freezed(equal: false)
+abstract class PresenceState with _$PresenceState {
+  const PresenceState._();
+  const factory PresenceState({
+    @Default({}) Map<String, bool> online,
+    ServerPresenceChange? change,
+  }) = _PresenceState;
 }

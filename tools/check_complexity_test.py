@@ -60,7 +60,8 @@ class ComplexityProfileTest(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="space-cognitive-scope-") as temporary:
             root = Path(temporary)
             paths = ["client/lib/main.dart", "packages/admin/lib/panel.dart", "client/lib/generated/api.dart",
-                     "client/lib/l10n/app_localizations.dart", "client/test/main_test.dart", "client/vendor/plugin/lib/main.dart"]
+                     "client/lib/l10n/app_localizations.dart", "client/lib/model.freezed.dart",
+                     "packages/admin/lib/model.g.dart", "client/test/main_test.dart", "client/vendor/plugin/lib/main.dart"]
             for name in paths:
                 path = root / name
                 path.parent.mkdir(parents=True, exist_ok=True)

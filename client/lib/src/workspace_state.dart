@@ -1,7 +1,10 @@
 part of 'server_workspaces.dart';
 
-final class WorkspaceState {
-  const WorkspaceState({this.chats = const {}, this.loading = const {}});
-  final Map<String, ChatState> chats;
-  final Set<String> loading;
+@Freezed(equal: false)
+abstract class WorkspaceState with _$WorkspaceState {
+  const WorkspaceState._();
+  const factory WorkspaceState({
+    @Default({}) Map<String, ChatState> chats,
+    @Default({}) Set<String> loading,
+  }) = _WorkspaceState;
 }

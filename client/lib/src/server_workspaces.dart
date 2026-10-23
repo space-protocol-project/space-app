@@ -1,8 +1,12 @@
 import 'dart:async';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'chat_controller.dart';
 import 'core.dart';
 import 'event_controller.dart';
+
+part 'server_workspaces.freezed.dart';
 
 part 'workspace_events.dart';
 part 'workspace_state.dart';
