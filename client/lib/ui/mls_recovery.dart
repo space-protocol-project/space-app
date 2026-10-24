@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import '../src/files.dart';
+import '../src/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../src/mls/client.dart';

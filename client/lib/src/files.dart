@@ -1,19 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
-
-import 'package:cross_file/cross_file.dart' as cross;
-import 'package:file_selector/file_selector.dart' as picker;
-
-export 'package:file_selector/file_selector.dart'
-    hide XFile, openFile, openFiles;
 
 /// Файл приложения с известным именем и независимым сроком хранения данных.
 class SpaceFile {
-  SpaceFile(String path)
-    : this._(cross.XFile.fileSystem(path: path), null, path);
+  SpaceFile(String path) : this._(_LocalFileSource(File(path)), null, path);
 
-  SpaceFile.transient(cross.XFile source, {required String name})
-    : this._(source, null, source.uri, name: name, transient: true);
+  SpaceFile.source(
+    SpaceFileSource source, {
+    required String path,
+    required String name,
+    bool transient = false,
+  }) : this._(source, null, path, name: name, transient: transient);
 
   SpaceFile.fromData(
     Uint8List data, {
@@ -30,17 +28,11 @@ class SpaceFile {
     this.transient = false,
   }) : name = name ?? path.split(RegExp(r'[/\\]')).last;
 
-  final cross.XFile? _source;
+  final SpaceFileSource? _source;
   final Uint8List? _bytes;
   final String path;
   final String name;
   final bool transient;
-
-  static Future<SpaceFile> fromSource(cross.XFile source) async {
-    final name = await source.name() ?? 'file';
-    final location = source is cross.FileSystemXFile ? source.path : source.uri;
-    return SpaceFile._(source, null, location, name: name);
-  }
 
   Future<int?> declaredLength() async =>
       _bytes?.length ?? await _source!.length();
@@ -50,7 +42,7 @@ class SpaceFile {
   Future<Uint8List> readAsBytes() async =>
       _bytes == null ? _source!.readAsBytes() : Uint8List.fromList(_bytes);
 
-  Stream<Uint8List> openRead([int? start, int? end]) => _bytes == null
+  Stream<List<int>> openRead([int? start, int? end]) => _bytes == null
       ? _source!.openRead(start, end)
       : Stream.value(Uint8List.sublistView(_bytes, start ?? 0, end));
 
@@ -58,24 +50,24 @@ class SpaceFile {
       encoding.decode(await readAsBytes());
 
   Future<void> saveTo(String destination) async {
-    await cross.FileSystemXFile(destination).writeAsBytes(await readAsBytes());
+    await File(destination).writeAsBytes(await readAsBytes(), flush: true);
   }
 }
 
-Future<SpaceFile?> openFile({
-  List<picker.XTypeGroup> acceptedTypeGroups = const [],
-}) async {
-  final selected = await picker.openFile(
-    acceptedTypeGroups: acceptedTypeGroups,
-  );
-  return selected == null ? null : SpaceFile.fromSource(selected);
+abstract interface class SpaceFileSource {
+  Future<int?> length();
+  Future<Uint8List> readAsBytes();
+  Stream<List<int>> openRead([int? start, int? end]);
 }
 
-Future<List<SpaceFile>> openFiles({
-  List<picker.XTypeGroup> acceptedTypeGroups = const [],
-}) async {
-  final selected = await picker.openFiles(
-    acceptedTypeGroups: acceptedTypeGroups,
-  );
-  return Future.wait(selected.map(SpaceFile.fromSource));
+class _LocalFileSource implements SpaceFileSource {
+  _LocalFileSource(this.file);
+  final File file;
+  @override
+  Future<int> length() => file.length();
+  @override
+  Future<Uint8List> readAsBytes() => file.readAsBytes();
+  @override
+  Stream<List<int>> openRead([int? start, int? end]) =>
+      file.openRead(start, end);
 }

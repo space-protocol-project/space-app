@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/attachments.dart';
-import 'package:space_client/src/files.dart';
+import 'package:space_client/src/file_picker.dart' show droppedFile;
 
 final class EphemeralFile extends FileSystemXFile {
   EphemeralFile(this.chunks, this.reportedLength) : super('provider-file');
@@ -32,9 +32,7 @@ void main() {
       final queue = AttachmentQueue();
       addTearDown(queue.close);
       await queue.add(
-        AttachmentFilesAdded([
-          SpaceFile.transient(source, name: 'проверка.bin'),
-        ]),
+        AttachmentFilesAdded([droppedFile(source, name: 'проверка.bin')]),
       );
       expect(queue.state.files.single.size, 2);
       expect(await queue.state.files.single.file.readAsBytes(), [4, 5]);
@@ -49,9 +47,7 @@ void main() {
       final queue = AttachmentQueue();
       addTearDown(queue.close);
       await queue.add(
-        AttachmentFilesAdded([
-          SpaceFile.transient(source, name: 'проверка.txt'),
-        ]),
+        AttachmentFilesAdded([droppedFile(source, name: 'проверка.txt')]),
       );
       source.released.complete();
       final saved = queue.state.files.single;
@@ -70,9 +66,7 @@ void main() {
       ]) {
         final queue = AttachmentQueue();
         await queue.add(
-          AttachmentFilesAdded([
-            SpaceFile.transient(source, name: 'проверка.bin'),
-          ]),
+          AttachmentFilesAdded([droppedFile(source, name: 'проверка.bin')]),
         );
         expect(queue.state.files, isEmpty);
         expect(queue.state.problem, isA<StateError>());

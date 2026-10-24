@@ -4,7 +4,7 @@ import '../l10n/strings.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../src/files.dart';
+import '../src/file_picker.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:grpc/grpc.dart';
 

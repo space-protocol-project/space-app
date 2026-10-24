@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:desktop_drop/desktop_drop.dart';
 
-import '../src/files.dart';
+import '../src/file_picker.dart';
 
 import 'package:flutter/material.dart';
 

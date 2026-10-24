@@ -89,6 +89,13 @@ jobs:
       - name: Совместимость API файловых плагинов всех платформ
         if: matrix.target == 'linux'
         run: python tools/check_file_adapters.py
+      - name: Служебные программы остаются независимыми от Flutter
+        if: matrix.target == 'linux'
+        working-directory: client
+        shell: bash
+        run: |
+          dart compile kernel tool/home_server_drill.dart -o "$RUNNER_TEMP/home-server-drill.dill"
+          dart compile kernel tool/home_transfer_drill.dart -o "$RUNNER_TEMP/home-transfer-drill.dill"
       - name: Проверка воспроизводимости состояний Freezed
         working-directory: client
         shell: bash

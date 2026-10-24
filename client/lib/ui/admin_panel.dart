@@ -1,4 +1,4 @@
-import '../src/files.dart';
+import '../src/file_picker.dart';
 import 'package:flutter/foundation.dart';
 
 import '../src/generated/space/v1/space.pb.dart';

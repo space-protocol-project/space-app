@@ -1,4 +1,4 @@
-import '../src/files.dart';
+import '../src/file_picker.dart';
 import 'message_input_surface.dart';
 import '../src/saved_drafts.dart';
 
@@ -726,7 +726,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         setState(() => draggingFiles = false);
         final files = <SpaceFile>[];
         for (final item in details.items.whereType<DropFileItem>()) {
-          files.add(SpaceFile.transient(item.file, name: item.name));
+          files.add(droppedFile(item.file, name: item.name));
         }
         await attachmentQueue.add(AttachmentFilesAdded(files));
       },
