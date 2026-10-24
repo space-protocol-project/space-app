@@ -5,7 +5,7 @@ extension _ChatOutboxFiles on ChatController {
     OutboxScope scope,
     int epoch,
     PendingMessage entry,
-    List<XFile> files,
+    List<SpaceFile> files,
   ) async {
     if (files.isNotEmpty) {
       return fileStore.enqueue(
@@ -105,7 +105,7 @@ extension _ChatOutboxFiles on ChatController {
     final queue = AttachmentQueue(
       files: [
         PendingAttachment(
-          XFile.fromData(bytes, name: file.name, path: file.name),
+          SpaceFile.fromData(bytes, name: file.name, path: file.name),
           file.size,
           requestKey: file.key,
         ),

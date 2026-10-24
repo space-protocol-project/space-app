@@ -18,3 +18,21 @@ dependencies:
 
 flutter:
   generate: true
+
+# Согласовано с адаптацией cross_file в клиенте.
+dependency_overrides:
+  cross_file: 0.4.0
+  file_selector_platform_interface:
+    path: ../../client/vendor/file_selector_platform_interface
+  file_selector_windows:
+    path: ../../client/vendor/file_selector_windows
+  file_selector_linux:
+    path: ../../client/vendor/file_selector_linux
+  file_selector_macos:
+    path: ../../client/vendor/file_selector_macos
+  file_selector_ios:
+    path: ../../client/vendor/file_selector_ios
+  file_selector_android:
+    path: ../../client/vendor/file_selector_android
+  file_selector_web:
+    path: ../../client/vendor/file_selector_web

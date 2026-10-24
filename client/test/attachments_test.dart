@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart' as crypto;
-import 'package:file_selector/file_selector.dart';
+import 'package:space_client/src/files.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/attachments.dart';
@@ -84,7 +84,7 @@ class FilesSession implements AttachmentSession {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-XFile file(int length) => XFile.fromData(
+SpaceFile file(int length) => SpaceFile.fromData(
   Uint8List.fromList(List.generate(length, (i) => i % 256)),
   name: 'file.bin',
   path: 'file.bin',

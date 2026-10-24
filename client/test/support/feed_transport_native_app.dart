@@ -5,7 +5,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
-import 'package:file_selector/file_selector.dart';
+import 'package:space_client/src/files.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:grpc/grpc.dart';
@@ -276,7 +276,7 @@ Future<void> peerReplay(SpaceSession session) async {
     );
     final source = await File('${work.path}/large-test.bin')
         .writeAsBytes(bytes, flush: true);
-    await draft.queue.add(AttachmentFilesAdded([XFile(source.path)]));
+    await draft.queue.add(AttachmentFilesAdded([SpaceFile(source.path)]));
     draft.change(replayText);
     require(!await draft.send(), 'Разрыв HTTP не дошёл до черновика');
     require(

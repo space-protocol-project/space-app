@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart' as hash;
 import 'package:cryptography/cryptography.dart';
-import 'package:file_selector/file_selector.dart';
+import 'files.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'attachments.dart';
@@ -103,14 +103,14 @@ class QueuedFileStore {
   Future<List<QueuedFile>> stage(
     OutboxScope scope,
     String message,
-    List<XFile> files,
+    List<SpaceFile> files,
   ) => _locked(scope, (folder) => _stage(scope, folder, message, files));
 
   Future<List<QueuedFile>> _stage(
     OutboxScope scope,
     Directory folder,
     String message,
-    List<XFile> files,
+    List<SpaceFile> files,
   ) async {
     if (files.length > maxAttachments) {
       throw const FormatException('Не более пяти файлов');
@@ -151,7 +151,7 @@ class QueuedFileStore {
   Future<List<PendingMessage>> enqueue(
     OutboxScope scope,
     PendingMessage entry,
-    List<XFile> files,
+    List<SpaceFile> files,
     ChatOutboxStore outbox, {
     required bool Function() active,
   }) => _locked(scope, (folder) async {
@@ -174,7 +174,7 @@ class QueuedFileStore {
     });
   });
 
-  void _checkCapacity(PendingMessage entry, List<XFile> files, int count) {
+  void _checkCapacity(PendingMessage entry, List<SpaceFile> files, int count) {
     if (count >= maxPendingMessages) throw const OutboxFull();
     if (files.isEmpty ||
         files.length + entry.attachments.length > maxAttachments ||
@@ -200,7 +200,7 @@ class QueuedFileStore {
     SecretKey key,
     String message,
     int index,
-    XFile source,
+    SpaceFile source,
   ) async {
     final bytes = await readAttachmentBytes(source);
     final file = QueuedFile(

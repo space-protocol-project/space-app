@@ -15,7 +15,7 @@ import '../src/rpc_clients.dart' show MlsDevice, Reaction;
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:file_selector/file_selector.dart';
+import '../src/files.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -152,7 +152,7 @@ class _MlsConversationState extends State<_MlsConversation> {
     }
   }
 
-  List<XFile> files = [];
+  List<SpaceFile> files = [];
   bool submitting = false;
   String? submittedText;
   Map<String, dynamic>? replyTarget;
@@ -416,7 +416,7 @@ class _MlsConversationState extends State<_MlsConversation> {
         suggestedName: descriptor['name'] as String,
       );
       if (destination == null) return;
-      await XFile.fromData(
+      await SpaceFile.fromData(
         bytes,
         name: descriptor['name'] as String,
       ).saveTo(destination.path);

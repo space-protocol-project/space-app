@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc_concurrency/bloc_concurrency.dart';
-import 'package:file_selector/file_selector.dart';
+import '../files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:grpc/grpc.dart';
 
@@ -17,7 +17,7 @@ class MlsRefresh extends MlsEvent {}
 class MlsSend extends MlsEvent {
   MlsSend(this.text, this.files, {this.reply});
   final String text;
-  final List<XFile> files;
+  final List<SpaceFile> files;
   final Map<String, dynamic>? reply;
   final done = Completer<bool>();
 }

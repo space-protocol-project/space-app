@@ -38,9 +38,10 @@ void main() {
       expect(find.text('Полное восстановление'), findsOneWidget);
       expect(tester.takeException(), isNull);
       final drop = tester.widget<DropTarget>(find.byType(DropTarget));
-      drop.onDragDone!(
-        DropDoneDetails(
-          files: [DropItemFile('device.spacedevice')],
+      drop.onDrop(
+        DropDetails(
+          operation: DropOperation.copy,
+          items: [DropFileItem.fromPath('device.spacedevice')],
           localPosition: Offset.zero,
           globalPosition: Offset.zero,
         ),

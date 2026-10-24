@@ -33,11 +33,12 @@ class _ServerIconPickerState extends State<ServerIconPicker> {
         ],
       );
       if (file == null) return;
-      if (await file.length() > 8 * 1024 * 1024)
+      final size = await file.length();
+      if (size == null || size > 8 * 1024 * 1024)
         throw const FormatException('Файл слишком большой');
       final icon = await compute(prepareServerIcon, [
         await file.readAsBytes(),
-        file.name.toLowerCase().endsWith('.svg'),
+        (await file.name() ?? '').toLowerCase().endsWith('.svg'),
       ]);
       if (mounted) {
         widget.onChanged(icon);

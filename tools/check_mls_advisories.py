@@ -22,10 +22,15 @@ def dependencies():
             cwd=ROOT / "native" / crate, text=True,
         )
         for line in output.splitlines():
-            match = re.fullmatch(r"([\w-]+) v([\w.+-]+)(?: \(proc-macro\))?(?: \(\*\))?", line)
+            if line.startswith(("space_mls v", "space_mls_bridge v", "space_mls_interop v")):
+                continue
+            match = re.fullmatch(
+                r"([\w-]+) v([\w.+-]+)(?: \((?:proc-macro|[A-Za-z]:[\\/][^)]+|/[^)]+)\))?(?: \(\*\))?",
+                line,
+            )
             if match:
                 packages.add(match.groups())
-            elif not line.startswith(("space_mls v", "space_mls_bridge v", "space_mls_interop v")):
+            else:
                 raise RuntimeError("Неизвестный формат Rust-зависимости: " + line)
     if not packages:
         raise RuntimeError("Не удалось определить Rust-зависимости")

@@ -85,7 +85,7 @@ class ImagePicker extends FileSelectorPlatform {
     );
     if (file != null) {
       final bytes = await file.readAsBytes();
-      selectedFile = XFile.fromData(bytes);
+      selectedFile = file;
       final decoder = img.findDecoderForData(bytes);
       final info = decoder?.startDecode(bytes);
       image = {

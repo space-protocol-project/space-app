@@ -5,12 +5,12 @@ use mls_rs::{
         basic::{BasicCredential, BasicIdentityProvider},
     },
 };
-use mls_rs_crypto_rustcrypto::RustCryptoProvider;
+use mls_rs_crypto_awslc::AwsLcCryptoProvider;
 use space_mls::{ClosedChannel, Device, Message, TrustedDevice};
 
 #[test]
 fn openmls_and_mls_rs_exchange_and_update() -> Result<(), Box<dyn std::error::Error>> {
-    let provider = RustCryptoProvider::default();
+    let provider = AwsLcCryptoProvider::default();
     let suite = provider
         .cipher_suite_provider(CipherSuite::CURVE25519_AES128)
         .ok_or("Нет suite")?;

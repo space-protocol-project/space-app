@@ -1,3 +1,4 @@
+import '../src/files.dart';
 import 'message_input_surface.dart';
 import '../src/saved_drafts.dart';
 
@@ -714,20 +715,20 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   Widget build(BuildContext context) => BlocBuilder<ChatController, ChatState>(
     bloc: widget.controller,
     builder: (context, state) => DropTarget(
-      enable:
+      enabled:
           editing == null &&
           state.canQueue &&
           !state.busy &&
           widget.controller.canAttachFiles,
-      onDragEntered: (_) => setState(() => draggingFiles = true),
-      onDragExited: (_) => setState(() => draggingFiles = false),
-      onDragDone: (details) {
+      onEnter: (_) => setState(() => draggingFiles = true),
+      onLeave: () => setState(() => draggingFiles = false),
+      onDrop: (details) async {
         setState(() => draggingFiles = false);
-        attachmentQueue.add(
-          AttachmentFilesAdded(
-            details.files.whereType<DropItemFile>().toList(),
-          ),
-        );
+        final files = <SpaceFile>[];
+        for (final item in details.items.whereType<DropFileItem>()) {
+          files.add(SpaceFile.transient(item.file, name: item.name));
+        }
+        await attachmentQueue.add(AttachmentFilesAdded(files));
       },
       child: Stack(
         children: [

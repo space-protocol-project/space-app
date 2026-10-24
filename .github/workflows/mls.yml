@@ -15,12 +15,15 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - name: Системные зависимости нативных модулей Linux
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.8'
           channel: stable
       - name: Rust для нативного моста
-        run: rustup toolchain install 1.99.0 --profile minimal
+        run: rustup toolchain install 1.99.1 --profile minimal
       - name: Отрицательные сценарии с настоящим MLS и HTTP
         working-directory: client
         run: |
@@ -38,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Установка закреплённого Rust
-        run: rustup toolchain install 1.99.0 --profile minimal --component clippy --component rustfmt
+        run: rustup toolchain install 1.99.1 --profile minimal --component clippy --component rustfmt
       - name: Форматирование
         run: cargo fmt --check
       - name: Анализ
@@ -69,7 +72,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Rust для Android ARM64
-        run: rustup toolchain install 1.99.0 --profile minimal --target aarch64-linux-android
+        run: rustup toolchain install 1.99.1 --profile minimal --target aarch64-linux-android
       - name: Проверка сборки ядра для Android
         run: |
           cargo check --locked --target aarch64-linux-android

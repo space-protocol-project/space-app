@@ -149,10 +149,10 @@ extension QueuedFileTransfer on QueuedFileStore {
       // Обе файловые блокировки уже удерживаются. Повторное их получение
       // через read/stage привело бы к взаимной блокировке.
       final key = await _key(source, from);
-      final files = <XFile>[];
+      final files = <SpaceFile>[];
       for (final file in entry.localFiles) {
         final bytes = await _read(source, from, key, file);
-        files.add(XFile.fromData(bytes, name: file.name, path: file.name));
+        files.add(SpaceFile.fromData(bytes, name: file.name, path: file.name));
       }
       final copied = await _stage(target, to, entry.key, files);
       if (jsonEncode(copied.map((file) => file.toJson()).toList()) !=

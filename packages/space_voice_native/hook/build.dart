@@ -33,13 +33,13 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
   await ensureToolchain(root, environment);
   await run(
     'rustup',
-    ['target', 'add', target, '--toolchain', '1.99.0'],
+    ['target', 'add', target, '--toolchain', '1.99.1'],
     root,
     environment,
   );
   await run(
     'cargo',
-    ['+1.99.0', 'build', '--locked', '--release', '--target', target],
+    ['+1.99.1', 'build', '--locked', '--release', '--target', target],
     root,
     environment,
   );
@@ -109,7 +109,7 @@ Future<void> run(
 Future<void> ensureToolchain(Uri root, Map<String, String> environment) async {
   final installed = await Process.run(
     'rustup',
-    ['run', '1.99.0', 'rustc', '--version'],
+    ['run', '1.99.1', 'rustc', '--version'],
     environment: environment,
     runInShell: Platform.isWindows,
   );
@@ -119,7 +119,7 @@ Future<void> ensureToolchain(Uri root, Map<String, String> environment) async {
     [
       'toolchain',
       'install',
-      '1.99.0',
+      '1.99.1',
       '--profile',
       'minimal',
       '--no-self-update',

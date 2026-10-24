@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:file_selector/file_selector.dart';
+import 'package:space_client/src/files.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +49,7 @@ class _FilesSession extends OutboxSession
     expect(
       request.name,
       isNotEmpty,
-      reason: 'Имя восстановленного XFile должно сохраниться',
+      reason: 'Имя восстановленного SpaceFile должно сохраниться',
     );
     if (backend.offline) throw const GrpcError.unavailable();
     if (!attachmentsEnabled) throw const GrpcError.permissionDenied();
@@ -167,7 +167,7 @@ void main() {
     return controller;
   }
 
-  XFile data([int length = 500000]) => XFile.fromData(
+  SpaceFile data([int length = 500000]) => SpaceFile.fromData(
     Uint8List.fromList(List.generate(length, (i) => i % 251)),
     name: 'проверка.bin',
     path: 'проверка.bin',
@@ -242,7 +242,7 @@ void main() {
       const text = 'Секретные байты локальной очереди — уникальная строка';
       await original.writeAsString(text);
       final staged = await files().stage(scope, 'message', [
-        XFile(original.path),
+        SpaceFile(original.path),
       ]);
       await original.delete();
       final bytes = await files().read(
@@ -432,7 +432,7 @@ void main() {
     expect(
       await first.send(
         'Файл переживёт перезапуск',
-        files: [XFile(original.path)],
+        files: [SpaceFile(original.path)],
       ),
       true,
     );
@@ -482,7 +482,7 @@ void main() {
     expect(
       await controller.send(
         'Запись подтверждена не была',
-        files: [XFile(original.path)],
+        files: [SpaceFile(original.path)],
       ),
       false,
     );

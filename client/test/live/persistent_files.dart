@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:file_selector/file_selector.dart';
+import 'package:space_client/src/files.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grpc/grpc.dart';
 import 'package:space_client/src/attachments.dart';
@@ -149,7 +149,7 @@ Future<void> verifyPersistentFiles(
     await original.writeAsBytes(bytes);
     final text = 'Файловая очередь ${newRequestKey()}';
     expect(
-      await first.send(text, files: [XFile(original.path)]),
+      await first.send(text, files: [SpaceFile(original.path)]),
       true,
       reason:
           'canQueueFiles=${first.canQueueFiles}, queue=${first.outboxError}',

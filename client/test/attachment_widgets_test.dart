@@ -1,3 +1,5 @@
+import 'package:cross_file/cross_file.dart' show FileSystemXFile;
+
 import 'dart:typed_data';
 
 import 'package:grpc/grpc.dart';
@@ -182,7 +184,7 @@ void main() {
       expect(find.byKey(const ValueKey('sidebar-channel-files')), findsNothing);
       expect(find.byType(ChannelFilesPanel), findsNothing);
       expect(
-        tester.widget<DropTarget>(find.byType(DropTarget)).enable,
+        tester.widget<DropTarget>(find.byType(DropTarget)).enabled,
         isFalse,
       );
       controller.allowFiles = true;
@@ -190,15 +192,15 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('attach-file-button')), findsOneWidget);
       final target = tester.widget<DropTarget>(find.byType(DropTarget));
-      expect(target.enable, isTrue);
-      target.onDragDone!(
-        DropDoneDetails(
-          files: List.generate(
+      expect(target.enabled, isTrue);
+      target.onDrop(
+        DropDetails(
+          operation: DropOperation.copy,
+          items: List.generate(
             5,
-            (i) => DropItemFile.fromData(
-              Uint8List.fromList([1, 2, 3]),
+            (i) => DropFileItem(
+              file: _DropTestFile('file-$i.txt'),
               name: 'file-$i.txt',
-              path: 'file-$i.txt',
             ),
           ),
           localPosition: Offset.zero,
@@ -218,4 +220,15 @@ void main() {
       controller.dispose();
     });
   }
+}
+
+final class _DropTestFile extends FileSystemXFile {
+  _DropTestFile(super.path);
+  @override
+  Future<int> length() async => 3;
+  @override
+  Future<String> name() async => path;
+  @override
+  Stream<Uint8List> openRead([int? start, int? end]) =>
+      Stream.value(Uint8List.fromList([1, 2, 3]));
 }

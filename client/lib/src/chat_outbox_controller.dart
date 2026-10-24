@@ -114,7 +114,7 @@ extension _ChatOutboxController on ChatController {
   Future<bool> _enqueueMessage(
     String text,
     List<String> attachments,
-    List<XFile> files,
+    List<SpaceFile> files,
     String replyTo,
   ) async {
     final scope = _outboxScope;
@@ -149,7 +149,7 @@ extension _ChatOutboxController on ChatController {
   Future<bool> _persistMessage(
     OutboxScope scope,
     PendingMessage entry, {
-    List<XFile> files = const [],
+    List<SpaceFile> files = const [],
   }) async {
     final epoch = _outboxEpoch;
     busy = true;

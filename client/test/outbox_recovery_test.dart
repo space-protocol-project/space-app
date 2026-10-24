@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:file_selector/file_selector.dart';
+import 'package:space_client/src/files.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/l10n/app_localizations.dart';
@@ -87,7 +87,7 @@ void main() {
       source,
       message(),
       [
-        XFile.fromData(
+        SpaceFile.fromData(
           Uint8List.fromList(utf8.encode('Вложение после смены grant')),
           name: 'файл.txt',
           path: 'файл.txt',
@@ -109,7 +109,7 @@ void main() {
         createdAt: 1,
         replyTo: 'message-1',
       ),
-      [XFile.fromData(bytes, name: 'reply.txt', path: 'reply.txt')],
+      [SpaceFile.fromData(bytes, name: 'reply.txt', path: 'reply.txt')],
       outbox,
       active: () => true,
     );

@@ -3,6 +3,7 @@
 mod attachments;
 mod binding;
 mod channel;
+mod crypto;
 mod device;
 mod state;
 mod transaction;

@@ -82,10 +82,13 @@ jobs:
           cache: true
       - name: Зависимости Linux (только CI)
         if: matrix.target == 'linux'
-        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev libnotify-dev xvfb xauth dbus-x11 python3-gi
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb xauth dbus-x11 python3-gi
       - name: Зависимости приложения
         working-directory: client
         run: flutter pub get
+      - name: Совместимость API файловых плагинов всех платформ
+        if: matrix.target == 'linux'
+        run: python tools/check_file_adapters.py
       - name: Проверка воспроизводимости состояний Freezed
         working-directory: client
         shell: bash
@@ -99,7 +102,7 @@ jobs:
       - name: Частоты захвата и обработка ошибок нативного голоса
         env:
           CARGO_TARGET_DIR: ${{ github.workspace }}/.local/voice-native
-        run: cargo +1.99.0 test --locked --release --target ${{ matrix.rust_target }} --manifest-path native/space_voice/Cargo.toml
+        run: cargo +1.99.1 test --locked --release --target ${{ matrix.rust_target }} --manifest-path native/space_voice/Cargo.toml
       - name: Закреплённая модель и уязвимости зависимостей голоса
         run: |
           python -m unittest discover -s tools -p 'check_voice_native_test.py'
@@ -291,7 +294,7 @@ jobs:
           channel: stable
           cache: true
       - name: Rust для настоящего MLS-ядра
-        run: rustup toolchain install 1.99.0 --profile minimal
+        run: rustup toolchain install 1.99.1 --profile minimal
       - name: UI → RPC → PostgreSQL → второй клиент
         working-directory: app-source
         shell: pwsh

@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
-import 'package:cross_file/cross_file.dart';
+
+import '../files.dart';
+
 import 'package:fixnum/fixnum.dart';
 
 import '../rpc_clients.dart';
@@ -17,7 +19,7 @@ class MlsFiles {
     String channel,
     List<int> group,
     String text,
-    List<XFile> files, {
+    List<SpaceFile> files, {
     Map<String, dynamic>? reply,
   }) async {
     if (files.length > 5) throw StateError('Не более пяти файлов');

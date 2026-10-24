@@ -16,7 +16,7 @@ import 'queued_file.dart';
 import 'queued_mutation.dart';
 import 'queued_mutation_projection.dart';
 
-import 'package:file_selector/file_selector.dart';
+import 'files.dart';
 
 import 'core.dart';
 import 'message_search.dart';
@@ -197,7 +197,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   Future<bool> send(
     String text, {
     List<String> attachments = const [],
-    List<XFile> files = const [],
+    List<SpaceFile> files = const [],
     String replyTo = '',
   }) => sendRequest(
     ChatMessageSent(
@@ -1605,7 +1605,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   Future<bool> _send(
     String text,
     List<String> attachments,
-    List<XFile> files,
+    List<SpaceFile> files,
     String replyTo,
   ) => _enqueueMessage(text, attachments, files, replyTo);
 

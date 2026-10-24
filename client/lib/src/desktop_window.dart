@@ -115,11 +115,10 @@ class DesktopWindowState with WindowListener {
       if (saved != null) {
         var bounds = saved!.bounds;
         try {
-          final displays = await screenRetriever.getAllDisplays();
+          final displays = DisplayManager.instance.getAll();
           bounds = visibleWindowBounds(bounds, [
             for (final display in displays)
-              (display.visiblePosition ?? Offset.zero) &
-                  (display.visibleSize ?? display.size),
+              display.workArea.toRect(),
           ]);
         } catch (_) {}
         saved = SavedWindow(bounds, maximized: saved!.maximized);

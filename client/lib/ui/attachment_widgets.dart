@@ -4,7 +4,7 @@ import '../l10n/strings.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:file_selector/file_selector.dart';
+import '../src/files.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:grpc/grpc.dart';
 
@@ -111,7 +111,7 @@ class AttachFileButton extends StatelessWidget {
       );
 }
 
-Future<List<XFile>> openFilesPicker() => openFiles();
+Future<List<SpaceFile>> openFilesPicker() => openFiles();
 
 class MessageAttachments extends StatelessWidget {
   const MessageAttachments({

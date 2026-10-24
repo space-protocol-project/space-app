@@ -35,6 +35,12 @@ class AdvisoryChecks(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 checker.dependencies()
 
+    def test_vendored_dependency_is_checked(self):
+        for directory in (r"C:\work\native\vendor\provider", "/work/native/vendor/provider"):
+            output = f"openmls_libcrux_crypto v0.4.0 ({directory})\n"
+            with patch.object(checker.subprocess, "check_output", return_value=output):
+                self.assertEqual(checker.dependencies(), [("openmls_libcrux_crypto", "0.4.0")])
+
 
 if __name__ == "__main__":
     unittest.main()

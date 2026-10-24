@@ -7,7 +7,7 @@ publish = false
 [dev-dependencies]
 space_mls = { path = "../space_mls" }
 mls-rs = "=0.56.0"
-mls-rs-crypto-rustcrypto = "=0.22.1"
+mls-rs-crypto-awslc = "=0.26.0"
 serde_json = "1"
 
 [profile.dev]

@@ -1,9 +1,10 @@
 use openmls::prelude::*;
-use openmls_basic_credential::SignatureKeyPair;
-use openmls_rust_crypto::OpenMlsRustCrypto;
 use tls_codec::Serialize;
 
-use crate::{Error, Result, SUITE};
+use crate::{
+    Error, Result, SUITE,
+    crypto::{DeviceSigner, Provider},
+};
 
 // Доверие должно быть подтверждено вне сервера доставки, например проверкой QR.
 #[derive(Clone, PartialEq, Eq)]
@@ -13,8 +14,8 @@ pub struct TrustedDevice {
 }
 
 pub struct Device {
-    pub(crate) provider: OpenMlsRustCrypto,
-    pub(crate) signer: SignatureKeyPair,
+    pub(crate) provider: Provider,
+    pub(crate) signer: DeviceSigner,
     pub(crate) credential: CredentialWithKey,
 }
 
@@ -27,13 +28,13 @@ impl Device {
         if identity.is_empty() || identity.len() > 1024 {
             return Err(Error::InvalidInput);
         }
-        let signer = SignatureKeyPair::new(SUITE.signature_algorithm()).map_err(|_| Error::Mls)?;
+        let signer = DeviceSigner::generate()?;
         let credential = CredentialWithKey {
             credential: BasicCredential::new(identity.to_vec()).into(),
             signature_key: signer.to_public_vec().into(),
         };
         Ok(Self {
-            provider: OpenMlsRustCrypto::default(),
+            provider: Provider::new().map_err(|_| Error::Mls)?,
             signer,
             credential,
         })

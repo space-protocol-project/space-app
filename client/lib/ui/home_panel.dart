@@ -23,7 +23,7 @@ import '../src/local_failure.dart';
 import 'components.dart';
 import 'space_link_qr.dart';
 
-import 'package:file_selector/file_selector.dart';
+import '../src/files.dart';
 
 class HomePanel extends StatefulWidget {
   const HomePanel({

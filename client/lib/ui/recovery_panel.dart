@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
-import 'package:file_selector/file_selector.dart';
+import '../src/files.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -246,7 +246,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       ],
     );
     if (destination == null) return;
-    await XFile.fromData(
+    await SpaceFile.fromData(
       content,
       mimeType: json ? 'application/json' : 'image/png',
       name: '${spaces ? 'space-spaces' : 'space-recovery'}.$extension',
@@ -287,7 +287,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
         ? await pickRecoveryFile(context)
         : null;
     final file = Platform.isWindows
-        ? (selectedPath == null ? null : XFile(selectedPath))
+        ? (selectedPath == null ? null : SpaceFile(selectedPath))
         : await openFile(acceptedTypeGroups: files);
     if (file == null) return null;
     stage(1);

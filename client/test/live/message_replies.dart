@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:file_selector/file_selector.dart';
+import 'package:space_client/src/files.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/attachments.dart';
 import 'package:space_client/src/chat_controller.dart';
@@ -57,7 +57,7 @@ class _ReplyFiles extends QueuedFileStore {
   Future<List<PendingMessage>> enqueue(
     OutboxScope scope,
     PendingMessage entry,
-    List<XFile> files,
+    List<SpaceFile> files,
     ChatOutboxStore outbox, {
     required bool Function() active,
   }) async {
@@ -128,7 +128,7 @@ Future<void> verifyMessageReplies(
     final first = await start();
     await first.disconnect();
     expect(
-      await first.send(text, replyTo: parent.id, files: [XFile(original.path)]),
+      await first.send(text, replyTo: parent.id, files: [SpaceFile(original.path)]),
       isTrue,
       reason:
           'queue=${first.canQueue}, files=${first.canQueueFiles}, replies=${first.repliesSupported}, error=${first.outboxError}, save=$saveFailure',

@@ -62,7 +62,7 @@ final class ChatMessageSent extends ChatEvent<bool> {
   ]);
   final String text, replyTo;
   final List<String> attachments;
-  final List<XFile> files;
+  final List<SpaceFile> files;
 }
 
 final class ChatDeviceRevoked extends ChatEvent<void> {}

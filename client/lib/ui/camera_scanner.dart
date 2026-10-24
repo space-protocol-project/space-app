@@ -159,7 +159,7 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
     XFile? photo;
     try {
       photo = await camera.takePicture();
-      if (await photo.length() > 8 * 1024 * 1024) return;
+      if ((await photo.length() ?? 0) > 8 * 1024 * 1024) return;
       final packet = await compute(
         widget.spaceLink ? spaceLinkFromImage : cameraCardInWorker,
         await photo.readAsBytes(),
@@ -183,7 +183,7 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
 
   Future<void> _deleteTemporaryPhoto(XFile? photo) async {
     if (photo != null) {
-      final path = File(photo.path).absolute.path;
+      final path = File(Uri.parse(photo.uri).toFilePath()).absolute.path;
       final root =
           '${Directory.systemTemp.absolute.path}${Platform.pathSeparator}';
       if (path

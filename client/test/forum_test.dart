@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:file_selector/file_selector.dart';
+import 'package:space_client/src/files.dart';
 import 'package:space_client/src/attachments.dart';
 import 'package:space_client/ui/attachment_widgets.dart';
 import 'package:space_client/ui/message_composer_controls.dart';
@@ -339,7 +339,7 @@ void main() {
       );
       await picker.queue.add(
         AttachmentFilesAdded([
-          XFile.fromData(
+          SpaceFile.fromData(
             Uint8List.fromList([1, 2, 3]),
             name: 'план.txt',
             path: 'план.txt',

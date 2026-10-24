@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:desktop_drop/desktop_drop.dart';
-import 'package:file_selector/file_selector.dart';
+
+import '../src/files.dart';
+
 import 'package:flutter/material.dart';
 
 import '../l10n/strings.dart';
@@ -48,16 +50,19 @@ class _DeviceTransferAreaState extends State<DeviceTransferArea> {
     if (file != null) await _run(file.path, importing: true);
   }
 
-  Future<void> _drop(DropDoneDetails details) async {
+  Future<void> _drop(DropDetails details) async {
     setState(() => dragging = false);
     if (busy) return;
-    if (details.files.length != 1 || details.files.single is! DropItemFile) {
+    if (details.items.length != 1 || details.items.single is! DropFileItem) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.strings.deviceTransferOneFile)),
       );
       return;
     }
-    await _run(details.files.single.path, importing: true);
+    final item = details.items.single as DropFileItem;
+    final path = item.localPath;
+    if (path == null) return;
+    await _run(path, importing: true);
   }
 
   Future<void> _run(String path, {required bool importing}) async {
@@ -107,10 +112,10 @@ class _DeviceTransferAreaState extends State<DeviceTransferArea> {
                 _export,
               ),
               DropTarget(
-                enable: !busy,
-                onDragEntered: (_) => setState(() => dragging = true),
-                onDragExited: (_) => setState(() => dragging = false),
-                onDragDone: (details) => unawaited(_drop(details)),
+                enabled: !busy,
+                onEnter: (_) => setState(() => dragging = true),
+                onLeave: () => setState(() => dragging = false),
+                onDrop: _drop,
                 child: _tile(
                   Icons.move_down_outlined,
                   context.strings.deviceTransferRestore,

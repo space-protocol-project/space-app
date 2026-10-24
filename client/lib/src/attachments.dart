@@ -3,7 +3,9 @@ import 'dart:typed_data';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:crypto/crypto.dart' as crypto;
-import 'package:file_selector/file_selector.dart';
+
+import 'files.dart';
+
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:grpc/grpc.dart';
@@ -19,7 +21,7 @@ const maxAttachments = 5;
 class PendingAttachment {
   PendingAttachment(this.file, this.size, {String? requestKey})
     : key = requestKey ?? newRequestKey();
-  final XFile file;
+  final SpaceFile file;
   final int size;
   final String key;
   String get name => attachmentName(file);
@@ -43,7 +45,7 @@ sealed class AttachmentEvent {}
 
 class AttachmentFilesAdded extends AttachmentEvent {
   AttachmentFilesAdded(this.files);
-  final List<XFile> files;
+  final List<SpaceFile> files;
 }
 
 class AttachmentQueue extends Cubit<AttachmentState> {
@@ -59,13 +61,7 @@ class AttachmentQueue extends Cubit<AttachmentState> {
       }
       final additions = <PendingAttachment>[];
       for (final file in event.files) {
-        final size = await file.length();
-        if (size < 1 || size > maxAttachmentSize) {
-          throw StateError(
-            'Размер каждого файла должен быть от 1 байта до 20 МиБ',
-          );
-        }
-        additions.add(PendingAttachment(file, size));
+        additions.add(await _prepare(file));
       }
       if (isClosed) return;
       emit(
@@ -82,6 +78,27 @@ class AttachmentQueue extends Cubit<AttachmentState> {
     } finally {
       _adding = false;
     }
+  }
+
+  Future<PendingAttachment> _prepare(SpaceFile file) async {
+    final size = await file.declaredLength();
+    if (size != null && size > maxAttachmentSize) {
+      throw StateError('Размер каждого файла должен быть от 1 байта до 20 МиБ');
+    }
+    if (file.transient) return _retain(file, size);
+    if (size == null || size < 1) throw StateError('Пустой файл');
+    return PendingAttachment(file, size);
+  }
+
+  Future<PendingAttachment> _retain(SpaceFile file, int? declaredSize) async {
+    final bytes = await readAttachmentBytes(file);
+    if (declaredSize != null && bytes.length != declaredSize) {
+      throw StateError('Размер файла изменился');
+    }
+    return PendingAttachment(
+      SpaceFile.fromData(bytes, name: file.name),
+      bytes.length,
+    );
   }
 
   bool _adding = false;
@@ -289,11 +306,11 @@ class AttachmentQueue extends Cubit<AttachmentState> {
   }
 }
 
-String attachmentName(XFile file) =>
+String attachmentName(SpaceFile file) =>
     file.name.replaceAll('\\', '/').split('/').last;
 
 Future<Uint8List> readAttachmentBytes(
-  XFile file, {
+  SpaceFile file, {
   bool Function()? cancelled,
 }) async {
   final result = BytesBuilder(copy: false);

@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:file_selector/file_selector.dart';
+import 'package:space_client/src/files.dart';
 
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/widgets.dart';
@@ -125,7 +125,7 @@ Future<void> main(List<String> args) async {
         scope,
         'ordinary-pending',
         [
-          XFile.fromData(
+          SpaceFile.fromData(
             Uint8List.fromList(
               utf8.encode('Файл переживает завершение процесса'),
             ),

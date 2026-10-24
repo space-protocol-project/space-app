@@ -36,7 +36,7 @@ def verify_sources():
 def packages():
     selected = {}
     for target in TARGETS:
-        raw = subprocess.check_output(['cargo', '+1.99.0', 'metadata', '--locked',
+        raw = subprocess.check_output(['cargo', '+1.99.1', 'metadata', '--locked',
             '--format-version', '1', '--filter-platform', target,
             '--manifest-path', str(ROOT / 'native/space_voice/Cargo.toml')], text=True)
         metadata = json.loads(raw)

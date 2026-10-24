@@ -1,0 +1,54 @@
+name: flutter_zxing
+description: A barcode scanner and generator natively in Flutter with Dart FFI based on ZXing.
+version: 3.1.0
+repository: https://github.com/khoren93/flutter_zxing
+
+environment:
+  sdk: ">=3.11.0 <4.0.0"
+  flutter: ">=3.41.0"
+
+dependencies:
+  # 0.11.0 is the floor on purpose: it is where `camera` switched Android over
+  # to CameraX. The older camera2 implementation crashed inside
+  # `io.flutter.plugins.camera.Camera` on a number of devices, and nothing in
+  # this plugin can work around that.
+  camera: ">=0.11.0 <0.13.0"
+  ffi: ^2.0.0
+  flutter:
+    sdk: flutter
+  image: ^4.1.0
+  image_picker: ^1.0.0
+
+dev_dependencies:
+  # Used by the tests to build synthetic camera frames.
+  camera_platform_interface: ^2.7.0
+  ffigen: ">=12.0.0 <22.0.0" # dart run ffigen --config ffigen.yaml
+  flutter_lints: ">=4.0.0 <7.0.0"
+  flutter_test:
+    sdk: flutter
+  melos: ">=5.0.0 <9.0.0"
+  plugin_platform_interface: ^2.1.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        ffiPlugin: true
+      ios:
+        ffiPlugin: true
+      linux:
+        ffiPlugin: true
+      macos:
+        ffiPlugin: true
+      windows:
+        ffiPlugin: true
+
+# Publish to pub.dev
+# make publish        (or: ./scripts/publish.sh [--dry-run] [--force])
+# Bump this version and `s.version` in both podspecs together with the
+# CHANGELOG entry first; the script checks all three agree, refreshes the
+# generated iOS/macOS sources -- they are git-ignored, and without them the
+# released package does not build on those platforms -- then publishes.
+
+# Update zxing-cpp submodule
+# git submodule update --remote

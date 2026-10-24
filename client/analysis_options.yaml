@@ -11,6 +11,25 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   exclude:
+    - vendor/camera_android_camerax/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/camera_avfoundation/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/camera_platform_interface/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/file_selector_android/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/file_selector_ios/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/file_selector_linux/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/file_selector_macos/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/file_selector_platform_interface/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/file_selector_web/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/file_selector_windows/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/flutter_zxing/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/image_picker_android/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/image_picker_for_web/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/image_picker_ios/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/image_picker_linux/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/image_picker_macos/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/image_picker_platform_interface/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/image_picker_windows/** # Сторонний код; адаптации проверяются сборками и тестами.
+    - vendor/window_manager/** # Сторонний код; адаптации проверяются сборками и тестами.
     - vendor/flutter_webrtc/** # Сторонний Dart; собственные изменения только в native.
     - build/**
     - windows/**

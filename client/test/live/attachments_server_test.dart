@@ -15,7 +15,7 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:file_selector/file_selector.dart';
+import 'package:space_client/src/files.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grpc/grpc.dart';
 import 'package:space_client/src/attachments.dart';
@@ -146,7 +146,7 @@ void main() {
         await file.delete();
         await folder.delete();
       });
-      await queue.add(AttachmentFilesAdded([XFile(file.path)]));
+      await queue.add(AttachmentFilesAdded([SpaceFile(file.path)]));
       final ids = await queue.upload(owner, 'general');
       expect(ids, hasLength(1), reason: queue.state.error);
       final received = member
@@ -302,7 +302,7 @@ Future<void> verifyOrdinaryOutbox(
   final queue = AttachmentQueue();
   ChatController? first, restarted;
   try {
-    await queue.add(AttachmentFilesAdded([XFile(file.path)]));
+    await queue.add(AttachmentFilesAdded([SpaceFile(file.path)]));
     final ids = await queue.upload(uploader, 'general');
     expect(ids, hasLength(1));
     first = controller()..preview = remote;

@@ -9,7 +9,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cryptography/cryptography.dart';
-import 'package:file_selector/file_selector.dart';
+import 'package:space_client/src/files.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grpc/grpc.dart';
 import 'package:space_client/src/core.dart';
@@ -208,7 +208,7 @@ void main() {
         List.generate(256 * 1024 + 31, (i) => i % 251),
       );
       await MlsFiles(a).send('private', group, 'Файл для группы', [
-        XFile.fromData(bytes, path: 'секретный-файл.bin'),
+        SpaceFile.fromData(bytes, path: 'секретный-файл.bin'),
       ], reply: originalReply);
       view = await c.refresh('private', group);
       final item = view.messages.single;
@@ -289,7 +289,7 @@ void main() {
         isTrue,
       );
       await MlsFiles(b).send('private', group, 'Мой файл до смены root', [
-        XFile.fromData(bytes, path: 'мой-файл.bin'),
+        SpaceFile.fromData(bytes, path: 'мой-файл.bin'),
       ]);
       view = await a.refresh('private', group);
       final ownFileMessage = view.messages.last['message'] as Map;
@@ -581,7 +581,7 @@ void main() {
       await c.refresh('retention', group);
       final bytes = Uint8List.fromList(List.generate(1024, (i) => i % 251));
       await MlsFiles(b).send('retention', group, 'До смены root', [
-        XFile.fromData(bytes, path: 'history.bin'),
+        SpaceFile.fromData(bytes, path: 'history.bin'),
       ]);
       final oldMessage =
           (await a.refresh('retention', group)).messages.last['message'] as Map;

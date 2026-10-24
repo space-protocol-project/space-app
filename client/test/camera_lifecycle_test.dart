@@ -68,7 +68,7 @@ class LifecycleCamera extends CameraPlatform {
   @override
   Future<XFile> takePicture(int cameraId) async {
     captures++;
-    return pendingPicture?.future ?? XFile.fromData(Uint8List(8));
+    return pendingPicture?.future ?? _TestPhoto();
   }
 }
 
@@ -187,7 +187,7 @@ void main() {
             .onPressed,
         isNull,
       );
-      camera.pendingPicture!.complete(XFile.fromData(Uint8List(8)));
+      camera.pendingPicture!.complete(_TestPhoto());
       for (var attempt = 0; attempt < 20; attempt++) {
         await tester.runAsync(
           () => Future<void>.delayed(const Duration(milliseconds: 100)),
@@ -220,4 +220,12 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+}
+
+final class _TestPhoto extends FileSystemXFile {
+  _TestPhoto() : super("camera-lifecycle-test.jpg");
+  @override
+  Future<int> length() async => 8;
+  @override
+  Future<Uint8List> readAsBytes() async => Uint8List(8);
 }

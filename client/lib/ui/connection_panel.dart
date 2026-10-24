@@ -10,7 +10,7 @@ import 'pairing_panel.dart';
 import 'camera_scanner.dart';
 import '../src/space_link_qr.dart';
 
-import 'package:file_selector/file_selector.dart';
+import '../src/files.dart';
 import 'package:flutter/foundation.dart';
 
 class ConnectionPanel extends StatefulWidget {

@@ -1,16 +1,19 @@
 use chacha20poly1305::{
-    XChaCha20Poly1305, XNonce,
-    aead::{Aead, KeyInit, OsRng, Payload, rand_core::RngCore},
+    XChaCha20Poly1305,
+    aead::{Aead, KeyInit, Payload},
 };
 use openmls::prelude::*;
-use openmls_basic_credential::SignatureKeyPair;
-use openmls_rust_crypto::OpenMlsRustCrypto;
 use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, Zeroizing};
 
-use crate::{Device, DeviceBinding, Error, Result, SpaceDevice};
+use crate::{
+    Device, DeviceBinding, Error, Result, SpaceDevice,
+    crypto::{DeviceSigner, Provider},
+};
 
 const MAX_STATE_SIZE: usize = 64 * 1024 * 1024;
+// Это идентификатор сохранённого формата, а не текущая версия библиотеки.
+const STATE_FORMAT: &str = "space/mls/state/openmls-0.9.1/v1";
 
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -31,7 +34,7 @@ pub struct RestoredState {
 struct StoredState {
     format: String,
     credential: CredentialWithKey,
-    signer: SignatureKeyPair,
+    signer: DeviceSigner,
     entries: Vec<(Vec<u8>, Vec<u8>)>,
     pending: Vec<PendingDelivery>,
 }
@@ -69,7 +72,7 @@ impl Device {
         let entries: Vec<_> = values.iter().collect();
         let plaintext = Zeroizing::new(
             serde_json::to_vec(&(
-                "space/mls/state/openmls-0.9.1/v1",
+                STATE_FORMAT,
                 &self.credential,
                 &self.signer,
                 entries,
@@ -81,13 +84,11 @@ impl Device {
             return Err(Error::InvalidState);
         }
         let mut nonce = [0u8; 24];
-        OsRng
-            .try_fill_bytes(&mut nonce)
-            .map_err(|_| Error::InvalidState)?;
+        getrandom::fill(&mut nonce).map_err(|_| Error::InvalidState)?;
         let aad = state_aad(binding, revision)?;
         let ciphertext = XChaCha20Poly1305::new(key.into())
             .encrypt(
-                XNonce::from_slice(&nonce),
+                (&nonce).into(),
                 Payload {
                     msg: &plaintext,
                     aad: &aad,
@@ -111,10 +112,11 @@ impl Device {
             return Err(Error::InvalidState);
         }
         let aad = state_aad(binding, expected_revision)?;
+        let nonce: &[u8; 24] = snapshot[..24].try_into().map_err(|_| Error::InvalidState)?;
         let plaintext = Zeroizing::new(
             XChaCha20Poly1305::new(key.into())
                 .decrypt(
-                    XNonce::from_slice(&snapshot[..24]),
+                    nonce.into(),
                     Payload {
                         msg: &snapshot[24..],
                         aad: &aad,
@@ -133,7 +135,7 @@ impl Device {
             pending,
         };
         validate_stored(&stored, &trusted)?;
-        let provider = OpenMlsRustCrypto::default();
+        let provider = Provider::new().map_err(|_| Error::InvalidState)?;
         let mut values = provider
             .storage()
             .values
@@ -145,7 +147,7 @@ impl Device {
             }
         }
         drop(values);
-        // SignatureKeyPair не Clone: переносим через защищённое сериализованное представление.
+        // Секретный ключ переносим через защищённое сериализованное представление.
         let signer_bytes =
             Zeroizing::new(serde_json::to_vec(&stored.signer).map_err(|_| Error::InvalidState)?);
         let signer = serde_json::from_slice(&signer_bytes).map_err(|_| Error::InvalidState)?;
@@ -166,7 +168,8 @@ fn state_aad(binding: &DeviceBinding, revision: u64) -> Result<Vec<u8>> {
 }
 
 fn validate_stored(stored: &StoredState, trusted: &crate::TrustedDevice) -> Result<()> {
-    if stored.format != "space/mls/state/openmls-0.9.1/v1"
+    stored.signer.validate()?;
+    if stored.format != STATE_FORMAT
         || stored.entries.len() > 65536
         || stored.credential.credential.serialized_content() != trusted.identity
         || stored.credential.signature_key.as_slice() != trusted.signature_key

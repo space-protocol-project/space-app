@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:cross_file/cross_file.dart';
+import 'package:space_client/src/files.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/mls/client.dart';
@@ -68,7 +68,7 @@ Future<void> seedRestorePeers(
     await peer.mls.refresh('private', group);
   }
   await MlsFiles(peers.first.mls).send('private', group, 'Зашифрованный файл', [
-    XFile.fromData(restoreBytes, name: 'проверка.bin', path: 'проверка.bin'),
+    SpaceFile.fromData(restoreBytes, name: 'проверка.bin', path: 'проверка.bin'),
   ]);
   for (final peer in peers) {
     await verifyRestoreFile(peer.mls, group);

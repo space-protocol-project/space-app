@@ -6,7 +6,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:cryptography/cryptography.dart';
-import 'package:cross_file/cross_file.dart';
+import 'package:space_client/src/files.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/home_network.dart';
 import 'package:space_client/src/home_diagnostics.dart';
@@ -223,7 +223,7 @@ Future<void> main(List<String> arguments) async {
     );
     await MlsFiles(mls)
         .send('route-private', group, 'Старый зашифрованный файл', [
-          XFile.fromData(
+          SpaceFile.fromData(
             Uint8List.fromList(utf8.encode('Файл до смены маршрута')),
             path: 'route-secret.txt',
           ),

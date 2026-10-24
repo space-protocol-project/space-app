@@ -1,16 +1,15 @@
 use openmls::prelude::OpenMlsProvider;
-use openmls_rust_crypto::OpenMlsRustCrypto;
 use zeroize::Zeroize;
 
-use crate::{Error, Result};
+use crate::{Error, Result, crypto::Provider};
 
 // Только для временного прототипа. Рабочее хранилище получит настоящую
 // транзакцию; эксклюзивный &mut Device исключает параллельные операции.
-pub(crate) struct Candidate(OpenMlsRustCrypto);
+pub(crate) struct Candidate(Provider);
 
 impl Candidate {
-    pub fn new(source: &OpenMlsRustCrypto) -> Result<Self> {
-        let candidate = Self(OpenMlsRustCrypto::default());
+    pub fn new(source: &Provider) -> Result<Self> {
+        let candidate = Self(Provider::new().map_err(|_| Error::Mls)?);
         let values = source.storage().values.read().map_err(|_| Error::Mls)?;
         *candidate
             .0
@@ -21,11 +20,11 @@ impl Candidate {
         Ok(candidate)
     }
 
-    pub fn provider(&self) -> &OpenMlsRustCrypto {
+    pub fn provider(&self) -> &Provider {
         &self.0
     }
 
-    pub fn commit(&self, target: &OpenMlsRustCrypto) -> Result<()> {
+    pub fn commit(&self, target: &Provider) -> Result<()> {
         let values = self.0.storage().values.read().map_err(|_| Error::Mls)?;
         let mut target = target.storage().values.write().map_err(|_| Error::Mls)?;
         for (mut key, mut value) in target.drain() {

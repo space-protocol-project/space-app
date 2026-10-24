@@ -10,7 +10,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_secure_storage_windows
   flutter_webrtc
   local_notifier
-  screen_retriever_windows
   url_launcher_windows
   window_manager
 )

@@ -1,6 +1,6 @@
 use chacha20poly1305::{
-    XChaCha20Poly1305, XNonce,
-    aead::{Aead, KeyInit, OsRng, Payload, rand_core::RngCore},
+    XChaCha20Poly1305,
+    aead::{Aead, KeyInit, Payload},
 };
 use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop};
@@ -76,20 +76,14 @@ pub fn seal_file(
     };
     descriptor.validate()?;
     validate_group(group_id)?;
-    OsRng
-        .try_fill_bytes(&mut descriptor.id)
-        .map_err(|_| Error::InvalidFile)?;
-    OsRng
-        .try_fill_bytes(&mut descriptor.key)
-        .map_err(|_| Error::InvalidFile)?;
-    OsRng
-        .try_fill_bytes(&mut descriptor.nonce)
-        .map_err(|_| Error::InvalidFile)?;
+    getrandom::fill(&mut descriptor.id).map_err(|_| Error::InvalidFile)?;
+    getrandom::fill(&mut descriptor.key).map_err(|_| Error::InvalidFile)?;
+    getrandom::fill(&mut descriptor.nonce).map_err(|_| Error::InvalidFile)?;
     let aad = descriptor.aad(group_id)?;
     let cipher = XChaCha20Poly1305::new((&descriptor.key).into());
     let ciphertext = cipher
         .encrypt(
-            XNonce::from_slice(&descriptor.nonce),
+            (&descriptor.nonce).into(),
             Payload {
                 msg: plaintext,
                 aad: &aad,
@@ -117,7 +111,7 @@ pub fn open_file(
     let cipher = XChaCha20Poly1305::new((&descriptor.key).into());
     cipher
         .decrypt(
-            XNonce::from_slice(&descriptor.nonce),
+            (&descriptor.nonce).into(),
             Payload {
                 msg: ciphertext,
                 aad: &aad,

@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:file_selector/file_selector.dart';
+import '../src/files.dart';
 import 'package:flutter/material.dart';
 
 import '../src/mls/client.dart';
@@ -64,7 +64,7 @@ Future<void> manageMlsArchive(
       suggestedName: 'space-history.mlsarchive',
     );
     if (destination == null) return;
-    await XFile.fromData(Uint8List.fromList(bytes)).saveTo(destination.path);
+    await SpaceFile.fromData(Uint8List.fromList(bytes)).saveTo(destination.path);
   } else {
     final file = await openFile();
     if (file == null) return;

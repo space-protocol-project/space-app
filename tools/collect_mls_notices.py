@@ -14,10 +14,11 @@ TARGETS = ("x86_64-pc-windows-msvc", "x86_64-unknown-linux-gnu", "aarch64-apple-
 def packages():
     selected = {}
     for target in TARGETS:
-        result = subprocess.run(["cargo", "+1.99.0", "metadata", "--locked", "--format-version", "1", "--filter-platform", target, "--manifest-path", str(ROOT / "native/space_mls_bridge/Cargo.toml")], capture_output=True, text=True, check=True)
+        result = subprocess.run(["cargo", "+1.99.1", "metadata", "--locked", "--format-version", "1", "--filter-platform", target, "--manifest-path", str(ROOT / "native/space_mls_bridge/Cargo.toml")], capture_output=True, text=True, check=True)
         metadata = json.loads(result.stdout)
         active = {node["id"] for node in metadata["resolve"]["nodes"]}
-        selected.update({p["id"]: p for p in metadata["packages"] if p["id"] in active and p["source"]})
+        selected.update({p["id"]: p for p in metadata["packages"]
+                         if p["id"] in active and (p["source"] or p["name"] == "openmls_libcrux_crypto")})
     return sorted(selected.values(), key=lambda p: (p["name"], p["version"]))
 
 
@@ -54,11 +55,11 @@ def upstream_licenses(package, directory, cache):
 
 
 def rust_notices():
-    result = subprocess.run(["rustup", "run", "1.99.0", "rustc", "--print", "sysroot"], capture_output=True, text=True, check=True)
+    result = subprocess.run(["rustup", "run", "1.99.1", "rustc", "--print", "sysroot"], capture_output=True, text=True, check=True)
     docs = Path(result.stdout.strip()) / "share/doc/rust"
     html = (docs / "COPYRIGHT-library.html").read_text(encoding="utf-8")
     text = unescape(re.sub("<[^>]+>", " ", re.sub(r"<style.*?</style>", "", html, flags=re.S)))
-    sections = ["Rust standard library 1.99.0\n" + text]
+    sections = ["Rust standard library 1.99.1\n" + text]
     names = set(re.findall(r'licenses/([^"#<> ]+\.txt)', html)) | {"MIT.txt", "Apache-2.0.txt"}
     sections.extend((docs / "licenses" / name).read_text(encoding="utf-8") for name in sorted(names))
     return "\n\n".join(sections)
@@ -71,7 +72,9 @@ def main():
     for package in selected:
         directory = Path(package["manifest_path"]).parent
         licenses = local_licenses(directory) or upstream_licenses(package, directory, cache)
-        header = f"{package['name']} {package['version']}\nSPDX: {package['license']}\nАвторы: {', '.join(package['authors'])}\nИсходники: https://crates.io/api/v1/crates/{package['name']}/{package['version']}/download"
+        source = (f"https://crates.io/api/v1/crates/{package['name']}/{package['version']}/download"
+                  if package["source"] else "native/vendor/openmls_libcrux_crypto (SPACE-PATCH.md)")
+        header = f"{package['name']} {package['version']}\nSPDX: {package['license']}\nАвторы: {', '.join(package['authors'])}\nИсходники: {source}"
         sections.append(header + "\n\n" + "\n\n".join(name + "\n" + text for name, text in licenses))
     sections.append(rust_notices())
     destination = ROOT / "client/assets/legal/mls-NOTICES.txt"
