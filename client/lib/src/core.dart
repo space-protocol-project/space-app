@@ -34,7 +34,7 @@ import 'origin_binding.dart';
 import 'rpc_connection.dart';
 import 'forum_api.dart';
 import 'feed_api.dart';
-import 'community_search.dart';
+import 'community_search_api.dart';
 import 'community_overview.dart';
 import 'generated/space/v1/community_overview.pb.dart' as overview_pb;
 import 'generated/space/v1/community_overview.connect.spec.dart'

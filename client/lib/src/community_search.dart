@@ -4,23 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'generated/space/v1/community_search.pb.dart';
+import 'community_search_api.dart';
+
+export 'community_search_api.dart';
 
 part 'community_search.freezed.dart';
-
-abstract interface class CommunitySearchApi {
-  Future<SearchCommunityContentResponse> search(
-    String channel,
-    String query,
-    String token,
-  );
-}
-
-abstract interface class CommunitySearchSource {
-  CommunitySearchApi? get communitySearch;
-}
-
-CommunitySearchApi? communitySearchFor(Object api) =>
-    api is CommunitySearchSource ? api.communitySearch : null;
 
 @freezed
 abstract class CommunitySearchState with _$CommunitySearchState {
