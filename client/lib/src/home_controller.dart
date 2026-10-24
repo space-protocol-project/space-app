@@ -706,7 +706,8 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     process.stderr.listen(record);
     unawaited(
       process.exitCode.then((code) async {
-        if (_process != process) return;
+        // Остановку и снятие блокировки подтверждает _stop после проверки базы.
+        if (_process != process || phase == HomePhase.stopping) return;
         _process = null;
         running = false;
         server = null;
