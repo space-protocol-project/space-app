@@ -126,6 +126,9 @@ jobs:
       - name: Лента и мобильная навигация Android
         working-directory: client
         run: flutter test test/feed_test.dart test/feed_android_test.dart
+      - name: Поиск сообществ и персональная сводка
+        working-directory: client
+        run: flutter test test/community_search_test.dart test/dashboard_highlights_test.dart
       - name: Голосовые комнаты и завершение захвата микрофона
         working-directory: client
         run: flutter test test/voice_android_test.dart test/voice_network_test.dart test/voice_audio_test.dart test/voice_transmission_test.dart test/voice_shortcut_test.dart test/voice_microphone_test.dart test/voice_devices_test.dart test/voice_device_call_test.dart test/voice_recovery_test.dart test/voice_controller_test.dart test/voice_widgets_test.dart test/voice_semantics_test.dart test/tooltip_semantics_test.dart test/channels_test.dart

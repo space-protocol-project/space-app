@@ -2670,4 +2670,82 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get feedReaderRole => 'Readers';
+
+  @override
+  String get communitySearchHint => 'Search this section';
+
+  @override
+  String get communitySearchEmpty => 'No matches';
+
+  @override
+  String get communitySearchInvalid => 'Enter 1–256 UTF-8 bytes of text';
+
+  @override
+  String get communitySearchThread => 'Thread';
+
+  @override
+  String get communitySearchReply => 'Reply';
+
+  @override
+  String get communitySearchPost => 'Post';
+
+  @override
+  String get communitySearchComment => 'Comment';
+
+  @override
+  String get communitySearchRevoked =>
+      'Access to this section is no longer available';
+
+  @override
+  String get dashboardAttention => 'Needs attention';
+
+  @override
+  String get dashboardAttentionEmpty =>
+      'All caught up — nothing needs attention.';
+
+  @override
+  String get dashboardChecking => 'Checking for updates…';
+
+  @override
+  String get dashboardAttentionLimit =>
+      'Showing the first tasks. Open your spaces for the rest.';
+
+  @override
+  String get dashboardConnectionIssue => 'Connection issue';
+
+  @override
+  String get dashboardPendingReports => 'Pending reports';
+
+  @override
+  String get dashboardRepliesToYou => 'Replies to your thread';
+
+  @override
+  String get dashboardCommunityNews => 'New in communities';
+
+  @override
+  String get dashboardCommunityDescription =>
+      'Recent threads and posts from sections you can read. Thread badges show unread items.';
+
+  @override
+  String get dashboardCommunityFailed =>
+      'Some sections could not be refreshed. Try again.';
+
+  @override
+  String get dashboardCommunityUnsupported =>
+      'Update the server to enable community summaries.';
+
+  @override
+  String get dashboardCommunityEmpty =>
+      'No threads or posts are available yet.';
+
+  @override
+  String get dashboardAttentionUnknown =>
+      'Some sections have not been checked yet.';
+
+  @override
+  String get dashboardAttachmentPost => 'Post with attachments';
+
+  @override
+  String get dashboardCommunityOffline =>
+      'Updates from unavailable spaces will appear after connecting.';
 }

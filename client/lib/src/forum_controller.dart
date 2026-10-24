@@ -296,6 +296,11 @@ class ForumController extends Cubit<ForumState> {
         : Int64.ZERO;
     await _openFrom(id, after);
   });
+  Future<bool> openSearchResult(String id, int sequence) => _run(() async {
+    emit(state.copy(clearTopic: true));
+    await _openFrom(id, Int64(sequence > 0 ? sequence - 1 : 0));
+  });
+
   Future<void> _openFrom(String id, Int64 after) async {
     final page = await api.thread(state.section!.id, id, after);
     if (!isClosed) {

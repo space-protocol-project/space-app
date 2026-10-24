@@ -116,6 +116,70 @@ Future<void> _verifyHidden(SpaceSession session, String post) async {
   expect(result.comments, isEmpty);
 }
 
+Future<void> _verifyCommunityDiscovery(
+  SpaceSession session,
+  String post, {
+  required bool visible,
+}) async {
+  expect(session.communitySearchSupported, true);
+  final search = SessionCommunitySearchApi(session);
+  final posts = await search.search('feed', 'Публикация CI', '');
+  expect(posts.results.map((entry) => entry.id), visible ? [post] : isEmpty);
+  final comments = await search.search('feed', 'Комментарий', '');
+  expect(comments.results, visible ? hasLength(1) : isEmpty);
+  if (visible) expect(comments.results.single.parentId, post);
+  final overview = session.communityOverview;
+  expect(overview.supported, true);
+  final summary = await overview.overview('feed');
+  expect(
+    summary.recent.map((entry) => entry.content.id),
+    visible ? [post] : isEmpty,
+  );
+  expect(summary.repliesToYou, isEmpty);
+  for (final entry in summary.recent) {
+    expect(entry.readStateSupported, false);
+    expect(entry.unreadCount, Int64.ZERO);
+  }
+}
+
+Future<void> _verifyCommunityRevoked(
+  SpaceSession owner,
+  SpaceSession member,
+) async {
+  final access = await owner.adminRequest('/api/v1/channels/feed/access');
+  await owner.adminRequest(
+    '/api/v1/channels/feed/access',
+    method: 'PUT',
+    body: {
+      'expectedRevision': access['revision'],
+      'rules': [
+        ...List<dynamic>.from(access['rules'] as List? ?? []),
+        {
+          'principalId': member.principalId,
+          'permissions': {
+            'visible': true,
+            'read': false,
+            'write': false,
+            'manage': false,
+          },
+        },
+      ],
+    },
+  );
+  final denied = throwsA(
+    isA<GrpcError>().having(
+      (error) => error.code,
+      'code',
+      StatusCode.permissionDenied,
+    ),
+  );
+  await expectLater(
+    SessionCommunitySearchApi(member).search('feed', 'Публикация CI', ''),
+    denied,
+  );
+  await expectLater(member.communityOverview.overview('feed'), denied);
+}
+
 Future<Uint8List> _remaining(
   SpaceSession session,
   String asset,
@@ -197,6 +261,7 @@ void main() {
       );
       final discussion = await api.post('feed', created.post.id, Int64.ZERO);
       expect(discussion.comments, hasLength(1));
+      await _verifyCommunityDiscovery(member, created.post.id, visible: true);
       final first = await member.downloadChunk(
         sp.DownloadChunkRequest(assetId: asset),
       );
@@ -213,6 +278,7 @@ void main() {
       );
       await _verifyHidden(owner, created.post.id);
       await _verifyHidden(member, created.post.id);
+      await _verifyCommunityDiscovery(member, created.post.id, visible: false);
       await expectLater(
         member.downloadChunk(
           sp.DownloadChunkRequest(assetId: asset, offset: first.nextOffset),
@@ -233,6 +299,8 @@ void main() {
       final restored = await _remaining(member, asset, first);
       expect(restored.length, data.length);
       expect(sha256.convert(restored), sha256.convert(data));
+      await _verifyCommunityDiscovery(member, created.post.id, visible: true);
+      await _verifyCommunityRevoked(owner, member);
     },
     skip: origin == null,
   );

@@ -2471,6 +2471,75 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get feedReaderRole => '读者';
+
+  @override
+  String get communitySearchHint => '搜索此分区';
+
+  @override
+  String get communitySearchEmpty => '没有匹配结果';
+
+  @override
+  String get communitySearchInvalid => '请输入 1–256 字节的 UTF-8 文本';
+
+  @override
+  String get communitySearchThread => '主题';
+
+  @override
+  String get communitySearchReply => '回复';
+
+  @override
+  String get communitySearchPost => '动态';
+
+  @override
+  String get communitySearchComment => '评论';
+
+  @override
+  String get communitySearchRevoked => '已无法访问此分区';
+
+  @override
+  String get dashboardAttention => '需要关注';
+
+  @override
+  String get dashboardAttentionEmpty => '暂无需要处理的事项。';
+
+  @override
+  String get dashboardChecking => '正在检查更新…';
+
+  @override
+  String get dashboardAttentionLimit => '显示部分事项，其余内容可在空间中查看。';
+
+  @override
+  String get dashboardConnectionIssue => '连接问题';
+
+  @override
+  String get dashboardPendingReports => '待处理举报';
+
+  @override
+  String get dashboardRepliesToYou => '您的主题有新回复';
+
+  @override
+  String get dashboardCommunityNews => '社区动态';
+
+  @override
+  String get dashboardCommunityDescription => '您有权阅读的分区中的最新主题和动态。主题角标显示未读数量。';
+
+  @override
+  String get dashboardCommunityFailed => '部分分区刷新失败，请重试。';
+
+  @override
+  String get dashboardCommunityUnsupported => '请更新服务器以启用社区摘要。';
+
+  @override
+  String get dashboardCommunityEmpty => '暂无可用的主题或动态。';
+
+  @override
+  String get dashboardAttentionUnknown => '部分分区尚未检查。';
+
+  @override
+  String get dashboardAttachmentPost => '含附件的动态';
+
+  @override
+  String get dashboardCommunityOffline => '连接后将显示不可用空间的动态。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3370,4 +3439,73 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get migrationExported => '迁移已保存，旧设备已停止。重装系统前请保管归档和密码。';
+
+  @override
+  String get communitySearchHint => '搜索此分区';
+
+  @override
+  String get communitySearchEmpty => '没有匹配结果';
+
+  @override
+  String get communitySearchInvalid => '请输入 1–256 字节的 UTF-8 文本';
+
+  @override
+  String get communitySearchThread => '主题';
+
+  @override
+  String get communitySearchReply => '回复';
+
+  @override
+  String get communitySearchPost => '动态';
+
+  @override
+  String get communitySearchComment => '评论';
+
+  @override
+  String get communitySearchRevoked => '已无法访问此分区';
+
+  @override
+  String get dashboardAttention => '需要关注';
+
+  @override
+  String get dashboardAttentionEmpty => '暂无需要处理的事项。';
+
+  @override
+  String get dashboardChecking => '正在检查更新…';
+
+  @override
+  String get dashboardAttentionLimit => '显示部分事项，其余内容可在空间中查看。';
+
+  @override
+  String get dashboardConnectionIssue => '连接问题';
+
+  @override
+  String get dashboardPendingReports => '待处理举报';
+
+  @override
+  String get dashboardRepliesToYou => '您的主题有新回复';
+
+  @override
+  String get dashboardCommunityNews => '社区动态';
+
+  @override
+  String get dashboardCommunityDescription => '您有权阅读的分区中的最新主题和动态。主题角标显示未读数量。';
+
+  @override
+  String get dashboardCommunityFailed => '部分分区刷新失败，请重试。';
+
+  @override
+  String get dashboardCommunityUnsupported => '请更新服务器以启用社区摘要。';
+
+  @override
+  String get dashboardCommunityEmpty => '暂无可用的主题或动态。';
+
+  @override
+  String get dashboardAttentionUnknown => '部分分区尚未检查。';
+
+  @override
+  String get dashboardAttachmentPost => '含附件的动态';
+
+  @override
+  String get dashboardCommunityOffline => '连接后将显示不可用空间的动态。';
 }

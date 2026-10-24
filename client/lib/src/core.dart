@@ -34,6 +34,14 @@ import 'origin_binding.dart';
 import 'rpc_connection.dart';
 import 'forum_api.dart';
 import 'feed_api.dart';
+import 'community_search.dart';
+import 'community_overview.dart';
+import 'generated/space/v1/community_overview.pb.dart' as overview_pb;
+import 'generated/space/v1/community_overview.connect.spec.dart'
+    as overview_specs;
+import 'generated/space/v1/community_search.pb.dart' as community;
+import 'generated/space/v1/community_search.connect.spec.dart'
+    as community_specs;
 
 import 'package:connectrpc/connect.dart' as connect;
 
@@ -51,6 +59,8 @@ part 'push_registration.dart';
 part 'voice_rpc.dart';
 part 'forum_rpc.dart';
 part 'feed_rpc.dart';
+part 'community_search_rpc.dart';
+part 'community_overview_rpc.dart';
 
 String url64(List<int> value) => base64Url.encode(value).replaceAll('=', '');
 
@@ -691,7 +701,8 @@ class SpaceSession
         RootRotationControl,
         ChannelNavigation,
         ChannelUpdates,
-        SpaceAdministration {
+        SpaceAdministration,
+        CommunityOverviewSource {
   final _closing = StreamController<void>.broadcast();
   Stream<void> get closing => _closing.stream;
   SpaceSession._(this.server, this.record, this.vault, this.channel);
@@ -799,6 +810,11 @@ class SpaceSession
   bool mlsSupported = false;
   bool forumSupported = false;
   bool feedSupported = false;
+  bool communitySearchSupported = false;
+  bool communityOverviewSupported = false;
+  @override
+  late final CommunityOverviewApi communityOverview =
+      SessionCommunityOverviewApi(this);
   bool forumNavigationSupported = false;
   bool forumModerationSupported = false;
   bool forumReportsSupported = false;
@@ -859,6 +875,12 @@ class SpaceSession
     repliesSupported = manifest.ordinaryRepliesSupported;
     forumSupported = manifest.capabilities.contains('core.forum.v1');
     feedSupported = manifest.capabilities.contains('core.feed.v1');
+    communityOverviewSupported = manifest.capabilities.contains(
+      'core.community.overview.v1',
+    );
+    communitySearchSupported = manifest.capabilities.contains(
+      'core.community.search.v1',
+    );
     forumModerationSupported = manifest.capabilities.contains(
       'core.forum.moderation.v1',
     );
@@ -1259,6 +1281,12 @@ class SpaceSession
       session.repliesSupported = manifest.ordinaryRepliesSupported;
       session.forumSupported = manifest.capabilities.contains('core.forum.v1');
       session.feedSupported = manifest.capabilities.contains('core.feed.v1');
+      session.communityOverviewSupported = manifest.capabilities.contains(
+        'core.community.overview.v1',
+      );
+      session.communitySearchSupported = manifest.capabilities.contains(
+        'core.community.search.v1',
+      );
       session.forumModerationSupported = manifest.capabilities.contains(
         'core.forum.moderation.v1',
       );

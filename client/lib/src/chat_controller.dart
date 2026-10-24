@@ -19,6 +19,7 @@ import 'queued_mutation_projection.dart';
 import 'files.dart';
 
 import 'core.dart';
+import 'community_overview.dart';
 import 'message_search.dart';
 import 'history_pages.dart';
 import 'mls/saved_archive.dart';
@@ -259,6 +260,14 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     if (message == null || message.deleted) return null;
     await revealSearchMessage(message);
     return messages.where((m) => m.id == message.id && !m.deleted).firstOrNull;
+  }
+
+  CommunityOverviewApi? get communityOverview {
+    final session = _session;
+    if (!connected || accessRemoved) return null;
+    return session is CommunityOverviewSource
+        ? (session as CommunityOverviewSource).communityOverview
+        : null;
   }
 
   SpaceSession? get mlsSession =>

@@ -5,6 +5,8 @@ targets:
         generate_for:
           - lib/src/attachments.dart
           - lib/src/channel_files_controller.dart
+          - lib/src/dashboard_controller.dart
+          - lib/src/community_search.dart
           - lib/src/chat_controller.dart
           - lib/src/feed_controller.dart
           - lib/src/feed_management.dart

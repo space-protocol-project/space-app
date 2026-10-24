@@ -4857,6 +4857,144 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Читатели'**
   String get feedReaderRole;
+
+  /// No description provided for @communitySearchHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поиск в разделе'**
+  String get communitySearchHint;
+
+  /// No description provided for @communitySearchEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Совпадений нет'**
+  String get communitySearchEmpty;
+
+  /// No description provided for @communitySearchInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите текст от 1 до 256 байт UTF-8'**
+  String get communitySearchInvalid;
+
+  /// No description provided for @communitySearchThread.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тема'**
+  String get communitySearchThread;
+
+  /// No description provided for @communitySearchReply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ответ'**
+  String get communitySearchReply;
+
+  /// No description provided for @communitySearchPost.
+  ///
+  /// In ru, this message translates to:
+  /// **'Публикация'**
+  String get communitySearchPost;
+
+  /// No description provided for @communitySearchComment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Комментарий'**
+  String get communitySearchComment;
+
+  /// No description provided for @communitySearchRevoked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Раздел больше недоступен'**
+  String get communitySearchRevoked;
+
+  /// No description provided for @dashboardAttention.
+  ///
+  /// In ru, this message translates to:
+  /// **'Требует внимания'**
+  String get dashboardAttention;
+
+  /// No description provided for @dashboardAttentionEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Всё спокойно — новых задач нет.'**
+  String get dashboardAttentionEmpty;
+
+  /// No description provided for @dashboardChecking.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверяем обновления…'**
+  String get dashboardChecking;
+
+  /// No description provided for @dashboardAttentionLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показаны ближайшие задачи. Остальные доступны внутри пространств.'**
+  String get dashboardAttentionLimit;
+
+  /// No description provided for @dashboardConnectionIssue.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проблема подключения'**
+  String get dashboardConnectionIssue;
+
+  /// No description provided for @dashboardPendingReports.
+  ///
+  /// In ru, this message translates to:
+  /// **'Жалобы на рассмотрении'**
+  String get dashboardPendingReports;
+
+  /// No description provided for @dashboardRepliesToYou.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ответы в вашей теме'**
+  String get dashboardRepliesToYou;
+
+  /// No description provided for @dashboardCommunityNews.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новое в сообществах'**
+  String get dashboardCommunityNews;
+
+  /// No description provided for @dashboardCommunityDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Свежие темы и публикации из доступных вам разделов. Счётчик у темы показывает непрочитанное.'**
+  String get dashboardCommunityDescription;
+
+  /// No description provided for @dashboardCommunityFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось обновить часть разделов. Повторите попытку.'**
+  String get dashboardCommunityFailed;
+
+  /// No description provided for @dashboardCommunityUnsupported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для сводки сообществ обновите сервер.'**
+  String get dashboardCommunityUnsupported;
+
+  /// No description provided for @dashboardCommunityEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока нет доступных тем и публикаций.'**
+  String get dashboardCommunityEmpty;
+
+  /// No description provided for @dashboardAttentionUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Часть разделов пока не проверена.'**
+  String get dashboardAttentionUnknown;
+
+  /// No description provided for @dashboardAttachmentPost.
+  ///
+  /// In ru, this message translates to:
+  /// **'Публикация с вложениями'**
+  String get dashboardAttachmentPost;
+
+  /// No description provided for @dashboardCommunityOffline.
+  ///
+  /// In ru, this message translates to:
+  /// **'Данные недоступных пространств появятся после подключения.'**
+  String get dashboardCommunityOffline;
 }
 
 class _AppLocalizationsDelegate

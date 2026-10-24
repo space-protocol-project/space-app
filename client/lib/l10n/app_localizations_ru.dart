@@ -2690,4 +2690,78 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get feedReaderRole => 'Читатели';
+
+  @override
+  String get communitySearchHint => 'Поиск в разделе';
+
+  @override
+  String get communitySearchEmpty => 'Совпадений нет';
+
+  @override
+  String get communitySearchInvalid => 'Введите текст от 1 до 256 байт UTF-8';
+
+  @override
+  String get communitySearchThread => 'Тема';
+
+  @override
+  String get communitySearchReply => 'Ответ';
+
+  @override
+  String get communitySearchPost => 'Публикация';
+
+  @override
+  String get communitySearchComment => 'Комментарий';
+
+  @override
+  String get communitySearchRevoked => 'Раздел больше недоступен';
+
+  @override
+  String get dashboardAttention => 'Требует внимания';
+
+  @override
+  String get dashboardAttentionEmpty => 'Всё спокойно — новых задач нет.';
+
+  @override
+  String get dashboardChecking => 'Проверяем обновления…';
+
+  @override
+  String get dashboardAttentionLimit =>
+      'Показаны ближайшие задачи. Остальные доступны внутри пространств.';
+
+  @override
+  String get dashboardConnectionIssue => 'Проблема подключения';
+
+  @override
+  String get dashboardPendingReports => 'Жалобы на рассмотрении';
+
+  @override
+  String get dashboardRepliesToYou => 'Ответы в вашей теме';
+
+  @override
+  String get dashboardCommunityNews => 'Новое в сообществах';
+
+  @override
+  String get dashboardCommunityDescription =>
+      'Свежие темы и публикации из доступных вам разделов. Счётчик у темы показывает непрочитанное.';
+
+  @override
+  String get dashboardCommunityFailed =>
+      'Не удалось обновить часть разделов. Повторите попытку.';
+
+  @override
+  String get dashboardCommunityUnsupported =>
+      'Для сводки сообществ обновите сервер.';
+
+  @override
+  String get dashboardCommunityEmpty => 'Пока нет доступных тем и публикаций.';
+
+  @override
+  String get dashboardAttentionUnknown => 'Часть разделов пока не проверена.';
+
+  @override
+  String get dashboardAttachmentPost => 'Публикация с вложениями';
+
+  @override
+  String get dashboardCommunityOffline =>
+      'Данные недоступных пространств появятся после подключения.';
 }

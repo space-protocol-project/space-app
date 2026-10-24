@@ -9,6 +9,9 @@ import 'package:space_admin_ui/space_admin_ui.dart'
 
 import '../l10n/strings.dart';
 import '../src/core.dart';
+import '../src/community_search.dart';
+import '../src/generated/space/v1/community_search.pb.dart';
+import 'community_search.dart';
 import '../src/forum_api.dart';
 import '../src/forum_controller.dart';
 import '../src/generated/space/v1/forum.pb.dart' show ForumReply;
@@ -29,9 +32,15 @@ class ForumView extends StatefulWidget {
     this.active = true,
     this.sendWithShift = false,
     this.sectionId,
+    this.initialThread = '',
+    this.initialReplySequence = 0,
+    this.showReports = false,
   });
   final SpaceSession? session;
   final String? sectionId;
+  final String initialThread;
+  final int initialReplySequence;
+  final bool showReports;
   final bool active, sendWithShift;
   @override
   State<ForumView> createState() => _ForumViewState();
@@ -55,6 +64,9 @@ class _ForumViewState extends State<ForumView> {
       key: ObjectKey(connected),
       api: SessionForumApi(connected),
       sectionId: widget.sectionId,
+      initialThread: widget.initialThread,
+      initialReplySequence: widget.initialReplySequence,
+      showReports: widget.showReports,
       sendWithShift: widget.sendWithShift,
       active: widget.active,
       authorize: connected.record.administrative
@@ -103,9 +115,15 @@ class ForumArea extends StatefulWidget {
     this.active = true,
     this.sendWithShift = false,
     this.sectionId,
+    this.initialThread = '',
+    this.initialReplySequence = 0,
+    this.showReports = false,
   });
   final ForumApi api;
   final String? sectionId;
+  final String initialThread;
+  final int initialReplySequence;
+  final bool showReports;
   final bool sendWithShift, active;
   final Future<void> Function()? manage, authorize;
   @override
@@ -144,6 +162,31 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
         .firstOrNull;
     if (section != null && section.id != controller.state.section?.id) {
       await controller.selectSection(section);
+    }
+    await _openInitial();
+  }
+
+  Future<void> _openInitial() async {
+    if (!mounted || !widget.active) return;
+    if (widget.sectionId != null &&
+        controller.state.section?.id != widget.sectionId) {
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+        SnackBar(content: Text(context.strings.communitySearchRevoked)),
+      );
+      return;
+    }
+    if (widget.initialThread.isNotEmpty) {
+      await controller.openSearchResult(
+        widget.initialThread,
+        widget.initialReplySequence,
+      );
+      revealCommunityResult(
+        () => readTracker.keys[widget.initialReplySequence]?.currentContext,
+      );
+    }
+    if (!mounted || !widget.showReports || reports == null) return;
+    if (controller.state.section?.permissions.manage == true) {
+      unawaited(_reportsQueue());
     }
   }
 
@@ -543,6 +586,18 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
       PopupMenuItem(value: 'report', child: Text(context.strings.forumReport)),
   ];
 
+  List<PopupMenuEntry<String>> _searchMenu(ForumState state) {
+    if (state.section == null || communitySearchFor(widget.api) == null) {
+      return [];
+    }
+    return [
+      PopupMenuItem(
+        value: 'search',
+        child: Text(context.strings.communitySearchHint),
+      ),
+    ];
+  }
+
   Widget _menu(ForumState state) => PopupMenuButton<String>(
     key: const ValueKey('forum-actions'),
     tooltip: context.strings.forumActions,
@@ -550,6 +605,7 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
     icon: const Icon(Icons.more_horiz),
     onSelected: (action) => _action(action),
     itemBuilder: (context) => [
+      ..._searchMenu(state),
       ..._moderationMenu(state),
       ..._reportMenu(state),
       if (_canClose(state))
@@ -585,8 +641,37 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
       ),
     ],
   );
+  Future<void> _search() async {
+    final section = controller.state.section;
+    final api = communitySearchFor(widget.api);
+    if (section == null || api == null) return;
+    bool available() =>
+        mounted && widget.active && controller.state.section?.id == section.id;
+    final result = await showCommunitySearch(
+      context,
+      api: api,
+      channel: section.id,
+      title: section.title,
+      changes: controller.stream,
+      available: available,
+    );
+    if (result == null || !available()) return;
+    final child =
+        result.kind == CommunitySearchKind.COMMUNITY_SEARCH_KIND_FORUM_REPLY;
+    await controller.openSearchResult(
+      result.parentId,
+      child ? result.sequence.toInt() : 0,
+    );
+    if (!mounted || !child) return;
+    revealCommunityResult(
+      () => readTracker.keys[result.sequence.toInt()]?.currentContext,
+    );
+  }
+
   void _action(String action) {
     switch (action) {
+      case 'search':
+        unawaited(_search());
       case 'report':
         unawaited(_report());
       case 'reports':

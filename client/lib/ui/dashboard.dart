@@ -6,12 +6,14 @@ import '../l10n/strings.dart';
 import '../src/server_presence.dart';
 import '../src/server_workspaces.dart';
 import 'components.dart';
+import 'dashboard_highlights.dart';
+import '../src/community_overview.dart';
 import 'space_availability.dart';
 import '../src/chat_controller.dart';
 
 import 'package:space_admin_ui/space_admin_ui.dart' show ServerIconView;
 
-class Dashboard extends StatelessWidget {
+class Dashboard extends StatefulWidget {
   const Dashboard({
     super.key,
     required this.workspaces,
@@ -20,6 +22,8 @@ class Dashboard extends StatelessWidget {
     required this.openSpace,
     required this.openChannel,
     this.removeSpace,
+    this.openCommunity,
+    this.active = true,
     this.homeAction,
     this.homeDetails,
     this.createOwnSpace,
@@ -32,6 +36,8 @@ class Dashboard extends StatelessWidget {
   final VoidCallback addSpace;
   final ValueChanged<String> openSpace;
   final ValueChanged<String>? removeSpace;
+  final ValueChanged<DashboardCommunityTarget>? openCommunity;
+  final bool active;
   final void Function(String, String) openChannel;
   final VoidCallback? homeAction;
   final VoidCallback? homeDetails;
@@ -40,12 +46,19 @@ class Dashboard extends StatelessWidget {
   final bool homeRunning, homeBusy;
 
   @override
+  State<Dashboard> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<Dashboard> {
+  final highlights = GlobalKey<DashboardHighlightsState>();
+  @override
   Widget build(BuildContext context) {
-    final entries = workspaces.controllers.entries.toList();
+    final entries = widget.workspaces.controllers.entries.toList();
     final known = entries
         .where(
           (entry) =>
-              entry.value.connected && presence.online(entry.key) != false,
+              entry.value.connected &&
+              widget.presence.online(entry.key) != false,
         )
         .toList();
     final channels = known.fold(
@@ -74,10 +87,22 @@ class Dashboard extends StatelessWidget {
         _DashboardMetrics(
           servers: entries.length,
           online: entries
-              .where((entry) => presence.online(entry.key) == true)
+              .where((entry) => widget.presence.online(entry.key) == true)
               .length,
           channels: channels,
           unread: unread,
+        ),
+        const SizedBox(height: 24),
+        DashboardHighlights(
+          key: highlights,
+          workspaces: widget.workspaces,
+          presence: widget.presence,
+          active: widget.active,
+          openSpace: widget.openSpace,
+          openChannel: widget.openChannel,
+          openCommunity:
+              widget.openCommunity ??
+              (target) => widget.openSpace(target.origin),
         ),
         const SizedBox(height: 28),
         if (entries.isEmpty)
@@ -115,12 +140,12 @@ class Dashboard extends StatelessWidget {
                     child: _SpaceOverviewCard(
                       origin: entry.key,
                       controller: entry.value,
-                      online: presence.online(entry.key),
-                      open: () => openSpace(entry.key),
-                      remove: removeSpace == null
+                      online: widget.presence.online(entry.key),
+                      open: () => widget.openSpace(entry.key),
+                      remove: widget.removeSpace == null
                           ? null
-                          : () => removeSpace!(entry.key),
-                      openChannel: (id) => openChannel(entry.key, id),
+                          : () => widget.removeSpace!(entry.key),
+                      openChannel: (id) => widget.openChannel(entry.key, id),
                     ),
                   ),
               ],
@@ -143,14 +168,14 @@ class Dashboard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 FilledButton.icon(
-                  onPressed: addSpace,
+                  onPressed: widget.addSpace,
                   icon: const Icon(Icons.add),
                   label: Text(context.strings.addSpace),
                 ),
-                if (createOwnSpace != null) ...[
+                if (widget.createOwnSpace != null) ...[
                   const SizedBox(height: 16),
                   FilledButton.icon(
-                    onPressed: homeBusy ? null : createOwnSpace,
+                    onPressed: widget.homeBusy ? null : widget.createOwnSpace,
                     icon: const Icon(Icons.add_home_outlined),
                     label: Text(context.strings.createOwnSpace),
                   ),
@@ -160,23 +185,25 @@ class Dashboard extends StatelessWidget {
           ),
         OutlinedButton.icon(
           onPressed: () {
-            workspaces.refresh();
-            presence.check();
+            widget.workspaces.refresh();
+            widget.presence.check();
+            highlights.currentState?.refresh();
           },
           icon: const Icon(Icons.refresh),
           label: Text(context.strings.dashboardRefresh),
         ),
-        if (importSpace != null)
+        if (widget.importSpace != null)
           OutlinedButton.icon(
             key: const ValueKey('import-space-entry'),
-            onPressed: homeBusy ? null : importSpace,
+            onPressed: widget.homeBusy ? null : widget.importSpace,
             icon: const Icon(Icons.file_download_outlined),
             label: Text(context.strings.homeImport),
           ),
-        if (MediaQuery.sizeOf(context).width < 760 && homeDetails != null)
+        if (MediaQuery.sizeOf(context).width < 760 &&
+            widget.homeDetails != null)
           OutlinedButton.icon(
             key: const ValueKey('home-server-details'),
-            onPressed: homeDetails,
+            onPressed: widget.homeDetails,
             icon: const Icon(Icons.sensors),
             label: Text(context.strings.goLive),
           ),

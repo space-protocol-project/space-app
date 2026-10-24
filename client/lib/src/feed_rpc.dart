@@ -1,8 +1,12 @@
 part of 'core.dart';
 
-class SessionFeedApi implements FeedApi {
+class SessionFeedApi implements FeedApi, CommunitySearchSource {
   SessionFeedApi(this.session);
   final SpaceSession session;
+  @override
+  CommunitySearchApi? get communitySearch => session.communitySearchSupported
+      ? SessionCommunitySearchApi(session)
+      : null;
   @override
   bool get supported => session.feedSupported;
   @override

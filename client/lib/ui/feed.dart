@@ -7,6 +7,9 @@ import 'package:space_admin_ui/space_admin_ui.dart' show ChannelsPanel;
 
 import '../l10n/strings.dart';
 import '../src/core.dart';
+import '../src/community_search.dart';
+import '../src/generated/space/v1/community_search.pb.dart';
+import 'community_search.dart';
 import '../src/feed_api.dart';
 import '../src/feed_controller.dart';
 import '../src/feed_management.dart';
@@ -41,9 +44,15 @@ class FeedView extends StatefulWidget {
     required this.session,
     required this.active,
     this.sendWithShift = false,
+    this.sectionId,
+    this.initialPost = '',
+    this.showReports = false,
   });
   final SpaceSession? session;
   final bool active, sendWithShift;
+  final String? sectionId;
+  final String initialPost;
+  final bool showReports;
   @override
   State<FeedView> createState() => _FeedViewState();
 }
@@ -66,6 +75,9 @@ class _FeedViewState extends State<FeedView> {
       key: ObjectKey(session),
       api: SessionFeedApi(session),
       active: widget.active,
+      sectionId: widget.sectionId,
+      initialPost: widget.initialPost,
+      showReports: widget.showReports,
       sendWithShift: widget.sendWithShift,
       authorize: session.record.administrative
           ? null
@@ -107,11 +119,17 @@ class FeedArea extends StatefulWidget {
     required this.api,
     this.active = true,
     this.sendWithShift = false,
+    this.sectionId,
+    this.initialPost = '',
+    this.showReports = false,
     this.manage,
     this.authorize,
   });
   final FeedApi api;
   final bool active, sendWithShift;
+  final String? sectionId;
+  final String initialPost;
+  final bool showReports;
   final Future<void> Function()? manage, authorize;
   @override
   State<FeedArea> createState() => _FeedAreaState();
@@ -120,6 +138,8 @@ class FeedArea extends StatefulWidget {
 class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
   late final controller = FeedController(widget.api);
   Timer? timer;
+  final searchTarget = GlobalKey();
+  String searchComment = '';
   bool foreground = true;
   @override
   void initState() {
@@ -127,10 +147,42 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     foreground =
         WidgetsBinding.instance.lifecycleState != AppLifecycleState.paused;
-    unawaited(controller.refresh());
+    unawaited(_loadInitial());
     timer = Timer.periodic(const Duration(seconds: 10), (_) {
       if (widget.active && foreground) unawaited(controller.refresh());
     });
+  }
+
+  Future<void> _loadInitial() async {
+    await controller.refresh();
+    if (!mounted) return;
+    final section = controller.state.sections
+        .where((c) => c.id == widget.sectionId)
+        .firstOrNull;
+    if (section != null && controller.state.section?.id != section.id) {
+      await controller.select(section);
+    }
+    if (!mounted || !widget.active) return;
+    if (widget.sectionId != null &&
+        controller.state.section?.id != widget.sectionId) {
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+        SnackBar(content: Text(context.strings.communitySearchRevoked)),
+      );
+      return;
+    }
+    if (widget.initialPost.isNotEmpty) {
+      await controller.open(widget.initialPost);
+    }
+    if (!mounted || !widget.showReports) return;
+    if (controller.state.section?.permissions.manage == true) {
+      await showFeedManagement(
+        context,
+        widget.api,
+        controller.state.section!.id,
+        action: 'reports',
+        open: (id) => unawaited(controller.open(id)),
+      );
+    }
   }
 
   @override
@@ -249,6 +301,12 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
         tooltip: context.strings.forumRefresh,
         icon: const Icon(Icons.refresh),
       ),
+      if (state.section != null && communitySearchFor(widget.api) != null)
+        IconButton(
+          onPressed: _search,
+          tooltip: context.strings.communitySearchHint,
+          icon: const Icon(Icons.search),
+        ),
       if (widget.manage != null)
         TextButton(
           onPressed: () => managed(widget.manage),
@@ -262,6 +320,32 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
       if (state.section?.permissions.manage == true) _management(state),
     ],
   );
+  Future<void> _search() async {
+    final section = controller.state.section;
+    final api = communitySearchFor(widget.api);
+    if (section == null || api == null) return;
+    bool available() =>
+        mounted && widget.active && controller.state.section?.id == section.id;
+    final result = await showCommunitySearch(
+      context,
+      api: api,
+      channel: section.id,
+      title: section.title,
+      changes: controller.stream,
+      available: available,
+    );
+    if (result == null || !available()) return;
+    final child =
+        result.kind == CommunitySearchKind.COMMUNITY_SEARCH_KIND_FEED_COMMENT;
+    searchComment = child ? result.id : '';
+    await controller.open(
+      result.parentId,
+      afterSequence: child ? result.sequence.toInt() - 1 : 0,
+    );
+    if (!mounted || !child) return;
+    revealCommunityResult(() => searchTarget.currentContext);
+  }
+
   Widget _management(FeedState state) => PopupMenuButton<String>(
     tooltip: context.strings.feedActions,
     itemBuilder: (_) => [
@@ -389,7 +473,9 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
     ],
   );
   Widget _comment(FeedComment comment) => FeedEntryCard(
-    key: ValueKey('feed-comment-${comment.id}'),
+    key: comment.id == searchComment
+        ? searchTarget
+        : ValueKey('feed-comment-${comment.id}'),
     text: comment.text,
     author: forumAuthor(comment.authorName, comment.authorId),
     timestamp: comment.createdAtUnix.toInt(),

@@ -112,9 +112,12 @@ class SpaceFrame extends StatelessWidget {
     double progress,
     Widget child,
   ) {
-    final radius = BorderRadius.circular(
-      compact ? SpaceAppearance.radius * progress : 0,
-    );
+    final radius = compact
+        ? BorderRadius.circular(SpaceAppearance.radius * progress)
+        : BorderRadius.horizontal(
+            left: Radius.circular(SpaceAppearance.radius * (1 - progress)),
+            right: const Radius.circular(SpaceAppearance.radius),
+          );
     return Positioned(
       top: 0,
       bottom: 0,

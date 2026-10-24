@@ -139,7 +139,7 @@ class FeedController extends Cubit<FeedState> {
     await refresh();
   }
 
-  Future<void> open(String id) async {
+  Future<void> open(String id, {int afterSequence = 0}) async {
     final channel = state.section?.id;
     if (channel == null) return;
     final generation = ++_generation;
@@ -153,7 +153,7 @@ class FeedController extends Cubit<FeedState> {
       ),
     );
     try {
-      final page = await api.post(channel, id, Int64.ZERO);
+      final page = await api.post(channel, id, Int64(afterSequence));
       if (_current(generation)) {
         emit(
           state.copyWith(

@@ -6,9 +6,14 @@ class SessionForumApi
         ForumMedia,
         ForumNavigation,
         ForumModeration,
-        ForumReports {
+        ForumReports,
+        CommunitySearchSource {
   SessionForumApi(this.session);
   final SpaceSession session;
+  @override
+  CommunitySearchApi? get communitySearch => session.communitySearchSupported
+      ? SessionCommunitySearchApi(session)
+      : null;
   @override
   AttachmentSession get attachmentSession => session;
   @override

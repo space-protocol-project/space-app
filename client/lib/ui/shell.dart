@@ -1,6 +1,7 @@
 import '../src/generated/space/v1/space.pb.dart' show Channel, Content;
 import 'mls_channel.dart';
 import '../src/message_summary.dart';
+import '../src/community_overview.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:space_admin_ui/space_admin_ui.dart' show ServerIconView;
@@ -404,6 +405,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     if (target == null || !mounted) return;
     setState(() {
       activeController = target;
+      dashboardTarget = null;
       dashboard = false;
       applicationSettings = false;
       devicePage = false;
@@ -415,6 +417,36 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     if (channel != null && mounted && identical(controller, target)) {
       await target.selectChannel(channel);
     }
+  }
+
+  DashboardCommunityTarget? dashboardTarget;
+  int communityNavigationRequest = 0;
+  DashboardCommunityTarget? get _forumDashboardTarget =>
+      switch (dashboardTarget?.destination) {
+        DashboardDestination.forum ||
+        DashboardDestination.forumReports => dashboardTarget,
+        _ => null,
+      };
+  DashboardCommunityTarget? get _feedDashboardTarget =>
+      switch (dashboardTarget?.destination) {
+        DashboardDestination.feed ||
+        DashboardDestination.feedReports => dashboardTarget,
+        _ => null,
+      };
+  Future<void> openDashboardCommunity(DashboardCommunityTarget target) async {
+    await openSpace(target.origin);
+    if (!mounted || !identical(controller, workspaces[target.origin])) return;
+    setState(() {
+      dashboardTarget = target;
+      communityNavigationRequest++;
+      if (_forumDashboardTarget != null) selectedForumSection = target.channel;
+      forumNavigationRequest++;
+      selected = switch (target.destination) {
+        DashboardDestination.forum ||
+        DashboardDestination.forumReports => Section.forum,
+        _ => Section.feed,
+      };
+    });
   }
 
   Future<void> addSpace() async {
@@ -529,6 +561,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
         : createTransient();
     setState(() {
       activeController = target;
+      dashboardTarget = null;
       dashboard = false;
       applicationSettings = false;
       devicePage = false;
@@ -1183,6 +1216,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   }
 
   void openForumSection(String? id) {
+    dashboardTarget = null;
     selectedForumSection = id;
     forumNavigationRequest++;
     select(Section.forum);
@@ -1755,11 +1789,22 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
               forumNavigationRequest,
             )),
             sectionId: selectedForumSection,
+            initialThread: _forumDashboardTarget?.id ?? '',
+            initialReplySequence: _forumDashboardTarget?.replySequence ?? 0,
+            showReports:
+                _forumDashboardTarget?.destination ==
+                DashboardDestination.forumReports,
             sendWithShift: widget.preferences.sendShortcut == 'shiftEnter',
             session: controller.mlsSession,
             active: selected == Section.forum,
           ),
           Section.feed => FeedView(
+            key: ValueKey((controller.mlsSession, communityNavigationRequest)),
+            sectionId: _feedDashboardTarget?.channel,
+            initialPost: _feedDashboardTarget?.id ?? '',
+            showReports:
+                _feedDashboardTarget?.destination ==
+                DashboardDestination.feedReports,
             session: controller.mlsSession,
             active: selected == Section.feed && !drawerOpen,
             sendWithShift: widget.preferences.sendShortcut == 'shiftEnter',
@@ -1822,6 +1867,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     leading: [
       _navigationButton(compact),
       if (!compact) ...[
+        const SizedBox(width: 24),
         IgnorePointer(child: Icon(_headerIcon, size: 22)),
         const SizedBox(width: 12),
       ],
@@ -1959,6 +2005,13 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
                           index: _workspacePageIndex,
                           children: [
                             Dashboard(
+                              active:
+                                  dashboard &&
+                                  !devicePage &&
+                                  !serverList &&
+                                  !applicationSettings,
+                              openCommunity: (target) =>
+                                  unawaited(openDashboardCommunity(target)),
                               workspaces: workspaces,
                               presence: presence,
                               homeAction: home.supported ? showHome : null,
