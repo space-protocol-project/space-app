@@ -34,6 +34,7 @@ import '../src/voice_signaling.dart';
 import 'voice_devices.dart';
 import 'voice_rooms.dart';
 import 'forum.dart';
+import 'feed.dart';
 import 'voice_room_navigation.dart';
 import 'navigation_group_header.dart';
 import '../src/preferences.dart';
@@ -1226,6 +1227,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             Section.chat,
             Section.rooms,
             Section.forum,
+            Section.feed,
           ])
             _sidebarSection(section),
         ],
@@ -1316,6 +1318,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             _sidebarSection(Section.chat),
           _sidebarSection(Section.rooms),
           _sidebarSection(Section.forum),
+          _sidebarSection(Section.feed),
           const Divider(),
           ListTile(
             key: const ValueKey('my-device-tab'),
@@ -1683,10 +1686,10 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             session: controller.mlsSession,
             active: selected == Section.forum,
           ),
-          Section.feed => UnavailablePanel(
-            title: context.strings.feedTitle,
-            description: context.strings.feedDescription,
-            icon: Icons.view_agenda_outlined,
+          Section.feed => FeedView(
+            session: controller.mlsSession,
+            active: selected == Section.feed && !drawerOpen,
+            sendWithShift: widget.preferences.sendShortcut == 'shiftEnter',
           ),
           Section.rooms => VoiceRoomsView(
             roomId: selectedVoiceRoom,

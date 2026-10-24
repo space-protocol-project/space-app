@@ -892,4 +892,19 @@ class AdminLocalizationsRu extends AdminLocalizations {
   @override
   String get forumSectionPrivacy =>
       'Форум не поддерживает публичное превью и сквозное шифрование. Архивный раздел доступен только для чтения.';
+
+  @override
+  String get feedSectionsTitle => 'Разделы ленты';
+
+  @override
+  String get feedSectionDefaults =>
+      'Участники получают обычный доступ к разделу. Публикация и комментирование разрешаются отдельно в ленте.';
+
+  @override
+  String get feedSectionAccessHelp =>
+      'Эти правила управляют чтением и модерацией раздела. Права публикации и комментариев настройте в меню ленты.';
+
+  @override
+  String get feedSectionPrivacy =>
+      'Публикации доступны серверу. Сквозное шифрование и публичный предпросмотр недоступны.';
 }

@@ -33,6 +33,12 @@ import 'root_device_proof.dart';
 import 'origin_binding.dart';
 import 'rpc_connection.dart';
 import 'forum_api.dart';
+import 'feed_api.dart';
+
+import 'package:connectrpc/connect.dart' as connect;
+
+import 'generated/space/v1/feed.pb.dart' as feed;
+import 'generated/space/v1/feed.connect.spec.dart' as feed_specs;
 import 'generated/space/v1/forum.pb.dart' as forum;
 import 'generated/space/v1/forum.connect.spec.dart' as forum_specs;
 import 'generated/space/v1/voice.pb.dart' as voice;
@@ -44,6 +50,7 @@ part 'queued_mutation_rpc.dart';
 part 'push_registration.dart';
 part 'voice_rpc.dart';
 part 'forum_rpc.dart';
+part 'feed_rpc.dart';
 
 String url64(List<int> value) => base64Url.encode(value).replaceAll('=', '');
 
@@ -791,6 +798,7 @@ class SpaceSession
   bool attachmentsEnabled = false;
   bool mlsSupported = false;
   bool forumSupported = false;
+  bool feedSupported = false;
   bool forumNavigationSupported = false;
   bool forumModerationSupported = false;
   bool forumReportsSupported = false;
@@ -850,6 +858,7 @@ class SpaceSession
     mlsSupported = manifest.mlsSupported;
     repliesSupported = manifest.ordinaryRepliesSupported;
     forumSupported = manifest.capabilities.contains('core.forum.v1');
+    feedSupported = manifest.capabilities.contains('core.feed.v1');
     forumModerationSupported = manifest.capabilities.contains(
       'core.forum.moderation.v1',
     );
@@ -887,7 +896,7 @@ class SpaceSession
           c.title.isEmpty ||
           c.latestMessageSequence.isNegative ||
           !c.views.any(
-            (v) => ['chat', 'voice_room', 'forum'].contains(v.type),
+            (v) => ['chat', 'voice_room', 'forum', 'feed'].contains(v.type),
           ) ||
           !c.hasPermissions()) {
         throw const LocalFailure(
@@ -1249,6 +1258,7 @@ class SpaceSession
       );
       session.repliesSupported = manifest.ordinaryRepliesSupported;
       session.forumSupported = manifest.capabilities.contains('core.forum.v1');
+      session.feedSupported = manifest.capabilities.contains('core.feed.v1');
       session.forumModerationSupported = manifest.capabilities.contains(
         'core.forum.moderation.v1',
       );

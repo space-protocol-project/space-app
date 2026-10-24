@@ -126,6 +126,46 @@ Future<void> toggle(WidgetTester tester, String key) async {
 }
 
 void main() {
+  for (final locale in ['ru', 'en', 'zh']) {
+    testWidgets(
+      'Лента: отдельный тип и независимые права публикации: $locale',
+      (tester) async {
+        final server = ChannelServer();
+        final strings = lookupAdminLocalizations(Locale(locale));
+        await tester.pumpWidget(
+          MaterialApp(
+            locale: Locale(locale),
+            supportedLocales: AdminLocalizations.supportedLocales,
+            localizationsDelegates: AdminLocalizations.localizationsDelegates,
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: ChannelsPanel(call: server.call, feed: true),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text(strings.feedSectionsTitle), findsOneWidget);
+        await press(tester, strings.channelCreateSection);
+        await tester.enterText(
+          find.byKey(const ValueKey('new-channel-title')),
+          'Новости',
+        );
+        expect(find.text(strings.feedSectionDefaults), findsOneWidget);
+        final create = find.widgetWithText(FilledButton, strings.channelCreate);
+        await tester.ensureVisible(create);
+        await tester.tap(create);
+        await tester.pumpAndSettle();
+        final id = server.channels.keys.singleWhere((id) => id != 'general');
+        expect(server.channels[id]!['views'], [
+          {'type': 'feed'},
+        ]);
+        expect(server.channels[id]!['publicPreview'], false);
+        expect(find.text(strings.channelPublicPreview), findsNothing);
+        expect(find.text(strings.feedSectionAccessHelp), findsOneWidget);
+      },
+    );
+  }
   testWidgets('Форум: создание отдельного раздела и права модератора', (
     tester,
   ) async {

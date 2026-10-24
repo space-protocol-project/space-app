@@ -310,10 +310,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get forumDescription => '为需要更多时间的讨论提供空间。';
 
   @override
-  String get feedTitle => '一点灵感。';
+  String get feedTitle => '空间动态';
 
   @override
-  String get feedDescription => '你关注的人发布的内容。';
+  String get feedDescription => '此空间的新闻和成员发布。';
 
   @override
   String get search => '搜索';
@@ -2374,6 +2374,103 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get forumReportReply => '回复举报';
+
+  @override
+  String get feedPrivacy => '服务器可读取发布内容，未使用端到端加密。';
+
+  @override
+  String get feedSections => '动态分区';
+
+  @override
+  String get feedPolicy => '发布和评论权限';
+
+  @override
+  String get feedEmptySections => '暂无可用的动态分区。';
+
+  @override
+  String get feedEmpty => '暂无发布。';
+
+  @override
+  String get feedReadOnly => '您无权在此分区发布。';
+
+  @override
+  String get feedBack => '返回动态';
+
+  @override
+  String get feedComments => '评论';
+
+  @override
+  String get feedHiddenPost => '此发布已被版主隐藏。';
+
+  @override
+  String get feedHiddenComment => '此评论已被版主隐藏。';
+
+  @override
+  String get feedRestoreComment => '恢复评论';
+
+  @override
+  String get feedRestorePost => '恢复发布';
+
+  @override
+  String get feedSendFailed => '发送失败。文本和文件已保留。请检查权限和连接后重试。';
+
+  @override
+  String get feedPublishPermission => '发布动态';
+
+  @override
+  String get feedCommentPermission => '发表评论';
+
+  @override
+  String get feedPolicyHelp =>
+      '发布和评论分别授权。没有规则时两者均禁止。个人规则替代角色规则。读者经明确授权可评论，但不可发布。';
+
+  @override
+  String get feedPrincipal => '成员标识符（可选，否则使用角色）';
+
+  @override
+  String get feedRole => '角色';
+
+  @override
+  String get feedAddRule => '添加规则';
+
+  @override
+  String get feedRemoveRule => '删除规则';
+
+  @override
+  String get feedPost => '发布';
+
+  @override
+  String get feedComment => '评论';
+
+  @override
+  String get feedOpenPost => '打开发布';
+
+  @override
+  String get feedUpdateRuntime => '此服务器尚不支持动态，请在家庭服务器中更新。';
+
+  @override
+  String get feedConnectFirst => '连接空间以查看动态。';
+
+  @override
+  String get feedConflict => '发布内容或权限已更改，请刷新后重试。';
+
+  @override
+  String get feedDenied => '访问权限已撤销或此分区不可用，请刷新动态。';
+
+  @override
+  String get feedWriteUnavailable => '此操作不可用：发布已隐藏或分区已归档，请刷新动态。';
+
+  @override
+  String get feedInvalidText => '请输入不超过8192个UTF-8字节的文本或附加文件。';
+
+  @override
+  String get feedActions => '操作';
+
+  @override
+  String get feedMemberRole => '成员';
+
+  @override
+  String get feedReaderRole => '读者';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).

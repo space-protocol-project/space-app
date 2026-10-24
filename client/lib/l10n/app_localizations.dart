@@ -692,13 +692,13 @@ abstract class AppLocalizations {
   /// No description provided for @feedTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Немного вдохновения.'**
+  /// **'Лента пространства'**
   String get feedTitle;
 
   /// No description provided for @feedDescription.
   ///
   /// In ru, this message translates to:
-  /// **'Публикации людей, которых вы выбрали.'**
+  /// **'Новости и публикации участников этого пространства.'**
   String get feedDescription;
 
   /// No description provided for @search.
@@ -4665,6 +4665,198 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Жалоба на ответ'**
   String get forumReportReply;
+
+  /// No description provided for @feedPrivacy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Публикации доступны серверу. Сквозное шифрование не используется.'**
+  String get feedPrivacy;
+
+  /// No description provided for @feedSections.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разделы ленты'**
+  String get feedSections;
+
+  /// No description provided for @feedPolicy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Права публикации и комментариев'**
+  String get feedPolicy;
+
+  /// No description provided for @feedEmptySections.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступных разделов ленты пока нет.'**
+  String get feedEmptySections;
+
+  /// No description provided for @feedEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Публикаций пока нет.'**
+  String get feedEmpty;
+
+  /// No description provided for @feedReadOnly.
+  ///
+  /// In ru, this message translates to:
+  /// **'У вас нет права публиковать в этом разделе.'**
+  String get feedReadOnly;
+
+  /// No description provided for @feedBack.
+  ///
+  /// In ru, this message translates to:
+  /// **'К публикациям'**
+  String get feedBack;
+
+  /// No description provided for @feedComments.
+  ///
+  /// In ru, this message translates to:
+  /// **'Комментарии'**
+  String get feedComments;
+
+  /// No description provided for @feedHiddenPost.
+  ///
+  /// In ru, this message translates to:
+  /// **'Публикация скрыта модератором.'**
+  String get feedHiddenPost;
+
+  /// No description provided for @feedHiddenComment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Комментарий скрыт модератором.'**
+  String get feedHiddenComment;
+
+  /// No description provided for @feedRestoreComment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановить комментарий'**
+  String get feedRestoreComment;
+
+  /// No description provided for @feedRestorePost.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановить публикацию'**
+  String get feedRestorePost;
+
+  /// No description provided for @feedSendFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось отправить. Текст и файлы сохранены. Проверьте права и подключение и повторите попытку.'**
+  String get feedSendFailed;
+
+  /// No description provided for @feedPublishPermission.
+  ///
+  /// In ru, this message translates to:
+  /// **'Публиковать записи'**
+  String get feedPublishPermission;
+
+  /// No description provided for @feedCommentPermission.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оставлять комментарии'**
+  String get feedCommentPermission;
+
+  /// No description provided for @feedPolicyHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Публикация и комментирование разрешаются отдельно. Без правила оба действия запрещены. Правило участника заменяет правило роли. Читатель может комментировать по явному разрешению, но не публиковать.'**
+  String get feedPolicyHelp;
+
+  /// No description provided for @feedPrincipal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Идентификатор участника — необязательно; иначе применяется роль'**
+  String get feedPrincipal;
+
+  /// No description provided for @feedRole.
+  ///
+  /// In ru, this message translates to:
+  /// **'Роль'**
+  String get feedRole;
+
+  /// No description provided for @feedAddRule.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить правило'**
+  String get feedAddRule;
+
+  /// No description provided for @feedRemoveRule.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить правило'**
+  String get feedRemoveRule;
+
+  /// No description provided for @feedPost.
+  ///
+  /// In ru, this message translates to:
+  /// **'Публикация'**
+  String get feedPost;
+
+  /// No description provided for @feedComment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Комментарий'**
+  String get feedComment;
+
+  /// No description provided for @feedOpenPost.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть публикацию'**
+  String get feedOpenPost;
+
+  /// No description provided for @feedUpdateRuntime.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер ещё не поддерживает ленту. Обновите сервер через «Эфир».'**
+  String get feedUpdateRuntime;
+
+  /// No description provided for @feedConnectFirst.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключитесь к пространству, чтобы открыть ленту.'**
+  String get feedConnectFirst;
+
+  /// No description provided for @feedConflict.
+  ///
+  /// In ru, this message translates to:
+  /// **'Публикация или права изменились. Обновите данные и повторите действие.'**
+  String get feedConflict;
+
+  /// No description provided for @feedDenied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ отозван или раздел недоступен. Обновите ленту.'**
+  String get feedDenied;
+
+  /// No description provided for @feedWriteUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действие недоступно: публикация скрыта или раздел архивирован. Обновите ленту.'**
+  String get feedWriteUnavailable;
+
+  /// No description provided for @feedInvalidText.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите текст до 8192 байт UTF-8 или прикрепите файл.'**
+  String get feedInvalidText;
+
+  /// No description provided for @feedActions.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действия'**
+  String get feedActions;
+
+  /// No description provided for @feedMemberRole.
+  ///
+  /// In ru, this message translates to:
+  /// **'Участники'**
+  String get feedMemberRole;
+
+  /// No description provided for @feedReaderRole.
+  ///
+  /// In ru, this message translates to:
+  /// **'Читатели'**
+  String get feedReaderRole;
 }
 
 class _AppLocalizationsDelegate

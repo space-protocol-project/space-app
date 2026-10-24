@@ -374,5 +374,9 @@
   "forumSectionsTitle": "Forum sections and permissions",
   "forumSectionDefaults": "Members can read, create topics and reply; readers can only read.",
   "forumSectionAccessHelp": "Manage and Read permissions allow closing topics. The device needs administrative access. Authorship alone does not allow closing.",
-  "forumSectionPrivacy": "Forum sections do not support public previews or end-to-end encryption. Archived sections are read-only."
+  "forumSectionPrivacy": "Forum sections do not support public previews or end-to-end encryption. Archived sections are read-only.",
+  "feedSectionsTitle": "Feed sections",
+  "feedSectionDefaults": "Members receive regular section access. Publishing and commenting are granted separately in the feed.",
+  "feedSectionAccessHelp": "These rules control section reading and moderation. Set publishing and commenting permissions in the feed menu.",
+  "feedSectionPrivacy": "Posts are visible to the server. End-to-end encryption and public preview are unavailable."
 }

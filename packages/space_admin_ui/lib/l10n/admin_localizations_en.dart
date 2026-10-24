@@ -891,4 +891,19 @@ class AdminLocalizationsEn extends AdminLocalizations {
   @override
   String get forumSectionPrivacy =>
       'Forum sections do not support public previews or end-to-end encryption. Archived sections are read-only.';
+
+  @override
+  String get feedSectionsTitle => 'Feed sections';
+
+  @override
+  String get feedSectionDefaults =>
+      'Members receive regular section access. Publishing and commenting are granted separately in the feed.';
+
+  @override
+  String get feedSectionAccessHelp =>
+      'These rules control section reading and moderation. Set publishing and commenting permissions in the feed menu.';
+
+  @override
+  String get feedSectionPrivacy =>
+      'Posts are visible to the server. End-to-end encryption and public preview are unavailable.';
 }

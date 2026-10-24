@@ -6,6 +6,8 @@ targets:
           - lib/src/attachments.dart
           - lib/src/channel_files_controller.dart
           - lib/src/chat_controller.dart
+          - lib/src/feed_controller.dart
+          - lib/src/feed_management.dart
           - lib/src/home_controller.dart
           - lib/src/message_search_controller.dart
           - lib/src/preferences.dart

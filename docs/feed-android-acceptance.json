@@ -1,0 +1,32 @@
+{
+  "physicalDeviceTested": false,
+  "nativeTestsPassed": 5,
+  "success": true,
+  "artifacts": [
+    {
+      "file": "Space-feed-local-armeabi-v7a-debug.apk",
+      "signatureVerified": true,
+      "bytes": 151636868,
+      "nativeLibrariesVerified": true,
+      "sha256": "24fc84cbb13ca3bd57a86a15f1fd682c32da041b9b240ec593b07192f2b6a7e2",
+      "abi": "armeabi-v7a"
+    },
+    {
+      "file": "Space-feed-local-arm64-v8a-debug.apk",
+      "signatureVerified": true,
+      "bytes": 187601258,
+      "nativeLibrariesVerified": true,
+      "sha256": "0a2439c592a204163e2fb2e3274a1cf6fb4a3b15a414825a1e23e7e15e12e310",
+      "abi": "arm64-v8a"
+    },
+    {
+      "file": "Space-feed-local-x86_64-debug.apk",
+      "signatureVerified": true,
+      "bytes": 182374663,
+      "nativeLibrariesVerified": true,
+      "sha256": "4a627ac96bafa29ae2f4915fa4aa4472ae9a29b6c60ae608277fca97ef2f6f23",
+      "abi": "x86_64"
+    }
+  ],
+  "mode": "debug"
+}

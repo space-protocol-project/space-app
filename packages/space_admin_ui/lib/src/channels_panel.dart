@@ -26,10 +26,12 @@ class ChannelsPanel extends StatefulWidget {
     required this.call,
     this.voiceRooms = false,
     this.forum = false,
+    this.feed = false,
   });
   final AdminCall call;
   final bool voiceRooms;
   final bool forum;
+  final bool feed;
   @override
   State<ChannelsPanel> createState() => _ChannelsPanelState();
 }
@@ -37,7 +39,9 @@ class ChannelsPanel extends StatefulWidget {
 class _ChannelsPanelState extends State<ChannelsPanel> {
   final operations = AdminOperations();
   bool get busy => operations.state.busy;
-  String get viewType => widget.forum
+  String get viewType => widget.feed
+      ? 'feed'
+      : widget.forum
       ? 'forum'
       : widget.voiceRooms
       ? 'voice_room'
@@ -522,11 +526,15 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
     ),
   );
 
-  String get _panelTitle => widget.forum
-      ? strings.forumSectionsTitle
-      : widget.voiceRooms
-      ? strings.voiceRoomsTitle
-      : strings.channelsTitle;
+  String get _panelTitle {
+    if (widget.feed) return strings.feedSectionsTitle;
+    return widget.forum
+        ? strings.forumSectionsTitle
+        : widget.voiceRooms
+        ? strings.voiceRoomsTitle
+        : strings.channelsTitle;
+  }
+
   String get _reloadLabel =>
       widget.voiceRooms ? strings.voiceRoomsReload : strings.channelsReload;
   String get _emptyLabel =>
@@ -536,24 +544,32 @@ class _ChannelsPanelState extends State<ChannelsPanel> {
       : strings.channelCreateSection;
   String get _newTitleLabel =>
       widget.voiceRooms ? strings.voiceRoomNewTitle : strings.channelNewTitle;
-  String get _defaultsLabel => widget.forum
-      ? strings.forumSectionDefaults
-      : widget.voiceRooms
-      ? strings.voiceRoomDefaults
-      : strings.channelDefaults;
+  String get _defaultsLabel {
+    if (widget.feed) return strings.feedSectionDefaults;
+    return widget.forum
+        ? strings.forumSectionDefaults
+        : widget.voiceRooms
+        ? strings.voiceRoomDefaults
+        : strings.channelDefaults;
+  }
+
   String get _createLabel =>
       widget.voiceRooms ? strings.voiceRoomCreate : strings.channelCreate;
   String get _saveLabel =>
       widget.voiceRooms ? strings.voiceRoomSave : strings.channelSave;
   String get _deleteLabel =>
       widget.voiceRooms ? strings.voiceRoomDelete : strings.channelDelete;
-  String get _accessHelp => widget.forum
-      ? strings.forumSectionAccessHelp
-      : widget.voiceRooms
-      ? strings.voiceRoomAccessHelp
-      : strings.channelAccessHelp;
+  String get _accessHelp {
+    if (widget.feed) return strings.feedSectionAccessHelp;
+    return widget.forum
+        ? strings.forumSectionAccessHelp
+        : widget.voiceRooms
+        ? strings.voiceRoomAccessHelp
+        : strings.channelAccessHelp;
+  }
 
   List<Widget> _previewControls() {
+    if (widget.feed) return [Text(strings.feedSectionPrivacy)];
     if (widget.forum) return [Text(strings.forumSectionPrivacy)];
     if (widget.voiceRooms) return [Text(strings.voiceRoomArchiveHelp)];
     return [

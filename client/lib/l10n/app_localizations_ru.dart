@@ -320,10 +320,11 @@ class AppLocalizationsRu extends AppLocalizations {
       'Место для обсуждений, которым нужно больше времени.';
 
   @override
-  String get feedTitle => 'Немного вдохновения.';
+  String get feedTitle => 'Лента пространства';
 
   @override
-  String get feedDescription => 'Публикации людей, которых вы выбрали.';
+  String get feedDescription =>
+      'Новости и публикации участников этого пространства.';
 
   @override
   String get search => 'Поиск';
@@ -2583,4 +2584,110 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get forumReportReply => 'Жалоба на ответ';
+
+  @override
+  String get feedPrivacy =>
+      'Публикации доступны серверу. Сквозное шифрование не используется.';
+
+  @override
+  String get feedSections => 'Разделы ленты';
+
+  @override
+  String get feedPolicy => 'Права публикации и комментариев';
+
+  @override
+  String get feedEmptySections => 'Доступных разделов ленты пока нет.';
+
+  @override
+  String get feedEmpty => 'Публикаций пока нет.';
+
+  @override
+  String get feedReadOnly => 'У вас нет права публиковать в этом разделе.';
+
+  @override
+  String get feedBack => 'К публикациям';
+
+  @override
+  String get feedComments => 'Комментарии';
+
+  @override
+  String get feedHiddenPost => 'Публикация скрыта модератором.';
+
+  @override
+  String get feedHiddenComment => 'Комментарий скрыт модератором.';
+
+  @override
+  String get feedRestoreComment => 'Восстановить комментарий';
+
+  @override
+  String get feedRestorePost => 'Восстановить публикацию';
+
+  @override
+  String get feedSendFailed =>
+      'Не удалось отправить. Текст и файлы сохранены. Проверьте права и подключение и повторите попытку.';
+
+  @override
+  String get feedPublishPermission => 'Публиковать записи';
+
+  @override
+  String get feedCommentPermission => 'Оставлять комментарии';
+
+  @override
+  String get feedPolicyHelp =>
+      'Публикация и комментирование разрешаются отдельно. Без правила оба действия запрещены. Правило участника заменяет правило роли. Читатель может комментировать по явному разрешению, но не публиковать.';
+
+  @override
+  String get feedPrincipal =>
+      'Идентификатор участника — необязательно; иначе применяется роль';
+
+  @override
+  String get feedRole => 'Роль';
+
+  @override
+  String get feedAddRule => 'Добавить правило';
+
+  @override
+  String get feedRemoveRule => 'Удалить правило';
+
+  @override
+  String get feedPost => 'Публикация';
+
+  @override
+  String get feedComment => 'Комментарий';
+
+  @override
+  String get feedOpenPost => 'Открыть публикацию';
+
+  @override
+  String get feedUpdateRuntime =>
+      'Сервер ещё не поддерживает ленту. Обновите сервер через «Эфир».';
+
+  @override
+  String get feedConnectFirst =>
+      'Подключитесь к пространству, чтобы открыть ленту.';
+
+  @override
+  String get feedConflict =>
+      'Публикация или права изменились. Обновите данные и повторите действие.';
+
+  @override
+  String get feedDenied =>
+      'Доступ отозван или раздел недоступен. Обновите ленту.';
+
+  @override
+  String get feedWriteUnavailable =>
+      'Действие недоступно: публикация скрыта или раздел архивирован. Обновите ленту.';
+
+  @override
+  String get feedInvalidText =>
+      'Введите текст до 8192 байт UTF-8 или прикрепите файл.';
+
+  @override
+  String get feedActions => 'Действия';
+
+  @override
+  String get feedMemberRole => 'Участники';
+
+  @override
+  String get feedReaderRole => 'Читатели';
 }

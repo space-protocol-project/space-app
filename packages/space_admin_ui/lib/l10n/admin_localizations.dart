@@ -1695,6 +1695,30 @@ abstract class AdminLocalizations {
   /// In ru, this message translates to:
   /// **'Форум не поддерживает публичное превью и сквозное шифрование. Архивный раздел доступен только для чтения.'**
   String get forumSectionPrivacy;
+
+  /// No description provided for @feedSectionsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разделы ленты'**
+  String get feedSectionsTitle;
+
+  /// No description provided for @feedSectionDefaults.
+  ///
+  /// In ru, this message translates to:
+  /// **'Участники получают обычный доступ к разделу. Публикация и комментирование разрешаются отдельно в ленте.'**
+  String get feedSectionDefaults;
+
+  /// No description provided for @feedSectionAccessHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эти правила управляют чтением и модерацией раздела. Права публикации и комментариев настройте в меню ленты.'**
+  String get feedSectionAccessHelp;
+
+  /// No description provided for @feedSectionPrivacy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Публикации доступны серверу. Сквозное шифрование и публичный предпросмотр недоступны.'**
+  String get feedSectionPrivacy;
 }
 
 class _AdminLocalizationsDelegate

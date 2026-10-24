@@ -839,4 +839,16 @@ class AdminLocalizationsZh extends AdminLocalizations {
 
   @override
   String get forumSectionPrivacy => '论坛版块不支持公开预览和端到端加密。已归档版块为只读。';
+
+  @override
+  String get feedSectionsTitle => '动态分区';
+
+  @override
+  String get feedSectionDefaults => '成员获得常规分区访问权限。发布和评论须在动态中分别授权。';
+
+  @override
+  String get feedSectionAccessHelp => '这些规则控制分区的阅读和管理。请在动态菜单中设置发布和评论权限。';
+
+  @override
+  String get feedSectionPrivacy => '服务器可读取发布内容，不支持端到端加密和公开预览。';
 }

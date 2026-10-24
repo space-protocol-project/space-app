@@ -1,6 +1,11 @@
 name: Установщики приложения
 on:
   workflow_dispatch:
+    inputs:
+      server_ref:
+        description: SHA сервера для проверки совместимой пары; по умолчанию .github/space-server.ref
+        type: string
+        default: ''
   push:
     branches: [main]
     tags: ['v*']
@@ -108,6 +113,9 @@ jobs:
       - name: Навигация, фокус и сохранение черновика
         working-directory: client
         run: flutter test test/navigation_reveal_test.dart test/mobile_navigation_test.dart test/mobile_client_test.dart test/redesign_test.dart
+      - name: Лента и мобильная навигация Android
+        working-directory: client
+        run: flutter test test/feed_test.dart test/feed_android_test.dart
       - name: Голосовые комнаты и завершение захвата микрофона
         working-directory: client
         run: flutter test test/voice_android_test.dart test/voice_network_test.dart test/voice_audio_test.dart test/voice_transmission_test.dart test/voice_shortcut_test.dart test/voice_microphone_test.dart test/voice_devices_test.dart test/voice_device_call_test.dart test/voice_recovery_test.dart test/voice_controller_test.dart test/voice_widgets_test.dart test/voice_semantics_test.dart test/tooltip_semantics_test.dart test/channels_test.dart
@@ -258,11 +266,20 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: app-source
+      - name: Закреплённый сервер совместимой пары
+        id: server-ref
+        shell: bash
+        env:
+          REQUESTED_SERVER_REF: ${{ inputs.server_ref }}
+        run: |
+          server_ref="$REQUESTED_SERVER_REF"
+          if [ -z "$server_ref" ]; then server_ref=$(cat app-source/.github/space-server.ref); fi
+          if [[ ! "$server_ref" =~ ^[0-9a-f]{40}$ ]]; then echo 'Нужен полный SHA сервера'; exit 1; fi
+          echo "ref=$server_ref" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
         with:
           repository: space-protocol-project/space-server
-          # Runtime v0.7.14 на Go 1.27.3, схема 30.
-          ref: 48de57e19e40afd97a0ece2ba252c2c65397fb6b
+          ref: ${{ steps.server-ref.outputs.ref }}
           path: space-server
       - uses: actions/setup-go@v5
         with:

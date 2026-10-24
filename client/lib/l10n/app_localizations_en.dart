@@ -317,10 +317,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forumDescription => 'A place for discussions that need more time.';
 
   @override
-  String get feedTitle => 'A little inspiration.';
+  String get feedTitle => 'Space feed';
 
   @override
-  String get feedDescription => 'Posts from people you choose.';
+  String get feedDescription => 'News and posts from this space.';
 
   @override
   String get search => 'Search';
@@ -2566,4 +2566,108 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forumReportReply => 'Reply report';
+
+  @override
+  String get feedPrivacy =>
+      'Posts are visible to the server. End-to-end encryption is not used.';
+
+  @override
+  String get feedSections => 'Feed sections';
+
+  @override
+  String get feedPolicy => 'Publishing and commenting permissions';
+
+  @override
+  String get feedEmptySections => 'No feed sections are available yet.';
+
+  @override
+  String get feedEmpty => 'No posts yet.';
+
+  @override
+  String get feedReadOnly => 'You cannot publish in this section.';
+
+  @override
+  String get feedBack => 'Back to posts';
+
+  @override
+  String get feedComments => 'Comments';
+
+  @override
+  String get feedHiddenPost => 'This post was hidden by a moderator.';
+
+  @override
+  String get feedHiddenComment => 'This comment was hidden by a moderator.';
+
+  @override
+  String get feedRestoreComment => 'Restore comment';
+
+  @override
+  String get feedRestorePost => 'Restore post';
+
+  @override
+  String get feedSendFailed =>
+      'Could not send. Text and files have been kept. Check your permissions and connection, then try again.';
+
+  @override
+  String get feedPublishPermission => 'Publish posts';
+
+  @override
+  String get feedCommentPermission => 'Write comments';
+
+  @override
+  String get feedPolicyHelp =>
+      'Publishing and commenting are granted separately. Both are denied without a rule. An individual rule replaces the role rule. Readers may comment when explicitly allowed, but cannot publish.';
+
+  @override
+  String get feedPrincipal => 'Member ID — optional; otherwise use the role';
+
+  @override
+  String get feedRole => 'Role';
+
+  @override
+  String get feedAddRule => 'Add rule';
+
+  @override
+  String get feedRemoveRule => 'Remove rule';
+
+  @override
+  String get feedPost => 'Post';
+
+  @override
+  String get feedComment => 'Comment';
+
+  @override
+  String get feedOpenPost => 'Open post';
+
+  @override
+  String get feedUpdateRuntime =>
+      'This server does not support the feed yet. Update it in Home server.';
+
+  @override
+  String get feedConnectFirst => 'Connect to a space to open its feed.';
+
+  @override
+  String get feedConflict =>
+      'The post or permissions changed. Refresh and try again.';
+
+  @override
+  String get feedDenied =>
+      'Access was revoked or this section is unavailable. Refresh the feed.';
+
+  @override
+  String get feedWriteUnavailable =>
+      'This action is unavailable: the post is hidden or the section is archived. Refresh the feed.';
+
+  @override
+  String get feedInvalidText =>
+      'Enter text up to 8192 UTF-8 bytes or attach a file.';
+
+  @override
+  String get feedActions => 'Actions';
+
+  @override
+  String get feedMemberRole => 'Members';
+
+  @override
+  String get feedReaderRole => 'Readers';
 }
