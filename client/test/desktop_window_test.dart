@@ -118,8 +118,16 @@ void main() {
         minimized = true;
         state.onWindowClose();
         await closed.future.timeout(const Duration(seconds: 3));
-        final next = DesktopWindowState(prefs);
+        var screenReads = 0;
+        final next = DesktopWindowState(
+          prefs,
+          readWorkAreas: () {
+            screenReads++;
+            return [const Rect.fromLTWH(0, 0, 1920, 1080)];
+          },
+        );
         await next.restore();
+        expect(screenReads, 1);
         expect(bounds, normal);
         expect(maximized, true);
       },

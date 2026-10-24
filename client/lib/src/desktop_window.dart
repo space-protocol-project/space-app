@@ -10,6 +10,11 @@ import 'package:window_manager/window_manager.dart';
 
 const windowStateKey = 'space.window.v1';
 
+List<Rect> _nativeWorkAreas() => [
+  for (final display in DisplayManager.instance.getAll())
+    display.workArea.toRect(),
+];
+
 class SavedWindow {
   const SavedWindow(this.bounds, {this.maximized = false});
   final Rect bounds;
@@ -80,11 +85,16 @@ Rect visibleWindowBounds(Rect bounds, List<Rect> workAreas) {
 }
 
 class DesktopWindowState with WindowListener {
-  DesktopWindowState(this.preferences, {WindowManager? manager})
-    : manager = manager ?? windowManager,
-      saved = SavedWindow.decode(preferences.getString(windowStateKey));
+  DesktopWindowState(
+    this.preferences, {
+    WindowManager? manager,
+    List<Rect> Function()? readWorkAreas,
+  }) : manager = manager ?? windowManager,
+       readWorkAreas = readWorkAreas ?? _nativeWorkAreas,
+       saved = SavedWindow.decode(preferences.getString(windowStateKey));
   final SharedPreferences preferences;
   final WindowManager manager;
+  final List<Rect> Function() readWorkAreas;
   SavedWindow? saved;
   Timer? _timer;
   Future<void> _pending = Future<void>.value();
@@ -115,11 +125,7 @@ class DesktopWindowState with WindowListener {
       if (saved != null) {
         var bounds = saved!.bounds;
         try {
-          final displays = DisplayManager.instance.getAll();
-          bounds = visibleWindowBounds(bounds, [
-            for (final display in displays)
-              display.workArea.toRect(),
-          ]);
+          bounds = visibleWindowBounds(bounds, readWorkAreas());
         } catch (_) {}
         saved = SavedWindow(bounds, maximized: saved!.maximized);
         await manager.setBounds(bounds);
