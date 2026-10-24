@@ -29,6 +29,7 @@ export 'home_backup_policy.dart';
 import 'home_update_executor.dart';
 import 'home_update_journal.dart';
 import 'local_failure.dart';
+import 'managed_process.dart';
 
 part 'home_controller.freezed.dart';
 
@@ -199,6 +200,7 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
   download;
   Directory? _root;
   Process? _process;
+  bool get ownsProcess => _process != null;
   RandomAccessFile? _lock;
   Future<void>? _unlocking;
   bool busy = false, running = false, _disposed = false;
@@ -906,10 +908,13 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
     final process = _process;
     if (process != null) {
       // EOF запускает штатное завершение Go, затем остановку собственной PostgreSQL.
-      await process.stdin.close().timeout(const Duration(seconds: 3));
-      stopProgress = .35;
-      _update();
-      final code = await process.exitCode.timeout(const Duration(seconds: 30));
+      await stopManagedProcess(
+        process,
+        onInputClosed: () {
+          stopProgress = .35;
+          _update();
+        },
+      );
       stopProgress = .8;
       _update();
       final pidFile = _root == null
@@ -917,9 +922,6 @@ class HomeController extends EventController<HomeEvent<dynamic>, HomeState> {
           : File('${_root!.path}/data/postgres/postmaster.pid');
       if (pidFile != null && await pidFile.exists()) {
         throw StateError('PostgreSQL не подтвердила остановку: $_diagnostic');
-      }
-      if (code != 0 && pidFile == null) {
-        throw StateError('Ошибка остановки домашнего сервера: $_diagnostic');
       }
       _process = null;
       stopProgress = .95;

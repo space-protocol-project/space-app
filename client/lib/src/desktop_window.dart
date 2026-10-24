@@ -89,19 +89,23 @@ class DesktopWindowState with WindowListener {
     this.preferences, {
     WindowManager? manager,
     List<Rect> Function()? readWorkAreas,
+    this.prepareExit,
   }) : manager = manager ?? windowManager,
        readWorkAreas = readWorkAreas ?? _nativeWorkAreas,
        saved = SavedWindow.decode(preferences.getString(windowStateKey));
   final SharedPreferences preferences;
   final WindowManager manager;
   final List<Rect> Function() readWorkAreas;
+  final Future<bool> Function()? prepareExit;
   SavedWindow? saved;
   Timer? _timer;
   Future<void> _pending = Future<void>.value();
   bool _closing = false;
   bool _restoring = true;
 
-  static Future<DesktopWindowState?> initialize() async {
+  static Future<DesktopWindowState?> initialize({
+    Future<bool> Function()? prepareExit,
+  }) async {
     if (kIsWeb ||
         ![
           TargetPlatform.windows,
@@ -111,7 +115,10 @@ class DesktopWindowState with WindowListener {
       return null;
     }
     await windowManager.ensureInitialized();
-    final state = DesktopWindowState(await SharedPreferences.getInstance());
+    final state = DesktopWindowState(
+      await SharedPreferences.getInstance(),
+      prepareExit: prepareExit,
+    );
     windowManager.addListener(state);
     await windowManager.setPreventClose(true);
     return state;
@@ -188,6 +195,15 @@ class DesktopWindowState with WindowListener {
   }
 
   Future<void> _saveAndClose() async {
+    try {
+      if (await prepareExit?.call() == false) {
+        _closing = false;
+        return;
+      }
+    } catch (_) {
+      _closing = false;
+      return;
+    }
     try {
       await save().timeout(const Duration(seconds: 2));
     } catch (_) {

@@ -6,14 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:space_admin_ui/space_admin_ui.dart';
 
 import 'src/chat_controller.dart';
+import 'src/app_shutdown.dart';
 import 'src/preferences.dart';
 import 'l10n/app_localizations.dart';
 import 'ui/shell.dart';
 import 'ui/interface_scale.dart';
+import 'ui/app_shutdown_gate.dart';
 
 class SpaceApp extends StatefulWidget {
-  const SpaceApp({super.key, this.controller});
+  const SpaceApp({super.key, this.controller, this.shutdown});
   final ChatController? controller;
+  final AppShutdown? shutdown;
   @override
   State<SpaceApp> createState() => _SpaceAppState();
 }
@@ -41,7 +44,10 @@ class _SpaceAppState extends State<SpaceApp> {
           title: 'Space',
           builder: (context, child) => InterfaceScale(
             scale: state.uiScale,
-            child: child ?? const SizedBox.shrink(),
+            child: AppShutdownGate(
+              shutdown: widget.shutdown,
+              child: child ?? const SizedBox.shrink(),
+            ),
           ),
           debugShowCheckedModeBanner: false,
           scrollBehavior: const MaterialScrollBehavior(),
@@ -56,6 +62,7 @@ class _SpaceAppState extends State<SpaceApp> {
             preferences: preferences,
             startupReady: startupReady,
             controller: widget.controller,
+            shutdown: widget.shutdown,
           ),
         ),
       );

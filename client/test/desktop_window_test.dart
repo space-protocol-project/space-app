@@ -104,7 +104,14 @@ void main() {
               .defaultBinaryMessenger
               .setMockMethodCallHandler(channel, null),
         );
-        final state = await DesktopWindowState.initialize();
+        final cleanup = Completer<bool>();
+        var exitCalls = 0;
+        final state = await DesktopWindowState.initialize(
+          prepareExit: () {
+            exitCalls++;
+            return cleanup.future;
+          },
+        );
         expect(state, isNotNull);
         await state!.save();
         final normal = bounds;
@@ -117,6 +124,12 @@ void main() {
         );
         minimized = true;
         state.onWindowClose();
+        state.onWindowClose();
+        await Future<void>.delayed(Duration.zero);
+        expect(exitCalls, 1);
+        expect(preventClose, true);
+        expect(closed.isCompleted, false);
+        cleanup.complete(true);
         await closed.future.timeout(const Duration(seconds: 3));
         var screenReads = 0;
         final next = DesktopWindowState(
@@ -133,4 +146,33 @@ void main() {
       },
     );
   }
+
+  test(
+    'Неподтверждённый выход сохраняет окно; следующий запрос может завершиться',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      var allowExit = false;
+      var closes = 0;
+      const channel = MethodChannel('window_manager');
+      final messenger =
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        if (call.method == 'isMinimized') return true;
+        if (call.method == 'close') closes++;
+        return null;
+      });
+      addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
+      final state = DesktopWindowState(
+        await SharedPreferences.getInstance(),
+        prepareExit: () async => allowExit,
+      );
+      state.onWindowClose();
+      await Future<void>.delayed(Duration.zero);
+      expect(closes, 0);
+      allowExit = true;
+      state.onWindowClose();
+      await Future<void>.delayed(Duration.zero);
+      expect(closes, 1);
+    },
+  );
 }

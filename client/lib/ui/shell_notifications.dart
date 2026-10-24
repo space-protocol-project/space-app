@@ -198,7 +198,8 @@ extension _ShellNotifications on _SpaceShellState {
   }
 
   Future<void> queueNotificationOpen(String payload) async {
-    if (widget.preferences.notificationMode == 0 ||
+    if (exiting ||
+        widget.preferences.notificationMode == 0 ||
         ChatNotificationTarget.decode(payload) == null) {
       return;
     }
@@ -216,7 +217,7 @@ extension _ShellNotifications on _SpaceShellState {
 
   Future<void> drainNotificationOpen() async {
     final payload = deferredNotification;
-    if (!mounted || notificationOpening || payload == null) return;
+    if (!mounted || exiting || notificationOpening || payload == null) return;
     notificationOpening = true;
     try {
       deferredNotification = null;
@@ -300,6 +301,7 @@ extension _ShellNotifications on _SpaceShellState {
     int epoch,
   ) =>
       mounted &&
+      !exiting &&
       epoch == notificationOpenEpoch &&
       widget.preferences.notificationMode != 0 &&
       target.accessible(chat.state);

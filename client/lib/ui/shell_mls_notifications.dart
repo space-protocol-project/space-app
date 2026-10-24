@@ -1,8 +1,12 @@
 part of 'shell.dart';
 
 extension _ShellMlsNotifications on _SpaceShellState {
-  Future<void> pollMlsNotifications() =>
-      mlsNotificationWatcher.poll(notificationMlsSources(), queueNotification);
+  Future<void> pollMlsNotifications() => exiting
+      ? Future.value()
+      : mlsNotificationWatcher.poll(
+          notificationMlsSources(),
+          queueNotification,
+        );
 
   List<MlsNotificationSource> notificationMlsSources() => [
     for (final chat in workspaces.controllers.values)

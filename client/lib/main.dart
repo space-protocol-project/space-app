@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import 'app.dart';
 import 'src/desktop_window.dart';
+import 'src/app_shutdown.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,12 +31,15 @@ Future<void> main() async {
     }
   });
   DesktopWindowState? desktopWindow;
+  final shutdown = AppShutdown();
   try {
-    desktopWindow = await DesktopWindowState.initialize();
+    desktopWindow = await DesktopWindowState.initialize(
+      prepareExit: shutdown.request,
+    );
   } catch (_) {
     // Недоступные настройки окна не мешают запуску приложения.
   }
-  runApp(const SpaceApp());
+  runApp(SpaceApp(shutdown: shutdown));
   if (desktopWindow != null) {
     unawaited(desktopWindow.restore().catchError((Object _) {}));
   }

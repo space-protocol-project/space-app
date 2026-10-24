@@ -12,6 +12,7 @@ import '../l10n/app_localizations.dart';
 import 'admin_panel.dart';
 
 import 'dart:async';
+import 'dart:ui' show AppExitResponse;
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
@@ -44,6 +45,7 @@ import '../src/home_controller.dart';
 import '../src/home_migration.dart';
 import '../src/device_migration.dart';
 import '../src/saved_drafts.dart';
+import '../src/app_shutdown.dart';
 import 'device_transfer_area.dart';
 
 import 'package:path_provider/path_provider.dart';
@@ -107,8 +109,10 @@ class SpaceShell extends StatefulWidget {
     this.notifications,
     this.startupReady,
     this.hostingEnabled = true,
+    this.shutdown,
   });
   final bool hostingEnabled;
+  final AppShutdown? shutdown;
   final AppPreferences preferences;
   final AppUpdates? updates;
   final SystemNotifications? notifications;
@@ -446,7 +450,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   }
 
   Future<void> watchSavedServers() async {
-    if (movingDevice) return;
+    if (movingDevice || exiting) return;
     deniedHandled.removeWhere(
       (origin) => workspaces[origin]?.accessRemoved != true,
     );
@@ -456,7 +460,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   }
 
   void announcePresence(ServerPresenceChange change) {
-    if (!mounted || movingDevice) return;
+    if (!mounted || movingDevice || exiting) return;
     if (change.online &&
         !(home.busy &&
             home.phase == HomePhase.stopping &&
@@ -489,6 +493,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    widget.shutdown?.prepare = prepareExit;
     WidgetsBinding.instance.addObserver(this);
     mlsNotificationTimer = Timer.periodic(
       const Duration(seconds: 3),
@@ -565,6 +570,73 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   Future<void> stopHome() async {
     final owner = homeClient(home.server?.publicOrigin ?? '');
     await home.stop(disconnectClient: owner?.disconnect);
+  }
+
+  @override
+  Future<AppExitResponse> didRequestAppExit() async =>
+      await widget.shutdown?.request() == false
+      ? AppExitResponse.cancel
+      : AppExitResponse.exit;
+
+  Future<void> prepareExit() async {
+    try {
+      await _finishAppOperations();
+      if (_exitSessions.any(
+        (session) => session.sendStatus == MessageSendStatus.unconfirmed,
+      )) {
+        throw StateError('Есть неподтверждённые сообщения');
+      }
+      await Future.wait([widget.preferences.flush(), SavedDrafts.flush()])
+          .timeout(const Duration(seconds: 5));
+      await _disconnectForExit();
+      if (home.running || home.ownsProcess) {
+        await home.stop().timeout(const Duration(seconds: 60));
+        if (home.running || home.failureCode != null || home.busy) {
+          throw StateError('Домашний сервер не подтвердил остановку');
+        }
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Завершение не подтверждено. Приложение остаётся открытым; проверьте состояние домашнего сервера и повторите выход.',
+            ),
+          ),
+        );
+      }
+      rethrow;
+    }
+  }
+
+  Set<ChatController> get _exitSessions => {
+    ...workspaces.controllers.values,
+    ...transientControllers,
+    initialController,
+  };
+
+  bool get exiting =>
+      widget.shutdown?.state == AppShutdownState.stopping ||
+      widget.shutdown?.state == AppShutdownState.stopped;
+
+  Future<void> _finishAppOperations() async {
+    final deadline = DateTime.now().add(const Duration(seconds: 10));
+    while (home.busy ||
+        notificationOpening ||
+        movingDevice ||
+        _exitSessions.any((session) => session.busy)) {
+      if (!mounted || DateTime.now().isAfter(deadline)) {
+        throw StateError('Операции приложения ещё не завершены');
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+  }
+
+  Future<void> _disconnectForExit() async {
+    await voice.leave().timeout(const Duration(seconds: 5));
+    await Future.wait([
+      for (final session in _exitSessions) session.disconnect(),
+    ]).timeout(const Duration(seconds: 12));
   }
 
   Future<void> prepareAppInstall() async {
@@ -921,6 +993,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    widget.shutdown?.prepare = null;
     if (widget.voiceController == null) unawaited(voice.close());
     mlsNotificationTimer?.cancel();
     mlsNotificationWatcher.dispose();

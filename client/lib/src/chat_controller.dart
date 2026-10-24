@@ -1638,12 +1638,15 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
 
   Future<void> _disconnect() async {
     if (busy) return;
-    _stopOutbox();
-    try {
-      await _flushHistory().timeout(const Duration(seconds: 3));
-    } catch (_) {}
     busy = true;
     connected = false;
+    _stopOutbox();
+    try {
+      await Future.wait([
+        _finishOutbox(),
+        _flushHistory().timeout(const Duration(seconds: 3)),
+      ]);
+    } catch (_) {}
     _stopCatalog();
     _stopSubscription();
     _update();
