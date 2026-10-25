@@ -1,6 +1,10 @@
 use openmls::prelude::*;
 use tls_codec::{Deserialize, Serialize};
 
+#[cfg(test)]
+#[path = "channel_mentions_tests.rs"]
+mod mentions_tests;
+
 use crate::{
     Device, Error, MAX_GROUP_DEVICES, MAX_HANDSHAKE_SIZE, MAX_MESSAGE_SIZE, Message, Result, SUITE,
     TrustedDevice,
@@ -26,6 +30,7 @@ impl ClosedChannel {
         valid_group_id(group_id)?;
         let config = MlsGroupCreateConfig::builder()
             .ciphersuite(SUITE)
+            .capabilities(crate::message_capabilities::capabilities())
             .use_ratchet_tree_extension(true)
             .wire_format_policy(PURE_CIPHERTEXT_WIRE_FORMAT_POLICY)
             .build();
@@ -152,6 +157,7 @@ impl ClosedChannel {
             return Err(Error::Mls);
         }
         message.validate()?;
+        crate::message_capabilities::require_recipients(&self.group, message)?;
         let payload =
             zeroize::Zeroizing::new(serde_json::to_vec(message).map_err(|_| Error::InvalidInput)?);
         let encrypted = self
@@ -236,7 +242,9 @@ impl ClosedChannel {
             .self_update(
                 &device.provider,
                 &device.signer,
-                LeafNodeParameters::default(),
+                LeafNodeParameters::builder()
+                    .with_capabilities(crate::message_capabilities::capabilities())
+                    .build(),
             )
             .map_err(|_| Error::Mls)?
             .into_messages();
@@ -251,6 +259,10 @@ impl ClosedChannel {
                 signature_key: member.signature_key,
             })
             .collect()
+    }
+
+    pub fn message_features(&self) -> crate::MessageFeatures {
+        crate::message_capabilities::features(&self.group)
     }
 
     pub fn verify_members(&self, roster: &[TrustedDevice]) -> Result<()> {

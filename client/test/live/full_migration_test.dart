@@ -6,7 +6,6 @@ import 'package:space_client/src/home_archive_inspection.dart';
 import 'package:space_client/src/key_vault.dart';
 import 'package:space_client/src/migration_archive.dart';
 import 'package:space_client/src/mls/local_store.dart';
-import 'package:space_client/src/mls/client.dart';
 import 'package:space_client/src/mls/native.dart';
 import 'package:space_client/src/root_rotation.dart' as rotation;
 import 'package:space_client/src/rpc_clients.dart' show AuthServiceClient;

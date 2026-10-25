@@ -2829,4 +2829,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get notificationOpen => 'Открыть';
+
+  @override
+  String get mlsMentionsLegacy =>
+      'Не все устройства подтвердили поддержку упоминаний. Отправится только имя без отметки обращения.';
+
+  @override
+  String get mlsCancelRetry =>
+      'Отменить отложенные отправки после смены состава';
 }

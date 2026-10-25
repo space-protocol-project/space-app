@@ -1009,5 +1009,7 @@
   "notificationNext": "Следующая страница",
   "notificationUnavailable": "Нет доступных разделов",
   "notificationReply": "Ответ вам",
-  "notificationOpen": "Открыть"
+  "notificationOpen": "Открыть",
+  "mlsMentionsLegacy": "Не все устройства подтвердили поддержку упоминаний. Отправится только имя без отметки обращения.",
+  "mlsCancelRetry": "Отменить отложенные отправки после смены состава"
 }

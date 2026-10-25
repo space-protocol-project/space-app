@@ -1,24 +1,42 @@
 import 'dart:async';
 
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+
 import '../files.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:grpc/grpc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+import '../generated/space/v1/community_mentions.pb.dart';
 
 import '../rpc_clients.dart';
 import 'client.dart';
 import 'files.dart';
 import 'local_store.dart';
+import 'mentions.dart';
+
+part 'controller.freezed.dart';
 
 sealed class MlsEvent {}
 
 class MlsRefresh extends MlsEvent {}
 
+class MlsCancelRetry extends MlsEvent {}
+
 class MlsSend extends MlsEvent {
-  MlsSend(this.text, this.files, {this.reply});
+  MlsSend(
+    this.text,
+    this.files, {
+    this.reply,
+    List<CommunityMention> mentions = const [],
+  }) : mentions = List.unmodifiable(
+         mentions.map((m) => m.deepCopy()..freeze()),
+       );
   final String text;
   final List<SpaceFile> files;
   final Map<String, dynamic>? reply;
+  final List<CommunityMention> mentions;
   final done = Completer<bool>();
 }
 
@@ -49,19 +67,15 @@ class MlsReact extends MlsEvent {
   final bool active;
 }
 
-class MlsState {
-  const MlsState({
-    this.busy = false,
-    this.error = '',
-    this.data,
-    this.sent = 0,
-    this.recoveryRequired = false,
-  });
-  final bool busy;
-  final bool recoveryRequired;
-  final String error;
-  final MlsChannelData? data;
-  final int sent;
+@freezed
+abstract class MlsState with _$MlsState {
+  const factory MlsState({
+    @Default(false) bool busy,
+    @Default('') String error,
+    MlsChannelData? data,
+    @Default(0) int sent,
+    @Default(false) bool recoveryRequired,
+  }) = _MlsState;
 }
 
 class MlsController extends Bloc<MlsEvent, MlsState> {
@@ -77,15 +91,7 @@ class MlsController extends Bloc<MlsEvent, MlsState> {
   Future<void> _handle(MlsEvent event, Emitter<MlsState> emit) async {
     working = true;
     if (event is! MlsRefresh || state.data == null) {
-      emit(
-        MlsState(
-          busy: true,
-          data: state.data,
-          sent: state.sent,
-          error: state.error,
-          recoveryRequired: state.recoveryRequired,
-        ),
-      );
+      emit(state.copyWith(busy: true));
     }
     var sent = state.sent;
     var accepted = false;
@@ -124,7 +130,11 @@ class MlsController extends Bloc<MlsEvent, MlsState> {
       final document = await client.local.read();
       final channel =
           (document['channels'] as Map)[channelId] as Map<String, dynamic>?;
-      return channel == null ? null : MlsChannelData(channel);
+      if (channel == null) return null;
+      final features = channel['joined'] == true
+          ? await client.local.messageFeatures(groupId)
+          : const MlsMessageFeatures.legacy();
+      return MlsChannelData(channel, messageFeatures: features);
     } catch (_) {
       return null;
     }
@@ -147,6 +157,8 @@ class MlsController extends Bloc<MlsEvent, MlsState> {
     switch (event) {
       case MlsRefresh():
         break;
+      case MlsCancelRetry():
+        await client.cancelRebasedMessages(channelId);
       case MlsTrust():
         await client.trust(event.device);
       case MlsInvite():
@@ -163,9 +175,14 @@ class MlsController extends Bloc<MlsEvent, MlsState> {
           event.active,
         );
       case MlsSend():
-        await MlsFiles(
-          client,
-        ).send(channelId, groupId, event.text, event.files, reply: event.reply);
+        await MlsFiles(client).send(
+          channelId,
+          groupId,
+          event.text,
+          event.files,
+          reply: event.reply,
+          mentions: event.mentions,
+        );
     }
   }
 }

@@ -1009,5 +1009,7 @@
   "notificationNext": "下一页",
   "notificationUnavailable": "没有可访问的分区",
   "notificationReply": "回复你的消息",
-  "notificationOpen": "打开"
+  "notificationOpen": "打开",
+  "mlsMentionsLegacy": "部分设备尚未确认支持提及。将仅发送姓名，不包含提及标记。",
+  "mlsCancelRetry": "取消成员变更后的待发送消息"
 }

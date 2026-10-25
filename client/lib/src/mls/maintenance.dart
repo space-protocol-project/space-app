@@ -56,9 +56,12 @@ extension MlsMaintenance on MlsClient {
     await _removeInvalidDevices(id, active);
     final updated = _channel(await local.read(), id);
     final previous = updated['last_self_update'] as int? ?? 0;
-    if ((updated['outbox'] as List).isEmpty &&
+    final upgrade =
+        view.messageFeatures.known && !view.messageFeatures.ownMentions;
+    final expired =
         DateTime.now().millisecondsSinceEpoch - previous >=
-            const Duration(days: 1).inMilliseconds) {
+        const Duration(days: 1).inMilliseconds;
+    if ((updated['outbox'] as List).isEmpty && (upgrade || expired)) {
       await selfUpdate(id);
     }
     await _retryRebasedMessage(id);

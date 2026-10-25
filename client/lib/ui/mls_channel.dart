@@ -1,4 +1,8 @@
 import '../src/community_mentions.dart';
+import '../src/generated/space/v1/community_mentions.pb.dart';
+import '../src/mls/drafts.dart';
+import '../src/mls/mentions.dart';
+import 'mention_badge.dart';
 import '../src/community_mentions_api.dart';
 import 'community_mentions.dart';
 import 'message_input_surface.dart';
@@ -53,10 +57,23 @@ class MlsChannelView extends StatefulWidget {
 }
 
 class _MlsChannelViewState extends State<MlsChannelView> {
-  late final Future<MlsClient> future = widget.session.mlsClient();
-  late final mentionApi = SessionCommunityMentionApi(widget.session);
+  late Future<MlsClient> future = widget.session.mlsClient();
+  late CommunityMentionApi mentionApi = SessionCommunityMentionApi(
+    widget.session,
+  );
+
+  @override
+  void didUpdateWidget(covariant MlsChannelView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.session, widget.session)) {
+      future = widget.session.mlsClient();
+      mentionApi = SessionCommunityMentionApi(widget.session);
+    }
+  }
+
   @override
   Widget build(BuildContext context) => FutureBuilder<MlsClient>(
+    key: ObjectKey(widget.session),
     future: future,
     builder: (context, snapshot) {
       if (snapshot.hasError) {
@@ -69,6 +86,11 @@ class _MlsChannelViewState extends State<MlsChannelView> {
         return const Center(child: CircularProgressIndicator());
       }
       return _MlsConversation(
+        key: ValueKey((
+          client.local.storageKey,
+          widget.channelId,
+          base64Encode(widget.groupId),
+        )),
         client: client,
         mentionApi: widget.session.chatMentionsSupported ? mentionApi : null,
         channelId: widget.channelId,
@@ -85,6 +107,7 @@ class _MlsChannelViewState extends State<MlsChannelView> {
 
 class _MlsConversation extends StatefulWidget {
   const _MlsConversation({
+    super.key,
     required this.client,
     this.mentionApi,
     required this.channelId,
@@ -113,7 +136,15 @@ class _MlsConversationState extends State<_MlsConversation> {
     widget.groupId,
   );
   final draft = TextEditingController();
-  final mentions = MentionDraftCubit();
+  late final mentions = MlsMentionDraftCubit(
+    jsonEncode([
+      'mls/draft/v1',
+      widget.client.local.storageKey,
+      widget.channelId,
+      base64Encode(widget.groupId),
+    ]),
+  );
+  StreamSubscription<MentionDraftState>? draftSubscription;
   final scroll = ScrollController();
   final messageKeys = <String, GlobalKey>{};
   int seenJump = -1;
@@ -164,6 +195,7 @@ class _MlsConversationState extends State<_MlsConversation> {
   List<SpaceFile> files = [];
   bool submitting = false;
   String? submittedText;
+  List<CommunityMention> submittedMentions = const [];
   Map<String, dynamic>? replyTarget;
   Map<String, dynamic>? submittedReply;
   Timer? timer;
@@ -173,6 +205,14 @@ class _MlsConversationState extends State<_MlsConversation> {
   void initState() {
     super.initState();
     draft.addListener(() => mentions.change(draft.text));
+    draftSubscription = mentions.stream.listen((value) {
+      if (!identical(value, mentions.state) || draft.text == value.text) return;
+      draft.value = TextEditingValue(
+        text: value.text,
+        selection: TextSelection.collapsed(offset: value.text.length),
+      );
+    });
+    unawaited(mentions.load());
     controller.add(MlsRefresh());
     timer = Timer.periodic(const Duration(seconds: 2), (_) {
       if (widget.active && !controller.working) controller.add(MlsRefresh());
@@ -193,6 +233,7 @@ class _MlsConversationState extends State<_MlsConversation> {
   @override
   void dispose() {
     timer?.cancel();
+    unawaited(draftSubscription?.cancel());
     unawaited(controller.close());
     unawaited(mentions.close());
     draft.dispose();
@@ -514,12 +555,7 @@ class _MlsConversationState extends State<_MlsConversation> {
                     principalId: principal,
                     onSet: canReact ? react : null,
                   ),
-                  metadata: Text(
-                    DateFormat.Hm().format(
-                      DateTime.fromMillisecondsSinceEpoch(item['time'] as int),
-                    ),
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
+                  metadata: messageMetadata(item, principal),
                 ),
               ),
             ],
@@ -536,6 +572,42 @@ class _MlsConversationState extends State<_MlsConversation> {
       !submitting &&
       state.data?.joined == true &&
       widget.canWrite;
+
+  Widget messageMetadata(Map<String, dynamic> item, String principal) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      MentionBadge(
+        key: ValueKey('mls-mention-${mlsMessageKey(item)}'),
+        mentions: checkedMlsMentions(item['message'] as Map),
+        principal: principal,
+      ),
+      const SizedBox(width: 8),
+      Text(
+        DateFormat.Hm().format(
+          DateTime.fromMillisecondsSinceEpoch(item['time'] as int),
+        ),
+        style: Theme.of(context).textTheme.labelSmall,
+      ),
+    ],
+  );
+
+  Widget mentionCompatibility(MlsState state) =>
+      BlocBuilder<MentionDraftCubit, MentionDraftState>(
+        bloc: mentions,
+        builder: (context, draftState) {
+          if (draftState.mentions.isEmpty ||
+              state.data?.messageFeatures.allMentions == true) {
+            return const SizedBox.shrink();
+          }
+          return Padding(
+            padding: const EdgeInsets.only(top: 8, bottom: 12),
+            child: Text(
+              context.strings.mlsMentionsLegacy,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          );
+        },
+      );
 
   Widget _attachmentChips(MlsState state) => Wrap(
     children: files
@@ -578,6 +650,7 @@ class _MlsConversationState extends State<_MlsConversation> {
             text: draft,
             enabled: _canSubmit(state),
           ),
+          mentionCompatibility(state),
           Row(
             children: [
               if (widget.attachmentsEnabled)
@@ -702,8 +775,10 @@ class _MlsConversationState extends State<_MlsConversation> {
       draft.text,
       widget.attachmentsEnabled ? List.of(files) : [],
       reply: replyTarget,
+      mentions: mentions.state.mentions,
     );
     submittedText = draft.text;
+    submittedMentions = event.mentions;
     submittedReply = replyTarget;
     setState(() => submitting = true);
     controller.add(event);
@@ -714,7 +789,10 @@ class _MlsConversationState extends State<_MlsConversation> {
   }
 
   void clearSubmitted() {
-    if (draft.text != submittedText) return;
+    if (draft.text != submittedText ||
+        !sameMentions(mentions.state.mentions, submittedMentions)) {
+      return;
+    }
     draft.clear();
     setState(() {
       files = [];
@@ -783,6 +861,10 @@ class _MlsConversationState extends State<_MlsConversation> {
       );
     },
   );
+  bool hasRebasedMessages(MlsState state) =>
+      (state.data?.channel['retry_messages'] as List? ?? const []).isNotEmpty ||
+      state.data?.channel['retry_message'] != null;
+
   Widget _header(MlsState state) => Row(
     children: [
       const SizedBox(width: 16),
@@ -793,6 +875,12 @@ class _MlsConversationState extends State<_MlsConversation> {
         tooltip: 'Защита и история',
         onSelected: _securityAction,
         itemBuilder: (context) => [
+          if (hasRebasedMessages(state))
+            PopupMenuItem(
+              value: 'cancel-retry',
+              enabled: !state.busy,
+              child: Text(context.strings.mlsCancelRetry),
+            ),
           const PopupMenuItem(
             value: 'cancel-transfer',
             child: Text('Отменить ожидающую передачу управления'),
@@ -840,6 +928,10 @@ class _MlsConversationState extends State<_MlsConversation> {
   );
 
   void _securityAction(String action) => safely(() async {
+    if (action == 'cancel-retry') {
+      controller.add(MlsCancelRetry());
+      return;
+    }
     if (action == 'code') {
       await showMlsGroupCode(context, widget.client, widget.channelId);
     } else if (action == 'update') {

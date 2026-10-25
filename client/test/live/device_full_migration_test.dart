@@ -10,7 +10,6 @@ import 'device_migration_home.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/key_vault.dart';
-import 'package:space_client/src/mls/client.dart';
 import 'package:space_client/src/root_rotation.dart' as rotation;
 import 'package:space_client/src/rpc_clients.dart' show AuthServiceClient;
 

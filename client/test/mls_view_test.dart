@@ -15,6 +15,10 @@ import 'package:space_client/ui/mls_files.dart';
 import 'package:space_client/ui/message_footer.dart';
 import 'package:space_client/ui/message_markdown.dart';
 import 'package:space_client/ui/message_reactions.dart';
+import 'package:space_client/ui/community_mentions.dart';
+import 'package:space_client/ui/mention_badge.dart';
+import 'package:space_client/src/generated/space/v1/community_mentions.pb.dart';
+import 'package:space_client/src/mls/mentions.dart';
 
 import 'mls_native_test.dart' show MemoryMlsStorage;
 
@@ -56,6 +60,29 @@ class _Client implements MlsClient {
   @override
   Future<List<MlsDevice>> devices(String channel) async => listed;
   Completer<void>? delayed;
+  Completer<void>? sending;
+  List<CommunityMention> sentMentions = [];
+  @override
+  Future<void> requireMentionTargets(
+    String channel,
+    List<CommunityMention> mentions,
+  ) async {}
+  @override
+  Future<void> requireReplyTarget(String channel, Map? reply) async {}
+  @override
+  Future<void> send(
+    String channel,
+    String text, {
+    List<Map<String, dynamic>> files = const [],
+    List<String> assetIds = const [],
+    List<int>? messageId,
+    Map<String, dynamic>? reply,
+    List<CommunityMention> mentions = const [],
+  }) async {
+    sentMentions = mentions;
+    await sending?.future;
+  }
+
   @override
   Future<MlsChannelData> refresh(String channel, List<int> group) async {
     await delayed?.future;
@@ -85,6 +112,102 @@ Widget app(Widget child) => MaterialApp(
 );
 
 void main() {
+  for (final width in [360.0, 1500.0]) {
+    testWidgets('MLS: обращение, Markdown и отправка на ширине $width', (
+      tester,
+    ) async {
+      tester.view.physicalSize = Size(width, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final client = _Client(1);
+      final mention = CommunityMention(
+        principalId: 'own',
+        displayName: 'Боб',
+        start: 0,
+        length: 4,
+      );
+      final message = client.data.messages.single['message'] as Map;
+      message.addAll(<String, Object>{
+        'version': 2,
+        'text': '@Боб **привет**',
+        'mentions': mlsMentionJson('@Боб **привет**', [mention]),
+        'files': [],
+      });
+      await tester.pumpWidget(
+        app(
+          MlsChannelView(
+            session: _Session(client),
+            channelId: 'private',
+            groupId: List.filled(32, 1),
+            attachmentsEnabled: false,
+            canWrite: true,
+            active: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(MessageMarkdown), findsOneWidget);
+      final badge = find.byType(MentionBadge);
+      expect(badge, findsOneWidget);
+      expect(
+        tester
+            .widget<Tooltip>(
+              find.descendant(of: badge, matching: find.byType(Tooltip)),
+            )
+            .message,
+        contains('@Боб (own)'),
+      );
+      final selected = tester
+          .widget<MentionButton>(find.byType(MentionButton))
+          .draft;
+      selected.restore('@Боб', [mention]);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Не все устройства'), findsOneWidget);
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller!.text,
+        '@Боб',
+      );
+      expect(
+        tester
+            .widget<IconButton>(
+              find.widgetWithIcon(IconButton, Icons.arrow_upward),
+            )
+            .onPressed,
+        isNotNull,
+      );
+      client.sending = Completer<void>();
+      await tester.tap(find.widgetWithIcon(IconButton, Icons.arrow_upward));
+      await tester.pumpAndSettle();
+      expect(
+        client.sentMentions,
+        isNotEmpty,
+        reason: tester
+            .widgetList<Text>(find.byType(Text))
+            .map((t) => t.data)
+            .join('\n'),
+      );
+      expect(client.sentMentions.single.principalId, 'own');
+      selected.restore('@Боб', [
+        mention.deepCopy()..principalId = 'another-bob',
+      ]);
+      await tester.pump();
+      client.sending!.complete();
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller!.text,
+        '@Боб',
+      );
+      expect(selected.state.mentions.single.principalId, 'another-bob');
+      final input = tester.widget<TextField>(find.byType(TextField)).controller!;
+      input.text = 'А';
+      input.text = 'Б';
+      await tester.pump();
+      expect(input.text, 'Б');
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    });
+  }
   for (final width in [390.0, 1500.0]) {
     testWidgets('MLS: Markdown и время справа от реакций на ширине $width', (
       tester,

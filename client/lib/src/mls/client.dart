@@ -11,6 +11,8 @@ import '../rpc_connection.dart';
 import 'local_store.dart';
 import 'envelope_checks.dart';
 import 'replies.dart';
+import 'mentions.dart';
+import '../generated/space/v1/community_mentions.pb.dart';
 import '../reactions.dart';
 
 part 'delivery.dart';
@@ -43,9 +45,14 @@ List<Map<String, dynamic>> mergeMlsHistory(Iterable<dynamic> items) => {
 }.values.toList();
 
 class MlsChannelData {
-  MlsChannelData(this.channel, {this.untrusted = const []});
+  MlsChannelData(
+    this.channel, {
+    this.untrusted = const [],
+    this.messageFeatures = const MlsMessageFeatures.legacy(),
+  });
   final Map<String, dynamic> channel;
   final List<MlsDevice> untrusted;
+  final MlsMessageFeatures messageFeatures;
   bool get joined => channel['joined'] == true;
   List<Map<String, dynamic>> get messages => projectMlsReactions(
     mergeMlsHistory([
@@ -69,6 +76,57 @@ class MlsClient {
   final Future<void> Function(String id, List<int> group)? pinChannel;
   final bool Function()? attachmentsEnabled;
   bool get filesAllowed => attachmentsEnabled?.call() ?? true;
+
+  Future<void> send(
+    String channelId,
+    String text, {
+    List<Map<String, dynamic>> files = const [],
+    List<String> assetIds = const [],
+    List<int>? messageId,
+    Map<String, dynamic>? reply,
+    List<CommunityMention> mentions = const [],
+  }) {
+    final selected = mentions
+        .map((m) => m.deepCopy()..freeze())
+        .toList(growable: false);
+    return _serial(
+      () => _send(
+        channelId,
+        text,
+        files: files,
+        assetIds: assetIds,
+        messageId: messageId,
+        reply: reply,
+        mentions: selected,
+      ),
+    );
+  }
+
+  Future<void> requireMentionTargets(
+    String channelId,
+    List<CommunityMention> mentions,
+  ) async {
+    if (mentions.isEmpty) return;
+    final channel = _channel(await local.read(), channelId);
+    final members = (channel['roster'] as List)
+        .cast<Map>()
+        .map((binding) => (binding['device'] as Map)['principal_id'])
+        .toSet();
+    if (mentions.any((mention) => !members.contains(mention.principalId))) {
+      throw StateError(
+        'Участник покинул закрытый канал. Выберите обращение заново.',
+      );
+    }
+  }
+
+  Future<void> cancelRebasedMessages(String channelId) => _serial(
+    () => local.change((document) {
+      final channel = _channel(document, channelId);
+      channel.remove('retry_message');
+      channel['retry_messages'] = <dynamic>[];
+    }),
+  );
+
   Future<void> requireReplyTarget(String channelId, Map? reply) async {
     if (reply == null) return;
     final channel = _channel(await local.read(), channelId);
@@ -242,7 +300,11 @@ class MlsClient {
       await maintainChannels();
       await _retryRebasedMessage(channelId);
     }
-    return MlsChannelData(_channel(await local.read(), channelId));
+    final current = _channel(await local.read(), channelId);
+    final features = current['joined'] == true
+        ? await local.messageFeatures(groupId)
+        : const MlsMessageFeatures.legacy();
+    return MlsChannelData(current, messageFeatures: features);
   }
 
   Future<void> _ensureLocalChannel(String id, List<int> group) =>

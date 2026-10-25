@@ -1,3 +1,5 @@
+import 'package:space_client/src/generated/space/v1/community_mentions.pb.dart';
+import 'package:space_client/src/mls/mentions.dart';
 import 'package:space_client/src/chat_notifications.dart';
 import 'package:space_client/src/mls/notifications.dart';
 
@@ -159,19 +161,35 @@ void main() {
       );
       await watcher.poll([source], notices.add);
       expect(notices, isEmpty);
-      await a.send('private', 'Секретный текст');
+      expect(view.messageFeatures.allMentions, isTrue);
+      await a.send(
+        'private',
+        '@Участник Секретный текст',
+        mentions: [
+          CommunityMention(
+            principalId: member.principalId,
+            displayName: 'Участник',
+            start: 0,
+            length: 9,
+          ),
+        ],
+      );
       await watcher.poll([source], notices.add);
-      expect(notices.single.message!.text, 'Секретный текст');
+      expect(notices.single.message!.text, '@Участник Секретный текст');
+      expect(
+        notices.single.message!.mentions.single.principalId,
+        member.principalId,
+      );
       expect(
         (await watcher.message(source, notices.single.message!.id))!.text,
-        'Секретный текст',
+        '@Участник Секретный текст',
       );
       await watcher.poll([source], notices.add);
       expect(notices, hasLength(1));
       view = await b.refresh('private', group);
       expect(
         (view.messages.single['message'] as Map)['text'],
-        'Секретный текст',
+        '@Участник Секретный текст',
       );
       final localSearch = await searchMlsMessages(
         b,
@@ -180,8 +198,14 @@ void main() {
         'СЕКРЕТНЫЙ',
         '',
       );
-      expect(localSearch.messages.single.text, 'Секретный текст');
+      expect(localSearch.messages.single.text, '@Участник Секретный текст');
       expect(localSearch.next, isEmpty);
+      expect(
+        checkedMlsMentions(view.messages.single['message'] as Map)
+            .single
+            .principalId,
+        member.principalId,
+      );
       final originalReply = mlsReplyReference(view.messages.single);
       await a.trust(deviceC);
       await a.invite('private', deviceC);
@@ -381,7 +405,7 @@ void main() {
         );
         expect(
           view.messages.any(
-            (m) => (m['message'] as Map)['text'] == 'Секретный текст',
+            (m) => (m['message'] as Map)['text'] == '@Участник Секретный текст',
           ),
           isTrue,
         );
@@ -419,7 +443,15 @@ void main() {
       await expectLater(
         interrupted.send(
           'private',
-          'Очередь пережила отзыв',
+          '@Третий Очередь пережила отзыв',
+          mentions: [
+            CommunityMention(
+              principalId: third.principalId,
+              displayName: 'Третий',
+              start: 0,
+              length: 7,
+            ),
+          ],
           reply: mlsReplyReference(item),
         ),
         throwsA(isA<GrpcError>()),
@@ -460,7 +492,8 @@ void main() {
       expect(
         (await a.refresh('private', group)).messages.where(
           (entry) =>
-              (entry['message'] as Map)['text'] == 'Очередь пережила отзыв',
+              (entry['message'] as Map)['text'] ==
+              '@Третий Очередь пережила отзыв',
         ),
         hasLength(1),
       );
@@ -480,9 +513,13 @@ void main() {
       await c.refresh('private', group);
       final replyView = await c.refresh('private', group);
       final rebasedReply = replyView.messages.singleWhere(
-        (entry) => entry['message']['text'] == 'Очередь пережила отзыв',
+        (entry) => entry['message']['text'] == '@Третий Очередь пережила отзыв',
       );
       expect(rebasedReply['message']['reply'], mlsReplyReference(item));
+      expect(
+        checkedMlsMentions(rebasedReply['message'] as Map).single.principalId,
+        third.principalId,
+      );
       await expectLater(
         b.refresh('private', group),
         throwsA(
@@ -505,7 +542,7 @@ void main() {
               base64Decode((await a.local.read())['snapshot'] as String),
               allowMalformed: true,
             )
-            .contains('Секретный текст'),
+            .contains('@Участник Секретный текст'),
         isFalse,
       );
     },

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../rpc_clients.dart' show Asset, Content;
+import 'mentions.dart';
 
 Map<String, dynamic>? checkedMlsReply(Map message) {
   final value = message['reply'];
@@ -45,6 +46,7 @@ Content? mlsReplyContent(Map? item) {
   return Content(
     authorId: item['author_id'] as String,
     text: message['text'] as String,
+    mentions: checkedMlsMentions(message),
     attachments: [
       for (final file in message['files'] as List)
         Asset(name: (file as Map)['name'] as String),

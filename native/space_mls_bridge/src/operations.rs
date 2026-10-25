@@ -34,6 +34,10 @@ pub fn execute(input: &[u8]) -> Result<Value> {
         &snapshot,
     )?;
     let result = operate(&request, &mut state.device)?;
+    // Чтение возможностей не меняет ratchet, revision или snapshot.
+    if request.op == "message_features" {
+        return Ok(json!({"result":result}));
+    }
     let revision = request.revision.checked_add(1).ok_or(Error::InvalidState)?;
     let snapshot = state
         .device
@@ -69,6 +73,9 @@ fn operate(request: &Request, device: &mut Device) -> Result<Value> {
 fn group_operation(request: &Request, device: &mut Device) -> Result<Value> {
     let mut group = ClosedChannel::restore(device, &bytes(&request.args, "group_id")?)?;
     match request.op.as_str() {
+        "message_features" => {
+            Ok(serde_json::to_value(group.message_features()).map_err(|_| Error::InvalidInput)?)
+        }
         "group_code" => Ok(json!({"epoch":group.epoch(),
             "authenticator":STANDARD.encode(group.epoch_authenticator())})),
         "self_update" => {

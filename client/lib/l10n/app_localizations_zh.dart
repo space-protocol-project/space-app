@@ -2604,6 +2604,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get notificationOpen => '打开';
+
+  @override
+  String get mlsMentionsLegacy => '部分设备尚未确认支持提及。将仅发送姓名，不包含提及标记。';
+
+  @override
+  String get mlsCancelRetry => '取消成员变更后的待发送消息';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3636,4 +3642,10 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get notificationOpen => '打开';
+
+  @override
+  String get mlsMentionsLegacy => '部分设备尚未确认支持提及。将仅发送姓名，不包含提及标记。';
+
+  @override
+  String get mlsCancelRetry => '取消成员变更后的待发送消息';
 }

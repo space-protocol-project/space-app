@@ -2813,4 +2813,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationOpen => 'Open';
+
+  @override
+  String get mlsMentionsLegacy =>
+      'Some devices have not confirmed mention support. Only the name will be sent, without a mention marker.';
+
+  @override
+  String get mlsCancelRetry =>
+      'Cancel pending messages after membership changes';
 }

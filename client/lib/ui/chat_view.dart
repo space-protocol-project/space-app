@@ -1,3 +1,4 @@
+import 'mention_badge.dart';
 import '../src/community_mentions.dart';
 import 'community_mentions.dart';
 import '../src/file_picker.dart';
@@ -1021,22 +1022,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
 
   Widget? _mentionBadge(BuildContext context, Content message) {
     if (message.deleted || message.mentions.isEmpty) return null;
-    final mine = message.mentions.any(
-      (m) => m.principalId == widget.controller.principalId,
-    );
-    final labels = message.mentions
-        .map((m) => '@${m.displayName} (${m.principalId})')
-        .toSet()
-        .join('\n');
-    return Tooltip(
-      message: mine ? '${context.strings.dashboardMention}\n$labels' : labels,
-      child: Icon(
-        Icons.alternate_email,
-        size: 15,
-        color: mine
-            ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.onSurfaceVariant,
-      ),
+    return MentionBadge(
+      mentions: message.mentions,
+      principal: widget.controller.principalId,
     );
   }
 

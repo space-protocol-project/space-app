@@ -49,6 +49,7 @@ extension MlsRecovery on MlsClient {
   Map<String, dynamic> _checkedHistoryItem(dynamic value) {
     final item = value as Map;
     final message = item['message'] as Map;
+    final mentions = checkedMlsMentions(message);
     final text = message['text'] as String;
     if (utf8.encode(text).length > 65536 ||
         (message['files'] as List).length > 5 ||
@@ -68,10 +69,11 @@ extension MlsRecovery on MlsClient {
       'sequence': item['sequence'],
       'time': item['time'],
       'message': {
-        'version': 1,
+        'version': mentions.isEmpty ? 1 : 2,
         'id': message['id'],
         'text': text,
         'files': files,
+        if (mentions.isNotEmpty) 'mentions': mlsMentionJson(text, mentions),
         if (reaction != null) 'reaction': Map<String, dynamic>.from(reaction),
         'reply': ?checkedMlsReply(message),
       },

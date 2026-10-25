@@ -5121,6 +5121,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Открыть'**
   String get notificationOpen;
+
+  /// No description provided for @mlsMentionsLegacy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не все устройства подтвердили поддержку упоминаний. Отправится только имя без отметки обращения.'**
+  String get mlsMentionsLegacy;
+
+  /// No description provided for @mlsCancelRetry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отменить отложенные отправки после смены состава'**
+  String get mlsCancelRetry;
 }
 
 class _AppLocalizationsDelegate

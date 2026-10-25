@@ -16,6 +16,8 @@ class NotificationMlsStore implements MlsLocalStore {
   Object? error;
   String principal = 'me';
   @override
+  String get storageKey => 'test.notification.mls.$principal';
+  @override
   Map<String, dynamic> get scope => {'principal_id': principal};
   @override
   Future<Map<String, dynamic>> read() async {

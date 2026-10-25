@@ -148,6 +148,7 @@ extension MlsReceive on MlsClient {
     Map<String, dynamic> message,
     MlsEnvelope envelope,
   ) {
+    checkedMlsMentions(message);
     final manager = message['manager'];
     if (envelope.kind == 'transfer') {
       final authorized = (channel['managers'] as List).contains(

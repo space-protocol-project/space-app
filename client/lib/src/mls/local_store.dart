@@ -7,6 +7,7 @@ import 'package:crypto/crypto.dart';
 
 import '../key_vault.dart';
 import 'native.dart';
+import 'mentions.dart';
 
 class MlsRecoveryRequired extends StateError {
   MlsRecoveryRequired()
@@ -99,6 +100,25 @@ class MlsLocalStore {
 
   Future<Map<String, dynamic>> read() => _serial(_load);
 
+  // Разрешён только этот читающий вызов: шифрование без сохранения snapshot
+  // здесь недопустимо, поскольку могло бы повторно использовать ratchet.
+  Future<MlsMessageFeatures> messageFeatures(List<int> group) =>
+      _serial(() async {
+        final document = await _load();
+        final reply = await engine.execute({
+          'op': 'message_features',
+          'scope': scope,
+          'key': document['key'],
+          'revision': document['revision'],
+          'binding': document['binding'],
+          'snapshot': document['snapshot'],
+          'args': {'group_id': base64Encode(group)},
+        });
+        return MlsMessageFeatures.read(
+          Map<String, dynamic>.from(reply['result'] as Map),
+        );
+      });
+
   Future<Map<String, dynamic>> _load() async {
     final raw = await storage.read(key: storageKey);
     await _verify(raw);
@@ -113,6 +133,7 @@ class MlsLocalStore {
           jsonEncode(document['scope']) != jsonEncode(scope)) {
         throw StateError('Состояние MLS принадлежит другому устройству');
       }
+      _checkChannelMentions(document);
       return document;
     }
     if (requireExisting) {
@@ -296,6 +317,7 @@ class MlsLocalStore {
         document['trusted'] is! Map) {
       throw const FormatException('Снимок MLS не соответствует устройству');
     }
+    _checkChannelMentions(document);
     final reply = await engine.execute({
       'op': 'key_package',
       'scope': scope,
@@ -307,6 +329,12 @@ class MlsLocalStore {
     });
     document.addAll(reply);
     document.remove('result');
+  }
+
+  void _checkChannelMentions(Map document) {
+    for (final channel in (document['channels'] as Map).values) {
+      checkMlsChannelMentions(channel as Map);
+    }
   }
 
   Future<void> change(void Function(Map<String, dynamic>) change) =>

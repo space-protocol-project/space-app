@@ -1009,5 +1009,7 @@
   "notificationNext": "Next page",
   "notificationUnavailable": "No accessible sections",
   "notificationReply": "Reply to you",
-  "notificationOpen": "Open"
+  "notificationOpen": "Open",
+  "mlsMentionsLegacy": "Some devices have not confirmed mention support. Only the name will be sent, without a mention marker.",
+  "mlsCancelRetry": "Cancel pending messages after membership changes"
 }

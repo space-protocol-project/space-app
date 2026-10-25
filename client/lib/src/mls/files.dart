@@ -4,11 +4,13 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 
 import '../files.dart';
+import '../generated/space/v1/community_mentions.pb.dart';
 
 import 'package:fixnum/fixnum.dart';
 
 import '../rpc_clients.dart';
 import 'client.dart';
+import 'mentions.dart';
 
 class MlsFiles {
   MlsFiles(this.client);
@@ -21,8 +23,11 @@ class MlsFiles {
     String text,
     List<SpaceFile> files, {
     Map<String, dynamic>? reply,
+    List<CommunityMention> mentions = const [],
   }) async {
     if (files.length > 5) throw StateError('Не более пяти файлов');
+    requireMlsMentions(text, mentions);
+    await client.requireMentionTargets(channel, mentions);
     await client.requireReplyTarget(channel, reply);
     final messageId = mlsId();
     final descriptors = <Map<String, dynamic>>[];
@@ -52,6 +57,7 @@ class MlsFiles {
       assetIds: ids,
       messageId: messageId,
       reply: reply,
+      mentions: mentions,
     );
   }
 

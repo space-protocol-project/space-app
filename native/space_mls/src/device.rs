@@ -49,6 +49,7 @@ impl Device {
 
     pub fn key_package(&mut self) -> Result<Vec<u8>> {
         let bundle = KeyPackage::builder()
+            .leaf_node_capabilities(crate::message_capabilities::capabilities())
             .build(SUITE, &self.provider, &self.signer, self.credential.clone())
             .map_err(|_| Error::Mls)?;
         bundle

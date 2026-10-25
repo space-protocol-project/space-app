@@ -13,24 +13,6 @@ extension MlsDelivery on MlsClient {
       );
     }),
   );
-  Future<void> send(
-    String channelId,
-    String text, {
-    List<Map<String, dynamic>> files = const [],
-    List<String> assetIds = const [],
-    List<int>? messageId,
-    Map<String, dynamic>? reply,
-  }) => _serial(
-    () => _send(
-      channelId,
-      text,
-      files: files,
-      assetIds: assetIds,
-      messageId: messageId,
-      reply: reply,
-    ),
-  );
-
   Future<void> _send(
     String channelId,
     String text, {
@@ -39,6 +21,7 @@ extension MlsDelivery on MlsClient {
     List<int>? messageId,
     Map<String, dynamic>? reaction,
     Map<String, dynamic>? reply,
+    List<CommunityMention> mentions = const [],
   }) async {
     final id = messageId ?? mlsId();
     final document = await local.read();
@@ -57,14 +40,14 @@ extension MlsDelivery on MlsClient {
     if ((channel['outbox'] as List).any((item) => !_filePaused(item as Map))) {
       throw StateError('Сначала завершите предыдущую отправку');
     }
-    final message = {
+    final message = await _annotatedMessage(channelId, channel, {
       'version': 1,
       'id': id,
       'text': text,
       'files': files,
       'reaction': ?reaction,
       'reply': ?reply,
-    };
+    }, mentions);
     await local.update(
       'encrypt',
       {'group_id': channel['group_id'], 'message': message},
@@ -87,6 +70,22 @@ extension MlsDelivery on MlsClient {
       },
     );
     await _flush(channelId);
+  }
+
+  Future<Map<String, dynamic>> _annotatedMessage(
+    String channelId,
+    Map channel,
+    Map<String, dynamic> message,
+    List<CommunityMention> mentions,
+  ) async {
+    final selected = mlsMentionJson(message['text'] as String, mentions);
+    if (selected.isEmpty) return message;
+    await requireMentionTargets(channelId, mentions);
+    final features = await local.messageFeatures(
+      base64Decode(channel['group_id'] as String),
+    );
+    if (!features.allMentions) return message;
+    return {...message, 'version': 2, 'mentions': selected};
   }
 
   Future<void> setReaction(
@@ -391,6 +390,7 @@ extension MlsDelivery on MlsClient {
             ? null
             : Map<String, dynamic>.from(message['reply'] as Map),
         files: (message['files'] as List).cast<Map<String, dynamic>>(),
+        mentions: checkedMlsMentions(message),
         assetIds: (retry['asset_ids'] as List).cast<String>(),
       );
     }

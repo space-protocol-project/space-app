@@ -5,6 +5,8 @@ mod binding;
 mod channel;
 mod crypto;
 mod device;
+mod message_capabilities;
+mod message_mentions;
 mod state;
 mod transaction;
 
@@ -12,6 +14,8 @@ pub use attachments::{FileDescriptor, SealedFile, open_file, seal_file};
 pub use binding::{DeviceBinding, SpaceDevice};
 pub use channel::{ClosedChannel, Invitation, ReceivedMessage};
 pub use device::{Device, TrustedDevice};
+pub use message_capabilities::{MENTIONS_EXTENSION, MessageFeatures};
+pub use message_mentions::{MAX_MENTIONS, Mention};
 use openmls::prelude::Ciphersuite;
 use serde::{Deserialize, Serialize};
 pub use state::{PendingDelivery, RestoredState};
@@ -38,6 +42,8 @@ pub enum Error {
     InvalidFile,
     #[error("Состояние повреждено, принадлежит другому устройству или было откачено")]
     InvalidState,
+    #[error("Устройства группы ещё не подтвердили новый формат сообщения")]
+    UnsupportedMessageFormat,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -56,6 +62,12 @@ pub struct Message {
     pub reaction: Option<Reaction>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reply: Option<Reply>,
+    #[serde(
+        default,
+        deserialize_with = "message_mentions::deserialize_mentions",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub mentions: Option<Vec<Mention>>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -84,15 +96,29 @@ impl Message {
             manager: None,
             reaction: None,
             reply: None,
+            mentions: None,
         };
         message.validate()?;
         Ok(message)
     }
 
+    pub fn with_mentions(mut self, mentions: Vec<Mention>) -> Result<Self> {
+        self.mentions = (!mentions.is_empty()).then_some(mentions);
+        self.version = if self.mentions.is_some() { 2 } else { 1 };
+        self.validate()?;
+        Ok(self)
+    }
+
     fn validate(&self) -> Result<()> {
-        if self.version != 1 || self.text.len() > MAX_TEXT_SIZE || self.files.len() > MAX_FILES {
+        if self.text.len() > MAX_TEXT_SIZE || self.files.len() > MAX_FILES {
             return Err(Error::InvalidInput);
         }
+        message_mentions::validate_mentions(
+            self.version,
+            &self.text,
+            self.mentions.as_deref(),
+            self.manager.is_some() || self.reaction.is_some(),
+        )?;
         if let Some(reply) = &self.reply
             && (self.manager.is_some()
                 || self.reaction.is_some()

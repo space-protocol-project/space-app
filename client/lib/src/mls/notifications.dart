@@ -6,6 +6,7 @@ import '../chat_notifications.dart';
 import '../rpc_clients.dart' show Channel, Content;
 import 'client.dart';
 import 'replies.dart';
+import 'mentions.dart';
 
 class MlsNotificationSource {
   MlsNotificationSource({
@@ -188,6 +189,7 @@ class MlsNotificationWatcher {
     channelId: source.channel.id,
     authorId: item['author_id'] as String,
     text: (item['message'] as Map)['text'] as String,
+    mentions: checkedMlsMentions(item['message'] as Map),
     sequence: Int64(item['sequence'] as int),
   );
 

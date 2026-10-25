@@ -67,6 +67,7 @@ Content? _matchingMlsContent(Map item, String channel, String term) {
     id: mlsMessageKey(item),
     channelId: channel,
     text: text,
+    mentions: checkedMlsMentions(item['message'] as Map),
     authorId: item['author_id'] as String,
     sequence: Int64(item['sequence'] as int),
   );
