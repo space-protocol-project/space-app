@@ -6,6 +6,7 @@ import 'mention_badge.dart';
 import '../src/community_mentions_api.dart';
 import 'community_mentions.dart';
 import 'message_input_surface.dart';
+import 'accent_controls.dart';
 import 'message_body_layout.dart';
 import 'message_footer.dart';
 import 'message_markdown.dart';
@@ -674,9 +675,7 @@ class _MlsConversationState extends State<_MlsConversation> {
               IconButton.filled(
                 onPressed: _canSubmit(state) ? submit : null,
                 tooltip: context.strings.mlsSend,
-                style: IconButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                ),
+                style: sendButtonStyle(context),
                 icon: const Icon(Icons.arrow_upward),
               ),
             ],

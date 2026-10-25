@@ -77,6 +77,7 @@ import 'search.dart';
 import 'components.dart';
 import 'space_appearance.dart';
 import 'space_frame.dart';
+import 'unread_counter.dart';
 import 'space_popup.dart';
 import 'measure_size.dart';
 import 'retained_indexed_stack.dart';
@@ -2302,20 +2303,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     ),
     title: Text(channel.title, overflow: TextOverflow.ellipsis),
     trailing: controller.unreadCount(channel.id) > 0
-        ? Tooltip(
-            message: context.strings.unreadCount(
-              controller.unreadCount(channel.id),
-            ),
-            child: Badge(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              textColor: Theme.of(context).colorScheme.onPrimary,
-              label: Text(
-                controller.unreadCount(channel.id) > 99
-                    ? '99+'
-                    : '${controller.unreadCount(channel.id)}',
-              ),
-            ),
-          )
+        ? UnreadCounter(count: controller.unreadCount(channel.id))
         : null,
     subtitle: channel.archived
         ? Text(context.strings.archived)

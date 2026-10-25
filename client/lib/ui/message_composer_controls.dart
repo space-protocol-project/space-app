@@ -6,6 +6,7 @@ import '../src/attachments.dart';
 import 'attachment_widgets.dart';
 import 'emoji_picker.dart';
 import 'message_input_surface.dart';
+import 'accent_controls.dart';
 
 /// Одно поле ввода для чата и форума.
 class MessageDraftField extends StatelessWidget {
@@ -68,9 +69,7 @@ class MessageComposerActions extends StatelessWidget {
         tooltip: editing
             ? context.strings.saveMessage
             : context.strings.sendMessage,
-        style: IconButton.styleFrom(
-          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        ),
+        style: sendButtonStyle(context),
         icon: Icon(editing ? Icons.check : Icons.arrow_upward),
       ),
     ],
