@@ -1,6 +1,6 @@
 part of 'core.dart';
 
-class SessionFeedApi implements FeedApi, CommunitySearchSource {
+class SessionFeedApi implements FeedApi, CommunitySearchSource, FeedReadApi {
   SessionFeedApi(this.session);
   final SpaceSession session;
   @override
@@ -9,6 +9,26 @@ class SessionFeedApi implements FeedApi, CommunitySearchSource {
       : null;
   @override
   bool get supported => session.feedSupported;
+  @override
+  bool get readSupported => session.feedReadSupported;
+  @override
+  Future<feed.FeedPost> markRead(
+    String channel,
+    String post,
+    Int64 through,
+  ) async {
+    if (!readSupported) throw const GrpcError.unimplemented();
+    final response = await _call(
+      feed_specs.FeedService.markFeedPostRead,
+      feed.MarkFeedPostReadRequest(
+        channelId: channel,
+        postId: post,
+        throughSequence: through,
+      ),
+    );
+    return response.post;
+  }
+
   @override
   bool get attachmentsEnabled => supported && session.attachmentsEnabled;
   @override

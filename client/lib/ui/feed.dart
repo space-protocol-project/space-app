@@ -21,6 +21,8 @@ import 'feed_management.dart';
 import 'forum_device_permission.dart';
 import 'forum_moderation.dart';
 import 'forum_widgets.dart' show forumAuthor, forumDate;
+import 'forum_read_tracker.dart';
+import 'space_frame.dart' show SpaceContentInsets;
 import 'message_composer_controls.dart';
 import 'message_input_surface.dart';
 
@@ -136,9 +138,10 @@ class FeedArea extends StatefulWidget {
 }
 
 class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
-  late final controller = FeedController(widget.api);
+  late FeedController controller = FeedController(widget.api);
   Timer? timer;
   final searchTarget = GlobalKey();
+  final readTracker = ForumReadTracker();
   String searchComment = '';
   bool foreground = true;
   @override
@@ -188,11 +191,20 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     foreground = state == AppLifecycleState.resumed;
+    if (foreground) _scheduleRead(controller.state);
   }
 
   @override
   void didUpdateWidget(covariant FeedArea oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.api, widget.api)) {
+      unawaited(controller.close());
+      controller = FeedController(widget.api);
+      searchComment = '';
+      readTracker.select('');
+      unawaited(_loadInitial());
+      return;
+    }
     if (!oldWidget.active && widget.active) unawaited(controller.refresh());
   }
 
@@ -256,18 +268,38 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
     ),
   );
 
-  Widget _page(FeedState state) => PageBody(
-    title: context.strings.feedTitle,
-    description: context.strings.feedDescription,
-    children: [
-      Text(context.strings.feedPrivacy),
-      const SizedBox(height: 16),
-      _toolbar(state),
-      const SizedBox(height: 16),
-      ..._status(state),
-      ..._content(state),
-    ],
-  );
+  void _scheduleRead(FeedState state) {
+    readTracker.select(state.post?.id ?? '');
+    readTracker.schedule(
+      context,
+      () => widget.active && foreground && !controller.state.loading,
+      (sequence) => unawaited(controller.markVisible(sequence)),
+      topPadding: SpaceContentInsets.topOf(context),
+    );
+  }
+
+  Widget _page(FeedState state) {
+    _scheduleRead(state);
+    return NotificationListener<ScrollNotification>(
+      onNotification: (_) {
+        _scheduleRead(controller.state);
+        return false;
+      },
+      child: PageBody(
+        scrollKey: readTracker.viewport,
+        title: context.strings.feedTitle,
+        description: context.strings.feedDescription,
+        children: [
+          Text(context.strings.feedPrivacy),
+          const SizedBox(height: 16),
+          _toolbar(state),
+          const SizedBox(height: 16),
+          ..._status(state),
+          ..._content(state),
+        ],
+      ),
+    );
+  }
 
   Widget _toolbar(FeedState state) => Wrap(
     spacing: 12,
@@ -413,8 +445,8 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
       label: Text(context.strings.feedBack),
     ),
     const SizedBox(height: 12),
-    _post(state.post!, open: false),
-    ...state.comments.map(_comment),
+    readTracker.track(0, _post(state.post!, open: false)),
+    ...state.comments.map(_trackedComment),
     if (state.after > 0)
       TextButton(
         onPressed: state.loading ? null : controller.more,
@@ -423,6 +455,9 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
     const SizedBox(height: 24),
     if (!state.post!.hidden && state.permissions?.comment == true) _composer(),
   ];
+  Widget _trackedComment(FeedComment comment) => comment.hidden
+      ? _comment(comment)
+      : readTracker.track(comment.sequence.toInt(), _comment(comment));
   Widget _post(FeedPost post, {required bool open}) => FeedEntryCard(
     key: ValueKey('feed-post-${post.id}'),
     text: post.text,
@@ -433,18 +468,33 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
     assets: post.attachments,
     session: widget.api.attachmentSession,
     actions: open
-        ? TextButton(
-            onPressed: () => controller.open(post.id),
-            child: Text(
-              '${context.strings.feedComments} · ${post.commentCount}',
-            ),
+        ? Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            children: [
+              if (_hasUnread(post)) _unread(post),
+              TextButton(
+                onPressed: () => controller.open(post.id),
+                child: Text(
+                  '${context.strings.feedComments} · ${post.commentCount}',
+                ),
+              ),
+            ],
           )
         : _postActions(post),
+  );
+  bool _hasUnread(FeedPost post) =>
+      post.readStateSupported && post.unreadCount > 0;
+  Widget _unread(FeedPost post) => Text(
+    '${context.strings.forumUnread}: ${post.unreadCount}',
+    key: ValueKey('feed-unread-${post.id}'),
   );
   Widget _postActions(FeedPost post) => Wrap(
     spacing: 12,
     runSpacing: 8,
     children: [
+      if (_hasUnread(post)) _unread(post),
+      ..._readActions(post),
       if (!post.hidden)
         TextButton(
           onPressed: controller.state.busy ? null : report,
@@ -472,6 +522,24 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
         ),
     ],
   );
+  List<Widget> _readActions(FeedPost post) {
+    if (!controller.readingSupported || post.unreadCount <= 0) return [];
+    final gap = controller.readHasGap;
+    final enabled = !controller.state.busy && !controller.state.loading;
+    return [
+      TextButton.icon(
+        key: ValueKey(gap ? 'feed-open-unread' : 'feed-mark-read'),
+        onPressed: enabled
+            ? (gap ? controller.openUnread : controller.markRead)
+            : null,
+        icon: Icon(gap ? Icons.mark_chat_unread_outlined : Icons.done_all),
+        label: Text(
+          gap ? context.strings.feedOpenUnread : context.strings.forumReadShown,
+        ),
+      ),
+    ];
+  }
+
   Widget _comment(FeedComment comment) => FeedEntryCard(
     key: comment.id == searchComment
         ? searchTarget

@@ -2391,6 +2391,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get feedEmpty => '暂无发布。';
 
   @override
+  String get feedOpenUnread => '打开未读评论';
+
+  @override
   String get feedReadOnly => '您无权在此分区发布。';
 
   @override
@@ -2521,7 +2524,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboardCommunityNews => '社区动态';
 
   @override
-  String get dashboardCommunityDescription => '您有权阅读的分区中的最新主题和动态。主题角标显示未读数量。';
+  String get dashboardCommunityDescription =>
+      '来自可读版块的最新主题与动态。服务器支持阅读记录时，徽标显示未读数量。';
 
   @override
   String get dashboardCommunityFailed => '部分分区刷新失败，请重试。';
@@ -3441,6 +3445,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get migrationExported => '迁移已保存，旧设备已停止。重装系统前请保管归档和密码。';
 
   @override
+  String get feedOpenUnread => '打开未读评论';
+
+  @override
   String get communitySearchHint => '搜索此分区';
 
   @override
@@ -3489,7 +3496,8 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get dashboardCommunityNews => '社区动态';
 
   @override
-  String get dashboardCommunityDescription => '您有权阅读的分区中的最新主题和动态。主题角标显示未读数量。';
+  String get dashboardCommunityDescription =>
+      '来自可读版块的最新主题与动态。服务器支持阅读记录时，徽标显示未读数量。';
 
   @override
   String get dashboardCommunityFailed => '部分分区刷新失败，请重试。';

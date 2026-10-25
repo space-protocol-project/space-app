@@ -53,6 +53,16 @@ const FeedPost$json = {
       '10': 'attachments'
     },
     {'1': 'hidden', '3': 11, '4': 1, '5': 8, '10': 'hidden'},
+    {
+      '1': 'read_state_supported',
+      '3': 12,
+      '4': 1,
+      '5': 8,
+      '10': 'readStateSupported'
+    },
+    {'1': 'seen', '3': 13, '4': 1, '5': 8, '10': 'seen'},
+    {'1': 'read_sequence', '3': 14, '4': 1, '5': 3, '10': 'readSequence'},
+    {'1': 'unread_count', '3': 15, '4': 1, '5': 3, '10': 'unreadCount'},
   ],
 };
 
@@ -64,7 +74,46 @@ final $typed_data.Uint8List feedPostDescriptor = $convert.base64Decode(
     'NyZWF0ZWRBdFVuaXgSGgoIc2VxdWVuY2UYByABKANSCHNlcXVlbmNlEhoKCHJldmlzaW9uGAgg'
     'ASgDUghyZXZpc2lvbhIjCg1jb21tZW50X2NvdW50GAkgASgDUgxjb21tZW50Q291bnQSMQoLYX'
     'R0YWNobWVudHMYCiADKAsyDy5zcGFjZS52MS5Bc3NldFILYXR0YWNobWVudHMSFgoGaGlkZGVu'
-    'GAsgASgIUgZoaWRkZW4=');
+    'GAsgASgIUgZoaWRkZW4SMAoUcmVhZF9zdGF0ZV9zdXBwb3J0ZWQYDCABKAhSEnJlYWRTdGF0ZV'
+    'N1cHBvcnRlZBISCgRzZWVuGA0gASgIUgRzZWVuEiMKDXJlYWRfc2VxdWVuY2UYDiABKANSDHJl'
+    'YWRTZXF1ZW5jZRIhCgx1bnJlYWRfY291bnQYDyABKANSC3VucmVhZENvdW50');
+
+@$core.Deprecated('Use markFeedPostReadRequestDescriptor instead')
+const MarkFeedPostReadRequest$json = {
+  '1': 'MarkFeedPostReadRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'post_id', '3': 2, '4': 1, '5': 9, '10': 'postId'},
+    {'1': 'through_sequence', '3': 3, '4': 1, '5': 3, '10': 'throughSequence'},
+  ],
+};
+
+/// Descriptor for `MarkFeedPostReadRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List markFeedPostReadRequestDescriptor = $convert.base64Decode(
+    'ChdNYXJrRmVlZFBvc3RSZWFkUmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSW'
+    'QSFwoHcG9zdF9pZBgCIAEoCVIGcG9zdElkEikKEHRocm91Z2hfc2VxdWVuY2UYAyABKANSD3Ro'
+    'cm91Z2hTZXF1ZW5jZQ==');
+
+@$core.Deprecated('Use markFeedPostReadResponseDescriptor instead')
+const MarkFeedPostReadResponse$json = {
+  '1': 'MarkFeedPostReadResponse',
+  '2': [
+    {
+      '1': 'post',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.FeedPost',
+      '10': 'post'
+    },
+  ],
+};
+
+/// Descriptor for `MarkFeedPostReadResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List markFeedPostReadResponseDescriptor =
+    $convert.base64Decode(
+        'ChhNYXJrRmVlZFBvc3RSZWFkUmVzcG9uc2USJgoEcG9zdBgBIAEoCzISLnNwYWNlLnYxLkZlZW'
+        'RQb3N0UgRwb3N0');
 
 @$core.Deprecated('Use feedCommentDescriptor instead')
 const FeedComment$json = {
@@ -768,6 +817,11 @@ const $core.Map<$core.String, $core.dynamic> FeedServiceBase$json = {
       '2': '.space.v1.ResolveFeedReportRequest',
       '3': '.space.v1.ResolveFeedReportResponse'
     },
+    {
+      '1': 'MarkFeedPostRead',
+      '2': '.space.v1.MarkFeedPostReadRequest',
+      '3': '.space.v1.MarkFeedPostReadResponse'
+    },
   ],
 };
 
@@ -805,6 +859,8 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
   '.space.v1.FeedReport': FeedReport$json,
   '.space.v1.ResolveFeedReportRequest': ResolveFeedReportRequest$json,
   '.space.v1.ResolveFeedReportResponse': ResolveFeedReportResponse$json,
+  '.space.v1.MarkFeedPostReadRequest': MarkFeedPostReadRequest$json,
+  '.space.v1.MarkFeedPostReadResponse': MarkFeedPostReadResponse$json,
 };
 
 /// Descriptor for `FeedService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
@@ -828,4 +884,6 @@ final $typed_data.Uint8List feedServiceDescriptor = $convert.base64Decode(
     'ZW50UmVzcG9uc2USVgoPTGlzdEZlZWRSZXBvcnRzEiAuc3BhY2UudjEuTGlzdEZlZWRSZXBvcn'
     'RzUmVxdWVzdBohLnNwYWNlLnYxLkxpc3RGZWVkUmVwb3J0c1Jlc3BvbnNlElwKEVJlc29sdmVG'
     'ZWVkUmVwb3J0EiIuc3BhY2UudjEuUmVzb2x2ZUZlZWRSZXBvcnRSZXF1ZXN0GiMuc3BhY2Uudj'
-    'EuUmVzb2x2ZUZlZWRSZXBvcnRSZXNwb25zZQ==');
+    'EuUmVzb2x2ZUZlZWRSZXBvcnRSZXNwb25zZRJZChBNYXJrRmVlZFBvc3RSZWFkEiEuc3BhY2Uu'
+    'djEuTWFya0ZlZWRQb3N0UmVhZFJlcXVlc3QaIi5zcGFjZS52MS5NYXJrRmVlZFBvc3RSZWFkUm'
+    'VzcG9uc2U=');

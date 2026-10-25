@@ -810,6 +810,7 @@ class SpaceSession
   bool mlsSupported = false;
   bool forumSupported = false;
   bool feedSupported = false;
+  bool feedReadSupported = false;
   bool communitySearchSupported = false;
   bool communityOverviewSupported = false;
   @override
@@ -875,6 +876,7 @@ class SpaceSession
     repliesSupported = manifest.ordinaryRepliesSupported;
     forumSupported = manifest.capabilities.contains('core.forum.v1');
     feedSupported = manifest.capabilities.contains('core.feed.v1');
+    feedReadSupported = manifest.capabilities.contains('core.feed.read.v1');
     communityOverviewSupported = manifest.capabilities.contains(
       'core.community.overview.v1',
     );
@@ -1281,6 +1283,9 @@ class SpaceSession
       session.repliesSupported = manifest.ordinaryRepliesSupported;
       session.forumSupported = manifest.capabilities.contains('core.forum.v1');
       session.feedSupported = manifest.capabilities.contains('core.feed.v1');
+      session.feedReadSupported = manifest.capabilities.contains(
+        'core.feed.read.v1',
+      );
       session.communityOverviewSupported = manifest.capabilities.contains(
         'core.community.overview.v1',
       );

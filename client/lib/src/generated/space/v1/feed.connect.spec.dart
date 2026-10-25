@@ -94,4 +94,12 @@ abstract final class FeedService {
     spacev1feed.ResolveFeedReportRequest.new,
     spacev1feed.ResolveFeedReportResponse.new,
   );
+
+  /// core.feed.read.v1: персональная монотонная отметка, общая для устройств.
+  static const markFeedPostRead = connect.Spec(
+    '/$name/MarkFeedPostRead',
+    connect.StreamType.unary,
+    spacev1feed.MarkFeedPostReadRequest.new,
+    spacev1feed.MarkFeedPostReadResponse.new,
+  );
 }

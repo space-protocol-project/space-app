@@ -45,6 +45,8 @@ abstract class FeedServiceBase extends $pb.GeneratedService {
       $pb.ServerContext ctx, $1.ListFeedReportsRequest request);
   $async.Future<$1.ResolveFeedReportResponse> resolveFeedReport(
       $pb.ServerContext ctx, $1.ResolveFeedReportRequest request);
+  $async.Future<$1.MarkFeedPostReadResponse> markFeedPostRead(
+      $pb.ServerContext ctx, $1.MarkFeedPostReadRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
@@ -72,6 +74,8 @@ abstract class FeedServiceBase extends $pb.GeneratedService {
         return $1.ListFeedReportsRequest();
       case 'ResolveFeedReport':
         return $1.ResolveFeedReportRequest();
+      case 'MarkFeedPostRead':
+        return $1.MarkFeedPostReadRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -105,6 +109,8 @@ abstract class FeedServiceBase extends $pb.GeneratedService {
         return listFeedReports(ctx, request as $1.ListFeedReportsRequest);
       case 'ResolveFeedReport':
         return resolveFeedReport(ctx, request as $1.ResolveFeedReportRequest);
+      case 'MarkFeedPostRead':
+        return markFeedPostRead(ctx, request as $1.MarkFeedPostReadRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }

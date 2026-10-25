@@ -12,6 +12,7 @@
 - [Управление сервером](docs/ADMIN-GUIDE.md).
 - [Голосовые комнаты и настройки звука](docs/VOICE-ROOMS.md).
 - [Лента публикаций](docs/FEED.md).
+- [Непрочитанное в ленте — следующий срез](docs/FEED-READ.md).
 - [Поиск внутри форума и ленты](docs/COMMUNITY-SEARCH.md).
 - [Сводка: требует внимания и новое в сообществах](docs/DASHBOARD.md).
 - [Совместимый выпуск поиска и сводки](docs/COMMUNITIES-RELEASE.md).

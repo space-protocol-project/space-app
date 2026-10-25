@@ -2584,6 +2584,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedEmpty => 'No posts yet.';
 
   @override
+  String get feedOpenUnread => 'Open unread comments';
+
+  @override
   String get feedReadOnly => 'You cannot publish in this section.';
 
   @override
@@ -2724,7 +2727,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardCommunityDescription =>
-      'Recent threads and posts from sections you can read. Thread badges show unread items.';
+      'Recent threads and posts from sections you can read. Badges show unread items where the server supports read tracking.';
 
   @override
   String get dashboardCommunityFailed =>

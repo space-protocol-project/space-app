@@ -103,6 +103,10 @@ class FeedPost extends $pb.GeneratedMessage {
     $fixnum.Int64? commentCount,
     $core.Iterable<$0.Asset>? attachments,
     $core.bool? hidden,
+    $core.bool? readStateSupported,
+    $core.bool? seen,
+    $fixnum.Int64? readSequence,
+    $fixnum.Int64? unreadCount,
   }) {
     final result = FeedPost._();
     if (id != null) result.id = id;
@@ -116,6 +120,11 @@ class FeedPost extends $pb.GeneratedMessage {
     if (commentCount != null) result.commentCount = commentCount;
     if (attachments != null) result.attachments.addAll(attachments);
     if (hidden != null) result.hidden = hidden;
+    if (readStateSupported != null)
+      result.readStateSupported = readStateSupported;
+    if (seen != null) result.seen = seen;
+    if (readSequence != null) result.readSequence = readSequence;
+    if (unreadCount != null) result.unreadCount = unreadCount;
     return result;
   }
 
@@ -144,6 +153,10 @@ class FeedPost extends $pb.GeneratedMessage {
     ..pPM<$0.Asset>(10, _omitFieldNames ? '' : 'attachments',
         subBuilder: $0.Asset.$_createMessage)
     ..aOB(11, _omitFieldNames ? '' : 'hidden')
+    ..aOB(12, _omitFieldNames ? '' : 'readStateSupported')
+    ..aOB(13, _omitFieldNames ? '' : 'seen')
+    ..aInt64(14, _omitFieldNames ? '' : 'readSequence')
+    ..aInt64(15, _omitFieldNames ? '' : 'unreadCount')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -259,6 +272,191 @@ class FeedPost extends $pb.GeneratedMessage {
   $core.bool hasHidden() => $_has(10);
   @$pb.TagNumber(11)
   void clearHidden() => $_clearField(11);
+
+  @$pb.TagNumber(12)
+  $core.bool get readStateSupported => $_getBF(11);
+  @$pb.TagNumber(12)
+  set readStateSupported($core.bool value) => $_setBool(11, value);
+  @$pb.TagNumber(12)
+  $core.bool hasReadStateSupported() => $_has(11);
+  @$pb.TagNumber(12)
+  void clearReadStateSupported() => $_clearField(12);
+
+  @$pb.TagNumber(13)
+  $core.bool get seen => $_getBF(12);
+  @$pb.TagNumber(13)
+  set seen($core.bool value) => $_setBool(12, value);
+  @$pb.TagNumber(13)
+  $core.bool hasSeen() => $_has(12);
+  @$pb.TagNumber(13)
+  void clearSeen() => $_clearField(13);
+
+  @$pb.TagNumber(14)
+  $fixnum.Int64 get readSequence => $_getI64(13);
+  @$pb.TagNumber(14)
+  set readSequence($fixnum.Int64 value) => $_setInt64(13, value);
+  @$pb.TagNumber(14)
+  $core.bool hasReadSequence() => $_has(13);
+  @$pb.TagNumber(14)
+  void clearReadSequence() => $_clearField(14);
+
+  /// Невидимая ещё публикация плюс видимые комментарии после read_sequence.
+  @$pb.TagNumber(15)
+  $fixnum.Int64 get unreadCount => $_getI64(14);
+  @$pb.TagNumber(15)
+  set unreadCount($fixnum.Int64 value) => $_setInt64(14, value);
+  @$pb.TagNumber(15)
+  $core.bool hasUnreadCount() => $_has(14);
+  @$pb.TagNumber(15)
+  void clearUnreadCount() => $_clearField(15);
+}
+
+class MarkFeedPostReadRequest extends $pb.GeneratedMessage {
+  factory MarkFeedPostReadRequest({
+    $core.String? channelId,
+    $core.String? postId,
+    $fixnum.Int64? throughSequence,
+  }) {
+    final result = MarkFeedPostReadRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (postId != null) result.postId = postId;
+    if (throughSequence != null) result.throughSequence = throughSequence;
+    return result;
+  }
+
+  MarkFeedPostReadRequest._();
+
+  factory MarkFeedPostReadRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      MarkFeedPostReadRequest()..mergeFromBuffer(data, registry);
+  factory MarkFeedPostReadRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      MarkFeedPostReadRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'MarkFeedPostReadRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: MarkFeedPostReadRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..aOS(2, _omitFieldNames ? '' : 'postId')
+    ..aInt64(3, _omitFieldNames ? '' : 'throughSequence')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MarkFeedPostReadRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MarkFeedPostReadRequest copyWith(
+          void Function(MarkFeedPostReadRequest) updates) =>
+      super.copyWith((message) => updates(message as MarkFeedPostReadRequest))
+          as MarkFeedPostReadRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use MarkFeedPostReadRequest() / MarkFeedPostReadRequest.new instead')
+  static MarkFeedPostReadRequest create() => MarkFeedPostReadRequest._();
+  static $pb.GeneratedMessage $_createMessage() => MarkFeedPostReadRequest._();
+  @$core.override
+  MarkFeedPostReadRequest createEmptyInstance() => MarkFeedPostReadRequest._();
+  @$core.pragma('dart2js:noInline')
+  static MarkFeedPostReadRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<MarkFeedPostReadRequest>(
+          MarkFeedPostReadRequest.$_createMessage);
+  static MarkFeedPostReadRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get postId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set postId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasPostId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearPostId() => $_clearField(2);
+
+  /// 0 подтверждает публикацию; положительное значение — комментарии до курсора.
+  /// Не больше последнего видимого комментария либо уже сохранённого курсора.
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get throughSequence => $_getI64(2);
+  @$pb.TagNumber(3)
+  set throughSequence($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasThroughSequence() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearThroughSequence() => $_clearField(3);
+}
+
+class MarkFeedPostReadResponse extends $pb.GeneratedMessage {
+  factory MarkFeedPostReadResponse({
+    FeedPost? post,
+  }) {
+    final result = MarkFeedPostReadResponse._();
+    if (post != null) result.post = post;
+    return result;
+  }
+
+  MarkFeedPostReadResponse._();
+
+  factory MarkFeedPostReadResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      MarkFeedPostReadResponse()..mergeFromBuffer(data, registry);
+  factory MarkFeedPostReadResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      MarkFeedPostReadResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'MarkFeedPostReadResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: MarkFeedPostReadResponse.$_createMessage)
+    ..aOM<FeedPost>(1, _omitFieldNames ? '' : 'post',
+        subBuilder: FeedPost.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MarkFeedPostReadResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  MarkFeedPostReadResponse copyWith(
+          void Function(MarkFeedPostReadResponse) updates) =>
+      super.copyWith((message) => updates(message as MarkFeedPostReadResponse))
+          as MarkFeedPostReadResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use MarkFeedPostReadResponse() / MarkFeedPostReadResponse.new instead')
+  static MarkFeedPostReadResponse create() => MarkFeedPostReadResponse._();
+  static $pb.GeneratedMessage $_createMessage() => MarkFeedPostReadResponse._();
+  @$core.override
+  MarkFeedPostReadResponse createEmptyInstance() =>
+      MarkFeedPostReadResponse._();
+  @$core.pragma('dart2js:noInline')
+  static MarkFeedPostReadResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<MarkFeedPostReadResponse>(
+          MarkFeedPostReadResponse.$_createMessage);
+  static MarkFeedPostReadResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  FeedPost get post => $_getN(0);
+  @$pb.TagNumber(1)
+  set post(FeedPost value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPost() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPost() => $_clearField(1);
+  @$pb.TagNumber(1)
+  FeedPost ensurePost() => $_ensure(0);
 }
 
 class FeedComment extends $pb.GeneratedMessage {
@@ -2862,6 +3060,12 @@ class FeedServiceApi {
           $pb.ClientContext? ctx, ResolveFeedReportRequest request) =>
       _client.invoke<ResolveFeedReportResponse>(ctx, 'FeedService',
           'ResolveFeedReport', request, ResolveFeedReportResponse());
+
+  /// core.feed.read.v1: персональная монотонная отметка, общая для устройств.
+  $async.Future<MarkFeedPostReadResponse> markFeedPostRead(
+          $pb.ClientContext? ctx, MarkFeedPostReadRequest request) =>
+      _client.invoke<MarkFeedPostReadResponse>(ctx, 'FeedService',
+          'MarkFeedPostRead', request, MarkFeedPostReadResponse());
 }
 
 const $core.bool _omitFieldNames =

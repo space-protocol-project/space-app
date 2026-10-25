@@ -4696,6 +4696,12 @@ abstract class AppLocalizations {
   /// **'Публикаций пока нет.'**
   String get feedEmpty;
 
+  /// No description provided for @feedOpenUnread.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть непрочитанное'**
+  String get feedOpenUnread;
+
   /// No description provided for @feedReadOnly.
   ///
   /// In ru, this message translates to:
@@ -4957,7 +4963,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardCommunityDescription.
   ///
   /// In ru, this message translates to:
-  /// **'Свежие темы и публикации из доступных вам разделов. Счётчик у темы показывает непрочитанное.'**
+  /// **'Свежие темы и публикации из доступных вам разделов. Счётчики показывают непрочитанное там, где сервер поддерживает отметки чтения.'**
   String get dashboardCommunityDescription;
 
   /// No description provided for @dashboardCommunityFailed.

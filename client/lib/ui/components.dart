@@ -99,11 +99,14 @@ class PageBody extends StatelessWidget {
     required this.title,
     required this.description,
     required this.children,
+    this.scrollKey,
   });
   final String title, description;
   final List<Widget> children;
+  final Key? scrollKey;
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
+    key: scrollKey,
     primary: false,
     padding: EdgeInsets.fromLTRB(
       24,

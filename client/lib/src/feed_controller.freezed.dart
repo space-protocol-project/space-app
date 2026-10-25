@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FeedState {
 
- bool get loading; bool get busy; bool get supported; List<Channel> get sections; Channel? get section; List<FeedPost> get posts; FeedPost? get post; List<FeedComment> get comments; int get before; int get after; FeedPermissions? get permissions; Object? get error;
+ bool get loading; bool get busy; bool get supported; List<Channel> get sections; Channel? get section; List<FeedPost> get posts; FeedPost? get post; List<FeedComment> get comments; int get before; int get after; int get commentStart; FeedPermissions? get permissions; Object? get error;
 /// Create a copy of FeedState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,20 +27,20 @@ $FeedStateCopyWith<FeedState> get copyWith => _$FeedStateCopyWithImpl<FeedState>
 @override
 bool operator ==(Object other) {
   final _this = this as FeedState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeedState&&(identical(other.loading, _this.loading) || other.loading == _this.loading)&&(identical(other.busy, _this.busy) || other.busy == _this.busy)&&(identical(other.supported, _this.supported) || other.supported == _this.supported)&&const DeepCollectionEquality().equals(other.sections, _this.sections)&&(identical(other.section, _this.section) || other.section == _this.section)&&const DeepCollectionEquality().equals(other.posts, _this.posts)&&(identical(other.post, _this.post) || other.post == _this.post)&&const DeepCollectionEquality().equals(other.comments, _this.comments)&&(identical(other.before, _this.before) || other.before == _this.before)&&(identical(other.after, _this.after) || other.after == _this.after)&&(identical(other.permissions, _this.permissions) || other.permissions == _this.permissions)&&const DeepCollectionEquality().equals(other.error, _this.error));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeedState&&(identical(other.loading, _this.loading) || other.loading == _this.loading)&&(identical(other.busy, _this.busy) || other.busy == _this.busy)&&(identical(other.supported, _this.supported) || other.supported == _this.supported)&&const DeepCollectionEquality().equals(other.sections, _this.sections)&&(identical(other.section, _this.section) || other.section == _this.section)&&const DeepCollectionEquality().equals(other.posts, _this.posts)&&(identical(other.post, _this.post) || other.post == _this.post)&&const DeepCollectionEquality().equals(other.comments, _this.comments)&&(identical(other.before, _this.before) || other.before == _this.before)&&(identical(other.after, _this.after) || other.after == _this.after)&&(identical(other.commentStart, _this.commentStart) || other.commentStart == _this.commentStart)&&(identical(other.permissions, _this.permissions) || other.permissions == _this.permissions)&&const DeepCollectionEquality().equals(other.error, _this.error));
 }
 
 
 @override
 int get hashCode {
   final _this = this as FeedState;
-  return Object.hash(runtimeType,_this.loading,_this.busy,_this.supported,const DeepCollectionEquality().hash(_this.sections),_this.section,const DeepCollectionEquality().hash(_this.posts),_this.post,const DeepCollectionEquality().hash(_this.comments),_this.before,_this.after,_this.permissions,const DeepCollectionEquality().hash(_this.error));
+  return Object.hash(runtimeType,_this.loading,_this.busy,_this.supported,const DeepCollectionEquality().hash(_this.sections),_this.section,const DeepCollectionEquality().hash(_this.posts),_this.post,const DeepCollectionEquality().hash(_this.comments),_this.before,_this.after,_this.commentStart,_this.permissions,const DeepCollectionEquality().hash(_this.error));
 }
 
 @override
 String toString() {
   final _this = this as FeedState;
-  return 'FeedState(loading: ${_this.loading}, busy: ${_this.busy}, supported: ${_this.supported}, sections: ${_this.sections}, section: ${_this.section}, posts: ${_this.posts}, post: ${_this.post}, comments: ${_this.comments}, before: ${_this.before}, after: ${_this.after}, permissions: ${_this.permissions}, error: ${_this.error})';
+  return 'FeedState(loading: ${_this.loading}, busy: ${_this.busy}, supported: ${_this.supported}, sections: ${_this.sections}, section: ${_this.section}, posts: ${_this.posts}, post: ${_this.post}, comments: ${_this.comments}, before: ${_this.before}, after: ${_this.after}, commentStart: ${_this.commentStart}, permissions: ${_this.permissions}, error: ${_this.error})';
 }
 
 
@@ -51,7 +51,7 @@ abstract mixin class $FeedStateCopyWith<$Res>  {
   factory $FeedStateCopyWith(FeedState value, $Res Function(FeedState) _then) = _$FeedStateCopyWithImpl;
 @useResult
 $Res call({
- bool loading, bool busy, bool supported, List<Channel> sections, Channel? section, List<FeedPost> posts, FeedPost? post, List<FeedComment> comments, int before, int after, FeedPermissions? permissions, Object? error
+ bool loading, bool busy, bool supported, List<Channel> sections, Channel? section, List<FeedPost> posts, FeedPost? post, List<FeedComment> comments, int before, int after, int commentStart, FeedPermissions? permissions, Object? error
 });
 
 
@@ -68,7 +68,7 @@ class _$FeedStateCopyWithImpl<$Res>
 
 /// Create a copy of FeedState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? loading = null,Object? busy = null,Object? supported = null,Object? sections = null,Object? section = freezed,Object? posts = null,Object? post = freezed,Object? comments = null,Object? before = null,Object? after = null,Object? permissions = freezed,Object? error = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? loading = null,Object? busy = null,Object? supported = null,Object? sections = null,Object? section = freezed,Object? posts = null,Object? post = freezed,Object? comments = null,Object? before = null,Object? after = null,Object? commentStart = null,Object? permissions = freezed,Object? error = freezed,}) {
   return _then(FeedState(
 loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,busy: null == busy ? _self.busy : busy // ignore: cast_nullable_to_non_nullable
@@ -80,6 +80,7 @@ as List<FeedPost>,post: freezed == post ? _self.post : post // ignore: cast_null
 as FeedPost?,comments: null == comments ? _self.comments : comments // ignore: cast_nullable_to_non_nullable
 as List<FeedComment>,before: null == before ? _self.before : before // ignore: cast_nullable_to_non_nullable
 as int,after: null == after ? _self.after : after // ignore: cast_nullable_to_non_nullable
+as int,commentStart: null == commentStart ? _self.commentStart : commentStart // ignore: cast_nullable_to_non_nullable
 as int,permissions: freezed == permissions ? _self.permissions : permissions // ignore: cast_nullable_to_non_nullable
 as FeedPermissions?,error: freezed == error ? _self.error : error ,
   ));
@@ -166,10 +167,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool loading,  bool busy,  bool supported,  List<Channel> sections,  Channel? section,  List<FeedPost> posts,  FeedPost? post,  List<FeedComment> comments,  int before,  int after,  FeedPermissions? permissions,  Object? error)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool loading,  bool busy,  bool supported,  List<Channel> sections,  Channel? section,  List<FeedPost> posts,  FeedPost? post,  List<FeedComment> comments,  int before,  int after,  int commentStart,  FeedPermissions? permissions,  Object? error)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FeedState() when $default != null:
-return $default(_that.loading,_that.busy,_that.supported,_that.sections,_that.section,_that.posts,_that.post,_that.comments,_that.before,_that.after,_that.permissions,_that.error);case _:
+return $default(_that.loading,_that.busy,_that.supported,_that.sections,_that.section,_that.posts,_that.post,_that.comments,_that.before,_that.after,_that.commentStart,_that.permissions,_that.error);case _:
   return orElse();
 
 }
@@ -187,10 +188,10 @@ return $default(_that.loading,_that.busy,_that.supported,_that.sections,_that.se
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool loading,  bool busy,  bool supported,  List<Channel> sections,  Channel? section,  List<FeedPost> posts,  FeedPost? post,  List<FeedComment> comments,  int before,  int after,  FeedPermissions? permissions,  Object? error)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool loading,  bool busy,  bool supported,  List<Channel> sections,  Channel? section,  List<FeedPost> posts,  FeedPost? post,  List<FeedComment> comments,  int before,  int after,  int commentStart,  FeedPermissions? permissions,  Object? error)  $default,) {final _that = this;
 switch (_that) {
 case _FeedState():
-return $default(_that.loading,_that.busy,_that.supported,_that.sections,_that.section,_that.posts,_that.post,_that.comments,_that.before,_that.after,_that.permissions,_that.error);case _:
+return $default(_that.loading,_that.busy,_that.supported,_that.sections,_that.section,_that.posts,_that.post,_that.comments,_that.before,_that.after,_that.commentStart,_that.permissions,_that.error);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -207,10 +208,10 @@ return $default(_that.loading,_that.busy,_that.supported,_that.sections,_that.se
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool loading,  bool busy,  bool supported,  List<Channel> sections,  Channel? section,  List<FeedPost> posts,  FeedPost? post,  List<FeedComment> comments,  int before,  int after,  FeedPermissions? permissions,  Object? error)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool loading,  bool busy,  bool supported,  List<Channel> sections,  Channel? section,  List<FeedPost> posts,  FeedPost? post,  List<FeedComment> comments,  int before,  int after,  int commentStart,  FeedPermissions? permissions,  Object? error)?  $default,) {final _that = this;
 switch (_that) {
 case _FeedState() when $default != null:
-return $default(_that.loading,_that.busy,_that.supported,_that.sections,_that.section,_that.posts,_that.post,_that.comments,_that.before,_that.after,_that.permissions,_that.error);case _:
+return $default(_that.loading,_that.busy,_that.supported,_that.sections,_that.section,_that.posts,_that.post,_that.comments,_that.before,_that.after,_that.commentStart,_that.permissions,_that.error);case _:
   return null;
 
 }
@@ -222,7 +223,7 @@ return $default(_that.loading,_that.busy,_that.supported,_that.sections,_that.se
 
 
 class _FeedState implements FeedState {
-  const _FeedState({this.loading = false, this.busy = false, this.supported = false,  List<Channel> sections = const [], this.section,  List<FeedPost> posts = const [], this.post,  List<FeedComment> comments = const [], this.before = 0, this.after = 0, this.permissions, this.error}): _sections = sections,_posts = posts,_comments = comments;
+  const _FeedState({this.loading = false, this.busy = false, this.supported = false,  List<Channel> sections = const [], this.section,  List<FeedPost> posts = const [], this.post,  List<FeedComment> comments = const [], this.before = 0, this.after = 0, this.commentStart = 0, this.permissions, this.error}): _sections = sections,_posts = posts,_comments = comments;
   
 
 @override@JsonKey() final  bool loading;
@@ -253,6 +254,7 @@ class _FeedState implements FeedState {
 
 @override@JsonKey() final  int before;
 @override@JsonKey() final  int after;
+@override@JsonKey() final  int commentStart;
 @override final  FeedPermissions? permissions;
 @override final  Object? error;
 
@@ -266,18 +268,18 @@ _$FeedStateCopyWith<_FeedState> get copyWith => __$FeedStateCopyWithImpl<_FeedSt
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeedState&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.busy, busy) || other.busy == busy)&&(identical(other.supported, supported) || other.supported == supported)&&const DeepCollectionEquality().equals(other.sections, _sections)&&(identical(other.section, section) || other.section == section)&&const DeepCollectionEquality().equals(other.posts, _posts)&&(identical(other.post, post) || other.post == post)&&const DeepCollectionEquality().equals(other.comments, _comments)&&(identical(other.before, before) || other.before == before)&&(identical(other.after, after) || other.after == after)&&(identical(other.permissions, permissions) || other.permissions == permissions)&&const DeepCollectionEquality().equals(other.error, error));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeedState&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.busy, busy) || other.busy == busy)&&(identical(other.supported, supported) || other.supported == supported)&&const DeepCollectionEquality().equals(other.sections, _sections)&&(identical(other.section, section) || other.section == section)&&const DeepCollectionEquality().equals(other.posts, _posts)&&(identical(other.post, post) || other.post == post)&&const DeepCollectionEquality().equals(other.comments, _comments)&&(identical(other.before, before) || other.before == before)&&(identical(other.after, after) || other.after == after)&&(identical(other.commentStart, commentStart) || other.commentStart == commentStart)&&(identical(other.permissions, permissions) || other.permissions == permissions)&&const DeepCollectionEquality().equals(other.error, error));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,loading,busy,supported,const DeepCollectionEquality().hash(_sections),section,const DeepCollectionEquality().hash(_posts),post,const DeepCollectionEquality().hash(_comments),before,after,permissions,const DeepCollectionEquality().hash(error));
+    return Object.hash(runtimeType,loading,busy,supported,const DeepCollectionEquality().hash(_sections),section,const DeepCollectionEquality().hash(_posts),post,const DeepCollectionEquality().hash(_comments),before,after,commentStart,permissions,const DeepCollectionEquality().hash(error));
 }
 
 @override
 String toString() {
-    return 'FeedState(loading: $loading, busy: $busy, supported: $supported, sections: $sections, section: $section, posts: $posts, post: $post, comments: $comments, before: $before, after: $after, permissions: $permissions, error: $error)';
+    return 'FeedState(loading: $loading, busy: $busy, supported: $supported, sections: $sections, section: $section, posts: $posts, post: $post, comments: $comments, before: $before, after: $after, commentStart: $commentStart, permissions: $permissions, error: $error)';
 }
 
 
@@ -288,7 +290,7 @@ abstract mixin class _$FeedStateCopyWith<$Res> implements $FeedStateCopyWith<$Re
   factory _$FeedStateCopyWith(_FeedState value, $Res Function(_FeedState) _then) = __$FeedStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool loading, bool busy, bool supported, List<Channel> sections, Channel? section, List<FeedPost> posts, FeedPost? post, List<FeedComment> comments, int before, int after, FeedPermissions? permissions, Object? error
+ bool loading, bool busy, bool supported, List<Channel> sections, Channel? section, List<FeedPost> posts, FeedPost? post, List<FeedComment> comments, int before, int after, int commentStart, FeedPermissions? permissions, Object? error
 });
 
 
@@ -305,7 +307,7 @@ class __$FeedStateCopyWithImpl<$Res>
 
 /// Create a copy of FeedState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? loading = null,Object? busy = null,Object? supported = null,Object? sections = null,Object? section = freezed,Object? posts = null,Object? post = freezed,Object? comments = null,Object? before = null,Object? after = null,Object? permissions = freezed,Object? error = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? loading = null,Object? busy = null,Object? supported = null,Object? sections = null,Object? section = freezed,Object? posts = null,Object? post = freezed,Object? comments = null,Object? before = null,Object? after = null,Object? commentStart = null,Object? permissions = freezed,Object? error = freezed,}) {
   return _then(_FeedState(
 loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,busy: null == busy ? _self.busy : busy // ignore: cast_nullable_to_non_nullable
@@ -317,6 +319,7 @@ as List<FeedPost>,post: freezed == post ? _self.post : post // ignore: cast_null
 as FeedPost?,comments: null == comments ? _self._comments : comments // ignore: cast_nullable_to_non_nullable
 as List<FeedComment>,before: null == before ? _self.before : before // ignore: cast_nullable_to_non_nullable
 as int,after: null == after ? _self.after : after // ignore: cast_nullable_to_non_nullable
+as int,commentStart: null == commentStart ? _self.commentStart : commentStart // ignore: cast_nullable_to_non_nullable
 as int,permissions: freezed == permissions ? _self.permissions : permissions // ignore: cast_nullable_to_non_nullable
 as FeedPermissions?,error: freezed == error ? _self.error : error ,
   ));

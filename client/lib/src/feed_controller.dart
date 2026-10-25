@@ -26,6 +26,7 @@ abstract class FeedState with _$FeedState {
     @Default([]) List<FeedComment> comments,
     @Default(0) int before,
     @Default(0) int after,
+    @Default(0) int commentStart,
     FeedPermissions? permissions,
     Object? error,
   }) = _FeedState;
@@ -35,12 +36,28 @@ class FeedController extends Cubit<FeedState> {
   FeedController(this.api) : super(const FeedState());
   final FeedApi api;
   final _drafts = <String, FeedDraftCubit>{};
+  bool _reading = false;
+  String _failedRead = '';
+  FeedReadApi? get readApi => api is FeedReadApi ? api as FeedReadApi : null;
+  bool get readingSupported =>
+      readApi?.readSupported == true &&
+      state.post?.readStateSupported == true &&
+      state.post?.hidden == false;
+  bool get readHasGap =>
+      state.commentStart > (state.post?.readSequence.toInt() ?? 0);
+  bool get _canMark =>
+      readingSupported &&
+      !_reading &&
+      !state.loading &&
+      !state.busy &&
+      !isClosed;
   int _generation = 0;
   bool _current(int generation) => !isClosed && _generation == generation;
 
   Future<void> refresh() async {
     if (state.loading || state.busy) return;
     final generation = ++_generation;
+    _failedRead = '';
     final previous = state;
     emit(state.copyWith(loading: true, error: null));
     try {
@@ -162,6 +179,7 @@ class FeedController extends Cubit<FeedState> {
             posts: _updatedPosts(state.posts, page.post),
             comments: page.comments,
             after: page.nextSequence.toInt(),
+            commentStart: afterSequence,
             permissions: page.permissions,
           ),
         );
@@ -174,6 +192,59 @@ class FeedController extends Cubit<FeedState> {
   void back() {
     ++_generation;
     emit(state.copyWith(loading: false, post: null, comments: [], after: 0));
+  }
+
+  Future<void> markRead() async {
+    _failedRead = '';
+    final visible = state.comments.where((comment) => !comment.hidden);
+    await _markThrough(
+      readHasGap ? 0 : visible.lastOrNull?.sequence.toInt() ?? 0,
+    );
+  }
+
+  Future<void> openUnread() async {
+    final post = state.post;
+    if (post == null) return;
+    await open(post.id, afterSequence: post.readSequence.toInt());
+  }
+
+  Future<void> markVisible(int sequence) async {
+    final post = state.post;
+    if (post == null) return;
+    // Поиск мог пропустить ранние непрочитанные комментарии.
+    await _markThrough(readHasGap ? 0 : sequence);
+  }
+
+  Future<void> _markThrough(int sequence) async {
+    final post = state.post;
+    if (!_canMark) return;
+    if (post!.seen && post.readSequence >= Int64(sequence)) return;
+    final channel = state.section!.id;
+    final attempt = '$channel/${post.id}/$sequence';
+    if (_failedRead == attempt) return;
+    _reading = true;
+    final generation = _generation;
+    try {
+      final updated = await readApi!.markRead(
+        channel,
+        post.id,
+        Int64(sequence),
+      );
+      if (!_current(generation)) return;
+      _failedRead = '';
+      emit(
+        state.copyWith(
+          post: updated,
+          posts: _updatedPosts(state.posts, updated),
+          error: null,
+        ),
+      );
+    } catch (error) {
+      if (_current(generation)) _failedRead = attempt;
+      _failure(generation, error);
+    } finally {
+      _reading = false;
+    }
   }
 
   Future<void> more() async {

@@ -137,14 +137,39 @@ Future<void> _verifyCommunityDiscovery(
   );
   expect(summary.repliesToYou, isEmpty);
   for (final entry in summary.recent) {
-    expect(entry.readStateSupported, false);
-    expect(entry.unreadCount, Int64.ZERO);
+    expect(entry.readStateSupported, true);
+    expect(entry.unreadCount, Int64(2));
   }
+}
+
+Future<void> _verifyFeedRead(SpaceSession session, String post) async {
+  final api = SessionFeedApi(session);
+  expect(api.readSupported, true);
+  final detail = await api.post('feed', post, Int64.ZERO);
+  expect(detail.post.unreadCount, Int64(2));
+  final root = await api.markRead('feed', post, Int64.ZERO);
+  expect(root.seen, true);
+  expect(root.unreadCount, Int64.ONE);
+  final read = await api.markRead(
+    'feed',
+    post,
+    detail.comments.single.sequence,
+  );
+  expect(read.unreadCount, Int64.ZERO);
+  expect(
+    (await api.posts('feed', Int64.ZERO)).posts.single.unreadCount,
+    Int64.ZERO,
+  );
+  final summary = await session.communityOverview.overview('feed');
+  expect(summary.recent.single.unreadCount, Int64.ZERO);
+  final delayed = await api.markRead('feed', post, Int64.ZERO);
+  expect(delayed.readSequence, detail.comments.single.sequence);
 }
 
 Future<void> _verifyCommunityRevoked(
   SpaceSession owner,
   SpaceSession member,
+  String post,
 ) async {
   final access = await owner.adminRequest('/api/v1/channels/feed/access');
   await owner.adminRequest(
@@ -178,6 +203,10 @@ Future<void> _verifyCommunityRevoked(
     denied,
   );
   await expectLater(member.communityOverview.overview('feed'), denied);
+  await expectLater(
+    SessionFeedApi(member).markRead('feed', post, Int64.ZERO),
+    denied,
+  );
 }
 
 Future<Uint8List> _remaining(
@@ -300,7 +329,8 @@ void main() {
       expect(restored.length, data.length);
       expect(sha256.convert(restored), sha256.convert(data));
       await _verifyCommunityDiscovery(member, created.post.id, visible: true);
-      await _verifyCommunityRevoked(owner, member);
+      await _verifyFeedRead(member, created.post.id);
+      await _verifyCommunityRevoked(owner, member, created.post.id);
     },
     skip: origin == null,
   );

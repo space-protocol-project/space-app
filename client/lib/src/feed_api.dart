@@ -4,6 +4,12 @@ import 'core.dart' show AttachmentSession;
 import 'generated/space/v1/feed.pb.dart';
 import 'generated/space/v1/space.pb.dart' show Channel;
 
+// Необязательное расширение: прежние реализации FeedApi продолжают работать.
+abstract interface class FeedReadApi {
+  bool get readSupported;
+  Future<FeedPost> markRead(String channel, String post, Int64 through);
+}
+
 abstract interface class FeedApi {
   bool get supported;
   bool get attachmentsEnabled;

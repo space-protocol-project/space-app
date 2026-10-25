@@ -2602,6 +2602,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get feedEmpty => 'Публикаций пока нет.';
 
   @override
+  String get feedOpenUnread => 'Открыть непрочитанное';
+
+  @override
   String get feedReadOnly => 'У вас нет права публиковать в этом разделе.';
 
   @override
@@ -2742,7 +2745,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get dashboardCommunityDescription =>
-      'Свежие темы и публикации из доступных вам разделов. Счётчик у темы показывает непрочитанное.';
+      'Свежие темы и публикации из доступных вам разделов. Счётчики показывают непрочитанное там, где сервер поддерживает отметки чтения.';
 
   @override
   String get dashboardCommunityFailed =>

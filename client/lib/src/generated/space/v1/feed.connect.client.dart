@@ -212,4 +212,22 @@ extension type FeedServiceClient (connect.Transport _transport) {
       onTrailer: onTrailer,
     );
   }
+
+  /// core.feed.read.v1: персональная монотонная отметка, общая для устройств.
+  Future<spacev1feed.MarkFeedPostReadResponse> markFeedPostRead(
+    spacev1feed.MarkFeedPostReadRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.FeedService.markFeedPostRead,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
 }

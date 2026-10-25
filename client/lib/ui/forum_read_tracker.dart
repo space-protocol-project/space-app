@@ -23,8 +23,9 @@ class ForumReadTracker {
   void schedule(
     BuildContext context,
     bool Function() active,
-    ValueChanged<int> read,
-  ) {
+    ValueChanged<int> read, {
+    double topPadding = 0,
+  }) {
     if (scheduled) return;
     scheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -34,16 +35,16 @@ class ForumReadTracker {
           ModalRoute.of(context)?.isCurrent == false) {
         return;
       }
-      final sequence = visibleThrough(context);
+      final sequence = visibleThrough(context, topPadding: topPadding);
       if (sequence != null) read(sequence);
     });
   }
 
-  int? visibleThrough(BuildContext context) {
+  int? visibleThrough(BuildContext context, {double topPadding = 0}) {
     final box = viewport.currentContext?.findRenderObject();
     if (box is! RenderBox || !box.hasSize) return null;
     final media = MediaQuery.of(context);
-    final top = math.max(0.0, box.localToGlobal(Offset.zero).dy);
+    final top = math.max(0.0, box.localToGlobal(Offset.zero).dy + topPadding);
     final bottom = math.min(
       box.localToGlobal(Offset(0, box.size.height)).dy,
       media.size.height - media.viewInsets.bottom,
