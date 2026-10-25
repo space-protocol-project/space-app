@@ -1,8 +1,8 @@
 # Упоминания и ответы в личной сводке
 
-Локальное дополнение после v0.7.24: [структурированные MLS-упоминания](MLS-MENTIONS.md).
+Дополнение приложения v0.7.25: [структурированные MLS-упоминания](MLS-MENTIONS.md).
 Описанный ниже совместимый текст MLS относится к опубликованному v0.7.23;
-новый формат пока не опубликован.
+новый формат опубликован в v0.7.25.
 
 Выпущено в [приложении v0.7.23](https://github.com/space-protocol-project/space-app/releases/tag/v0.7.23) и [runtime v0.7.18](https://github.com/space-protocol-project/space-server/releases/tag/v0.7.18).
 Нужны клиент с этим изменением и сервер с `core.community.mentions.v1`,
