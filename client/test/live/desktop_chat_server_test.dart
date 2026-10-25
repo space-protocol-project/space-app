@@ -23,6 +23,8 @@ class _ClosedSession implements SpaceSession {
   _ClosedSession(this.client);
   final MlsClient client;
   @override
+  bool get chatMentionsSupported => false;
+  @override
   Future<MlsClient> mlsClient() async => client;
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
