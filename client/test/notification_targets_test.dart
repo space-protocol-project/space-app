@@ -4,12 +4,28 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/notification_targets.dart';
 import 'package:space_client/src/system_notifications.dart';
+import 'package:space_client/src/personal_notification_target.dart';
 
 import 'chat_history_test.dart' show HistoryKeys;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   final payload = jsonEncode(['https://saved.example', 'me', 'general', 7]);
+  test('Личная цель переживает перезапуск и используется один раз', () async {
+    final keys = HistoryKeys();
+    final target = PersonalNotificationTarget(
+      'https://saved.example',
+      'me',
+      'forum',
+      7,
+      'pn_7',
+    );
+    final first = NotificationTargets(storage: keys);
+    final token = await first.save(7, jsonEncode(target.payload));
+    final restarted = NotificationTargets(storage: keys);
+    expect(await restarted.take(token), jsonEncode(target.payload));
+    expect(await restarted.take(token), isNull);
+  });
   test(
     'Цель переживает новый экземпляр, ключ одноразовый и непрозрачный',
     () async {

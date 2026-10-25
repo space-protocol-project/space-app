@@ -21,6 +21,7 @@ import 'files.dart';
 import 'core.dart';
 import 'community_overview.dart';
 import 'community_mentions_api.dart';
+import 'personal_notifications_api.dart';
 import 'generated/space/v1/community_mentions.pb.dart';
 import 'mention_data.dart';
 import 'message_search.dart';
@@ -273,6 +274,57 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     if (message == null || message.deleted) return null;
     await revealSearchMessage(message);
     return messages.where((m) => m.id == message.id && !m.deleted).firstOrNull;
+  }
+
+  Future<Content?> notificationContent(String target, int sequence) async {
+    final session = _session, principal = principalId;
+    if (!_notificationSourceCurrent(session, principal, target)) return null;
+    if (session is! HistoryPageSession) {
+      return messages
+          .where(
+            (m) =>
+                m.channelId == target &&
+                m.sequence.toInt() == sequence &&
+                !m.deleted,
+          )
+          .firstOrNull;
+    }
+    final page = await (session as HistoryPageSession)
+        .historyPage(target, before: sequence + 1)
+        .timeout(const Duration(seconds: 5));
+    if (!_notificationSourceCurrent(session, principal, target)) return null;
+    return page.messages
+        .where(
+          (m) =>
+              m.channelId == target &&
+              m.sequence.toInt() == sequence &&
+              !m.deleted,
+        )
+        .firstOrNull;
+  }
+
+  bool _notificationSourceCurrent(
+    Object? session,
+    String principal,
+    String target,
+  ) =>
+      connected &&
+      !accessRemoved &&
+      identical(session, _session) &&
+      principalId == principal &&
+      channels.any(
+        (c) =>
+            c.id == target &&
+            readableNotificationSection(c) &&
+            c.views.any((v) => v.type == 'chat'),
+      );
+
+  PersonalNotificationApi? get personalNotifications {
+    final session = _session;
+    if (!connected || accessRemoved) return null;
+    return session is PersonalNotificationSource
+        ? (session as PersonalNotificationSource).personalNotifications
+        : null;
   }
 
   CommunityOverviewApi? get communityOverview {

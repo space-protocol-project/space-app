@@ -36,6 +36,10 @@ import 'forum_api.dart';
 import 'feed_api.dart';
 import 'community_search_api.dart';
 import 'community_mentions_api.dart';
+import 'personal_notifications_api.dart';
+import 'generated/space/v1/personal_notifications.pb.dart' as notifications_pb;
+import 'generated/space/v1/personal_notifications.connect.spec.dart'
+    as notifications_specs;
 import 'generated/space/v1/community_mentions.pb.dart' as mentions_pb;
 import 'generated/space/v1/community_mentions.connect.spec.dart'
     as mentions_specs;
@@ -66,6 +70,7 @@ part 'feed_rpc.dart';
 part 'community_search_rpc.dart';
 part 'community_mentions_rpc.dart';
 part 'chat_mentions_rpc.dart';
+part 'personal_notifications_rpc.dart';
 part 'community_overview_rpc.dart';
 
 String url64(List<int> value) => base64Url.encode(value).replaceAll('=', '');
@@ -710,7 +715,8 @@ class SpaceSession
         ChannelNavigation,
         ChannelUpdates,
         SpaceAdministration,
-        CommunityOverviewSource {
+        CommunityOverviewSource,
+        PersonalNotificationSource {
   final _closing = StreamController<void>.broadcast();
   Stream<void> get closing => _closing.stream;
   SpaceSession._(this.server, this.record, this.vault, this.channel);
@@ -822,6 +828,11 @@ class SpaceSession
   bool communitySearchSupported = false;
   bool communityMentionsSupported = false;
   bool chatMentionsSupported = false;
+  bool personalNotificationsSupported = false;
+  late final _personalNotificationApi = SessionPersonalNotificationApi(this);
+  @override
+  PersonalNotificationApi? get personalNotifications =>
+      personalNotificationsSupported ? _personalNotificationApi : null;
   late final _chatMentionApi = SessionCommunityMentionApi(this);
   @override
   CommunityMentionApi? get communityMentions =>
@@ -893,6 +904,9 @@ class SpaceSession
     feedReadSupported = manifest.capabilities.contains('core.feed.read.v1');
     communityOverviewSupported = manifest.capabilities.contains(
       'core.community.overview.v1',
+    );
+    personalNotificationsSupported = manifest.capabilities.contains(
+      'core.personal.notifications.v1',
     );
     chatMentionsSupported = manifest.capabilities.contains(
       'core.chat.mentions.v1',
@@ -1308,6 +1322,9 @@ class SpaceSession
       );
       session.communityOverviewSupported = manifest.capabilities.contains(
         'core.community.overview.v1',
+      );
+      session.personalNotificationsSupported = manifest.capabilities.contains(
+        'core.personal.notifications.v1',
       );
       session.chatMentionsSupported = manifest.capabilities.contains(
         'core.chat.mentions.v1',

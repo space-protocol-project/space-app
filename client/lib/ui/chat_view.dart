@@ -53,6 +53,7 @@ class ChatView extends StatefulWidget {
     this.jumpRequest,
     this.topInset = 0,
     this.jumpGeneration = 0,
+    this.onVisibleMessages,
   });
   final ChatController controller;
   final VoidCallback openConnection;
@@ -60,6 +61,7 @@ class ChatView extends StatefulWidget {
   final String? jumpRequest;
   final double topInset;
   final int jumpGeneration;
+  final void Function(ChatController, List<Content>)? onVisibleMessages;
   @override
   State<ChatView> createState() => _ChatViewState();
 }
@@ -241,13 +243,18 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     final top = box.localToGlobal(Offset.zero).dy + widget.topInset;
     final bottom = visibleBottom(box);
     String? lastVisible;
+    final visibleMessages = <Content>[];
     for (final message in messages) {
       final row = messageKeys[message.id]?.currentContext?.findRenderObject();
       if (row is! RenderBox || !row.hasSize) continue;
       final start = row.localToGlobal(Offset.zero).dy;
       final end = row.localToGlobal(Offset(0, row.size.height)).dy;
-      if (start >= top && end <= bottom) lastVisible = message.id;
+      if (start >= top && end <= bottom) {
+        lastVisible = message.id;
+        visibleMessages.add(message);
+      }
     }
+    widget.onVisibleMessages?.call(controller, visibleMessages);
     if (lastVisible != null && lastVisible != controller.state.readThrough) {
       controller.markRead(lastVisible);
     }

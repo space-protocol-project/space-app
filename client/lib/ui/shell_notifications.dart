@@ -108,6 +108,10 @@ extension _ShellNotifications on _SpaceShellState {
         notice.message!.id,
       );
     }
+    final chat = workspaces[notice.origin];
+    if (chat?.personalNotifications != null) {
+      return chat!.notificationContent(notice.channel.id, notice.sequence);
+    }
     return workspaces[notice.origin]?.messages
         .where(
           (m) =>
@@ -133,13 +137,25 @@ extension _ShellNotifications on _SpaceShellState {
         notificationChatVisible(notice)) {
       return;
     }
-    if (notice.isMls && latest == null) return;
+    if (latest == null &&
+        (notice.isMls ||
+            workspaces[notice.origin]?.personalNotifications != null)) {
+      return;
+    }
     if (latest?.deleted == true || latest?.authorId == notice.principal) return;
+    if (!notice.isMls &&
+        workspaces[notice.origin]?.personalNotifications != null &&
+        latest?.mentions.any((m) => m.principalId == notice.principal) ==
+            true) {
+      return;
+    }
     await showNotification(notice, latest);
   }
 
   Future<void> showNotification(ChatNotice notice, Content? latest) async {
-    final preview = widget.preferences.notificationMode == 2;
+    final mode = widget.preferences.notificationMode;
+    final epoch = notificationOpenEpoch;
+    final preview = mode == 2;
     final title = preview
         ? '${workspaces[notice.origin]!.spaceTitle} · ${notice.channel.title}'
         : 'Space';
@@ -160,6 +176,13 @@ extension _ShellNotifications on _SpaceShellState {
       title: title,
       body: body,
       actionLabel: context.strings.openChat,
+      permitted: () =>
+          mounted &&
+          epoch == notificationOpenEpoch &&
+          widget.preferences.notificationMode == mode &&
+          widget.preferences.origins.contains(notice.origin) &&
+          notificationStillAllowed(notice) &&
+          !notificationChatVisible(notice),
       target: [
         notice.origin,
         notice.principal,
@@ -194,13 +217,19 @@ extension _ShellNotifications on _SpaceShellState {
       // Неудача запуска из уведомления не препятствует обычному запуску.
     } finally {
       notificationStartupComplete = true;
+      if (mounted) {
+        personalNotifications.setDeliveryEnabled(
+          widget.preferences.notificationMode != 0,
+        );
+      }
     }
   }
 
   Future<void> queueNotificationOpen(String payload) async {
     if (exiting ||
         widget.preferences.notificationMode == 0 ||
-        ChatNotificationTarget.decode(payload) == null) {
+        ChatNotificationTarget.decode(payload) == null &&
+            PersonalNotificationTarget.decode(payload) == null) {
       return;
     }
     notificationOpenEpoch++;
@@ -229,6 +258,15 @@ extension _ShellNotifications on _SpaceShellState {
   }
 
   Future<void> openNotification(String payload) async {
+    final personal = PersonalNotificationTarget.decode(payload);
+    if (personal != null) {
+      await openPersonalNotification(personal, notificationOpenEpoch);
+    } else {
+      await openChatNotification(payload);
+    }
+  }
+
+  Future<void> openChatNotification(String payload) async {
     final epoch = notificationOpenEpoch;
     try {
       final target = ChatNotificationTarget.decode(payload);
@@ -237,7 +275,12 @@ extension _ShellNotifications on _SpaceShellState {
       if (chat == null || !widget.preferences.origins.contains(target.origin)) {
         return;
       }
-      if (!await notificationConnectionReady(chat, target, payload, epoch)) {
+      if (!await notificationConnectionReady(
+        chat,
+        target.origin,
+        payload,
+        epoch,
+      )) {
         return;
       }
       if (!notificationAccessCurrent(chat, target, epoch)) return;
@@ -264,11 +307,11 @@ extension _ShellNotifications on _SpaceShellState {
 
   Future<bool> notificationConnectionReady(
     ChatController chat,
-    ChatNotificationTarget target,
+    String origin,
     String payload,
     int epoch,
   ) async {
-    await workspaces.reconnect(target.origin);
+    await workspaces.reconnect(origin);
     if (chat.busy) {
       try {
         await chat.stream
@@ -280,7 +323,7 @@ extension _ShellNotifications on _SpaceShellState {
     }
     if (!mounted || epoch != notificationOpenEpoch) return false;
     if (chat.connected || chat.accessRemoved) return true;
-    if (widget.preferences.origins.contains(target.origin)) {
+    if (widget.preferences.origins.contains(origin)) {
       deferredNotification ??= payload;
     }
     return false;

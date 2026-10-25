@@ -368,5 +368,15 @@
   "appearanceTheme": "主题",
   "appearanceThemeSystem": "跟随系统",
   "appearanceThemeLight": "浅色",
-  "appearanceThemeDark": "深色"
+  "appearanceThemeDark": "深色",
+  "notificationSection": "分区",
+  "notificationInboxEmpty": "没有未读通知",
+  "notificationInboxFailed": "无法更新通知。请检查连接和访问权限。",
+  "notificationMarkRead": "标记为已查看",
+  "notificationRefresh": "刷新通知",
+  "notificationPrevious": "上一页",
+  "notificationNext": "下一页",
+  "notificationUnavailable": "没有可访问的分区",
+  "notificationReply": "回复你的消息",
+  "notificationOpen": "打开"
 }

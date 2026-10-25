@@ -999,5 +999,15 @@
   "appearanceTheme": "Theme",
   "appearanceThemeSystem": "Automatic",
   "appearanceThemeLight": "Light",
-  "appearanceThemeDark": "Dark"
+  "appearanceThemeDark": "Dark",
+  "notificationSection": "Section",
+  "notificationInboxEmpty": "No unread notifications",
+  "notificationInboxFailed": "Could not update notifications. Check your connection and access.",
+  "notificationMarkRead": "Mark as seen",
+  "notificationRefresh": "Refresh notifications",
+  "notificationPrevious": "Previous page",
+  "notificationNext": "Next page",
+  "notificationUnavailable": "No accessible sections",
+  "notificationReply": "Reply to you",
+  "notificationOpen": "Open"
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -10,6 +11,45 @@ import 'chat_history_test.dart' show HistoryKeys;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  test(
+    'Отзыв доступа во время сохранения отменяет карточку и её цель',
+    () async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.linux;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+      final saved = _DelayedTargets();
+      final service = SystemNotifications(savedTargets: saved);
+      addTearDown(service.dispose);
+      final shown = <Object?>[];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemNotifications.activationChannel, (
+            call,
+          ) async {
+            if (call.method == 'show') shown.add(call.arguments);
+            return null;
+          });
+      addTearDown(
+        () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(
+              SystemNotifications.activationChannel,
+              null,
+            ),
+      );
+      var allowed = true;
+      final pending = service.show(
+        id: 1,
+        title: 'Space',
+        body: 'Новое сообщение',
+        target: ['personal', 'https://saved.example', 'me', 'forum', 1, 'pn_1'],
+        permitted: () => allowed,
+      );
+      await saved.entered.future;
+      allowed = false;
+      saved.resume.complete();
+      await pending;
+      expect(shown, isEmpty);
+      expect(await saved.take(saved.token!), isNull);
+    },
+  );
   for (final platform in [
     TargetPlatform.macOS,
     TargetPlatform.linux,
@@ -117,5 +157,18 @@ void main() {
       await click();
       expect(taps, hasLength(1));
     });
+  }
+}
+
+class _DelayedTargets extends NotificationTargets {
+  _DelayedTargets() : super(storage: HistoryKeys());
+  final entered = Completer<void>(), resume = Completer<void>();
+  String? token;
+  @override
+  Future<String> save(int id, String payload) async {
+    token = await super.save(id, payload);
+    entered.complete();
+    await resume.future;
+    return token!;
   }
 }

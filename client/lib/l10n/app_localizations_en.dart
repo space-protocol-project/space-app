@@ -2782,4 +2782,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appearanceThemeDark => 'Dark';
+
+  @override
+  String get notificationSection => 'Section';
+
+  @override
+  String get notificationInboxEmpty => 'No unread notifications';
+
+  @override
+  String get notificationInboxFailed =>
+      'Could not update notifications. Check your connection and access.';
+
+  @override
+  String get notificationMarkRead => 'Mark as seen';
+
+  @override
+  String get notificationRefresh => 'Refresh notifications';
+
+  @override
+  String get notificationPrevious => 'Previous page';
+
+  @override
+  String get notificationNext => 'Next page';
+
+  @override
+  String get notificationUnavailable => 'No accessible sections';
+
+  @override
+  String get notificationReply => 'Reply to you';
+
+  @override
+  String get notificationOpen => 'Open';
 }

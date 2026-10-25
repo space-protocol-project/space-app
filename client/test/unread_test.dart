@@ -60,6 +60,7 @@ void main() {
       final controller = await tester.runAsync(
         () => connected(LongSession(), MemoryPositions()),
       );
+      var acknowledged = <String>[];
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -68,6 +69,8 @@ void main() {
               openConnection: () {},
               topInset: 120,
               showHeader: false,
+              onVisibleMessages: (_, messages) =>
+                  acknowledged = messages.map((m) => m.id).toList(),
             ),
           ),
         ),
@@ -99,6 +102,7 @@ void main() {
         }
         expect(visible, isNotEmpty);
         expect(controller.readSequence('general'), visible.last);
+        expect(acknowledged, visible.map((sequence) => 'm-$sequence'));
         expect(tester.takeException(), isNull);
       }
       await tester.pumpWidget(const SizedBox());

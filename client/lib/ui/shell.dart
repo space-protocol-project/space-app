@@ -1,3 +1,11 @@
+import 'package:fixnum/fixnum.dart';
+
+import '../src/personal_notifications_controller.dart';
+import '../src/personal_inbox_controller.dart';
+import '../src/personal_notification_scope.dart';
+import '../src/personal_notification_target.dart';
+import '../src/generated/space/v1/personal_notifications.pb.dart';
+import 'personal_inbox.dart';
 import 'theme_mode_picker.dart';
 import '../src/generated/space/v1/space.pb.dart' show Channel, Content;
 import 'mls_channel.dart';
@@ -74,6 +82,7 @@ import 'measure_size.dart';
 import 'retained_indexed_stack.dart';
 
 part 'shell_notifications.dart';
+part 'shell_personal_notifications.dart';
 part 'shell_message_search.dart';
 part 'shell_mls_notifications.dart';
 
@@ -132,6 +141,10 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
       widget.notifications ?? SystemNotifications();
   late final voice = widget.voiceController ?? VoiceController();
   final notificationTracker = ChatNotificationTracker();
+  late final personalNotifications = PersonalNotificationsController(
+    workspaces,
+    deliver: deliverPersonalNotifications,
+  );
   StreamSubscription<String>? notificationTaps;
   Future<void> notificationJobs = Future.value();
   final pendingNotices = <String, ChatNotice>{};
@@ -437,6 +450,10 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   Future<void> openDashboardCommunity(DashboardCommunityTarget target) async {
     await openSpace(target.origin);
     if (!mounted || !identical(controller, workspaces[target.origin])) return;
+    showCommunityTarget(target);
+  }
+
+  void showCommunityTarget(DashboardCommunityTarget target) {
     setState(() {
       dashboardTarget = target;
       communityNavigationRequest++;
@@ -838,6 +855,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
 
   Future<void> _stopDeviceForMigration() async {
     movingDevice = true;
+    personalNotifications.setDeliveryEnabled(false);
     mlsNotificationTimer?.cancel();
     await presence.watch([]);
     await voice.leave();
@@ -1028,6 +1046,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   @override
   void dispose() {
     widget.shutdown?.prepare = null;
+    unawaited(personalNotifications.close());
     if (widget.voiceController == null) unawaited(voice.close());
     mlsNotificationTimer?.cancel();
     mlsNotificationWatcher.dispose();
@@ -1766,6 +1785,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
           Section.chat => ChatView(
             key: const ValueKey('live-chat'),
             controller: controller,
+            onVisibleMessages: personalNotifications.markVisibleChat,
             active:
                 !applicationSettings &&
                 !dashboard &&
@@ -1858,7 +1878,11 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     return context.strings.disconnected;
   }
 
-  Widget header(bool compact) => SpaceHeader(
+  Widget header(bool compact) => LayoutBuilder(
+    builder: (context, box) => _header(compact || box.maxWidth < 600),
+  );
+
+  Widget _header(bool compact) => SpaceHeader(
     minHeight: compact ? 62 : SpaceAppearance.headerHeight,
     title: _headerTitle,
     subtitle: !applicationSettings && !dashboard && selected == Section.chat
@@ -1887,6 +1911,8 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
           ),
         ),
       if (!compact) _connectionButton(),
+      if (personalNotifications.state.scopes.isNotEmpty)
+        personalNotificationButton(),
       IconButton(
         tooltip: context.strings.search,
         onPressed: search,
@@ -1952,6 +1978,9 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   }
 
   void _preferencesChanged(BuildContext context, PreferencesState state) {
+    personalNotifications.setDeliveryEnabled(
+      widget.preferences.notificationMode != 0,
+    );
     unawaited(syncAndroidNotifications());
     resetMlsNotifications();
     if (notificationStartupComplete) clearPrivateNotifications();
@@ -2222,6 +2251,10 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) => MultiBlocListener(
     listeners: [
+      BlocListener<PersonalNotificationsController, PersonalNotificationsState>(
+        bloc: personalNotifications,
+        listener: (_, _) => _refreshShell(),
+      ),
       BlocListener<AppPreferences, PreferencesState>(
         bloc: widget.preferences,
         listener: _preferencesChanged,

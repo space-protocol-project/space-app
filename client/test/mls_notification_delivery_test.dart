@@ -74,6 +74,7 @@ class _Notifications extends SystemNotifications {
     required String body,
     required List<Object> target,
     String actionLabel = 'Space',
+    bool Function()? permitted,
   }) async {
     shown.add((title, body));
     lastTarget = target;

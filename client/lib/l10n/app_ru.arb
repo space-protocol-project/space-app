@@ -999,5 +999,15 @@
   "appearanceTheme": "Тема",
   "appearanceThemeSystem": "Автоматическая",
   "appearanceThemeLight": "Светлая",
-  "appearanceThemeDark": "Тёмная"
+  "appearanceThemeDark": "Тёмная",
+  "notificationSection": "Раздел",
+  "notificationInboxEmpty": "Непросмотренных уведомлений нет",
+  "notificationInboxFailed": "Не удалось обновить уведомления. Проверьте подключение и доступ.",
+  "notificationMarkRead": "Отметить просмотренным",
+  "notificationRefresh": "Обновить уведомления",
+  "notificationPrevious": "Предыдущая страница",
+  "notificationNext": "Следующая страница",
+  "notificationUnavailable": "Нет доступных разделов",
+  "notificationReply": "Ответ вам",
+  "notificationOpen": "Открыть"
 }

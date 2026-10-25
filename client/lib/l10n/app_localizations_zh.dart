@@ -2574,6 +2574,36 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get appearanceThemeDark => '深色';
+
+  @override
+  String get notificationSection => '分区';
+
+  @override
+  String get notificationInboxEmpty => '没有未读通知';
+
+  @override
+  String get notificationInboxFailed => '无法更新通知。请检查连接和访问权限。';
+
+  @override
+  String get notificationMarkRead => '标记为已查看';
+
+  @override
+  String get notificationRefresh => '刷新通知';
+
+  @override
+  String get notificationPrevious => '上一页';
+
+  @override
+  String get notificationNext => '下一页';
+
+  @override
+  String get notificationUnavailable => '没有可访问的分区';
+
+  @override
+  String get notificationReply => '回复你的消息';
+
+  @override
+  String get notificationOpen => '打开';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3576,4 +3606,34 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get appearanceThemeDark => '深色';
+
+  @override
+  String get notificationSection => '分区';
+
+  @override
+  String get notificationInboxEmpty => '没有未读通知';
+
+  @override
+  String get notificationInboxFailed => '无法更新通知。请检查连接和访问权限。';
+
+  @override
+  String get notificationMarkRead => '标记为已查看';
+
+  @override
+  String get notificationRefresh => '刷新通知';
+
+  @override
+  String get notificationPrevious => '上一页';
+
+  @override
+  String get notificationNext => '下一页';
+
+  @override
+  String get notificationUnavailable => '没有可访问的分区';
+
+  @override
+  String get notificationReply => '回复你的消息';
+
+  @override
+  String get notificationOpen => '打开';
 }

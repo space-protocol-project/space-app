@@ -5061,6 +5061,66 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Тёмная'**
   String get appearanceThemeDark;
+
+  /// No description provided for @notificationSection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Раздел'**
+  String get notificationSection;
+
+  /// No description provided for @notificationInboxEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Непросмотренных уведомлений нет'**
+  String get notificationInboxEmpty;
+
+  /// No description provided for @notificationInboxFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось обновить уведомления. Проверьте подключение и доступ.'**
+  String get notificationInboxFailed;
+
+  /// No description provided for @notificationMarkRead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметить просмотренным'**
+  String get notificationMarkRead;
+
+  /// No description provided for @notificationRefresh.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить уведомления'**
+  String get notificationRefresh;
+
+  /// No description provided for @notificationPrevious.
+  ///
+  /// In ru, this message translates to:
+  /// **'Предыдущая страница'**
+  String get notificationPrevious;
+
+  /// No description provided for @notificationNext.
+  ///
+  /// In ru, this message translates to:
+  /// **'Следующая страница'**
+  String get notificationNext;
+
+  /// No description provided for @notificationUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет доступных разделов'**
+  String get notificationUnavailable;
+
+  /// No description provided for @notificationReply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ответ вам'**
+  String get notificationReply;
+
+  /// No description provided for @notificationOpen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть'**
+  String get notificationOpen;
 }
 
 class _AppLocalizationsDelegate

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'chat_notifications.dart';
+import 'personal_notification_target.dart';
 import 'secure_vault.dart';
 
 /// ОС получает только случайный одноразовый ключ, без адреса и текста чата.
@@ -41,10 +42,14 @@ class NotificationTargets {
       entry['time'] >= cutoff &&
       entry['time'] <= now().millisecondsSinceEpoch &&
       entry['payload'] is String &&
-      ChatNotificationTarget.decode(entry['payload']) != null;
+      _validPayload(entry['payload']);
+
+  bool _validPayload(String payload) =>
+      ChatNotificationTarget.decode(payload) != null ||
+      PersonalNotificationTarget.decode(payload) != null;
 
   Future<String> save(int id, String payload) => _serial(() async {
-    if (ChatNotificationTarget.decode(payload) == null) {
+    if (!_validPayload(payload)) {
       throw ArgumentError('Некорректная цель уведомления');
     }
     final data = await _read();

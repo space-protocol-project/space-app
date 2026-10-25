@@ -103,10 +103,15 @@ class SystemNotifications {
     required String body,
     required List<Object> target,
     String actionLabel = 'Space',
+    bool Function()? permitted,
   }) async {
     await initialize();
-    if (_disposed) return;
+    if (!_canShow(permitted)) return;
     final token = await savedTargets.save(id, jsonEncode(target));
+    if (!_canShow(permitted)) {
+      await savedTargets.take(token);
+      return;
+    }
     await activationChannel.invokeMethod<void>('show', {
       'token': token,
       'appId': appName,
@@ -116,6 +121,9 @@ class SystemNotifications {
       'actionLabel': actionLabel,
     });
   }
+
+  bool _canShow(bool Function()? permitted) =>
+      !_disposed && (permitted?.call() ?? true);
 
   Future<void> clear() async {
     if (supported) {

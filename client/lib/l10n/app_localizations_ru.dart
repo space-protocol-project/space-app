@@ -2798,4 +2798,35 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get appearanceThemeDark => 'Тёмная';
+
+  @override
+  String get notificationSection => 'Раздел';
+
+  @override
+  String get notificationInboxEmpty => 'Непросмотренных уведомлений нет';
+
+  @override
+  String get notificationInboxFailed =>
+      'Не удалось обновить уведомления. Проверьте подключение и доступ.';
+
+  @override
+  String get notificationMarkRead => 'Отметить просмотренным';
+
+  @override
+  String get notificationRefresh => 'Обновить уведомления';
+
+  @override
+  String get notificationPrevious => 'Предыдущая страница';
+
+  @override
+  String get notificationNext => 'Следующая страница';
+
+  @override
+  String get notificationUnavailable => 'Нет доступных разделов';
+
+  @override
+  String get notificationReply => 'Ответ вам';
+
+  @override
+  String get notificationOpen => 'Открыть';
 }
