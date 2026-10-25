@@ -374,7 +374,11 @@ class DashboardHighlightsState extends State<DashboardHighlights>
     title: Text(title, maxLines: 2, overflow: TextOverflow.ellipsis),
     subtitle: Text(subtitle, maxLines: 2, overflow: TextOverflow.ellipsis),
     trailing: count > 0
-        ? Badge(label: Text('$count'))
+        ? Badge(
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            textColor: Theme.of(context).colorScheme.onPrimaryContainer,
+            label: Text('$count'),
+          )
         : const Icon(Icons.chevron_right),
     onTap: tap,
   );
