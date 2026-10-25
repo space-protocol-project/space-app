@@ -16,9 +16,12 @@ class UnreadCounter extends StatelessWidget {
       child: Badge(
         backgroundColor: colors.background,
         textColor: colors.foreground,
-        padding: const EdgeInsets.fromLTRB(5, 1, 5, 0),
-        textStyle: Theme.of(context).textTheme.labelSmall
-            ?.copyWith(fontWeight: FontWeight.w700, height: 1),
+        padding: const EdgeInsets.all(6),
+        textStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
+          fontWeight: FontWeight.w700,
+          height: 1,
+          leadingDistribution: TextLeadingDistribution.even,
+        ),
         label: Text(count > 99 ? '99+' : '$count'),
       ),
     );

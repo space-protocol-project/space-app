@@ -901,9 +901,9 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       children: [
         if (view.canRead && view.unreadCount(view.channelId) > 0)
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
             child: Align(
-              alignment: Alignment.centerRight,
+              alignment: Alignment.center,
               child: FilledButton.tonalIcon(
                 onPressed: jumpToNew,
                 icon: const Icon(Icons.arrow_downward, size: 18),

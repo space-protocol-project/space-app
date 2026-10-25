@@ -5,6 +5,7 @@ import 'package:space_client/src/generated/space/v1/space.pb.dart';
 import 'package:space_client/ui/chat_view.dart';
 import 'package:space_client/ui/message_bubble.dart';
 import 'package:space_client/ui/measure_size.dart';
+import 'package:space_client/ui/message_input_surface.dart';
 
 import 'channels_test.dart'
     show CatalogSession, MemoryPositions, connected, chat, settle;
@@ -187,6 +188,15 @@ void main() {
     await tester.pumpAndSettle();
     expect(c.readSequence('general'), 30);
     expect(c.unreadCount('general'), 20);
+    final jump = tester.getRect(
+      find.ancestor(
+        of: find.text('Новые сообщения: 20'),
+        matching: find.byType(FilledButton),
+      ),
+    );
+    final input = tester.getRect(find.byType(MessageInputSurface));
+    expect(jump.center.dx, closeTo(input.center.dx, 0.1));
+    expect(input.top - jump.bottom, closeTo(12, 0.1));
     await tester.tap(find.text('Новые сообщения: 20'));
     await tester.pumpAndSettle();
     expect(c.readSequence('general'), greaterThan(30));
