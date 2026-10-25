@@ -1,7 +1,9 @@
 # Уведомления об упоминаниях и ответах
 
-Срез включён в подготовленный выпуск приложения v0.7.24 с опубликованным
-runtime v0.7.19: capability `core.personal.notifications.v1`, миграция 35→36.
+Срез опубликован в приложении [v0.7.24](https://github.com/space-protocol-project/space-app/releases/tag/v0.7.24)
+и runtime [v0.7.19](https://github.com/space-protocol-project/space-server/releases/tag/v0.7.19):
+capability `core.personal.notifications.v1`, миграция 35→36.
+[Проверки выпуска](NOTIFICATIONS-RELEASE.md).
 Контракт — [ADR-052](../../space-protocol/docs/adr/052-personal-notifications.md).
 Добавлены наблюдение, персональный список и системные карточки работающего
 приложения. Существующие уведомления чатов описаны в [NOTIFICATIONS.md](NOTIFICATIONS.md).
