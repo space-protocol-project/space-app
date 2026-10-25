@@ -215,12 +215,14 @@ class GetCommunityOverviewResponse extends $pb.GeneratedMessage {
     $core.Iterable<CommunityOverviewEntry>? repliesToYou,
     $fixnum.Int64? pendingReports,
     $core.bool? canModerate,
+    $core.Iterable<CommunityOverviewEntry>? mentions,
   }) {
     final result = GetCommunityOverviewResponse._();
     if (recent != null) result.recent.addAll(recent);
     if (repliesToYou != null) result.repliesToYou.addAll(repliesToYou);
     if (pendingReports != null) result.pendingReports = pendingReports;
     if (canModerate != null) result.canModerate = canModerate;
+    if (mentions != null) result.mentions.addAll(mentions);
     return result;
   }
 
@@ -243,6 +245,8 @@ class GetCommunityOverviewResponse extends $pb.GeneratedMessage {
         subBuilder: CommunityOverviewEntry.$_createMessage)
     ..aInt64(3, _omitFieldNames ? '' : 'pendingReports')
     ..aOB(4, _omitFieldNames ? '' : 'canModerate')
+    ..pPM<CommunityOverviewEntry>(5, _omitFieldNames ? '' : 'mentions',
+        subBuilder: CommunityOverviewEntry.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -296,6 +300,10 @@ class GetCommunityOverviewResponse extends $pb.GeneratedMessage {
   $core.bool hasCanModerate() => $_has(3);
   @$pb.TagNumber(4)
   void clearCanModerate() => $_clearField(4);
+
+  /// Непросмотренные упоминания текущего principal; не включает скрытые объекты.
+  @$pb.TagNumber(5)
+  $pb.PbList<CommunityOverviewEntry> get mentions => $_getList(4);
 }
 
 /// core.community.overview.v1: персональная сводка одного доступного раздела.

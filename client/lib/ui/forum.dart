@@ -1,3 +1,5 @@
+import '../src/community_mentions_api.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -220,6 +222,18 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
             child: ForumComposer(
               sendWithShift: widget.sendWithShift,
               newTopic: true,
+              mentionApi: communityMentionsFor(widget.api),
+              submitMentioned: (title, text, key, files, mentions) async {
+                final success = await controller.create(
+                  title,
+                  text,
+                  key,
+                  files,
+                  mentions,
+                );
+                if (success && context.mounted) Navigator.pop(context);
+                return success;
+              },
               session: media?.attachmentSession,
               attachmentsEnabled: media?.attachmentsEnabled ?? false,
               channelId: controller.state.section!.id,
@@ -297,6 +311,8 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
               context,
               () => widget.active && foreground && !controller.state.busy,
               (sequence) => unawaited(controller.markVisible(sequence)),
+              visible: controller.markMentionsVisible,
+              topPadding: SpaceContentInsets.topOf(context),
             );
             return NotificationListener<ScrollNotification>(
               onNotification: (_) {
@@ -304,6 +320,8 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
                   context,
                   () => widget.active && foreground && !controller.state.busy,
                   (sequence) => unawaited(controller.markVisible(sequence)),
+                  visible: controller.markMentionsVisible,
+                  topPadding: SpaceContentInsets.topOf(context),
                 );
                 return false;
               },
@@ -901,6 +919,7 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
           author: reply.authorName,
           authorId: reply.authorId,
           text: reply.text,
+          mentions: reply.mentions,
           timestamp: reply.createdAtUnix.toInt(),
           assets: _visibleAssets(reply.attachments),
           session: media?.attachmentSession,
@@ -926,6 +945,7 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
                 author: topic.authorName,
                 authorId: topic.authorId,
                 text: topic.text,
+                mentions: topic.mentions,
                 timestamp: topic.createdAtUnix.toInt(),
                 original: true,
                 assets: _visibleAssets(topic.attachments),
@@ -997,6 +1017,10 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
       sendWithShift: widget.sendWithShift,
       key: ValueKey(state.topic!.id),
       disabled: state.busy,
+      mentionApi: communityMentionsFor(widget.api),
+      parentId: state.topic!.id,
+      submitMentioned: (_, text, key, files, mentions) =>
+          controller.reply(text, key, files, mentions),
       channelId: state.section!.id,
       session: media?.attachmentSession,
       attachmentsEnabled: media?.attachmentsEnabled ?? false,

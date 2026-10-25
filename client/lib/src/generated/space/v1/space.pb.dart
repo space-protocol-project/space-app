@@ -16,6 +16,8 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import 'community_mentions.pb.dart' as $0;
+
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 class LogoutRequest extends $pb.GeneratedMessage {
@@ -6039,6 +6041,7 @@ class Content extends $pb.GeneratedMessage {
     $core.String? replyToId,
     $core.Iterable<$core.MapEntry<$core.String, $core.String>>?
         participantNames,
+    $core.Iterable<$0.CommunityMention>? mentions,
   }) {
     final result = Content._();
     if (id != null) result.id = id;
@@ -6055,6 +6058,7 @@ class Content extends $pb.GeneratedMessage {
     if (replyToId != null) result.replyToId = replyToId;
     if (participantNames != null)
       result.participantNames.addEntries(participantNames);
+    if (mentions != null) result.mentions.addAll(mentions);
     return result;
   }
 
@@ -6091,6 +6095,8 @@ class Content extends $pb.GeneratedMessage {
         keyFieldType: $pb.PbFieldType.OS,
         valueFieldType: $pb.PbFieldType.OS,
         packageName: const $pb.PackageName('space.v1'))
+    ..pPM<$0.CommunityMention>(14, _omitFieldNames ? '' : 'mentions',
+        subBuilder: $0.CommunityMention.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6214,6 +6220,9 @@ class Content extends $pb.GeneratedMessage {
   /// Актуальные имена видимых авторов и участников реакций; идентификаторы не меняются.
   @$pb.TagNumber(13)
   $pb.PbMap<$core.String, $core.String> get participantNames => $_getMap(12);
+
+  @$pb.TagNumber(14)
+  $pb.PbList<$0.CommunityMention> get mentions => $_getList(13);
 }
 
 class UpdateContentRequest extends $pb.GeneratedMessage {
@@ -6223,6 +6232,7 @@ class UpdateContentRequest extends $pb.GeneratedMessage {
     $core.String? text,
     $fixnum.Int64? expectedRevision,
     $core.String? idempotencyKey,
+    $core.Iterable<$0.CommunityMention>? mentions,
   }) {
     final result = UpdateContentRequest._();
     if (channelId != null) result.channelId = channelId;
@@ -6230,6 +6240,7 @@ class UpdateContentRequest extends $pb.GeneratedMessage {
     if (text != null) result.text = text;
     if (expectedRevision != null) result.expectedRevision = expectedRevision;
     if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
+    if (mentions != null) result.mentions.addAll(mentions);
     return result;
   }
 
@@ -6251,6 +6262,8 @@ class UpdateContentRequest extends $pb.GeneratedMessage {
     ..aOS(3, _omitFieldNames ? '' : 'text')
     ..aInt64(4, _omitFieldNames ? '' : 'expectedRevision')
     ..aOS(5, _omitFieldNames ? '' : 'idempotencyKey')
+    ..pPM<$0.CommunityMention>(6, _omitFieldNames ? '' : 'mentions',
+        subBuilder: $0.CommunityMention.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6320,6 +6333,9 @@ class UpdateContentRequest extends $pb.GeneratedMessage {
   $core.bool hasIdempotencyKey() => $_has(4);
   @$pb.TagNumber(5)
   void clearIdempotencyKey() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $pb.PbList<$0.CommunityMention> get mentions => $_getList(5);
 }
 
 class UpdateContentResponse extends $pb.GeneratedMessage {
@@ -6595,6 +6611,7 @@ class CreateContentRequest extends $pb.GeneratedMessage {
     $core.String? idempotencyKey,
     $core.Iterable<$core.String>? attachmentIds,
     $core.String? replyToId,
+    $core.Iterable<$0.CommunityMention>? mentions,
   }) {
     final result = CreateContentRequest._();
     if (channelId != null) result.channelId = channelId;
@@ -6602,6 +6619,7 @@ class CreateContentRequest extends $pb.GeneratedMessage {
     if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
     if (attachmentIds != null) result.attachmentIds.addAll(attachmentIds);
     if (replyToId != null) result.replyToId = replyToId;
+    if (mentions != null) result.mentions.addAll(mentions);
     return result;
   }
 
@@ -6623,6 +6641,8 @@ class CreateContentRequest extends $pb.GeneratedMessage {
     ..aOS(3, _omitFieldNames ? '' : 'idempotencyKey')
     ..pPS(4, _omitFieldNames ? '' : 'attachmentIds')
     ..aOS(5, _omitFieldNames ? '' : 'replyToId')
+    ..pPM<$0.CommunityMention>(6, _omitFieldNames ? '' : 'mentions',
+        subBuilder: $0.CommunityMention.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6686,6 +6706,9 @@ class CreateContentRequest extends $pb.GeneratedMessage {
   $core.bool hasReplyToId() => $_has(4);
   @$pb.TagNumber(5)
   void clearReplyToId() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $pb.PbList<$0.CommunityMention> get mentions => $_getList(5);
 }
 
 class CreateContentResponse extends $pb.GeneratedMessage {

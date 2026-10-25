@@ -1,3 +1,5 @@
+import 'theme_mode_picker.dart';
+
 import 'dart:io';
 
 import 'mls_create.dart';
@@ -216,13 +218,8 @@ class SettingsPanel extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
-            SwitchListTile.adaptive(
-              contentPadding: EdgeInsets.zero,
-              title: Text(context.strings.darkTheme),
-              subtitle: Text(context.strings.themeDescription),
-              value: state.dark,
-              onChanged: (value) => preferences.change(dark: value),
-            ),
+            ThemeModePicker(preferences: preferences, mode: state.themeMode),
+            const SizedBox(height: 16),
             SwitchListTile.adaptive(
               contentPadding: EdgeInsets.zero,
               title: Text(context.strings.glassEffects),

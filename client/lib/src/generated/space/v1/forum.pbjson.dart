@@ -15,12 +15,21 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
+import 'community_mentions.pbjson.dart' as $1;
 import 'space.pbjson.dart' as $0;
 
 @$core.Deprecated('Use forumThreadDescriptor instead')
 const ForumThread$json = {
   '1': 'ForumThread',
   '2': [
+    {
+      '1': 'mentions',
+      '3': 19,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.CommunityMention',
+      '10': 'mentions'
+    },
     {'1': 'hidden', '3': 18, '4': 1, '5': 8, '10': 'hidden'},
     {'1': 'pinned', '3': 13, '4': 1, '5': 8, '10': 'pinned'},
     {
@@ -57,22 +66,31 @@ const ForumThread$json = {
 
 /// Descriptor for `ForumThread`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List forumThreadDescriptor = $convert.base64Decode(
-    'CgtGb3J1bVRocmVhZBIWCgZoaWRkZW4YEiABKAhSBmhpZGRlbhIWCgZwaW5uZWQYDSABKAhSBn'
-    'Bpbm5lZBIwChRyZWFkX3N0YXRlX3N1cHBvcnRlZBgOIAEoCFIScmVhZFN0YXRlU3VwcG9ydGVk'
-    'EhIKBHNlZW4YDyABKAhSBHNlZW4SIwoNcmVhZF9zZXF1ZW5jZRgQIAEoA1IMcmVhZFNlcXVlbm'
-    'NlEiEKDHVucmVhZF9jb3VudBgRIAEoA1ILdW5yZWFkQ291bnQSMQoLYXR0YWNobWVudHMYDCAD'
-    'KAsyDy5zcGFjZS52MS5Bc3NldFILYXR0YWNobWVudHMSDgoCaWQYASABKAlSAmlkEh0KCmNoYW'
-    '5uZWxfaWQYAiABKAlSCWNoYW5uZWxJZBIbCglhdXRob3JfaWQYAyABKAlSCGF1dGhvcklkEh8K'
-    'C2F1dGhvcl9uYW1lGAQgASgJUgphdXRob3JOYW1lEhQKBXRpdGxlGAUgASgJUgV0aXRsZRISCg'
-    'R0ZXh0GAYgASgJUgR0ZXh0EiYKD2NyZWF0ZWRfYXRfdW5peBgHIAEoA1INY3JlYXRlZEF0VW5p'
-    'eBIaCghzZXF1ZW5jZRgIIAEoA1IIc2VxdWVuY2USGgoIcmV2aXNpb24YCSABKANSCHJldmlzaW'
-    '9uEhYKBmNsb3NlZBgKIAEoCFIGY2xvc2VkEh8KC3JlcGx5X2NvdW50GAsgASgDUgpyZXBseUNv'
-    'dW50');
+    'CgtGb3J1bVRocmVhZBI2CghtZW50aW9ucxgTIAMoCzIaLnNwYWNlLnYxLkNvbW11bml0eU1lbn'
+    'Rpb25SCG1lbnRpb25zEhYKBmhpZGRlbhgSIAEoCFIGaGlkZGVuEhYKBnBpbm5lZBgNIAEoCFIG'
+    'cGlubmVkEjAKFHJlYWRfc3RhdGVfc3VwcG9ydGVkGA4gASgIUhJyZWFkU3RhdGVTdXBwb3J0ZW'
+    'QSEgoEc2VlbhgPIAEoCFIEc2VlbhIjCg1yZWFkX3NlcXVlbmNlGBAgASgDUgxyZWFkU2VxdWVu'
+    'Y2USIQoMdW5yZWFkX2NvdW50GBEgASgDUgt1bnJlYWRDb3VudBIxCgthdHRhY2htZW50cxgMIA'
+    'MoCzIPLnNwYWNlLnYxLkFzc2V0UgthdHRhY2htZW50cxIOCgJpZBgBIAEoCVICaWQSHQoKY2hh'
+    'bm5lbF9pZBgCIAEoCVIJY2hhbm5lbElkEhsKCWF1dGhvcl9pZBgDIAEoCVIIYXV0aG9ySWQSHw'
+    'oLYXV0aG9yX25hbWUYBCABKAlSCmF1dGhvck5hbWUSFAoFdGl0bGUYBSABKAlSBXRpdGxlEhIK'
+    'BHRleHQYBiABKAlSBHRleHQSJgoPY3JlYXRlZF9hdF91bml4GAcgASgDUg1jcmVhdGVkQXRVbm'
+    'l4EhoKCHNlcXVlbmNlGAggASgDUghzZXF1ZW5jZRIaCghyZXZpc2lvbhgJIAEoA1IIcmV2aXNp'
+    'b24SFgoGY2xvc2VkGAogASgIUgZjbG9zZWQSHwoLcmVwbHlfY291bnQYCyABKANSCnJlcGx5Q2'
+    '91bnQ=');
 
 @$core.Deprecated('Use forumReplyDescriptor instead')
 const ForumReply$json = {
   '1': 'ForumReply',
   '2': [
+    {
+      '1': 'mentions',
+      '3': 11,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.CommunityMention',
+      '10': 'mentions'
+    },
     {'1': 'hidden', '3': 9, '4': 1, '5': 8, '10': 'hidden'},
     {'1': 'revision', '3': 10, '4': 1, '5': 3, '10': 'revision'},
     {
@@ -95,12 +113,13 @@ const ForumReply$json = {
 
 /// Descriptor for `ForumReply`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List forumReplyDescriptor = $convert.base64Decode(
-    'CgpGb3J1bVJlcGx5EhYKBmhpZGRlbhgJIAEoCFIGaGlkZGVuEhoKCHJldmlzaW9uGAogASgDUg'
-    'hyZXZpc2lvbhIxCgthdHRhY2htZW50cxgIIAMoCzIPLnNwYWNlLnYxLkFzc2V0UgthdHRhY2ht'
-    'ZW50cxIOCgJpZBgBIAEoCVICaWQSGwoJdGhyZWFkX2lkGAIgASgJUgh0aHJlYWRJZBIbCglhdX'
-    'Rob3JfaWQYAyABKAlSCGF1dGhvcklkEh8KC2F1dGhvcl9uYW1lGAQgASgJUgphdXRob3JOYW1l'
-    'EhIKBHRleHQYBSABKAlSBHRleHQSJgoPY3JlYXRlZF9hdF91bml4GAYgASgDUg1jcmVhdGVkQX'
-    'RVbml4EhoKCHNlcXVlbmNlGAcgASgDUghzZXF1ZW5jZQ==');
+    'CgpGb3J1bVJlcGx5EjYKCG1lbnRpb25zGAsgAygLMhouc3BhY2UudjEuQ29tbXVuaXR5TWVudG'
+    'lvblIIbWVudGlvbnMSFgoGaGlkZGVuGAkgASgIUgZoaWRkZW4SGgoIcmV2aXNpb24YCiABKANS'
+    'CHJldmlzaW9uEjEKC2F0dGFjaG1lbnRzGAggAygLMg8uc3BhY2UudjEuQXNzZXRSC2F0dGFjaG'
+    '1lbnRzEg4KAmlkGAEgASgJUgJpZBIbCgl0aHJlYWRfaWQYAiABKAlSCHRocmVhZElkEhsKCWF1'
+    'dGhvcl9pZBgDIAEoCVIIYXV0aG9ySWQSHwoLYXV0aG9yX25hbWUYBCABKAlSCmF1dGhvck5hbW'
+    'USEgoEdGV4dBgFIAEoCVIEdGV4dBImCg9jcmVhdGVkX2F0X3VuaXgYBiABKANSDWNyZWF0ZWRB'
+    'dFVuaXgSGgoIc2VxdWVuY2UYByABKANSCHNlcXVlbmNl');
 
 @$core.Deprecated('Use listForumThreadsRequestDescriptor instead')
 const ListForumThreadsRequest$json = {
@@ -200,6 +219,14 @@ const CreateForumThreadRequest$json = {
     {'1': 'text', '3': 3, '4': 1, '5': 9, '10': 'text'},
     {'1': 'idempotency_key', '3': 4, '4': 1, '5': 9, '10': 'idempotencyKey'},
     {'1': 'attachment_ids', '3': 5, '4': 3, '5': 9, '10': 'attachmentIds'},
+    {
+      '1': 'mentions',
+      '3': 6,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.CommunityMention',
+      '10': 'mentions'
+    },
   ],
 };
 
@@ -208,7 +235,8 @@ final $typed_data.Uint8List createForumThreadRequestDescriptor = $convert.base64
     'ChhDcmVhdGVGb3J1bVRocmVhZFJlcXVlc3QSHQoKY2hhbm5lbF9pZBgBIAEoCVIJY2hhbm5lbE'
     'lkEhQKBXRpdGxlGAIgASgJUgV0aXRsZRISCgR0ZXh0GAMgASgJUgR0ZXh0EicKD2lkZW1wb3Rl'
     'bmN5X2tleRgEIAEoCVIOaWRlbXBvdGVuY3lLZXkSJQoOYXR0YWNobWVudF9pZHMYBSADKAlSDW'
-    'F0dGFjaG1lbnRJZHM=');
+    'F0dGFjaG1lbnRJZHMSNgoIbWVudGlvbnMYBiADKAsyGi5zcGFjZS52MS5Db21tdW5pdHlNZW50'
+    'aW9uUghtZW50aW9ucw==');
 
 @$core.Deprecated('Use createForumThreadResponseDescriptor instead')
 const CreateForumThreadResponse$json = {
@@ -240,6 +268,14 @@ const ReplyForumThreadRequest$json = {
     {'1': 'text', '3': 3, '4': 1, '5': 9, '10': 'text'},
     {'1': 'idempotency_key', '3': 4, '4': 1, '5': 9, '10': 'idempotencyKey'},
     {'1': 'attachment_ids', '3': 5, '4': 3, '5': 9, '10': 'attachmentIds'},
+    {
+      '1': 'mentions',
+      '3': 6,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.CommunityMention',
+      '10': 'mentions'
+    },
   ],
 };
 
@@ -248,7 +284,8 @@ final $typed_data.Uint8List replyForumThreadRequestDescriptor = $convert.base64D
     'ChdSZXBseUZvcnVtVGhyZWFkUmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSW'
     'QSGwoJdGhyZWFkX2lkGAIgASgJUgh0aHJlYWRJZBISCgR0ZXh0GAMgASgJUgR0ZXh0EicKD2lk'
     'ZW1wb3RlbmN5X2tleRgEIAEoCVIOaWRlbXBvdGVuY3lLZXkSJQoOYXR0YWNobWVudF9pZHMYBS'
-    'ADKAlSDWF0dGFjaG1lbnRJZHM=');
+    'ADKAlSDWF0dGFjaG1lbnRJZHMSNgoIbWVudGlvbnMYBiADKAsyGi5zcGFjZS52MS5Db21tdW5p'
+    'dHlNZW50aW9uUghtZW50aW9ucw==');
 
 @$core.Deprecated('Use replyForumThreadResponseDescriptor instead')
 const ReplyForumThreadResponse$json = {
@@ -793,6 +830,7 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
   '.space.v1.ListForumThreadsResponse': ListForumThreadsResponse$json,
   '.space.v1.ForumThread': ForumThread$json,
   '.space.v1.Asset': $0.Asset$json,
+  '.space.v1.CommunityMention': $1.CommunityMention$json,
   '.space.v1.GetForumThreadRequest': GetForumThreadRequest$json,
   '.space.v1.GetForumThreadResponse': GetForumThreadResponse$json,
   '.space.v1.ForumReply': ForumReply$json,

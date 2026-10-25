@@ -98,7 +98,9 @@ void main() {
     testWidgets('Перетаскивание файлов и форма на ширине $width', (
       tester,
     ) async {
-      SharedPreferences.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({
+        'space.ui.origins': ['http://127.0.0.1:8080'],
+      });
       tester.view.physicalSize = Size(width, 800);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
@@ -120,6 +122,10 @@ void main() {
         await tester.tap(
           find.byKey(const ValueKey('server-inbox-http://127.0.0.1:8080')),
         );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('navigation-menu-button')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
       } else {
         await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
       }
@@ -148,7 +154,9 @@ void main() {
         await tester.tap(find.byKey(const ValueKey('navigation-menu-button')));
         await tester.pumpAndSettle();
       }
-      await tester.tap(find.widgetWithText(ListTile, 'Обзор').last);
+      await tester.tap(
+        find.byKey(const ValueKey('server-tab-http://127.0.0.1:8080')),
+      );
       await tester.pumpAndSettle();
       final mine = find.byKey(const ValueKey('sidebar-my-files'));
       await tester.ensureVisible(mine);

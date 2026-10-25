@@ -5001,6 +5001,66 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Данные недоступных пространств появятся после подключения.'**
   String get dashboardCommunityOffline;
+
+  /// No description provided for @communityMention.
+  ///
+  /// In ru, this message translates to:
+  /// **'Упомянуть участника'**
+  String get communityMention;
+
+  /// No description provided for @communityMentionQuery.
+  ///
+  /// In ru, this message translates to:
+  /// **'Имя или ID участника'**
+  String get communityMentionQuery;
+
+  /// No description provided for @communityMentionFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось получить участников. Проверьте доступ и повторите поиск.'**
+  String get communityMentionFailed;
+
+  /// No description provided for @communityMentionEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Участники не найдены'**
+  String get communityMentionEmpty;
+
+  /// No description provided for @dashboardMention.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вас упомянули'**
+  String get dashboardMention;
+
+  /// No description provided for @dashboardFeedRepliesToYou.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ответы на вашу публикацию'**
+  String get dashboardFeedRepliesToYou;
+
+  /// No description provided for @appearanceTheme.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тема'**
+  String get appearanceTheme;
+
+  /// No description provided for @appearanceThemeSystem.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автоматическая'**
+  String get appearanceThemeSystem;
+
+  /// No description provided for @appearanceThemeLight.
+  ///
+  /// In ru, this message translates to:
+  /// **'Светлая'**
+  String get appearanceThemeLight;
+
+  /// No description provided for @appearanceThemeDark.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тёмная'**
+  String get appearanceThemeDark;
 }
 
 class _AppLocalizationsDelegate

@@ -18,6 +18,7 @@ import 'package:space_client/src/preferences.dart';
 import 'package:space_client/src/server_presence.dart';
 import 'package:space_client/src/server_workspaces.dart';
 import 'package:space_client/ui/shell.dart';
+import 'package:space_client/ui/space_frame.dart';
 
 import 'channels_test.dart'
     show MemoryHistory, CatalogSession, ChannelVault, MemoryPositions, chat;
@@ -174,6 +175,46 @@ void main() {
           await Future<void>.delayed(Duration.zero);
         });
         await tester.pumpAndSettle();
+        expect(find.widgetWithText(ListTile, 'Обзор'), findsNothing);
+        expect(
+          tester.widget<SpaceHeader>(find.byType(SpaceHeader)).title,
+          'Основа',
+        );
+        await tester.tap(
+          find.descendant(
+            of: find.byKey(const ValueKey('server-chats')),
+            matching: find.text('Команда · Основа'),
+          ),
+        );
+        await tester.runAsync(() async {
+          await Future<void>.delayed(Duration.zero);
+        });
+        await tester.pumpAndSettle();
+        expect(workspaces[first]!.channelId, 'team');
+        expect(
+          tester.widget<SpaceHeader>(find.byType(SpaceHeader)).title,
+          'Команда · Основа',
+        );
+        await tester.tap(find.byKey(const ValueKey('server-tab-$first')));
+        await tester.runAsync(() async {
+          await Future<void>.delayed(Duration.zero);
+        });
+        await tester.pumpAndSettle();
+        expect(
+          tester.widget<SpaceHeader>(find.byType(SpaceHeader)).title,
+          'Основа',
+        );
+        expect(workspaces[first]!.channelId, 'team');
+        await tester.tap(
+          find.descendant(
+            of: find.byKey(const ValueKey('server-chats')),
+            matching: find.text('Общий · Основа'),
+          ),
+        );
+        await tester.runAsync(() async {
+          await Future<void>.delayed(Duration.zero);
+        });
+        await tester.pumpAndSettle();
         for (final name in ['Общий · Основа', 'Команда · Основа']) {
           expect(
             find.descendant(
@@ -204,6 +245,13 @@ void main() {
           await Future<void>.delayed(Duration.zero);
         });
         await tester.pumpAndSettle();
+        expect(find.widgetWithText(ListTile, 'Обзор'), findsNothing);
+        expect(
+          tester.widget<SpaceHeader>(find.byType(SpaceHeader)).title,
+          'Мастерская',
+        );
+        await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
+        await tester.pumpAndSettle();
         expect(
           tester
               .widget<TextField>(find.byKey(const ValueKey('chat-draft')))
@@ -227,6 +275,13 @@ void main() {
           await Future<void>.delayed(Duration.zero);
         });
         await tester.pumpAndSettle();
+        expect(find.widgetWithText(ListTile, 'Обзор'), findsNothing);
+        expect(
+          tester.widget<SpaceHeader>(find.byType(SpaceHeader)).title,
+          'Основа',
+        );
+        await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
+        await tester.pumpAndSettle();
         expect(
           tester
               .widget<TextField>(find.byKey(const ValueKey('chat-draft')))
@@ -248,6 +303,13 @@ void main() {
         await tester.runAsync(() async {
           await Future<void>.delayed(Duration.zero);
         });
+        await tester.pumpAndSettle();
+        expect(find.widgetWithText(ListTile, 'Обзор'), findsNothing);
+        expect(
+          tester.widget<SpaceHeader>(find.byType(SpaceHeader)).title,
+          'Мастерская',
+        );
+        await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
         await tester.pumpAndSettle();
         await tester.enterText(
           find.byKey(const ValueKey('chat-draft')),
@@ -275,6 +337,13 @@ void main() {
         await tester.runAsync(() async {
           await Future<void>.delayed(Duration.zero);
         });
+        await tester.pumpAndSettle();
+        expect(find.widgetWithText(ListTile, 'Обзор'), findsNothing);
+        expect(
+          tester.widget<SpaceHeader>(find.byType(SpaceHeader)).title,
+          'Основа',
+        );
+        await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
         await tester.pumpAndSettle();
         expect(
           tester

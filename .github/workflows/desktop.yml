@@ -126,6 +126,9 @@ jobs:
       - name: Лента и мобильная навигация Android
         working-directory: client
         run: flutter test test/feed_test.dart test/feed_read_test.dart test/feed_read_visibility_test.dart test/feed_android_test.dart
+      - name: Упоминания, темы и переходы к обзору пространства
+        working-directory: client
+        run: flutter test --no-pub --concurrency 2 test/community_mentions_test.dart test/chat_mentions_test.dart test/theme_mode_test.dart test/dashboard_workspaces_test.dart test/admin_sidebar_test.dart
       - name: Поиск сообществ и персональная сводка
         working-directory: client
         run: flutter test test/community_search_test.dart test/dashboard_highlights_test.dart

@@ -83,6 +83,14 @@ const GetCommunityOverviewResponse$json = {
   '1': 'GetCommunityOverviewResponse',
   '2': [
     {
+      '1': 'mentions',
+      '3': 5,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.CommunityOverviewEntry',
+      '10': 'mentions'
+    },
+    {
       '1': 'recent',
       '3': 1,
       '4': 3,
@@ -105,11 +113,12 @@ const GetCommunityOverviewResponse$json = {
 
 /// Descriptor for `GetCommunityOverviewResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List getCommunityOverviewResponseDescriptor = $convert.base64Decode(
-    'ChxHZXRDb21tdW5pdHlPdmVydmlld1Jlc3BvbnNlEjgKBnJlY2VudBgBIAMoCzIgLnNwYWNlLn'
-    'YxLkNvbW11bml0eU92ZXJ2aWV3RW50cnlSBnJlY2VudBJGCg5yZXBsaWVzX3RvX3lvdRgCIAMo'
-    'CzIgLnNwYWNlLnYxLkNvbW11bml0eU92ZXJ2aWV3RW50cnlSDHJlcGxpZXNUb1lvdRInCg9wZW'
-    '5kaW5nX3JlcG9ydHMYAyABKANSDnBlbmRpbmdSZXBvcnRzEiEKDGNhbl9tb2RlcmF0ZRgEIAEo'
-    'CFILY2FuTW9kZXJhdGU=');
+    'ChxHZXRDb21tdW5pdHlPdmVydmlld1Jlc3BvbnNlEjwKCG1lbnRpb25zGAUgAygLMiAuc3BhY2'
+    'UudjEuQ29tbXVuaXR5T3ZlcnZpZXdFbnRyeVIIbWVudGlvbnMSOAoGcmVjZW50GAEgAygLMiAu'
+    'c3BhY2UudjEuQ29tbXVuaXR5T3ZlcnZpZXdFbnRyeVIGcmVjZW50EkYKDnJlcGxpZXNfdG9feW'
+    '91GAIgAygLMiAuc3BhY2UudjEuQ29tbXVuaXR5T3ZlcnZpZXdFbnRyeVIMcmVwbGllc1RvWW91'
+    'EicKD3BlbmRpbmdfcmVwb3J0cxgDIAEoA1IOcGVuZGluZ1JlcG9ydHMSIQoMY2FuX21vZGVyYX'
+    'RlGAQgASgIUgtjYW5Nb2RlcmF0ZQ==');
 
 const $core.Map<$core.String, $core.dynamic> CommunityOverviewServiceBase$json =
     {

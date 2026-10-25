@@ -275,31 +275,40 @@ void Win32Window::OnDestroy() {
   // No-op; provided for subclasses.
 }
 
+void Win32Window::SetAppTheme(bool dark, unsigned int background,
+                               unsigned int foreground) {
+  has_app_theme_ = true;
+  app_dark_ = dark;
+  app_background_ = RGB((background >> 16) & 255, (background >> 8) & 255, background & 255);
+  app_foreground_ = RGB((foreground >> 16) & 255, (foreground >> 8) & 255, foreground & 255);
+  UpdateTheme(window_handle_);
+}
+
 void Win32Window::UpdateTheme(HWND const window) {
-  DWORD light_mode;
+  DWORD light_mode = 0;
   DWORD light_mode_size = sizeof(light_mode);
   LSTATUS result = RegGetValue(HKEY_CURRENT_USER, kGetPreferredBrightnessRegKey,
                                kGetPreferredBrightnessRegValue,
                                RRF_RT_REG_DWORD, nullptr, &light_mode,
                                &light_mode_size);
 
-  if (result == ERROR_SUCCESS) {
-    BOOL enable_dark_mode = light_mode == 0;
+  if (has_app_theme_ || result == ERROR_SUCCESS) {
+    BOOL enable_dark_mode = has_app_theme_ ? app_dark_ : light_mode == 0;
     DwmSetWindowAttribute(window, DWMWA_USE_IMMERSIVE_DARK_MODE,
                           &enable_dark_mode, sizeof(enable_dark_mode));
     // Единый нейтральный цвет рамки при получении и потере фокуса.
     // DWMWA_BORDER_COLOR поддерживается Windows 11; старые системы
     // сохраняют стандартную рамку при неподдерживаемом атрибуте.
     constexpr DWORD kBorderColorAttribute = 34;
-    const COLORREF border_color = RGB(29, 32, 33);
+    const COLORREF border_color = has_app_theme_ ? app_background_ : RGB(29, 32, 33);
     DwmSetWindowAttribute(window, kBorderColorAttribute,
                          &border_color, sizeof(border_color));
     // Цвет строки заголовка задаётся отдельно от внешней рамки.
     // Оба состояния окна используют палитру Space, а не акцент Windows.
     constexpr DWORD kCaptionColorAttribute = 35;
     constexpr DWORD kCaptionTextColorAttribute = 36;
-    const COLORREF caption_color = RGB(29, 32, 33);
-    const COLORREF caption_text_color = RGB(235, 219, 178);
+    const COLORREF caption_color = has_app_theme_ ? app_background_ : RGB(29, 32, 33);
+    const COLORREF caption_text_color = has_app_theme_ ? app_foreground_ : RGB(235, 219, 178);
     DwmSetWindowAttribute(window, kCaptionColorAttribute,
                          &caption_color, sizeof(caption_color));
     DwmSetWindowAttribute(window, kCaptionTextColorAttribute,

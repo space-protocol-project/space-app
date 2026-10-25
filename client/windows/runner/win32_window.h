@@ -55,6 +55,9 @@ class Win32Window {
   // Return a RECT representing the bounds of the current client area.
   RECT GetClientArea();
 
+  // Цвета приложения сохраняются при смене фокуса и системного оформления.
+  void SetAppTheme(bool dark, unsigned int background, unsigned int foreground);
+
  protected:
   // Processes and route salient window messages for mouse handling,
   // size change and DPI. Delegates handling of these to member overloads that
@@ -88,7 +91,11 @@ class Win32Window {
   static Win32Window* GetThisFromHandle(HWND const window) noexcept;
 
   // Update the window frame's theme to match the system theme.
-  static void UpdateTheme(HWND const window);
+  void UpdateTheme(HWND const window);
+  bool has_app_theme_ = false;
+  bool app_dark_ = true;
+  COLORREF app_background_ = RGB(29, 32, 33);
+  COLORREF app_foreground_ = RGB(235, 219, 178);
 
   bool quit_on_close_ = false;
 

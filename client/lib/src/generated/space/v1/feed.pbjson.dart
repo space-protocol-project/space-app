@@ -15,6 +15,7 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
+import 'community_mentions.pbjson.dart' as $1;
 import 'space.pbjson.dart' as $0;
 
 @$core.Deprecated('Use feedPermissionsDescriptor instead')
@@ -35,6 +36,14 @@ final $typed_data.Uint8List feedPermissionsDescriptor = $convert.base64Decode(
 const FeedPost$json = {
   '1': 'FeedPost',
   '2': [
+    {
+      '1': 'mentions',
+      '3': 16,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.CommunityMention',
+      '10': 'mentions'
+    },
     {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
     {'1': 'channel_id', '3': 2, '4': 1, '5': 9, '10': 'channelId'},
     {'1': 'author_id', '3': 3, '4': 1, '5': 9, '10': 'authorId'},
@@ -68,15 +77,16 @@ const FeedPost$json = {
 
 /// Descriptor for `FeedPost`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List feedPostDescriptor = $convert.base64Decode(
-    'CghGZWVkUG9zdBIOCgJpZBgBIAEoCVICaWQSHQoKY2hhbm5lbF9pZBgCIAEoCVIJY2hhbm5lbE'
-    'lkEhsKCWF1dGhvcl9pZBgDIAEoCVIIYXV0aG9ySWQSHwoLYXV0aG9yX25hbWUYBCABKAlSCmF1'
-    'dGhvck5hbWUSEgoEdGV4dBgFIAEoCVIEdGV4dBImCg9jcmVhdGVkX2F0X3VuaXgYBiABKANSDW'
-    'NyZWF0ZWRBdFVuaXgSGgoIc2VxdWVuY2UYByABKANSCHNlcXVlbmNlEhoKCHJldmlzaW9uGAgg'
-    'ASgDUghyZXZpc2lvbhIjCg1jb21tZW50X2NvdW50GAkgASgDUgxjb21tZW50Q291bnQSMQoLYX'
-    'R0YWNobWVudHMYCiADKAsyDy5zcGFjZS52MS5Bc3NldFILYXR0YWNobWVudHMSFgoGaGlkZGVu'
-    'GAsgASgIUgZoaWRkZW4SMAoUcmVhZF9zdGF0ZV9zdXBwb3J0ZWQYDCABKAhSEnJlYWRTdGF0ZV'
-    'N1cHBvcnRlZBISCgRzZWVuGA0gASgIUgRzZWVuEiMKDXJlYWRfc2VxdWVuY2UYDiABKANSDHJl'
-    'YWRTZXF1ZW5jZRIhCgx1bnJlYWRfY291bnQYDyABKANSC3VucmVhZENvdW50');
+    'CghGZWVkUG9zdBI2CghtZW50aW9ucxgQIAMoCzIaLnNwYWNlLnYxLkNvbW11bml0eU1lbnRpb2'
+    '5SCG1lbnRpb25zEg4KAmlkGAEgASgJUgJpZBIdCgpjaGFubmVsX2lkGAIgASgJUgljaGFubmVs'
+    'SWQSGwoJYXV0aG9yX2lkGAMgASgJUghhdXRob3JJZBIfCgthdXRob3JfbmFtZRgEIAEoCVIKYX'
+    'V0aG9yTmFtZRISCgR0ZXh0GAUgASgJUgR0ZXh0EiYKD2NyZWF0ZWRfYXRfdW5peBgGIAEoA1IN'
+    'Y3JlYXRlZEF0VW5peBIaCghzZXF1ZW5jZRgHIAEoA1IIc2VxdWVuY2USGgoIcmV2aXNpb24YCC'
+    'ABKANSCHJldmlzaW9uEiMKDWNvbW1lbnRfY291bnQYCSABKANSDGNvbW1lbnRDb3VudBIxCgth'
+    'dHRhY2htZW50cxgKIAMoCzIPLnNwYWNlLnYxLkFzc2V0UgthdHRhY2htZW50cxIWCgZoaWRkZW'
+    '4YCyABKAhSBmhpZGRlbhIwChRyZWFkX3N0YXRlX3N1cHBvcnRlZBgMIAEoCFIScmVhZFN0YXRl'
+    'U3VwcG9ydGVkEhIKBHNlZW4YDSABKAhSBHNlZW4SIwoNcmVhZF9zZXF1ZW5jZRgOIAEoA1IMcm'
+    'VhZFNlcXVlbmNlEiEKDHVucmVhZF9jb3VudBgPIAEoA1ILdW5yZWFkQ291bnQ=');
 
 @$core.Deprecated('Use markFeedPostReadRequestDescriptor instead')
 const MarkFeedPostReadRequest$json = {
@@ -119,6 +129,14 @@ final $typed_data.Uint8List markFeedPostReadResponseDescriptor =
 const FeedComment$json = {
   '1': 'FeedComment',
   '2': [
+    {
+      '1': 'mentions',
+      '3': 11,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.CommunityMention',
+      '10': 'mentions'
+    },
     {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
     {'1': 'post_id', '3': 2, '4': 1, '5': 9, '10': 'postId'},
     {'1': 'author_id', '3': 3, '4': 1, '5': 9, '10': 'authorId'},
@@ -141,12 +159,13 @@ const FeedComment$json = {
 
 /// Descriptor for `FeedComment`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List feedCommentDescriptor = $convert.base64Decode(
-    'CgtGZWVkQ29tbWVudBIOCgJpZBgBIAEoCVICaWQSFwoHcG9zdF9pZBgCIAEoCVIGcG9zdElkEh'
-    'sKCWF1dGhvcl9pZBgDIAEoCVIIYXV0aG9ySWQSHwoLYXV0aG9yX25hbWUYBCABKAlSCmF1dGhv'
-    'ck5hbWUSEgoEdGV4dBgFIAEoCVIEdGV4dBImCg9jcmVhdGVkX2F0X3VuaXgYBiABKANSDWNyZW'
-    'F0ZWRBdFVuaXgSGgoIc2VxdWVuY2UYByABKANSCHNlcXVlbmNlEhoKCHJldmlzaW9uGAggASgD'
-    'UghyZXZpc2lvbhIxCgthdHRhY2htZW50cxgJIAMoCzIPLnNwYWNlLnYxLkFzc2V0UgthdHRhY2'
-    'htZW50cxIWCgZoaWRkZW4YCiABKAhSBmhpZGRlbg==');
+    'CgtGZWVkQ29tbWVudBI2CghtZW50aW9ucxgLIAMoCzIaLnNwYWNlLnYxLkNvbW11bml0eU1lbn'
+    'Rpb25SCG1lbnRpb25zEg4KAmlkGAEgASgJUgJpZBIXCgdwb3N0X2lkGAIgASgJUgZwb3N0SWQS'
+    'GwoJYXV0aG9yX2lkGAMgASgJUghhdXRob3JJZBIfCgthdXRob3JfbmFtZRgEIAEoCVIKYXV0aG'
+    '9yTmFtZRISCgR0ZXh0GAUgASgJUgR0ZXh0EiYKD2NyZWF0ZWRfYXRfdW5peBgGIAEoA1INY3Jl'
+    'YXRlZEF0VW5peBIaCghzZXF1ZW5jZRgHIAEoA1IIc2VxdWVuY2USGgoIcmV2aXNpb24YCCABKA'
+    'NSCHJldmlzaW9uEjEKC2F0dGFjaG1lbnRzGAkgAygLMg8uc3BhY2UudjEuQXNzZXRSC2F0dGFj'
+    'aG1lbnRzEhYKBmhpZGRlbhgKIAEoCFIGaGlkZGVu');
 
 @$core.Deprecated('Use listFeedPostsRequestDescriptor instead')
 const ListFeedPostsRequest$json = {
@@ -261,6 +280,14 @@ final $typed_data.Uint8List getFeedPostResponseDescriptor = $convert.base64Decod
 const CreateFeedPostRequest$json = {
   '1': 'CreateFeedPostRequest',
   '2': [
+    {
+      '1': 'mentions',
+      '3': 5,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.CommunityMention',
+      '10': 'mentions'
+    },
     {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
     {'1': 'text', '3': 2, '4': 1, '5': 9, '10': 'text'},
     {'1': 'idempotency_key', '3': 3, '4': 1, '5': 9, '10': 'idempotencyKey'},
@@ -270,9 +297,10 @@ const CreateFeedPostRequest$json = {
 
 /// Descriptor for `CreateFeedPostRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List createFeedPostRequestDescriptor = $convert.base64Decode(
-    'ChVDcmVhdGVGZWVkUG9zdFJlcXVlc3QSHQoKY2hhbm5lbF9pZBgBIAEoCVIJY2hhbm5lbElkEh'
-    'IKBHRleHQYAiABKAlSBHRleHQSJwoPaWRlbXBvdGVuY3lfa2V5GAMgASgJUg5pZGVtcG90ZW5j'
-    'eUtleRIlCg5hdHRhY2htZW50X2lkcxgEIAMoCVINYXR0YWNobWVudElkcw==');
+    'ChVDcmVhdGVGZWVkUG9zdFJlcXVlc3QSNgoIbWVudGlvbnMYBSADKAsyGi5zcGFjZS52MS5Db2'
+    '1tdW5pdHlNZW50aW9uUghtZW50aW9ucxIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSWQS'
+    'EgoEdGV4dBgCIAEoCVIEdGV4dBInCg9pZGVtcG90ZW5jeV9rZXkYAyABKAlSDmlkZW1wb3Rlbm'
+    'N5S2V5EiUKDmF0dGFjaG1lbnRfaWRzGAQgAygJUg1hdHRhY2htZW50SWRz');
 
 @$core.Deprecated('Use createFeedPostResponseDescriptor instead')
 const CreateFeedPostResponse$json = {
@@ -299,6 +327,14 @@ final $typed_data.Uint8List createFeedPostResponseDescriptor =
 const CommentFeedPostRequest$json = {
   '1': 'CommentFeedPostRequest',
   '2': [
+    {
+      '1': 'mentions',
+      '3': 6,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.CommunityMention',
+      '10': 'mentions'
+    },
     {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
     {'1': 'post_id', '3': 2, '4': 1, '5': 9, '10': 'postId'},
     {'1': 'text', '3': 3, '4': 1, '5': 9, '10': 'text'},
@@ -309,10 +345,11 @@ const CommentFeedPostRequest$json = {
 
 /// Descriptor for `CommentFeedPostRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List commentFeedPostRequestDescriptor = $convert.base64Decode(
-    'ChZDb21tZW50RmVlZFBvc3RSZXF1ZXN0Eh0KCmNoYW5uZWxfaWQYASABKAlSCWNoYW5uZWxJZB'
-    'IXCgdwb3N0X2lkGAIgASgJUgZwb3N0SWQSEgoEdGV4dBgDIAEoCVIEdGV4dBInCg9pZGVtcG90'
-    'ZW5jeV9rZXkYBCABKAlSDmlkZW1wb3RlbmN5S2V5EiUKDmF0dGFjaG1lbnRfaWRzGAUgAygJUg'
-    '1hdHRhY2htZW50SWRz');
+    'ChZDb21tZW50RmVlZFBvc3RSZXF1ZXN0EjYKCG1lbnRpb25zGAYgAygLMhouc3BhY2UudjEuQ2'
+    '9tbXVuaXR5TWVudGlvblIIbWVudGlvbnMSHQoKY2hhbm5lbF9pZBgBIAEoCVIJY2hhbm5lbElk'
+    'EhcKB3Bvc3RfaWQYAiABKAlSBnBvc3RJZBISCgR0ZXh0GAMgASgJUgR0ZXh0EicKD2lkZW1wb3'
+    'RlbmN5X2tleRgEIAEoCVIOaWRlbXBvdGVuY3lLZXkSJQoOYXR0YWNobWVudF9pZHMYBSADKAlS'
+    'DWF0dGFjaG1lbnRJZHM=');
 
 @$core.Deprecated('Use commentFeedPostResponseDescriptor instead')
 const CommentFeedPostResponse$json = {
@@ -832,6 +869,7 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
   '.space.v1.ListFeedPostsResponse': ListFeedPostsResponse$json,
   '.space.v1.FeedPost': FeedPost$json,
   '.space.v1.Asset': $0.Asset$json,
+  '.space.v1.CommunityMention': $1.CommunityMention$json,
   '.space.v1.FeedPermissions': FeedPermissions$json,
   '.space.v1.GetFeedPostRequest': GetFeedPostRequest$json,
   '.space.v1.GetFeedPostResponse': GetFeedPostResponse$json,

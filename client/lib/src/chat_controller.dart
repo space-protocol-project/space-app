@@ -20,6 +20,9 @@ import 'files.dart';
 
 import 'core.dart';
 import 'community_overview.dart';
+import 'community_mentions_api.dart';
+import 'generated/space/v1/community_mentions.pb.dart';
+import 'mention_data.dart';
 import 'message_search.dart';
 import 'history_pages.dart';
 import 'mls/saved_archive.dart';
@@ -138,15 +141,23 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     on<ChatMessageSent>(
       (event, _) => handleRequest(
         event,
-        () => _send(event.text, event.attachments, event.files, event.replyTo),
+        () => _send(
+          event.text,
+          event.attachments,
+          event.files,
+          event.replyTo,
+          event.mentions,
+        ),
       ),
     );
     on<ChatReactionSet>(
       (event, _) => handleRequest(event, () => _setReaction(event)),
     );
     on<ChatMessageChanged>(
-      (event, _) =>
-          handleRequest(event, () => _changeMessage(event.message, event.text)),
+      (event, _) => handleRequest(
+        event,
+        () => _changeMessage(event.message, event.text, event.mentions),
+      ),
     );
     on<ChatDeviceRevoked>((event, _) => handleRequest(event, _revoke));
     on<ChatDisconnected>((event, _) => handleRequest(event, _disconnect));
@@ -200,12 +211,14 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     List<String> attachments = const [],
     List<SpaceFile> files = const [],
     String replyTo = '',
+    List<CommunityMention> mentions = const [],
   }) => sendRequest(
     ChatMessageSent(
       text,
       List.unmodifiable(attachments),
       List.unmodifiable(files),
       replyTo,
+      mentions.map((m) => m.deepCopy()..freeze()).toList(growable: false),
     ),
   );
   final SavedMlsArchiveOpener openMlsArchive;
@@ -356,8 +369,11 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     }
   }
 
-  Future<bool> updateMessage(Content message, String text) =>
-      sendRequest(ChatMessageChanged(message, text));
+  Future<bool> updateMessage(
+    Content message,
+    String text, {
+    List<CommunityMention> mentions = const [],
+  }) => sendRequest(ChatMessageChanged(message, text, mentions));
   Future<bool> deleteMessage(Content message) =>
       sendRequest(ChatMessageChanged(message, null));
   bool canChangeMessage(Content message) =>
@@ -1560,18 +1576,27 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     }
   }
 
-  Future<bool> _changeMessage(Content message, String? text) async {
+  Future<bool> _changeMessage(
+    Content message,
+    String? text,
+    List<CommunityMention> mentions,
+  ) async {
     if (_canQueueMutation && canChangeMessage(message)) {
       return _enqueueMutation(
         message,
         text == null ? MutationKind.delete : MutationKind.edit,
         text: text ?? '',
+        mentions: mentions,
       );
     }
-    return _changeMessageOnline(message, text);
+    return _changeMessageOnline(message, text, mentions);
   }
 
-  Future<bool> _changeMessageOnline(Content message, String? text) async {
+  Future<bool> _changeMessageOnline(
+    Content message,
+    String? text,
+    List<CommunityMention> mentions,
+  ) async {
     final session = _session;
     if (!canChangeMessage(message) ||
         session == null ||
@@ -1586,7 +1611,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     try {
       final result = text == null
           ? await changes.deleteMessage(message)
-          : await changes.updateMessage(message, text);
+          : await _updateMentionedOnline(changes, message, text, mentions);
       if (!identical(session, _session) || channelId != startingChannel) {
         return false;
       }
@@ -1611,12 +1636,32 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
     }
   }
 
+  CommunityMentionApi? get chatMentions =>
+      _session == null ? null : communityMentionsFor(_session!);
+  Future<Content> _updateMentionedOnline(
+    MessageChanges changes,
+    Content message,
+    String text,
+    List<CommunityMention> mentions,
+  ) {
+    if (mentions.isEmpty && message.mentions.isEmpty) {
+      return changes.updateMessage(message, text);
+    }
+    if (changes is! ChatMentionWriter) throw const GrpcError.unimplemented();
+    return (changes as ChatMentionWriter).updateMentioned(
+      message,
+      text,
+      mentions,
+    );
+  }
+
   Future<bool> _send(
     String text,
     List<String> attachments,
     List<SpaceFile> files,
     String replyTo,
-  ) => _enqueueMessage(text, attachments, files, replyTo);
+    List<CommunityMention> mentions,
+  ) => _enqueueMessage(text, attachments, files, replyTo, mentions);
 
   Future<void> _revoke() async {
     if (busy || _session == null) return;

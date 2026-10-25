@@ -2544,6 +2544,36 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dashboardCommunityOffline => '连接后将显示不可用空间的动态。';
+
+  @override
+  String get communityMention => '提及成员';
+
+  @override
+  String get communityMentionQuery => '成员名称或 ID';
+
+  @override
+  String get communityMentionFailed => '无法加载成员。请检查访问权限并重试。';
+
+  @override
+  String get communityMentionEmpty => '未找到成员';
+
+  @override
+  String get dashboardMention => '有人提及您';
+
+  @override
+  String get dashboardFeedRepliesToYou => '您的动态有新回复';
+
+  @override
+  String get appearanceTheme => '主题';
+
+  @override
+  String get appearanceThemeSystem => '跟随系统';
+
+  @override
+  String get appearanceThemeLight => '浅色';
+
+  @override
+  String get appearanceThemeDark => '深色';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3516,4 +3546,34 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get dashboardCommunityOffline => '连接后将显示不可用空间的动态。';
+
+  @override
+  String get communityMention => '提及成员';
+
+  @override
+  String get communityMentionQuery => '成员名称或 ID';
+
+  @override
+  String get communityMentionFailed => '无法加载成员。请检查访问权限并重试。';
+
+  @override
+  String get communityMentionEmpty => '未找到成员';
+
+  @override
+  String get dashboardMention => '有人提及您';
+
+  @override
+  String get dashboardFeedRepliesToYou => '您的动态有新回复';
+
+  @override
+  String get appearanceTheme => '主题';
+
+  @override
+  String get appearanceThemeSystem => '跟随系统';
+
+  @override
+  String get appearanceThemeLight => '浅色';
+
+  @override
+  String get appearanceThemeDark => '深色';
 }

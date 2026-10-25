@@ -1,3 +1,10 @@
+import 'dart:async';
+
+import 'community_mentions.dart';
+import 'generated/space/v1/community_search.pb.dart';
+import 'community_mentions_api.dart';
+import 'generated/space/v1/community_mentions.pb.dart';
+
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:grpc/grpc.dart';
@@ -56,6 +63,32 @@ class ForumState {
 class ForumController extends Cubit<ForumState> {
   ForumController(this.api) : super(const ForumState());
   final ForumApi api;
+  late final mentionReads = MentionReadCubit.fromSource(api);
+  void markMentionsVisible(Set<int> sequences) {
+    final channel = state.section?.id;
+    final root = state.topic;
+    if (channel == null || root == null || root.hidden) return;
+    final refs = <CommunityContentReference?>[
+      if (sequences.contains(0))
+        mentionedContent(
+          mentionReads.api,
+          root.mentions,
+          CommunitySearchKind.COMMUNITY_SEARCH_KIND_FORUM_THREAD,
+          root.id,
+        ),
+      for (final child in state.replies.where(
+        (c) => !c.hidden && sequences.contains(c.sequence.toInt()),
+      ))
+        mentionedContent(
+          mentionReads.api,
+          child.mentions,
+          CommunitySearchKind.COMMUNITY_SEARCH_KIND_FORUM_REPLY,
+          child.id,
+        ),
+    ];
+    unawaited(mentionReads.visible(channel, refs.nonNulls.toList()));
+  }
+
   ForumModeration? get moderation {
     final source = api;
     return source is ForumModeration &&
@@ -193,6 +226,7 @@ class ForumController extends Cubit<ForumState> {
     final previousChannel = state.section?.id;
     final previousTopic = state.topic?.id;
     failedRead = '';
+    mentionReads.retry();
     await api.refresh();
     if (isClosed) return;
     final sections = api.sections;
@@ -326,14 +360,22 @@ class ForumController extends Cubit<ForumState> {
     String text,
     String key, [
     List<String> attachments = const [],
+    List<CommunityMention> mentions = const [],
   ]) => _run(() async {
-    final topic = await api.create(
-      state.section!.id,
-      title,
-      text,
-      key,
-      attachments,
-    );
+    final writer = api;
+    if (mentions.isNotEmpty && writer is! ForumMentionWriter) {
+      throw StateError('Упоминания недоступны');
+    }
+    final topic = mentions.isNotEmpty
+        ? await (writer as ForumMentionWriter).createMentioned(
+            state.section!.id,
+            title,
+            text,
+            key,
+            attachments,
+            mentions,
+          )
+        : await api.create(state.section!.id, title, text, key, attachments);
     if (isClosed) return;
     // Повтор с тем же ключом возвращает ту же тему, не дублируя список.
     final threads = state.threads.where((t) => t.id != topic.id).toList();
@@ -353,14 +395,28 @@ class ForumController extends Cubit<ForumState> {
     String text,
     String key, [
     List<String> attachments = const [],
+    List<CommunityMention> mentions = const [],
   ]) => _run(() async {
-    final response = await api.reply(
-      state.section!.id,
-      state.topic!.id,
-      text,
-      key,
-      attachments,
-    );
+    final writer = api;
+    if (mentions.isNotEmpty && writer is! ForumMentionWriter) {
+      throw StateError('Упоминания недоступны');
+    }
+    final response = mentions.isNotEmpty
+        ? await (writer as ForumMentionWriter).replyMentioned(
+            state.section!.id,
+            state.topic!.id,
+            text,
+            key,
+            attachments,
+            mentions,
+          )
+        : await api.reply(
+            state.section!.id,
+            state.topic!.id,
+            text,
+            key,
+            attachments,
+          );
     if (isClosed) return;
     _replaceTopic(response.thread);
     await _loadTopic(response.thread.id, false);
@@ -376,6 +432,12 @@ class ForumController extends Cubit<ForumState> {
     if (isClosed) return;
     _replaceTopic(closed);
   });
+  @override
+  Future<void> close() async {
+    await mentionReads.close();
+    await super.close();
+  }
+
   static int compareTopics(ForumThread a, ForumThread b) {
     if (a.pinned != b.pinned) return a.pinned ? -1 : 1;
     return a.sequence.compareTo(b.sequence);
@@ -449,6 +511,7 @@ class ForumController extends Cubit<ForumState> {
       final detail = await _syncDetail(previous);
       if (!isClosed && identical(state, previous)) {
         failedRead = '';
+        mentionReads.retry();
         emit(
           state.copy(
             threads: threads,

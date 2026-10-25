@@ -14,6 +14,7 @@ final class NotificationsChanged extends PreferencesCommand<void> {
 final class PreferencesChanged extends PreferencesCommand<void> {
   PreferencesChanged({
     this.dark,
+    this.themeMode,
     this.effects,
     this.palette,
     this.language,
@@ -21,6 +22,7 @@ final class PreferencesChanged extends PreferencesCommand<void> {
     this.uiScale,
   });
   final double? uiScale;
+  final ThemeMode? themeMode;
   final bool? dark, effects;
   final String? palette, language, sendShortcut;
 }
@@ -45,4 +47,9 @@ final class ServerIconCached extends PreferencesCommand<void> {
 final class PreferencesStatePublished extends PreferencesEvent<void> {
   PreferencesStatePublished(this.state);
   final PreferencesState state;
+}
+
+final class SystemBrightnessChanged extends PreferencesCommand<void> {
+  SystemBrightnessChanged(this.brightness);
+  final Brightness brightness;
 }

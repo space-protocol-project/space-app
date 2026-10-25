@@ -1,8 +1,23 @@
 #include "flutter_window.h"
 
 #include <optional>
+#include <flutter/standard_method_codec.h>
 
 #include "flutter/generated_plugin_registrant.h"
+
+namespace {
+std::optional<unsigned int> ThemeColor(const flutter::EncodableMap& args, const char* key) {
+  const auto item = args.find(flutter::EncodableValue(key));
+  if (item == args.end()) return std::nullopt;
+  if (const auto value = std::get_if<int64_t>(&item->second)) {
+    if (*value >= 0 && *value <= 0xFFFFFFFFLL) return static_cast<unsigned int>(*value);
+  }
+  if (const auto value = std::get_if<int32_t>(&item->second)) {
+    if (*value >= 0) return static_cast<unsigned int>(*value);
+  }
+  return std::nullopt;
+}
+}  // namespace
 
 FlutterWindow::FlutterWindow(const flutter::DartProject& project,
                              const std::string& activation)
@@ -26,6 +41,21 @@ bool FlutterWindow::OnCreate() {
     return false;
   }
   RegisterPlugins(flutter_controller_->engine());
+  theme_channel_ = std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+      flutter_controller_->engine()->messenger(), "space/window-theme",
+      &flutter::StandardMethodCodec::GetInstance());
+  theme_channel_->SetMethodCallHandler([this](const auto& call, auto result) {
+    if (call.method_name() != "set") { result->NotImplemented(); return; }
+    const auto* args = call.arguments() ? std::get_if<flutter::EncodableMap>(call.arguments()) : nullptr;
+    if (!args) { result->Error("arguments", "Некорректная тема окна"); return; }
+    const auto dark_item = args->find(flutter::EncodableValue("dark"));
+    const auto* dark = dark_item == args->end() ? nullptr : std::get_if<bool>(&dark_item->second);
+    const auto background = ThemeColor(*args, "background");
+    const auto foreground = ThemeColor(*args, "foreground");
+    if (!dark || !background || !foreground) { result->Error("arguments", "Некорректные цвета окна"); return; }
+    SetAppTheme(*dark, *background, *foreground);
+    result->Success();
+  });
   notifications_ = std::make_unique<NotificationActivation>(
       flutter_controller_->engine()->messenger());
   notifications_->Receive(activation_);
@@ -44,6 +74,7 @@ bool FlutterWindow::OnCreate() {
 }
 
 void FlutterWindow::OnDestroy() {
+  theme_channel_ = nullptr;
   notifications_ = nullptr;
   if (flutter_controller_) {
     flutter_controller_ = nullptr;

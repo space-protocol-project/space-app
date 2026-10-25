@@ -94,6 +94,10 @@ void main() {
         await tester.tap(
           find.byKey(const ValueKey('server-inbox-http://127.0.0.1:8080')),
         );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('navigation-menu-button')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
       } else {
         await tester.tap(find.widgetWithText(ListTile, 'Чаты'));
       }

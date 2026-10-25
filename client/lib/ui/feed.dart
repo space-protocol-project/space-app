@@ -1,3 +1,7 @@
+import '../src/community_mentions_api.dart';
+import '../src/generated/space/v1/community_mentions.pb.dart';
+import 'community_mentions.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -48,12 +52,14 @@ class FeedView extends StatefulWidget {
     this.sendWithShift = false,
     this.sectionId,
     this.initialPost = '',
+    this.initialReplySequence = 0,
     this.showReports = false,
   });
   final SpaceSession? session;
   final bool active, sendWithShift;
   final String? sectionId;
   final String initialPost;
+  final int initialReplySequence;
   final bool showReports;
   @override
   State<FeedView> createState() => _FeedViewState();
@@ -79,6 +85,7 @@ class _FeedViewState extends State<FeedView> {
       active: widget.active,
       sectionId: widget.sectionId,
       initialPost: widget.initialPost,
+      initialReplySequence: widget.initialReplySequence,
       showReports: widget.showReports,
       sendWithShift: widget.sendWithShift,
       authorize: session.record.administrative
@@ -123,6 +130,7 @@ class FeedArea extends StatefulWidget {
     this.sendWithShift = false,
     this.sectionId,
     this.initialPost = '',
+    this.initialReplySequence = 0,
     this.showReports = false,
     this.manage,
     this.authorize,
@@ -131,6 +139,7 @@ class FeedArea extends StatefulWidget {
   final bool active, sendWithShift;
   final String? sectionId;
   final String initialPost;
+  final int initialReplySequence;
   final bool showReports;
   final Future<void> Function()? manage, authorize;
   @override
@@ -173,9 +182,7 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
       );
       return;
     }
-    if (widget.initialPost.isNotEmpty) {
-      await controller.open(widget.initialPost);
-    }
+    await _openInitialPost();
     if (!mounted || !widget.showReports) return;
     if (controller.state.section?.permissions.manage == true) {
       await showFeedManagement(
@@ -185,6 +192,24 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
         action: 'reports',
         open: (id) => unawaited(controller.open(id)),
       );
+    }
+  }
+
+  Future<void> _openInitialPost() async {
+    if (widget.initialPost.isNotEmpty) {
+      final sequence = widget.initialReplySequence;
+      await controller.open(
+        widget.initialPost,
+        afterSequence: sequence > 0 ? sequence - 1 : 0,
+      );
+      if (!mounted) return;
+      final comment = controller.state.comments
+          .where((c) => c.sequence.toInt() == sequence)
+          .firstOrNull;
+      if (comment != null) {
+        setState(() => searchComment = comment.id);
+        revealCommunityResult(() => searchTarget.currentContext);
+      }
     }
   }
 
@@ -274,6 +299,7 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
       context,
       () => widget.active && foreground && !controller.state.loading,
       (sequence) => unawaited(controller.markVisible(sequence)),
+      visible: controller.markMentionsVisible,
       topPadding: SpaceContentInsets.topOf(context),
     );
   }
@@ -461,6 +487,7 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
   Widget _post(FeedPost post, {required bool open}) => FeedEntryCard(
     key: ValueKey('feed-post-${post.id}'),
     text: post.text,
+    mentions: post.mentions,
     author: forumAuthor(post.authorName, post.authorId),
     timestamp: post.createdAtUnix.toInt(),
     hidden: post.hidden,
@@ -545,6 +572,7 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
         ? searchTarget
         : ValueKey('feed-comment-${comment.id}'),
     text: comment.text,
+    mentions: comment.mentions,
     author: forumAuthor(comment.authorName, comment.authorId),
     timestamp: comment.createdAtUnix.toInt(),
     hidden: comment.hidden,
@@ -582,6 +610,7 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
 class FeedEntryCard extends StatelessWidget {
   const FeedEntryCard({
     super.key,
+    this.mentions = const [],
     required this.text,
     required this.author,
     required this.timestamp,
@@ -591,6 +620,7 @@ class FeedEntryCard extends StatelessWidget {
     required this.session,
     required this.actions,
   });
+  final List<CommunityMention> mentions;
   final String text, author, hiddenText;
   final int timestamp;
   final bool hidden;
@@ -611,7 +641,10 @@ class FeedEntryCard extends StatelessWidget {
               style: Theme.of(context).textTheme.bodySmall,
             ),
           const SizedBox(height: 12),
-          SelectableText(hidden ? hiddenText : text),
+          CommunityMentionText(
+            hidden ? hiddenText : text,
+            mentions: hidden ? const [] : mentions,
+          ),
           for (final asset in assets)
             Padding(
               padding: const EdgeInsets.only(top: 12),
@@ -681,6 +714,14 @@ class _FeedComposerState extends State<FeedComposer> {
                       maxLength: 8192,
                       hint: context.strings.messageHint,
                     ),
+                  ),
+                  MentionButton(
+                    api: communityMentionsFor(widget.draft.api),
+                    channel: widget.draft.channel,
+                    parent: widget.draft.post,
+                    draft: widget.draft.mentions,
+                    text: text,
+                    enabled: !state.busy,
                   ),
                   MessageComposerActions(
                     controller: text,

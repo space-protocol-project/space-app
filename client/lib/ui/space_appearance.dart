@@ -86,7 +86,7 @@ ThemeData quietSpaceTheme(
       : base.colorScheme.primary;
   final appearance = SpaceAppearance(
     effects: effects,
-    background: tone(0xFF1D2021, 0xFFE8E5DB),
+    background: tone(0xFF1D2021, 0xFFDEDACE),
     sidebar: tone(0xFF252625, 0xFFEEECE3),
     main: tone(0xFF2B2B29, 0xFFF7F5ED),
     surface: tone(0xFF343430, 0xFFE9E5D9),

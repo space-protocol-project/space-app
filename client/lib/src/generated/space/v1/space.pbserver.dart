@@ -15,47 +15,47 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'space.pb.dart' as $0;
+import 'space.pb.dart' as $1;
 import 'space.pbjson.dart';
 
 export 'space.pb.dart';
 
 abstract class ChannelServiceBase extends $pb.GeneratedService {
-  $async.Future<$0.WatchChannelsResponse> watchChannels(
-      $pb.ServerContext ctx, $0.WatchChannelsRequest request);
-  $async.Future<$0.ListChannelsResponse> listChannels(
-      $pb.ServerContext ctx, $0.ListChannelsRequest request);
-  $async.Future<$0.CreateChannelResponse> createChannel(
-      $pb.ServerContext ctx, $0.CreateChannelRequest request);
-  $async.Future<$0.UpdateChannelResponse> updateChannel(
-      $pb.ServerContext ctx, $0.UpdateChannelRequest request);
-  $async.Future<$0.DeleteChannelResponse> deleteChannel(
-      $pb.ServerContext ctx, $0.DeleteChannelRequest request);
-  $async.Future<$0.GetChannelAccessResponse> getChannelAccess(
-      $pb.ServerContext ctx, $0.GetChannelAccessRequest request);
-  $async.Future<$0.UpdateChannelAccessResponse> updateChannelAccess(
-      $pb.ServerContext ctx, $0.UpdateChannelAccessRequest request);
-  $async.Future<$0.GetManifestResponse> getManifest(
-      $pb.ServerContext ctx, $0.GetManifestRequest request);
+  $async.Future<$1.WatchChannelsResponse> watchChannels(
+      $pb.ServerContext ctx, $1.WatchChannelsRequest request);
+  $async.Future<$1.ListChannelsResponse> listChannels(
+      $pb.ServerContext ctx, $1.ListChannelsRequest request);
+  $async.Future<$1.CreateChannelResponse> createChannel(
+      $pb.ServerContext ctx, $1.CreateChannelRequest request);
+  $async.Future<$1.UpdateChannelResponse> updateChannel(
+      $pb.ServerContext ctx, $1.UpdateChannelRequest request);
+  $async.Future<$1.DeleteChannelResponse> deleteChannel(
+      $pb.ServerContext ctx, $1.DeleteChannelRequest request);
+  $async.Future<$1.GetChannelAccessResponse> getChannelAccess(
+      $pb.ServerContext ctx, $1.GetChannelAccessRequest request);
+  $async.Future<$1.UpdateChannelAccessResponse> updateChannelAccess(
+      $pb.ServerContext ctx, $1.UpdateChannelAccessRequest request);
+  $async.Future<$1.GetManifestResponse> getManifest(
+      $pb.ServerContext ctx, $1.GetManifestRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
       case 'WatchChannels':
-        return $0.WatchChannelsRequest();
+        return $1.WatchChannelsRequest();
       case 'ListChannels':
-        return $0.ListChannelsRequest();
+        return $1.ListChannelsRequest();
       case 'CreateChannel':
-        return $0.CreateChannelRequest();
+        return $1.CreateChannelRequest();
       case 'UpdateChannel':
-        return $0.UpdateChannelRequest();
+        return $1.UpdateChannelRequest();
       case 'DeleteChannel':
-        return $0.DeleteChannelRequest();
+        return $1.DeleteChannelRequest();
       case 'GetChannelAccess':
-        return $0.GetChannelAccessRequest();
+        return $1.GetChannelAccessRequest();
       case 'UpdateChannelAccess':
-        return $0.UpdateChannelAccessRequest();
+        return $1.UpdateChannelAccessRequest();
       case 'GetManifest':
-        return $0.GetManifestRequest();
+        return $1.GetManifestRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -65,22 +65,22 @@ abstract class ChannelServiceBase extends $pb.GeneratedService {
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
       case 'WatchChannels':
-        return watchChannels(ctx, request as $0.WatchChannelsRequest);
+        return watchChannels(ctx, request as $1.WatchChannelsRequest);
       case 'ListChannels':
-        return listChannels(ctx, request as $0.ListChannelsRequest);
+        return listChannels(ctx, request as $1.ListChannelsRequest);
       case 'CreateChannel':
-        return createChannel(ctx, request as $0.CreateChannelRequest);
+        return createChannel(ctx, request as $1.CreateChannelRequest);
       case 'UpdateChannel':
-        return updateChannel(ctx, request as $0.UpdateChannelRequest);
+        return updateChannel(ctx, request as $1.UpdateChannelRequest);
       case 'DeleteChannel':
-        return deleteChannel(ctx, request as $0.DeleteChannelRequest);
+        return deleteChannel(ctx, request as $1.DeleteChannelRequest);
       case 'GetChannelAccess':
-        return getChannelAccess(ctx, request as $0.GetChannelAccessRequest);
+        return getChannelAccess(ctx, request as $1.GetChannelAccessRequest);
       case 'UpdateChannelAccess':
         return updateChannelAccess(
-            ctx, request as $0.UpdateChannelAccessRequest);
+            ctx, request as $1.UpdateChannelAccessRequest);
       case 'GetManifest':
-        return getManifest(ctx, request as $0.GetManifestRequest);
+        return getManifest(ctx, request as $1.GetManifestRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -92,41 +92,41 @@ abstract class ChannelServiceBase extends $pb.GeneratedService {
 }
 
 abstract class ContentServiceBase extends $pb.GeneratedService {
-  $async.Future<$0.GetHistoryPageResponse> getHistoryPage(
-      $pb.ServerContext ctx, $0.GetHistoryPageRequest request);
-  $async.Future<$0.SearchContentResponse> searchContent(
-      $pb.ServerContext ctx, $0.SearchContentRequest request);
-  $async.Future<$0.ApplyContentMutationResponse> applyContentMutation(
-      $pb.ServerContext ctx, $0.ApplyContentMutationRequest request);
-  $async.Future<$0.SetReactionResponse> setReaction(
-      $pb.ServerContext ctx, $0.SetReactionRequest request);
-  $async.Future<$0.UpdateContentResponse> updateContent(
-      $pb.ServerContext ctx, $0.UpdateContentRequest request);
-  $async.Future<$0.DeleteContentResponse> deleteContent(
-      $pb.ServerContext ctx, $0.DeleteContentRequest request);
-  $async.Future<$0.CreateContentResponse> createContent(
-      $pb.ServerContext ctx, $0.CreateContentRequest request);
-  $async.Future<$0.ListContentResponse> listContent(
-      $pb.ServerContext ctx, $0.ListContentRequest request);
+  $async.Future<$1.GetHistoryPageResponse> getHistoryPage(
+      $pb.ServerContext ctx, $1.GetHistoryPageRequest request);
+  $async.Future<$1.SearchContentResponse> searchContent(
+      $pb.ServerContext ctx, $1.SearchContentRequest request);
+  $async.Future<$1.ApplyContentMutationResponse> applyContentMutation(
+      $pb.ServerContext ctx, $1.ApplyContentMutationRequest request);
+  $async.Future<$1.SetReactionResponse> setReaction(
+      $pb.ServerContext ctx, $1.SetReactionRequest request);
+  $async.Future<$1.UpdateContentResponse> updateContent(
+      $pb.ServerContext ctx, $1.UpdateContentRequest request);
+  $async.Future<$1.DeleteContentResponse> deleteContent(
+      $pb.ServerContext ctx, $1.DeleteContentRequest request);
+  $async.Future<$1.CreateContentResponse> createContent(
+      $pb.ServerContext ctx, $1.CreateContentRequest request);
+  $async.Future<$1.ListContentResponse> listContent(
+      $pb.ServerContext ctx, $1.ListContentRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
       case 'GetHistoryPage':
-        return $0.GetHistoryPageRequest();
+        return $1.GetHistoryPageRequest();
       case 'SearchContent':
-        return $0.SearchContentRequest();
+        return $1.SearchContentRequest();
       case 'ApplyContentMutation':
-        return $0.ApplyContentMutationRequest();
+        return $1.ApplyContentMutationRequest();
       case 'SetReaction':
-        return $0.SetReactionRequest();
+        return $1.SetReactionRequest();
       case 'UpdateContent':
-        return $0.UpdateContentRequest();
+        return $1.UpdateContentRequest();
       case 'DeleteContent':
-        return $0.DeleteContentRequest();
+        return $1.DeleteContentRequest();
       case 'CreateContent':
-        return $0.CreateContentRequest();
+        return $1.CreateContentRequest();
       case 'ListContent':
-        return $0.ListContentRequest();
+        return $1.ListContentRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -136,22 +136,22 @@ abstract class ContentServiceBase extends $pb.GeneratedService {
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
       case 'GetHistoryPage':
-        return getHistoryPage(ctx, request as $0.GetHistoryPageRequest);
+        return getHistoryPage(ctx, request as $1.GetHistoryPageRequest);
       case 'SearchContent':
-        return searchContent(ctx, request as $0.SearchContentRequest);
+        return searchContent(ctx, request as $1.SearchContentRequest);
       case 'ApplyContentMutation':
         return applyContentMutation(
-            ctx, request as $0.ApplyContentMutationRequest);
+            ctx, request as $1.ApplyContentMutationRequest);
       case 'SetReaction':
-        return setReaction(ctx, request as $0.SetReactionRequest);
+        return setReaction(ctx, request as $1.SetReactionRequest);
       case 'UpdateContent':
-        return updateContent(ctx, request as $0.UpdateContentRequest);
+        return updateContent(ctx, request as $1.UpdateContentRequest);
       case 'DeleteContent':
-        return deleteContent(ctx, request as $0.DeleteContentRequest);
+        return deleteContent(ctx, request as $1.DeleteContentRequest);
       case 'CreateContent':
-        return createContent(ctx, request as $0.CreateContentRequest);
+        return createContent(ctx, request as $1.CreateContentRequest);
       case 'ListContent':
-        return listContent(ctx, request as $0.ListContentRequest);
+        return listContent(ctx, request as $1.ListContentRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -163,37 +163,37 @@ abstract class ContentServiceBase extends $pb.GeneratedService {
 }
 
 abstract class AssetServiceBase extends $pb.GeneratedService {
-  $async.Future<$0.BeginUploadResponse> beginUpload(
-      $pb.ServerContext ctx, $0.BeginUploadRequest request);
-  $async.Future<$0.UploadChunkResponse> uploadChunk(
-      $pb.ServerContext ctx, $0.UploadChunkRequest request);
-  $async.Future<$0.CompleteUploadResponse> completeUpload(
-      $pb.ServerContext ctx, $0.CompleteUploadRequest request);
-  $async.Future<$0.CancelUploadResponse> cancelUpload(
-      $pb.ServerContext ctx, $0.CancelUploadRequest request);
-  $async.Future<$0.DownloadChunkResponse> downloadChunk(
-      $pb.ServerContext ctx, $0.DownloadChunkRequest request);
-  $async.Future<$0.ListMyAssetsResponse> listMyAssets(
-      $pb.ServerContext ctx, $0.ListMyAssetsRequest request);
-  $async.Future<$0.ListChannelAssetsResponse> listChannelAssets(
-      $pb.ServerContext ctx, $0.ListChannelAssetsRequest request);
+  $async.Future<$1.BeginUploadResponse> beginUpload(
+      $pb.ServerContext ctx, $1.BeginUploadRequest request);
+  $async.Future<$1.UploadChunkResponse> uploadChunk(
+      $pb.ServerContext ctx, $1.UploadChunkRequest request);
+  $async.Future<$1.CompleteUploadResponse> completeUpload(
+      $pb.ServerContext ctx, $1.CompleteUploadRequest request);
+  $async.Future<$1.CancelUploadResponse> cancelUpload(
+      $pb.ServerContext ctx, $1.CancelUploadRequest request);
+  $async.Future<$1.DownloadChunkResponse> downloadChunk(
+      $pb.ServerContext ctx, $1.DownloadChunkRequest request);
+  $async.Future<$1.ListMyAssetsResponse> listMyAssets(
+      $pb.ServerContext ctx, $1.ListMyAssetsRequest request);
+  $async.Future<$1.ListChannelAssetsResponse> listChannelAssets(
+      $pb.ServerContext ctx, $1.ListChannelAssetsRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
       case 'BeginUpload':
-        return $0.BeginUploadRequest();
+        return $1.BeginUploadRequest();
       case 'UploadChunk':
-        return $0.UploadChunkRequest();
+        return $1.UploadChunkRequest();
       case 'CompleteUpload':
-        return $0.CompleteUploadRequest();
+        return $1.CompleteUploadRequest();
       case 'CancelUpload':
-        return $0.CancelUploadRequest();
+        return $1.CancelUploadRequest();
       case 'DownloadChunk':
-        return $0.DownloadChunkRequest();
+        return $1.DownloadChunkRequest();
       case 'ListMyAssets':
-        return $0.ListMyAssetsRequest();
+        return $1.ListMyAssetsRequest();
       case 'ListChannelAssets':
-        return $0.ListChannelAssetsRequest();
+        return $1.ListChannelAssetsRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -203,19 +203,19 @@ abstract class AssetServiceBase extends $pb.GeneratedService {
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
       case 'BeginUpload':
-        return beginUpload(ctx, request as $0.BeginUploadRequest);
+        return beginUpload(ctx, request as $1.BeginUploadRequest);
       case 'UploadChunk':
-        return uploadChunk(ctx, request as $0.UploadChunkRequest);
+        return uploadChunk(ctx, request as $1.UploadChunkRequest);
       case 'CompleteUpload':
-        return completeUpload(ctx, request as $0.CompleteUploadRequest);
+        return completeUpload(ctx, request as $1.CompleteUploadRequest);
       case 'CancelUpload':
-        return cancelUpload(ctx, request as $0.CancelUploadRequest);
+        return cancelUpload(ctx, request as $1.CancelUploadRequest);
       case 'DownloadChunk':
-        return downloadChunk(ctx, request as $0.DownloadChunkRequest);
+        return downloadChunk(ctx, request as $1.DownloadChunkRequest);
       case 'ListMyAssets':
-        return listMyAssets(ctx, request as $0.ListMyAssetsRequest);
+        return listMyAssets(ctx, request as $1.ListMyAssetsRequest);
       case 'ListChannelAssets':
-        return listChannelAssets(ctx, request as $0.ListChannelAssetsRequest);
+        return listChannelAssets(ctx, request as $1.ListChannelAssetsRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -227,61 +227,61 @@ abstract class AssetServiceBase extends $pb.GeneratedService {
 }
 
 abstract class AuthServiceBase extends $pb.GeneratedService {
-  $async.Future<$0.CreateRootRotationResponse> createRootRotation(
-      $pb.ServerContext ctx, $0.CreateRootRotationRequest request);
-  $async.Future<$0.CompleteRootRotationResponse> completeRootRotation(
-      $pb.ServerContext ctx, $0.CompleteRootRotationRequest request);
-  $async.Future<$0.ProposePairingResponse> proposePairing(
-      $pb.ServerContext ctx, $0.ProposePairingRequest request);
-  $async.Future<$0.CreatePairingResponse> createPairing(
-      $pb.ServerContext ctx, $0.CreatePairingRequest request);
-  $async.Future<$0.InspectPairingResponse> inspectPairing(
-      $pb.ServerContext ctx, $0.InspectPairingRequest request);
-  $async.Future<$0.PollPairingResponse> pollPairing(
-      $pb.ServerContext ctx, $0.PollPairingRequest request);
-  $async.Future<$0.CancelPairingResponse> cancelPairing(
-      $pb.ServerContext ctx, $0.CancelPairingRequest request);
-  $async.Future<$0.ClaimPairingResponse> claimPairing(
-      $pb.ServerContext ctx, $0.ClaimPairingRequest request);
-  $async.Future<$0.RevokeCurrentDeviceResponse> revokeCurrentDevice(
-      $pb.ServerContext ctx, $0.RevokeCurrentDeviceRequest request);
-  $async.Future<$0.ListDevicesResponse> listDevices(
-      $pb.ServerContext ctx, $0.ListDevicesRequest request);
-  $async.Future<$0.LogoutResponse> logout(
-      $pb.ServerContext ctx, $0.LogoutRequest request);
-  $async.Future<$0.CreateChallengeResponse> createChallenge(
-      $pb.ServerContext ctx, $0.CreateChallengeRequest request);
-  $async.Future<$0.CompleteChallengeResponse> completeChallenge(
-      $pb.ServerContext ctx, $0.CompleteChallengeRequest request);
+  $async.Future<$1.CreateRootRotationResponse> createRootRotation(
+      $pb.ServerContext ctx, $1.CreateRootRotationRequest request);
+  $async.Future<$1.CompleteRootRotationResponse> completeRootRotation(
+      $pb.ServerContext ctx, $1.CompleteRootRotationRequest request);
+  $async.Future<$1.ProposePairingResponse> proposePairing(
+      $pb.ServerContext ctx, $1.ProposePairingRequest request);
+  $async.Future<$1.CreatePairingResponse> createPairing(
+      $pb.ServerContext ctx, $1.CreatePairingRequest request);
+  $async.Future<$1.InspectPairingResponse> inspectPairing(
+      $pb.ServerContext ctx, $1.InspectPairingRequest request);
+  $async.Future<$1.PollPairingResponse> pollPairing(
+      $pb.ServerContext ctx, $1.PollPairingRequest request);
+  $async.Future<$1.CancelPairingResponse> cancelPairing(
+      $pb.ServerContext ctx, $1.CancelPairingRequest request);
+  $async.Future<$1.ClaimPairingResponse> claimPairing(
+      $pb.ServerContext ctx, $1.ClaimPairingRequest request);
+  $async.Future<$1.RevokeCurrentDeviceResponse> revokeCurrentDevice(
+      $pb.ServerContext ctx, $1.RevokeCurrentDeviceRequest request);
+  $async.Future<$1.ListDevicesResponse> listDevices(
+      $pb.ServerContext ctx, $1.ListDevicesRequest request);
+  $async.Future<$1.LogoutResponse> logout(
+      $pb.ServerContext ctx, $1.LogoutRequest request);
+  $async.Future<$1.CreateChallengeResponse> createChallenge(
+      $pb.ServerContext ctx, $1.CreateChallengeRequest request);
+  $async.Future<$1.CompleteChallengeResponse> completeChallenge(
+      $pb.ServerContext ctx, $1.CompleteChallengeRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
       case 'CreateRootRotation':
-        return $0.CreateRootRotationRequest();
+        return $1.CreateRootRotationRequest();
       case 'CompleteRootRotation':
-        return $0.CompleteRootRotationRequest();
+        return $1.CompleteRootRotationRequest();
       case 'ProposePairing':
-        return $0.ProposePairingRequest();
+        return $1.ProposePairingRequest();
       case 'CreatePairing':
-        return $0.CreatePairingRequest();
+        return $1.CreatePairingRequest();
       case 'InspectPairing':
-        return $0.InspectPairingRequest();
+        return $1.InspectPairingRequest();
       case 'PollPairing':
-        return $0.PollPairingRequest();
+        return $1.PollPairingRequest();
       case 'CancelPairing':
-        return $0.CancelPairingRequest();
+        return $1.CancelPairingRequest();
       case 'ClaimPairing':
-        return $0.ClaimPairingRequest();
+        return $1.ClaimPairingRequest();
       case 'RevokeCurrentDevice':
-        return $0.RevokeCurrentDeviceRequest();
+        return $1.RevokeCurrentDeviceRequest();
       case 'ListDevices':
-        return $0.ListDevicesRequest();
+        return $1.ListDevicesRequest();
       case 'Logout':
-        return $0.LogoutRequest();
+        return $1.LogoutRequest();
       case 'CreateChallenge':
-        return $0.CreateChallengeRequest();
+        return $1.CreateChallengeRequest();
       case 'CompleteChallenge':
-        return $0.CompleteChallengeRequest();
+        return $1.CompleteChallengeRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -291,33 +291,33 @@ abstract class AuthServiceBase extends $pb.GeneratedService {
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
       case 'CreateRootRotation':
-        return createRootRotation(ctx, request as $0.CreateRootRotationRequest);
+        return createRootRotation(ctx, request as $1.CreateRootRotationRequest);
       case 'CompleteRootRotation':
         return completeRootRotation(
-            ctx, request as $0.CompleteRootRotationRequest);
+            ctx, request as $1.CompleteRootRotationRequest);
       case 'ProposePairing':
-        return proposePairing(ctx, request as $0.ProposePairingRequest);
+        return proposePairing(ctx, request as $1.ProposePairingRequest);
       case 'CreatePairing':
-        return createPairing(ctx, request as $0.CreatePairingRequest);
+        return createPairing(ctx, request as $1.CreatePairingRequest);
       case 'InspectPairing':
-        return inspectPairing(ctx, request as $0.InspectPairingRequest);
+        return inspectPairing(ctx, request as $1.InspectPairingRequest);
       case 'PollPairing':
-        return pollPairing(ctx, request as $0.PollPairingRequest);
+        return pollPairing(ctx, request as $1.PollPairingRequest);
       case 'CancelPairing':
-        return cancelPairing(ctx, request as $0.CancelPairingRequest);
+        return cancelPairing(ctx, request as $1.CancelPairingRequest);
       case 'ClaimPairing':
-        return claimPairing(ctx, request as $0.ClaimPairingRequest);
+        return claimPairing(ctx, request as $1.ClaimPairingRequest);
       case 'RevokeCurrentDevice':
         return revokeCurrentDevice(
-            ctx, request as $0.RevokeCurrentDeviceRequest);
+            ctx, request as $1.RevokeCurrentDeviceRequest);
       case 'ListDevices':
-        return listDevices(ctx, request as $0.ListDevicesRequest);
+        return listDevices(ctx, request as $1.ListDevicesRequest);
       case 'Logout':
-        return logout(ctx, request as $0.LogoutRequest);
+        return logout(ctx, request as $1.LogoutRequest);
       case 'CreateChallenge':
-        return createChallenge(ctx, request as $0.CreateChallengeRequest);
+        return createChallenge(ctx, request as $1.CreateChallengeRequest);
       case 'CompleteChallenge':
-        return completeChallenge(ctx, request as $0.CompleteChallengeRequest);
+        return completeChallenge(ctx, request as $1.CompleteChallengeRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -329,17 +329,17 @@ abstract class AuthServiceBase extends $pb.GeneratedService {
 }
 
 abstract class SyncServiceBase extends $pb.GeneratedService {
-  $async.Future<$0.SubscribeResponse> subscribe(
-      $pb.ServerContext ctx, $0.SubscribeRequest request);
-  $async.Future<$0.ListEventsResponse> listEvents(
-      $pb.ServerContext ctx, $0.ListEventsRequest request);
+  $async.Future<$1.SubscribeResponse> subscribe(
+      $pb.ServerContext ctx, $1.SubscribeRequest request);
+  $async.Future<$1.ListEventsResponse> listEvents(
+      $pb.ServerContext ctx, $1.ListEventsRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
       case 'Subscribe':
-        return $0.SubscribeRequest();
+        return $1.SubscribeRequest();
       case 'ListEvents':
-        return $0.ListEventsRequest();
+        return $1.ListEventsRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -349,9 +349,9 @@ abstract class SyncServiceBase extends $pb.GeneratedService {
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
       case 'Subscribe':
-        return subscribe(ctx, request as $0.SubscribeRequest);
+        return subscribe(ctx, request as $1.SubscribeRequest);
       case 'ListEvents':
-        return listEvents(ctx, request as $0.ListEventsRequest);
+        return listEvents(ctx, request as $1.ListEventsRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -363,45 +363,45 @@ abstract class SyncServiceBase extends $pb.GeneratedService {
 }
 
 abstract class AdminServiceBase extends $pb.GeneratedService {
-  $async.Future<$0.ListMembersResponse> listMembers(
-      $pb.ServerContext ctx, $0.ListMembersRequest request);
-  $async.Future<$0.UpdateMemberResponse> updateMember(
-      $pb.ServerContext ctx, $0.UpdateMemberRequest request);
-  $async.Future<$0.CreateInviteResponse> createInvite(
-      $pb.ServerContext ctx, $0.CreateInviteRequest request);
-  $async.Future<$0.ListInvitesResponse> listInvites(
-      $pb.ServerContext ctx, $0.ListInvitesRequest request);
-  $async.Future<$0.RevokeInviteResponse> revokeInvite(
-      $pb.ServerContext ctx, $0.RevokeInviteRequest request);
-  $async.Future<$0.GetSetupStatusResponse> getSetupStatus(
-      $pb.ServerContext ctx, $0.GetSetupStatusRequest request);
-  $async.Future<$0.ClaimOwnerResponse> claimOwner(
-      $pb.ServerContext ctx, $0.ClaimOwnerRequest request);
-  $async.Future<$0.GetSettingsResponse> getSettings(
-      $pb.ServerContext ctx, $0.GetSettingsRequest request);
-  $async.Future<$0.UpdateSettingsResponse> updateSettings(
-      $pb.ServerContext ctx, $0.UpdateSettingsRequest request);
+  $async.Future<$1.ListMembersResponse> listMembers(
+      $pb.ServerContext ctx, $1.ListMembersRequest request);
+  $async.Future<$1.UpdateMemberResponse> updateMember(
+      $pb.ServerContext ctx, $1.UpdateMemberRequest request);
+  $async.Future<$1.CreateInviteResponse> createInvite(
+      $pb.ServerContext ctx, $1.CreateInviteRequest request);
+  $async.Future<$1.ListInvitesResponse> listInvites(
+      $pb.ServerContext ctx, $1.ListInvitesRequest request);
+  $async.Future<$1.RevokeInviteResponse> revokeInvite(
+      $pb.ServerContext ctx, $1.RevokeInviteRequest request);
+  $async.Future<$1.GetSetupStatusResponse> getSetupStatus(
+      $pb.ServerContext ctx, $1.GetSetupStatusRequest request);
+  $async.Future<$1.ClaimOwnerResponse> claimOwner(
+      $pb.ServerContext ctx, $1.ClaimOwnerRequest request);
+  $async.Future<$1.GetSettingsResponse> getSettings(
+      $pb.ServerContext ctx, $1.GetSettingsRequest request);
+  $async.Future<$1.UpdateSettingsResponse> updateSettings(
+      $pb.ServerContext ctx, $1.UpdateSettingsRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
       case 'ListMembers':
-        return $0.ListMembersRequest();
+        return $1.ListMembersRequest();
       case 'UpdateMember':
-        return $0.UpdateMemberRequest();
+        return $1.UpdateMemberRequest();
       case 'CreateInvite':
-        return $0.CreateInviteRequest();
+        return $1.CreateInviteRequest();
       case 'ListInvites':
-        return $0.ListInvitesRequest();
+        return $1.ListInvitesRequest();
       case 'RevokeInvite':
-        return $0.RevokeInviteRequest();
+        return $1.RevokeInviteRequest();
       case 'GetSetupStatus':
-        return $0.GetSetupStatusRequest();
+        return $1.GetSetupStatusRequest();
       case 'ClaimOwner':
-        return $0.ClaimOwnerRequest();
+        return $1.ClaimOwnerRequest();
       case 'GetSettings':
-        return $0.GetSettingsRequest();
+        return $1.GetSettingsRequest();
       case 'UpdateSettings':
-        return $0.UpdateSettingsRequest();
+        return $1.UpdateSettingsRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -411,23 +411,23 @@ abstract class AdminServiceBase extends $pb.GeneratedService {
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
       case 'ListMembers':
-        return listMembers(ctx, request as $0.ListMembersRequest);
+        return listMembers(ctx, request as $1.ListMembersRequest);
       case 'UpdateMember':
-        return updateMember(ctx, request as $0.UpdateMemberRequest);
+        return updateMember(ctx, request as $1.UpdateMemberRequest);
       case 'CreateInvite':
-        return createInvite(ctx, request as $0.CreateInviteRequest);
+        return createInvite(ctx, request as $1.CreateInviteRequest);
       case 'ListInvites':
-        return listInvites(ctx, request as $0.ListInvitesRequest);
+        return listInvites(ctx, request as $1.ListInvitesRequest);
       case 'RevokeInvite':
-        return revokeInvite(ctx, request as $0.RevokeInviteRequest);
+        return revokeInvite(ctx, request as $1.RevokeInviteRequest);
       case 'GetSetupStatus':
-        return getSetupStatus(ctx, request as $0.GetSetupStatusRequest);
+        return getSetupStatus(ctx, request as $1.GetSetupStatusRequest);
       case 'ClaimOwner':
-        return claimOwner(ctx, request as $0.ClaimOwnerRequest);
+        return claimOwner(ctx, request as $1.ClaimOwnerRequest);
       case 'GetSettings':
-        return getSettings(ctx, request as $0.GetSettingsRequest);
+        return getSettings(ctx, request as $1.GetSettingsRequest);
       case 'UpdateSettings':
-        return updateSettings(ctx, request as $0.UpdateSettingsRequest);
+        return updateSettings(ctx, request as $1.UpdateSettingsRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -439,25 +439,25 @@ abstract class AdminServiceBase extends $pb.GeneratedService {
 }
 
 abstract class MembershipServiceBase extends $pb.GeneratedService {
-  $async.Future<$0.UpdateProfileResponse> updateProfile(
-      $pb.ServerContext ctx, $0.UpdateProfileRequest request);
-  $async.Future<$0.PreviewInviteResponse> previewInvite(
-      $pb.ServerContext ctx, $0.PreviewInviteRequest request);
-  $async.Future<$0.AcceptInviteResponse> acceptInvite(
-      $pb.ServerContext ctx, $0.AcceptInviteRequest request);
-  $async.Future<$0.GetMembershipResponse> getMembership(
-      $pb.ServerContext ctx, $0.GetMembershipRequest request);
+  $async.Future<$1.UpdateProfileResponse> updateProfile(
+      $pb.ServerContext ctx, $1.UpdateProfileRequest request);
+  $async.Future<$1.PreviewInviteResponse> previewInvite(
+      $pb.ServerContext ctx, $1.PreviewInviteRequest request);
+  $async.Future<$1.AcceptInviteResponse> acceptInvite(
+      $pb.ServerContext ctx, $1.AcceptInviteRequest request);
+  $async.Future<$1.GetMembershipResponse> getMembership(
+      $pb.ServerContext ctx, $1.GetMembershipRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
       case 'UpdateProfile':
-        return $0.UpdateProfileRequest();
+        return $1.UpdateProfileRequest();
       case 'PreviewInvite':
-        return $0.PreviewInviteRequest();
+        return $1.PreviewInviteRequest();
       case 'AcceptInvite':
-        return $0.AcceptInviteRequest();
+        return $1.AcceptInviteRequest();
       case 'GetMembership':
-        return $0.GetMembershipRequest();
+        return $1.GetMembershipRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -467,13 +467,13 @@ abstract class MembershipServiceBase extends $pb.GeneratedService {
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
       case 'UpdateProfile':
-        return updateProfile(ctx, request as $0.UpdateProfileRequest);
+        return updateProfile(ctx, request as $1.UpdateProfileRequest);
       case 'PreviewInvite':
-        return previewInvite(ctx, request as $0.PreviewInviteRequest);
+        return previewInvite(ctx, request as $1.PreviewInviteRequest);
       case 'AcceptInvite':
-        return acceptInvite(ctx, request as $0.AcceptInviteRequest);
+        return acceptInvite(ctx, request as $1.AcceptInviteRequest);
       case 'GetMembership':
-        return getMembership(ctx, request as $0.GetMembershipRequest);
+        return getMembership(ctx, request as $1.GetMembershipRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -486,29 +486,29 @@ abstract class MembershipServiceBase extends $pb.GeneratedService {
 }
 
 abstract class MlsServiceBase extends $pb.GeneratedService {
-  $async.Future<$0.RegisterMlsDeviceResponse> registerMlsDevice(
-      $pb.ServerContext ctx, $0.RegisterMlsDeviceRequest request);
-  $async.Future<$0.ListMlsDevicesResponse> listMlsDevices(
-      $pb.ServerContext ctx, $0.ListMlsDevicesRequest request);
-  $async.Future<$0.GetMlsChannelResponse> getMlsChannel(
-      $pb.ServerContext ctx, $0.GetMlsChannelRequest request);
-  $async.Future<$0.PublishMlsResponse> publishMls(
-      $pb.ServerContext ctx, $0.PublishMlsRequest request);
-  $async.Future<$0.ListMlsEnvelopesResponse> listMlsEnvelopes(
-      $pb.ServerContext ctx, $0.ListMlsEnvelopesRequest request);
+  $async.Future<$1.RegisterMlsDeviceResponse> registerMlsDevice(
+      $pb.ServerContext ctx, $1.RegisterMlsDeviceRequest request);
+  $async.Future<$1.ListMlsDevicesResponse> listMlsDevices(
+      $pb.ServerContext ctx, $1.ListMlsDevicesRequest request);
+  $async.Future<$1.GetMlsChannelResponse> getMlsChannel(
+      $pb.ServerContext ctx, $1.GetMlsChannelRequest request);
+  $async.Future<$1.PublishMlsResponse> publishMls(
+      $pb.ServerContext ctx, $1.PublishMlsRequest request);
+  $async.Future<$1.ListMlsEnvelopesResponse> listMlsEnvelopes(
+      $pb.ServerContext ctx, $1.ListMlsEnvelopesRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
       case 'RegisterMlsDevice':
-        return $0.RegisterMlsDeviceRequest();
+        return $1.RegisterMlsDeviceRequest();
       case 'ListMlsDevices':
-        return $0.ListMlsDevicesRequest();
+        return $1.ListMlsDevicesRequest();
       case 'GetMlsChannel':
-        return $0.GetMlsChannelRequest();
+        return $1.GetMlsChannelRequest();
       case 'PublishMls':
-        return $0.PublishMlsRequest();
+        return $1.PublishMlsRequest();
       case 'ListMlsEnvelopes':
-        return $0.ListMlsEnvelopesRequest();
+        return $1.ListMlsEnvelopesRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -518,15 +518,15 @@ abstract class MlsServiceBase extends $pb.GeneratedService {
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
       case 'RegisterMlsDevice':
-        return registerMlsDevice(ctx, request as $0.RegisterMlsDeviceRequest);
+        return registerMlsDevice(ctx, request as $1.RegisterMlsDeviceRequest);
       case 'ListMlsDevices':
-        return listMlsDevices(ctx, request as $0.ListMlsDevicesRequest);
+        return listMlsDevices(ctx, request as $1.ListMlsDevicesRequest);
       case 'GetMlsChannel':
-        return getMlsChannel(ctx, request as $0.GetMlsChannelRequest);
+        return getMlsChannel(ctx, request as $1.GetMlsChannelRequest);
       case 'PublishMls':
-        return publishMls(ctx, request as $0.PublishMlsRequest);
+        return publishMls(ctx, request as $1.PublishMlsRequest);
       case 'ListMlsEnvelopes':
-        return listMlsEnvelopes(ctx, request as $0.ListMlsEnvelopesRequest);
+        return listMlsEnvelopes(ctx, request as $1.ListMlsEnvelopesRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }

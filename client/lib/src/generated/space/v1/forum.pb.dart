@@ -16,6 +16,7 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import 'community_mentions.pb.dart' as $1;
 import 'space.pb.dart' as $0;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
@@ -40,6 +41,7 @@ class ForumThread extends $pb.GeneratedMessage {
     $fixnum.Int64? readSequence,
     $fixnum.Int64? unreadCount,
     $core.bool? hidden,
+    $core.Iterable<$1.CommunityMention>? mentions,
   }) {
     final result = ForumThread._();
     if (id != null) result.id = id;
@@ -61,6 +63,7 @@ class ForumThread extends $pb.GeneratedMessage {
     if (readSequence != null) result.readSequence = readSequence;
     if (unreadCount != null) result.unreadCount = unreadCount;
     if (hidden != null) result.hidden = hidden;
+    if (mentions != null) result.mentions.addAll(mentions);
     return result;
   }
 
@@ -96,6 +99,8 @@ class ForumThread extends $pb.GeneratedMessage {
     ..aInt64(16, _omitFieldNames ? '' : 'readSequence')
     ..aInt64(17, _omitFieldNames ? '' : 'unreadCount')
     ..aOB(18, _omitFieldNames ? '' : 'hidden')
+    ..pPM<$1.CommunityMention>(19, _omitFieldNames ? '' : 'mentions',
+        subBuilder: $1.CommunityMention.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -275,6 +280,9 @@ class ForumThread extends $pb.GeneratedMessage {
   $core.bool hasHidden() => $_has(17);
   @$pb.TagNumber(18)
   void clearHidden() => $_clearField(18);
+
+  @$pb.TagNumber(19)
+  $pb.PbList<$1.CommunityMention> get mentions => $_getList(18);
 }
 
 class ForumReply extends $pb.GeneratedMessage {
@@ -289,6 +297,7 @@ class ForumReply extends $pb.GeneratedMessage {
     $core.Iterable<$0.Asset>? attachments,
     $core.bool? hidden,
     $fixnum.Int64? revision,
+    $core.Iterable<$1.CommunityMention>? mentions,
   }) {
     final result = ForumReply._();
     if (id != null) result.id = id;
@@ -301,6 +310,7 @@ class ForumReply extends $pb.GeneratedMessage {
     if (attachments != null) result.attachments.addAll(attachments);
     if (hidden != null) result.hidden = hidden;
     if (revision != null) result.revision = revision;
+    if (mentions != null) result.mentions.addAll(mentions);
     return result;
   }
 
@@ -328,6 +338,8 @@ class ForumReply extends $pb.GeneratedMessage {
         subBuilder: $0.Asset.$_createMessage)
     ..aOB(9, _omitFieldNames ? '' : 'hidden')
     ..aInt64(10, _omitFieldNames ? '' : 'revision')
+    ..pPM<$1.CommunityMention>(11, _omitFieldNames ? '' : 'mentions',
+        subBuilder: $1.CommunityMention.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -433,6 +445,9 @@ class ForumReply extends $pb.GeneratedMessage {
   $core.bool hasRevision() => $_has(9);
   @$pb.TagNumber(10)
   void clearRevision() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $pb.PbList<$1.CommunityMention> get mentions => $_getList(10);
 }
 
 /// Курсоры — sequence последней записи; 0 начинает чтение, limit 1..50 (0 = 50).
@@ -807,6 +822,7 @@ class CreateForumThreadRequest extends $pb.GeneratedMessage {
     $core.String? text,
     $core.String? idempotencyKey,
     $core.Iterable<$core.String>? attachmentIds,
+    $core.Iterable<$1.CommunityMention>? mentions,
   }) {
     final result = CreateForumThreadRequest._();
     if (channelId != null) result.channelId = channelId;
@@ -814,6 +830,7 @@ class CreateForumThreadRequest extends $pb.GeneratedMessage {
     if (text != null) result.text = text;
     if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
     if (attachmentIds != null) result.attachmentIds.addAll(attachmentIds);
+    if (mentions != null) result.mentions.addAll(mentions);
     return result;
   }
 
@@ -835,6 +852,8 @@ class CreateForumThreadRequest extends $pb.GeneratedMessage {
     ..aOS(3, _omitFieldNames ? '' : 'text')
     ..aOS(4, _omitFieldNames ? '' : 'idempotencyKey')
     ..pPS(5, _omitFieldNames ? '' : 'attachmentIds')
+    ..pPM<$1.CommunityMention>(6, _omitFieldNames ? '' : 'mentions',
+        subBuilder: $1.CommunityMention.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -900,6 +919,9 @@ class CreateForumThreadRequest extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(5)
   $pb.PbList<$core.String> get attachmentIds => $_getList(4);
+
+  @$pb.TagNumber(6)
+  $pb.PbList<$1.CommunityMention> get mentions => $_getList(5);
 }
 
 class CreateForumThreadResponse extends $pb.GeneratedMessage {
@@ -973,6 +995,7 @@ class ReplyForumThreadRequest extends $pb.GeneratedMessage {
     $core.String? text,
     $core.String? idempotencyKey,
     $core.Iterable<$core.String>? attachmentIds,
+    $core.Iterable<$1.CommunityMention>? mentions,
   }) {
     final result = ReplyForumThreadRequest._();
     if (channelId != null) result.channelId = channelId;
@@ -980,6 +1003,7 @@ class ReplyForumThreadRequest extends $pb.GeneratedMessage {
     if (text != null) result.text = text;
     if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
     if (attachmentIds != null) result.attachmentIds.addAll(attachmentIds);
+    if (mentions != null) result.mentions.addAll(mentions);
     return result;
   }
 
@@ -1001,6 +1025,8 @@ class ReplyForumThreadRequest extends $pb.GeneratedMessage {
     ..aOS(3, _omitFieldNames ? '' : 'text')
     ..aOS(4, _omitFieldNames ? '' : 'idempotencyKey')
     ..pPS(5, _omitFieldNames ? '' : 'attachmentIds')
+    ..pPM<$1.CommunityMention>(6, _omitFieldNames ? '' : 'mentions',
+        subBuilder: $1.CommunityMention.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1065,6 +1091,9 @@ class ReplyForumThreadRequest extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(5)
   $pb.PbList<$core.String> get attachmentIds => $_getList(4);
+
+  @$pb.TagNumber(6)
+  $pb.PbList<$1.CommunityMention> get mentions => $_getList(5);
 }
 
 class ReplyForumThreadResponse extends $pb.GeneratedMessage {

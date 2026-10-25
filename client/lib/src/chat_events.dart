@@ -59,8 +59,10 @@ final class ChatMessageSent extends ChatEvent<bool> {
     this.attachments = const [],
     this.files = const [],
     this.replyTo = '',
+    this.mentions = const [],
   ]);
   final String text, replyTo;
+  final List<CommunityMention> mentions;
   final List<String> attachments;
   final List<SpaceFile> files;
 }
@@ -101,8 +103,15 @@ final class ChatCatalogFailed extends ChatEvent<bool> {
 }
 
 final class ChatMessageChanged extends ChatEvent<bool> {
-  ChatMessageChanged(Content message, this.text)
-    : message = message.deepCopy()..freeze();
+  ChatMessageChanged(
+    Content message,
+    this.text, [
+    List<CommunityMention> mentions = const [],
+  ]) : mentions = mentions
+           .map((m) => m.deepCopy()..freeze())
+           .toList(growable: false),
+       message = message.deepCopy()..freeze();
+  final List<CommunityMention> mentions;
   final Content message;
   final String? text;
 }

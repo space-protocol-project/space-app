@@ -18,6 +18,7 @@ class MessageBubble extends StatelessWidget {
     this.favorite = false,
     this.onToggleFavorite,
     this.actions,
+    this.mentionBadge,
     this.reactions,
     this.reply,
     this.attachments,
@@ -28,6 +29,7 @@ class MessageBubble extends StatelessWidget {
   final bool mine, grouped, accepted;
   final DateTime? sentAt;
   final bool favorite, edited, deleted;
+  final Widget? mentionBadge;
   final Widget? actions, attachments, reactions, reply;
   final VoidCallback? onToggleFavorite;
 
@@ -103,6 +105,10 @@ class MessageBubble extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (mentionBadge != null && !deleted) ...[
+            mentionBadge!,
+            const SizedBox(width: 6),
+          ],
           ?actions,
           if (edited && !deleted) ...[
             Text(

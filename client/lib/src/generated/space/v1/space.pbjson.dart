@@ -15,6 +15,8 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
+import 'community_mentions.pbjson.dart' as $0;
+
 @$core.Deprecated('Use logoutRequestDescriptor instead')
 const LogoutRequest$json = {
   '1': 'LogoutRequest',
@@ -1638,6 +1640,14 @@ const Content$json = {
       '6': '.space.v1.Content.ParticipantNamesEntry',
       '10': 'participantNames'
     },
+    {
+      '1': 'mentions',
+      '3': 14,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.CommunityMention',
+      '10': 'mentions'
+    },
   ],
   '3': [Content_ParticipantNamesEntry$json],
 };
@@ -1662,9 +1672,10 @@ final $typed_data.Uint8List contentDescriptor = $convert.base64Decode(
     'IxCgthdHRhY2htZW50cxgKIAMoCzIPLnNwYWNlLnYxLkFzc2V0UgthdHRhY2htZW50cxIwCgly'
     'ZWFjdGlvbnMYCyADKAsyEi5zcGFjZS52MS5SZWFjdGlvblIJcmVhY3Rpb25zEh4KC3JlcGx5X3'
     'RvX2lkGAwgASgJUglyZXBseVRvSWQSVAoRcGFydGljaXBhbnRfbmFtZXMYDSADKAsyJy5zcGFj'
-    'ZS52MS5Db250ZW50LlBhcnRpY2lwYW50TmFtZXNFbnRyeVIQcGFydGljaXBhbnROYW1lcxpDCh'
-    'VQYXJ0aWNpcGFudE5hbWVzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUYAiABKAlS'
-    'BXZhbHVlOgI4AQ==');
+    'ZS52MS5Db250ZW50LlBhcnRpY2lwYW50TmFtZXNFbnRyeVIQcGFydGljaXBhbnROYW1lcxI2Cg'
+    'htZW50aW9ucxgOIAMoCzIaLnNwYWNlLnYxLkNvbW11bml0eU1lbnRpb25SCG1lbnRpb25zGkMK'
+    'FVBhcnRpY2lwYW50TmFtZXNFbnRyeRIQCgNrZXkYASABKAlSA2tleRIUCgV2YWx1ZRgCIAEoCV'
+    'IFdmFsdWU6AjgB');
 
 @$core.Deprecated('Use updateContentRequestDescriptor instead')
 const UpdateContentRequest$json = {
@@ -1681,6 +1692,14 @@ const UpdateContentRequest$json = {
       '10': 'expectedRevision'
     },
     {'1': 'idempotency_key', '3': 5, '4': 1, '5': 9, '10': 'idempotencyKey'},
+    {
+      '1': 'mentions',
+      '3': 6,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.CommunityMention',
+      '10': 'mentions'
+    },
   ],
 };
 
@@ -1689,7 +1708,8 @@ final $typed_data.Uint8List updateContentRequestDescriptor = $convert.base64Deco
     'ChRVcGRhdGVDb250ZW50UmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSWQSDg'
     'oCaWQYAiABKAlSAmlkEhIKBHRleHQYAyABKAlSBHRleHQSKwoRZXhwZWN0ZWRfcmV2aXNpb24Y'
     'BCABKANSEGV4cGVjdGVkUmV2aXNpb24SJwoPaWRlbXBvdGVuY3lfa2V5GAUgASgJUg5pZGVtcG'
-    '90ZW5jeUtleQ==');
+    '90ZW5jeUtleRI2CghtZW50aW9ucxgGIAMoCzIaLnNwYWNlLnYxLkNvbW11bml0eU1lbnRpb25S'
+    'CG1lbnRpb25z');
 
 @$core.Deprecated('Use updateContentResponseDescriptor instead')
 const UpdateContentResponse$json = {
@@ -1769,6 +1789,14 @@ const CreateContentRequest$json = {
     {'1': 'idempotency_key', '3': 3, '4': 1, '5': 9, '10': 'idempotencyKey'},
     {'1': 'attachment_ids', '3': 4, '4': 3, '5': 9, '10': 'attachmentIds'},
     {'1': 'reply_to_id', '3': 5, '4': 1, '5': 9, '10': 'replyToId'},
+    {
+      '1': 'mentions',
+      '3': 6,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.CommunityMention',
+      '10': 'mentions'
+    },
   ],
 };
 
@@ -1777,7 +1805,8 @@ final $typed_data.Uint8List createContentRequestDescriptor = $convert.base64Deco
     'ChRDcmVhdGVDb250ZW50UmVxdWVzdBIdCgpjaGFubmVsX2lkGAEgASgJUgljaGFubmVsSWQSEg'
     'oEdGV4dBgCIAEoCVIEdGV4dBInCg9pZGVtcG90ZW5jeV9rZXkYAyABKAlSDmlkZW1wb3RlbmN5'
     'S2V5EiUKDmF0dGFjaG1lbnRfaWRzGAQgAygJUg1hdHRhY2htZW50SWRzEh4KC3JlcGx5X3RvX2'
-    'lkGAUgASgJUglyZXBseVRvSWQ=');
+    'lkGAUgASgJUglyZXBseVRvSWQSNgoIbWVudGlvbnMYBiADKAsyGi5zcGFjZS52MS5Db21tdW5p'
+    'dHlNZW50aW9uUghtZW50aW9ucw==');
 
 @$core.Deprecated('Use createContentResponseDescriptor instead')
 const CreateContentResponse$json = {
@@ -2969,6 +2998,7 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
   '.space.v1.Asset': Asset$json,
   '.space.v1.Reaction': Reaction$json,
   '.space.v1.Content.ParticipantNamesEntry': Content_ParticipantNamesEntry$json,
+  '.space.v1.CommunityMention': $0.CommunityMention$json,
   '.space.v1.SearchContentRequest': SearchContentRequest$json,
   '.space.v1.SearchContentResponse': SearchContentResponse$json,
   '.space.v1.ApplyContentMutationRequest': ApplyContentMutationRequest$json,
@@ -3264,6 +3294,7 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
   '.space.v1.Asset': Asset$json,
   '.space.v1.Reaction': Reaction$json,
   '.space.v1.Content.ParticipantNamesEntry': Content_ParticipantNamesEntry$json,
+  '.space.v1.CommunityMention': $0.CommunityMention$json,
   '.space.v1.ListEventsRequest': ListEventsRequest$json,
   '.space.v1.ListEventsResponse': ListEventsResponse$json,
 };

@@ -1,4 +1,8 @@
 import 'dart:convert';
+import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
+
+import 'window_theme.dart';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -27,9 +31,11 @@ class AppPreferences
         event,
         () => switch (event) {
           PreferencesLoaded() => _load(),
+          SystemBrightnessChanged() => _systemChanged(event.brightness),
           NotificationsChanged() => _changeNotifications(event.mode),
           PreferencesChanged() => _change(
             dark: event.dark,
+            themeMode: event.themeMode,
             effects: event.effects,
             palette: event.palette,
             language: event.language,
@@ -62,6 +68,7 @@ class AppPreferences
 
   Future<void> change({
     bool? dark,
+    ThemeMode? themeMode,
     bool? effects,
     String? palette,
     String? language,
@@ -71,6 +78,7 @@ class AppPreferences
     PreferencesChanged(
       uiScale: uiScale,
       dark: dark,
+      themeMode: themeMode,
       effects: effects,
       palette: palette,
       language: language,
@@ -83,6 +91,35 @@ class AppPreferences
       sendRequest(ServerIconCached(origin, value));
 
   bool dark = true, effects = true;
+  ThemeMode themeMode = ThemeMode.dark;
+  Brightness _systemBrightness = PlatformDispatcher.instance.platformBrightness;
+  Future<void> updateSystemBrightness(Brightness brightness) =>
+      sendRequest(SystemBrightnessChanged(brightness));
+  void _systemChanged(Brightness brightness) {
+    _systemBrightness = brightness;
+    if (themeMode != ThemeMode.system) return;
+    dark = brightness == Brightness.dark;
+    publishState();
+  }
+
+  void _setThemeMode(ThemeMode mode) {
+    themeMode = mode;
+    dark = mode == ThemeMode.system
+        ? _systemBrightness == Brightness.dark
+        : mode == ThemeMode.dark;
+  }
+
+  void _loadThemeMode(SharedPreferences data) {
+    final saved = data.getString('space.ui.themeMode');
+    final mode = ThemeMode.values.where((m) => m.name == saved).firstOrNull;
+    _setThemeMode(
+      mode ??
+          ((data.getBool('space.ui.dark') ?? true)
+              ? ThemeMode.dark
+              : ThemeMode.light),
+    );
+  }
+
   String palette = 'gruvbox', error = '';
   String language = 'ru';
   String sendShortcut = 'enter';
@@ -113,7 +150,7 @@ class AppPreferences
     try {
       final data = await SharedPreferences.getInstance();
       if (_disposed) return;
-      dark = data.getBool('space.ui.dark') ?? true;
+      _loadThemeMode(data);
       final mode = data.getInt('space.notifications.mode') ?? 0;
       notificationMode = [0, 1, 2].contains(mode) ? mode : 0;
       effects = data.getBool('space.ui.effects') ?? true;
@@ -150,6 +187,7 @@ class AppPreferences
 
   Future<void> _change({
     bool? dark,
+    ThemeMode? themeMode,
     bool? effects,
     String? palette,
     String? language,
@@ -164,7 +202,8 @@ class AppPreferences
     if (language != null && languages.contains(language)) {
       this.language = language;
     }
-    if (dark != null) this.dark = dark;
+    if (dark != null) _setThemeMode(dark ? ThemeMode.dark : ThemeMode.light);
+    if (themeMode != null) _setThemeMode(themeMode);
     if (effects != null) this.effects = effects;
     if (palette != null && ['gruvbox', 'ocean', 'iris'].contains(palette)) {
       this.palette = palette;
@@ -195,6 +234,7 @@ class AppPreferences
       notificationMode: notificationMode,
       uiScale: uiScale,
       dark: dark,
+      themeMode: themeMode,
       effects: effects,
       palette: palette,
       language: language,
@@ -209,6 +249,7 @@ class AppPreferences
           data.setInt('space.notifications.mode', snapshot.notificationMode),
           data.setDouble('space.ui.scale', snapshot.uiScale),
           data.setBool('space.ui.dark', snapshot.dark),
+          data.setString('space.ui.themeMode', snapshot.themeMode.name),
           data.setBool('space.ui.effects', snapshot.effects),
           data.setString('space.ui.palette', snapshot.palette),
           data.setString('space.ui.language', snapshot.language),
@@ -228,9 +269,9 @@ class AppPreferences
 
   void publishState() {
     if (!_disposed && !isClosed) {
-      publishStateEvent(
-        PreferencesStatePublished(PreferencesState.fromController(this)),
-      );
+      final next = PreferencesState.fromController(this);
+      publishStateEvent(PreferencesStatePublished(next));
+      unawaited(updateWindowTheme(next.theme!));
     }
   }
 

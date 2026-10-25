@@ -15,67 +15,67 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'forum.pb.dart' as $1;
+import 'forum.pb.dart' as $2;
 import 'forum.pbjson.dart';
 
 export 'forum.pb.dart';
 
 abstract class ForumServiceBase extends $pb.GeneratedService {
-  $async.Future<$1.ReportForumContentResponse> reportForumContent(
-      $pb.ServerContext ctx, $1.ReportForumContentRequest request);
-  $async.Future<$1.ListForumReportsResponse> listForumReports(
-      $pb.ServerContext ctx, $1.ListForumReportsRequest request);
-  $async.Future<$1.ResolveForumReportResponse> resolveForumReport(
-      $pb.ServerContext ctx, $1.ResolveForumReportRequest request);
-  $async.Future<$1.ListForumThreadsResponse> listForumThreads(
-      $pb.ServerContext ctx, $1.ListForumThreadsRequest request);
-  $async.Future<$1.GetForumThreadResponse> getForumThread(
-      $pb.ServerContext ctx, $1.GetForumThreadRequest request);
-  $async.Future<$1.CreateForumThreadResponse> createForumThread(
-      $pb.ServerContext ctx, $1.CreateForumThreadRequest request);
-  $async.Future<$1.ReplyForumThreadResponse> replyForumThread(
-      $pb.ServerContext ctx, $1.ReplyForumThreadRequest request);
-  $async.Future<$1.SetForumThreadPinnedResponse> setForumThreadPinned(
-      $pb.ServerContext ctx, $1.SetForumThreadPinnedRequest request);
-  $async.Future<$1.MarkForumThreadReadResponse> markForumThreadRead(
-      $pb.ServerContext ctx, $1.MarkForumThreadReadRequest request);
-  $async.Future<$1.CloseForumThreadResponse> closeForumThread(
-      $pb.ServerContext ctx, $1.CloseForumThreadRequest request);
-  $async.Future<$1.ModerateForumThreadResponse> moderateForumThread(
-      $pb.ServerContext ctx, $1.ModerateForumThreadRequest request);
-  $async.Future<$1.ModerateForumReplyResponse> moderateForumReply(
-      $pb.ServerContext ctx, $1.ModerateForumReplyRequest request);
-  $async.Future<$1.ListForumModerationResponse> listForumModeration(
-      $pb.ServerContext ctx, $1.ListForumModerationRequest request);
+  $async.Future<$2.ReportForumContentResponse> reportForumContent(
+      $pb.ServerContext ctx, $2.ReportForumContentRequest request);
+  $async.Future<$2.ListForumReportsResponse> listForumReports(
+      $pb.ServerContext ctx, $2.ListForumReportsRequest request);
+  $async.Future<$2.ResolveForumReportResponse> resolveForumReport(
+      $pb.ServerContext ctx, $2.ResolveForumReportRequest request);
+  $async.Future<$2.ListForumThreadsResponse> listForumThreads(
+      $pb.ServerContext ctx, $2.ListForumThreadsRequest request);
+  $async.Future<$2.GetForumThreadResponse> getForumThread(
+      $pb.ServerContext ctx, $2.GetForumThreadRequest request);
+  $async.Future<$2.CreateForumThreadResponse> createForumThread(
+      $pb.ServerContext ctx, $2.CreateForumThreadRequest request);
+  $async.Future<$2.ReplyForumThreadResponse> replyForumThread(
+      $pb.ServerContext ctx, $2.ReplyForumThreadRequest request);
+  $async.Future<$2.SetForumThreadPinnedResponse> setForumThreadPinned(
+      $pb.ServerContext ctx, $2.SetForumThreadPinnedRequest request);
+  $async.Future<$2.MarkForumThreadReadResponse> markForumThreadRead(
+      $pb.ServerContext ctx, $2.MarkForumThreadReadRequest request);
+  $async.Future<$2.CloseForumThreadResponse> closeForumThread(
+      $pb.ServerContext ctx, $2.CloseForumThreadRequest request);
+  $async.Future<$2.ModerateForumThreadResponse> moderateForumThread(
+      $pb.ServerContext ctx, $2.ModerateForumThreadRequest request);
+  $async.Future<$2.ModerateForumReplyResponse> moderateForumReply(
+      $pb.ServerContext ctx, $2.ModerateForumReplyRequest request);
+  $async.Future<$2.ListForumModerationResponse> listForumModeration(
+      $pb.ServerContext ctx, $2.ListForumModerationRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
       case 'ReportForumContent':
-        return $1.ReportForumContentRequest();
+        return $2.ReportForumContentRequest();
       case 'ListForumReports':
-        return $1.ListForumReportsRequest();
+        return $2.ListForumReportsRequest();
       case 'ResolveForumReport':
-        return $1.ResolveForumReportRequest();
+        return $2.ResolveForumReportRequest();
       case 'ListForumThreads':
-        return $1.ListForumThreadsRequest();
+        return $2.ListForumThreadsRequest();
       case 'GetForumThread':
-        return $1.GetForumThreadRequest();
+        return $2.GetForumThreadRequest();
       case 'CreateForumThread':
-        return $1.CreateForumThreadRequest();
+        return $2.CreateForumThreadRequest();
       case 'ReplyForumThread':
-        return $1.ReplyForumThreadRequest();
+        return $2.ReplyForumThreadRequest();
       case 'SetForumThreadPinned':
-        return $1.SetForumThreadPinnedRequest();
+        return $2.SetForumThreadPinnedRequest();
       case 'MarkForumThreadRead':
-        return $1.MarkForumThreadReadRequest();
+        return $2.MarkForumThreadReadRequest();
       case 'CloseForumThread':
-        return $1.CloseForumThreadRequest();
+        return $2.CloseForumThreadRequest();
       case 'ModerateForumThread':
-        return $1.ModerateForumThreadRequest();
+        return $2.ModerateForumThreadRequest();
       case 'ModerateForumReply':
-        return $1.ModerateForumReplyRequest();
+        return $2.ModerateForumReplyRequest();
       case 'ListForumModeration':
-        return $1.ListForumModerationRequest();
+        return $2.ListForumModerationRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -85,35 +85,35 @@ abstract class ForumServiceBase extends $pb.GeneratedService {
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
       case 'ReportForumContent':
-        return reportForumContent(ctx, request as $1.ReportForumContentRequest);
+        return reportForumContent(ctx, request as $2.ReportForumContentRequest);
       case 'ListForumReports':
-        return listForumReports(ctx, request as $1.ListForumReportsRequest);
+        return listForumReports(ctx, request as $2.ListForumReportsRequest);
       case 'ResolveForumReport':
-        return resolveForumReport(ctx, request as $1.ResolveForumReportRequest);
+        return resolveForumReport(ctx, request as $2.ResolveForumReportRequest);
       case 'ListForumThreads':
-        return listForumThreads(ctx, request as $1.ListForumThreadsRequest);
+        return listForumThreads(ctx, request as $2.ListForumThreadsRequest);
       case 'GetForumThread':
-        return getForumThread(ctx, request as $1.GetForumThreadRequest);
+        return getForumThread(ctx, request as $2.GetForumThreadRequest);
       case 'CreateForumThread':
-        return createForumThread(ctx, request as $1.CreateForumThreadRequest);
+        return createForumThread(ctx, request as $2.CreateForumThreadRequest);
       case 'ReplyForumThread':
-        return replyForumThread(ctx, request as $1.ReplyForumThreadRequest);
+        return replyForumThread(ctx, request as $2.ReplyForumThreadRequest);
       case 'SetForumThreadPinned':
         return setForumThreadPinned(
-            ctx, request as $1.SetForumThreadPinnedRequest);
+            ctx, request as $2.SetForumThreadPinnedRequest);
       case 'MarkForumThreadRead':
         return markForumThreadRead(
-            ctx, request as $1.MarkForumThreadReadRequest);
+            ctx, request as $2.MarkForumThreadReadRequest);
       case 'CloseForumThread':
-        return closeForumThread(ctx, request as $1.CloseForumThreadRequest);
+        return closeForumThread(ctx, request as $2.CloseForumThreadRequest);
       case 'ModerateForumThread':
         return moderateForumThread(
-            ctx, request as $1.ModerateForumThreadRequest);
+            ctx, request as $2.ModerateForumThreadRequest);
       case 'ModerateForumReply':
-        return moderateForumReply(ctx, request as $1.ModerateForumReplyRequest);
+        return moderateForumReply(ctx, request as $2.ModerateForumReplyRequest);
       case 'ListForumModeration':
         return listForumModeration(
-            ctx, request as $1.ListForumModerationRequest);
+            ctx, request as $2.ListForumModerationRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }

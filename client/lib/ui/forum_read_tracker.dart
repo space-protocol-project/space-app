@@ -25,6 +25,7 @@ class ForumReadTracker {
     bool Function() active,
     ValueChanged<int> read, {
     double topPadding = 0,
+    ValueChanged<Set<int>>? visible,
   }) {
     if (scheduled) return;
     scheduled = true;
@@ -35,27 +36,34 @@ class ForumReadTracker {
           ModalRoute.of(context)?.isCurrent == false) {
         return;
       }
-      final sequence = visibleThrough(context, topPadding: topPadding);
+      final shown = visibleSequences(context, topPadding: topPadding);
+      visible?.call(shown);
+      final sequence = shown.isEmpty ? null : shown.reduce(math.max);
       if (sequence != null) read(sequence);
     });
   }
 
   int? visibleThrough(BuildContext context, {double topPadding = 0}) {
+    final shown = visibleSequences(context, topPadding: topPadding);
+    return shown.isEmpty ? null : shown.reduce(math.max);
+  }
+
+  Set<int> visibleSequences(BuildContext context, {double topPadding = 0}) {
     final box = viewport.currentContext?.findRenderObject();
-    if (box is! RenderBox || !box.hasSize) return null;
+    if (box is! RenderBox || !box.hasSize) return {};
     final media = MediaQuery.of(context);
     final top = math.max(0.0, box.localToGlobal(Offset.zero).dy + topPadding);
     final bottom = math.min(
       box.localToGlobal(Offset(0, box.size.height)).dy,
       media.size.height - media.viewInsets.bottom,
     );
-    int? through;
+    final through = <int>{};
     for (final entry in keys.entries) {
       final message = entry.value.currentContext?.findRenderObject();
       if (message is! RenderBox || !message.hasSize) continue;
       final end = message.localToGlobal(Offset(0, message.size.height)).dy;
       if (end > top && end <= bottom) {
-        through = math.max(through ?? 0, entry.key);
+        through.add(entry.key);
       }
     }
     return through;

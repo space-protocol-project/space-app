@@ -67,6 +67,8 @@ class _Client implements MlsClient {
 }
 
 class _Session implements SpaceSession {
+  @override
+  bool get chatMentionsSupported => false;
   _Session(this.client);
   final MlsClient client;
   @override

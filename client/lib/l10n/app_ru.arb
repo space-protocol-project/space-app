@@ -989,5 +989,15 @@
   "dashboardCommunityEmpty": "Пока нет доступных тем и публикаций.",
   "dashboardAttentionUnknown": "Часть разделов пока не проверена.",
   "dashboardAttachmentPost": "Публикация с вложениями",
-  "dashboardCommunityOffline": "Данные недоступных пространств появятся после подключения."
+  "dashboardCommunityOffline": "Данные недоступных пространств появятся после подключения.",
+  "communityMention": "Упомянуть участника",
+  "communityMentionQuery": "Имя или ID участника",
+  "communityMentionFailed": "Не удалось получить участников. Проверьте доступ и повторите поиск.",
+  "communityMentionEmpty": "Участники не найдены",
+  "dashboardMention": "Вас упомянули",
+  "dashboardFeedRepliesToYou": "Ответы на вашу публикацию",
+  "appearanceTheme": "Тема",
+  "appearanceThemeSystem": "Автоматическая",
+  "appearanceThemeLight": "Светлая",
+  "appearanceThemeDark": "Тёмная"
 }

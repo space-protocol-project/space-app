@@ -1,3 +1,5 @@
+import 'mention_data.dart';
+import 'generated/space/v1/community_mentions.pb.dart';
 import 'generated/space/v1/space.pb.dart';
 
 enum MutationKind { edit, delete, reaction }
@@ -13,6 +15,7 @@ class QueuedMutation {
     this.emoji = '',
     this.active = false,
     this.after = '',
+    this.mentions = const [],
   });
   factory QueuedMutation.forMessage(
     Content message,
@@ -20,6 +23,7 @@ class QueuedMutation {
     String emoji = '',
     bool active = false,
     String after = '',
+    List<CommunityMention> mentions = const [],
   }) => QueuedMutation(
     kind: kind,
     id: message.id,
@@ -29,9 +33,11 @@ class QueuedMutation {
     hasAttachments: message.attachments.isNotEmpty,
     emoji: emoji,
     active: active,
+    mentions: mentions,
     after: after,
   );
   final MutationKind kind;
+  final List<CommunityMention> mentions;
   final String id, author, emoji, after;
   final int sequence, revision;
   final bool active, hasAttachments;
@@ -45,6 +51,7 @@ class QueuedMutation {
     hasAttachments: hasAttachments,
     emoji: emoji,
     active: active,
+    mentions: mentions,
   );
 
   QueuedMutation dependingOn(String key) => QueuedMutation(
@@ -56,6 +63,7 @@ class QueuedMutation {
     hasAttachments: hasAttachments,
     emoji: emoji,
     active: active,
+    mentions: mentions,
     after: key,
   );
 
@@ -69,6 +77,7 @@ class QueuedMutation {
     'emoji': emoji,
     'active': active,
     'after': after,
+    if (mentions.isNotEmpty) 'mentions': mentionJson(mentions),
   };
   factory QueuedMutation.fromJson(Map<String, dynamic> value) {
     final result = QueuedMutation(
@@ -81,11 +90,27 @@ class QueuedMutation {
       emoji: value['emoji'] as String,
       active: value['active'] as bool,
       after: value['after'] as String,
+      mentions: (value['mentions'] as List? ?? [])
+          .map((m) => CommunityMention()..mergeFromProto3Json(m))
+          .toList(),
     );
     result.validate();
     return result;
   }
   void validate() {
+    _validateTarget();
+    _validateMentions();
+    _validateReaction();
+  }
+
+  void _validateMentions() {
+    if (mentions.length > 10 ||
+        (kind != MutationKind.edit && mentions.isNotEmpty)) {
+      throw const FormatException('Недопустимые упоминания изменения');
+    }
+  }
+
+  void _validateTarget() {
     if (id.isEmpty ||
         id.length > 128 ||
         author.isEmpty ||
@@ -95,12 +120,17 @@ class QueuedMutation {
         after.length > 128) {
       throw const FormatException('Недопустимая цель изменения');
     }
-    if (kind == MutationKind.reaction) {
-      if (emoji.isEmpty || emoji.runes.length > 16 || emoji.length > 64) {
-        throw const FormatException('Недопустимая реакция');
+  }
+
+  void _validateReaction() {
+    if (kind != MutationKind.reaction) {
+      if (emoji.isNotEmpty || active) {
+        throw const FormatException('Неожиданная реакция');
       }
-    } else if (emoji.isNotEmpty || active) {
-      throw const FormatException('Неожиданная реакция');
+      return;
+    }
+    if (emoji.isEmpty || emoji.runes.length > 16 || emoji.length > 64) {
+      throw const FormatException('Недопустимая реакция');
     }
   }
 }

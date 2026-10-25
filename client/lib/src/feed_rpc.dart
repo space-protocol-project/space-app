@@ -1,8 +1,17 @@
 part of 'core.dart';
 
-class SessionFeedApi implements FeedApi, CommunitySearchSource, FeedReadApi {
+class SessionFeedApi
+    implements
+        FeedApi,
+        CommunityMentionSource,
+        CommunitySearchSource,
+        FeedReadApi {
   SessionFeedApi(this.session);
   final SpaceSession session;
+  late final _mentions = SessionCommunityMentionApi(session);
+  @override
+  CommunityMentionApi? get communityMentions =>
+      session.communityMentionsSupported ? _mentions : null;
   @override
   CommunitySearchApi? get communitySearch => session.communitySearchSupported
       ? SessionCommunitySearchApi(session)

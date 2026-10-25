@@ -989,5 +989,15 @@
   "dashboardCommunityEmpty": "暂无可用的主题或动态。",
   "dashboardAttentionUnknown": "部分分区尚未检查。",
   "dashboardAttachmentPost": "含附件的动态",
-  "dashboardCommunityOffline": "连接后将显示不可用空间的动态。"
+  "dashboardCommunityOffline": "连接后将显示不可用空间的动态。",
+  "communityMention": "提及成员",
+  "communityMentionQuery": "成员名称或 ID",
+  "communityMentionFailed": "无法加载成员。请检查访问权限并重试。",
+  "communityMentionEmpty": "未找到成员",
+  "dashboardMention": "有人提及您",
+  "dashboardFeedRepliesToYou": "您的动态有新回复",
+  "appearanceTheme": "主题",
+  "appearanceThemeSystem": "跟随系统",
+  "appearanceThemeLight": "浅色",
+  "appearanceThemeDark": "深色"
 }

@@ -1,3 +1,10 @@
+import 'dart:async';
+
+import 'generated/space/v1/community_mentions.pb.dart';
+import 'generated/space/v1/community_search.pb.dart';
+import 'community_mentions.dart';
+import 'community_mentions_api.dart';
+
 import 'dart:convert';
 
 import 'package:fixnum/fixnum.dart';
@@ -35,6 +42,32 @@ abstract class FeedState with _$FeedState {
 class FeedController extends Cubit<FeedState> {
   FeedController(this.api) : super(const FeedState());
   final FeedApi api;
+  late final mentionReads = MentionReadCubit.fromSource(api);
+  void markMentionsVisible(Set<int> sequences) {
+    final channel = state.section?.id;
+    final root = state.post;
+    if (channel == null || root == null || root.hidden) return;
+    final refs = <CommunityContentReference?>[
+      if (sequences.contains(0))
+        mentionedContent(
+          mentionReads.api,
+          root.mentions,
+          CommunitySearchKind.COMMUNITY_SEARCH_KIND_FEED_POST,
+          root.id,
+        ),
+      for (final child in state.comments.where(
+        (c) => !c.hidden && sequences.contains(c.sequence.toInt()),
+      ))
+        mentionedContent(
+          mentionReads.api,
+          child.mentions,
+          CommunitySearchKind.COMMUNITY_SEARCH_KIND_FEED_COMMENT,
+          child.id,
+        ),
+    ];
+    unawaited(mentionReads.visible(channel, refs.nonNulls.toList()));
+  }
+
   final _drafts = <String, FeedDraftCubit>{};
   bool _reading = false;
   String _failedRead = '';
@@ -58,6 +91,7 @@ class FeedController extends Cubit<FeedState> {
     if (state.loading || state.busy) return;
     final generation = ++_generation;
     _failedRead = '';
+    mentionReads.retry();
     final previous = state;
     emit(state.copyWith(loading: true, error: null));
     try {
@@ -196,6 +230,7 @@ class FeedController extends Cubit<FeedState> {
 
   Future<void> markRead() async {
     _failedRead = '';
+    mentionReads.retry();
     final visible = state.comments.where((comment) => !comment.hidden);
     await _markThrough(
       readHasGap ? 0 : visible.lastOrNull?.sequence.toInt() ?? 0,
@@ -232,6 +267,7 @@ class FeedController extends Cubit<FeedState> {
       );
       if (!_current(generation)) return;
       _failedRead = '';
+      mentionReads.retry();
       emit(
         state.copyWith(
           post: updated,
@@ -367,6 +403,7 @@ class FeedController extends Cubit<FeedState> {
 
   @override
   Future<void> close() async {
+    await mentionReads.close();
     ++_generation;
     for (final draft in _drafts.values) {
       await draft.close();
@@ -397,8 +434,11 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
   final String channel, post;
   final Future<void> Function() sent;
   final queue = AttachmentQueue();
+  final mentions = MentionDraftCubit();
   void change(String text) {
-    if (!state.busy && !isClosed) emit(state.copyWith(text: text));
+    if (state.busy || isClosed) return;
+    mentions.change(text);
+    emit(state.copyWith(text: text));
   }
 
   Future<bool> send() async {
@@ -413,6 +453,7 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
     }
     final payload = jsonEncode([
       text,
+      mentions.trimmed.map((m) => m.toProto3Json()).toList(),
       queue.state.files.map((f) => f.key).toList(),
     ]);
     final key = payload == state.payload ? state.key : newRequestKey();
@@ -423,6 +464,7 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
       await _submit(text, key, ids);
       if (isClosed) return false;
       queue.clear();
+      mentions.change('');
       emit(const FeedDraftState());
       await sent();
       return true;
@@ -433,6 +475,9 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
   }
 
   Future<void> _submit(String text, String key, List<String> ids) async {
+    if (mentions.trimmed.isNotEmpty && communityMentionsFor(api) == null) {
+      throw StateError('Упоминания недоступны');
+    }
     if (post.isEmpty) {
       await api.publish(
         CreateFeedPostRequest(
@@ -440,6 +485,7 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
           text: text,
           idempotencyKey: key,
           attachmentIds: ids,
+          mentions: mentions.trimmed,
         ),
       );
     } else {
@@ -450,6 +496,7 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
           text: text,
           idempotencyKey: key,
           attachmentIds: ids,
+          mentions: mentions.trimmed,
         ),
       );
     }
@@ -470,6 +517,7 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
   Future<void> close() async {
     queue.cancel();
     await queue.close();
+    await mentions.close();
     await super.close();
   }
 }

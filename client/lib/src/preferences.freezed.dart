@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PreferencesState {
 
- int get notificationMode; double get uiScale; bool get dark; bool get effects; String get palette; String get language; String get sendShortcut; String get error; List<String> get origins; Map<String, Map<String, dynamic>> get serverIcons; ThemeData? get theme;
+ int get notificationMode; double get uiScale; bool get dark; ThemeMode get themeMode; bool get effects; String get palette; String get language; String get sendShortcut; String get error; List<String> get origins; Map<String, Map<String, dynamic>> get serverIcons; ThemeData? get theme;
 /// Create a copy of PreferencesState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,7 +29,7 @@ $PreferencesStateCopyWith<PreferencesState> get copyWith => _$PreferencesStateCo
 @override
 String toString() {
   final _this = this as PreferencesState;
-  return 'PreferencesState(notificationMode: ${_this.notificationMode}, uiScale: ${_this.uiScale}, dark: ${_this.dark}, effects: ${_this.effects}, palette: ${_this.palette}, language: ${_this.language}, sendShortcut: ${_this.sendShortcut}, error: ${_this.error}, origins: ${_this.origins}, serverIcons: ${_this.serverIcons}, theme: ${_this.theme})';
+  return 'PreferencesState(notificationMode: ${_this.notificationMode}, uiScale: ${_this.uiScale}, dark: ${_this.dark}, themeMode: ${_this.themeMode}, effects: ${_this.effects}, palette: ${_this.palette}, language: ${_this.language}, sendShortcut: ${_this.sendShortcut}, error: ${_this.error}, origins: ${_this.origins}, serverIcons: ${_this.serverIcons}, theme: ${_this.theme})';
 }
 
 
@@ -40,7 +40,7 @@ abstract mixin class $PreferencesStateCopyWith<$Res>  {
   factory $PreferencesStateCopyWith(PreferencesState value, $Res Function(PreferencesState) _then) = _$PreferencesStateCopyWithImpl;
 @useResult
 $Res call({
- int notificationMode, double uiScale, bool dark, bool effects, String palette, String language, String sendShortcut, String error, List<String> origins, Map<String, Map<String, dynamic>> serverIcons, ThemeData? theme
+ int notificationMode, double uiScale, bool dark, ThemeMode themeMode, bool effects, String palette, String language, String sendShortcut, String error, List<String> origins, Map<String, Map<String, dynamic>> serverIcons, ThemeData? theme
 });
 
 
@@ -57,12 +57,13 @@ class _$PreferencesStateCopyWithImpl<$Res>
 
 /// Create a copy of PreferencesState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? notificationMode = null,Object? uiScale = null,Object? dark = null,Object? effects = null,Object? palette = null,Object? language = null,Object? sendShortcut = null,Object? error = null,Object? origins = null,Object? serverIcons = null,Object? theme = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? notificationMode = null,Object? uiScale = null,Object? dark = null,Object? themeMode = null,Object? effects = null,Object? palette = null,Object? language = null,Object? sendShortcut = null,Object? error = null,Object? origins = null,Object? serverIcons = null,Object? theme = freezed,}) {
   return _then(PreferencesState(
 notificationMode: null == notificationMode ? _self.notificationMode : notificationMode // ignore: cast_nullable_to_non_nullable
 as int,uiScale: null == uiScale ? _self.uiScale : uiScale // ignore: cast_nullable_to_non_nullable
 as double,dark: null == dark ? _self.dark : dark // ignore: cast_nullable_to_non_nullable
-as bool,effects: null == effects ? _self.effects : effects // ignore: cast_nullable_to_non_nullable
+as bool,themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
+as ThemeMode,effects: null == effects ? _self.effects : effects // ignore: cast_nullable_to_non_nullable
 as bool,palette: null == palette ? _self.palette : palette // ignore: cast_nullable_to_non_nullable
 as String,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
 as String,sendShortcut: null == sendShortcut ? _self.sendShortcut : sendShortcut // ignore: cast_nullable_to_non_nullable
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int notificationMode,  double uiScale,  bool dark,  bool effects,  String palette,  String language,  String sendShortcut,  String error,  List<String> origins,  Map<String, Map<String, dynamic>> serverIcons,  ThemeData? theme)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int notificationMode,  double uiScale,  bool dark,  ThemeMode themeMode,  bool effects,  String palette,  String language,  String sendShortcut,  String error,  List<String> origins,  Map<String, Map<String, dynamic>> serverIcons,  ThemeData? theme)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PreferencesState() when $default != null:
-return $default(_that.notificationMode,_that.uiScale,_that.dark,_that.effects,_that.palette,_that.language,_that.sendShortcut,_that.error,_that.origins,_that.serverIcons,_that.theme);case _:
+return $default(_that.notificationMode,_that.uiScale,_that.dark,_that.themeMode,_that.effects,_that.palette,_that.language,_that.sendShortcut,_that.error,_that.origins,_that.serverIcons,_that.theme);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.notificationMode,_that.uiScale,_that.dark,_that.effects,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int notificationMode,  double uiScale,  bool dark,  bool effects,  String palette,  String language,  String sendShortcut,  String error,  List<String> origins,  Map<String, Map<String, dynamic>> serverIcons,  ThemeData? theme)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int notificationMode,  double uiScale,  bool dark,  ThemeMode themeMode,  bool effects,  String palette,  String language,  String sendShortcut,  String error,  List<String> origins,  Map<String, Map<String, dynamic>> serverIcons,  ThemeData? theme)  $default,) {final _that = this;
 switch (_that) {
 case _PreferencesState():
-return $default(_that.notificationMode,_that.uiScale,_that.dark,_that.effects,_that.palette,_that.language,_that.sendShortcut,_that.error,_that.origins,_that.serverIcons,_that.theme);case _:
+return $default(_that.notificationMode,_that.uiScale,_that.dark,_that.themeMode,_that.effects,_that.palette,_that.language,_that.sendShortcut,_that.error,_that.origins,_that.serverIcons,_that.theme);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +197,10 @@ return $default(_that.notificationMode,_that.uiScale,_that.dark,_that.effects,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int notificationMode,  double uiScale,  bool dark,  bool effects,  String palette,  String language,  String sendShortcut,  String error,  List<String> origins,  Map<String, Map<String, dynamic>> serverIcons,  ThemeData? theme)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int notificationMode,  double uiScale,  bool dark,  ThemeMode themeMode,  bool effects,  String palette,  String language,  String sendShortcut,  String error,  List<String> origins,  Map<String, Map<String, dynamic>> serverIcons,  ThemeData? theme)?  $default,) {final _that = this;
 switch (_that) {
 case _PreferencesState() when $default != null:
-return $default(_that.notificationMode,_that.uiScale,_that.dark,_that.effects,_that.palette,_that.language,_that.sendShortcut,_that.error,_that.origins,_that.serverIcons,_that.theme);case _:
+return $default(_that.notificationMode,_that.uiScale,_that.dark,_that.themeMode,_that.effects,_that.palette,_that.language,_that.sendShortcut,_that.error,_that.origins,_that.serverIcons,_that.theme);case _:
   return null;
 
 }
@@ -211,12 +212,13 @@ return $default(_that.notificationMode,_that.uiScale,_that.dark,_that.effects,_t
 
 
 class _PreferencesState extends PreferencesState {
-  const _PreferencesState({this.notificationMode = 0, this.uiScale = 1, this.dark = true, this.effects = true, this.palette = 'gruvbox', this.language = 'ru', this.sendShortcut = 'enter', this.error = '',  List<String> origins = const [],  Map<String, Map<String, dynamic>> serverIcons = const {}, this.theme}): _origins = origins,_serverIcons = serverIcons,super._();
+  const _PreferencesState({this.notificationMode = 0, this.uiScale = 1, this.dark = true, this.themeMode = ThemeMode.dark, this.effects = true, this.palette = 'gruvbox', this.language = 'ru', this.sendShortcut = 'enter', this.error = '',  List<String> origins = const [],  Map<String, Map<String, dynamic>> serverIcons = const {}, this.theme}): _origins = origins,_serverIcons = serverIcons,super._();
   
 
 @override@JsonKey() final  int notificationMode;
 @override@JsonKey() final  double uiScale;
 @override@JsonKey() final  bool dark;
+@override@JsonKey() final  ThemeMode themeMode;
 @override@JsonKey() final  bool effects;
 @override@JsonKey() final  String palette;
 @override@JsonKey() final  String language;
@@ -250,7 +252,7 @@ _$PreferencesStateCopyWith<_PreferencesState> get copyWith => __$PreferencesStat
 
 @override
 String toString() {
-    return 'PreferencesState(notificationMode: $notificationMode, uiScale: $uiScale, dark: $dark, effects: $effects, palette: $palette, language: $language, sendShortcut: $sendShortcut, error: $error, origins: $origins, serverIcons: $serverIcons, theme: $theme)';
+    return 'PreferencesState(notificationMode: $notificationMode, uiScale: $uiScale, dark: $dark, themeMode: $themeMode, effects: $effects, palette: $palette, language: $language, sendShortcut: $sendShortcut, error: $error, origins: $origins, serverIcons: $serverIcons, theme: $theme)';
 }
 
 
@@ -261,7 +263,7 @@ abstract mixin class _$PreferencesStateCopyWith<$Res> implements $PreferencesSta
   factory _$PreferencesStateCopyWith(_PreferencesState value, $Res Function(_PreferencesState) _then) = __$PreferencesStateCopyWithImpl;
 @override @useResult
 $Res call({
- int notificationMode, double uiScale, bool dark, bool effects, String palette, String language, String sendShortcut, String error, List<String> origins, Map<String, Map<String, dynamic>> serverIcons, ThemeData? theme
+ int notificationMode, double uiScale, bool dark, ThemeMode themeMode, bool effects, String palette, String language, String sendShortcut, String error, List<String> origins, Map<String, Map<String, dynamic>> serverIcons, ThemeData? theme
 });
 
 
@@ -278,12 +280,13 @@ class __$PreferencesStateCopyWithImpl<$Res>
 
 /// Create a copy of PreferencesState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? notificationMode = null,Object? uiScale = null,Object? dark = null,Object? effects = null,Object? palette = null,Object? language = null,Object? sendShortcut = null,Object? error = null,Object? origins = null,Object? serverIcons = null,Object? theme = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? notificationMode = null,Object? uiScale = null,Object? dark = null,Object? themeMode = null,Object? effects = null,Object? palette = null,Object? language = null,Object? sendShortcut = null,Object? error = null,Object? origins = null,Object? serverIcons = null,Object? theme = freezed,}) {
   return _then(_PreferencesState(
 notificationMode: null == notificationMode ? _self.notificationMode : notificationMode // ignore: cast_nullable_to_non_nullable
 as int,uiScale: null == uiScale ? _self.uiScale : uiScale // ignore: cast_nullable_to_non_nullable
 as double,dark: null == dark ? _self.dark : dark // ignore: cast_nullable_to_non_nullable
-as bool,effects: null == effects ? _self.effects : effects // ignore: cast_nullable_to_non_nullable
+as bool,themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
+as ThemeMode,effects: null == effects ? _self.effects : effects // ignore: cast_nullable_to_non_nullable
 as bool,palette: null == palette ? _self.palette : palette // ignore: cast_nullable_to_non_nullable
 as String,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
 as String,sendShortcut: null == sendShortcut ? _self.sendShortcut : sendShortcut // ignore: cast_nullable_to_non_nullable

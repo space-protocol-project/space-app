@@ -2751,4 +2751,35 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dashboardCommunityOffline =>
       'Updates from unavailable spaces will appear after connecting.';
+
+  @override
+  String get communityMention => 'Mention a member';
+
+  @override
+  String get communityMentionQuery => 'Member name or ID';
+
+  @override
+  String get communityMentionFailed =>
+      'Could not load members. Check your access and try again.';
+
+  @override
+  String get communityMentionEmpty => 'No members found';
+
+  @override
+  String get dashboardMention => 'You were mentioned';
+
+  @override
+  String get dashboardFeedRepliesToYou => 'Replies to your post';
+
+  @override
+  String get appearanceTheme => 'Theme';
+
+  @override
+  String get appearanceThemeSystem => 'Automatic';
+
+  @override
+  String get appearanceThemeLight => 'Light';
+
+  @override
+  String get appearanceThemeDark => 'Dark';
 }

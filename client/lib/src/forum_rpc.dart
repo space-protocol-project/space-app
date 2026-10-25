@@ -3,13 +3,19 @@ part of 'core.dart';
 class SessionForumApi
     implements
         ForumApi,
+        ForumMentionWriter,
         ForumMedia,
         ForumNavigation,
         ForumModeration,
         ForumReports,
+        CommunityMentionSource,
         CommunitySearchSource {
   SessionForumApi(this.session);
   final SpaceSession session;
+  late final _mentions = SessionCommunityMentionApi(session);
+  @override
+  CommunityMentionApi? get communityMentions =>
+      session.communityMentionsSupported ? _mentions : null;
   @override
   CommunitySearchApi? get communitySearch => session.communitySearchSupported
       ? SessionCommunitySearchApi(session)
@@ -70,8 +76,12 @@ class SessionForumApi
     String text,
     String key, [
     List<String> attachments = const [],
+    List<mentions_pb.CommunityMention> mentions = const [],
   ]) async {
     _checkAttachments(attachments);
+    if (mentions.isNotEmpty && !session.communityMentionsSupported) {
+      throw const GrpcError.unimplemented();
+    }
     await session._ensureSession();
     final response = await session.channel.unary(
       forum_specs.ForumService.createForumThread,
@@ -81,6 +91,7 @@ class SessionForumApi
         text: text,
         idempotencyKey: key,
         attachmentIds: attachments,
+        mentions: mentions,
       ),
       options: session._options,
     );
@@ -94,8 +105,12 @@ class SessionForumApi
     String text,
     String key, [
     List<String> attachments = const [],
+    List<mentions_pb.CommunityMention> mentions = const [],
   ]) async {
     _checkAttachments(attachments);
+    if (mentions.isNotEmpty && !session.communityMentionsSupported) {
+      throw const GrpcError.unimplemented();
+    }
     await session._ensureSession();
     return session.channel.unary(
       forum_specs.ForumService.replyForumThread,
@@ -105,10 +120,30 @@ class SessionForumApi
         text: text,
         idempotencyKey: key,
         attachmentIds: attachments,
+        mentions: mentions,
       ),
       options: session._options,
     );
   }
+
+  @override
+  Future<forum.ForumThread> createMentioned(
+    String channel,
+    String title,
+    String text,
+    String key,
+    List<String> attachments,
+    List<mentions_pb.CommunityMention> mentions,
+  ) => create(channel, title, text, key, attachments, mentions);
+  @override
+  Future<forum.ReplyForumThreadResponse> replyMentioned(
+    String channel,
+    String parent,
+    String text,
+    String key,
+    List<String> attachments,
+    List<mentions_pb.CommunityMention> mentions,
+  ) => reply(channel, parent, text, key, attachments, mentions);
 
   @override
   Future<forum.ForumThread> closeTopic(

@@ -1,3 +1,5 @@
+import '../src/community_mentions.dart';
+import 'community_mentions.dart';
 import '../src/file_picker.dart';
 import 'message_input_surface.dart';
 import '../src/saved_drafts.dart';
@@ -88,6 +90,11 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   }
 
   final draft = TextEditingController();
+  final mentionDrafts = <String, MentionDraftCubit>{};
+  final editingMentions = MentionDraftCubit();
+  MentionDraftCubit get inputMentions => editing != null
+      ? editingMentions
+      : mentionDrafts.putIfAbsent(scope, MentionDraftCubit.new);
   Content? editing;
   final replyDrafts = <String, String>{};
   String get replyTo => replyDrafts[scope] ?? '';
@@ -150,23 +157,28 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   }
 
   void saveDraft() {
+    inputMentions.change(draft.text);
     if (editing != null || changingDraft) return;
     draftLoadGeneration++;
     drafts[scope] = draft.text;
-    SavedDrafts.save(scope, draft.text);
+    SavedDrafts.save(scope, draft.text, mentions: inputMentions.state.mentions);
   }
 
   Future<void> loadDraft(String requestedScope) async {
     final generation = draftLoadGeneration;
     try {
       final text = await SavedDrafts.load(requestedScope);
+      final mentions = await SavedDrafts.loadMentions(requestedScope, text);
       if (!mounted ||
           generation != draftLoadGeneration ||
           scope != requestedScope ||
           draft.text.isNotEmpty) {
         return;
       }
+      inputMentions.restore(text, mentions);
+      changingDraft = true;
       draft.text = text;
+      changingDraft = false;
     } catch (_) {
       // Ошибка хранилища не должна мешать набору нового сообщения.
     }
@@ -335,6 +347,10 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     for (final queue in queues.values) {
       unawaited(queue.close());
     }
+    unawaited(editingMentions.close());
+    for (final mentions in mentionDrafts.values) {
+      unawaited(mentions.close());
+    }
     draft.dispose();
     draftFocus.dispose();
     scroll.dispose();
@@ -353,13 +369,25 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     if (queue.state.busy || target.busy) return;
     final selected = queue.state.files.map((entry) => entry.file).toList();
     final replying = replyTo;
-    final sent = await target.send(text, files: selected, replyTo: replying);
+    final mentions = inputMentions.state.mentions;
+    final sent = await target.send(
+      text,
+      files: selected,
+      replyTo: replying,
+      mentions: mentions,
+    );
     if (sent && replyDrafts[startingScope] == replying) {
       replyDrafts.remove(startingScope);
     }
     if (sent) queue.clear();
     if (!mounted) return;
-    if (sent) _clearSentDraft(text, startingScope, target);
+    if (sent &&
+        sameMentions(
+          mentionDrafts[startingScope]?.state.mentions ?? [],
+          mentions,
+        )) {
+      _clearSentDraft(text, startingScope, target);
+    }
     if (restoreFocus) _restoreDraftFocus(startingScope, target);
   }
 
@@ -373,6 +401,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
         text: message.text,
         selection: TextSelection.collapsed(offset: message.text.length),
       );
+      editingMentions.restore(message.text, message.mentions);
       draggingFiles = false;
     });
     draftFocus.requestFocus();
@@ -395,7 +424,11 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
       setState(() => editError = context.strings.messageTextInvalid);
       return;
     }
-    final success = await controller.updateMessage(message, text);
+    final success = await controller.updateMessage(
+      message,
+      text,
+      mentions: inputMentions.state.mentions,
+    );
     if (!mounted ||
         !identical(editing, message) ||
         !identical(controller, widget.controller)) {
@@ -929,6 +962,16 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
             ),
           ),
         Flexible(child: _draftField(context)),
+        MentionButton(
+          key: ValueKey(('chat-mention', scope, editing?.id)),
+          api: widget.controller.chatMentions,
+          channel: widget.controller.channelId,
+          draft: inputMentions,
+          text: draft,
+          enabled: editing == null
+              ? widget.controller.canQueue
+              : widget.controller.canChangeMessage(editing!),
+        ),
         _composerButtons(context),
       ],
     ),
@@ -969,6 +1012,27 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     );
   }
 
+  Widget? _mentionBadge(BuildContext context, Content message) {
+    if (message.deleted || message.mentions.isEmpty) return null;
+    final mine = message.mentions.any(
+      (m) => m.principalId == widget.controller.principalId,
+    );
+    final labels = message.mentions
+        .map((m) => '@${m.displayName} (${m.principalId})')
+        .toSet()
+        .join('\n');
+    return Tooltip(
+      message: mine ? '${context.strings.dashboardMention}\n$labels' : labels,
+      child: Icon(
+        Icons.alternate_email,
+        size: 15,
+        color: mine
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+    );
+  }
+
   Widget _bubble(
     BuildContext context,
     Content message,
@@ -981,6 +1045,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
     return MessageBubble(
       key: messageKeys.putIfAbsent(message.id, GlobalKey.new),
       text: message.text,
+      mentionBadge: _mentionBadge(context, message),
       reply: message.replyToId.isEmpty ? null : replyPreview(message.replyToId),
       attachments: message.deleted || !controller.attachmentsEnabled
           ? null

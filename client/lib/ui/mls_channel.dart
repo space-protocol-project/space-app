@@ -1,3 +1,6 @@
+import '../src/community_mentions.dart';
+import '../src/community_mentions_api.dart';
+import 'community_mentions.dart';
 import 'message_input_surface.dart';
 import 'message_body_layout.dart';
 import 'message_footer.dart';
@@ -16,6 +19,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import '../src/file_picker.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -50,6 +54,7 @@ class MlsChannelView extends StatefulWidget {
 
 class _MlsChannelViewState extends State<MlsChannelView> {
   late final Future<MlsClient> future = widget.session.mlsClient();
+  late final mentionApi = SessionCommunityMentionApi(widget.session);
   @override
   Widget build(BuildContext context) => FutureBuilder<MlsClient>(
     future: future,
@@ -65,6 +70,7 @@ class _MlsChannelViewState extends State<MlsChannelView> {
       }
       return _MlsConversation(
         client: client,
+        mentionApi: widget.session.chatMentionsSupported ? mentionApi : null,
         channelId: widget.channelId,
         groupId: widget.groupId,
         attachmentsEnabled: widget.attachmentsEnabled,
@@ -80,6 +86,7 @@ class _MlsChannelViewState extends State<MlsChannelView> {
 class _MlsConversation extends StatefulWidget {
   const _MlsConversation({
     required this.client,
+    this.mentionApi,
     required this.channelId,
     required this.groupId,
     required this.attachmentsEnabled,
@@ -89,6 +96,7 @@ class _MlsConversation extends StatefulWidget {
     this.jumpGeneration = 0,
   });
   final MlsClient client;
+  final CommunityMentionApi? mentionApi;
   final String channelId;
   final List<int> groupId;
   final bool attachmentsEnabled, canWrite, active;
@@ -105,6 +113,7 @@ class _MlsConversationState extends State<_MlsConversation> {
     widget.groupId,
   );
   final draft = TextEditingController();
+  final mentions = MentionDraftCubit();
   final scroll = ScrollController();
   final messageKeys = <String, GlobalKey>{};
   int seenJump = -1;
@@ -163,6 +172,7 @@ class _MlsConversationState extends State<_MlsConversation> {
   @override
   void initState() {
     super.initState();
+    draft.addListener(() => mentions.change(draft.text));
     controller.add(MlsRefresh());
     timer = Timer.periodic(const Duration(seconds: 2), (_) {
       if (widget.active && !controller.working) controller.add(MlsRefresh());
@@ -184,6 +194,7 @@ class _MlsConversationState extends State<_MlsConversation> {
   void dispose() {
     timer?.cancel();
     unawaited(controller.close());
+    unawaited(mentions.close());
     draft.dispose();
     scroll.dispose();
     super.dispose();
@@ -559,6 +570,13 @@ class _MlsConversationState extends State<_MlsConversation> {
               enabled: _canSubmit(state),
               decoration: messageInputDecoration(context.strings.mlsInput),
             ),
+          ),
+          MentionButton(
+            api: widget.mentionApi,
+            channel: widget.channelId,
+            draft: mentions,
+            text: draft,
+            enabled: _canSubmit(state),
           ),
           Row(
             children: [

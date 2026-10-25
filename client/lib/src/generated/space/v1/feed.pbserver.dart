@@ -15,67 +15,67 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'feed.pb.dart' as $1;
+import 'feed.pb.dart' as $2;
 import 'feed.pbjson.dart';
 
 export 'feed.pb.dart';
 
 abstract class FeedServiceBase extends $pb.GeneratedService {
-  $async.Future<$1.ListFeedPostsResponse> listFeedPosts(
-      $pb.ServerContext ctx, $1.ListFeedPostsRequest request);
-  $async.Future<$1.GetFeedPostResponse> getFeedPost(
-      $pb.ServerContext ctx, $1.GetFeedPostRequest request);
-  $async.Future<$1.CreateFeedPostResponse> createFeedPost(
-      $pb.ServerContext ctx, $1.CreateFeedPostRequest request);
-  $async.Future<$1.CommentFeedPostResponse> commentFeedPost(
-      $pb.ServerContext ctx, $1.CommentFeedPostRequest request);
-  $async.Future<$1.GetFeedAccessResponse> getFeedAccess(
-      $pb.ServerContext ctx, $1.GetFeedAccessRequest request);
-  $async.Future<$1.UpdateFeedAccessResponse> updateFeedAccess(
-      $pb.ServerContext ctx, $1.UpdateFeedAccessRequest request);
-  $async.Future<$1.ModerateFeedPostResponse> moderateFeedPost(
-      $pb.ServerContext ctx, $1.ModerateFeedPostRequest request);
-  $async.Future<$1.ModerateFeedCommentResponse> moderateFeedComment(
-      $pb.ServerContext ctx, $1.ModerateFeedCommentRequest request);
-  $async.Future<$1.ListFeedModerationResponse> listFeedModeration(
-      $pb.ServerContext ctx, $1.ListFeedModerationRequest request);
-  $async.Future<$1.ReportFeedContentResponse> reportFeedContent(
-      $pb.ServerContext ctx, $1.ReportFeedContentRequest request);
-  $async.Future<$1.ListFeedReportsResponse> listFeedReports(
-      $pb.ServerContext ctx, $1.ListFeedReportsRequest request);
-  $async.Future<$1.ResolveFeedReportResponse> resolveFeedReport(
-      $pb.ServerContext ctx, $1.ResolveFeedReportRequest request);
-  $async.Future<$1.MarkFeedPostReadResponse> markFeedPostRead(
-      $pb.ServerContext ctx, $1.MarkFeedPostReadRequest request);
+  $async.Future<$2.ListFeedPostsResponse> listFeedPosts(
+      $pb.ServerContext ctx, $2.ListFeedPostsRequest request);
+  $async.Future<$2.GetFeedPostResponse> getFeedPost(
+      $pb.ServerContext ctx, $2.GetFeedPostRequest request);
+  $async.Future<$2.CreateFeedPostResponse> createFeedPost(
+      $pb.ServerContext ctx, $2.CreateFeedPostRequest request);
+  $async.Future<$2.CommentFeedPostResponse> commentFeedPost(
+      $pb.ServerContext ctx, $2.CommentFeedPostRequest request);
+  $async.Future<$2.GetFeedAccessResponse> getFeedAccess(
+      $pb.ServerContext ctx, $2.GetFeedAccessRequest request);
+  $async.Future<$2.UpdateFeedAccessResponse> updateFeedAccess(
+      $pb.ServerContext ctx, $2.UpdateFeedAccessRequest request);
+  $async.Future<$2.ModerateFeedPostResponse> moderateFeedPost(
+      $pb.ServerContext ctx, $2.ModerateFeedPostRequest request);
+  $async.Future<$2.ModerateFeedCommentResponse> moderateFeedComment(
+      $pb.ServerContext ctx, $2.ModerateFeedCommentRequest request);
+  $async.Future<$2.ListFeedModerationResponse> listFeedModeration(
+      $pb.ServerContext ctx, $2.ListFeedModerationRequest request);
+  $async.Future<$2.ReportFeedContentResponse> reportFeedContent(
+      $pb.ServerContext ctx, $2.ReportFeedContentRequest request);
+  $async.Future<$2.ListFeedReportsResponse> listFeedReports(
+      $pb.ServerContext ctx, $2.ListFeedReportsRequest request);
+  $async.Future<$2.ResolveFeedReportResponse> resolveFeedReport(
+      $pb.ServerContext ctx, $2.ResolveFeedReportRequest request);
+  $async.Future<$2.MarkFeedPostReadResponse> markFeedPostRead(
+      $pb.ServerContext ctx, $2.MarkFeedPostReadRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
       case 'ListFeedPosts':
-        return $1.ListFeedPostsRequest();
+        return $2.ListFeedPostsRequest();
       case 'GetFeedPost':
-        return $1.GetFeedPostRequest();
+        return $2.GetFeedPostRequest();
       case 'CreateFeedPost':
-        return $1.CreateFeedPostRequest();
+        return $2.CreateFeedPostRequest();
       case 'CommentFeedPost':
-        return $1.CommentFeedPostRequest();
+        return $2.CommentFeedPostRequest();
       case 'GetFeedAccess':
-        return $1.GetFeedAccessRequest();
+        return $2.GetFeedAccessRequest();
       case 'UpdateFeedAccess':
-        return $1.UpdateFeedAccessRequest();
+        return $2.UpdateFeedAccessRequest();
       case 'ModerateFeedPost':
-        return $1.ModerateFeedPostRequest();
+        return $2.ModerateFeedPostRequest();
       case 'ModerateFeedComment':
-        return $1.ModerateFeedCommentRequest();
+        return $2.ModerateFeedCommentRequest();
       case 'ListFeedModeration':
-        return $1.ListFeedModerationRequest();
+        return $2.ListFeedModerationRequest();
       case 'ReportFeedContent':
-        return $1.ReportFeedContentRequest();
+        return $2.ReportFeedContentRequest();
       case 'ListFeedReports':
-        return $1.ListFeedReportsRequest();
+        return $2.ListFeedReportsRequest();
       case 'ResolveFeedReport':
-        return $1.ResolveFeedReportRequest();
+        return $2.ResolveFeedReportRequest();
       case 'MarkFeedPostRead':
-        return $1.MarkFeedPostReadRequest();
+        return $2.MarkFeedPostReadRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -85,32 +85,32 @@ abstract class FeedServiceBase extends $pb.GeneratedService {
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
       case 'ListFeedPosts':
-        return listFeedPosts(ctx, request as $1.ListFeedPostsRequest);
+        return listFeedPosts(ctx, request as $2.ListFeedPostsRequest);
       case 'GetFeedPost':
-        return getFeedPost(ctx, request as $1.GetFeedPostRequest);
+        return getFeedPost(ctx, request as $2.GetFeedPostRequest);
       case 'CreateFeedPost':
-        return createFeedPost(ctx, request as $1.CreateFeedPostRequest);
+        return createFeedPost(ctx, request as $2.CreateFeedPostRequest);
       case 'CommentFeedPost':
-        return commentFeedPost(ctx, request as $1.CommentFeedPostRequest);
+        return commentFeedPost(ctx, request as $2.CommentFeedPostRequest);
       case 'GetFeedAccess':
-        return getFeedAccess(ctx, request as $1.GetFeedAccessRequest);
+        return getFeedAccess(ctx, request as $2.GetFeedAccessRequest);
       case 'UpdateFeedAccess':
-        return updateFeedAccess(ctx, request as $1.UpdateFeedAccessRequest);
+        return updateFeedAccess(ctx, request as $2.UpdateFeedAccessRequest);
       case 'ModerateFeedPost':
-        return moderateFeedPost(ctx, request as $1.ModerateFeedPostRequest);
+        return moderateFeedPost(ctx, request as $2.ModerateFeedPostRequest);
       case 'ModerateFeedComment':
         return moderateFeedComment(
-            ctx, request as $1.ModerateFeedCommentRequest);
+            ctx, request as $2.ModerateFeedCommentRequest);
       case 'ListFeedModeration':
-        return listFeedModeration(ctx, request as $1.ListFeedModerationRequest);
+        return listFeedModeration(ctx, request as $2.ListFeedModerationRequest);
       case 'ReportFeedContent':
-        return reportFeedContent(ctx, request as $1.ReportFeedContentRequest);
+        return reportFeedContent(ctx, request as $2.ReportFeedContentRequest);
       case 'ListFeedReports':
-        return listFeedReports(ctx, request as $1.ListFeedReportsRequest);
+        return listFeedReports(ctx, request as $2.ListFeedReportsRequest);
       case 'ResolveFeedReport':
-        return resolveFeedReport(ctx, request as $1.ResolveFeedReportRequest);
+        return resolveFeedReport(ctx, request as $2.ResolveFeedReportRequest);
       case 'MarkFeedPostRead':
-        return markFeedPostRead(ctx, request as $1.MarkFeedPostReadRequest);
+        return markFeedPostRead(ctx, request as $2.MarkFeedPostReadRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }

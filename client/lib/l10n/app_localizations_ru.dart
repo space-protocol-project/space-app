@@ -2767,4 +2767,35 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get dashboardCommunityOffline =>
       'Данные недоступных пространств появятся после подключения.';
+
+  @override
+  String get communityMention => 'Упомянуть участника';
+
+  @override
+  String get communityMentionQuery => 'Имя или ID участника';
+
+  @override
+  String get communityMentionFailed =>
+      'Не удалось получить участников. Проверьте доступ и повторите поиск.';
+
+  @override
+  String get communityMentionEmpty => 'Участники не найдены';
+
+  @override
+  String get dashboardMention => 'Вас упомянули';
+
+  @override
+  String get dashboardFeedRepliesToYou => 'Ответы на вашу публикацию';
+
+  @override
+  String get appearanceTheme => 'Тема';
+
+  @override
+  String get appearanceThemeSystem => 'Автоматическая';
+
+  @override
+  String get appearanceThemeLight => 'Светлая';
+
+  @override
+  String get appearanceThemeDark => 'Тёмная';
 }

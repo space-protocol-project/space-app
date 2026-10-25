@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'secure_vault.dart';
+import 'mention_data.dart';
+import 'generated/space/v1/community_mentions.pb.dart';
 
 // Черновики сохраняются защищённо, а записи выполняются последовательно.
 class SavedDrafts {
@@ -21,17 +23,35 @@ class SavedDrafts {
   static Future<String> load(String scope) async {
     await _tail;
     final drafts = await _read();
-    return drafts[scope] as String? ?? '';
+    final value = drafts[scope];
+    return value is Map ? value['text'] as String : value as String? ?? '';
   }
 
-  static void save(String scope, String text) {
+  static Future<List<CommunityMention>> loadMentions(
+    String scope,
+    String text,
+  ) async {
+    await _tail;
+    final value = (await _read())[scope];
+    if (value is! Map || value['text'] != text) return [];
+    return readMentions(value['mentions'], text);
+  }
+
+  static void save(
+    String scope,
+    String text, {
+    List<CommunityMention> mentions = const [],
+  }) {
+    final encodedMentions = mentionJson(mentions);
     _tail = _tail.then((_) async {
       try {
         final drafts = await _read();
         if (text.isEmpty) {
           drafts.remove(scope);
         } else {
-          drafts[scope] = text;
+          drafts[scope] = mentions.isEmpty
+              ? text
+              : {'text': text, 'mentions': encodedMentions};
         }
         final encoded = jsonEncode(drafts);
         if (encoded.length > 4 * 1024 * 1024) {

@@ -21,17 +21,28 @@ class SpaceApp extends StatefulWidget {
   State<SpaceApp> createState() => _SpaceAppState();
 }
 
-class _SpaceAppState extends State<SpaceApp> {
+class _SpaceAppState extends State<SpaceApp> with WidgetsBindingObserver {
   final preferences = AppPreferences();
   late final Future<void> startupReady;
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     startupReady = preferences.load();
   }
 
   @override
+  void didChangePlatformBrightness() {
+    unawaited(
+      preferences.updateSystemBrightness(
+        WidgetsBinding.instance.platformDispatcher.platformBrightness,
+      ),
+    );
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     preferences.dispose();
     super.dispose();
   }

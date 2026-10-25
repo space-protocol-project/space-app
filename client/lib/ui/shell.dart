@@ -1,3 +1,4 @@
+import 'theme_mode_picker.dart';
 import '../src/generated/space/v1/space.pb.dart' show Channel, Content;
 import 'mls_channel.dart';
 import '../src/message_summary.dart';
@@ -410,7 +411,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
       applicationSettings = false;
       devicePage = false;
       serverList = false;
-      selected = Section.chat;
+      selected = channel == null ? Section.overview : Section.chat;
     });
     closeNavigation();
     await workspaces.reconnect(origin);
@@ -1330,7 +1331,6 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
           ),
           const SizedBox(height: 16),
           for (final section in [
-            Section.overview,
             Section.chat,
             Section.rooms,
             Section.forum,
@@ -1420,8 +1420,6 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             onTap: showServers,
           ),
           if (controller.preview != null || controller.connected)
-            _sidebarSection(Section.overview),
-          if (controller.preview != null || controller.connected)
             _sidebarSection(Section.chat),
           _sidebarSection(Section.rooms),
           _sidebarSection(Section.forum),
@@ -1439,11 +1437,11 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             title: Text(context.strings.appSettings),
             onTap: showApplicationSettings,
           ),
-          SwitchListTile(
-            title: Text(context.strings.darkTheme),
-            value: widget.preferences.dark,
-            onChanged: (value) => widget.preferences.change(dark: value),
+          ThemeModePicker(
+            preferences: widget.preferences,
+            mode: widget.preferences.state.themeMode,
           ),
+          const SizedBox(height: 16),
         ],
       ),
     ),
@@ -1802,6 +1800,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             key: ValueKey((controller.mlsSession, communityNavigationRequest)),
             sectionId: _feedDashboardTarget?.channel,
             initialPost: _feedDashboardTarget?.id ?? '',
+            initialReplySequence: _feedDashboardTarget?.replySequence ?? 0,
             showReports:
                 _feedDashboardTarget?.destination ==
                 DashboardDestination.feedReports,
@@ -1849,6 +1848,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     if (applicationSettings) return context.strings.appSettings;
     if (dashboard) return context.strings.dashboard;
     if (selected == Section.chat) return chatLabel;
+    if (selected == Section.overview) return spaceLabel;
     return selected.localized(context);
   }
 

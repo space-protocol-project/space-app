@@ -16,6 +16,7 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import 'community_mentions.pb.dart' as $1;
 import 'space.pb.dart' as $0;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
@@ -107,6 +108,7 @@ class FeedPost extends $pb.GeneratedMessage {
     $core.bool? seen,
     $fixnum.Int64? readSequence,
     $fixnum.Int64? unreadCount,
+    $core.Iterable<$1.CommunityMention>? mentions,
   }) {
     final result = FeedPost._();
     if (id != null) result.id = id;
@@ -125,6 +127,7 @@ class FeedPost extends $pb.GeneratedMessage {
     if (seen != null) result.seen = seen;
     if (readSequence != null) result.readSequence = readSequence;
     if (unreadCount != null) result.unreadCount = unreadCount;
+    if (mentions != null) result.mentions.addAll(mentions);
     return result;
   }
 
@@ -157,6 +160,8 @@ class FeedPost extends $pb.GeneratedMessage {
     ..aOB(13, _omitFieldNames ? '' : 'seen')
     ..aInt64(14, _omitFieldNames ? '' : 'readSequence')
     ..aInt64(15, _omitFieldNames ? '' : 'unreadCount')
+    ..pPM<$1.CommunityMention>(16, _omitFieldNames ? '' : 'mentions',
+        subBuilder: $1.CommunityMention.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -309,6 +314,9 @@ class FeedPost extends $pb.GeneratedMessage {
   $core.bool hasUnreadCount() => $_has(14);
   @$pb.TagNumber(15)
   void clearUnreadCount() => $_clearField(15);
+
+  @$pb.TagNumber(16)
+  $pb.PbList<$1.CommunityMention> get mentions => $_getList(15);
 }
 
 class MarkFeedPostReadRequest extends $pb.GeneratedMessage {
@@ -471,6 +479,7 @@ class FeedComment extends $pb.GeneratedMessage {
     $fixnum.Int64? revision,
     $core.Iterable<$0.Asset>? attachments,
     $core.bool? hidden,
+    $core.Iterable<$1.CommunityMention>? mentions,
   }) {
     final result = FeedComment._();
     if (id != null) result.id = id;
@@ -483,6 +492,7 @@ class FeedComment extends $pb.GeneratedMessage {
     if (revision != null) result.revision = revision;
     if (attachments != null) result.attachments.addAll(attachments);
     if (hidden != null) result.hidden = hidden;
+    if (mentions != null) result.mentions.addAll(mentions);
     return result;
   }
 
@@ -510,6 +520,8 @@ class FeedComment extends $pb.GeneratedMessage {
     ..pPM<$0.Asset>(9, _omitFieldNames ? '' : 'attachments',
         subBuilder: $0.Asset.$_createMessage)
     ..aOB(10, _omitFieldNames ? '' : 'hidden')
+    ..pPM<$1.CommunityMention>(11, _omitFieldNames ? '' : 'mentions',
+        subBuilder: $1.CommunityMention.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -617,6 +629,9 @@ class FeedComment extends $pb.GeneratedMessage {
   $core.bool hasHidden() => $_has(9);
   @$pb.TagNumber(10)
   void clearHidden() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $pb.PbList<$1.CommunityMention> get mentions => $_getList(10);
 }
 
 /// sequence DESC; before=0 начинает список, next=0 означает конец.
@@ -981,12 +996,14 @@ class CreateFeedPostRequest extends $pb.GeneratedMessage {
     $core.String? text,
     $core.String? idempotencyKey,
     $core.Iterable<$core.String>? attachmentIds,
+    $core.Iterable<$1.CommunityMention>? mentions,
   }) {
     final result = CreateFeedPostRequest._();
     if (channelId != null) result.channelId = channelId;
     if (text != null) result.text = text;
     if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
     if (attachmentIds != null) result.attachmentIds.addAll(attachmentIds);
+    if (mentions != null) result.mentions.addAll(mentions);
     return result;
   }
 
@@ -1007,6 +1024,8 @@ class CreateFeedPostRequest extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'text')
     ..aOS(3, _omitFieldNames ? '' : 'idempotencyKey')
     ..pPS(4, _omitFieldNames ? '' : 'attachmentIds')
+    ..pPM<$1.CommunityMention>(5, _omitFieldNames ? '' : 'mentions',
+        subBuilder: $1.CommunityMention.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1062,6 +1081,9 @@ class CreateFeedPostRequest extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(4)
   $pb.PbList<$core.String> get attachmentIds => $_getList(3);
+
+  @$pb.TagNumber(5)
+  $pb.PbList<$1.CommunityMention> get mentions => $_getList(4);
 }
 
 class CreateFeedPostResponse extends $pb.GeneratedMessage {
@@ -1133,6 +1155,7 @@ class CommentFeedPostRequest extends $pb.GeneratedMessage {
     $core.String? text,
     $core.String? idempotencyKey,
     $core.Iterable<$core.String>? attachmentIds,
+    $core.Iterable<$1.CommunityMention>? mentions,
   }) {
     final result = CommentFeedPostRequest._();
     if (channelId != null) result.channelId = channelId;
@@ -1140,6 +1163,7 @@ class CommentFeedPostRequest extends $pb.GeneratedMessage {
     if (text != null) result.text = text;
     if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
     if (attachmentIds != null) result.attachmentIds.addAll(attachmentIds);
+    if (mentions != null) result.mentions.addAll(mentions);
     return result;
   }
 
@@ -1161,6 +1185,8 @@ class CommentFeedPostRequest extends $pb.GeneratedMessage {
     ..aOS(3, _omitFieldNames ? '' : 'text')
     ..aOS(4, _omitFieldNames ? '' : 'idempotencyKey')
     ..pPS(5, _omitFieldNames ? '' : 'attachmentIds')
+    ..pPM<$1.CommunityMention>(6, _omitFieldNames ? '' : 'mentions',
+        subBuilder: $1.CommunityMention.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1225,6 +1251,9 @@ class CommentFeedPostRequest extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(5)
   $pb.PbList<$core.String> get attachmentIds => $_getList(4);
+
+  @$pb.TagNumber(6)
+  $pb.PbList<$1.CommunityMention> get mentions => $_getList(5);
 }
 
 class CommentFeedPostResponse extends $pb.GeneratedMessage {

@@ -8,6 +8,8 @@ import 'secure_vault.dart';
 import 'outbox_lock.dart';
 import 'queued_file.dart';
 import 'queued_mutation.dart';
+import 'mention_data.dart';
+import 'generated/space/v1/community_mentions.pb.dart';
 
 part 'chat_outbox_sources.dart';
 
@@ -40,6 +42,7 @@ class PendingMessage {
     List<String> attachments = const [],
     List<QueuedFile> localFiles = const [],
     List<String> uploadedFiles = const [],
+    this.mentions = const [],
     this.blocked = false,
     this.mutation,
     this.replyTo = '',
@@ -47,6 +50,7 @@ class PendingMessage {
        localFiles = List.unmodifiable(localFiles),
        uploadedFiles = List.unmodifiable(uploadedFiles);
   final String key, channelId, text, replyTo;
+  final List<CommunityMention> mentions;
   final int createdAt;
   final List<String> attachments;
   final List<QueuedFile> localFiles;
@@ -66,6 +70,7 @@ class PendingMessage {
     blocked: value,
     mutation: mutation,
     replyTo: replyTo,
+    mentions: mentions,
   );
 
   PendingMessage withFiles(List<QueuedFile> files) => PendingMessage(
@@ -79,6 +84,7 @@ class PendingMessage {
     blocked: blocked,
     mutation: mutation,
     replyTo: replyTo,
+    mentions: mentions,
   );
 
   PendingMessage withUploaded(List<String> ids) => PendingMessage(
@@ -92,6 +98,7 @@ class PendingMessage {
     blocked: blocked,
     mutation: mutation,
     replyTo: replyTo,
+    mentions: mentions,
   );
 
   PendingMessage withMutation(QueuedMutation value, {bool? blocked}) =>
@@ -109,6 +116,7 @@ class PendingMessage {
     'channel': channelId,
     'text': text,
     'created': createdAt,
+    if (mentions.isNotEmpty) 'mentions': mentionJson(mentions),
     'attachments': attachments,
     'files': localFiles.map((file) => file.toJson()).toList(),
     'uploaded': uploadedFiles,
@@ -122,6 +130,7 @@ class PendingMessage {
       key: value['key'] as String,
       channelId: value['channel'] as String,
       text: value['text'] as String,
+      mentions: readMentions(value['mentions'], value['text'] as String),
       createdAt: value['created'] as int,
       attachments: (value['attachments'] as List).cast<String>(),
       localFiles: (value['files'] as List? ?? [])
@@ -144,6 +153,10 @@ class PendingMessage {
   }
 
   void validate() {
+    if (mentions.length > 10 ||
+        validMentions(text, mentions).length != mentions.length) {
+      throw const FormatException('Некорректные упоминания очереди');
+    }
     if (key.isEmpty ||
         key.length > 128 ||
         channelId.isEmpty ||
@@ -168,6 +181,12 @@ class PendingMessage {
   void _validateMutation() {
     final change = mutation!;
     change.validate();
+    readMentions(mentionJson(change.mentions), text);
+    if (mentions.isNotEmpty) {
+      throw const FormatException(
+        'Упоминания изменения должны находиться в операции',
+      );
+    }
     if (attachments.isNotEmpty ||
         localFiles.isNotEmpty ||
         uploadedFiles.isNotEmpty ||

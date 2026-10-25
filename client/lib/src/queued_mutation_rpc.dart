@@ -7,6 +7,9 @@ extension _QueuedMutationRpc on SpaceSession {
     String text,
     QueuedMutation change,
   ) async {
+    if (change.mentions.isNotEmpty && !chatMentionsSupported) {
+      throw const GrpcError.unimplemented();
+    }
     final revision = Int64(change.revision);
     final request = switch (change.kind) {
       MutationKind.edit => ApplyContentMutationRequest(
@@ -14,6 +17,7 @@ extension _QueuedMutationRpc on SpaceSession {
           channelId: channelId,
           id: change.id,
           text: text,
+          mentions: change.mentions,
           expectedRevision: revision,
           idempotencyKey: key,
         ),

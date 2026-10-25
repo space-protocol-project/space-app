@@ -10,6 +10,7 @@ extension _ChatOutboxMutations on ChatController {
     Content message,
     MutationKind kind, {
     String text = '',
+    List<CommunityMention> mentions = const [],
     String emoji = '',
     bool active = false,
   }) async {
@@ -29,6 +30,7 @@ extension _ChatOutboxMutations on ChatController {
     final change = QueuedMutation.forMessage(
       message,
       kind,
+      mentions: mentions,
       emoji: emoji,
       active: active,
     );

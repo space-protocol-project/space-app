@@ -1,3 +1,4 @@
+import 'mention_data.dart';
 import 'chat_outbox.dart';
 import 'generated/space/v1/space.pb.dart';
 import 'queued_mutation.dart';
@@ -31,9 +32,13 @@ void _projectChange(Content message, PendingMessage entry, String principal) {
   switch (change.kind) {
     case MutationKind.edit:
       message.text = entry.text;
+      message.mentions
+        ..clear()
+        ..addAll(change.mentions);
     case MutationKind.delete:
       message.deleted = true;
       message.text = '';
+      message.mentions.clear();
       message.attachments.clear();
       message.reactions.clear();
     case MutationKind.reaction:
@@ -96,7 +101,10 @@ void checkMutationReceipt(
 bool _matchesChange(Content content, PendingMessage entry, String principal) {
   final change = entry.mutation!;
   return switch (change.kind) {
-    MutationKind.edit => !content.deleted && content.text == entry.text,
+    MutationKind.edit =>
+      !content.deleted &&
+          content.text == entry.text &&
+          sameMentions(content.mentions, change.mentions),
     MutationKind.delete =>
       content.deleted &&
           content.text.isEmpty &&

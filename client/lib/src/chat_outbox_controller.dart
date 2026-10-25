@@ -116,6 +116,7 @@ extension _ChatOutboxController on ChatController {
     List<String> attachments,
     List<SpaceFile> files,
     String replyTo,
+    List<CommunityMention> mentions,
   ) async {
     final scope = _outboxScope;
     if (!canQueue || scope == null) return false;
@@ -129,6 +130,7 @@ extension _ChatOutboxController on ChatController {
       text,
       attachments,
       replyTo,
+      mentionJson(mentions),
       files.map((f) => [f.path, f.name]).toList(),
     ]);
     if (_pendingText != request || _pendingKey.isEmpty) {
@@ -142,6 +144,7 @@ extension _ChatOutboxController on ChatController {
       attachments: attachments,
       createdAt: now().millisecondsSinceEpoch,
       replyTo: replyTo,
+      mentions: mentions,
     );
     return _persistMessage(scope, entry, files: files);
   }
@@ -240,6 +243,17 @@ extension _ChatOutboxController on ChatController {
   }
 
   Future<Content> _sendPending(LiveSession session, PendingMessage entry) {
+    if (entry.mentions.isNotEmpty) {
+      if (session is! ChatMentionWriter) throw const GrpcError.unimplemented();
+      return (session as ChatMentionWriter).sendMentioned(
+        entry.channelId,
+        entry.text,
+        entry.key,
+        entry.attachmentIds,
+        entry.replyTo,
+        entry.mentions,
+      );
+    }
     if (entry.replyTo.isNotEmpty) {
       _requireReplySupport(session, entry);
       return (session as ReplyMessageSession).sendReplyQueued(
@@ -370,6 +384,7 @@ extension _ChatOutboxController on ChatController {
     }
     if (content.revision == 1 &&
         (content.text != entry.text ||
+            !sameMentions(content.mentions, entry.mentions) ||
             !listEquals(
               content.attachments.map((asset) => asset.id).toList(),
               entry.attachmentIds,

@@ -129,6 +129,7 @@ class DashboardHighlightsState extends State<DashboardHighlights>
     final rows = <Widget>[
       ..._connectionRows(),
       ..._reportRows(state),
+      ..._mentionRows(state),
       ..._replyRows(state),
       ..._chatRows(),
     ];
@@ -225,15 +226,35 @@ class DashboardHighlightsState extends State<DashboardHighlights>
       )
       .toList();
 
+  List<Widget> _mentionRows(DashboardState state) => [
+    for (final section in state.communities)
+      for (final entry in section.overview.mentions)
+        _row(
+          key: 'dashboard-mention-${section.origin}-${entry.content.id}',
+          icon: Icons.alternate_email,
+          title: entry.content.snippet,
+          subtitle:
+              '${context.strings.dashboardMention} · ${_sectionName(section)}',
+          tap: () => widget.openCommunity(
+            section.target(
+              id: entry.content.parentId,
+              replySequence: entry.content.sequence.toInt(),
+            ),
+          ),
+        ),
+  ];
+
   List<Widget> _replyRows(DashboardState state) => [
     for (final section in state.communities)
       for (final entry in section.overview.repliesToYou)
         _row(
           key: 'dashboard-reply-${section.origin}-${entry.content.id}',
           icon: Icons.reply_outlined,
-          title: entry.content.title,
+          title: entry.content.title.isEmpty
+              ? entry.content.snippet
+              : entry.content.title,
           subtitle:
-              '${context.strings.dashboardRepliesToYou} · ${_sectionName(section)}',
+              '${section.forum ? context.strings.dashboardRepliesToYou : context.strings.dashboardFeedRepliesToYou} · ${_sectionName(section)}',
           count: entry.unreadRepliesToYou.toInt(),
           tap: () => widget.openCommunity(
             section.target(

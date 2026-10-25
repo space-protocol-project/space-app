@@ -1,6 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import '../src/community_mentions.dart';
+import '../src/community_mentions_api.dart';
+import '../src/generated/space/v1/community_mentions.pb.dart';
+import 'community_mentions.dart';
+
 import 'package:flutter/material.dart';
 
 import '../l10n/strings.dart';
@@ -14,6 +19,9 @@ class ForumComposer extends StatefulWidget {
   const ForumComposer({
     super.key,
     required this.submit,
+    this.mentionApi,
+    this.parentId = '',
+    this.submitMentioned,
     this.newTopic = false,
     this.disabled = false,
     this.session,
@@ -28,6 +36,16 @@ class ForumComposer extends StatefulWidget {
     List<String> attachments,
   )
   submit;
+  final CommunityMentionApi? mentionApi;
+  final String parentId;
+  final Future<bool> Function(
+    String,
+    String,
+    String,
+    List<String>,
+    List<CommunityMention>,
+  )?
+  submitMentioned;
   final bool newTopic, disabled, attachmentsEnabled, sendWithShift;
   final AttachmentSession? session;
   final String channelId;
@@ -38,10 +56,18 @@ class ForumComposer extends StatefulWidget {
 class _ForumComposerState extends State<ForumComposer> {
   final title = TextEditingController(), text = TextEditingController();
   final queue = AttachmentQueue();
+  final mentions = MentionDraftCubit();
+  @override
+  void initState() {
+    super.initState();
+    text.addListener(() => mentions.change(text.text));
+  }
+
   String? requestKey, requestPayload;
   bool busy = false, invalid = false, failed = false;
   @override
   void dispose() {
+    unawaited(mentions.close());
     title.dispose();
     text.dispose();
     queue.cancel();
@@ -61,6 +87,7 @@ class _ForumComposerState extends State<ForumComposer> {
 
   Future<bool> submit() async {
     final payload = jsonEncode([
+      mentions.trimmed.map((m) => m.toProto3Json()).toList(),
       title.text,
       text.text,
       queue.state.files.map((f) => f.key).toList(),
@@ -76,6 +103,17 @@ class _ForumComposerState extends State<ForumComposer> {
       final uploaded = await queue.upload(session, widget.channelId);
       if (uploaded == null || !mounted) return false;
       ids = uploaded;
+    }
+    final submitMentioned = widget.submitMentioned;
+    if (mentions.trimmed.isNotEmpty && submitMentioned == null) return false;
+    if (submitMentioned != null) {
+      return submitMentioned(
+        title.text.trim(),
+        text.text.trim(),
+        requestKey!,
+        ids,
+        mentions.trimmed,
+      );
     }
     return widget.submit(title.text.trim(), text.text.trim(), requestKey!, ids);
   }
@@ -145,6 +183,14 @@ class _ForumComposerState extends State<ForumComposer> {
                 enabled: enabled,
                 hint: context.strings.messageHint,
               ),
+            ),
+            MentionButton(
+              api: widget.mentionApi,
+              channel: widget.channelId,
+              parent: widget.parentId,
+              draft: mentions,
+              text: text,
+              enabled: enabled,
             ),
             MessageComposerActions(
               controller: text,

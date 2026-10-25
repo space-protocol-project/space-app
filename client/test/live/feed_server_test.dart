@@ -7,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:grpc/grpc.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/generated/space/v1/feed.pb.dart';
+import 'package:space_client/src/generated/space/v1/community_mentions.pb.dart';
+import 'package:space_client/src/generated/space/v1/community_search.pb.dart';
 import 'package:space_client/src/generated/space/v1/space.pb.dart' as sp;
 
 class _Vault implements IdentityVault {
@@ -135,7 +137,8 @@ Future<void> _verifyCommunityDiscovery(
     summary.recent.map((entry) => entry.content.id),
     visible ? [post] : isEmpty,
   );
-  expect(summary.repliesToYou, isEmpty);
+  expect(summary.repliesToYou, visible ? hasLength(1) : isEmpty);
+  expect(summary.mentions, visible ? hasLength(1) : isEmpty);
   for (final entry in summary.recent) {
     expect(entry.readStateSupported, true);
     expect(entry.unreadCount, Int64(2));
@@ -164,6 +167,38 @@ Future<void> _verifyFeedRead(SpaceSession session, String post) async {
   expect(summary.recent.single.unreadCount, Int64.ZERO);
   final delayed = await api.markRead('feed', post, Int64.ZERO);
   expect(delayed.readSequence, detail.comments.single.sequence);
+}
+
+Future<void> _verifyMentionRead(SpaceSession session, String post) async {
+  expect(session.communityMentionsSupported, true);
+  final overview = await session.communityOverview.overview('feed');
+  expect(overview.mentions, hasLength(1));
+  final content = overview.mentions.single.content;
+  expect(content.parentId, post);
+  expect(content.kind, CommunitySearchKind.COMMUNITY_SEARCH_KIND_FEED_COMMENT);
+  final api = SessionCommunityMentionApi(session);
+  await api.markRead('feed', [
+    CommunityContentReference(kind: content.kind, id: content.id),
+  ]);
+  expect((await session.communityOverview.overview('feed')).mentions, isEmpty);
+}
+
+Future<void> _verifyChatMentions(SpaceSession owner,SpaceSession member) async {
+  await owner.adminRequest('/api/v1/channels',method:'POST',body:{'channelId':'mention-chat','title':'Упоминания CI','viewType':'chat'});
+  await owner.refreshChannels();await member.refreshChannels();
+  expect(owner.chatMentionsSupported,true);
+  final target=(await SessionCommunityMentionApi(owner).candidates('mention-chat','',member.principalId)).single;
+  final label='@${target.displayName}';
+  final mentions=[CommunityMention(principalId:target.principalId,displayName:target.displayName,start:0,length:label.length)];
+  final created=await owner.sendMentioned('mention-chat','$label привет','chat-mention-ci',[],'',mentions);
+  expect((await owner.sendMentioned('mention-chat','$label привет','chat-mention-ci',[],'',mentions)).id,created.id);
+  member.selectChannel('mention-chat');
+  expect((await member.messages()).single.mentions.single.principalId,member.principalId);
+  final changed=await owner.updateMentioned(created,'$label ещё',mentions);
+  expect(changed.mentions.single.principalId,member.principalId);
+  await owner.deleteMessage(changed);
+  final deleted=(await member.messages()).single;
+  expect(deleted.deleted,true);expect(deleted.mentions,isEmpty);
 }
 
 Future<void> _verifyCommunityRevoked(
@@ -280,11 +315,23 @@ void main() {
       final created = await api.publish(request);
       expect((await api.publish(request)).post.id, created.post.id);
       expect((await api.posts('feed', Int64.ZERO)).posts, hasLength(1));
+      final candidates = await SessionCommunityMentionApi(owner)
+          .candidates('feed', created.post.id, member.principalId);
+      final candidate = candidates.single;
+      final label = '@${candidate.displayName}';
       await SessionFeedApi(owner).comment(
         CommentFeedPostRequest(
           channelId: 'feed',
           postId: created.post.id,
-          text: 'Комментарий',
+          text: 'Комментарий $label',
+          mentions: [
+            CommunityMention(
+              principalId: candidate.principalId,
+              displayName: candidate.displayName,
+              start: 12,
+              length: label.length,
+            ),
+          ],
           idempotencyKey: 'feed-ci-comment',
         ),
       );
@@ -330,6 +377,8 @@ void main() {
       expect(sha256.convert(restored), sha256.convert(data));
       await _verifyCommunityDiscovery(member, created.post.id, visible: true);
       await _verifyFeedRead(member, created.post.id);
+      await _verifyMentionRead(member, created.post.id);
+      await _verifyChatMentions(owner,member);
       await _verifyCommunityRevoked(owner, member, created.post.id);
     },
     skip: origin == null,

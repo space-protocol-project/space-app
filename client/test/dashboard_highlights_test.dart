@@ -57,6 +57,8 @@ class OverviewApi implements CommunityOverviewApi {
   bool supported = true;
   @override
   List<Channel> sections = [section('forum', 'forum'), section('feed', 'feed')];
+  final mentions = <CommunityOverviewEntry>[];
+  final feedReplies = <CommunityOverviewEntry>[];
   final requests = <String>[];
   final failures = <String, Object>{};
   final waiting = <String, Completer<GetCommunityOverviewResponse>>{};
@@ -70,6 +72,8 @@ class OverviewApi implements CommunityOverviewApi {
     if (channel == 'feed') {
       return GetCommunityOverviewResponse(
         recent: [entry('post', 'Новая публикация')..readStateSupported = false],
+        mentions: mentions,
+        repliesToYou: feedReplies,
       );
     }
     return GetCommunityOverviewResponse(
@@ -216,6 +220,81 @@ void main() {
     await workspaces.close();
     await presence.close();
     chat.dispose();
+  });
+
+  testWidgets('упоминание и ответ ленты переходят к точному комментарию', (
+    tester,
+  ) async {
+    final api = OverviewApi();
+    api.mentions.add(
+      CommunityOverviewEntry(
+        content: CommunitySearchResult(
+          id: 'mention-comment',
+          parentId: 'post',
+          snippet: 'Точный комментарий',
+          sequence: Int64(70),
+          kind: CommunitySearchKind.COMMUNITY_SEARCH_KIND_FEED_COMMENT,
+        ),
+      ),
+    );
+    api.feedReplies.add(
+      entry('post', '', replies: 1)..content.snippet = 'Моя публикация',
+    );
+    final (chat: chat, workspaces: workspaces, presence: presence) =
+        await widgetFixture(tester, api);
+    final destinations = <DashboardCommunityTarget>[];
+    await tester.pumpWidget(
+      localized(
+        DashboardHighlights(
+          workspaces: workspaces,
+          presence: presence,
+          openSpace: (_) {},
+          openChannel: (_, _) {},
+          openCommunity: destinations.add,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final mention = find.byKey(
+      const ValueKey('dashboard-mention-$origin-mention-comment'),
+    );
+    await tester.ensureVisible(mention);
+    await tester.tap(mention);
+    expect(destinations.last.id, 'post');
+    expect(destinations.last.replySequence, 70);
+    expect(destinations.last.destination, DashboardDestination.feed);
+    final reply = find.byKey(const ValueKey('dashboard-reply-$origin-post'));
+    await tester.ensureVisible(reply);
+    await tester.tap(reply);
+    expect(destinations.last.replySequence, 70);
+    await tester.pumpWidget(const SizedBox());
+    workspaces.dispose();
+    presence.dispose();
+    chat.dispose();
+  });
+
+  testWidgets('переход из сводки ленты пропускает ранние комментарии', (
+    tester,
+  ) async {
+    final api = FakeFeed();
+    api.comments.add(
+      FeedComment(
+        id: 'late',
+        postId: 'post',
+        text: 'Адресный комментарий',
+        sequence: Int64(70),
+      ),
+    );
+    await tester.pumpWidget(
+      localized(
+        FeedArea(api: api, initialPost: 'post', initialReplySequence: 70),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Адресный комментарий'), findsOneWidget);
+    expect(find.text('Первый комментарий'), findsNothing);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
   });
 
   for (final width in [360.0, 1280.0]) {

@@ -989,5 +989,15 @@
   "dashboardCommunityEmpty": "No threads or posts are available yet.",
   "dashboardAttentionUnknown": "Some sections have not been checked yet.",
   "dashboardAttachmentPost": "Post with attachments",
-  "dashboardCommunityOffline": "Updates from unavailable spaces will appear after connecting."
+  "dashboardCommunityOffline": "Updates from unavailable spaces will appear after connecting.",
+  "communityMention": "Mention a member",
+  "communityMentionQuery": "Member name or ID",
+  "communityMentionFailed": "Could not load members. Check your access and try again.",
+  "communityMentionEmpty": "No members found",
+  "dashboardMention": "You were mentioned",
+  "dashboardFeedRepliesToYou": "Replies to your post",
+  "appearanceTheme": "Theme",
+  "appearanceThemeSystem": "Automatic",
+  "appearanceThemeLight": "Light",
+  "appearanceThemeDark": "Dark"
 }

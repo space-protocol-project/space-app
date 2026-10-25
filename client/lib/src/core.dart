@@ -35,6 +35,10 @@ import 'rpc_connection.dart';
 import 'forum_api.dart';
 import 'feed_api.dart';
 import 'community_search_api.dart';
+import 'community_mentions_api.dart';
+import 'generated/space/v1/community_mentions.pb.dart' as mentions_pb;
+import 'generated/space/v1/community_mentions.connect.spec.dart'
+    as mentions_specs;
 import 'community_overview.dart';
 import 'generated/space/v1/community_overview.pb.dart' as overview_pb;
 import 'generated/space/v1/community_overview.connect.spec.dart'
@@ -60,6 +64,8 @@ part 'voice_rpc.dart';
 part 'forum_rpc.dart';
 part 'feed_rpc.dart';
 part 'community_search_rpc.dart';
+part 'community_mentions_rpc.dart';
+part 'chat_mentions_rpc.dart';
 part 'community_overview_rpc.dart';
 
 String url64(List<int> value) => base64Url.encode(value).replaceAll('=', '');
@@ -685,6 +691,8 @@ class SpaceSession
         MessageSearchSession,
         HistoryPageSession,
         LiveSession,
+        ChatMentionWriter,
+        CommunityMentionSource,
         QueuedMessageSession,
         ReplyMessageSession,
         QueuedMutationSession,
@@ -812,6 +820,12 @@ class SpaceSession
   bool feedSupported = false;
   bool feedReadSupported = false;
   bool communitySearchSupported = false;
+  bool communityMentionsSupported = false;
+  bool chatMentionsSupported = false;
+  late final _chatMentionApi = SessionCommunityMentionApi(this);
+  @override
+  CommunityMentionApi? get communityMentions =>
+      chatMentionsSupported ? _chatMentionApi : null;
   bool communityOverviewSupported = false;
   @override
   late final CommunityOverviewApi communityOverview =
@@ -879,6 +893,12 @@ class SpaceSession
     feedReadSupported = manifest.capabilities.contains('core.feed.read.v1');
     communityOverviewSupported = manifest.capabilities.contains(
       'core.community.overview.v1',
+    );
+    chatMentionsSupported = manifest.capabilities.contains(
+      'core.chat.mentions.v1',
+    );
+    communityMentionsSupported = manifest.capabilities.contains(
+      'core.community.mentions.v1',
     );
     communitySearchSupported = manifest.capabilities.contains(
       'core.community.search.v1',
@@ -1288,6 +1308,12 @@ class SpaceSession
       );
       session.communityOverviewSupported = manifest.capabilities.contains(
         'core.community.overview.v1',
+      );
+      session.chatMentionsSupported = manifest.capabilities.contains(
+        'core.chat.mentions.v1',
+      );
+      session.communityMentionsSupported = manifest.capabilities.contains(
+        'core.community.mentions.v1',
       );
       session.communitySearchSupported = manifest.capabilities.contains(
         'core.community.search.v1',
@@ -1915,6 +1941,22 @@ class SpaceSession
     await _ensureSession();
     return _mutateQueued(channelId, key, text, mutation);
   }
+
+  @override
+  Future<Content> sendMentioned(
+    String channelId,
+    String text,
+    String key,
+    List<String> attachments,
+    String replyTo,
+    List<mentions_pb.CommunityMention> mentions,
+  ) => _sendMentioned(channelId, text, key, attachments, replyTo, mentions);
+  @override
+  Future<Content> updateMentioned(
+    Content message,
+    String text,
+    List<mentions_pb.CommunityMention> mentions,
+  ) => _updateMentioned(message, text, mentions);
 
   @override
   Future<Content> updateMessage(Content message, String text) async {

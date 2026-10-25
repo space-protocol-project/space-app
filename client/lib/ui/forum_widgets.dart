@@ -1,3 +1,6 @@
+import '../src/generated/space/v1/community_mentions.pb.dart';
+import 'community_mentions.dart';
+
 import 'package:flutter/material.dart';
 import 'package:fixnum/fixnum.dart';
 
@@ -140,6 +143,7 @@ class ForumTopicList extends StatelessWidget {
 class ForumMessage extends StatelessWidget {
   const ForumMessage({
     super.key,
+    this.mentions = const [],
     required this.author,
     required this.authorId,
     required this.text,
@@ -149,6 +153,7 @@ class ForumMessage extends StatelessWidget {
     this.session,
     this.trailing,
   });
+  final List<CommunityMention> mentions;
   final String author, authorId, text;
   final int timestamp;
   final bool original;
@@ -177,7 +182,11 @@ class ForumMessage extends StatelessWidget {
           _header(context),
           if (text.isNotEmpty) ...[
             const SizedBox(height: 14),
-            SelectableText(text, style: const TextStyle(height: 1.7)),
+            CommunityMentionText(
+              text,
+              mentions: mentions,
+              style: const TextStyle(height: 1.7),
+            ),
           ],
           if (assets.isNotEmpty)
             MessageAttachments(assets: assets, session: session),

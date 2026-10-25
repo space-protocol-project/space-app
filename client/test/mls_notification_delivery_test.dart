@@ -24,6 +24,8 @@ import 'support/chat_outbox.dart';
 
 class _Session implements SpaceSession {
   @override
+  bool get chatMentionsSupported => false;
+  @override
   List<Channel> get availableChannels => const [];
   _Session(this.client);
   final MlsClient client;
