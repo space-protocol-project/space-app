@@ -368,11 +368,25 @@ abstract final class MembershipService {
   /// Fully-qualified name of the MembershipService service.
   static const name = 'space.v1.MembershipService';
 
-  static const updateProfile = connect.Spec(
-    '/$name/UpdateProfile',
+  static const getParticipantProfile = connect.Spec(
+    '/$name/GetParticipantProfile',
     connect.StreamType.unary,
-    spacev1space.UpdateProfileRequest.new,
-    spacev1space.UpdateProfileResponse.new,
+    spacev1space.GetParticipantProfileRequest.new,
+    spacev1space.GetParticipantProfileResponse.new,
+  );
+
+  static const updateParticipantProfile = connect.Spec(
+    '/$name/UpdateParticipantProfile',
+    connect.StreamType.unary,
+    spacev1space.UpdateParticipantProfileRequest.new,
+    spacev1space.UpdateParticipantProfileResponse.new,
+  );
+
+  static const listParticipantProfiles = connect.Spec(
+    '/$name/ListParticipantProfiles',
+    connect.StreamType.unary,
+    spacev1space.ListParticipantProfilesRequest.new,
+    spacev1space.ListParticipantProfilesResponse.new,
   );
 
   static const previewInvite = connect.Spec(

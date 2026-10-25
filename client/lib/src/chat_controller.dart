@@ -339,8 +339,8 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       _session is SpaceSession ? _session as SpaceSession : null;
   bool get encryptedChannel =>
       channels.any((c) => c.id == channelId && c.mlsGroupId.isNotEmpty);
-  MemberProfile? get memberProfile =>
-      connected && _session is MemberProfile ? _session as MemberProfile : null;
+  ParticipantProfiles? get memberProfile =>
+      connected ? participantProfiles(_session) : null;
   AttachmentSession? get attachmentSession =>
       !encryptedChannel && attachmentsEnabled && _session is AttachmentSession
       ? _session as AttachmentSession
@@ -1093,24 +1093,28 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
 
   Future<void> _applyNickname(LiveSession session, String? nickname) async {
     if (nickname == null || nickname.trim().isEmpty) return;
-    if (session is MemberProfile) {
-      try {
-        await (session as MemberProfile).setNickname(nickname.trim());
-      } on GrpcError catch (error) {
-        if (error.code == StatusCode.alreadyExists) {
-          throw const LocalFailure(
-            LocalFailureCode.nicknameTaken,
-            'Это имя уже занято',
-          );
-        }
-        if (error.code == StatusCode.invalidArgument) {
-          throw const LocalFailure(
-            LocalFailureCode.nicknameInvalid,
-            'Недопустимое имя',
-          );
-        }
-        rethrow;
+    final api = participantProfiles(session);
+    if (api == null) {
+      throw const GrpcError.unimplemented(
+        'Сервер не поддерживает профиль участника',
+      );
+    }
+    try {
+      await updateParticipantName(api, nickname.trim());
+    } on GrpcError catch (error) {
+      if (error.code == StatusCode.alreadyExists) {
+        throw const LocalFailure(
+          LocalFailureCode.nicknameTaken,
+          'Это имя уже занято',
+        );
       }
+      if (error.code == StatusCode.invalidArgument) {
+        throw const LocalFailure(
+          LocalFailureCode.nicknameInvalid,
+          'Недопустимое имя',
+        );
+      }
+      rethrow;
     }
   }
 

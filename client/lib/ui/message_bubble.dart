@@ -1,3 +1,4 @@
+import 'participant_profile.dart';
 import 'message_body_layout.dart';
 import 'message_footer.dart';
 import 'message_markdown.dart';
@@ -11,6 +12,7 @@ class MessageBubble extends StatelessWidget {
     super.key,
     required this.text,
     required this.author,
+    this.authorId = '',
     required this.mine,
     this.grouped = false,
     this.sentAt,
@@ -25,7 +27,7 @@ class MessageBubble extends StatelessWidget {
     this.edited = false,
     this.deleted = false,
   });
-  final String text, author;
+  final String text, author, authorId;
   final bool mine, grouped, accepted;
   final DateTime? sentAt;
   final bool favorite, edited, deleted;
@@ -40,7 +42,6 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     return LayoutBuilder(
       builder: (context, box) => Row(
         mainAxisAlignment: mine
@@ -49,20 +50,7 @@ class MessageBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!mine) ...[
-            SizedBox(
-              width: 32,
-              child: grouped
-                  ? null
-                  : CircleAvatar(
-                      radius: 16,
-                      backgroundColor: colors.surfaceContainerHighest,
-                      child: Icon(
-                        Icons.person_outline,
-                        size: 18,
-                        color: colors.onSurface,
-                      ),
-                    ),
-            ),
+            SizedBox(width: 32, child: grouped ? null : _authorAvatar(context)),
             const SizedBox(width: 10),
           ],
           Flexible(
@@ -84,6 +72,19 @@ class MessageBubble extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _authorAvatar(BuildContext context) {
+    if (currentParticipantProfile(context, authorId)?.avatarPng.isNotEmpty ==
+        true) {
+      return ParticipantAvatar(principal: authorId);
+    }
+    final colors = Theme.of(context).colorScheme;
+    return CircleAvatar(
+      radius: 16,
+      backgroundColor: colors.surfaceContainerHighest,
+      child: Icon(Icons.person_outline, size: 18, color: colors.onSurface),
     );
   }
 
@@ -147,8 +148,9 @@ class MessageBubble extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return [
       if (!mine && !grouped) ...[
-        Text(
-          author,
+        ParticipantName(
+          principal: authorId,
+          fallback: author,
           style: TextStyle(
             fontWeight: FontWeight.w700,
             color: colors.secondary,

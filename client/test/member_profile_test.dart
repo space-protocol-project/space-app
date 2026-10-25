@@ -5,25 +5,17 @@ import 'package:space_client/l10n/app_localizations.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/ui/member_profile.dart';
 
+import 'support/participant_profiles.dart';
+
 import 'shell_test.dart' show TestController;
 
-class ProfileSession implements MemberProfile {
-  String nickname = 'Алиса';
-  bool taken = false;
-  @override
-  Future<String> getNickname() async => nickname;
-  @override
-  Future<void> setNickname(String value) async {
-    if (taken) throw const GrpcError.alreadyExists('taken');
-    nickname = value;
-  }
-}
+class ProfileSession extends FakeParticipantProfiles {}
 
 class ProfileChat extends TestController {
   ProfileChat(this.profile);
-  final MemberProfile profile;
+  final ParticipantProfiles profile;
   @override
-  MemberProfile? get memberProfile => profile;
+  ParticipantProfiles? get memberProfile => profile;
 }
 
 void main() {
@@ -45,21 +37,21 @@ void main() {
     final field = find.byKey(const ValueKey('member-nickname'));
     expect(tester.widget<TextField>(field).controller!.text, 'Алиса');
     await tester.enterText(field, 'Боб');
-    session.taken = true;
-    await tester.tap(find.text('Сохранить имя'));
+    session.failure = const GrpcError.alreadyExists('taken');
+    await tester.tap(find.text('Сохранить профиль'));
     await tester.pumpAndSettle();
     expect(find.text('Это имя уже занято. Выберите другое.'), findsOneWidget);
     expect(tester.widget<TextField>(field).controller!.text, 'Боб');
-    expect(session.nickname, 'Алиса');
-    session.taken = false;
-    await tester.tap(find.text('Сохранить имя'));
+    expect(session.value.displayName, 'Алиса');
+    session.failure = null;
+    await tester.tap(find.text('Сохранить профиль'));
     await tester.pumpAndSettle();
-    expect(session.nickname, 'Боб');
-    expect(find.text('Имя сохранено'), findsOneWidget);
+    expect(session.value.displayName, 'Боб');
+    expect(find.text('Профиль сохранён'), findsOneWidget);
     await tester.enterText(field, '');
-    await tester.tap(find.text('Сохранить имя'));
+    await tester.tap(find.text('Сохранить профиль'));
     await tester.pumpAndSettle();
-    expect(session.nickname, '');
+    expect(session.value.displayName, '');
     expect(tester.takeException(), isNull);
   });
 
@@ -69,7 +61,7 @@ void main() {
     addTearDown(profile.close);
     await profile.load();
     await profile.save('Новое имя');
-    expect(first.nickname, 'Новое имя');
-    expect(second.nickname, 'Алиса');
+    expect(first.value.displayName, 'Новое имя');
+    expect(second.value.displayName, 'Алиса');
   });
 }

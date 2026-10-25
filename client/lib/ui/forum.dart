@@ -1,3 +1,4 @@
+import 'participant_profile.dart';
 import '../src/community_mentions_api.dart';
 
 import 'dart:async';
@@ -65,6 +66,7 @@ class _ForumViewState extends State<ForumView> {
     return ForumArea(
       key: ObjectKey(connected),
       api: SessionForumApi(connected),
+      profiles: participantProfiles(connected),
       sectionId: widget.sectionId,
       initialThread: widget.initialThread,
       initialReplySequence: widget.initialReplySequence,
@@ -112,6 +114,7 @@ class ForumArea extends StatefulWidget {
   const ForumArea({
     super.key,
     required this.api,
+    this.profiles,
     this.manage,
     this.authorize,
     this.active = true,
@@ -122,6 +125,7 @@ class ForumArea extends StatefulWidget {
     this.showReports = false,
   });
   final ForumApi api;
+  final ParticipantProfiles? profiles;
   final String? sectionId;
   final String initialThread;
   final int initialReplySequence;
@@ -302,73 +306,93 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
   Widget build(BuildContext context) =>
       BlocBuilder<ForumController, ForumState>(
         bloc: controller,
-        builder: (context, state) => LayoutBuilder(
-          builder: (context, constraints) {
-            final wide = constraints.maxWidth >= 1000;
-            final padding = constraints.maxWidth < 600 ? 18.0 : 28.0;
-            readTracker.select(state.topic?.id ?? '');
-            readTracker.schedule(
-              context,
-              () => widget.active && foreground && !controller.state.busy,
-              (sequence) => unawaited(controller.markVisible(sequence)),
-              visible: controller.markMentionsVisible,
-              topPadding: SpaceContentInsets.topOf(context),
-            );
-            return NotificationListener<ScrollNotification>(
-              onNotification: (_) {
-                readTracker.schedule(
-                  context,
-                  () => widget.active && foreground && !controller.state.busy,
-                  (sequence) => unawaited(controller.markVisible(sequence)),
-                  visible: controller.markMentionsVisible,
-                  topPadding: SpaceContentInsets.topOf(context),
-                );
-                return false;
-              },
-              child: SingleChildScrollView(
-                key: readTracker.viewport,
-                primary: false,
-                padding: EdgeInsets.fromLTRB(
-                  padding,
-                  24 + SpaceContentInsets.topOf(context),
-                  padding,
-                  28,
-                ),
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1180),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _heading(state),
-                        if (state.busy)
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 12),
-                            child: LinearProgressIndicator(),
-                          ),
-                        if (state.error != null)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            child: Text(
-                              errorText(state.error!),
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.error,
-                              ),
-                            ),
-                          ),
-                        const SizedBox(height: 24),
-                        _content(state, wide),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
+        builder: (context, state) => ParticipantProfileScope(
+          api: widget.profiles,
+          channel: state.section?.id ?? '',
+          ids: _authors(state),
+          active: widget.active && foreground && state.error == null,
+          child: _layout(context, state),
         ),
       );
 
+  Iterable<String> _authors(ForumState state) sync* {
+    for (final topic in state.threads.where((t) => !t.hidden)) {
+      yield topic.authorId;
+    }
+    final topic = state.topic;
+    if (topic != null && !topic.hidden) {
+      yield topic.authorId;
+    }
+    for (final reply in state.replies.where((r) => !r.hidden)) {
+      yield reply.authorId;
+    }
+  }
+
+  Widget _layout(BuildContext context, ForumState state) => LayoutBuilder(
+    builder: (context, constraints) {
+      final wide = constraints.maxWidth >= 1000;
+      final padding = constraints.maxWidth < 600 ? 18.0 : 28.0;
+      readTracker.select(state.topic?.id ?? '');
+      readTracker.schedule(
+        context,
+        () => widget.active && foreground && !controller.state.busy,
+        (sequence) => unawaited(controller.markVisible(sequence)),
+        visible: controller.markMentionsVisible,
+        topPadding: SpaceContentInsets.topOf(context),
+      );
+      return NotificationListener<ScrollNotification>(
+        onNotification: (_) {
+          readTracker.schedule(
+            context,
+            () => widget.active && foreground && !controller.state.busy,
+            (sequence) => unawaited(controller.markVisible(sequence)),
+            visible: controller.markMentionsVisible,
+            topPadding: SpaceContentInsets.topOf(context),
+          );
+          return false;
+        },
+        child: SingleChildScrollView(
+          key: readTracker.viewport,
+          primary: false,
+          padding: EdgeInsets.fromLTRB(
+            padding,
+            24 + SpaceContentInsets.topOf(context),
+            padding,
+            28,
+          ),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1180),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _heading(state),
+                  if (state.busy)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: LinearProgressIndicator(),
+                    ),
+                  if (state.error != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Text(
+                        errorText(state.error!),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 24),
+                  _content(state, wide),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
   Widget _heading(ForumState state) {
     if (state.topic != null) return _topicHeading(state);
     if (state.section == null) {

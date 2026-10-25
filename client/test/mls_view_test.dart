@@ -95,6 +95,8 @@ class _Client implements MlsClient {
 
 class _Session implements SpaceSession {
   @override
+  bool get participantProfilesSupported => false;
+  @override
   bool get chatMentionsSupported => false;
   _Session(this.client);
   final MlsClient client;

@@ -2821,4 +2821,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get mlsCancelRetry =>
       'Cancel pending messages after membership changes';
+
+  @override
+  String get profileAvatar => 'Space avatar';
+
+  @override
+  String get chooseAvatar => 'Choose image';
+
+  @override
+  String get removeAvatar => 'Remove avatar';
+
+  @override
+  String get avatarInvalid =>
+      'Choose a still PNG or JPEG up to 5 MiB and 4 million pixels.';
+
+  @override
+  String get profileConflict =>
+      'The profile changed on another device. Reload it and save again; your draft is preserved.';
+
+  @override
+  String get profileSaved => 'Profile saved';
+
+  @override
+  String get saveProfile => 'Save profile';
+
+  @override
+  String get profileSpaceHelp =>
+      'Your name is unique in this space. Your name and avatar apply to every section.';
 }

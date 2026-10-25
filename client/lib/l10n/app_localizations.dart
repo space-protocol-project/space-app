@@ -5133,6 +5133,54 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Отменить отложенные отправки после смены состава'**
   String get mlsCancelRetry;
+
+  /// No description provided for @profileAvatar.
+  ///
+  /// In ru, this message translates to:
+  /// **'Аватар в пространстве'**
+  String get profileAvatar;
+
+  /// No description provided for @chooseAvatar.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбрать изображение'**
+  String get chooseAvatar;
+
+  /// No description provided for @removeAvatar.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить аватар'**
+  String get removeAvatar;
+
+  /// No description provided for @avatarInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите статичный PNG или JPEG до 5 МиБ и 4 миллионов пикселей.'**
+  String get avatarInvalid;
+
+  /// No description provided for @profileConflict.
+  ///
+  /// In ru, this message translates to:
+  /// **'Профиль изменён на другом устройстве. Обновите его и повторите сохранение; ваш ввод сохранён.'**
+  String get profileConflict;
+
+  /// No description provided for @profileSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Профиль сохранён'**
+  String get profileSaved;
+
+  /// No description provided for @saveProfile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить профиль'**
+  String get saveProfile;
+
+  /// No description provided for @profileSpaceHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Имя уникально в этом пространстве. Имя и аватар общие для всех его разделов.'**
+  String get profileSpaceHelp;
 }
 
 class _AppLocalizationsDelegate

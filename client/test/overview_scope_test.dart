@@ -10,15 +10,15 @@ import 'channels_test.dart' show chat;
 import 'shell_test.dart' show TestController;
 import 'member_profile_test.dart' show ProfileSession;
 
-import 'package:space_client/src/core.dart' show MemberProfile;
+import 'package:space_client/src/core.dart' show ParticipantProfiles;
 
 class OverviewController extends TestController {
   OverviewController(this.name, this.channel) {
-    profile.nickname = '$channel-ник';
+    profile.value.displayName = '$channel-ник';
   }
   final profile = ProfileSession();
   @override
-  MemberProfile? get memberProfile => profile;
+  ParticipantProfiles? get memberProfile => profile;
   final String name, channel;
   @override
   String get spaceTitle => name;

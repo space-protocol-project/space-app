@@ -2610,6 +2610,30 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mlsCancelRetry => '取消成员变更后的待发送消息';
+
+  @override
+  String get profileAvatar => '空间头像';
+
+  @override
+  String get chooseAvatar => '选择图片';
+
+  @override
+  String get removeAvatar => '移除头像';
+
+  @override
+  String get avatarInvalid => '请选择不超过 5 MiB 和 400 万像素的静态 PNG 或 JPEG 图片。';
+
+  @override
+  String get profileConflict => '个人资料已在其他设备上更改。请重新加载后保存；您的草稿已保留。';
+
+  @override
+  String get profileSaved => '个人资料已保存';
+
+  @override
+  String get saveProfile => '保存个人资料';
+
+  @override
+  String get profileSpaceHelp => '名称在此空间内唯一。名称和头像适用于所有版块。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3648,4 +3672,28 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mlsCancelRetry => '取消成员变更后的待发送消息';
+
+  @override
+  String get profileAvatar => '空间头像';
+
+  @override
+  String get chooseAvatar => '选择图片';
+
+  @override
+  String get removeAvatar => '移除头像';
+
+  @override
+  String get avatarInvalid => '请选择不超过 5 MiB 和 400 万像素的静态 PNG 或 JPEG 图片。';
+
+  @override
+  String get profileConflict => '个人资料已在其他设备上更改。请重新加载后保存；您的草稿已保留。';
+
+  @override
+  String get profileSaved => '个人资料已保存';
+
+  @override
+  String get saveProfile => '保存个人资料';
+
+  @override
+  String get profileSpaceHelp => '名称在此空间内唯一。名称和头像适用于所有版块。';
 }

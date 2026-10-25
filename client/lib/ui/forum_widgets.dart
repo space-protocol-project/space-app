@@ -1,3 +1,4 @@
+import 'participant_profile.dart';
 import '../src/generated/space/v1/community_mentions.pb.dart';
 import 'community_mentions.dart';
 
@@ -126,7 +127,10 @@ class ForumTopicList extends StatelessWidget {
         ],
         Tooltip(
           message: topic.authorId,
-          child: Text(forumAuthor(topic.authorName, topic.authorId)),
+          child: ParticipantName(
+            principal: topic.authorId,
+            fallback: forumAuthor(topic.authorName, topic.authorId),
+          ),
         ),
         const Text('·'),
         Text(forumDate(context, topic.createdAtUnix.toInt())),
@@ -199,10 +203,10 @@ class ForumMessage extends StatelessWidget {
     final name = forumAuthor(author, authorId);
     return Row(
       children: [
-        CircleAvatar(
+        ParticipantAvatar(
+          principal: authorId,
           radius: 15,
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          child: Text(
+          fallback: Text(
             name.isEmpty ? '?' : name.characters.first.toUpperCase(),
             style: const TextStyle(fontSize: 12),
           ),
@@ -211,8 +215,9 @@ class ForumMessage extends StatelessWidget {
         Expanded(
           child: Tooltip(
             message: authorId,
-            child: Text(
-              name,
+            child: ParticipantName(
+              principal: authorId,
+              fallback: name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),

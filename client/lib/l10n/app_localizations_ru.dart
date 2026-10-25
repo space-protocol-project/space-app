@@ -2837,4 +2837,31 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get mlsCancelRetry =>
       'Отменить отложенные отправки после смены состава';
+
+  @override
+  String get profileAvatar => 'Аватар в пространстве';
+
+  @override
+  String get chooseAvatar => 'Выбрать изображение';
+
+  @override
+  String get removeAvatar => 'Удалить аватар';
+
+  @override
+  String get avatarInvalid =>
+      'Выберите статичный PNG или JPEG до 5 МиБ и 4 миллионов пикселей.';
+
+  @override
+  String get profileConflict =>
+      'Профиль изменён на другом устройстве. Обновите его и повторите сохранение; ваш ввод сохранён.';
+
+  @override
+  String get profileSaved => 'Профиль сохранён';
+
+  @override
+  String get saveProfile => 'Сохранить профиль';
+
+  @override
+  String get profileSpaceHelp =>
+      'Имя уникально в этом пространстве. Имя и аватар общие для всех его разделов.';
 }

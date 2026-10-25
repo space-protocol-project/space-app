@@ -1,3 +1,5 @@
+import 'participant_profile.dart';
+import '../src/participant_profiles.dart';
 import 'mention_badge.dart';
 import '../src/community_mentions.dart';
 import 'community_mentions.dart';
@@ -755,44 +757,52 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) => BlocBuilder<ChatController, ChatState>(
     bloc: widget.controller,
-    builder: (context, state) => DropTarget(
-      enabled:
-          editing == null &&
-          state.canQueue &&
-          !state.busy &&
-          widget.controller.canAttachFiles,
-      onEnter: (_) => setState(() => draggingFiles = true),
-      onLeave: () => setState(() => draggingFiles = false),
-      onDrop: (details) async {
-        setState(() => draggingFiles = false);
-        final files = <SpaceFile>[];
-        for (final item in details.items.whereType<DropFileItem>()) {
-          files.add(droppedFile(item.file, name: item.name));
-        }
-        await attachmentQueue.add(AttachmentFilesAdded(files));
-      },
-      child: Stack(
-        children: [
-          _withFiles(context),
-          if (draggingFiles)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: ColoredBox(
-                  color: Theme.of(context).colorScheme.primary
-                      .withValues(alpha: .15),
-                  child: Center(
-                    child: Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(24),
-                        child: Text(context.strings.dropFilesHere),
-                      ),
+    builder: (context, state) => ParticipantProfileScope(
+      api: participantProfiles(widget.controller.memberProfile),
+      channel: state.channelId,
+      ids: state.messages.map((m) => m.authorId),
+      active: widget.active,
+      child: _dropTarget(context, state),
+    ),
+  );
+
+  Widget _dropTarget(BuildContext context, ChatState state) => DropTarget(
+    enabled:
+        editing == null &&
+        state.canQueue &&
+        !state.busy &&
+        widget.controller.canAttachFiles,
+    onEnter: (_) => setState(() => draggingFiles = true),
+    onLeave: () => setState(() => draggingFiles = false),
+    onDrop: (details) async {
+      setState(() => draggingFiles = false);
+      final files = <SpaceFile>[];
+      for (final item in details.items.whereType<DropFileItem>()) {
+        files.add(droppedFile(item.file, name: item.name));
+      }
+      await attachmentQueue.add(AttachmentFilesAdded(files));
+    },
+    child: Stack(
+      children: [
+        _withFiles(context),
+        if (draggingFiles)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: ColoredBox(
+                color: Theme.of(context).colorScheme.primary
+                    .withValues(alpha: .15),
+                child: Center(
+                  child: Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text(context.strings.dropFilesHere),
                     ),
                   ),
                 ),
               ),
             ),
-        ],
-      ),
+          ),
+      ],
     ),
   );
 
@@ -1067,6 +1077,7 @@ class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
             )
           : null,
       author: author,
+      authorId: message.authorId,
       mine: mine,
       grouped: grouped,
       sentAt:

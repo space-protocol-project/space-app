@@ -339,11 +339,27 @@ class AdminServiceClient {
 }
 
 class MembershipServiceClient {
-  Future<UpdateProfileResponse> updateProfile(
-    UpdateProfileRequest request, {
+  Future<GetParticipantProfileResponse> getParticipantProfile(
+    GetParticipantProfileRequest request, {
     RpcOptions? options,
   }) => connection.unary(
-    specs.MembershipService.updateProfile,
+    specs.MembershipService.getParticipantProfile,
+    request,
+    options: options,
+  );
+  Future<UpdateParticipantProfileResponse> updateParticipantProfile(
+    UpdateParticipantProfileRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.MembershipService.updateParticipantProfile,
+    request,
+    options: options,
+  );
+  Future<ListParticipantProfilesResponse> listParticipantProfiles(
+    ListParticipantProfilesRequest request, {
+    RpcOptions? options,
+  }) => connection.unary(
+    specs.MembershipService.listParticipantProfiles,
     request,
     options: options,
   );

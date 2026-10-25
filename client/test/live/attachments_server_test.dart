@@ -53,10 +53,13 @@ void main() {
       expect(owner.role, 'owner', reason: 'Нужна новая изолированная база');
       final member = await SpaceSession.connect(discovery, memberVault);
       addTearDown(member.close);
-      await member.setNickname('Участник v0.3');
-      expect(await member.getNickname(), 'Участник v0.3');
+      await updateParticipantName(member, 'Участник v0.3');
+      expect(
+        (await member.getParticipantProfile()).displayName,
+        'Участник v0.3',
+      );
       await expectLater(
-        owner.setNickname('  УЧАСТНИК V0.3  '),
+        updateParticipantName(owner, '  УЧАСТНИК V0.3  '),
         throwsA(
           isA<GrpcError>().having(
             (e) => e.code,
@@ -65,9 +68,9 @@ void main() {
           ),
         ),
       );
-      await member.setNickname('Новое имя');
-      expect(await member.getNickname(), 'Новое имя');
-      await member.setNickname('Участник v0.3');
+      await updateParticipantName(member, 'Новое имя');
+      expect((await member.getParticipantProfile()).displayName, 'Новое имя');
+      await updateParticipantName(member, 'Участник v0.3');
 
       final members = await owner.adminRequest('/api/v1/space/members');
       expect(

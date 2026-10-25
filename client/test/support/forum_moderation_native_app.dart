@@ -74,8 +74,8 @@ Future<void> capture(String name) async {
 }
 
 Future<void> seedSpace(SpaceSession owner, SpaceSession peer) async {
-  await owner.setNickname('Алиса');
-  await peer.setNickname('Борис');
+  await updateParticipantName(owner, 'Алиса');
+  await updateParticipantName(peer, 'Борис');
   final response = await owner.adminRequest('/api/v1/space/settings');
   final settings = Map<String, dynamic>.from(response['settings'] as Map);
   await owner.adminRequest(

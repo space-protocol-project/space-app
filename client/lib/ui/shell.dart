@@ -6,7 +6,6 @@ import '../src/personal_notification_scope.dart';
 import '../src/personal_notification_target.dart';
 import '../src/generated/space/v1/personal_notifications.pb.dart';
 import 'personal_inbox.dart';
-import 'theme_mode_picker.dart';
 import '../src/generated/space/v1/space.pb.dart' show Channel, Content;
 import 'mls_channel.dart';
 import '../src/message_summary.dart';
@@ -1002,17 +1001,14 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
       ? controller.chatTitle
       : context.strings.chat;
 
-  int get bottomIndex => serverList
-      ? 1
-      : devicePage
-      ? 2
-      : dashboard || applicationSettings
-      ? 0
-      : switch (selected) {
-          Section.chat => 1,
-          Section.settings => 0,
-          _ => 0,
-        };
+  int get bottomIndex {
+    if (serverList) return 1;
+    if (devicePage) return 2;
+    if (applicationSettings) return 3;
+    if (dashboard) return 0;
+    return selected == Section.chat ? 1 : 0;
+  }
+
   void showApplicationSettings() {
     setState(() {
       devicePage = false;
@@ -1450,16 +1446,6 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
             leading: const Icon(Icons.computer_outlined),
             title: Text(context.strings.myDevice),
             onTap: showDevice,
-          ),
-          ListTile(
-            key: const ValueKey('app-settings-tab'),
-            leading: updateBadge(Icons.settings_outlined),
-            title: Text(context.strings.appSettings),
-            onTap: showApplicationSettings,
-          ),
-          ThemeModePicker(
-            preferences: widget.preferences,
-            mode: widget.preferences.state.themeMode,
           ),
           const SizedBox(height: 16),
         ],
@@ -2177,6 +2163,11 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
         icon: Icon(Icons.computer_outlined),
         label: context.strings.myDevice,
       ),
+      NavigationDestination(
+        key: const ValueKey('app-settings-tab'),
+        icon: updateBadge(Icons.settings_outlined),
+        label: context.strings.settings,
+      ),
     ],
   );
 
@@ -2188,6 +2179,8 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
         showServers();
       case 2:
         select(Section.identity);
+      case 3:
+        showApplicationSettings();
     }
   }
 

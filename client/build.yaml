@@ -16,6 +16,8 @@ targets:
           - lib/src/personal_inbox_controller.dart
           - lib/src/personal_notifications_controller.dart
           - lib/src/mls/controller.dart
+          - lib/src/member_profile_controller.dart
+          - lib/src/participant_directory.dart
           - lib/src/preferences.dart
           - lib/src/server_presence.dart
           - lib/src/server_workspaces.dart

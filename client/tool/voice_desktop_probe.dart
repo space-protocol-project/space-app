@@ -178,7 +178,7 @@ Future<void> scenario(Directory work, String origin, String role) async {
       if (selected == null) throw StateError('Указанный вход недоступен');
       await devices.select(selected);
     }
-    await session.setNickname(role == 'A' ? 'Алиса' : 'Борис');
+    await updateParticipantName(session, role == 'A' ? 'Алиса' : 'Борис');
     String room;
     if (role == 'A') {
       if (session.role != 'owner') {

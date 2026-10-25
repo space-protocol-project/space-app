@@ -1,87 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:grpc/grpc.dart';
+import 'package:space_admin_ui/member_avatar.dart';
+
+import '../src/member_profile_controller.dart';
+import '../src/file_picker.dart';
+export '../src/member_profile_controller.dart';
 
 import '../l10n/strings.dart';
 import '../src/chat_controller.dart';
 import '../src/core.dart';
 import 'components.dart';
-
-enum ProfileProblem { none, taken, invalid, unavailable }
-
-class MemberProfileState {
-  const MemberProfileState({
-    this.nickname = '',
-    this.loading = false,
-    this.saving = false,
-    this.loaded = false,
-    this.saved = false,
-    this.problem = ProfileProblem.none,
-  });
-  final String nickname;
-  final bool loading, saving, loaded, saved;
-  final ProfileProblem problem;
-}
-
-class MemberProfileController extends Cubit<MemberProfileState> {
-  MemberProfileController(this.session) : super(const MemberProfileState());
-  final MemberProfile session;
-
-  Future<void> load() async {
-    if (state.loading || state.saving) return;
-    emit(const MemberProfileState(loading: true));
-    try {
-      final nickname = await session.getNickname();
-      if (!isClosed) emit(MemberProfileState(nickname: nickname, loaded: true));
-    } catch (_) {
-      if (!isClosed) {
-        emit(const MemberProfileState(problem: ProfileProblem.unavailable));
-      }
-    }
-  }
-
-  Future<void> save(String nickname) async {
-    if (!state.loaded || state.saving) return;
-    final previous = state.nickname;
-    emit(MemberProfileState(nickname: previous, loaded: true, saving: true));
-    try {
-      await session.setNickname(nickname.trim());
-      if (!isClosed) {
-        emit(
-          MemberProfileState(
-            nickname: nickname.trim(),
-            loaded: true,
-            saved: true,
-          ),
-        );
-      }
-    } catch (error) {
-      if (!isClosed) {
-        emit(
-          MemberProfileState(
-            nickname: previous,
-            loaded: true,
-            problem: _problem(error),
-          ),
-        );
-      }
-    }
-  }
-
-  void edited() {
-    if (!state.saved && state.problem == ProfileProblem.none) return;
-    emit(MemberProfileState(nickname: state.nickname, loaded: state.loaded));
-  }
-
-  ProfileProblem _problem(Object error) {
-    if (error is! GrpcError) return ProfileProblem.unavailable;
-    return switch (error.code) {
-      StatusCode.alreadyExists => ProfileProblem.taken,
-      StatusCode.invalidArgument => ProfileProblem.invalid,
-      _ => ProfileProblem.unavailable,
-    };
-  }
-}
 
 class MemberProfileCard extends StatelessWidget {
   const MemberProfileCard({super.key, required this.controller});
@@ -99,7 +27,7 @@ class MemberProfileCard extends StatelessWidget {
 
 class _MemberProfileForm extends StatefulWidget {
   const _MemberProfileForm({super.key, required this.session});
-  final MemberProfile session;
+  final ParticipantProfiles session;
   @override
   State<_MemberProfileForm> createState() => _MemberProfileFormState();
 }
@@ -118,8 +46,13 @@ class _MemberProfileFormState extends State<_MemberProfileForm> {
   Widget build(BuildContext context) =>
       BlocConsumer<MemberProfileController, MemberProfileState>(
         bloc: profile,
-        listenWhen: (before, after) => before.loading && after.loaded,
-        listener: (context, state) => nickname.text = state.nickname,
+        listenWhen: (before, after) => before.draftName != after.draftName,
+        listener: (context, state) {
+          if (identical(state, profile.state) &&
+              nickname.text != state.draftName) {
+            nickname.text = state.draftName;
+          }
+        },
         builder: _profileForm,
       );
 
@@ -128,11 +61,13 @@ class _MemberProfileFormState extends State<_MemberProfileForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _avatar(context, state),
+            const SizedBox(height: 20),
             TextField(
               key: const ValueKey('member-nickname'),
               controller: nickname,
-              onChanged: (_) => profile.edited(),
-              enabled: state.loaded && !state.saving,
+              onChanged: profile.editName,
+              enabled: state.loaded && !state.busy,
               maxLength: 40,
               decoration: InputDecoration(
                 labelText: context.strings.serverNickname,
@@ -143,36 +78,90 @@ class _MemberProfileFormState extends State<_MemberProfileForm> {
             const SizedBox(height: 12),
             ..._profileStatus(context, state),
             const SizedBox(height: 12),
-            FilledButton(
-              onPressed: state.loaded && !state.saving
-                  ? () => profile.save(nickname.text)
-                  : null,
-              child: Text(context.strings.saveNickname),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                FilledButton(
+                  onPressed: state.loaded && !state.busy
+                      ? () => profile.save(nickname.text)
+                      : null,
+                  child: Text(context.strings.saveProfile),
+                ),
+                TextButton(
+                  onPressed: state.busy ? null : profile.load,
+                  child: Text(context.strings.retryProfile),
+                ),
+              ],
             ),
-            if (!state.loaded && !state.loading)
-              TextButton(
-                onPressed: profile.load,
-                child: Text(context.strings.retryProfile),
-              ),
+            const SizedBox(height: 12),
+            Text(context.strings.profileSpaceHelp),
           ],
         ),
       );
 
   List<Widget> _profileStatus(BuildContext context, MemberProfileState state) =>
       [
-        if (state.loading || state.saving) const LinearProgressIndicator(),
+        if (state.busy) const LinearProgressIndicator(),
         if (state.problem != ProfileProblem.none)
           Text(
             problemText(context, state.problem),
             style: TextStyle(color: Theme.of(context).colorScheme.error),
           ),
-        if (state.saved) Text(context.strings.nicknameSaved),
+        if (state.saved) Text(context.strings.profileSaved),
       ];
 
   String problemText(BuildContext context, ProfileProblem problem) =>
       switch (problem) {
         ProfileProblem.taken => context.strings.nicknameTaken,
         ProfileProblem.invalid => context.strings.nicknameInvalid,
+        ProfileProblem.avatar => context.strings.avatarInvalid,
+        ProfileProblem.conflict => context.strings.profileConflict,
         _ => context.strings.nicknameFailed,
       };
+  Widget _avatar(BuildContext context, MemberProfileState state) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(context.strings.profileAvatar),
+      const SizedBox(height: 12),
+      Wrap(
+        spacing: 16,
+        runSpacing: 12,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          MemberAvatar(data: state.previewAvatar, radius: 32),
+          OutlinedButton.icon(
+            key: const ValueKey('profile-pick-avatar'),
+            onPressed: state.loaded && !state.busy ? _chooseAvatar : null,
+            icon: const Icon(Icons.image_outlined),
+            label: Text(context.strings.chooseAvatar),
+          ),
+          TextButton(
+            key: const ValueKey('profile-remove-avatar'),
+            onPressed: !state.busy && state.previewAvatar.isNotEmpty
+                ? profile.removeAvatar
+                : null,
+            child: Text(context.strings.removeAvatar),
+          ),
+        ],
+      ),
+    ],
+  );
+
+  Future<void> _chooseAvatar() async {
+    try {
+      final file = await openFile(
+        acceptedTypeGroups: const [
+          XTypeGroup(
+            label: 'PNG / JPEG',
+            extensions: ['png', 'jpg', 'jpeg'],
+            mimeTypes: ['image/png', 'image/jpeg'],
+          ),
+        ],
+      );
+      if (mounted && file != null) await profile.selectAvatar(file);
+    } catch (_) {
+      if (mounted) profile.avatarFailed();
+    }
+  }
 }

@@ -1011,5 +1011,13 @@
   "notificationReply": "Reply to you",
   "notificationOpen": "Open",
   "mlsMentionsLegacy": "Some devices have not confirmed mention support. Only the name will be sent, without a mention marker.",
-  "mlsCancelRetry": "Cancel pending messages after membership changes"
+  "mlsCancelRetry": "Cancel pending messages after membership changes",
+  "profileAvatar": "Space avatar",
+  "chooseAvatar": "Choose image",
+  "removeAvatar": "Remove avatar",
+  "avatarInvalid": "Choose a still PNG or JPEG up to 5 MiB and 4 million pixels.",
+  "profileConflict": "The profile changed on another device. Reload it and save again; your draft is preserved.",
+  "profileSaved": "Profile saved",
+  "saveProfile": "Save profile",
+  "profileSpaceHelp": "Your name is unique in this space. Your name and avatar apply to every section."
 }

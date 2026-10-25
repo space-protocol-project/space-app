@@ -5,6 +5,8 @@ import 'package:space_client/src/generated/space/v1/personal_notifications.pb.da
 import 'package:space_client/src/generated/space/v1/space.pb.dart' as sp;
 
 class _Session implements SpaceSession {
+  @override
+  bool get participantProfilesSupported => false;
   _Session({this.supported = false, this.channels = const []});
   final bool supported;
   final List<sp.Channel> channels;

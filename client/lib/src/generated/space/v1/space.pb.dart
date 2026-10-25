@@ -1587,124 +1587,505 @@ class ProposePairingResponse extends $pb.GeneratedMessage {
   static ProposePairingResponse? _defaultInstance;
 }
 
-class UpdateProfileRequest extends $pb.GeneratedMessage {
-  factory UpdateProfileRequest({
-    $core.String? nickname,
+class ParticipantProfile extends $pb.GeneratedMessage {
+  factory ParticipantProfile({
+    $core.String? principalId,
+    $core.String? displayName,
+    $core.List<$core.int>? avatarPng,
+    $fixnum.Int64? revision,
   }) {
-    final result = UpdateProfileRequest._();
-    if (nickname != null) result.nickname = nickname;
+    final result = ParticipantProfile._();
+    if (principalId != null) result.principalId = principalId;
+    if (displayName != null) result.displayName = displayName;
+    if (avatarPng != null) result.avatarPng = avatarPng;
+    if (revision != null) result.revision = revision;
     return result;
   }
 
-  UpdateProfileRequest._();
+  ParticipantProfile._();
 
-  factory UpdateProfileRequest.fromBuffer($core.List<$core.int> data,
+  factory ParticipantProfile.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      UpdateProfileRequest()..mergeFromBuffer(data, registry);
-  factory UpdateProfileRequest.fromJson($core.String json,
+      ParticipantProfile()..mergeFromBuffer(data, registry);
+  factory ParticipantProfile.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      UpdateProfileRequest()..mergeFromJson(json, registry);
+      ParticipantProfile()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'UpdateProfileRequest',
+      _omitMessageNames ? '' : 'ParticipantProfile',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
-      createEmptyInstance: UpdateProfileRequest.$_createMessage)
-    ..aOS(1, _omitFieldNames ? '' : 'nickname')
+      createEmptyInstance: ParticipantProfile.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'principalId')
+    ..aOS(2, _omitFieldNames ? '' : 'displayName')
+    ..a<$core.List<$core.int>>(
+        3, _omitFieldNames ? '' : 'avatarPng', $pb.PbFieldType.OY)
+    ..aInt64(4, _omitFieldNames ? '' : 'revision')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  UpdateProfileRequest clone() => deepCopy();
+  ParticipantProfile clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  UpdateProfileRequest copyWith(void Function(UpdateProfileRequest) updates) =>
-      super.copyWith((message) => updates(message as UpdateProfileRequest))
-          as UpdateProfileRequest;
+  ParticipantProfile copyWith(void Function(ParticipantProfile) updates) =>
+      super.copyWith((message) => updates(message as ParticipantProfile))
+          as ParticipantProfile;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated(
-      'Use UpdateProfileRequest() / UpdateProfileRequest.new instead')
-  static UpdateProfileRequest create() => UpdateProfileRequest._();
-  static $pb.GeneratedMessage $_createMessage() => UpdateProfileRequest._();
+  @$core.Deprecated('Use ParticipantProfile() / ParticipantProfile.new instead')
+  static ParticipantProfile create() => ParticipantProfile._();
+  static $pb.GeneratedMessage $_createMessage() => ParticipantProfile._();
   @$core.override
-  UpdateProfileRequest createEmptyInstance() => UpdateProfileRequest._();
+  ParticipantProfile createEmptyInstance() => ParticipantProfile._();
   @$core.pragma('dart2js:noInline')
-  static UpdateProfileRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<UpdateProfileRequest>(
-          UpdateProfileRequest.$_createMessage);
-  static UpdateProfileRequest? _defaultInstance;
+  static ParticipantProfile getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ParticipantProfile>(
+          ParticipantProfile.$_createMessage);
+  static ParticipantProfile? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get nickname => $_getSZ(0);
+  $core.String get principalId => $_getSZ(0);
   @$pb.TagNumber(1)
-  set nickname($core.String value) => $_setString(0, value);
+  set principalId($core.String value) => $_setString(0, value);
   @$pb.TagNumber(1)
-  $core.bool hasNickname() => $_has(0);
+  $core.bool hasPrincipalId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearNickname() => $_clearField(1);
+  void clearPrincipalId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get displayName => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set displayName($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasDisplayName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearDisplayName() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get avatarPng => $_getN(2);
+  @$pb.TagNumber(3)
+  set avatarPng($core.List<$core.int> value) => $_setBytes(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAvatarPng() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAvatarPng() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get revision => $_getI64(3);
+  @$pb.TagNumber(4)
+  set revision($fixnum.Int64 value) => $_setInt64(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasRevision() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearRevision() => $_clearField(4);
 }
 
-class UpdateProfileResponse extends $pb.GeneratedMessage {
-  factory UpdateProfileResponse({
-    Member? member,
-  }) {
-    final result = UpdateProfileResponse._();
-    if (member != null) result.member = member;
-    return result;
-  }
+class GetParticipantProfileRequest extends $pb.GeneratedMessage {
+  factory GetParticipantProfileRequest() => GetParticipantProfileRequest._();
 
-  UpdateProfileResponse._();
+  GetParticipantProfileRequest._();
 
-  factory UpdateProfileResponse.fromBuffer($core.List<$core.int> data,
+  factory GetParticipantProfileRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      UpdateProfileResponse()..mergeFromBuffer(data, registry);
-  factory UpdateProfileResponse.fromJson($core.String json,
+      GetParticipantProfileRequest()..mergeFromBuffer(data, registry);
+  factory GetParticipantProfileRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      UpdateProfileResponse()..mergeFromJson(json, registry);
+      GetParticipantProfileRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'UpdateProfileResponse',
+      _omitMessageNames ? '' : 'GetParticipantProfileRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
-      createEmptyInstance: UpdateProfileResponse.$_createMessage)
-    ..aOM<Member>(1, _omitFieldNames ? '' : 'member',
-        subBuilder: Member.$_createMessage)
+      createEmptyInstance: GetParticipantProfileRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  UpdateProfileResponse clone() => deepCopy();
+  GetParticipantProfileRequest clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  UpdateProfileResponse copyWith(
-          void Function(UpdateProfileResponse) updates) =>
-      super.copyWith((message) => updates(message as UpdateProfileResponse))
-          as UpdateProfileResponse;
+  GetParticipantProfileRequest copyWith(
+          void Function(GetParticipantProfileRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as GetParticipantProfileRequest))
+          as GetParticipantProfileRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   @$core.Deprecated(
-      'Use UpdateProfileResponse() / UpdateProfileResponse.new instead')
-  static UpdateProfileResponse create() => UpdateProfileResponse._();
-  static $pb.GeneratedMessage $_createMessage() => UpdateProfileResponse._();
+      'Use GetParticipantProfileRequest() / GetParticipantProfileRequest.new instead')
+  static GetParticipantProfileRequest create() =>
+      GetParticipantProfileRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      GetParticipantProfileRequest._();
   @$core.override
-  UpdateProfileResponse createEmptyInstance() => UpdateProfileResponse._();
+  GetParticipantProfileRequest createEmptyInstance() =>
+      GetParticipantProfileRequest._();
   @$core.pragma('dart2js:noInline')
-  static UpdateProfileResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<UpdateProfileResponse>(
-          UpdateProfileResponse.$_createMessage);
-  static UpdateProfileResponse? _defaultInstance;
+  static GetParticipantProfileRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetParticipantProfileRequest>(
+          GetParticipantProfileRequest.$_createMessage);
+  static GetParticipantProfileRequest? _defaultInstance;
+}
+
+class GetParticipantProfileResponse extends $pb.GeneratedMessage {
+  factory GetParticipantProfileResponse({
+    ParticipantProfile? profile,
+  }) {
+    final result = GetParticipantProfileResponse._();
+    if (profile != null) result.profile = profile;
+    return result;
+  }
+
+  GetParticipantProfileResponse._();
+
+  factory GetParticipantProfileResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetParticipantProfileResponse()..mergeFromBuffer(data, registry);
+  factory GetParticipantProfileResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetParticipantProfileResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetParticipantProfileResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetParticipantProfileResponse.$_createMessage)
+    ..aOM<ParticipantProfile>(1, _omitFieldNames ? '' : 'profile',
+        subBuilder: ParticipantProfile.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetParticipantProfileResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetParticipantProfileResponse copyWith(
+          void Function(GetParticipantProfileResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as GetParticipantProfileResponse))
+          as GetParticipantProfileResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetParticipantProfileResponse() / GetParticipantProfileResponse.new instead')
+  static GetParticipantProfileResponse create() =>
+      GetParticipantProfileResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      GetParticipantProfileResponse._();
+  @$core.override
+  GetParticipantProfileResponse createEmptyInstance() =>
+      GetParticipantProfileResponse._();
+  @$core.pragma('dart2js:noInline')
+  static GetParticipantProfileResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetParticipantProfileResponse>(
+          GetParticipantProfileResponse.$_createMessage);
+  static GetParticipantProfileResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  Member get member => $_getN(0);
+  ParticipantProfile get profile => $_getN(0);
   @$pb.TagNumber(1)
-  set member(Member value) => $_setField(1, value);
+  set profile(ParticipantProfile value) => $_setField(1, value);
   @$pb.TagNumber(1)
-  $core.bool hasMember() => $_has(0);
+  $core.bool hasProfile() => $_has(0);
   @$pb.TagNumber(1)
-  void clearMember() => $_clearField(1);
+  void clearProfile() => $_clearField(1);
   @$pb.TagNumber(1)
-  Member ensureMember() => $_ensure(0);
+  ParticipantProfile ensureProfile() => $_ensure(0);
+}
+
+class UpdateParticipantProfileRequest extends $pb.GeneratedMessage {
+  factory UpdateParticipantProfileRequest({
+    $core.String? displayName,
+    $core.List<$core.int>? avatarPng,
+    $core.bool? removeAvatar,
+    $fixnum.Int64? expectedRevision,
+  }) {
+    final result = UpdateParticipantProfileRequest._();
+    if (displayName != null) result.displayName = displayName;
+    if (avatarPng != null) result.avatarPng = avatarPng;
+    if (removeAvatar != null) result.removeAvatar = removeAvatar;
+    if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    return result;
+  }
+
+  UpdateParticipantProfileRequest._();
+
+  factory UpdateParticipantProfileRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateParticipantProfileRequest()..mergeFromBuffer(data, registry);
+  factory UpdateParticipantProfileRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateParticipantProfileRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UpdateParticipantProfileRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: UpdateParticipantProfileRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'displayName')
+    ..a<$core.List<$core.int>>(
+        2, _omitFieldNames ? '' : 'avatarPng', $pb.PbFieldType.OY)
+    ..aOB(3, _omitFieldNames ? '' : 'removeAvatar')
+    ..aInt64(4, _omitFieldNames ? '' : 'expectedRevision')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateParticipantProfileRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateParticipantProfileRequest copyWith(
+          void Function(UpdateParticipantProfileRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as UpdateParticipantProfileRequest))
+          as UpdateParticipantProfileRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use UpdateParticipantProfileRequest() / UpdateParticipantProfileRequest.new instead')
+  static UpdateParticipantProfileRequest create() =>
+      UpdateParticipantProfileRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      UpdateParticipantProfileRequest._();
+  @$core.override
+  UpdateParticipantProfileRequest createEmptyInstance() =>
+      UpdateParticipantProfileRequest._();
+  @$core.pragma('dart2js:noInline')
+  static UpdateParticipantProfileRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UpdateParticipantProfileRequest>(
+          UpdateParticipantProfileRequest.$_createMessage);
+  static UpdateParticipantProfileRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get displayName => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set displayName($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasDisplayName() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDisplayName() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get avatarPng => $_getN(1);
+  @$pb.TagNumber(2)
+  set avatarPng($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasAvatarPng() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAvatarPng() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get removeAvatar => $_getBF(2);
+  @$pb.TagNumber(3)
+  set removeAvatar($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasRemoveAvatar() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearRemoveAvatar() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get expectedRevision => $_getI64(3);
+  @$pb.TagNumber(4)
+  set expectedRevision($fixnum.Int64 value) => $_setInt64(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasExpectedRevision() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearExpectedRevision() => $_clearField(4);
+}
+
+class UpdateParticipantProfileResponse extends $pb.GeneratedMessage {
+  factory UpdateParticipantProfileResponse({
+    ParticipantProfile? profile,
+  }) {
+    final result = UpdateParticipantProfileResponse._();
+    if (profile != null) result.profile = profile;
+    return result;
+  }
+
+  UpdateParticipantProfileResponse._();
+
+  factory UpdateParticipantProfileResponse.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateParticipantProfileResponse()..mergeFromBuffer(data, registry);
+  factory UpdateParticipantProfileResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      UpdateParticipantProfileResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UpdateParticipantProfileResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: UpdateParticipantProfileResponse.$_createMessage)
+    ..aOM<ParticipantProfile>(1, _omitFieldNames ? '' : 'profile',
+        subBuilder: ParticipantProfile.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateParticipantProfileResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UpdateParticipantProfileResponse copyWith(
+          void Function(UpdateParticipantProfileResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as UpdateParticipantProfileResponse))
+          as UpdateParticipantProfileResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use UpdateParticipantProfileResponse() / UpdateParticipantProfileResponse.new instead')
+  static UpdateParticipantProfileResponse create() =>
+      UpdateParticipantProfileResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      UpdateParticipantProfileResponse._();
+  @$core.override
+  UpdateParticipantProfileResponse createEmptyInstance() =>
+      UpdateParticipantProfileResponse._();
+  @$core.pragma('dart2js:noInline')
+  static UpdateParticipantProfileResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UpdateParticipantProfileResponse>(
+          UpdateParticipantProfileResponse.$_createMessage);
+  static UpdateParticipantProfileResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ParticipantProfile get profile => $_getN(0);
+  @$pb.TagNumber(1)
+  set profile(ParticipantProfile value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasProfile() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearProfile() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ParticipantProfile ensureProfile() => $_ensure(0);
+}
+
+class ListParticipantProfilesRequest extends $pb.GeneratedMessage {
+  factory ListParticipantProfilesRequest({
+    $core.String? channelId,
+    $core.Iterable<$core.String>? principalIds,
+  }) {
+    final result = ListParticipantProfilesRequest._();
+    if (channelId != null) result.channelId = channelId;
+    if (principalIds != null) result.principalIds.addAll(principalIds);
+    return result;
+  }
+
+  ListParticipantProfilesRequest._();
+
+  factory ListParticipantProfilesRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListParticipantProfilesRequest()..mergeFromBuffer(data, registry);
+  factory ListParticipantProfilesRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListParticipantProfilesRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListParticipantProfilesRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListParticipantProfilesRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'channelId')
+    ..pPS(2, _omitFieldNames ? '' : 'principalIds')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListParticipantProfilesRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListParticipantProfilesRequest copyWith(
+          void Function(ListParticipantProfilesRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as ListParticipantProfilesRequest))
+          as ListParticipantProfilesRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListParticipantProfilesRequest() / ListParticipantProfilesRequest.new instead')
+  static ListParticipantProfilesRequest create() =>
+      ListParticipantProfilesRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ListParticipantProfilesRequest._();
+  @$core.override
+  ListParticipantProfilesRequest createEmptyInstance() =>
+      ListParticipantProfilesRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ListParticipantProfilesRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListParticipantProfilesRequest>(
+          ListParticipantProfilesRequest.$_createMessage);
+  static ListParticipantProfilesRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasChannelId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $pb.PbList<$core.String> get principalIds => $_getList(1);
+}
+
+class ListParticipantProfilesResponse extends $pb.GeneratedMessage {
+  factory ListParticipantProfilesResponse({
+    $core.Iterable<ParticipantProfile>? profiles,
+  }) {
+    final result = ListParticipantProfilesResponse._();
+    if (profiles != null) result.profiles.addAll(profiles);
+    return result;
+  }
+
+  ListParticipantProfilesResponse._();
+
+  factory ListParticipantProfilesResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListParticipantProfilesResponse()..mergeFromBuffer(data, registry);
+  factory ListParticipantProfilesResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListParticipantProfilesResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListParticipantProfilesResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListParticipantProfilesResponse.$_createMessage)
+    ..pPM<ParticipantProfile>(1, _omitFieldNames ? '' : 'profiles',
+        subBuilder: ParticipantProfile.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListParticipantProfilesResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListParticipantProfilesResponse copyWith(
+          void Function(ListParticipantProfilesResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as ListParticipantProfilesResponse))
+          as ListParticipantProfilesResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListParticipantProfilesResponse() / ListParticipantProfilesResponse.new instead')
+  static ListParticipantProfilesResponse create() =>
+      ListParticipantProfilesResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ListParticipantProfilesResponse._();
+  @$core.override
+  ListParticipantProfilesResponse createEmptyInstance() =>
+      ListParticipantProfilesResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ListParticipantProfilesResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListParticipantProfilesResponse>(
+          ListParticipantProfilesResponse.$_createMessage);
+  static ListParticipantProfilesResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<ParticipantProfile> get profiles => $_getList(0);
 }
 
 class Member extends $pb.GeneratedMessage {
@@ -1715,6 +2096,7 @@ class Member extends $pb.GeneratedMessage {
     $fixnum.Int64? revision,
     $fixnum.Int64? storageLimitBytes,
     $core.String? nickname,
+    $core.List<$core.int>? avatarPng,
   }) {
     final result = Member._();
     if (principalId != null) result.principalId = principalId;
@@ -1723,6 +2105,7 @@ class Member extends $pb.GeneratedMessage {
     if (revision != null) result.revision = revision;
     if (storageLimitBytes != null) result.storageLimitBytes = storageLimitBytes;
     if (nickname != null) result.nickname = nickname;
+    if (avatarPng != null) result.avatarPng = avatarPng;
     return result;
   }
 
@@ -1745,6 +2128,8 @@ class Member extends $pb.GeneratedMessage {
     ..aInt64(4, _omitFieldNames ? '' : 'revision')
     ..aInt64(5, _omitFieldNames ? '' : 'storageLimitBytes')
     ..aOS(6, _omitFieldNames ? '' : 'nickname')
+    ..a<$core.List<$core.int>>(
+        7, _omitFieldNames ? '' : 'avatarPng', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1820,6 +2205,15 @@ class Member extends $pb.GeneratedMessage {
   $core.bool hasNickname() => $_has(5);
   @$pb.TagNumber(6)
   void clearNickname() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.List<$core.int> get avatarPng => $_getN(6);
+  @$pb.TagNumber(7)
+  set avatarPng($core.List<$core.int> value) => $_setBytes(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasAvatarPng() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearAvatarPng() => $_clearField(7);
 }
 
 class ListMembersRequest extends $pb.GeneratedMessage {
@@ -10937,10 +11331,26 @@ class MembershipServiceApi {
 
   MembershipServiceApi(this._client);
 
-  $async.Future<UpdateProfileResponse> updateProfile(
-          $pb.ClientContext? ctx, UpdateProfileRequest request) =>
-      _client.invoke<UpdateProfileResponse>(ctx, 'MembershipService',
-          'UpdateProfile', request, UpdateProfileResponse());
+  $async.Future<GetParticipantProfileResponse> getParticipantProfile(
+          $pb.ClientContext? ctx, GetParticipantProfileRequest request) =>
+      _client.invoke<GetParticipantProfileResponse>(ctx, 'MembershipService',
+          'GetParticipantProfile', request, GetParticipantProfileResponse());
+  $async.Future<UpdateParticipantProfileResponse> updateParticipantProfile(
+          $pb.ClientContext? ctx, UpdateParticipantProfileRequest request) =>
+      _client.invoke<UpdateParticipantProfileResponse>(
+          ctx,
+          'MembershipService',
+          'UpdateParticipantProfile',
+          request,
+          UpdateParticipantProfileResponse());
+  $async.Future<ListParticipantProfilesResponse> listParticipantProfiles(
+          $pb.ClientContext? ctx, ListParticipantProfilesRequest request) =>
+      _client.invoke<ListParticipantProfilesResponse>(
+          ctx,
+          'MembershipService',
+          'ListParticipantProfiles',
+          request,
+          ListParticipantProfilesResponse());
   $async.Future<PreviewInviteResponse> previewInvite(
           $pb.ClientContext? ctx, PreviewInviteRequest request) =>
       _client.invoke<PreviewInviteResponse>(ctx, 'MembershipService',

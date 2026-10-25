@@ -380,5 +380,13 @@
   "notificationReply": "回复你的消息",
   "notificationOpen": "打开",
   "mlsMentionsLegacy": "部分设备尚未确认支持提及。将仅发送姓名，不包含提及标记。",
-  "mlsCancelRetry": "取消成员变更后的待发送消息"
+  "mlsCancelRetry": "取消成员变更后的待发送消息",
+  "profileAvatar": "空间头像",
+  "chooseAvatar": "选择图片",
+  "removeAvatar": "移除头像",
+  "avatarInvalid": "请选择不超过 5 MiB 和 400 万像素的静态 PNG 或 JPEG 图片。",
+  "profileConflict": "个人资料已在其他设备上更改。请重新加载后保存；您的草稿已保留。",
+  "profileSaved": "个人资料已保存",
+  "saveProfile": "保存个人资料",
+  "profileSpaceHelp": "名称在此空间内唯一。名称和头像适用于所有版块。"
 }

@@ -288,7 +288,7 @@ Future<void> verifyUpgradedFiles(SpaceSession session) async {
     [complete.asset.id],
   );
   expect(await downloadAttachment(session, sent.attachments.single), bytes);
-  await session.setNickname('Владелец после обновления');
+  await updateParticipantName(session, 'Владелец после обновления');
   final result = await session.adminRequest('/api/v1/space/members');
   expect(
     (result['members'] as List).any(

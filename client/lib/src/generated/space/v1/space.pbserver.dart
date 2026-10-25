@@ -439,8 +439,12 @@ abstract class AdminServiceBase extends $pb.GeneratedService {
 }
 
 abstract class MembershipServiceBase extends $pb.GeneratedService {
-  $async.Future<$1.UpdateProfileResponse> updateProfile(
-      $pb.ServerContext ctx, $1.UpdateProfileRequest request);
+  $async.Future<$1.GetParticipantProfileResponse> getParticipantProfile(
+      $pb.ServerContext ctx, $1.GetParticipantProfileRequest request);
+  $async.Future<$1.UpdateParticipantProfileResponse> updateParticipantProfile(
+      $pb.ServerContext ctx, $1.UpdateParticipantProfileRequest request);
+  $async.Future<$1.ListParticipantProfilesResponse> listParticipantProfiles(
+      $pb.ServerContext ctx, $1.ListParticipantProfilesRequest request);
   $async.Future<$1.PreviewInviteResponse> previewInvite(
       $pb.ServerContext ctx, $1.PreviewInviteRequest request);
   $async.Future<$1.AcceptInviteResponse> acceptInvite(
@@ -450,8 +454,12 @@ abstract class MembershipServiceBase extends $pb.GeneratedService {
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
-      case 'UpdateProfile':
-        return $1.UpdateProfileRequest();
+      case 'GetParticipantProfile':
+        return $1.GetParticipantProfileRequest();
+      case 'UpdateParticipantProfile':
+        return $1.UpdateParticipantProfileRequest();
+      case 'ListParticipantProfiles':
+        return $1.ListParticipantProfilesRequest();
       case 'PreviewInvite':
         return $1.PreviewInviteRequest();
       case 'AcceptInvite':
@@ -466,8 +474,15 @@ abstract class MembershipServiceBase extends $pb.GeneratedService {
   $async.Future<$pb.GeneratedMessage> handleCall($pb.ServerContext ctx,
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
-      case 'UpdateProfile':
-        return updateProfile(ctx, request as $1.UpdateProfileRequest);
+      case 'GetParticipantProfile':
+        return getParticipantProfile(
+            ctx, request as $1.GetParticipantProfileRequest);
+      case 'UpdateParticipantProfile':
+        return updateParticipantProfile(
+            ctx, request as $1.UpdateParticipantProfileRequest);
+      case 'ListParticipantProfiles':
+        return listParticipantProfiles(
+            ctx, request as $1.ListParticipantProfilesRequest);
       case 'PreviewInvite':
         return previewInvite(ctx, request as $1.PreviewInviteRequest);
       case 'AcceptInvite':

@@ -1,3 +1,4 @@
+import '../member_avatar.dart';
 import 'storage_limits.dart';
 import 'content_insets.dart';
 
@@ -197,10 +198,7 @@ class _MembersPanelState extends State<MembersPanel> {
           children: [
             Align(
               alignment: Alignment.centerLeft,
-              child: CircleAvatar(
-                radius: 16,
-                child: Icon(Icons.person_outline),
-              ),
+              child: MemberAvatar(data: memberAvatarData(m['avatarPng'])),
             ),
             const SizedBox(height: 12),
             if ((m['nickname'] as String? ?? '').isNotEmpty)

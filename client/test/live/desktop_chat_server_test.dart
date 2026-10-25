@@ -20,6 +20,8 @@ import '../support/chat_outbox.dart';
 import 'mls_server_test.dart' show client;
 
 class _ClosedSession implements SpaceSession {
+  @override
+  bool get participantProfilesSupported => false;
   _ClosedSession(this.client);
   final MlsClient client;
   @override

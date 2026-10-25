@@ -1,3 +1,5 @@
+import 'participant_profiles.dart';
+export 'participant_profiles.dart';
 export 'endpoint_connection.dart';
 export 'server_endpoints.dart';
 import 'server_endpoints.dart';
@@ -664,11 +666,6 @@ abstract interface class ServerIconPresentation {
   ServerIcon? get serverIcon;
 }
 
-abstract interface class MemberProfile {
-  Future<String> getNickname();
-  Future<void> setNickname(String nickname);
-}
-
 abstract interface class AttachmentPolicy {
   bool get attachmentsEnabled;
 }
@@ -703,7 +700,7 @@ class SpaceSession
         QueuedMutationSession,
         MessageChanges,
         MessageReactions,
-        MemberProfile,
+        ParticipantProfiles,
         AttachmentSession,
         AttachmentPolicy,
         SpacePresentation,
@@ -828,6 +825,8 @@ class SpaceSession
   bool communitySearchSupported = false;
   bool communityMentionsSupported = false;
   bool chatMentionsSupported = false;
+  @override
+  bool participantProfilesSupported = false;
   bool personalNotificationsSupported = false;
   late final _personalNotificationApi = SessionPersonalNotificationApi(this);
   @override
@@ -904,6 +903,9 @@ class SpaceSession
     feedReadSupported = manifest.capabilities.contains('core.feed.read.v1');
     communityOverviewSupported = manifest.capabilities.contains(
       'core.community.overview.v1',
+    );
+    participantProfilesSupported = manifest.capabilities.contains(
+      'core.member.profile.v1',
     );
     personalNotificationsSupported = manifest.capabilities.contains(
       'core.personal.notifications.v1',
@@ -1322,6 +1324,9 @@ class SpaceSession
       );
       session.communityOverviewSupported = manifest.capabilities.contains(
         'core.community.overview.v1',
+      );
+      session.participantProfilesSupported = manifest.capabilities.contains(
+        'core.member.profile.v1',
       );
       session.personalNotificationsSupported = manifest.capabilities.contains(
         'core.personal.notifications.v1',
@@ -1842,20 +1847,44 @@ class SpaceSession
   }
 
   @override
-  Future<String> getNickname() async {
+  String get profilePrincipalId => principalId;
+
+  @override
+  Future<ParticipantProfile> getParticipantProfile() async {
     await _ensureSession();
-    final result = await MembershipServiceClient(channel)
-        .getMembership(GetMembershipRequest(), options: _options);
-    return result.member.nickname;
+    final result = await MembershipServiceClient(
+      channel,
+    ).getParticipantProfile(GetParticipantProfileRequest(), options: _options);
+    return checkedParticipantProfile(result.profile, principal: principalId);
   }
 
   @override
-  Future<void> setNickname(String nickname) async {
+  Future<ParticipantProfile> updateParticipantProfile(
+    UpdateParticipantProfileRequest request,
+  ) async {
     await _ensureSession();
-    await MembershipServiceClient(channel).updateProfile(
-      UpdateProfileRequest(nickname: nickname),
-      options: _options,
-    );
+    final result = await MembershipServiceClient(channel)
+        .updateParticipantProfile(request, options: _options);
+    return checkedParticipantProfile(result.profile, principal: principalId);
+  }
+
+  @override
+  Future<List<ParticipantProfile>> listParticipantProfiles(
+    String channelId,
+    List<String> ids,
+  ) async {
+    await _ensureSession();
+    final result = await MembershipServiceClient(channel)
+        .listParticipantProfiles(
+          ListParticipantProfilesRequest(
+            channelId: channelId,
+            principalIds: ids,
+          ),
+          options: _options,
+        );
+    return result.profiles
+        .map((value) => checkedParticipantProfile(value))
+        .toList();
   }
 
   @override

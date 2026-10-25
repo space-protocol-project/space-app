@@ -42,6 +42,8 @@ final roster = VoiceRoomState(
 
 class ScreenshotSession implements SpaceSession {
   @override
+  bool get participantProfilesSupported => false;
+  @override
   final server = Discovery(
     localOrigin('http://127.0.0.1:8080'),
     'srv_voice_demo',

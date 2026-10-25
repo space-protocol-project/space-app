@@ -1,3 +1,4 @@
+import 'participant_profile.dart';
 import '../src/community_mentions.dart';
 import '../src/generated/space/v1/community_mentions.pb.dart';
 import '../src/mls/drafts.dart';
@@ -93,6 +94,7 @@ class _MlsChannelViewState extends State<MlsChannelView> {
           base64Encode(widget.groupId),
         )),
         client: client,
+        profiles: participantProfiles(widget.session),
         mentionApi: widget.session.chatMentionsSupported ? mentionApi : null,
         channelId: widget.channelId,
         groupId: widget.groupId,
@@ -111,6 +113,7 @@ class _MlsConversation extends StatefulWidget {
     super.key,
     required this.client,
     this.mentionApi,
+    this.profiles,
     required this.channelId,
     required this.groupId,
     required this.attachmentsEnabled,
@@ -120,6 +123,7 @@ class _MlsConversation extends StatefulWidget {
     this.jumpGeneration = 0,
   });
   final MlsClient client;
+  final ParticipantProfiles? profiles;
   final CommunityMentionApi? mentionApi;
   final String channelId;
   final List<int> groupId;
@@ -531,11 +535,23 @@ class _MlsConversationState extends State<_MlsConversation> {
           ),
           child: MessageBodyLayout(
             children: [
-              Text(
-                item['author_id'] as String,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelSmall,
+              Row(
+                children: [
+                  ParticipantAvatar(
+                    principal: item['author_id'] as String,
+                    radius: 12,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ParticipantName(
+                      principal: item['author_id'] as String,
+                      fallback: item['author_id'] as String,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 6),
               if (message['reply'] != null)
@@ -819,7 +835,27 @@ class _MlsConversationState extends State<_MlsConversation> {
         ...?state.data?.messages,
       ]..sort((a, b) => (a['sequence'] as int).compareTo(b['sequence'] as int));
       scheduleJump(messages);
-      return Padding(
+      return ParticipantProfileScope(
+        api: widget.profiles,
+        channel: widget.channelId,
+        ids: _roster(state),
+        active:
+            widget.active && state.data?.joined == true && state.error.isEmpty,
+        child: _conversation(state, messages),
+      );
+    },
+  );
+
+  Iterable<String> _roster(MlsState state) =>
+      (state.data?.channel['roster'] as List? ?? const [])
+          .whereType<Map>()
+          .map((binding) => binding['device'])
+          .whereType<Map>()
+          .map((device) => device['principal_id'])
+          .whereType<String>();
+
+  Widget _conversation(MlsState state, List<Map<String, dynamic>> messages) =>
+      Padding(
         padding: const EdgeInsets.only(top: 72),
         child: Column(
           children: [
@@ -858,8 +894,6 @@ class _MlsConversationState extends State<_MlsConversation> {
           ],
         ),
       );
-    },
-  );
   bool hasRebasedMessages(MlsState state) =>
       (state.data?.channel['retry_messages'] as List? ?? const []).isNotEmpty ||
       state.data?.channel['retry_message'] != null;

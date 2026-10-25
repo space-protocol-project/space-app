@@ -237,21 +237,13 @@ void main() {
         find.text('Идентичности и ключи этого устройства.'),
         findsOneWidget,
       );
-      await tester.tap(find.byTooltip('Открыть навигацию'));
-      await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(
-        find.byKey(const ValueKey('app-settings-tab')),
-        160,
-        scrollable: find
-            .descendant(
-              of: find.byKey(const ValueKey('mobile-navigation')),
-              matching: find.byType(Scrollable),
-            )
-            .first,
-      );
-      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('app-settings-tab')));
       await tester.pumpAndSettle();
+      expect(
+        tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex,
+        3,
+      );
+      expect(find.text('Настройки приложения'), findsWidgets);
       expect(find.text('Оформление пространства'), findsNothing);
       expect(tester.takeException(), isNull);
     },

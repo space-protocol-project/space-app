@@ -1,3 +1,4 @@
+import 'participant_profile.dart';
 import '../src/community_mentions_api.dart';
 import '../src/generated/space/v1/community_mentions.pb.dart';
 import 'community_mentions.dart';
@@ -82,6 +83,7 @@ class _FeedViewState extends State<FeedView> {
     return FeedArea(
       key: ObjectKey(session),
       api: SessionFeedApi(session),
+      profiles: participantProfiles(session),
       active: widget.active,
       sectionId: widget.sectionId,
       initialPost: widget.initialPost,
@@ -126,6 +128,7 @@ class FeedArea extends StatefulWidget {
   const FeedArea({
     super.key,
     required this.api,
+    this.profiles,
     this.active = true,
     this.sendWithShift = false,
     this.sectionId,
@@ -136,6 +139,7 @@ class FeedArea extends StatefulWidget {
     this.authorize,
   });
   final FeedApi api;
+  final ParticipantProfiles? profiles;
   final bool active, sendWithShift;
   final String? sectionId;
   final String initialPost;
@@ -284,13 +288,34 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) => BlocBuilder<FeedController, FeedState>(
     bloc: controller,
-    builder: (context, state) => PopScope(
-      canPop: !widget.active || state.post == null,
-      onPopInvokedWithResult: (didPop, _) {
-        if (!didPop && widget.active && !state.busy) controller.back();
-      },
-      child: _page(state),
+    builder: (context, state) => ParticipantProfileScope(
+      api: widget.profiles,
+      channel: state.section?.id ?? '',
+      ids: _authors(state),
+      active: widget.active && foreground && state.error == null,
+      child: _navigation(state),
     ),
+  );
+
+  Iterable<String> _authors(FeedState state) sync* {
+    for (final post in state.posts.where((p) => !p.hidden)) {
+      yield post.authorId;
+    }
+    final post = state.post;
+    if (post != null && !post.hidden) {
+      yield post.authorId;
+    }
+    for (final comment in state.comments.where((c) => !c.hidden)) {
+      yield comment.authorId;
+    }
+  }
+
+  Widget _navigation(FeedState state) => PopScope(
+    canPop: !widget.active || state.post == null,
+    onPopInvokedWithResult: (didPop, _) {
+      if (!didPop && widget.active && !state.busy) controller.back();
+    },
+    child: _page(state),
   );
 
   void _scheduleRead(FeedState state) {
@@ -489,6 +514,7 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
     text: post.text,
     mentions: post.mentions,
     author: forumAuthor(post.authorName, post.authorId),
+    authorId: post.authorId,
     timestamp: post.createdAtUnix.toInt(),
     hidden: post.hidden,
     hiddenText: context.strings.feedHiddenPost,
@@ -574,6 +600,7 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
     text: comment.text,
     mentions: comment.mentions,
     author: forumAuthor(comment.authorName, comment.authorId),
+    authorId: comment.authorId,
     timestamp: comment.createdAtUnix.toInt(),
     hidden: comment.hidden,
     hiddenText: context.strings.feedHiddenComment,
@@ -613,6 +640,7 @@ class FeedEntryCard extends StatelessWidget {
     this.mentions = const [],
     required this.text,
     required this.author,
+    this.authorId = '',
     required this.timestamp,
     required this.hidden,
     required this.hiddenText,
@@ -621,7 +649,7 @@ class FeedEntryCard extends StatelessWidget {
     required this.actions,
   });
   final List<CommunityMention> mentions;
-  final String text, author, hiddenText;
+  final String text, author, authorId, hiddenText;
   final int timestamp;
   final bool hidden;
   final List<Asset> assets;
@@ -636,9 +664,27 @@ class FeedEntryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!hidden)
-            Text(
-              '$author · ${forumDate(context, timestamp)}',
-              style: Theme.of(context).textTheme.bodySmall,
+            Row(
+              children: [
+                ParticipantAvatar(principal: authorId, radius: 14),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ParticipantName(
+                        principal: authorId,
+                        fallback: author,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Text(
+                        forumDate(context, timestamp),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           const SizedBox(height: 12),
           CommunityMentionText(

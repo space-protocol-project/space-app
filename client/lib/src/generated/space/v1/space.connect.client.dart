@@ -818,15 +818,49 @@ extension type AdminServiceClient (connect.Transport _transport) {
   }
 }
 extension type MembershipServiceClient (connect.Transport _transport) {
-  Future<spacev1space.UpdateProfileResponse> updateProfile(
-    spacev1space.UpdateProfileRequest input, {
+  Future<spacev1space.GetParticipantProfileResponse> getParticipantProfile(
+    spacev1space.GetParticipantProfileRequest input, {
     connect.Headers? headers,
     connect.AbortSignal? signal,
     Function(connect.Headers)? onHeader,
     Function(connect.Headers)? onTrailer,
   }) {
     return connect.Client(_transport).unary(
-      specs.MembershipService.updateProfile,
+      specs.MembershipService.getParticipantProfile,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1space.UpdateParticipantProfileResponse> updateParticipantProfile(
+    spacev1space.UpdateParticipantProfileRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.MembershipService.updateParticipantProfile,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1space.ListParticipantProfilesResponse> listParticipantProfiles(
+    spacev1space.ListParticipantProfilesRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.MembershipService.listParticipantProfiles,
       input,
       signal: signal,
       headers: headers,

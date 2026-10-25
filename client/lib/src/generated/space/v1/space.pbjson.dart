@@ -387,38 +387,145 @@ const ProposePairingResponse$json = {
 final $typed_data.Uint8List proposePairingResponseDescriptor =
     $convert.base64Decode('ChZQcm9wb3NlUGFpcmluZ1Jlc3BvbnNl');
 
-@$core.Deprecated('Use updateProfileRequestDescriptor instead')
-const UpdateProfileRequest$json = {
-  '1': 'UpdateProfileRequest',
+@$core.Deprecated('Use participantProfileDescriptor instead')
+const ParticipantProfile$json = {
+  '1': 'ParticipantProfile',
   '2': [
-    {'1': 'nickname', '3': 1, '4': 1, '5': 9, '10': 'nickname'},
+    {'1': 'principal_id', '3': 1, '4': 1, '5': 9, '10': 'principalId'},
+    {'1': 'display_name', '3': 2, '4': 1, '5': 9, '10': 'displayName'},
+    {'1': 'avatar_png', '3': 3, '4': 1, '5': 12, '10': 'avatarPng'},
+    {'1': 'revision', '3': 4, '4': 1, '5': 3, '10': 'revision'},
   ],
 };
 
-/// Descriptor for `UpdateProfileRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List updateProfileRequestDescriptor =
-    $convert.base64Decode(
-        'ChRVcGRhdGVQcm9maWxlUmVxdWVzdBIaCghuaWNrbmFtZRgBIAEoCVIIbmlja25hbWU=');
+/// Descriptor for `ParticipantProfile`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List participantProfileDescriptor = $convert.base64Decode(
+    'ChJQYXJ0aWNpcGFudFByb2ZpbGUSIQoMcHJpbmNpcGFsX2lkGAEgASgJUgtwcmluY2lwYWxJZB'
+    'IhCgxkaXNwbGF5X25hbWUYAiABKAlSC2Rpc3BsYXlOYW1lEh0KCmF2YXRhcl9wbmcYAyABKAxS'
+    'CWF2YXRhclBuZxIaCghyZXZpc2lvbhgEIAEoA1IIcmV2aXNpb24=');
 
-@$core.Deprecated('Use updateProfileResponseDescriptor instead')
-const UpdateProfileResponse$json = {
-  '1': 'UpdateProfileResponse',
+@$core.Deprecated('Use getParticipantProfileRequestDescriptor instead')
+const GetParticipantProfileRequest$json = {
+  '1': 'GetParticipantProfileRequest',
+};
+
+/// Descriptor for `GetParticipantProfileRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getParticipantProfileRequestDescriptor =
+    $convert.base64Decode('ChxHZXRQYXJ0aWNpcGFudFByb2ZpbGVSZXF1ZXN0');
+
+@$core.Deprecated('Use getParticipantProfileResponseDescriptor instead')
+const GetParticipantProfileResponse$json = {
+  '1': 'GetParticipantProfileResponse',
   '2': [
     {
-      '1': 'member',
+      '1': 'profile',
       '3': 1,
       '4': 1,
       '5': 11,
-      '6': '.space.v1.Member',
-      '10': 'member'
+      '6': '.space.v1.ParticipantProfile',
+      '10': 'profile'
     },
   ],
 };
 
-/// Descriptor for `UpdateProfileResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List updateProfileResponseDescriptor = $convert.base64Decode(
-    'ChVVcGRhdGVQcm9maWxlUmVzcG9uc2USKAoGbWVtYmVyGAEgASgLMhAuc3BhY2UudjEuTWVtYm'
-    'VyUgZtZW1iZXI=');
+/// Descriptor for `GetParticipantProfileResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getParticipantProfileResponseDescriptor =
+    $convert.base64Decode(
+        'Ch1HZXRQYXJ0aWNpcGFudFByb2ZpbGVSZXNwb25zZRI2Cgdwcm9maWxlGAEgASgLMhwuc3BhY2'
+        'UudjEuUGFydGljaXBhbnRQcm9maWxlUgdwcm9maWxl');
+
+@$core.Deprecated('Use updateParticipantProfileRequestDescriptor instead')
+const UpdateParticipantProfileRequest$json = {
+  '1': 'UpdateParticipantProfileRequest',
+  '2': [
+    {'1': 'display_name', '3': 1, '4': 1, '5': 9, '10': 'displayName'},
+    {
+      '1': 'avatar_png',
+      '3': 2,
+      '4': 1,
+      '5': 12,
+      '9': 0,
+      '10': 'avatarPng',
+      '17': true
+    },
+    {'1': 'remove_avatar', '3': 3, '4': 1, '5': 8, '10': 'removeAvatar'},
+    {
+      '1': 'expected_revision',
+      '3': 4,
+      '4': 1,
+      '5': 3,
+      '10': 'expectedRevision'
+    },
+  ],
+  '8': [
+    {'1': '_avatar_png'},
+  ],
+};
+
+/// Descriptor for `UpdateParticipantProfileRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List updateParticipantProfileRequestDescriptor =
+    $convert.base64Decode(
+        'Ch9VcGRhdGVQYXJ0aWNpcGFudFByb2ZpbGVSZXF1ZXN0EiEKDGRpc3BsYXlfbmFtZRgBIAEoCV'
+        'ILZGlzcGxheU5hbWUSIgoKYXZhdGFyX3BuZxgCIAEoDEgAUglhdmF0YXJQbmeIAQESIwoNcmVt'
+        'b3ZlX2F2YXRhchgDIAEoCFIMcmVtb3ZlQXZhdGFyEisKEWV4cGVjdGVkX3JldmlzaW9uGAQgAS'
+        'gDUhBleHBlY3RlZFJldmlzaW9uQg0KC19hdmF0YXJfcG5n');
+
+@$core.Deprecated('Use updateParticipantProfileResponseDescriptor instead')
+const UpdateParticipantProfileResponse$json = {
+  '1': 'UpdateParticipantProfileResponse',
+  '2': [
+    {
+      '1': 'profile',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.ParticipantProfile',
+      '10': 'profile'
+    },
+  ],
+};
+
+/// Descriptor for `UpdateParticipantProfileResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List updateParticipantProfileResponseDescriptor =
+    $convert.base64Decode(
+        'CiBVcGRhdGVQYXJ0aWNpcGFudFByb2ZpbGVSZXNwb25zZRI2Cgdwcm9maWxlGAEgASgLMhwuc3'
+        'BhY2UudjEuUGFydGljaXBhbnRQcm9maWxlUgdwcm9maWxl');
+
+@$core.Deprecated('Use listParticipantProfilesRequestDescriptor instead')
+const ListParticipantProfilesRequest$json = {
+  '1': 'ListParticipantProfilesRequest',
+  '2': [
+    {'1': 'channel_id', '3': 1, '4': 1, '5': 9, '10': 'channelId'},
+    {'1': 'principal_ids', '3': 2, '4': 3, '5': 9, '10': 'principalIds'},
+  ],
+};
+
+/// Descriptor for `ListParticipantProfilesRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listParticipantProfilesRequestDescriptor =
+    $convert.base64Decode(
+        'Ch5MaXN0UGFydGljaXBhbnRQcm9maWxlc1JlcXVlc3QSHQoKY2hhbm5lbF9pZBgBIAEoCVIJY2'
+        'hhbm5lbElkEiMKDXByaW5jaXBhbF9pZHMYAiADKAlSDHByaW5jaXBhbElkcw==');
+
+@$core.Deprecated('Use listParticipantProfilesResponseDescriptor instead')
+const ListParticipantProfilesResponse$json = {
+  '1': 'ListParticipantProfilesResponse',
+  '2': [
+    {
+      '1': 'profiles',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.ParticipantProfile',
+      '10': 'profiles'
+    },
+  ],
+};
+
+/// Descriptor for `ListParticipantProfilesResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listParticipantProfilesResponseDescriptor =
+    $convert.base64Decode(
+        'Ch9MaXN0UGFydGljaXBhbnRQcm9maWxlc1Jlc3BvbnNlEjgKCHByb2ZpbGVzGAEgAygLMhwuc3'
+        'BhY2UudjEuUGFydGljaXBhbnRQcm9maWxlUghwcm9maWxlcw==');
 
 @$core.Deprecated('Use memberDescriptor instead')
 const Member$json = {
@@ -438,6 +545,7 @@ const Member$json = {
       '17': true
     },
     {'1': 'nickname', '3': 6, '4': 1, '5': 9, '10': 'nickname'},
+    {'1': 'avatar_png', '3': 7, '4': 1, '5': 12, '10': 'avatarPng'},
   ],
   '8': [
     {'1': '_storage_limit_bytes'},
@@ -449,7 +557,8 @@ final $typed_data.Uint8List memberDescriptor = $convert.base64Decode(
     'CgZNZW1iZXISIQoMcHJpbmNpcGFsX2lkGAEgASgJUgtwcmluY2lwYWxJZBISCgRyb2xlGAIgAS'
     'gJUgRyb2xlEhgKB2Jsb2NrZWQYAyABKAhSB2Jsb2NrZWQSGgoIcmV2aXNpb24YBCABKANSCHJl'
     'dmlzaW9uEjMKE3N0b3JhZ2VfbGltaXRfYnl0ZXMYBSABKANIAFIRc3RvcmFnZUxpbWl0Qnl0ZX'
-    'OIAQESGgoIbmlja25hbWUYBiABKAlSCG5pY2tuYW1lQhYKFF9zdG9yYWdlX2xpbWl0X2J5dGVz');
+    'OIAQESGgoIbmlja25hbWUYBiABKAlSCG5pY2tuYW1lEh0KCmF2YXRhcl9wbmcYByABKAxSCWF2'
+    'YXRhclBuZ0IWChRfc3RvcmFnZV9saW1pdF9ieXRlcw==');
 
 @$core.Deprecated('Use listMembersRequestDescriptor instead')
 const ListMembersRequest$json = {
@@ -3421,9 +3530,19 @@ const $core.Map<$core.String, $core.dynamic> MembershipServiceBase$json = {
   '1': 'MembershipService',
   '2': [
     {
-      '1': 'UpdateProfile',
-      '2': '.space.v1.UpdateProfileRequest',
-      '3': '.space.v1.UpdateProfileResponse'
+      '1': 'GetParticipantProfile',
+      '2': '.space.v1.GetParticipantProfileRequest',
+      '3': '.space.v1.GetParticipantProfileResponse'
+    },
+    {
+      '1': 'UpdateParticipantProfile',
+      '2': '.space.v1.UpdateParticipantProfileRequest',
+      '3': '.space.v1.UpdateParticipantProfileResponse'
+    },
+    {
+      '1': 'ListParticipantProfiles',
+      '2': '.space.v1.ListParticipantProfilesRequest',
+      '3': '.space.v1.ListParticipantProfilesResponse'
     },
     {
       '1': 'PreviewInvite',
@@ -3449,28 +3568,41 @@ const $core.Map<$core.String, $core.dynamic> MembershipServiceBase$json = {
 @$core.Deprecated('Use membershipServiceDescriptor instead')
 const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
     MembershipServiceBase$messageJson = {
-  '.space.v1.UpdateProfileRequest': UpdateProfileRequest$json,
-  '.space.v1.UpdateProfileResponse': UpdateProfileResponse$json,
-  '.space.v1.Member': Member$json,
+  '.space.v1.GetParticipantProfileRequest': GetParticipantProfileRequest$json,
+  '.space.v1.GetParticipantProfileResponse': GetParticipantProfileResponse$json,
+  '.space.v1.ParticipantProfile': ParticipantProfile$json,
+  '.space.v1.UpdateParticipantProfileRequest':
+      UpdateParticipantProfileRequest$json,
+  '.space.v1.UpdateParticipantProfileResponse':
+      UpdateParticipantProfileResponse$json,
+  '.space.v1.ListParticipantProfilesRequest':
+      ListParticipantProfilesRequest$json,
+  '.space.v1.ListParticipantProfilesResponse':
+      ListParticipantProfilesResponse$json,
   '.space.v1.PreviewInviteRequest': PreviewInviteRequest$json,
   '.space.v1.PreviewInviteResponse': PreviewInviteResponse$json,
   '.space.v1.AcceptInviteRequest': AcceptInviteRequest$json,
   '.space.v1.AcceptInviteResponse': AcceptInviteResponse$json,
+  '.space.v1.Member': Member$json,
   '.space.v1.GetMembershipRequest': GetMembershipRequest$json,
   '.space.v1.GetMembershipResponse': GetMembershipResponse$json,
 };
 
 /// Descriptor for `MembershipService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
 final $typed_data.Uint8List membershipServiceDescriptor = $convert.base64Decode(
-    'ChFNZW1iZXJzaGlwU2VydmljZRJQCg1VcGRhdGVQcm9maWxlEh4uc3BhY2UudjEuVXBkYXRlUH'
-    'JvZmlsZVJlcXVlc3QaHy5zcGFjZS52MS5VcGRhdGVQcm9maWxlUmVzcG9uc2USfwoNUHJldmll'
-    'd0ludml0ZRIeLnNwYWNlLnYxLlByZXZpZXdJbnZpdGVSZXF1ZXN0Gh8uc3BhY2UudjEuUHJldm'
-    'lld0ludml0ZVJlc3BvbnNlIi2C0+STAic6ASoiIi9hcGkvdjEvbWVtYmVyc2hpcC9pbnZpdGVz'
-    'L3ByZXZpZXcSewoMQWNjZXB0SW52aXRlEh0uc3BhY2UudjEuQWNjZXB0SW52aXRlUmVxdWVzdB'
-    'oeLnNwYWNlLnYxLkFjY2VwdEludml0ZVJlc3BvbnNlIiyC0+STAiY6ASoiIS9hcGkvdjEvbWVt'
-    'YmVyc2hpcC9pbnZpdGVzL2FjY2VwdBJsCg1HZXRNZW1iZXJzaGlwEh4uc3BhY2UudjEuR2V0TW'
-    'VtYmVyc2hpcFJlcXVlc3QaHy5zcGFjZS52MS5HZXRNZW1iZXJzaGlwUmVzcG9uc2UiGoLT5JMC'
-    'FBISL2FwaS92MS9tZW1iZXJzaGlw');
+    'ChFNZW1iZXJzaGlwU2VydmljZRJoChVHZXRQYXJ0aWNpcGFudFByb2ZpbGUSJi5zcGFjZS52MS'
+    '5HZXRQYXJ0aWNpcGFudFByb2ZpbGVSZXF1ZXN0Gicuc3BhY2UudjEuR2V0UGFydGljaXBhbnRQ'
+    'cm9maWxlUmVzcG9uc2UScQoYVXBkYXRlUGFydGljaXBhbnRQcm9maWxlEikuc3BhY2UudjEuVX'
+    'BkYXRlUGFydGljaXBhbnRQcm9maWxlUmVxdWVzdBoqLnNwYWNlLnYxLlVwZGF0ZVBhcnRpY2lw'
+    'YW50UHJvZmlsZVJlc3BvbnNlEm4KF0xpc3RQYXJ0aWNpcGFudFByb2ZpbGVzEiguc3BhY2Uudj'
+    'EuTGlzdFBhcnRpY2lwYW50UHJvZmlsZXNSZXF1ZXN0Gikuc3BhY2UudjEuTGlzdFBhcnRpY2lw'
+    'YW50UHJvZmlsZXNSZXNwb25zZRJ/Cg1QcmV2aWV3SW52aXRlEh4uc3BhY2UudjEuUHJldmlld0'
+    'ludml0ZVJlcXVlc3QaHy5zcGFjZS52MS5QcmV2aWV3SW52aXRlUmVzcG9uc2UiLYLT5JMCJzoB'
+    'KiIiL2FwaS92MS9tZW1iZXJzaGlwL2ludml0ZXMvcHJldmlldxJ7CgxBY2NlcHRJbnZpdGUSHS'
+    '5zcGFjZS52MS5BY2NlcHRJbnZpdGVSZXF1ZXN0Gh4uc3BhY2UudjEuQWNjZXB0SW52aXRlUmVz'
+    'cG9uc2UiLILT5JMCJjoBKiIhL2FwaS92MS9tZW1iZXJzaGlwL2ludml0ZXMvYWNjZXB0EmwKDU'
+    'dldE1lbWJlcnNoaXASHi5zcGFjZS52MS5HZXRNZW1iZXJzaGlwUmVxdWVzdBofLnNwYWNlLnYx'
+    'LkdldE1lbWJlcnNoaXBSZXNwb25zZSIagtPkkwIUEhIvYXBpL3YxL21lbWJlcnNoaXA=');
 
 const $core.Map<$core.String, $core.dynamic> MlsServiceBase$json = {
   '1': 'MlsService',
