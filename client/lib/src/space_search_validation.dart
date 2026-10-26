@@ -64,8 +64,9 @@ List<SpaceSearchResult> _checkedSpacePage(
     final item = source.deepCopy()..freeze();
     _checkSpaceMetadata(item);
     _checkSpaceTarget(item, channels);
-    if (!keys.add(spaceSearchKey(item)))
+    if (!keys.add(spaceSearchKey(item))) {
       throw StateError('Повтор результата поиска');
+    }
     if (result.isNotEmpty && compareSpaceSearch(result.last, item) >= 0) {
       throw StateError('Нарушен порядок результатов поиска');
     }

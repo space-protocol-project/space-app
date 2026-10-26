@@ -82,6 +82,7 @@ jobs:
           paths = glob.glob('lib/src/space_search*.dart') + glob.glob('lib/ui/space_search*.dart')
           paths += ['lib/ui/shell_space_search.dart', 'lib/src/core.dart', 'lib/src/chat_controller.dart', 'lib/ui/shell.dart', 'lib/ui/shell_message_search.dart']
           paths += glob.glob('test/space_search*_test.dart') + glob.glob('test/support/space_search.dart') + glob.glob('test/probes/space_search_probe.dart')
+          paths += glob.glob('tool/community_space_search_interoperability.dart')
           subprocess.run(['dart', 'format', *[p for p in paths if not p.endswith('.freezed.dart')]], check=True)
           PY
       - name: Анализ и целевые проверки общего поиска
@@ -124,4 +125,5 @@ jobs:
             app/client/test/space_search*_test.dart
             app/client/test/support/space_search.dart
             app/client/test/probes/space_search_probe.dart
+            app/client/tool/community_space_search_interoperability.dart
           if-no-files-found: error

@@ -109,10 +109,11 @@ extension _ShellSpaceSearch on _SpaceShellState {
       await scope.target.revealSearchMessage(message!);
       if (_spaceSearchCurrent(scope)) openMessage(hit.id);
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.strings.communitySearchRevoked)),
         );
+      }
     }
   }
 }
