@@ -50,12 +50,12 @@ jobs:
         run: |
           (cd protocol && buf lint)
           mkdir -p "$RUNNER_TEMP/feed-schema/space/v1"
-          cp protocol/protocol/proto/space/v1/feed.proto "$RUNNER_TEMP/feed-schema/space/v1/"
-          (cd protocol && buf generate "$RUNNER_TEMP/feed-schema" --template buf.gen.yaml)
-          (cd server && buf generate "$RUNNER_TEMP/feed-schema" --template buf.gen.yaml)
-          (cd server && buf generate "$RUNNER_TEMP/feed-schema" --template buf.connect.gen.yaml)
-          (cd app && buf generate "$RUNNER_TEMP/feed-schema" --template client/buf.gen.yaml)
-          (cd app && buf generate "$RUNNER_TEMP/feed-schema" --template client/buf.connect.gen.yaml)
+          cp protocol/protocol/proto/space/v1/*.proto "$RUNNER_TEMP/feed-schema/space/v1/"
+          (cd protocol && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/feed.proto" --template buf.gen.yaml)
+          (cd server && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/feed.proto" --template buf.gen.yaml)
+          (cd server && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/feed.proto" --template buf.connect.gen.yaml)
+          (cd app && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/feed.proto" --template client/buf.gen.yaml)
+          (cd app && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/feed.proto" --template client/buf.connect.gen.yaml)
           gofmt -w server/internal/postgres/feed*.go server/internal/postgres/store.go server/internal/postgres/admin.go
       - name: Freezed и переводы
         working-directory: app/client
