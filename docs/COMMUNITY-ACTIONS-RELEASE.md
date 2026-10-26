@@ -1,7 +1,8 @@
 # Совместимый выпуск реакций и избранного
 
 Runtime [v0.7.21](https://github.com/space-protocol-project/space-server/releases/tag/v0.7.21)
-опубликован. Приложение v0.7.27+57 готовится к публикации.
+и приложение [v0.7.27+57](https://github.com/space-protocol-project/space-app/releases/tag/v0.7.27)
+опубликованы 26 октября 2026 года. Оба выпуска Latest, не draft и не prerelease.
 Схема PostgreSQL 39, голосовой профиль 3. Реакции и личные закладки доступны
 для тем и ответов форума, публикаций и комментариев ленты. Переопределений
 профиля по разделам и слоя совместимости со старым API не добавлено.
@@ -27,9 +28,31 @@ Android на физическом устройстве и эмуляторе н�
 - [Серверные проверки реализации](https://github.com/space-protocol-project/space-server/actions/runs/40329535628): полный Go, `-race`, vet, проверка модулей и уязвимостей, анализ клиента, 970 Flutter-тестов и 42 пропуска по условиям окружения.
 - Настоящий Dart/Connect → Go → отдельная PostgreSQL: четыре типа содержимого, два устройства, приватность, ревизии, повторы, перезапуск, актуальное имя автора, лимиты и отзыв прав.
 - [Релизный CI runtime](https://github.com/space-protocol-project/space-server/actions/runs/40336123924): Windows x64, Linux x64 и macOS arm64; TLS, обновление, перенос пространства, восстановление MLS и системное хранилище Windows.
-- [Проверочный CI приложения](https://github.com/space-protocol-project/space-app/actions/runs/40336948766): анализ, сложность, платформенные сборки и нативный интерфейс избранного Linux с горячим перезапуском.
+- [Релизный CI приложения](https://github.com/space-protocol-project/space-app/actions/runs/40340976945): COG, Windows x64, Linux x64, macOS arm64, подписанный Android APK, MLS и сквозной чат с PostgreSQL. Нативное избранное Linux прошло добавление, удаление, список и горячий перезапуск без ошибок выполнения; этот интерфейсный сценарий использует тестовый API.
+- [Установка публичного runtime на трёх платформах](https://github.com/space-protocol-project/space-app/actions/runs/40340564507) и [Linux-установщик](https://github.com/space-protocol-project/space-server/actions/runs/40340549930): PostgreSQL, TLS, установка и штатный перезапуск.
 
-Публикация приложения и проверка публичных файлов нового выпуска ещё не завершены.
-Отдельный CI скачивает файлы полностью, сверяет размеры и SHA-256 с GitHub
-и SHA256SUMS, CRC архивов, схему runtime, содержимое каталога в APK,
-архитектуры ELF, пакет, versionCode и неизменность сертификата Android.
+[Проверка публичного совместимого выпуска](https://github.com/space-protocol-project/space-app/actions/runs/40347995528)
+прошла: все четыре установщика, три архива runtime, три дескриптора и файлы
+контрольных сумм скачаны полностью в CI. Размеры и SHA-256 совпали с GitHub
+и SHA256SUMS; CRC корректны, в каждом архиве runtime схема 39. Каталог внутри
+APK точно совпал с публичными дескрипторами v0.7.21.
+
+APK: `org.spaceprotocol.space_client`, версия 0.7.27, versionCode 57 > 56,
+minSdk 24. Все 36 ELF-библиотек трёх ABI проверены. Сертификат SHA-256
+`75d792704929d0135d2120d07fa6b557f94532bf0f2581857d770b908be7bda3`
+совпал с предыдущим опубликованным приложением.
+
+Исходники runtime: `9887a86fe202d21e85630e13203db718e04f6d9d`.
+Исходники тега приложения: `5375c24095f5decc2f60e697ed0ae0a9773eb3c6`.
+
+## Проверенные публичные файлы
+
+| Файл | Размер, байт | SHA-256 |
+|---|---:|---|
+| `Space-home-windows-x64.zip` | 76045985 | `98ba4f66bc184f8d92d8c5639f2a85def34c020de5ed4b2a8ba91e5a1c910686` |
+| `Space-home-linux-x64.zip` | 31532561 | `d8ebc795f92262aa1a71fef7bb57e90afb5f3604b38d2c1f71e958e61c0d4bb1` |
+| `Space-home-macos-arm64.zip` | 29172090 | `3d5064366112119b4f0c3b54839cc93181bc6f30ec83d6cbdda79361da1b98a2` |
+| `Space-Setup-windows-x64.exe` | 34373170 | `a68e13efc5ecf6cbba065a8d994a6de629f37c8318226a2923048ff4e12fd890` |
+| `Space-macos-arm64.dmg` | 83951625 | `57e9dcba56128d06b717207a6efb4f076811d1fd1d778a8cefa57d6b15ee375f` |
+| `Space-linux-x64.run` | 43466636 | `7bf8db92ab3ee5907572c50c4c4b9bd73b897799308f2c44d20b57557a827b95` |
+| `Space-android.apk` | 210371848 | `e5391d68c7648475d141397593873ff2452d5320d0a7e396a5d653f29165bd09` |
