@@ -48,9 +48,13 @@ API проверил ввод запроса, выбор точной цели �
 выполнения нет. Проверка COG прошла: максимум новых функций — 9, общий — 14.
 
 [Полные платформенные сборки](https://github.com/space-protocol-project/space-app/actions/runs/40353603073)
-и [серверный прогон](https://github.com/space-protocol-project/space-server/actions/runs/40356584413)
-ещё выполняются. Серверный набор включает PostgreSQL/Connect, `-race`, приватность,
-отзыв между страницами, скрытие родителя и ограниченные курсоры. Сквозной сценарий
-использует настоящий Dart/Connect → Go → отдельную PostgreSQL с перезапуском.
+и [серверный прогон](https://github.com/space-protocol-project/space-server/actions/runs/40352711596)
+завершились успешно. Собраны Windows, macOS, Linux и Android. Анализ Flutter
+без замечаний; 996 тестов прошли, 42 пропущены. Go-тесты, `-race`, `vet`,
+проверка модулей и уязвимостей прошли. Проверены приватность, отзыв прав между
+страницами, скрытие родителя и ограниченные курсоры. Сквозной сценарий
+настоящего Dart/Connect → Go → отдельную PostgreSQL подтвердил пять типов
+результатов, Unicode, неизменность истории и отметок чтения, отзыв ACL,
+скрытого родителя и штатную остановку с перезапуском сервера.
 
-[Контракт ADR-057](https://github.com/space-protocol-project/space-protocol/blob/codex/space-search/docs/adr/057-space-search.md).
+[Контракт ADR-057](https://github.com/space-protocol-project/space-protocol/blob/main/docs/adr/057-space-search.md).
