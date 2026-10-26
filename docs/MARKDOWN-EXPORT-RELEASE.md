@@ -1,7 +1,9 @@
 # Совместимый выпуск Markdown, экспорта и подписок
 
-Подготовлено приложение **v0.7.29+59**; runtime **v0.7.23** опубликован.
-Выпуск приложения и проверка публичных файлов ещё выполняются. Схема PostgreSQL 41,
+Приложение [v0.7.29+59](https://github.com/space-protocol-project/space-app/releases/tag/v0.7.29)
+и runtime [v0.7.23](https://github.com/space-protocol-project/space-server/releases/tag/v0.7.23)
+опубликованы 27 октября 2026 года. Оба выпуска Latest, не draft и не prerelease.
+Финальная проверка публичной пары успешна. Схема PostgreSQL 41,
 голосовой профиль 3. GenUI отложен и в зависимости приложения не включён.
 
 ## Возможности
@@ -48,7 +50,9 @@
 
 [Регрессионные проверки диска и резервных копий](https://github.com/space-protocol-project/space-app/actions/runs/40409883558) прошли на трёх ОС для того же коммита приложения. Это проверки существующих возможностей, не начало v0.8.0.
 
-[Релизный CI приложения v0.7.29](https://github.com/space-protocol-project/space-app/actions/runs/40409891076) выполняется. Нативный MLS, отрицательные сценарии и чат с PostgreSQL прошли. Публикацию приложения и финальную проверку публичной пары пока не считать завершёнными.
+[Релизный CI приложения v0.7.29](https://github.com/space-protocol-project/space-app/actions/runs/40409891076) полностью успешен: четыре платформы, подписанный APK, нативный MLS, отрицательные сценарии, чат с PostgreSQL, Go с гонками, чистый анализ и 1036 Flutter-тестов / 42 штатных пропуска. Нативный экспорт Linux и горячий перезапуск прошли; каталог runtime установлен на трёх ОС. [Серверный CI с закреплённым релизным клиентом](https://github.com/space-protocol-project/space-server/actions/runs/40410112957) также успешен.
+
+[Проверка публичной совместимой пары](https://github.com/space-protocol-project/space-app/actions/runs/40414458922) успешна: полное скачивание четырёх установщиков и трёх архивов runtime, размеры, SHA-256, CRC и схема 41. Встроенный каталог APK точно совпал с публичными дескрипторами v0.7.23. Android: `org.spaceprotocol.space_client`, minSdk 24, versionName 0.7.29, versionCode 59 > 58, 36 ELF в трёх ABI. Подпись совпала с v0.7.28: `75d792704929d0135d2120d07fa6b557f94532bf0f2581857d770b908be7bda3`.
 
 Неизменяемые исходники тегов:
 
@@ -62,6 +66,15 @@
 | Space-home-windows-x64.zip | 76184216 | d64a5770ce801b2a82fedbdfb7fc8766203246398ba39232e48cdd0bdabafd47 |
 | Space-home-linux-x64.zip | 31668381 | 83701e212996c2bf0d93772ea471f527ffd7641f0abcf4cee126df93f2e42f37 |
 | Space-home-macos-arm64.zip | 29319575 | 233cefe192284dbdd8e3c5efee0790341bed434819c269064b6b6d5024aaaa85 |
+
+## Проверенные установщики приложения
+
+| Файл | Байт | SHA-256 |
+| --- | ---: | --- |
+| Space-Setup-windows-x64.exe | 34422113 | 94a459ce6612e8a6f634945962bc6f9a498554ba9735ee2dfd62c9e378451033 |
+| Space-macos-arm64.dmg | 84090684 | 987963d180a422c5fc7e0bfc0cfce1651e5bf403fe30c61ae13ccc1df4da1779 |
+| Space-linux-x64.run | 43543417 | 16a1d487b8ad3ebff9c04941aad8c7282ac255f0f2c70c09ab302646a8f26131 |
+| Space-android.apk | 210863744 | 1a7a14754b6fa235011b28a3c8c641d7f106e303aded1a8840d04e41285e7572 |
 
 Описание: [ограниченный Markdown](SAFE-MARKDOWN.md),
 [формат и ограничения экспорта](USER-CONTENT-EXPORT.md),
