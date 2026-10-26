@@ -76,9 +76,13 @@ class FlutterMachine:
         request_id = self.sequence
         self.process.stdin.write(json.dumps([{'id': request_id, 'method': method, 'params': params}]) + '\n')
         self.process.stdin.flush()
-        response = self.wait(lambda value: value.get('id') == request_id, timeout=45)
+        response = self.wait(lambda value: value.get('id') == request_id or (
+            method == 'app.stop' and value.get('event') == 'app.stop' and
+            value.get('params', {}).get('appId') == self.app), timeout=45)
         if response.get('error'):
             raise RuntimeError(response['error'])
+        if response.get('event') == 'app.stop':
+            return True
         return response.get('result')
 
     def driver(self, command, **params):
@@ -119,7 +123,8 @@ class FlutterMachine:
         self.wait(lambda _: self.ready >= 2, timeout=60)
         self.driver('set_frame_sync', enabled='false')
         self.driver('waitFor', finderType='ByTooltipMessage', text='Убрать из избранного')
-        self.command('app.stop', {'appId': self.app})
+        if self.command('app.stop', {'appId': self.app}) is not True:
+            raise RuntimeError('Flutter не подтвердил остановку приложения')
         if self.process.wait(timeout=30):
             raise RuntimeError('Нативное приложение завершилось с ошибкой')
 

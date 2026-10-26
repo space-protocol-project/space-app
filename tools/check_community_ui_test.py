@@ -39,6 +39,32 @@ class CommunityUiMachineTest(unittest.TestCase):
         self.drain(machine)
         self.assertEqual(machine.ready, 1)
 
+    def command_machine(self):
+        machine = FlutterMachine.__new__(FlutterMachine)
+        machine.app, machine.sequence = 'probe', 0
+        machine.process = SimpleNamespace(stdin=io.StringIO())
+        return machine
+
+    def test_stop_accepts_own_stopped_event_before_rpc_response(self):
+        machine = self.command_machine()
+        event = {'event': 'app.stop', 'params': {'appId': 'probe'}}
+        def wait(predicate, timeout):
+            self.assertFalse(predicate({'event': 'app.stop', 'params': {'appId': 'other'}}))
+            self.assertTrue(predicate(event))
+            return event
+        machine.wait = wait
+        self.assertTrue(machine.command('app.stop', {'appId': machine.app}))
+
+    def test_stop_event_does_not_complete_other_commands(self):
+        machine = self.command_machine()
+        response = {'id': 1, 'result': {'code': 0}}
+        def wait(predicate, timeout):
+            self.assertFalse(predicate({'event': 'app.stop', 'params': {'appId': machine.app}}))
+            self.assertTrue(predicate(response))
+            return response
+        machine.wait = wait
+        self.assertEqual(machine.command('app.restart', {'appId': machine.app}), {'code': 0})
+
 
 if __name__ == '__main__':
     unittest.main()
