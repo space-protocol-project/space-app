@@ -97,11 +97,21 @@ class SessionFeedApi
   @override
   Future<feed.CreateFeedPostResponse> publish(
     feed.CreateFeedPostRequest request,
-  ) => _call(feed_specs.FeedService.createFeedPost, request);
+  ) async {
+    if (request.repostOf.isNotEmpty && !socialSupported) {
+      throw const GrpcError.unimplemented();
+    }
+    return _call(feed_specs.FeedService.createFeedPost, request);
+  }
   @override
   Future<feed.CommentFeedPostResponse> comment(
     feed.CommentFeedPostRequest request,
-  ) => _call(feed_specs.FeedService.commentFeedPost, request);
+  ) async {
+    if (request.replyToCommentId.isNotEmpty && !socialSupported) {
+      throw const GrpcError.unimplemented();
+    }
+    return _call(feed_specs.FeedService.commentFeedPost, request);
+  }
   @override
   Future<feed.GetFeedAccessResponse> access(String channel) => _call(
     feed_specs.FeedService.getFeedAccess,

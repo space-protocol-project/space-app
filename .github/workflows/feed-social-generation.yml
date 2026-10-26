@@ -58,6 +58,8 @@ jobs:
           (cd app && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/feed.proto" --template client/buf.gen.yaml)
           (cd app && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/feed.proto" --template client/buf.connect.gen.yaml)
           gofmt -w server/internal/postgres/feed*.go server/internal/postgres/store.go server/internal/postgres/admin.go
+      - name: Системные зависимости нативных пакетов
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev
       - name: Freezed и переводы
         working-directory: app/client
         run: |

@@ -40,6 +40,7 @@ class _SocialProbeState extends State<SocialProbe> {
     api.submitted.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) => MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -47,9 +48,18 @@ class _SocialProbeState extends State<SocialProbe> {
     locale: const Locale('ru'),
     supportedLocales: AppLocalizations.supportedLocales,
     localizationsDelegates: AppLocalizations.localizationsDelegates,
-    home: Scaffold(body: Column(children: [
-      ValueListenableBuilder(valueListenable: api.submitted, builder: (_, value, _) => Text(value)),
-      Expanded(child: FeedArea(api: api, initialPost: 'post')),
-    ])),
+    home: Scaffold(
+      body: Column(
+        children: [
+          ValueListenableBuilder(
+            valueListenable: api.submitted,
+            builder: (_, value, _) => Text(value),
+          ),
+          Expanded(
+            child: FeedArea(api: api, initialPost: 'post'),
+          ),
+        ],
+      ),
+    ),
   );
 }

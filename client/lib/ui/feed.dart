@@ -881,8 +881,10 @@ class FeedEntryCard extends StatelessWidget {
 
   Widget _body() {
     if (!hidden && text.isEmpty) return const SizedBox.shrink();
-    return CommunityMentionText(hidden ? hiddenText : text,
-      mentions: hidden ? const [] : mentions);
+    return CommunityMentionText(
+      hidden ? hiddenText : text,
+      mentions: hidden ? const [] : mentions,
+    );
   }
 }
 

@@ -1,6 +1,8 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:grpc/grpc.dart';
+import 'package:space_client/src/core.dart' show SpaceSession, SessionFeedApi;
 import 'package:space_client/src/feed_controller.dart';
 import 'package:space_client/src/generated/space/v1/feed.pb.dart';
 import 'package:space_client/ui/feed.dart';
@@ -27,7 +29,22 @@ class RecordingFeed extends FakeFeed {
 FeedDraftCubit draft(RecordingFeed api, {String post = ''}) =>
     FeedDraftCubit(api: api, channel: 'first', post: post, sent: () async {});
 
+class UnsupportedSocialSession implements SpaceSession {
+  @override
+  bool get feedSupported => true;
+  @override
+  bool get feedSocialSupported => false;
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw StateError('Сетевой вызов недопустим');
+}
+
 void main() {
+  test('RPC не теряет ссылки на сервере без capability', () async {
+    final api = SessionFeedApi(UnsupportedSocialSession());
+    final unsupported = throwsA(isA<GrpcError>().having((e) => e.code, 'code', StatusCode.unimplemented));
+    await expectLater(api.publish(CreateFeedPostRequest(repostOf: 'post')), unsupported);
+    await expectLater(api.comment(CommentFeedPostRequest(replyToCommentId: 'comment')), unsupported);
+  });
   test(
     'репост без текста и цитата передают ссылку, не копию оригинала',
     () async {
@@ -176,6 +193,24 @@ void main() {
     expect(api.published.single.repostOf, 'post');
     expect(api.published.single.text, isEmpty);
     expect(find.byType(Dialog), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+  testWidgets('переход к адресату загружает его страницу обсуждения', (tester) async {
+    final api = RecordingFeed();
+    api.comments.add(FeedComment(id: 'reply', postId: 'post', text: 'Ответ на другой странице',
+      sequence: Int64(2), replyToCommentId: 'comment', replyToSequence: Int64.ONE));
+    await tester.pumpWidget(app(FeedArea(api: api)));
+    await tester.pumpAndSettle();
+    final dynamic area = tester.state(find.byType(FeedArea));
+    await area.controller.open('post', afterSequence: 1);
+    await tester.pumpAndSettle();
+    final parent = find.byKey(const ValueKey('feed-reply-parent-reply'));
+    await tester.ensureVisible(parent);
+    await tester.tap(parent);
+    await tester.pumpAndSettle();
+    expect(area.controller.state.comments.first.id, 'comment');
+    expect(area.controller.state.commentStart, 0);
+    expect(find.text('Первый комментарий'), findsOneWidget);
     await tester.pumpWidget(const SizedBox.shrink());
   });
   testWidgets('цитата помещается на телефоне с увеличенным шрифтом', (
