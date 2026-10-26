@@ -1,6 +1,7 @@
 import 'local_failure.dart';
 
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:cryptography/cryptography.dart';
 
@@ -9,6 +10,7 @@ import 'rpc_connection.dart';
 import 'core.dart';
 import 'root_history.dart';
 import 'rpc_clients.dart';
+import 'pairing_lifetime.dart';
 
 RpcConnection _channel(Discovery server) => server.openConnection();
 final _deadline = RpcOptions(timeout: const Duration(seconds: 10));
@@ -25,9 +27,17 @@ Future<Pairing> inspectPairing(Discovery server, String code) async {
 }
 
 class PendingPairing {
-  PendingPairing._(this.server, this.seed, this.request, this.channel);
+  PendingPairing._(this.server, Uint8List seed, this.request, this.channel) {
+    _lifetime = PairingLifetime(
+      seed,
+      expiresAt: DateTime.fromMillisecondsSinceEpoch(
+        request.pairing.expiresAt.toInt() * 1000,
+      ),
+      release: _release,
+    );
+  }
   final Discovery server;
-  final List<int> seed;
+  late final PairingLifetime _lifetime;
   final CreatePairingResponse request;
   final RpcConnection channel;
   bool claimed = false;
@@ -37,8 +47,9 @@ class PendingPairing {
     bool administrative = false,
   }) async {
     final key = await Ed25519().newKeyPair(), channel = _channel(server);
-    final public = (await key.extractPublicKey()).bytes;
+    Uint8List? seed;
     try {
+      final public = (await key.extractPublicKey()).bytes;
       final result = await AuthServiceClient(channel).createPairing(
         CreatePairingRequest(
           publicKey: public,
@@ -63,23 +74,29 @@ class PendingPairing {
           'Запрос сопряжения не соответствует устройству',
         );
       }
+      seed = Uint8List.fromList(await key.extractPrivateKeyBytes());
       return PendingPairing._(
         server,
-        await key.extractPrivateKeyBytes(),
+        seed,
         result,
         channel,
       );
     } catch (_) {
+      if (seed != null) seed.fillRange(0, seed.length, 0);
       await channel.shutdown();
       rethrow;
+    } finally {
+      key.destroy();
     }
   }
 
   Future<PollPairingResponse> poll() async {
+    _lifetime.ensureActive();
     final response = await AuthServiceClient(channel).pollPairing(
       PollPairingRequest(pollToken: request.pollToken),
       options: _deadline,
     );
+    _lifetime.ensureActive();
     if (response.rootPublicKey.isNotEmpty) {
       if (response.rootPublicKey.length != 32 ||
           response.pairing.id != request.pairing.id ||
@@ -189,6 +206,7 @@ class PendingPairing {
   }
 
   Future<DeviceRecord> verifiedRecord(PollPairingResponse response) async {
+    _lifetime.ensureActive();
     final history = response.rootHistory
         .map(
           (v) => <String, dynamic>{
@@ -284,19 +302,24 @@ class PendingPairing {
       serverKey: url64(server.publicKey),
       rootSeed: [],
       rootPublicKey: response.rootPublicKey,
-      deviceSeed: seed,
+      deviceSeed: _lifetime.copySeed(),
       grantId: response.grantId,
       administrative: p.administrative,
       rootHistory: history,
     );
   }
 
-  Future<void> close() async {
+  Future<void> close() => _lifetime.close();
+
+  Future<void> _release() async {
+    final token = request.pollToken;
+    request.pollToken = '';
+    proposedRoot = null;
     try {
       if (!claimed) {
         await AuthServiceClient(channel).cancelPairing(
-          CancelPairingRequest(pollToken: request.pollToken),
-          options: _deadline,
+          CancelPairingRequest(pollToken: token),
+          options: const RpcOptions(timeout: Duration(seconds: 2)),
         );
       }
     } catch (_) {
