@@ -1376,7 +1376,9 @@ class SpaceSession
       session.feedSocialSupported = manifest.capabilities.contains(
         'core.feed.social.v1',
       );
-      session.userExportSupported = manifest.capabilities.contains('core.user.export.v1');
+      session.userExportSupported = manifest.capabilities.contains(
+        'core.user.export.v1',
+      );
       session.participantFollowsSupported = manifest.capabilities.contains(
         'core.participant.follows.v1',
       );

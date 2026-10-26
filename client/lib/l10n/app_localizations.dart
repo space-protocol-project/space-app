@@ -5379,6 +5379,72 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Открыть обсуждение'**
   String get personalFeedOpen;
+
+  /// No description provided for @userExportTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Экспорт моего содержимого'**
+  String get userExportTitle;
+
+  /// No description provided for @userExportHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Собственные обычные сообщения, темы, публикации и ответы в JSON. Вложения — только метаданные, без файлов. MLS, ключи и токены не входят. До 5000 записей и 8 МиБ за один период.'**
+  String get userExportHelp;
+
+  /// No description provided for @userExportSection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Раздел'**
+  String get userExportSection;
+
+  /// No description provided for @userExportAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все доступные разделы'**
+  String get userExportAll;
+
+  /// No description provided for @userExportAfter.
+  ///
+  /// In ru, this message translates to:
+  /// **'С даты (UTC, необязательно)'**
+  String get userExportAfter;
+
+  /// No description provided for @userExportBefore.
+  ///
+  /// In ru, this message translates to:
+  /// **'По дату включительно (UTC, необязательно)'**
+  String get userExportBefore;
+
+  /// No description provided for @userExportPrepare.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подготовить JSON'**
+  String get userExportPrepare;
+
+  /// No description provided for @userExportSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить JSON'**
+  String get userExportSave;
+
+  /// No description provided for @userExportReady.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записей подготовлено'**
+  String get userExportReady;
+
+  /// No description provided for @userExportSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Экспорт сохранён'**
+  String get userExportSaved;
+
+  /// No description provided for @userExportInvalidPeriod.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите корректные даты YYYY-MM-DD и период.'**
+  String get userExportInvalidPeriod;
 }
 
 class _AppLocalizationsDelegate

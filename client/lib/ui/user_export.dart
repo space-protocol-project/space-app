@@ -1,51 +1,70 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fixnum/fixnum.dart';
 import '../l10n/strings.dart';
 import '../src/chat_controller.dart';
 import '../src/file_picker.dart';
 import '../src/user_export.dart';
+import '../src/generated/space/v1/space.pb.dart' show Channel;
 import 'feed.dart' show feedError;
 
 class UserExportButton extends StatelessWidget {
   const UserExportButton({super.key,required this.parent});
   final ChatController parent;
-  @override Widget build(BuildContext context)=>ListenableBuilder(listenable:parent,builder:(context,_) {
+  void _open(BuildContext context) {
+    final api=parent.userExport;
+    if(api==null) return;
+    final scope=api.scopeId,catalog=_exportCatalog(parent);
+    bool available()=>parent.connected&&!parent.accessRemoved&&parent.userExport?.scopeId==scope&&_exportCatalog(parent)==catalog;
+    final channels=parent.channels.map((c)=>c.deepCopy()..freeze()).toList(growable:false);
+    unawaited(showDialog<void>(context:context,builder:(_)=>UserExportDialog(api:api,channels:channels,available:available,changes:parent.stream)));
+  }
+  @override Widget build(BuildContext context)=>BlocBuilder<ChatController,ChatState>(bloc:parent,builder:(context,_) {
     if(parent.userExport==null) return const SizedBox.shrink();
     return Padding(padding:const EdgeInsets.only(top:20),child:OutlinedButton.icon(
-      key:const ValueKey('open-user-export'),onPressed:()=>showDialog<void>(context:context,builder:(_)=>UserExportDialog(parent:parent)),
+      key:const ValueKey('open-user-export'),onPressed:()=>_open(context),
       icon:const Icon(Icons.download_outlined),label:Text(context.strings.userExportTitle)));
   });
 }
 
 class UserExportDialog extends StatefulWidget {
-  const UserExportDialog({super.key,required this.parent});
-  final ChatController parent;
+  const UserExportDialog({super.key,required this.api,required this.channels,required this.available,this.changes,this.chooseDestination});
+  final UserExportApi api;
+  final List<Channel> channels;
+  final bool Function() available;
+  final Stream<Object?>? changes;
+  final Future<String?> Function()? chooseDestination;
   @override State<UserExportDialog> createState()=>_UserExportDialogState();
 }
 class _UserExportDialogState extends State<UserExportDialog> with WidgetsBindingObserver {
   final after=TextEditingController(),before=TextEditingController();
   String channel='';
-  late final api=widget.parent.userExport!;
+  StreamSubscription<Object?>? subscription;
+  late final api=widget.api;
   late final scope=api.scopeId;
-  late final catalog=_catalog();
-  late final controller=UserExportController(api,channels:widget.parent.channels.map((c)=>c.id).toSet(),available:_available,
+  late final controller=UserExportController(api,channels:_exportChannels(widget.channels).map((c)=>c.id).toSet(),available:_available,
     write:(path,bytes)=>SpaceFile.fromData(bytes,mimeType:'application/json',name:'space-user-content.json').saveTo(path));
-  String _catalog()=>widget.parent.channels.map((c)=>'${c.id}:${c.revision}:${c.archived}:${c.permissions.read}:${c.permissions.visible}:${c.mlsGroupId}').join('|');
-  bool _available()=>mounted&&widget.parent.connected&&!widget.parent.accessRemoved&&widget.parent.userExport?.scopeId==scope&&_catalog()==catalog;
+  bool _available()=>mounted&&api.scopeId==scope&&widget.available();
   void _changed(){if(!_available()) controller.invalidate();}
-  @override void initState(){super.initState();WidgetsBinding.instance.addObserver(this);widget.parent.addListener(_changed);}
+  @override void initState(){super.initState();WidgetsBinding.instance.addObserver(this);subscription=widget.changes?.listen((_)=>_changed());}
   @override void didChangeAppLifecycleState(AppLifecycleState state){if(state!=AppLifecycleState.resumed) controller.invalidate();}
-  @override void dispose(){widget.parent.removeListener(_changed);WidgetsBinding.instance.removeObserver(this);after.dispose();before.dispose();unawaited(controller.close());super.dispose();}
+  @override void dispose(){unawaited(subscription?.cancel());WidgetsBinding.instance.removeObserver(this);after.dispose();before.dispose();unawaited(controller.close());super.dispose();}
   Future<void> _prepare() async {
     try {await controller.prepare(userExportSelection(channel,after.text,before.text));}
     catch(error) {if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text(context.strings.userExportInvalidPeriod)));}
   }
   Future<void> _save() async {
+    try {
+      final path=await (widget.chooseDestination??_destination)();
+      if(path!=null) await controller.save(path);
+    } catch(error) {
+      if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text(feedError(context,error))));
+    }
+  }
+  Future<String?> _destination() async {
     final destination=await getSaveLocation(suggestedName:'space-user-content-${DateTime.now().millisecondsSinceEpoch}.json',
       acceptedTypeGroups:const [XTypeGroup(label:'JSON',extensions:['json'])]);
-    if(destination!=null) await controller.save(destination.path);
+    return destination?.path;
   }
   @override Widget build(BuildContext context)=>BlocBuilder<UserExportController,UserExportState>(bloc:controller,builder:_body);
   Widget _body(BuildContext context,UserExportState state)=>Dialog(child:ConstrainedBox(
@@ -60,7 +79,7 @@ class _UserExportDialogState extends State<UserExportDialog> with WidgetsBinding
     DropdownButtonFormField<String>(initialValue:channel,isExpanded:true,
       decoration:InputDecoration(labelText:context.strings.userExportSection),
       items:[DropdownMenuItem(value:'',child:Text(context.strings.userExportAll)),
-        for(final c in widget.parent.channels.where((c)=>c.permissions.read&&c.mlsGroupId.isEmpty&&!c.archived))
+        for(final c in _exportChannels(widget.channels))
           DropdownMenuItem(value:c.id,child:Text(c.title,overflow:TextOverflow.ellipsis))],
       onChanged:state.busy||state.revoked?null:(value){channel=value??'';controller.reset();}),
     const SizedBox(height:16),
@@ -84,15 +103,6 @@ class _UserExportDialogState extends State<UserExportDialog> with WidgetsBinding
   ];
 }
 
-ExportUserContentRequest userExportSelection(String channel,String after,String before) {
-  final start=_exportDate(after),end=_exportDate(before)?.add(const Duration(days:1));
-  if(start!=null&&end!=null&&!start.isBefore(end)) throw const FormatException('Некорректный период');
-  return ExportUserContentRequest(channelId:channel,createdAfterUnixMs:Int64(start?.millisecondsSinceEpoch??0),createdBeforeUnixMs:Int64(end?.millisecondsSinceEpoch??0));
-}
-DateTime? _exportDate(String input) {
-  final text=input.trim();if(text.isEmpty) return null;
-  if(!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(text)) throw const FormatException('Нужна дата YYYY-MM-DD');
-  final date=DateTime.tryParse('${text}T00:00:00Z');
-  if(date==null||date.year<1970||date.toIso8601String().substring(0,10)!=text) throw const FormatException('Некорректная дата');
-  return date;
-}
+String _exportCatalog(ChatController parent)=>parent.channels.map((c)=>'${c.id}:${c.revision}:${c.archived}:${c.permissions.read}:${c.permissions.visible}:${c.mlsGroupId}').join('|');
+Iterable<Channel> _exportChannels(List<Channel> channels)=>channels.where((c)=>c.permissions.read&&c.permissions.visible&&!c.archived&&c.mlsGroupId.isEmpty&&c.views.any((view)=>['chat','forum','feed'].contains(view.type)));
+

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:url_launcher/url_launcher.dart';
+
 import '../src/markdown_policy.dart';
 
 // Любой возможный синтаксис оставляем полноценному Markdown-обработчику.
@@ -14,7 +15,12 @@ final _markdownSyntax = RegExp(
 );
 
 class MessageMarkdown extends StatelessWidget {
-  const MessageMarkdown({super.key, required this.text,this.highlightedNames=const [],this.style});
+  const MessageMarkdown({
+    super.key,
+    required this.text,
+    this.highlightedNames = const [],
+    this.style,
+  });
   final String text;
   final List<String> highlightedNames;
   final TextStyle? style;
@@ -26,7 +32,7 @@ class MessageMarkdown extends StatelessWidget {
       height: 1.45,
       color: colors.onSurface,
     ).merge(style);
-    if (!_markdownSyntax.hasMatch(text)||!canFormatMarkdown(text)) {
+    if (!_markdownSyntax.hasMatch(text) || !canFormatMarkdown(text)) {
       return SelectionArea(
         contextMenuBuilder: MessageContextMenu.contains(context)
             ? (_, _) => const SizedBox.shrink()
@@ -45,7 +51,9 @@ class MessageMarkdown extends StatelessWidget {
       child: MarkdownBody(
         data: text,
         extensionSet: md.ExtensionSet.commonMark,
-        inlineSyntaxes: highlightedNames.isEmpty?const []:[_MentionSyntax(highlightedNames)],
+        inlineSyntaxes: highlightedNames.isEmpty
+            ? const []
+            : [_MentionSyntax(highlightedNames)],
         selectable: false,
         softLineBreak: true,
         styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
@@ -89,10 +97,17 @@ class MessageMarkdown extends StatelessWidget {
 // Только визуальное выделение уже проверенных обращений. Новых уведомлений
 // или действий по имени этот синтаксис не создаёт; исходные UTF-16 spans не меняются.
 class _MentionSyntax extends md.InlineSyntax {
-  _MentionSyntax(List<String> names):super((names.toSet().toList()..sort((a,b)=>b.length.compareTo(a.length))).map(RegExp.escape).join('|'));
+  _MentionSyntax(List<String> names)
+    : super(_mentionPattern(names));
   @override
-  bool onMatch(md.InlineParser parser,Match match) {
-    parser.addNode(md.Element.text('strong',match[0]!));
+  bool onMatch(md.InlineParser parser, Match match) {
+    parser.addNode(md.Element.text('strong', match[0]!));
     return true;
   }
+}
+
+String _mentionPattern(List<String> names) {
+  final labels=names.where((name)=>name.isNotEmpty&&name.length<=160).take(10).toSet().toList()
+    ..sort((a,b)=>b.length.compareTo(a.length));
+  return labels.isEmpty?r'(?!)':labels.map(RegExp.escape).join('|');
 }

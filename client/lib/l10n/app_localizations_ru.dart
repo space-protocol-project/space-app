@@ -2973,4 +2973,39 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get personalFeedOpen => 'Открыть обсуждение';
+
+  @override
+  String get userExportTitle => 'Экспорт моего содержимого';
+
+  @override
+  String get userExportHelp =>
+      'Собственные обычные сообщения, темы, публикации и ответы в JSON. Вложения — только метаданные, без файлов. MLS, ключи и токены не входят. До 5000 записей и 8 МиБ за один период.';
+
+  @override
+  String get userExportSection => 'Раздел';
+
+  @override
+  String get userExportAll => 'Все доступные разделы';
+
+  @override
+  String get userExportAfter => 'С даты (UTC, необязательно)';
+
+  @override
+  String get userExportBefore => 'По дату включительно (UTC, необязательно)';
+
+  @override
+  String get userExportPrepare => 'Подготовить JSON';
+
+  @override
+  String get userExportSave => 'Сохранить JSON';
+
+  @override
+  String get userExportReady => 'Записей подготовлено';
+
+  @override
+  String get userExportSaved => 'Экспорт сохранён';
+
+  @override
+  String get userExportInvalidPeriod =>
+      'Укажите корректные даты YYYY-MM-DD и период.';
 }

@@ -7,6 +7,7 @@ import 'user_export_api.dart';
 export 'user_export_api.dart';
 part 'user_export.freezed.dart';
 part 'user_export_validation.dart';
+part 'user_export_selection.dart';
 
 @freezed
 abstract class UserExportState with _$UserExportState {

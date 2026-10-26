@@ -2955,4 +2955,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get personalFeedOpen => 'Open discussion';
+
+  @override
+  String get userExportTitle => 'Export my content';
+
+  @override
+  String get userExportHelp =>
+      'Your ordinary messages, topics, posts and replies as JSON. Attachments include metadata only, without files. MLS, keys and tokens are excluded. Up to 5000 entries and 8 MiB per period.';
+
+  @override
+  String get userExportSection => 'Section';
+
+  @override
+  String get userExportAll => 'All accessible sections';
+
+  @override
+  String get userExportAfter => 'From date (UTC, optional)';
+
+  @override
+  String get userExportBefore => 'Through date (UTC, optional)';
+
+  @override
+  String get userExportPrepare => 'Prepare JSON';
+
+  @override
+  String get userExportSave => 'Save JSON';
+
+  @override
+  String get userExportReady => 'Entries prepared';
+
+  @override
+  String get userExportSaved => 'Export saved';
+
+  @override
+  String get userExportInvalidPeriod =>
+      'Enter valid YYYY-MM-DD dates and a valid period.';
 }

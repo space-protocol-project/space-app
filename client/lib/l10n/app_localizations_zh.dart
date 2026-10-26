@@ -2735,6 +2735,40 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get personalFeedOpen => '打开讨论';
+
+  @override
+  String get userExportTitle => '导出我的内容';
+
+  @override
+  String get userExportHelp =>
+      '将自己的普通消息、主题、帖子和回复导出为 JSON。附件仅包含元数据，不含文件。无 MLS、密钥或令牌。每个时段最多 5000 条、8 MiB。';
+
+  @override
+  String get userExportSection => '版块';
+
+  @override
+  String get userExportAll => '所有可访问版块';
+
+  @override
+  String get userExportAfter => '起始日期（UTC，可选）';
+
+  @override
+  String get userExportBefore => '结束日期（UTC，包含当天，可选）';
+
+  @override
+  String get userExportPrepare => '准备 JSON';
+
+  @override
+  String get userExportSave => '保存 JSON';
+
+  @override
+  String get userExportReady => '已准备条目';
+
+  @override
+  String get userExportSaved => '导出已保存';
+
+  @override
+  String get userExportInvalidPeriod => '请输入有效的 YYYY-MM-DD 日期和时间范围。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3898,4 +3932,38 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get personalFeedOpen => '打开讨论';
+
+  @override
+  String get userExportTitle => '导出我的内容';
+
+  @override
+  String get userExportHelp =>
+      '将自己的普通消息、主题、帖子和回复导出为 JSON。附件仅包含元数据，不含文件。无 MLS、密钥或令牌。每个时段最多 5000 条、8 MiB。';
+
+  @override
+  String get userExportSection => '版块';
+
+  @override
+  String get userExportAll => '所有可访问版块';
+
+  @override
+  String get userExportAfter => '起始日期（UTC，可选）';
+
+  @override
+  String get userExportBefore => '结束日期（UTC，包含当天，可选）';
+
+  @override
+  String get userExportPrepare => '准备 JSON';
+
+  @override
+  String get userExportSave => '保存 JSON';
+
+  @override
+  String get userExportReady => '已准备条目';
+
+  @override
+  String get userExportSaved => '导出已保存';
+
+  @override
+  String get userExportInvalidPeriod => '请输入有效的 YYYY-MM-DD 日期和时间范围。';
 }

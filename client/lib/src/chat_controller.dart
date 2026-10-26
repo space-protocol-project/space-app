@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'user_export_api.dart';
+
 import 'dart:async';
 import 'dart:io';
 
@@ -259,9 +261,11 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   }
 
   UserExportApi? get userExport {
-    final session=_session;
-    if(!connected||accessRemoved) return null;
-    return session is UserExportSource?(session as UserExportSource).userExport:null;
+    final session = _session;
+    if (!connected || accessRemoved) return null;
+    return session is UserExportSource
+        ? (session as UserExportSource).userExport
+        : null;
   }
 
   Future<Content?> searchContent(String channel, int sequence) async {

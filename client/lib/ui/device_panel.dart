@@ -103,7 +103,7 @@ class _DevicePanelState extends State<DevicePanel> {
                   if (mounted) setState(() => selected = origin);
                 },
               ),
-              UserExportButton(parent:controller),
+              UserExportButton(parent: controller),
             ],
           );
         },

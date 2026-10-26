@@ -4,7 +4,6 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/user_export.dart';
 import 'package:space_client/src/generated/space/v1/space_search.pbenum.dart';
-import 'package:space_client/ui/user_export.dart' show userExportSelection;
 
 UserExportEntry entry(String id,int created)=>UserExportEntry(kind:SpaceSearchKind.SPACE_SEARCH_KIND_CHAT_MESSAGE,
   id:id,channelId:'general',channelTitle:'Общий',parentId:id,text:'Мой текст',revision:Int64.ONE,createdAtUnixMs:Int64(created));

@@ -82,6 +82,7 @@ jobs:
           paths += glob.glob('lib/src/user_export*.dart') + glob.glob('lib/src/markdown_policy.dart') + glob.glob('lib/ui/user_export.dart')
           paths += ['lib/ui/device_panel.dart', 'lib/ui/message_markdown.dart', 'lib/ui/community_mentions.dart', 'lib/src/chat_controller.dart']
           paths += glob.glob('test/user_export*_test.dart') + glob.glob('test/markdown_security_test.dart') + glob.glob('tool/community_user_export_interoperability.dart')
+          paths += glob.glob('test/probes/user_export_probe.dart') + glob.glob('test/support/user_export.dart')
           subprocess.run(['dart', 'format', *[p for p in paths if not p.endswith('.freezed.dart')]], check=True)
           PY
           dart fix --apply --code=curly_braces_in_flow_control_structures
@@ -90,7 +91,7 @@ jobs:
         run: |
           rustup toolchain install 1.99.1 --profile minimal
           flutter analyze
-          flutter test --no-pub test/user_export_test.dart test/markdown_security_test.dart test/composer_markdown_test.dart test/participant_follows_test.dart test/feed_test.dart test/feed_social_test.dart test/feed_read_test.dart test/feed_read_visibility_test.dart
+          flutter test --no-pub test/user_export_test.dart test/user_export_widgets_test.dart test/markdown_security_test.dart test/composer_markdown_test.dart test/participant_follows_test.dart test/feed_test.dart test/feed_social_test.dart test/feed_read_test.dart test/feed_read_visibility_test.dart
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -110,6 +111,8 @@ jobs:
             app/client/lib/ui/community_mentions.dart
             app/client/lib/ui/device_panel.dart
             app/client/test/user_export*_test.dart
+            app/client/test/probes/user_export_probe.dart
+            app/client/test/support/user_export.dart
             app/client/test/markdown_security_test.dart
             app/client/tool/community_user_export_interoperability.dart
             app/client/pubspec.lock

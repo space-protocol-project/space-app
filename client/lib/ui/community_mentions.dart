@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'message_markdown.dart';
 
 import '../l10n/strings.dart';
@@ -22,9 +23,14 @@ class CommunityMentionText extends StatelessWidget {
   final TextStyle? style;
   @override
   Widget build(BuildContext context) {
-    return MessageMarkdown(text:text,style:style,highlightedNames:[
-      for(final mention in validMentions(text,mentions)) text.substring(mention.start,mention.start+mention.length),
-    ]);
+    return MessageMarkdown(
+      text: text,
+      style: style,
+      highlightedNames: [
+        for (final mention in validMentions(text, mentions))
+          text.substring(mention.start, mention.start + mention.length),
+      ],
+    );
   }
 }
 
