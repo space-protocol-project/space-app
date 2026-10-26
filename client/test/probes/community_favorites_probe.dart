@@ -10,7 +10,7 @@ import 'package:space_client/src/preferences.dart';
 import 'package:space_client/ui/community_favorite_list.dart';
 import 'package:space_client/ui/community_favorites.dart';
 
-import '../test/support/community_favorites.dart';
+import '../support/community_favorites.dart';
 
 void main() {
   enableFlutterDriverExtension();
