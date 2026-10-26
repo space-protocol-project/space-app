@@ -441,12 +441,19 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
   void reply(FeedComment comment) {
     if (state.busy || isClosed || !api.socialSupported) return;
     if (post.isEmpty || comment.postId != post || comment.hidden) return;
-    emit(state.copyWith(replyTo: comment.id, replySequence: comment.sequence.toInt()));
+    emit(
+      state.copyWith(
+        replyTo: comment.id,
+        replySequence: comment.sequence.toInt(),
+      ),
+    );
   }
 
   void repost(FeedPost original) {
     if (state.busy || isClosed || !api.socialSupported) return;
-    if (post.isNotEmpty || original.channelId != channel || original.hidden) return;
+    if (post.isNotEmpty || original.channelId != channel || original.hidden) {
+      return;
+    }
     final id = original.repostOf.isEmpty ? original.id : original.repostOf;
     emit(state.copyWith(repostOf: id));
   }
@@ -499,7 +506,8 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
       (text.isEmpty && queue.state.files.isEmpty && state.repostOf.isEmpty);
 
   Future<void> _submit(String text, String key, List<String> ids) async {
-    if (!api.socialSupported && (state.replyTo.isNotEmpty || state.repostOf.isNotEmpty)) {
+    if (!api.socialSupported &&
+        (state.replyTo.isNotEmpty || state.repostOf.isNotEmpty)) {
       throw StateError('Социальная лента недоступна');
     }
     if (mentions.trimmed.isNotEmpty && communityMentionsFor(api) == null) {

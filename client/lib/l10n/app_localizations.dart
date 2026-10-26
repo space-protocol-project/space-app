@@ -5265,6 +5265,54 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Показаны первые 500 результатов. Уточните запрос.'**
   String get spaceSearchLimit;
+
+  /// No description provided for @feedCancelReference.
+  ///
+  /// In ru, this message translates to:
+  /// **'Убрать ссылку'**
+  String get feedCancelReference;
+
+  /// No description provided for @feedOpenOriginal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть оригинал'**
+  String get feedOpenOriginal;
+
+  /// No description provided for @feedOriginalUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исходная публикация недоступна'**
+  String get feedOriginalUnavailable;
+
+  /// No description provided for @feedReply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ответить'**
+  String get feedReply;
+
+  /// No description provided for @feedReplyTo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ответ на комментарий №{number}'**
+  String feedReplyTo(String number);
+
+  /// No description provided for @feedRepost.
+  ///
+  /// In ru, this message translates to:
+  /// **'Репост'**
+  String get feedRepost;
+
+  /// No description provided for @feedRepostHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправьте без текста для репоста или добавьте свою цитату.'**
+  String get feedRepostHint;
+
+  /// No description provided for @feedShare.
+  ///
+  /// In ru, this message translates to:
+  /// **'Репост или цитата'**
+  String get feedShare;
 }
 
 class _AppLocalizationsDelegate

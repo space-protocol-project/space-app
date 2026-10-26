@@ -331,7 +331,7 @@ as FeedPermissions?,error: freezed == error ? _self.error : error ,
 /// @nodoc
 mixin _$FeedDraftState {
 
- String get text; String get key; String get payload; bool get busy; bool get failed;
+ String get text; String get key; String get payload; String get replyTo; int get replySequence; String get repostOf; bool get busy; bool get failed;
 /// Create a copy of FeedDraftState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -343,20 +343,20 @@ $FeedDraftStateCopyWith<FeedDraftState> get copyWith => _$FeedDraftStateCopyWith
 @override
 bool operator ==(Object other) {
   final _this = this as FeedDraftState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeedDraftState&&(identical(other.text, _this.text) || other.text == _this.text)&&(identical(other.key, _this.key) || other.key == _this.key)&&(identical(other.payload, _this.payload) || other.payload == _this.payload)&&(identical(other.busy, _this.busy) || other.busy == _this.busy)&&(identical(other.failed, _this.failed) || other.failed == _this.failed));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeedDraftState&&(identical(other.text, _this.text) || other.text == _this.text)&&(identical(other.key, _this.key) || other.key == _this.key)&&(identical(other.payload, _this.payload) || other.payload == _this.payload)&&(identical(other.replyTo, _this.replyTo) || other.replyTo == _this.replyTo)&&(identical(other.replySequence, _this.replySequence) || other.replySequence == _this.replySequence)&&(identical(other.repostOf, _this.repostOf) || other.repostOf == _this.repostOf)&&(identical(other.busy, _this.busy) || other.busy == _this.busy)&&(identical(other.failed, _this.failed) || other.failed == _this.failed));
 }
 
 
 @override
 int get hashCode {
   final _this = this as FeedDraftState;
-  return Object.hash(runtimeType,_this.text,_this.key,_this.payload,_this.busy,_this.failed);
+  return Object.hash(runtimeType,_this.text,_this.key,_this.payload,_this.replyTo,_this.replySequence,_this.repostOf,_this.busy,_this.failed);
 }
 
 @override
 String toString() {
   final _this = this as FeedDraftState;
-  return 'FeedDraftState(text: ${_this.text}, key: ${_this.key}, payload: ${_this.payload}, busy: ${_this.busy}, failed: ${_this.failed})';
+  return 'FeedDraftState(text: ${_this.text}, key: ${_this.key}, payload: ${_this.payload}, replyTo: ${_this.replyTo}, replySequence: ${_this.replySequence}, repostOf: ${_this.repostOf}, busy: ${_this.busy}, failed: ${_this.failed})';
 }
 
 
@@ -367,7 +367,7 @@ abstract mixin class $FeedDraftStateCopyWith<$Res>  {
   factory $FeedDraftStateCopyWith(FeedDraftState value, $Res Function(FeedDraftState) _then) = _$FeedDraftStateCopyWithImpl;
 @useResult
 $Res call({
- String text, String key, String payload, bool busy, bool failed
+ String text, String key, String payload, String replyTo, int replySequence, String repostOf, bool busy, bool failed
 });
 
 
@@ -384,11 +384,14 @@ class _$FeedDraftStateCopyWithImpl<$Res>
 
 /// Create a copy of FeedDraftState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? text = null,Object? key = null,Object? payload = null,Object? busy = null,Object? failed = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? text = null,Object? key = null,Object? payload = null,Object? replyTo = null,Object? replySequence = null,Object? repostOf = null,Object? busy = null,Object? failed = null,}) {
   return _then(FeedDraftState(
 text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String,key: null == key ? _self.key : key // ignore: cast_nullable_to_non_nullable
 as String,payload: null == payload ? _self.payload : payload // ignore: cast_nullable_to_non_nullable
+as String,replyTo: null == replyTo ? _self.replyTo : replyTo // ignore: cast_nullable_to_non_nullable
+as String,replySequence: null == replySequence ? _self.replySequence : replySequence // ignore: cast_nullable_to_non_nullable
+as int,repostOf: null == repostOf ? _self.repostOf : repostOf // ignore: cast_nullable_to_non_nullable
 as String,busy: null == busy ? _self.busy : busy // ignore: cast_nullable_to_non_nullable
 as bool,failed: null == failed ? _self.failed : failed // ignore: cast_nullable_to_non_nullable
 as bool,
@@ -476,10 +479,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String text,  String key,  String payload,  bool busy,  bool failed)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String text,  String key,  String payload,  String replyTo,  int replySequence,  String repostOf,  bool busy,  bool failed)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FeedDraftState() when $default != null:
-return $default(_that.text,_that.key,_that.payload,_that.busy,_that.failed);case _:
+return $default(_that.text,_that.key,_that.payload,_that.replyTo,_that.replySequence,_that.repostOf,_that.busy,_that.failed);case _:
   return orElse();
 
 }
@@ -497,10 +500,10 @@ return $default(_that.text,_that.key,_that.payload,_that.busy,_that.failed);case
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String text,  String key,  String payload,  bool busy,  bool failed)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String text,  String key,  String payload,  String replyTo,  int replySequence,  String repostOf,  bool busy,  bool failed)  $default,) {final _that = this;
 switch (_that) {
 case _FeedDraftState():
-return $default(_that.text,_that.key,_that.payload,_that.busy,_that.failed);case _:
+return $default(_that.text,_that.key,_that.payload,_that.replyTo,_that.replySequence,_that.repostOf,_that.busy,_that.failed);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -517,10 +520,10 @@ return $default(_that.text,_that.key,_that.payload,_that.busy,_that.failed);case
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String text,  String key,  String payload,  bool busy,  bool failed)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String text,  String key,  String payload,  String replyTo,  int replySequence,  String repostOf,  bool busy,  bool failed)?  $default,) {final _that = this;
 switch (_that) {
 case _FeedDraftState() when $default != null:
-return $default(_that.text,_that.key,_that.payload,_that.busy,_that.failed);case _:
+return $default(_that.text,_that.key,_that.payload,_that.replyTo,_that.replySequence,_that.repostOf,_that.busy,_that.failed);case _:
   return null;
 
 }
@@ -532,12 +535,15 @@ return $default(_that.text,_that.key,_that.payload,_that.busy,_that.failed);case
 
 
 class _FeedDraftState implements FeedDraftState {
-  const _FeedDraftState({this.text = '', this.key = '', this.payload = '', this.busy = false, this.failed = false});
+  const _FeedDraftState({this.text = '', this.key = '', this.payload = '', this.replyTo = '', this.replySequence = 0, this.repostOf = '', this.busy = false, this.failed = false});
   
 
 @override@JsonKey() final  String text;
 @override@JsonKey() final  String key;
 @override@JsonKey() final  String payload;
+@override@JsonKey() final  String replyTo;
+@override@JsonKey() final  int replySequence;
+@override@JsonKey() final  String repostOf;
 @override@JsonKey() final  bool busy;
 @override@JsonKey() final  bool failed;
 
@@ -551,18 +557,18 @@ _$FeedDraftStateCopyWith<_FeedDraftState> get copyWith => __$FeedDraftStateCopyW
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeedDraftState&&(identical(other.text, text) || other.text == text)&&(identical(other.key, key) || other.key == key)&&(identical(other.payload, payload) || other.payload == payload)&&(identical(other.busy, busy) || other.busy == busy)&&(identical(other.failed, failed) || other.failed == failed));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeedDraftState&&(identical(other.text, text) || other.text == text)&&(identical(other.key, key) || other.key == key)&&(identical(other.payload, payload) || other.payload == payload)&&(identical(other.replyTo, replyTo) || other.replyTo == replyTo)&&(identical(other.replySequence, replySequence) || other.replySequence == replySequence)&&(identical(other.repostOf, repostOf) || other.repostOf == repostOf)&&(identical(other.busy, busy) || other.busy == busy)&&(identical(other.failed, failed) || other.failed == failed));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,text,key,payload,busy,failed);
+    return Object.hash(runtimeType,text,key,payload,replyTo,replySequence,repostOf,busy,failed);
 }
 
 @override
 String toString() {
-    return 'FeedDraftState(text: $text, key: $key, payload: $payload, busy: $busy, failed: $failed)';
+    return 'FeedDraftState(text: $text, key: $key, payload: $payload, replyTo: $replyTo, replySequence: $replySequence, repostOf: $repostOf, busy: $busy, failed: $failed)';
 }
 
 
@@ -573,7 +579,7 @@ abstract mixin class _$FeedDraftStateCopyWith<$Res> implements $FeedDraftStateCo
   factory _$FeedDraftStateCopyWith(_FeedDraftState value, $Res Function(_FeedDraftState) _then) = __$FeedDraftStateCopyWithImpl;
 @override @useResult
 $Res call({
- String text, String key, String payload, bool busy, bool failed
+ String text, String key, String payload, String replyTo, int replySequence, String repostOf, bool busy, bool failed
 });
 
 
@@ -590,11 +596,14 @@ class __$FeedDraftStateCopyWithImpl<$Res>
 
 /// Create a copy of FeedDraftState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? text = null,Object? key = null,Object? payload = null,Object? busy = null,Object? failed = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? text = null,Object? key = null,Object? payload = null,Object? replyTo = null,Object? replySequence = null,Object? repostOf = null,Object? busy = null,Object? failed = null,}) {
   return _then(_FeedDraftState(
 text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String,key: null == key ? _self.key : key // ignore: cast_nullable_to_non_nullable
 as String,payload: null == payload ? _self.payload : payload // ignore: cast_nullable_to_non_nullable
+as String,replyTo: null == replyTo ? _self.replyTo : replyTo // ignore: cast_nullable_to_non_nullable
+as String,replySequence: null == replySequence ? _self.replySequence : replySequence // ignore: cast_nullable_to_non_nullable
+as int,repostOf: null == repostOf ? _self.repostOf : repostOf // ignore: cast_nullable_to_non_nullable
 as String,busy: null == busy ? _self.busy : busy // ignore: cast_nullable_to_non_nullable
 as bool,failed: null == failed ? _self.failed : failed // ignore: cast_nullable_to_non_nullable
 as bool,

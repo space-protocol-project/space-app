@@ -109,6 +109,8 @@ class FeedPost extends $pb.GeneratedMessage {
     $fixnum.Int64? readSequence,
     $fixnum.Int64? unreadCount,
     $core.Iterable<$1.CommunityMention>? mentions,
+    $core.String? repostOf,
+    FeedPost? quotedPost,
   }) {
     final result = FeedPost._();
     if (id != null) result.id = id;
@@ -128,6 +130,8 @@ class FeedPost extends $pb.GeneratedMessage {
     if (readSequence != null) result.readSequence = readSequence;
     if (unreadCount != null) result.unreadCount = unreadCount;
     if (mentions != null) result.mentions.addAll(mentions);
+    if (repostOf != null) result.repostOf = repostOf;
+    if (quotedPost != null) result.quotedPost = quotedPost;
     return result;
   }
 
@@ -162,6 +166,9 @@ class FeedPost extends $pb.GeneratedMessage {
     ..aInt64(15, _omitFieldNames ? '' : 'unreadCount')
     ..pPM<$1.CommunityMention>(16, _omitFieldNames ? '' : 'mentions',
         subBuilder: $1.CommunityMention.$_createMessage)
+    ..aOS(17, _omitFieldNames ? '' : 'repostOf')
+    ..aOM<FeedPost>(18, _omitFieldNames ? '' : 'quotedPost',
+        subBuilder: FeedPost.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -317,6 +324,29 @@ class FeedPost extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(16)
   $pb.PbList<$1.CommunityMention> get mentions => $_getList(15);
+
+  /// core.feed.social.v1: репост только в том же разделе, без копии оригинала.
+  @$pb.TagNumber(17)
+  $core.String get repostOf => $_getSZ(16);
+  @$pb.TagNumber(17)
+  set repostOf($core.String value) => $_setString(16, value);
+  @$pb.TagNumber(17)
+  $core.bool hasRepostOf() => $_has(16);
+  @$pb.TagNumber(17)
+  void clearRepostOf() => $_clearField(17);
+
+  /// Заполняется заново при чтении. Отсутствует для скрытого оригинала.
+  /// Не содержит следующего quoted_post: глубина ограничена одним оригиналом.
+  @$pb.TagNumber(18)
+  FeedPost get quotedPost => $_getN(17);
+  @$pb.TagNumber(18)
+  set quotedPost(FeedPost value) => $_setField(18, value);
+  @$pb.TagNumber(18)
+  $core.bool hasQuotedPost() => $_has(17);
+  @$pb.TagNumber(18)
+  void clearQuotedPost() => $_clearField(18);
+  @$pb.TagNumber(18)
+  FeedPost ensureQuotedPost() => $_ensure(17);
 }
 
 class MarkFeedPostReadRequest extends $pb.GeneratedMessage {
@@ -480,6 +510,8 @@ class FeedComment extends $pb.GeneratedMessage {
     $core.Iterable<$0.Asset>? attachments,
     $core.bool? hidden,
     $core.Iterable<$1.CommunityMention>? mentions,
+    $core.String? replyToCommentId,
+    $fixnum.Int64? replyToSequence,
   }) {
     final result = FeedComment._();
     if (id != null) result.id = id;
@@ -493,6 +525,8 @@ class FeedComment extends $pb.GeneratedMessage {
     if (attachments != null) result.attachments.addAll(attachments);
     if (hidden != null) result.hidden = hidden;
     if (mentions != null) result.mentions.addAll(mentions);
+    if (replyToCommentId != null) result.replyToCommentId = replyToCommentId;
+    if (replyToSequence != null) result.replyToSequence = replyToSequence;
     return result;
   }
 
@@ -522,6 +556,8 @@ class FeedComment extends $pb.GeneratedMessage {
     ..aOB(10, _omitFieldNames ? '' : 'hidden')
     ..pPM<$1.CommunityMention>(11, _omitFieldNames ? '' : 'mentions',
         subBuilder: $1.CommunityMention.$_createMessage)
+    ..aOS(12, _omitFieldNames ? '' : 'replyToCommentId')
+    ..aInt64(13, _omitFieldNames ? '' : 'replyToSequence')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -632,6 +668,24 @@ class FeedComment extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(11)
   $pb.PbList<$1.CommunityMention> get mentions => $_getList(10);
+
+  @$pb.TagNumber(12)
+  $core.String get replyToCommentId => $_getSZ(11);
+  @$pb.TagNumber(12)
+  set replyToCommentId($core.String value) => $_setString(11, value);
+  @$pb.TagNumber(12)
+  $core.bool hasReplyToCommentId() => $_has(11);
+  @$pb.TagNumber(12)
+  void clearReplyToCommentId() => $_clearField(12);
+
+  @$pb.TagNumber(13)
+  $fixnum.Int64 get replyToSequence => $_getI64(12);
+  @$pb.TagNumber(13)
+  set replyToSequence($fixnum.Int64 value) => $_setInt64(12, value);
+  @$pb.TagNumber(13)
+  $core.bool hasReplyToSequence() => $_has(12);
+  @$pb.TagNumber(13)
+  void clearReplyToSequence() => $_clearField(13);
 }
 
 /// sequence DESC; before=0 начинает список, next=0 означает конец.
@@ -997,6 +1051,7 @@ class CreateFeedPostRequest extends $pb.GeneratedMessage {
     $core.String? idempotencyKey,
     $core.Iterable<$core.String>? attachmentIds,
     $core.Iterable<$1.CommunityMention>? mentions,
+    $core.String? repostOf,
   }) {
     final result = CreateFeedPostRequest._();
     if (channelId != null) result.channelId = channelId;
@@ -1004,6 +1059,7 @@ class CreateFeedPostRequest extends $pb.GeneratedMessage {
     if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
     if (attachmentIds != null) result.attachmentIds.addAll(attachmentIds);
     if (mentions != null) result.mentions.addAll(mentions);
+    if (repostOf != null) result.repostOf = repostOf;
     return result;
   }
 
@@ -1026,6 +1082,7 @@ class CreateFeedPostRequest extends $pb.GeneratedMessage {
     ..pPS(4, _omitFieldNames ? '' : 'attachmentIds')
     ..pPM<$1.CommunityMention>(5, _omitFieldNames ? '' : 'mentions',
         subBuilder: $1.CommunityMention.$_createMessage)
+    ..aOS(6, _omitFieldNames ? '' : 'repostOf')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1084,6 +1141,16 @@ class CreateFeedPostRequest extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(5)
   $pb.PbList<$1.CommunityMention> get mentions => $_getList(4);
+
+  /// Пустой текст допустим для репоста без вложений.
+  @$pb.TagNumber(6)
+  $core.String get repostOf => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set repostOf($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasRepostOf() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearRepostOf() => $_clearField(6);
 }
 
 class CreateFeedPostResponse extends $pb.GeneratedMessage {
@@ -1156,6 +1223,7 @@ class CommentFeedPostRequest extends $pb.GeneratedMessage {
     $core.String? idempotencyKey,
     $core.Iterable<$core.String>? attachmentIds,
     $core.Iterable<$1.CommunityMention>? mentions,
+    $core.String? replyToCommentId,
   }) {
     final result = CommentFeedPostRequest._();
     if (channelId != null) result.channelId = channelId;
@@ -1164,6 +1232,7 @@ class CommentFeedPostRequest extends $pb.GeneratedMessage {
     if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
     if (attachmentIds != null) result.attachmentIds.addAll(attachmentIds);
     if (mentions != null) result.mentions.addAll(mentions);
+    if (replyToCommentId != null) result.replyToCommentId = replyToCommentId;
     return result;
   }
 
@@ -1187,6 +1256,7 @@ class CommentFeedPostRequest extends $pb.GeneratedMessage {
     ..pPS(5, _omitFieldNames ? '' : 'attachmentIds')
     ..pPM<$1.CommunityMention>(6, _omitFieldNames ? '' : 'mentions',
         subBuilder: $1.CommunityMention.$_createMessage)
+    ..aOS(7, _omitFieldNames ? '' : 'replyToCommentId')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1254,6 +1324,16 @@ class CommentFeedPostRequest extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(6)
   $pb.PbList<$1.CommunityMention> get mentions => $_getList(5);
+
+  /// Только видимый более ранний комментарий той же публикации.
+  @$pb.TagNumber(7)
+  $core.String get replyToCommentId => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set replyToCommentId($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasReplyToCommentId() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearReplyToCommentId() => $_clearField(7);
 }
 
 class CommentFeedPostResponse extends $pb.GeneratedMessage {

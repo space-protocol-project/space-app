@@ -1354,7 +1354,9 @@ class SpaceSession
       session.repliesSupported = manifest.ordinaryRepliesSupported;
       session.forumSupported = manifest.capabilities.contains('core.forum.v1');
       session.feedSupported = manifest.capabilities.contains('core.feed.v1');
-      session.feedSocialSupported = manifest.capabilities.contains('core.feed.social.v1');
+      session.feedSocialSupported = manifest.capabilities.contains(
+        'core.feed.social.v1',
+      );
       session.feedReadSupported = manifest.capabilities.contains(
         'core.feed.read.v1',
       );

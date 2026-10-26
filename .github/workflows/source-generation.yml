@@ -67,7 +67,7 @@ jobs:
           python3 - <<'PY'
           import glob, subprocess
           paths = glob.glob('lib/src/feed*.dart') + glob.glob('lib/ui/feed*.dart')
-          paths += ['lib/src/core.dart', 'test/feed_social_test.dart', 'test/feed_test.dart', 'tool/community_feed_social_interoperability.dart']
+          paths += ['lib/src/core.dart', 'test/feed_social_test.dart', 'test/feed_test.dart', 'tool/community_feed_social_interoperability.dart', 'test/support/feed_social.dart', 'test/probes/feed_social_probe.dart']
           subprocess.run(['dart', 'format', *[p for p in paths if not p.endswith('.freezed.dart')]], check=True)
           PY
       - name: Анализ и тесты
@@ -94,4 +94,6 @@ jobs:
             app/client/lib/l10n/*.dart
             app/client/test/feed_social_test.dart
             app/client/test/feed_test.dart
+            app/client/test/support/feed_social.dart
+            app/client/test/probes/feed_social_probe.dart
             app/client/tool/community_feed_social_interoperability.dart

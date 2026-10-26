@@ -2676,6 +2676,32 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get spaceSearchLimit => '显示前 500 条结果。请缩小搜索范围。';
+
+  @override
+  String get feedCancelReference => '移除引用';
+
+  @override
+  String get feedOpenOriginal => '查看原文';
+
+  @override
+  String get feedOriginalUnavailable => '原帖不可用';
+
+  @override
+  String get feedReply => '回复';
+
+  @override
+  String feedReplyTo(String number) {
+    return '回复评论 #$number';
+  }
+
+  @override
+  String get feedRepost => '转发';
+
+  @override
+  String get feedRepostHint => '直接发送以转发，或添加文字以引用。';
+
+  @override
+  String get feedShare => '转发或引用';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3780,4 +3806,30 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get spaceSearchLimit => '显示前 500 条结果。请缩小搜索范围。';
+
+  @override
+  String get feedCancelReference => '移除引用';
+
+  @override
+  String get feedOpenOriginal => '查看原文';
+
+  @override
+  String get feedOriginalUnavailable => '原帖不可用';
+
+  @override
+  String get feedReply => '回复';
+
+  @override
+  String feedReplyTo(String number) {
+    return '回复评论 #$number';
+  }
+
+  @override
+  String get feedRepost => '转发';
+
+  @override
+  String get feedRepostHint => '直接发送以转发，或添加文字以引用。';
+
+  @override
+  String get feedShare => '转发或引用';
 }

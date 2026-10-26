@@ -2910,4 +2910,31 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get spaceSearchLimit =>
       'Показаны первые 500 результатов. Уточните запрос.';
+
+  @override
+  String get feedCancelReference => 'Убрать ссылку';
+
+  @override
+  String get feedOpenOriginal => 'Открыть оригинал';
+
+  @override
+  String get feedOriginalUnavailable => 'Исходная публикация недоступна';
+
+  @override
+  String get feedReply => 'Ответить';
+
+  @override
+  String feedReplyTo(String number) {
+    return 'Ответ на комментарий №$number';
+  }
+
+  @override
+  String get feedRepost => 'Репост';
+
+  @override
+  String get feedRepostHint =>
+      'Отправьте без текста для репоста или добавьте свою цитату.';
+
+  @override
+  String get feedShare => 'Репост или цитата';
 }

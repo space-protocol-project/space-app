@@ -2893,4 +2893,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get spaceSearchLimit =>
       'Showing the first 500 results. Refine your search.';
+
+  @override
+  String get feedCancelReference => 'Remove reference';
+
+  @override
+  String get feedOpenOriginal => 'Open original';
+
+  @override
+  String get feedOriginalUnavailable => 'Original post unavailable';
+
+  @override
+  String get feedReply => 'Reply';
+
+  @override
+  String feedReplyTo(String number) {
+    return 'Reply to comment #$number';
+  }
+
+  @override
+  String get feedRepost => 'Repost';
+
+  @override
+  String get feedRepostHint =>
+      'Send without text to repost, or add your own comment to quote.';
+
+  @override
+  String get feedShare => 'Repost or quote';
 }

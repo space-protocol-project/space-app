@@ -555,8 +555,7 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
         child: Text(context.strings.forumMore),
       ),
     const SizedBox(height: 24),
-    if (state.permissions?.publish != true)
-      Text(context.strings.feedReadOnly),
+    if (state.permissions?.publish != true) Text(context.strings.feedReadOnly),
   ];
 
   List<Widget> _discussion(FeedState state) => [
@@ -693,49 +692,62 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
     actions: _commentActions(comment),
   );
 
-  Widget? _commentReference(FeedComment comment) => comment.replyToCommentId.isEmpty ? null : TextButton.icon(
-      key: ValueKey('feed-reply-parent-${comment.id}'),
-      onPressed: controller.state.busy ? null : () => _openReply(comment),
-      icon: const Icon(Icons.subdirectory_arrow_right, size: 16),
-      label: Text(context.strings.feedReplyTo(comment.replyToSequence.toString())),
-    );
+  Widget? _commentReference(FeedComment comment) =>
+      comment.replyToCommentId.isEmpty
+      ? null
+      : TextButton.icon(
+          key: ValueKey('feed-reply-parent-${comment.id}'),
+          onPressed: controller.state.busy ? null : () => _openReply(comment),
+          icon: const Icon(Icons.subdirectory_arrow_right, size: 16),
+          label: Text(
+            context.strings.feedReplyTo(comment.replyToSequence.toString()),
+          ),
+        );
 
   Widget _commentActions(FeedComment comment) => Wrap(
-      spacing: 12,
-      runSpacing: 8,
-      children: [
-        ..._replyActions(comment),
-        if (!comment.hidden)
-          TextButton(
-            onPressed: controller.state.busy ? null : () => report(comment),
-            child: Text(context.strings.forumReport),
+    spacing: 12,
+    runSpacing: 8,
+    children: [
+      ..._replyActions(comment),
+      if (!comment.hidden)
+        TextButton(
+          onPressed: controller.state.busy ? null : () => report(comment),
+          child: Text(context.strings.forumReport),
+        ),
+      if (controller.state.section?.permissions.manage == true)
+        TextButton(
+          onPressed: controller.state.busy ? null : () => moderate(comment),
+          child: Text(
+            comment.hidden
+                ? context.strings.feedRestoreComment
+                : context.strings.forumReportHide,
           ),
-        if (controller.state.section?.permissions.manage == true)
-          TextButton(
-            onPressed: controller.state.busy ? null : () => moderate(comment),
-            child: Text(
-              comment.hidden
-                  ? context.strings.feedRestoreComment
-                  : context.strings.forumReportHide,
-            ),
-          ),
-      ],
-    );
+        ),
+    ],
+  );
 
   List<Widget> _replyActions(FeedComment comment) {
-    if (comment.hidden || !widget.api.socialSupported || controller.state.permissions?.comment != true) return [];
+    if (comment.hidden ||
+        !widget.api.socialSupported ||
+        controller.state.permissions?.comment != true) {
+      return [];
+    }
     return [
-          TextButton.icon(
-            key: ValueKey('feed-reply-${comment.id}'),
-            onPressed: controller.state.busy ? null : () => _reply(comment),
-            icon: const Icon(Icons.reply_outlined, size: 18),
-            label: Text(context.strings.feedReply),
-          ),
+      TextButton.icon(
+        key: ValueKey('feed-reply-${comment.id}'),
+        onPressed: controller.state.busy ? null : () => _reply(comment),
+        icon: const Icon(Icons.reply_outlined, size: 18),
+        label: Text(context.strings.feedReply),
+      ),
     ];
   }
+
   Future<void> _openReply(FeedComment comment) async {
     searchComment = comment.replyToCommentId;
-    await controller.open(comment.postId, afterSequence: comment.replyToSequence.toInt() - 1);
+    await controller.open(
+      comment.postId,
+      afterSequence: comment.replyToSequence.toInt() - 1,
+    );
     if (mounted) revealCommunityResult(() => searchTarget.currentContext);
   }
 
@@ -753,15 +765,27 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
   }
 
   List<Widget> _shareActions(FeedPost post) {
-    if (post.hidden || !widget.api.socialSupported || controller.state.permissions?.publish != true) return [];
-    return [TextButton.icon(
-      key: ValueKey('feed-share-${post.id}'),
-      onPressed: controller.state.busy ? null : () => showFeedShare(context,
-        api: widget.api, post: post, refresh: controller.refresh,
-        sendWithShift: widget.sendWithShift),
-      icon: const Icon(Icons.repeat, size: 18),
-      label: Text(context.strings.feedShare),
-    )];
+    if (post.hidden ||
+        !widget.api.socialSupported ||
+        controller.state.permissions?.publish != true) {
+      return [];
+    }
+    return [
+      TextButton.icon(
+        key: ValueKey('feed-share-${post.id}'),
+        onPressed: controller.state.busy
+            ? null
+            : () => showFeedShare(
+                context,
+                api: widget.api,
+                post: post,
+                refresh: controller.refresh,
+                sendWithShift: widget.sendWithShift,
+              ),
+        icon: const Icon(Icons.repeat, size: 18),
+        label: Text(context.strings.feedShare),
+      ),
+    ];
   }
 
   Widget _composer() => KeyedSubtree(
@@ -833,14 +857,11 @@ class FeedEntryCard extends StatelessWidget {
               ],
             ),
           const SizedBox(height: 12),
+          _body(),
           if (!hidden && reference != null) ...[
-            reference!,
             const SizedBox(height: 12),
+            reference!,
           ],
-          CommunityMentionText(
-            hidden ? hiddenText : text,
-            mentions: hidden ? const [] : mentions,
-          ),
           for (final asset in assets)
             Padding(
               padding: const EdgeInsets.only(top: 12),
@@ -857,6 +878,12 @@ class FeedEntryCard extends StatelessWidget {
       ),
     ),
   );
+
+  Widget _body() {
+    if (!hidden && text.isEmpty) return const SizedBox.shrink();
+    return CommunityMentionText(hidden ? hiddenText : text,
+      mentions: hidden ? const [] : mentions);
+  }
 }
 
 class FeedComposer extends StatefulWidget {
@@ -892,7 +919,10 @@ class _FeedComposerState extends State<FeedComposer> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (state.replyTo.isNotEmpty || state.repostOf.isNotEmpty)
-              FeedDraftReference(state: state, cancel: widget.draft.clearReference),
+              FeedDraftReference(
+                state: state,
+                cancel: widget.draft.clearReference,
+              ),
             AttachmentComposer(
               queue: widget.draft.queue,
               session: widget.draft.api.attachmentSession,
