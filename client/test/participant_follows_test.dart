@@ -267,7 +267,9 @@ void main() {
     expect(api.selected, isEmpty);
     await tester.pumpWidget(const SizedBox());
   });
-  testWidgets('Подписки и личная лента помещаются на мобильном экране', (tester) async {
+  testWidgets('Подписки и личная лента помещаются на мобильном экране', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(320, 740);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -278,7 +280,9 @@ void main() {
     await tester.ensureVisible(find.byKey(const ValueKey('follow-author')));
     await tester.tap(find.byKey(const ValueKey('follow-author')));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.byKey(const ValueKey('open-personal-feed')));
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('open-personal-feed')),
+    );
     await tester.tap(find.byKey(const ValueKey('open-personal-feed')));
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('personal-feed-tab')), findsOneWidget);
