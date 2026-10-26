@@ -6,10 +6,9 @@ class PairingLifetime {
   PairingLifetime(
     this._seed, {
     required this.expiresAt,
-    required Future<void> Function() release,
+    required this._release,
     DateTime Function()? now,
-  }) : _release = release,
-       _now = now ?? DateTime.now {
+  }) : _now = now ?? DateTime.now {
     final remaining = expiresAt.difference(_now());
     if (_seed.length != 32 || remaining <= Duration.zero) {
       _seed.fillRange(0, _seed.length, 0);

@@ -77,12 +77,7 @@ class PendingPairing {
         );
       }
       seed = Uint8List.fromList(await key.extractPrivateKeyBytes());
-      return PendingPairing._(
-        server,
-        seed,
-        result,
-        channel,
-      );
+      return PendingPairing._(server, seed, result, channel);
     } catch (_) {
       if (seed != null) seed.fillRange(0, seed.length, 0);
       await channel.shutdown();
