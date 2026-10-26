@@ -282,8 +282,14 @@ jobs:
             cp build/app/outputs/flutter-apk/app-debug.apk ../dist/Space-android-debug.apk
             (cd ../dist && sha256sum Space-android-debug.apk > SHA256SUMS-android-debug.txt)
           fi
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then apk=build/app/outputs/flutter-apk/app-release.apk; else apk=build/app/outputs/flutter-apk/app-debug.apk; fi
-          python3 ../tools/check_apk_native.py "$apk" --report ../dist/android-native.json
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            apk=build/app/outputs/flutter-apk/app-release.apk
+            report="$RUNNER_TEMP/android-native.json"
+          else
+            apk=build/app/outputs/flutter-apk/app-debug.apk
+            report=../dist/android-native.json
+          fi
+          python3 ../tools/check_apk_native.py "$apk" --report "$report"
       - name: Совместимость приватного push runtime и Android
         working-directory: client/android
         run: ./gradlew :app:testDebugUnitTest :flutter_webrtc:testDebugUnitTest
