@@ -44,7 +44,10 @@ class _ParticipantFollowScopeState extends State<ParticipantFollowScope> {
     binding = next;
     unawaited(controller?.close());
     controller = null;
-    if (api == null || !widget.active || widget.channel.isEmpty || ids.isEmpty) {
+    if (api == null ||
+        !widget.active ||
+        widget.channel.isEmpty ||
+        ids.isEmpty) {
       return;
     }
     controller = FollowAuthorsController(

@@ -355,7 +355,11 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
     channel: state.section?.id ?? '',
     ids: _followAuthors(state),
     active: widget.active && foreground && state.error == null,
-    available: () => mounted && widget.active && foreground && controller.state.error == null,
+    available: () =>
+        mounted &&
+        widget.active &&
+        foreground &&
+        controller.state.error == null,
     child: _navigation(state),
   );
 

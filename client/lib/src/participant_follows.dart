@@ -77,7 +77,9 @@ class FollowAuthorsController extends Cubit<FollowAuthorsState> {
   }
 
   Future<void> toggle(String id) async {
-    if (!_matches(_generation) || state.busy || !state.entries.containsKey(id)) {
+    if (!_matches(_generation) ||
+        state.busy ||
+        !state.entries.containsKey(id)) {
       return;
     }
     final generation = ++_generation;
