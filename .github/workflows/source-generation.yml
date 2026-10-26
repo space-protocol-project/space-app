@@ -77,7 +77,21 @@ jobs:
           flutter pub get
           dart run build_runner build
           flutter gen-l10n
-          dart format lib/src/space_search*.dart lib/ui/space_search*.dart lib/ui/shell_space_search.dart
+          python3 - <<'PY'
+          import glob, subprocess
+          paths = glob.glob('lib/src/space_search*.dart') + glob.glob('lib/ui/space_search*.dart')
+          paths += ['lib/ui/shell_space_search.dart', 'lib/src/core.dart', 'lib/src/chat_controller.dart', 'lib/ui/shell.dart', 'lib/ui/shell_message_search.dart']
+          subprocess.run(['dart', 'format', *[p for p in paths if not p.endswith('.freezed.dart')]], check=True)
+          PY
+      - name: Форматирование серверного поиска
+        run: |
+          python3 - <<'PY'
+          import glob, subprocess
+          paths = glob.glob('server/internal/postgres/space_search*.go')
+          paths += glob.glob('server/internal/transport/connect_space_search.go')
+          paths += ['server/internal/transport/connect.go', 'server/internal/transport/connect_test.go']
+          subprocess.run(['gofmt', '-w', *paths], check=True)
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: generated-space-search
@@ -89,5 +103,13 @@ jobs:
             app/client/lib/src/space_search*.dart
             app/client/lib/ui/space_search*.dart
             app/client/lib/ui/shell_space_search.dart
+            app/client/lib/src/core.dart
+            app/client/lib/src/chat_controller.dart
+            app/client/lib/ui/shell.dart
+            app/client/lib/ui/shell_message_search.dart
             app/client/lib/l10n/*.dart
+            server/internal/postgres/space_search*.go
+            server/internal/transport/connect_space_search.go
+            server/internal/transport/connect.go
+            server/internal/transport/connect_test.go
           if-no-files-found: error

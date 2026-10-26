@@ -8,6 +8,7 @@ targets:
           - lib/src/dashboard_controller.dart
           - lib/src/community_mentions.dart
           - lib/src/community_search.dart
+          - lib/src/space_search.dart
           - lib/src/community_reactions.dart
           - lib/src/community_favorites.dart
           - lib/src/community_favorite_list.dart

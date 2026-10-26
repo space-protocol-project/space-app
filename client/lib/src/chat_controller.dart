@@ -25,6 +25,7 @@ import 'personal_notifications_api.dart';
 import 'generated/space/v1/community_mentions.pb.dart';
 import 'mention_data.dart';
 import 'message_search.dart';
+import 'space_search_api.dart';
 import 'history_pages.dart';
 import 'mls/saved_archive.dart';
 import 'mls/local_store.dart';
@@ -248,6 +249,15 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       : null;
   Future<void> revealSearchMessage(Content message) =>
       sendRequest(ChatSearchMessageRevealed(message, _session));
+  SpaceSearchApi? get spaceSearch {
+    final session = _session;
+    if (!connected || accessRemoved) return null;
+    return session is SpaceSearchSource ? (session as SpaceSearchSource).spaceSearch : null;
+  }
+  Future<Content?> searchContent(String channel, int sequence) async {
+    if (_session is! HistoryPageSession) return null;
+    return notificationContent(channel, sequence);
+  }
   Future<Content?> notificationMessage(int sequence) async {
     final session = _session, channel = channelId, principal = principalId;
     if (!connected || !canRead || encryptedChannel) return null;

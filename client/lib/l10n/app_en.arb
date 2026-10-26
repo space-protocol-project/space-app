@@ -1028,5 +1028,10 @@
   "communityFavoriteAdd": "Save to favorites",
   "communityFavoriteRemove": "Remove from favorites",
   "communityFavoriteRetry": "Could not update favorites. Retry",
-  "communityFavoritesEmpty": "No favorites in this section yet."
+  "communityFavoritesEmpty": "No favorites in this section yet.",
+  "spaceSearch": "Search this space",
+  "spaceSearchHint": "Search chats, forums and feeds",
+  "spaceSearchChat": "Message",
+  "spaceSearchChatMode": "Search the selected chat and local MLS",
+  "spaceSearchLimit": "Showing the first 500 results. Refine your search."
 }

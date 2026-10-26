@@ -1028,5 +1028,10 @@
   "communityFavoriteAdd": "Сохранить в избранное",
   "communityFavoriteRemove": "Убрать из избранного",
   "communityFavoriteRetry": "Не удалось обновить избранное. Повторить",
-  "communityFavoritesEmpty": "В этом разделе пока нет избранного."
+  "communityFavoritesEmpty": "В этом разделе пока нет избранного.",
+  "spaceSearch": "Поиск в пространстве",
+  "spaceSearchHint": "Поиск в чатах, форуме и ленте",
+  "spaceSearchChat": "Сообщение",
+  "spaceSearchChatMode": "Поиск в выбранном чате и локальном MLS",
+  "spaceSearchLimit": "Показаны первые 500 результатов. Уточните запрос."
 }

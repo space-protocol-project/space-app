@@ -28,6 +28,8 @@ import 'package:crypto/crypto.dart';
 
 import '../src/chat_notifications.dart';
 import '../src/message_search.dart';
+import '../src/space_search.dart';
+import 'space_search.dart';
 import '../src/channel_search.dart';
 import '../src/core.dart' show SpaceSession, SessionForumApi;
 import '../src/system_notifications.dart';
@@ -84,6 +86,7 @@ import 'retained_indexed_stack.dart';
 part 'shell_notifications.dart';
 part 'shell_personal_notifications.dart';
 part 'shell_message_search.dart';
+part 'shell_space_search.dart';
 part 'shell_mls_notifications.dart';
 
 enum Section {
@@ -995,7 +998,14 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   String? get selectedVoiceRoom => selectedVoiceRooms[controller.knownOrigin];
 
   Section selected = Section.overview;
-  Future<void> search() => openMessageSearch();
+  Future<void> search() async {
+    final api = controller.spaceSearch;
+    if (dashboard || applicationSettings || api == null) {
+      await openMessageSearch();
+      return;
+    }
+    await openSpaceSearch(api);
+  }
 
   String get chatLabel => controller.channels.isNotEmpty
       ? controller.chatTitle

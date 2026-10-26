@@ -73,6 +73,7 @@ class _MessageSearchScope {
       );
 
   bool readable(Channel channel) =>
+      channel.views.any((view) => view.type == 'chat') &&
       !channel.archived &&
       channel.permissions.visible &&
       channel.permissions.read;
