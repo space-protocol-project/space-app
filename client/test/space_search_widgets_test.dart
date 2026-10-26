@@ -130,7 +130,7 @@ void main() {
     expect(find.byType(ListTile), findsWidgets);
     available = false;
     changes.add(null);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.byType(ListTile), findsNothing);
     expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
   });
