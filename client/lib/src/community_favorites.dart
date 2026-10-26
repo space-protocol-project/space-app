@@ -213,7 +213,10 @@ class CommunityFavoritesController extends Cubit<CommunityFavoritesState> {
       _pending.remove(key);
       _applied(key, entry);
     } catch (error) {
-      if (_current(generation)) _writeFailed(key, error);
+      if (_current(generation) &&
+          _pending[key]?.idempotencyKey == request.idempotencyKey) {
+        _writeFailed(key, error);
+      }
     }
   }
 

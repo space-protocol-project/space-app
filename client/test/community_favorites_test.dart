@@ -9,6 +9,30 @@ import 'package:space_client/src/community_favorite_list.dart';
 import 'support/community_favorites.dart';
 
 void main() {
+  test('Ошибка старого запроса не отменяет новый после восстановления видимости', () async {
+    final api = FakeCommunityFavorites();
+    final ref = favoriteRef('one');
+    final controller = CommunityFavoritesController(api, 'forum');
+    addTearDown(controller.close);
+    await controller.select([ref], active: true);
+    final oldResult = Completer<SetCommunityFavoriteResponse>();
+    api.onSet = (_) => oldResult.future;
+    final oldWrite = controller.toggle(ref);
+    api.onStates = (_) async => GetCommunityFavoriteStatesResponse();
+    await controller.refresh();
+    api.onStates = null;
+    await controller.refresh();
+    final newResult = Completer<SetCommunityFavoriteResponse>();
+    api.onSet = (_) => newResult.future;
+    final newWrite = controller.toggle(ref);
+    oldResult.completeError(const GrpcError.permissionDenied());
+    await oldWrite;
+    expect(controller.state.busy, contains('1:one'));
+    expect(controller.state.errors, isEmpty);
+    newResult.complete(api.apply(api.requests.last));
+    await newWrite;
+    expect(controller.state.entries['1:one']!.saved, isTrue);
+  });
   test('Избранное: добавление, удаление и пачки по 50', () async {
     final api = FakeCommunityFavorites();
     final c = CommunityFavoritesController(api, 'forum');
