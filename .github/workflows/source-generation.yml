@@ -1,0 +1,93 @@
+name: Генерация исходников в CI
+on:
+  workflow_dispatch:
+    inputs:
+      protocol_ref:
+        description: Коммит контракта поиска пространства
+        required: true
+        type: string
+      app_ref:
+        description: Коммит приложения
+        required: true
+        type: string
+      server_ref:
+        description: Коммит сервера
+        required: true
+        type: string
+      models:
+        description: Генерировать также состояния Freezed и переводы
+        default: false
+        type: boolean
+permissions:
+  contents: read
+jobs:
+  generate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-app
+          ref: ${{ inputs.app_ref }}
+          path: app
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: ${{ inputs.server_ref }}
+          path: server
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-protocol
+          ref: ${{ inputs.protocol_ref }}
+          path: protocol
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.8'
+          channel: stable
+          cache: true
+      - name: Стабильные генераторы, совместимые с SDK и runtime
+        run: |
+          go install github.com/bufbuild/buf/cmd/buf@v1.75.0
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.2
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.32.0
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.32.0
+          dart pub global activate protoc_plugin 25.1.0
+          dart pub global activate connectrpc 2.0.1
+      - name: Проверка контракта и генерация только нового RPC
+        env:
+          SCHEMA: ${{ runner.temp }}/space-search-schema
+        run: |
+          (cd protocol && buf lint)
+          mkdir -p "$SCHEMA/space/v1"
+          cp protocol/protocol/proto/space/v1/space_search.proto "$SCHEMA/space/v1/"
+          (cd protocol && buf generate "$SCHEMA" --template buf.gen.yaml)
+          (cd server && buf generate "$SCHEMA" --template buf.gen.yaml)
+          (cd server && buf generate "$SCHEMA" --template buf.connect.gen.yaml)
+          (cd app && buf generate "$SCHEMA" --template client/buf.gen.yaml)
+          (cd app && buf generate "$SCHEMA" --template client/buf.connect.gen.yaml)
+      - name: Freezed и переводы
+        if: inputs.models
+        working-directory: app/client
+        run: |
+          flutter pub get
+          dart run build_runner build
+          flutter gen-l10n
+          dart format lib/src/space_search*.dart lib/ui/space_search*.dart lib/ui/shell_space_search.dart
+      - uses: actions/upload-artifact@v4
+        with:
+          name: generated-space-search
+          path: |
+            protocol/protocol/openapi/space/v1/space_search.swagger.json
+            server/gen/space/v1/space_search*.go
+            server/gen/space/v1/spacev1connect/space_search.connect.go
+            app/client/lib/src/generated/space/v1/space_search*.dart
+            app/client/lib/src/space_search*.dart
+            app/client/lib/ui/space_search*.dart
+            app/client/lib/ui/shell_space_search.dart
+            app/client/lib/l10n/*.dart
+          if-no-files-found: error
