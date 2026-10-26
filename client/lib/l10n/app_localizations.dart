@@ -5389,7 +5389,7 @@ abstract class AppLocalizations {
   /// No description provided for @userExportHelp.
   ///
   /// In ru, this message translates to:
-  /// **'Собственные обычные сообщения, темы, публикации и ответы в JSON. Вложения — только метаданные, без файлов. MLS, ключи и токены не входят. До 5000 записей и 8 МиБ за один период.'**
+  /// **'Собственное содержимое доступных неархивных разделов в JSON. Вложения — только метаданные, без файлов. MLS, ключи и токены не входят. До 5000 записей и 8 МиБ за один период.'**
   String get userExportHelp;
 
   /// No description provided for @userExportSection.
