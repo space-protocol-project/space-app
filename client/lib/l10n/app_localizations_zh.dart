@@ -2702,6 +2702,39 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get feedShare => '转发或引用';
+
+  @override
+  String get followAdd => '关注';
+
+  @override
+  String get followingEmpty => '你还没有关注任何人。';
+
+  @override
+  String get followingTitle => '关注';
+
+  @override
+  String get followRefresh => '刷新关注';
+
+  @override
+  String get followRemove => '取消关注';
+
+  @override
+  String get followRevoked => '权限或空间已更改。请重新打开动态。';
+
+  @override
+  String get followUnavailable => '成员不可用';
+
+  @override
+  String get personalFeed => '我的动态';
+
+  @override
+  String get personalFeedEmpty => '这里显示你关注的作者在可访问版块中的帖子。在帖子或评论旁关注作者。';
+
+  @override
+  String get personalFeedLimit => '显示前500条帖子。刷新以查看新帖子。';
+
+  @override
+  String get personalFeedOpen => '打开讨论';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3832,4 +3865,37 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get feedShare => '转发或引用';
+
+  @override
+  String get followAdd => '关注';
+
+  @override
+  String get followingEmpty => '你还没有关注任何人。';
+
+  @override
+  String get followingTitle => '关注';
+
+  @override
+  String get followRefresh => '刷新关注';
+
+  @override
+  String get followRemove => '取消关注';
+
+  @override
+  String get followRevoked => '权限或空间已更改。请重新打开动态。';
+
+  @override
+  String get followUnavailable => '成员不可用';
+
+  @override
+  String get personalFeed => '我的动态';
+
+  @override
+  String get personalFeedEmpty => '这里显示你关注的作者在可访问版块中的帖子。在帖子或评论旁关注作者。';
+
+  @override
+  String get personalFeedLimit => '显示前500条帖子。刷新以查看新帖子。';
+
+  @override
+  String get personalFeedOpen => '打开讨论';
 }

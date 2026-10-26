@@ -5313,6 +5313,72 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Репост или цитата'**
   String get feedShare;
+
+  /// No description provided for @followAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подписаться'**
+  String get followAdd;
+
+  /// No description provided for @followingEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вы пока ни на кого не подписаны.'**
+  String get followingEmpty;
+
+  /// No description provided for @followingTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подписки'**
+  String get followingTitle;
+
+  /// No description provided for @followRefresh.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить подписки'**
+  String get followRefresh;
+
+  /// No description provided for @followRemove.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отписаться'**
+  String get followRemove;
+
+  /// No description provided for @followRevoked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ или пространство изменились. Откройте ленту заново.'**
+  String get followRevoked;
+
+  /// No description provided for @followUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Участник недоступен'**
+  String get followUnavailable;
+
+  /// No description provided for @personalFeed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Моя лента'**
+  String get personalFeed;
+
+  /// No description provided for @personalFeedEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здесь появятся публикации авторов, на которых вы подписаны, из доступных разделов. Подпишитесь на автора у его публикации или комментария.'**
+  String get personalFeedEmpty;
+
+  /// No description provided for @personalFeedLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показаны первые 500 публикаций. Обновите ленту, чтобы увидеть новые.'**
+  String get personalFeedLimit;
+
+  /// No description provided for @personalFeedOpen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть обсуждение'**
+  String get personalFeedOpen;
 }
 
 class _AppLocalizationsDelegate

@@ -70,7 +70,7 @@ jobs:
           import glob, subprocess
           paths = glob.glob('lib/src/participant_follows*.dart') + glob.glob('lib/ui/participant_follows.dart') + glob.glob('test/participant_follows*.dart')
           paths += ['lib/src/core.dart', 'lib/src/feed_api.dart', 'lib/src/feed_rpc.dart', 'lib/ui/feed.dart', 'lib/ui/personal_feed.dart', 'test/feed_test.dart', 'test/support/feed_social.dart']
-          paths += glob.glob('tool/community_participant_follows_interoperability.dart') + glob.glob('test/probes/participant_follows_probe.dart')
+          paths += glob.glob('tool/community_participant_follows_interoperability.dart') + glob.glob('test/probes/participant_follows_probe.dart') + glob.glob('test/support/participant_follows.dart')
           subprocess.run(['dart', 'format', *[p for p in paths if not p.endswith('.freezed.dart')]], check=True)
           PY
       - name: Анализ и тесты
@@ -109,6 +109,7 @@ jobs:
             app/client/test/feed_social_test.dart
             app/client/test/feed_test.dart
             app/client/test/participant_follows*.dart
+            app/client/test/support/participant_follows.dart
             app/client/test/probes/participant_follows_probe.dart
             app/client/tool/community_participant_follows_interoperability.dart
             app/client/test/support/feed_social.dart

@@ -2920,4 +2920,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get feedShare => 'Repost or quote';
+
+  @override
+  String get followAdd => 'Follow';
+
+  @override
+  String get followingEmpty => 'You are not following anyone yet.';
+
+  @override
+  String get followingTitle => 'Following';
+
+  @override
+  String get followRefresh => 'Refresh following';
+
+  @override
+  String get followRemove => 'Unfollow';
+
+  @override
+  String get followRevoked => 'Access or space changed. Open the feed again.';
+
+  @override
+  String get followUnavailable => 'Participant unavailable';
+
+  @override
+  String get personalFeed => 'My feed';
+
+  @override
+  String get personalFeedEmpty =>
+      'Posts from authors you follow will appear here from sections you can read. Follow an author next to their post or comment.';
+
+  @override
+  String get personalFeedLimit =>
+      'Showing the first 500 posts. Refresh to see newer posts.';
+
+  @override
+  String get personalFeedOpen => 'Open discussion';
 }

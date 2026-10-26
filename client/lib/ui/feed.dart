@@ -375,37 +375,69 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
   List<Widget> _followTools() {
     if (widget.api.follows == null) return [];
     return [
-      TextButton.icon(key: const ValueKey('open-personal-feed'),
+      TextButton.icon(
+        key: const ValueKey('open-personal-feed'),
         onPressed: () => _personalFeed(FollowPageKind.posts),
-        icon: const Icon(Icons.dynamic_feed_outlined),label: Text(context.strings.personalFeed)),
-      IconButton(key: const ValueKey('open-following'),
+        icon: const Icon(Icons.dynamic_feed_outlined),
+        label: Text(context.strings.personalFeed),
+      ),
+      IconButton(
+        key: const ValueKey('open-following'),
         onPressed: () => _personalFeed(FollowPageKind.authors),
-        tooltip: context.strings.followingTitle,icon: const Icon(Icons.people_outline)),
+        tooltip: context.strings.followingTitle,
+        icon: const Icon(Icons.people_outline),
+      ),
     ];
   }
 
-  String _feedCatalog() => controller.state.sections.map((c) =>
-    '${c.id}:${c.revision}:${c.permissions.read}:${c.permissions.visible}:${c.archived}').join('|');
+  String _feedCatalog() => controller.state.sections
+      .map(
+        (c) =>
+            '${c.id}:${c.revision}:${c.permissions.read}:${c.permissions.visible}:${c.archived}',
+      )
+      .join('|');
 
   Future<void> _personalFeed(FollowPageKind kind) async {
     final api = widget.api.follows;
     if (api == null) return;
     final catalog = _feedCatalog(), scope = api.scopeId;
-    bool available() => mounted && widget.active && foreground &&
-      widget.api.follows?.scopeId == scope && _feedCatalog() == catalog;
-    final target = await showPersonalFeed(context, api: api, feed: widget.api,
-      profiles: widget.profiles, channels: controller.state.sections.map((c) => c.id).toSet(),
-      available: available, changes: controller.stream, kind: kind);
+    bool available() =>
+        mounted &&
+        widget.active &&
+        foreground &&
+        widget.api.follows?.scopeId == scope &&
+        _feedCatalog() == catalog;
+    final target = await showPersonalFeed(
+      context,
+      api: api,
+      feed: widget.api,
+      profiles: widget.profiles,
+      channels: controller.state.sections.map((c) => c.id).toSet(),
+      available: available,
+      changes: controller.stream,
+      kind: kind,
+    );
     if (target == null || !available()) return;
     await _openPersonalTarget(target.post.channelId, target.post.id, scope);
   }
 
-  Future<void> _openPersonalTarget(String channel, String id, String scope) async {
+  Future<void> _openPersonalTarget(
+    String channel,
+    String id,
+    String scope,
+  ) async {
     final current = controller;
-    final section = current.state.sections.where((c) => c.id == channel).firstOrNull;
+    final section = current.state.sections
+        .where((c) => c.id == channel)
+        .firstOrNull;
     if (section == null) return;
     if (current.state.section?.id != channel) await current.select(section);
-    if (!mounted || !widget.active || !identical(current, controller) || widget.api.follows?.scopeId != scope) return;
+    if (!mounted ||
+        !widget.active ||
+        !identical(current, controller) ||
+        widget.api.follows?.scopeId != scope) {
+      return;
+    }
     await current.open(id);
   }
 
@@ -921,7 +953,7 @@ class FeedEntryCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (authorAction != null) authorAction!,
+                ?authorAction,
               ],
             ),
           const SizedBox(height: 12),

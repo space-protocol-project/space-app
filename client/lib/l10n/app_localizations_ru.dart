@@ -2937,4 +2937,40 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get feedShare => 'Репост или цитата';
+
+  @override
+  String get followAdd => 'Подписаться';
+
+  @override
+  String get followingEmpty => 'Вы пока ни на кого не подписаны.';
+
+  @override
+  String get followingTitle => 'Подписки';
+
+  @override
+  String get followRefresh => 'Обновить подписки';
+
+  @override
+  String get followRemove => 'Отписаться';
+
+  @override
+  String get followRevoked =>
+      'Доступ или пространство изменились. Откройте ленту заново.';
+
+  @override
+  String get followUnavailable => 'Участник недоступен';
+
+  @override
+  String get personalFeed => 'Моя лента';
+
+  @override
+  String get personalFeedEmpty =>
+      'Здесь появятся публикации авторов, на которых вы подписаны, из доступных разделов. Подпишитесь на автора у его публикации или комментария.';
+
+  @override
+  String get personalFeedLimit =>
+      'Показаны первые 500 публикаций. Обновите ленту, чтобы увидеть новые.';
+
+  @override
+  String get personalFeedOpen => 'Открыть обсуждение';
 }

@@ -128,7 +128,7 @@ jobs:
         run: flutter test test/navigation_reveal_test.dart test/mobile_navigation_test.dart test/mobile_client_test.dart test/redesign_test.dart
       - name: Лента и мобильная навигация Android
         working-directory: client
-        run: flutter test test/feed_test.dart test/feed_social_test.dart test/feed_read_test.dart test/feed_read_visibility_test.dart test/feed_android_test.dart
+        run: flutter test test/feed_test.dart test/feed_social_test.dart test/participant_follows_test.dart test/feed_read_test.dart test/feed_read_visibility_test.dart test/feed_android_test.dart
       - name: Упоминания, темы и переходы к обзору пространства
         working-directory: client
         run: flutter test --no-pub --concurrency 2 test/community_mentions_test.dart test/chat_mentions_test.dart test/personal_notifications_api_test.dart test/personal_notifications_controller_test.dart test/personal_inbox_test.dart test/personal_notification_navigation_test.dart test/theme_mode_test.dart test/dashboard_workspaces_test.dart test/admin_sidebar_test.dart
@@ -233,6 +233,17 @@ jobs:
         with:
           name: feed-social-native-ui
           path: ${{ runner.temp }}/feed-social-ui/*
+          if-no-files-found: warn
+      - name: Подписки и личная лента Linux с горячим перезапуском
+        if: matrix.target == 'linux'
+        shell: bash
+        run: dbus-run-session -- xvfb-run -a python3 tools/check_community_follows_ui.py --output "$RUNNER_TEMP/participant-follows-ui"
+      - name: Журнал подписок и личной ленты
+        if: always() && matrix.target == 'linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: participant-follows-native-ui
+          path: ${{ runner.temp }}/participant-follows-ui/*
           if-no-files-found: warn
       - name: Нативный запуск Linux из уведомления
         if: matrix.target == 'linux'
