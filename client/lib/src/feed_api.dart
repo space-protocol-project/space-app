@@ -12,6 +12,7 @@ abstract interface class FeedReadApi {
 
 abstract interface class FeedApi {
   bool get supported;
+  bool get socialSupported;
   bool get attachmentsEnabled;
   AttachmentSession? get attachmentSession;
   List<Channel> get sections;

@@ -29,6 +29,8 @@ class SessionFeedApi
   @override
   bool get supported => session.feedSupported;
   @override
+  bool get socialSupported => session.feedSocialSupported;
+  @override
   bool get readSupported => session.feedReadSupported;
   @override
   Future<feed.FeedPost> markRead(

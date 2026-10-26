@@ -1033,5 +1033,14 @@
   "spaceSearchHint": "Поиск в чатах, форуме и ленте",
   "spaceSearchChat": "Сообщение",
   "spaceSearchChatMode": "Поиск в выбранном чате и локальном MLS",
-  "spaceSearchLimit": "Показаны первые 500 результатов. Уточните запрос."
+  "spaceSearchLimit": "Показаны первые 500 результатов. Уточните запрос.",
+  "feedCancelReference": "Убрать ссылку",
+  "feedOpenOriginal": "Открыть оригинал",
+  "feedOriginalUnavailable": "Исходная публикация недоступна",
+  "feedReply": "Ответить",
+  "feedReplyTo": "Ответ на комментарий №{number}",
+  "feedRepost": "Репост",
+  "feedRepostHint": "Отправьте без текста для репоста или добавьте свою цитату.",
+  "feedShare": "Репост или цитата",
+  "@feedReplyTo": {"placeholders": {"number": {"type": "String"}}}
 }

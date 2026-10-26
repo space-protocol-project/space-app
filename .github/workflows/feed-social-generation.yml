@@ -1,0 +1,95 @@
+name: Подготовка социальной ленты в CI
+on:
+  workflow_dispatch:
+    inputs:
+      protocol_ref:
+        required: true
+        type: string
+      server_ref:
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  generate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: app
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: ${{ inputs.server_ref }}
+          path: server
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-protocol
+          ref: ${{ inputs.protocol_ref }}
+          path: protocol
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.8'
+          channel: stable
+          cache: true
+      - name: Генераторы
+        run: |
+          go install github.com/bufbuild/buf/cmd/buf@v1.75.0
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.2
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.32.0
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.32.0
+          dart pub global activate protoc_plugin 25.1.0
+          dart pub global activate connectrpc 2.0.1
+      - name: Контракт и форматирование
+        run: |
+          (cd protocol && buf lint)
+          mkdir -p "$RUNNER_TEMP/feed-schema/space/v1"
+          cp protocol/protocol/proto/space/v1/feed.proto "$RUNNER_TEMP/feed-schema/space/v1/"
+          (cd protocol && buf generate "$RUNNER_TEMP/feed-schema" --template buf.gen.yaml)
+          (cd server && buf generate "$RUNNER_TEMP/feed-schema" --template buf.gen.yaml)
+          (cd server && buf generate "$RUNNER_TEMP/feed-schema" --template buf.connect.gen.yaml)
+          (cd app && buf generate "$RUNNER_TEMP/feed-schema" --template client/buf.gen.yaml)
+          (cd app && buf generate "$RUNNER_TEMP/feed-schema" --template client/buf.connect.gen.yaml)
+          gofmt -w server/internal/postgres/feed*.go server/internal/postgres/store.go server/internal/postgres/admin.go
+      - name: Freezed и переводы
+        working-directory: app/client
+        run: |
+          flutter pub get
+          dart run build_runner build
+          flutter gen-l10n
+          python3 - <<'PY'
+          import glob, subprocess
+          paths = glob.glob('lib/src/feed*.dart') + glob.glob('lib/ui/feed*.dart')
+          paths += ['lib/src/core.dart', 'test/feed_social_test.dart', 'test/feed_test.dart']
+          subprocess.run(['dart', 'format', *[p for p in paths if not p.endswith('.freezed.dart')]], check=True)
+          PY
+      - name: Анализ и тесты
+        working-directory: app/client
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal
+          flutter analyze
+          flutter test --no-pub test/feed_test.dart test/feed_social_test.dart test/feed_read_test.dart test/feed_read_visibility_test.dart test/community_mentions_test.dart test/community_reactions_widgets_test.dart test/community_favorites_widgets_test.dart
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: generated-feed-social
+          path: |
+            protocol/protocol/openapi/space/v1/feed.swagger.json
+            server/gen/space/v1/feed*.go
+            server/gen/space/v1/spacev1connect/feed.connect.go
+            server/internal/postgres/feed*.go
+            server/internal/postgres/store.go
+            server/internal/postgres/admin.go
+            app/client/lib/src/generated/space/v1/feed*.dart
+            app/client/lib/src/feed*.dart
+            app/client/lib/src/core.dart
+            app/client/lib/ui/feed*.dart
+            app/client/lib/l10n/*.dart
+            app/client/test/feed_social_test.dart
+            app/client/test/feed_test.dart

@@ -402,5 +402,14 @@
   "spaceSearchHint": "搜索聊天、论坛和动态",
   "spaceSearchChat": "消息",
   "spaceSearchChatMode": "搜索当前聊天与本地 MLS",
-  "spaceSearchLimit": "显示前 500 条结果。请缩小搜索范围。"
+  "spaceSearchLimit": "显示前 500 条结果。请缩小搜索范围。",
+  "feedCancelReference": "移除引用",
+  "feedOpenOriginal": "查看原文",
+  "feedOriginalUnavailable": "原帖不可用",
+  "feedReply": "回复",
+  "feedReplyTo": "回复评论 #{number}",
+  "feedRepost": "转发",
+  "feedRepostHint": "直接发送以转发，或添加文字以引用。",
+  "feedShare": "转发或引用",
+  "@feedReplyTo": {"placeholders": {"number": {"type": "String"}}}
 }

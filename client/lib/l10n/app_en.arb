@@ -1033,5 +1033,14 @@
   "spaceSearchHint": "Search chats, forums and feeds",
   "spaceSearchChat": "Message",
   "spaceSearchChatMode": "Search the selected chat and local MLS",
-  "spaceSearchLimit": "Showing the first 500 results. Refine your search."
+  "spaceSearchLimit": "Showing the first 500 results. Refine your search.",
+  "feedCancelReference": "Remove reference",
+  "feedOpenOriginal": "Open original",
+  "feedOriginalUnavailable": "Original post unavailable",
+  "feedReply": "Reply",
+  "feedReplyTo": "Reply to comment #{number}",
+  "feedRepost": "Repost",
+  "feedRepostHint": "Send without text to repost, or add your own comment to quote.",
+  "feedShare": "Repost or quote",
+  "@feedReplyTo": {"placeholders": {"number": {"type": "String"}}}
 }

@@ -17,6 +17,8 @@ import 'package:space_client/ui/feed_management.dart';
 
 class FakeFeed implements FeedApi {
   @override
+  bool socialSupported = true;
+  @override
   bool supported = true;
   @override
   bool attachmentsEnabled = false;

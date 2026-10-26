@@ -418,6 +418,9 @@ abstract class FeedDraftState with _$FeedDraftState {
     @Default('') String text,
     @Default('') String key,
     @Default('') String payload,
+    @Default('') String replyTo,
+    @Default(0) int replySequence,
+    @Default('') String repostOf,
     @Default(false) bool busy,
     @Default(false) bool failed,
   }) = _FeedDraftState;
@@ -435,6 +438,24 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
   final Future<void> Function() sent;
   final queue = AttachmentQueue();
   final mentions = MentionDraftCubit();
+  void reply(FeedComment comment) {
+    if (state.busy || isClosed || !api.socialSupported) return;
+    if (post.isEmpty || comment.postId != post || comment.hidden) return;
+    emit(state.copyWith(replyTo: comment.id, replySequence: comment.sequence.toInt()));
+  }
+
+  void repost(FeedPost original) {
+    if (state.busy || isClosed || !api.socialSupported) return;
+    if (post.isNotEmpty || original.channelId != channel || original.hidden) return;
+    final id = original.repostOf.isEmpty ? original.id : original.repostOf;
+    emit(state.copyWith(repostOf: id));
+  }
+
+  void clearReference() {
+    if (state.busy || isClosed) return;
+    emit(state.copyWith(replyTo: '', replySequence: 0, repostOf: ''));
+  }
+
   void change(String text) {
     if (state.busy || isClosed) return;
     mentions.change(text);
@@ -444,10 +465,7 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
   Future<bool> send() async {
     if (state.busy || queue.state.busy || isClosed) return false;
     final text = state.text.trim();
-    final invalid =
-        utf8.encode(text).length > 8192 ||
-        (text.isEmpty && queue.state.files.isEmpty);
-    if (invalid) {
+    if (_invalid(text)) {
       emit(state.copyWith(failed: true));
       return false;
     }
@@ -455,6 +473,8 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
       text,
       mentions.trimmed.map((m) => m.toProto3Json()).toList(),
       queue.state.files.map((f) => f.key).toList(),
+      state.replyTo,
+      state.repostOf,
     ]);
     final key = payload == state.payload ? state.key : newRequestKey();
     emit(state.copyWith(busy: true, failed: false, key: key, payload: payload));
@@ -474,7 +494,14 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
     }
   }
 
+  bool _invalid(String text) =>
+      utf8.encode(text).length > 8192 ||
+      (text.isEmpty && queue.state.files.isEmpty && state.repostOf.isEmpty);
+
   Future<void> _submit(String text, String key, List<String> ids) async {
+    if (!api.socialSupported && (state.replyTo.isNotEmpty || state.repostOf.isNotEmpty)) {
+      throw StateError('Социальная лента недоступна');
+    }
     if (mentions.trimmed.isNotEmpty && communityMentionsFor(api) == null) {
       throw StateError('Упоминания недоступны');
     }
@@ -486,6 +513,7 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
           idempotencyKey: key,
           attachmentIds: ids,
           mentions: mentions.trimmed,
+          repostOf: state.repostOf,
         ),
       );
     } else {
@@ -497,6 +525,7 @@ class FeedDraftCubit extends Cubit<FeedDraftState> {
           idempotencyKey: key,
           attachmentIds: ids,
           mentions: mentions.trimmed,
+          replyToCommentId: state.replyTo,
         ),
       );
     }
