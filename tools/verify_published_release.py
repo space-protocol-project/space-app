@@ -103,9 +103,13 @@ def apk_metadata(apk, tools):
     sdk = re.search(r"sdkVersion:'(\d+)'", badging)
     signature = subprocess.check_output(
         [str(tools / 'apksigner'), 'verify', '--verbose', '--print-certs', str(apk)], text=True)
+    print('\n'.join(line for line in badging.splitlines()
+                    if line.startswith('package:') or 'sdkversion' in line.lower()), flush=True)
+    print(signature, flush=True)
     certificates = re.findall(r'Signer #\d+ certificate SHA-256 digest: ([a-f0-9]+)', signature)
     if package is None or sdk is None or not certificates:
-        raise ValueError('Не получены пакет, версия или сертификат APK')
+        raise ValueError(f'Не получены метаданные APK: package={package is not None}, '
+                         f'sdk={sdk is not None}, certificates={bool(certificates)}')
     return {'package': package[1], 'versionCode': int(package[2]),
             'versionName': package[3], 'minSdk': int(sdk[1]), 'certificates': certificates}
 
