@@ -2878,4 +2878,20 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get communityReactionsDenied =>
       'Реакции недоступны: доступ или состояние раздела изменились.';
+
+  @override
+  String get communityFavorites => 'Избранное';
+
+  @override
+  String get communityFavoriteAdd => 'Сохранить в избранное';
+
+  @override
+  String get communityFavoriteRemove => 'Убрать из избранного';
+
+  @override
+  String get communityFavoriteRetry =>
+      'Не удалось обновить избранное. Повторить';
+
+  @override
+  String get communityFavoritesEmpty => 'В этом разделе пока нет избранного.';
 }

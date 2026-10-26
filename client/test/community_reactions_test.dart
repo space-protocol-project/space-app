@@ -8,6 +8,26 @@ import 'package:space_client/src/community_reactions.dart';
 import 'support/community_reactions.dart';
 
 void main() {
+  test('Обновление после конфликта позволяет снова изменить реакцию', () async {
+    final api = FakeCommunityReactions();
+    final ref = reactionRef('one');
+    final c = CommunityReactionsController(api, 'forum');
+    addTearDown(c.close);
+    await c.select([ref], active: true);
+    api.value(ref)
+      ..revision = Int64.ONE
+      ..reactions.add(
+        CommunityReaction(emoji: '👍', count: Int64.ONE, selected: true),
+      );
+    await c.toggle(ref, '👍');
+    await Future<void>.delayed(Duration.zero);
+    expect(c.state.errors, isNotEmpty);
+    await c.recover(ref);
+    expect(c.state.errors, isEmpty);
+    await c.toggle(ref, '👍');
+    expect(api.requests.length, 2);
+    expect(c.state.entries['1:one']!.reactions, isEmpty);
+  });
   test('Пачки по 50, отсутствие чужих и повторных состояний', () async {
     final api = FakeCommunityReactions();
     final c = CommunityReactionsController(api, 'forum');

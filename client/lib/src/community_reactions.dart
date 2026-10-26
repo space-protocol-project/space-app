@@ -283,6 +283,17 @@ class CommunityReactionsController extends Cubit<CommunityReactionsState> {
     if (!retry) refresh();
   }
 
+  Future<void> recover(CommunityContentReference content) async {
+    if (isClosed || !_bindingMatches()) return;
+    final key = communityReactionKey(content);
+    if (_pending.containsKey(key)) {
+      await retry(content);
+      return;
+    }
+    emit(state.copyWith(errors: {...state.errors}..remove(key)));
+    await refresh();
+  }
+
   @override
   Future<void> close() {
     ++_generation;

@@ -1,5 +1,8 @@
 import '../src/community_reactions_api.dart';
 import 'community_reactions.dart';
+import 'community_favorites.dart';
+import 'community_favorite_list.dart';
+import '../src/community_favorites_api.dart';
 import 'participant_profile.dart';
 import '../src/community_mentions_api.dart';
 import '../src/generated/space/v1/community_mentions.pb.dart';
@@ -294,12 +297,18 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
       channel: state.section?.id ?? '',
       ids: _authors(state),
       active: widget.active && foreground && state.error == null,
-      child: CommunityReactionScope(
-        api: communityReactionsFor(widget.api),
+      child: CommunityFavoriteScope(
+        api: communityFavoritesFor(widget.api),
         channel: state.section?.id ?? '',
         contents: _reactionContents(state),
         active: widget.active && foreground && state.error == null,
-        child: _navigation(state),
+        child: CommunityReactionScope(
+          api: communityReactionsFor(widget.api),
+          channel: state.section?.id ?? '',
+          contents: _reactionContents(state),
+          active: widget.active && foreground && state.error == null,
+          child: _navigation(state),
+        ),
       ),
     ),
   );
@@ -408,6 +417,12 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
         tooltip: context.strings.forumRefresh,
         icon: const Icon(Icons.refresh),
       ),
+      if (state.section != null && communityFavoritesFor(widget.api) != null)
+        IconButton(
+          onPressed: _favorites,
+          tooltip: context.strings.communityFavorites,
+          icon: const Icon(Icons.bookmarks_outlined),
+        ),
       if (state.section != null && communitySearchFor(widget.api) != null)
         IconButton(
           onPressed: _search,
@@ -427,6 +442,31 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
       if (state.section?.permissions.manage == true) _management(state),
     ],
   );
+  Future<void> _favorites() async {
+    final section = controller.state.section;
+    final api = communityFavoritesFor(widget.api);
+    if (section == null || api == null) return;
+    bool available() =>
+        mounted && widget.active && controller.state.section?.id == section.id;
+    final result = await showCommunityFavorites(
+      context,
+      api: api,
+      channel: section.id,
+      changes: controller.stream,
+      available: available,
+    );
+    if (result == null || !available()) return;
+    final child =
+        result.kind == CommunitySearchKind.COMMUNITY_SEARCH_KIND_FEED_COMMENT;
+    searchComment = child ? result.id : '';
+    await controller.open(
+      result.parentId,
+      afterSequence: child ? result.sequence.toInt() - 1 : 0,
+    );
+    if (!mounted || !child) return;
+    revealCommunityResult(() => searchTarget.currentContext);
+  }
+
   Future<void> _search() async {
     final section = controller.state.section;
     final api = communitySearchFor(widget.api);
@@ -735,9 +775,9 @@ class FeedEntryCard extends StatelessWidget {
               child: AttachmentCard(asset: asset, session: session),
             ),
           if (!hidden && reactionContent != null)
-            CommunityReactionBar(
+            CommunityContentActions(
               content: reactionContent!,
-              enabled: reactionsEnabled,
+              reactionsEnabled: reactionsEnabled,
             ),
           const SizedBox(height: 16),
           actions,

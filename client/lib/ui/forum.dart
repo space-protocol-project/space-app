@@ -1,5 +1,8 @@
 import '../src/community_reactions_api.dart';
 import 'community_reactions.dart';
+import 'community_favorites.dart';
+import 'community_favorite_list.dart';
+import '../src/community_favorites_api.dart';
 import 'participant_profile.dart';
 import '../src/community_mentions_api.dart';
 
@@ -312,12 +315,18 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
           channel: state.section?.id ?? '',
           ids: _authors(state),
           active: widget.active && foreground && state.error == null,
-          child: CommunityReactionScope(
-            api: communityReactionsFor(widget.api),
+          child: CommunityFavoriteScope(
+            api: communityFavoritesFor(widget.api),
             channel: state.section?.id ?? '',
             contents: _reactionContents(state),
             active: widget.active && foreground && state.error == null,
-            child: _layout(context, state),
+            child: CommunityReactionScope(
+              api: communityReactionsFor(widget.api),
+              channel: state.section?.id ?? '',
+              contents: _reactionContents(state),
+              active: widget.active && foreground && state.error == null,
+              child: _layout(context, state),
+            ),
           ),
         ),
       );
@@ -664,6 +673,18 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
     ];
   }
 
+  List<PopupMenuEntry<String>> _favoriteMenu(ForumState state) {
+    if (state.section == null || communityFavoritesFor(widget.api) == null) {
+      return [];
+    }
+    return [
+      PopupMenuItem(
+        value: 'favorites',
+        child: Text(context.strings.communityFavorites),
+      ),
+    ];
+  }
+
   Widget _menu(ForumState state) => PopupMenuButton<String>(
     key: const ValueKey('forum-actions'),
     tooltip: context.strings.forumActions,
@@ -672,6 +693,7 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
     onSelected: (action) => _action(action),
     itemBuilder: (context) => [
       ..._searchMenu(state),
+      ..._favoriteMenu(state),
       ..._moderationMenu(state),
       ..._reportMenu(state),
       if (_canClose(state))
@@ -707,6 +729,32 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
       ),
     ],
   );
+  Future<void> _favorites() async {
+    final section = controller.state.section;
+    final api = communityFavoritesFor(widget.api);
+    if (section == null || api == null) return;
+    bool available() =>
+        mounted && widget.active && controller.state.section?.id == section.id;
+    final result = await showCommunityFavorites(
+      context,
+      api: api,
+      channel: section.id,
+      changes: controller.stream,
+      available: available,
+    );
+    if (result == null || !available()) return;
+    final child =
+        result.kind == CommunitySearchKind.COMMUNITY_SEARCH_KIND_FORUM_REPLY;
+    await controller.openSearchResult(
+      result.parentId,
+      child ? result.sequence.toInt() : 0,
+    );
+    if (!mounted || !child) return;
+    revealCommunityResult(
+      () => readTracker.keys[result.sequence.toInt()]?.currentContext,
+    );
+  }
+
   Future<void> _search() async {
     final section = controller.state.section;
     final api = communitySearchFor(widget.api);
@@ -736,6 +784,8 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
 
   void _action(String action) {
     switch (action) {
+      case 'favorites':
+        unawaited(_favorites());
       case 'search':
         unawaited(_search());
       case 'report':
@@ -983,9 +1033,9 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
   }
 
   Widget _reactionBar(ForumState state, CommunitySearchKind kind, String id) =>
-      CommunityReactionBar(
+      CommunityContentActions(
         content: CommunityContentReference(kind: kind, id: id),
-        enabled:
+        reactionsEnabled:
             state.section?.permissions.write == true &&
             state.topic?.closed == false,
       );

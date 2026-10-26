@@ -10,10 +10,15 @@ class SessionForumApi
         ForumReports,
         CommunityMentionSource,
         CommunitySearchSource,
-        CommunityReactionSource {
+        CommunityReactionSource,
+        CommunityFavoriteSource {
   SessionForumApi(this.session);
   final SpaceSession session;
   late final _reactions = SessionCommunityReactionApi(session);
+  late final _favorites = SessionCommunityFavoriteApi(session);
+  @override
+  CommunityFavoriteApi? get communityFavorites =>
+      session.communityFavoritesSupported ? _favorites : null;
   @override
   CommunityReactionApi? get communityReactions =>
       session.communityReactionsSupported ? _reactions : null;

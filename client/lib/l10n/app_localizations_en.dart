@@ -2862,4 +2862,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get communityReactionsDenied =>
       'Reactions are unavailable: access or the section state changed.';
+
+  @override
+  String get communityFavorites => 'Favorites';
+
+  @override
+  String get communityFavoriteAdd => 'Save to favorites';
+
+  @override
+  String get communityFavoriteRemove => 'Remove from favorites';
+
+  @override
+  String get communityFavoriteRetry => 'Could not update favorites. Retry';
+
+  @override
+  String get communityFavoritesEmpty => 'No favorites in this section yet.';
 }

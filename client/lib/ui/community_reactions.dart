@@ -207,7 +207,7 @@ class CommunityReactionBar extends StatelessWidget {
         onPressed: busy
             ? null
             : () => unawaited(
-                retry ? controller.retry(content) : controller.refresh(),
+                retry ? controller.retry(content) : controller.recover(content),
               ),
         child: Text(context.strings.communityReactionsRetry),
       ),

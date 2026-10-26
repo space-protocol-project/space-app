@@ -2646,6 +2646,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get communityReactionsDenied => '回应不可用：权限或分区状态已更改。';
+
+  @override
+  String get communityFavorites => '收藏';
+
+  @override
+  String get communityFavoriteAdd => '添加到收藏';
+
+  @override
+  String get communityFavoriteRemove => '取消收藏';
+
+  @override
+  String get communityFavoriteRetry => '无法更新收藏。重试';
+
+  @override
+  String get communityFavoritesEmpty => '此分区暂无收藏。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3720,4 +3735,19 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get communityReactionsDenied => '回应不可用：权限或分区状态已更改。';
+
+  @override
+  String get communityFavorites => '收藏';
+
+  @override
+  String get communityFavoriteAdd => '添加到收藏';
+
+  @override
+  String get communityFavoriteRemove => '取消收藏';
+
+  @override
+  String get communityFavoriteRetry => '无法更新收藏。重试';
+
+  @override
+  String get communityFavoritesEmpty => '此分区暂无收藏。';
 }

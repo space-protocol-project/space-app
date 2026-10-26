@@ -1023,5 +1023,10 @@
   "communityReactionsRetry": "Повторить запрос",
   "communityReactionsFailure": "Не удалось обновить реакции.",
   "communityReactionsConflict": "Реакции изменились. Проверьте выбор и повторите действие.",
-  "communityReactionsDenied": "Реакции недоступны: доступ или состояние раздела изменились."
+  "communityReactionsDenied": "Реакции недоступны: доступ или состояние раздела изменились.",
+  "communityFavorites": "Избранное",
+  "communityFavoriteAdd": "Сохранить в избранное",
+  "communityFavoriteRemove": "Убрать из избранного",
+  "communityFavoriteRetry": "Не удалось обновить избранное. Повторить",
+  "communityFavoritesEmpty": "В этом разделе пока нет избранного."
 }

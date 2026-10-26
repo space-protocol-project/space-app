@@ -1023,5 +1023,10 @@
   "communityReactionsRetry": "Retry request",
   "communityReactionsFailure": "Could not update reactions.",
   "communityReactionsConflict": "Reactions changed. Check your selection and try again.",
-  "communityReactionsDenied": "Reactions are unavailable: access or the section state changed."
+  "communityReactionsDenied": "Reactions are unavailable: access or the section state changed.",
+  "communityFavorites": "Favorites",
+  "communityFavoriteAdd": "Save to favorites",
+  "communityFavoriteRemove": "Remove from favorites",
+  "communityFavoriteRetry": "Could not update favorites. Retry",
+  "communityFavoritesEmpty": "No favorites in this section yet."
 }

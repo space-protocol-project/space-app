@@ -1,4 +1,8 @@
 import 'community_reactions_api.dart';
+import 'community_favorites_api.dart';
+import 'generated/space/v1/community_favorites.pb.dart' as favorites_pb;
+import 'generated/space/v1/community_favorites.connect.spec.dart'
+    as favorites_specs;
 import 'generated/space/v1/community_reactions.pb.dart' as reactions_pb;
 import 'generated/space/v1/community_reactions.connect.spec.dart'
     as reactions_specs;
@@ -75,6 +79,7 @@ part 'forum_rpc.dart';
 part 'feed_rpc.dart';
 part 'community_search_rpc.dart';
 part 'community_reactions_rpc.dart';
+part 'community_favorites_rpc.dart';
 part 'community_mentions_rpc.dart';
 part 'chat_mentions_rpc.dart';
 part 'personal_notifications_rpc.dart';
@@ -829,6 +834,7 @@ class SpaceSession
   bool feedReadSupported = false;
   bool communitySearchSupported = false;
   bool communityReactionsSupported = false;
+  bool communityFavoritesSupported = false;
   bool communityMentionsSupported = false;
   bool chatMentionsSupported = false;
   @override
@@ -921,6 +927,9 @@ class SpaceSession
     );
     communityMentionsSupported = manifest.capabilities.contains(
       'core.community.mentions.v1',
+    );
+    communityFavoritesSupported = manifest.capabilities.contains(
+      'core.community.favorites.v1',
     );
     communityReactionsSupported = manifest.capabilities.contains(
       'core.community.reactions.v1',
@@ -1345,6 +1354,9 @@ class SpaceSession
       );
       session.communityMentionsSupported = manifest.capabilities.contains(
         'core.community.mentions.v1',
+      );
+      session.communityFavoritesSupported = manifest.capabilities.contains(
+        'core.community.favorites.v1',
       );
       session.communityReactionsSupported = manifest.capabilities.contains(
         'core.community.reactions.v1',

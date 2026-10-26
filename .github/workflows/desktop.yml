@@ -9,9 +9,9 @@ on:
   push:
     branches: [main]
     tags: ['v*']
-    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_attachments.ps1', 'tools/check_desktop_chat_ci.ps1', 'tools/check_secure_storage.ps1', 'tools/check_voice_signal.py', 'tools/check_voice_native*', 'tools/collect_voice_notices.py', 'tools/voice_signal_test.cpp', 'tools/check_webrtc_cache.py', 'tools/check_voice_probe_output.ps1', 'tools/voice_probe_output.ps1', 'tools/check_linux_notification_activation.py', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
+    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_community*.py', 'tools/check_apk_native.py', 'tools/check_attachments.ps1', 'tools/check_desktop_chat_ci.ps1', 'tools/check_secure_storage.ps1', 'tools/check_voice_signal.py', 'tools/check_voice_native*', 'tools/collect_voice_notices.py', 'tools/voice_signal_test.cpp', 'tools/check_webrtc_cache.py', 'tools/check_voice_probe_output.ps1', 'tools/voice_probe_output.ps1', 'tools/check_linux_notification_activation.py', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
   pull_request:
-    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_attachments.ps1', 'tools/check_desktop_chat_ci.ps1', 'tools/check_secure_storage.ps1', 'tools/check_voice_signal.py', 'tools/check_voice_native*', 'tools/collect_voice_notices.py', 'tools/voice_signal_test.cpp', 'tools/check_webrtc_cache.py', 'tools/check_voice_probe_output.ps1', 'tools/voice_probe_output.ps1', 'tools/check_linux_notification_activation.py', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
+    paths: ['native/**', 'client/**', 'packages/**', 'packaging/**', 'tools/check_community*.py', 'tools/check_apk_native.py', 'tools/check_attachments.ps1', 'tools/check_desktop_chat_ci.ps1', 'tools/check_secure_storage.ps1', 'tools/check_voice_signal.py', 'tools/check_voice_native*', 'tools/collect_voice_notices.py', 'tools/voice_signal_test.cpp', 'tools/check_webrtc_cache.py', 'tools/check_voice_probe_output.ps1', 'tools/voice_probe_output.ps1', 'tools/check_linux_notification_activation.py', 'tools/secure_storage_atomic_test.cpp', 'Changelog.md', '.github/workflows/desktop.yml']
 permissions:
   contents: read
 concurrency:
@@ -129,9 +129,9 @@ jobs:
       - name: Упоминания, темы и переходы к обзору пространства
         working-directory: client
         run: flutter test --no-pub --concurrency 2 test/community_mentions_test.dart test/chat_mentions_test.dart test/personal_notifications_api_test.dart test/personal_notifications_controller_test.dart test/personal_inbox_test.dart test/personal_notification_navigation_test.dart test/theme_mode_test.dart test/dashboard_workspaces_test.dart test/admin_sidebar_test.dart
-      - name: Реакции форума и ленты, права и смена контекста
+      - name: Реакции и избранное форума и ленты, права и смена контекста
         working-directory: client
-        run: flutter test --no-pub test/community_reactions_test.dart test/community_reactions_widgets_test.dart
+        run: flutter test --no-pub test/community_reactions_test.dart test/community_reactions_widgets_test.dart test/community_favorites_test.dart test/community_favorites_widgets_test.dart
       - name: Поиск сообществ и персональная сводка
         working-directory: client
         run: flutter test test/community_search_test.dart test/dashboard_highlights_test.dart
@@ -196,6 +196,18 @@ jobs:
           path: dist/*
           if-no-files-found: error
           retention-days: 30
+      - name: Нативное избранное Linux и горячий перезапуск
+        if: matrix.target == 'linux'
+        shell: bash
+        run: dbus-run-session -- xvfb-run -a python3 tools/check_community_ui.py --output "$RUNNER_TEMP/community-ui"
+      - name: Журнал нативного интерфейса сообществ
+        if: always() && matrix.target == 'linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: community-native-ui
+          path: ${{ runner.temp }}/community-ui/*
+          if-no-files-found: warn
+          retention-days: 14
       - name: Нативный запуск Linux из уведомления
         if: matrix.target == 'linux'
         shell: bash
@@ -266,7 +278,12 @@ jobs:
             (cd ../dist && sha256sum Space-android.apk > SHA256SUMS-android.txt)
           else
             flutter build apk --debug
+            mkdir -p ../dist
+            cp build/app/outputs/flutter-apk/app-debug.apk ../dist/Space-android-debug.apk
+            (cd ../dist && sha256sum Space-android-debug.apk > SHA256SUMS-android-debug.txt)
           fi
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then apk=build/app/outputs/flutter-apk/app-release.apk; else apk=build/app/outputs/flutter-apk/app-debug.apk; fi
+          python3 ../tools/check_apk_native.py "$apk" --report ../dist/android-native.json
       - name: Совместимость приватного push runtime и Android
         working-directory: client/android
         run: ./gradlew :app:testDebugUnitTest :flutter_webrtc:testDebugUnitTest
@@ -276,6 +293,13 @@ jobs:
           name: Space-android
           path: dist/*
           if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        with:
+          name: Space-android-debug-CI
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
   chat-e2e:
     name: Интерфейс чата и отдельная PostgreSQL
     needs: validate

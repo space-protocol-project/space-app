@@ -5205,6 +5205,36 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Реакции недоступны: доступ или состояние раздела изменились.'**
   String get communityReactionsDenied;
+
+  /// No description provided for @communityFavorites.
+  ///
+  /// In ru, this message translates to:
+  /// **'Избранное'**
+  String get communityFavorites;
+
+  /// No description provided for @communityFavoriteAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить в избранное'**
+  String get communityFavoriteAdd;
+
+  /// No description provided for @communityFavoriteRemove.
+  ///
+  /// In ru, this message translates to:
+  /// **'Убрать из избранного'**
+  String get communityFavoriteRemove;
+
+  /// No description provided for @communityFavoriteRetry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось обновить избранное. Повторить'**
+  String get communityFavoriteRetry;
+
+  /// No description provided for @communityFavoritesEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'В этом разделе пока нет избранного.'**
+  String get communityFavoritesEmpty;
 }
 
 class _AppLocalizationsDelegate
