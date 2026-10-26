@@ -106,8 +106,11 @@ class SpaceSearchController extends Cubit<SpaceSearchState> {
 
   void _checkToken(String next, String previous, bool empty) {
     if (next.isEmpty) return;
-    if (next.length > 1024 || !_spaceSearchText(next, 1024) ||
-        next == previous || empty || !_tokens.add(next)) {
+    if (next.length > 1024 ||
+        !_spaceSearchText(next, 1024) ||
+        next == previous ||
+        empty ||
+        !_tokens.add(next)) {
       throw StateError('Некорректная страница поиска пространства');
     }
   }

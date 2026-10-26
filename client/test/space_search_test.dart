@@ -166,8 +166,14 @@ void main() {
         results: [searchHit('one')],
         nextPageToken: 'x' * 1025,
       ),
-      SearchSpaceResponse(results: [searchHit('one')], nextPageToken: '中' * 400),
-      SearchSpaceResponse(results: [searchHit('one')], nextPageToken: '\u0000next'),
+      SearchSpaceResponse(
+        results: [searchHit('one')],
+        nextPageToken: '中' * 400,
+      ),
+      SearchSpaceResponse(
+        results: [searchHit('one')],
+        nextPageToken: '\u0000next',
+      ),
     ]) {
       final api = FakeSpaceSearch()..onSearch = ((q, t) async => page);
       final c = create(api);
