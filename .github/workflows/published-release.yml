@@ -1,0 +1,57 @@
+name: Проверка публичного совместимого выпуска
+on:
+  workflow_dispatch:
+    inputs:
+      runtime_tag:
+        description: Опубликованный тег runtime
+        required: true
+        type: string
+      schema:
+        description: Ожидаемая схема PostgreSQL
+        required: true
+        type: string
+      app_tag:
+        description: Тег приложения; пусто для проверки только runtime
+        default: ''
+        type: string
+      previous_app_tag:
+        description: Предыдущий тег для проверки подписи и обновления Android
+        default: ''
+        type: string
+      version_code:
+        description: Ожидаемый versionCode APK
+        default: '0'
+        type: string
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Публичные файлы, контрольные суммы, схема и подпись APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUNTIME_TAG: ${{ inputs.runtime_tag }}
+          SCHEMA: ${{ inputs.schema }}
+          APP_TAG: ${{ inputs.app_tag }}
+          PREVIOUS_APP_TAG: ${{ inputs.previous_app_tag }}
+          VERSION_CODE: ${{ inputs.version_code }}
+        run: >-
+          python3 tools/verify_published_release.py
+          --runtime-tag "$RUNTIME_TAG" --schema "$SCHEMA"
+          --app-tag "$APP_TAG" --previous-app-tag "$PREVIOUS_APP_TAG"
+          --version-code "$VERSION_CODE" --report "$RUNNER_TEMP/public-release.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: public-release-verification
+          path: ${{ runner.temp }}/public-release.json
+          if-no-files-found: error
