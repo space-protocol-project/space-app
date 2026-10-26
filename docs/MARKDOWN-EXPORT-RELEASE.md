@@ -43,6 +43,25 @@
 - [Полный серверный прогон](https://github.com/space-protocol-project/space-server/actions/runs/40404971152) успешен: Go с проверкой гонок, vet, проверка модулей и уязвимых вызовов, анализ Flutter без замечаний, 1036 тестов / 42 штатных пропуска. Настоящий Dart/Connect → Go → PostgreSQL подтвердил собственное авторство, JSON, фильтр раздела, отзыв ACL и сохранность после перезапуска; остальные пять сценариев сообществ также прошли.
 - [Проверка платформ](https://github.com/space-protocol-project/space-app/actions/runs/40404342802) полностью успешна: COG ≤15, Windows/macOS/Linux/Android, настоящий чат с PostgreSQL, нативный экспорт Linux и горячий перезапуск, обновление Windows и очередь уведомлений macOS.
 - [Релизный конвейер runtime](https://github.com/space-protocol-project/space-server/actions/runs/40406370390) полностью успешен: три ОС, обновление, перенос, восстановление MLS, Go/Flutter и проверка гонок. Опубликован v0.7.23; каталог клиента получен из трёх публичных дескрипторов этого выпуска.
+- [Публичный runtime](https://github.com/space-protocol-project/space-app/actions/runs/40409781309) проверен полным скачиванием в CI: размеры, SHA-256, CRC, схема 41 и распакованный размер совпали с дескрипторами. [Публичный Linux-установщик](https://github.com/space-protocol-project/space-server/actions/runs/40409785065) также прошёл проверку.
+- [Установка опубликованного runtime на Windows/macOS/Linux](https://github.com/space-protocol-project/space-app/actions/runs/40409852513) успешна: скачивание по закреплённому каталогу, установка, запуск и штатный перезапуск.
+
+[Регрессионные проверки диска и резервных копий](https://github.com/space-protocol-project/space-app/actions/runs/40409883558) прошли на трёх ОС для того же коммита приложения. Это проверки существующих возможностей, не начало v0.8.0.
+
+[Релизный CI приложения v0.7.29](https://github.com/space-protocol-project/space-app/actions/runs/40409891076) выполняется. Нативный MLS, отрицательные сценарии и чат с PostgreSQL прошли. Публикацию приложения и финальную проверку публичной пары пока не считать завершёнными.
+
+Неизменяемые исходники тегов:
+
+- Приложение v0.7.29: `e6e022e38e4d28aa61cbb1fb213b103c1838db74`.
+- Runtime v0.7.23: `27e71ed83d98dd62134ba999b7637b11a7c14175`.
+
+## Проверенные файлы runtime
+
+| Файл | Байт | SHA-256 |
+| --- | ---: | --- |
+| Space-home-windows-x64.zip | 76184216 | d64a5770ce801b2a82fedbdfb7fc8766203246398ba39232e48cdd0bdabafd47 |
+| Space-home-linux-x64.zip | 31668381 | 83701e212996c2bf0d93772ea471f527ffd7641f0abcf4cee126df93f2e42f37 |
+| Space-home-macos-arm64.zip | 29319575 | 233cefe192284dbdd8e3c5efee0790341bed434819c269064b6b6d5024aaaa85 |
 
 Описание: [ограниченный Markdown](SAFE-MARKDOWN.md),
 [формат и ограничения экспорта](USER-CONTENT-EXPORT.md),
