@@ -1,3 +1,5 @@
+import '../src/community_reactions_api.dart';
+import 'community_reactions.dart';
 import 'participant_profile.dart';
 import '../src/community_mentions_api.dart';
 
@@ -13,7 +15,6 @@ import 'package:space_admin_ui/space_admin_ui.dart'
 import '../l10n/strings.dart';
 import '../src/core.dart';
 import '../src/community_search.dart';
-import '../src/generated/space/v1/community_search.pb.dart';
 import 'community_search.dart';
 import '../src/forum_api.dart';
 import '../src/forum_controller.dart';
@@ -311,9 +312,32 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
           channel: state.section?.id ?? '',
           ids: _authors(state),
           active: widget.active && foreground && state.error == null,
-          child: _layout(context, state),
+          child: CommunityReactionScope(
+            api: communityReactionsFor(widget.api),
+            channel: state.section?.id ?? '',
+            contents: _reactionContents(state),
+            active: widget.active && foreground && state.error == null,
+            child: _layout(context, state),
+          ),
         ),
       );
+
+  Iterable<CommunityContentReference> _reactionContents(
+    ForumState state,
+  ) sync* {
+    final topic = state.topic;
+    if (topic == null || topic.hidden) return;
+    yield CommunityContentReference(
+      kind: CommunitySearchKind.COMMUNITY_SEARCH_KIND_FORUM_THREAD,
+      id: topic.id,
+    );
+    for (final reply in state.replies.where((r) => !r.hidden)) {
+      yield CommunityContentReference(
+        kind: CommunitySearchKind.COMMUNITY_SEARCH_KIND_FORUM_REPLY,
+        id: reply.id,
+      );
+    }
+  }
 
   Iterable<String> _authors(ForumState state) sync* {
     for (final topic in state.threads.where((t) => !t.hidden)) {
@@ -947,11 +971,24 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
           timestamp: reply.createdAtUnix.toInt(),
           assets: _visibleAssets(reply.attachments),
           session: media?.attachmentSession,
+          footer: _reactionBar(
+            state,
+            CommunitySearchKind.COMMUNITY_SEARCH_KIND_FORUM_REPLY,
+            reply.id,
+          ),
           trailing: _replyActions(state, reply),
         ),
       ],
     );
   }
+
+  Widget _reactionBar(ForumState state, CommunitySearchKind kind, String id) =>
+      CommunityReactionBar(
+        content: CommunityContentReference(kind: kind, id: id),
+        enabled:
+            state.section?.permissions.write == true &&
+            state.topic?.closed == false,
+      );
 
   Widget _topic(ForumState state) {
     final topic = state.topic!;
@@ -971,6 +1008,11 @@ class _ForumAreaState extends State<ForumArea> with WidgetsBindingObserver {
                 text: topic.text,
                 mentions: topic.mentions,
                 timestamp: topic.createdAtUnix.toInt(),
+                footer: _reactionBar(
+                  state,
+                  CommunitySearchKind.COMMUNITY_SEARCH_KIND_FORUM_THREAD,
+                  topic.id,
+                ),
                 original: true,
                 assets: _visibleAssets(topic.attachments),
                 session: media?.attachmentSession,

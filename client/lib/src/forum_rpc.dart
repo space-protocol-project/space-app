@@ -9,9 +9,14 @@ class SessionForumApi
         ForumModeration,
         ForumReports,
         CommunityMentionSource,
-        CommunitySearchSource {
+        CommunitySearchSource,
+        CommunityReactionSource {
   SessionForumApi(this.session);
   final SpaceSession session;
+  late final _reactions = SessionCommunityReactionApi(session);
+  @override
+  CommunityReactionApi? get communityReactions =>
+      session.communityReactionsSupported ? _reactions : null;
   late final _mentions = SessionCommunityMentionApi(session);
   @override
   CommunityMentionApi? get communityMentions =>

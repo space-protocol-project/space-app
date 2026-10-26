@@ -1,3 +1,5 @@
+import '../src/community_reactions_api.dart';
+import 'community_reactions.dart';
 import 'participant_profile.dart';
 import '../src/community_mentions_api.dart';
 import '../src/generated/space/v1/community_mentions.pb.dart';
@@ -13,7 +15,6 @@ import 'package:space_admin_ui/space_admin_ui.dart' show ChannelsPanel;
 import '../l10n/strings.dart';
 import '../src/core.dart';
 import '../src/community_search.dart';
-import '../src/generated/space/v1/community_search.pb.dart';
 import 'community_search.dart';
 import '../src/feed_api.dart';
 import '../src/feed_controller.dart';
@@ -293,9 +294,32 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
       channel: state.section?.id ?? '',
       ids: _authors(state),
       active: widget.active && foreground && state.error == null,
-      child: _navigation(state),
+      child: CommunityReactionScope(
+        api: communityReactionsFor(widget.api),
+        channel: state.section?.id ?? '',
+        contents: _reactionContents(state),
+        active: widget.active && foreground && state.error == null,
+        child: _navigation(state),
+      ),
     ),
   );
+
+  Iterable<CommunityContentReference> _reactionContents(FeedState state) sync* {
+    final posts = state.post == null ? state.posts : [state.post!];
+    for (final post in posts.where((p) => !p.hidden)) {
+      yield CommunityContentReference(
+        kind: CommunitySearchKind.COMMUNITY_SEARCH_KIND_FEED_POST,
+        id: post.id,
+      );
+    }
+    if (state.post?.hidden == true) return;
+    for (final comment in state.comments.where((c) => !c.hidden)) {
+      yield CommunityContentReference(
+        kind: CommunitySearchKind.COMMUNITY_SEARCH_KIND_FEED_COMMENT,
+        id: comment.id,
+      );
+    }
+  }
 
   Iterable<String> _authors(FeedState state) sync* {
     for (final post in state.posts.where((p) => !p.hidden)) {
@@ -510,7 +534,12 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
       ? _comment(comment)
       : readTracker.track(comment.sequence.toInt(), _comment(comment));
   Widget _post(FeedPost post, {required bool open}) => FeedEntryCard(
+    reactionsEnabled: controller.state.permissions?.comment == true,
     key: ValueKey('feed-post-${post.id}'),
+    reactionContent: CommunityContentReference(
+      kind: CommunitySearchKind.COMMUNITY_SEARCH_KIND_FEED_POST,
+      id: post.id,
+    ),
     text: post.text,
     mentions: post.mentions,
     author: forumAuthor(post.authorName, post.authorId),
@@ -594,6 +623,11 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
   }
 
   Widget _comment(FeedComment comment) => FeedEntryCard(
+    reactionsEnabled: controller.state.permissions?.comment == true,
+    reactionContent: CommunityContentReference(
+      kind: CommunitySearchKind.COMMUNITY_SEARCH_KIND_FEED_COMMENT,
+      id: comment.id,
+    ),
     key: comment.id == searchComment
         ? searchTarget
         : ValueKey('feed-comment-${comment.id}'),
@@ -641,6 +675,8 @@ class FeedEntryCard extends StatelessWidget {
     required this.text,
     required this.author,
     this.authorId = '',
+    this.reactionContent,
+    this.reactionsEnabled = true,
     required this.timestamp,
     required this.hidden,
     required this.hiddenText,
@@ -648,6 +684,8 @@ class FeedEntryCard extends StatelessWidget {
     required this.session,
     required this.actions,
   });
+  final bool reactionsEnabled;
+  final CommunityContentReference? reactionContent;
   final List<CommunityMention> mentions;
   final String text, author, authorId, hiddenText;
   final int timestamp;
@@ -695,6 +733,11 @@ class FeedEntryCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 12),
               child: AttachmentCard(asset: asset, session: session),
+            ),
+          if (!hidden && reactionContent != null)
+            CommunityReactionBar(
+              content: reactionContent!,
+              enabled: reactionsEnabled,
             ),
           const SizedBox(height: 16),
           actions,

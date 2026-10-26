@@ -1019,5 +1019,9 @@
   "profileConflict": "个人资料已在其他设备上更改。请重新加载后保存；您的草稿已保留。",
   "profileSaved": "个人资料已保存",
   "saveProfile": "保存个人资料",
-  "profileSpaceHelp": "名称在此空间内唯一。名称和头像适用于所有版块。"
+  "profileSpaceHelp": "名称在此空间内唯一。名称和头像适用于所有版块。",
+  "communityReactionsRetry": "重试请求",
+  "communityReactionsFailure": "无法更新回应。",
+  "communityReactionsConflict": "回应已更改。请检查选择后重试。",
+  "communityReactionsDenied": "回应不可用：权限或分区状态已更改。"
 }

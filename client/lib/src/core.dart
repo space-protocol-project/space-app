@@ -1,3 +1,7 @@
+import 'community_reactions_api.dart';
+import 'generated/space/v1/community_reactions.pb.dart' as reactions_pb;
+import 'generated/space/v1/community_reactions.connect.spec.dart'
+    as reactions_specs;
 import 'participant_profiles.dart';
 export 'participant_profiles.dart';
 export 'endpoint_connection.dart';
@@ -70,6 +74,7 @@ part 'voice_rpc.dart';
 part 'forum_rpc.dart';
 part 'feed_rpc.dart';
 part 'community_search_rpc.dart';
+part 'community_reactions_rpc.dart';
 part 'community_mentions_rpc.dart';
 part 'chat_mentions_rpc.dart';
 part 'personal_notifications_rpc.dart';
@@ -823,6 +828,7 @@ class SpaceSession
   bool feedSupported = false;
   bool feedReadSupported = false;
   bool communitySearchSupported = false;
+  bool communityReactionsSupported = false;
   bool communityMentionsSupported = false;
   bool chatMentionsSupported = false;
   @override
@@ -915,6 +921,9 @@ class SpaceSession
     );
     communityMentionsSupported = manifest.capabilities.contains(
       'core.community.mentions.v1',
+    );
+    communityReactionsSupported = manifest.capabilities.contains(
+      'core.community.reactions.v1',
     );
     communitySearchSupported = manifest.capabilities.contains(
       'core.community.search.v1',
@@ -1336,6 +1345,9 @@ class SpaceSession
       );
       session.communityMentionsSupported = manifest.capabilities.contains(
         'core.community.mentions.v1',
+      );
+      session.communityReactionsSupported = manifest.capabilities.contains(
+        'core.community.reactions.v1',
       );
       session.communitySearchSupported = manifest.capabilities.contains(
         'core.community.search.v1',

@@ -2848,4 +2848,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get profileSpaceHelp =>
       'Your name is unique in this space. Your name and avatar apply to every section.';
+
+  @override
+  String get communityReactionsRetry => 'Retry request';
+
+  @override
+  String get communityReactionsFailure => 'Could not update reactions.';
+
+  @override
+  String get communityReactionsConflict =>
+      'Reactions changed. Check your selection and try again.';
+
+  @override
+  String get communityReactionsDenied =>
+      'Reactions are unavailable: access or the section state changed.';
 }

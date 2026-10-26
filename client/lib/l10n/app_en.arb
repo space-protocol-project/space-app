@@ -1019,5 +1019,9 @@
   "profileConflict": "The profile changed on another device. Reload it and save again; your draft is preserved.",
   "profileSaved": "Profile saved",
   "saveProfile": "Save profile",
-  "profileSpaceHelp": "Your name is unique in this space. Your name and avatar apply to every section."
+  "profileSpaceHelp": "Your name is unique in this space. Your name and avatar apply to every section.",
+  "communityReactionsRetry": "Retry request",
+  "communityReactionsFailure": "Could not update reactions.",
+  "communityReactionsConflict": "Reactions changed. Check your selection and try again.",
+  "communityReactionsDenied": "Reactions are unavailable: access or the section state changed."
 }

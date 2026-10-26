@@ -5,9 +5,14 @@ class SessionFeedApi
         FeedApi,
         CommunityMentionSource,
         CommunitySearchSource,
-        FeedReadApi {
+        FeedReadApi,
+        CommunityReactionSource {
   SessionFeedApi(this.session);
   final SpaceSession session;
+  late final _reactions = SessionCommunityReactionApi(session);
+  @override
+  CommunityReactionApi? get communityReactions =>
+      session.communityReactionsSupported ? _reactions : null;
   late final _mentions = SessionCommunityMentionApi(session);
   @override
   CommunityMentionApi? get communityMentions =>

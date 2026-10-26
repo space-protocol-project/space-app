@@ -2634,6 +2634,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get profileSpaceHelp => '名称在此空间内唯一。名称和头像适用于所有版块。';
+
+  @override
+  String get communityReactionsRetry => '重试请求';
+
+  @override
+  String get communityReactionsFailure => '无法更新回应。';
+
+  @override
+  String get communityReactionsConflict => '回应已更改。请检查选择后重试。';
+
+  @override
+  String get communityReactionsDenied => '回应不可用：权限或分区状态已更改。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3696,4 +3708,16 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get profileSpaceHelp => '名称在此空间内唯一。名称和头像适用于所有版块。';
+
+  @override
+  String get communityReactionsRetry => '重试请求';
+
+  @override
+  String get communityReactionsFailure => '无法更新回应。';
+
+  @override
+  String get communityReactionsConflict => '回应已更改。请检查选择后重试。';
+
+  @override
+  String get communityReactionsDenied => '回应不可用：权限或分区状态已更改。';
 }

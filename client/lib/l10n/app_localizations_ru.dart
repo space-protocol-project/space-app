@@ -2864,4 +2864,18 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get profileSpaceHelp =>
       'Имя уникально в этом пространстве. Имя и аватар общие для всех его разделов.';
+
+  @override
+  String get communityReactionsRetry => 'Повторить запрос';
+
+  @override
+  String get communityReactionsFailure => 'Не удалось обновить реакции.';
+
+  @override
+  String get communityReactionsConflict =>
+      'Реакции изменились. Проверьте выбор и повторите действие.';
+
+  @override
+  String get communityReactionsDenied =>
+      'Реакции недоступны: доступ или состояние раздела изменились.';
 }

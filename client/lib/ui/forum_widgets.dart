@@ -156,6 +156,7 @@ class ForumMessage extends StatelessWidget {
     this.assets = const [],
     this.session,
     this.trailing,
+    this.footer,
   });
   final List<CommunityMention> mentions;
   final String author, authorId, text;
@@ -163,7 +164,7 @@ class ForumMessage extends StatelessWidget {
   final bool original;
   final List<Asset> assets;
   final AttachmentSession? session;
-  final Widget? trailing;
+  final Widget? trailing, footer;
   @override
   Widget build(BuildContext context) {
     final appearance = SpaceAppearance.of(context);
@@ -194,6 +195,7 @@ class ForumMessage extends StatelessWidget {
           ],
           if (assets.isNotEmpty)
             MessageAttachments(assets: assets, session: session),
+          ?footer,
         ],
       ),
     );

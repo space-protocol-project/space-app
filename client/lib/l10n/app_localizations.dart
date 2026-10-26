@@ -5181,6 +5181,30 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Имя уникально в этом пространстве. Имя и аватар общие для всех его разделов.'**
   String get profileSpaceHelp;
+
+  /// No description provided for @communityReactionsRetry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторить запрос'**
+  String get communityReactionsRetry;
+
+  /// No description provided for @communityReactionsFailure.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось обновить реакции.'**
+  String get communityReactionsFailure;
+
+  /// No description provided for @communityReactionsConflict.
+  ///
+  /// In ru, this message translates to:
+  /// **'Реакции изменились. Проверьте выбор и повторите действие.'**
+  String get communityReactionsConflict;
+
+  /// No description provided for @communityReactionsDenied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Реакции недоступны: доступ или состояние раздела изменились.'**
+  String get communityReactionsDenied;
 }
 
 class _AppLocalizationsDelegate

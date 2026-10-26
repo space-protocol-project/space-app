@@ -8,6 +8,7 @@ targets:
           - lib/src/dashboard_controller.dart
           - lib/src/community_mentions.dart
           - lib/src/community_search.dart
+          - lib/src/community_reactions.dart
           - lib/src/chat_controller.dart
           - lib/src/feed_controller.dart
           - lib/src/feed_management.dart

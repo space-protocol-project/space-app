@@ -46,14 +46,14 @@ class _EmojiPicker extends StatefulWidget {
 }
 
 class _EmojiPickerState extends State<_EmojiPicker> {
-  static Future<EmojiCatalog>? catalogue;
+  late final Future<EmojiCatalog> catalogue;
   final search = TextEditingController();
   List<String> recent = [];
   String group = '';
   @override
   void initState() {
     super.initState();
-    catalogue ??= EmojiCatalog.load();
+    catalogue = EmojiCatalog.load();
     _loadRecent();
   }
 
