@@ -35,15 +35,24 @@ class UnsupportedSocialSession implements SpaceSession {
   @override
   bool get feedSocialSupported => false;
   @override
-  dynamic noSuchMethod(Invocation invocation) => throw StateError('Сетевой вызов недопустим');
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw StateError('Сетевой вызов недопустим');
 }
 
 void main() {
   test('RPC не теряет ссылки на сервере без capability', () async {
     final api = SessionFeedApi(UnsupportedSocialSession());
-    final unsupported = throwsA(isA<GrpcError>().having((e) => e.code, 'code', StatusCode.unimplemented));
-    await expectLater(api.publish(CreateFeedPostRequest(repostOf: 'post')), unsupported);
-    await expectLater(api.comment(CommentFeedPostRequest(replyToCommentId: 'comment')), unsupported);
+    final unsupported = throwsA(
+      isA<GrpcError>().having((e) => e.code, 'code', StatusCode.unimplemented),
+    );
+    await expectLater(
+      api.publish(CreateFeedPostRequest(repostOf: 'post')),
+      unsupported,
+    );
+    await expectLater(
+      api.comment(CommentFeedPostRequest(replyToCommentId: 'comment')),
+      unsupported,
+    );
   });
   test(
     'репост без текста и цитата передают ссылку, не копию оригинала',
@@ -195,10 +204,20 @@ void main() {
     expect(find.byType(Dialog), findsNothing);
     await tester.pumpWidget(const SizedBox.shrink());
   });
-  testWidgets('переход к адресату загружает его страницу обсуждения', (tester) async {
+  testWidgets('переход к адресату загружает его страницу обсуждения', (
+    tester,
+  ) async {
     final api = RecordingFeed();
-    api.comments.add(FeedComment(id: 'reply', postId: 'post', text: 'Ответ на другой странице',
-      sequence: Int64(2), replyToCommentId: 'comment', replyToSequence: Int64.ONE));
+    api.comments.add(
+      FeedComment(
+        id: 'reply',
+        postId: 'post',
+        text: 'Ответ на другой странице',
+        sequence: Int64(2),
+        replyToCommentId: 'comment',
+        replyToSequence: Int64.ONE,
+      ),
+    );
     await tester.pumpWidget(app(FeedArea(api: api)));
     await tester.pumpAndSettle();
     final dynamic area = tester.state(find.byType(FeedArea));

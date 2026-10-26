@@ -103,6 +103,7 @@ class SessionFeedApi
     }
     return _call(feed_specs.FeedService.createFeedPost, request);
   }
+
   @override
   Future<feed.CommentFeedPostResponse> comment(
     feed.CommentFeedPostRequest request,
@@ -112,6 +113,7 @@ class SessionFeedApi
     }
     return _call(feed_specs.FeedService.commentFeedPost, request);
   }
+
   @override
   Future<feed.GetFeedAccessResponse> access(String channel) => _call(
     feed_specs.FeedService.getFeedAccess,
