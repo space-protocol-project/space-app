@@ -26,7 +26,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Проверка подготовки и публикации выпусков
-        run: python3 -m unittest discover -s packaging -p '*_test.py'
+        run: |
+          python3 -m unittest discover -s packaging -p '*_test.py'
+          python3 -m unittest discover -s tools -p 'check_community*_test.py'
       - name: Проверка тега и changelog до сборки
         if: startsWith(github.ref, 'refs/tags/v')
         run: python3 packaging/check-release.py "$GITHUB_REF_NAME"

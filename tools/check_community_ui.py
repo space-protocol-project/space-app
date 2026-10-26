@@ -17,12 +17,18 @@ class FlutterMachine:
             text=True, encoding='utf-8', bufsize=1)
         self.messages = queue.Queue()
         self.log, self.app, self.ready, self.sequence = log, None, 0, 0
-        threading.Thread(target=self._read, daemon=True).start()
+        self.started_at = None
+        self.reader = threading.Thread(target=self._read, daemon=True)
+        self.reader.start()
 
     def _read(self):
         for line in self.process.stdout:
             self.log.write(line)
             self.log.flush()
+            if 'COMMUNITY_UI_ERROR:' in line:
+                self.messages.put({'event': 'community.error', 'params': {'log': line}})
+            if 'COMMUNITY_UI_READY' in line:
+                self.messages.put({'event': 'community.ready'})
             try:
                 messages = json.loads(line)
             except json.JSONDecodeError:
@@ -36,16 +42,22 @@ class FlutterMachine:
         params = message.get('params', {})
         if message.get('event') == 'app.start':
             self.app = params['appId']
-        if message.get('event') == 'app.log':
-            text = params.get('log', '')
-            if 'COMMUNITY_UI_ERROR:' in text:
-                raise RuntimeError(text)
-            if 'COMMUNITY_UI_READY' in text:
-                self.ready += 1
+        if message.get('event') == 'app.started':
+            self.started_at = time.monotonic()
+        if message.get('event') == 'community.error':
+            raise RuntimeError(params['log'])
+        if message.get('event') == 'community.ready':
+            self.ready += 1
+
+    def _check_startup(self):
+        if self.started_at is not None and self.ready == 0:
+            if time.monotonic() - self.started_at > 45:
+                raise TimeoutError('Приложение запущено, но тестовый экран не готов')
 
     def wait(self, predicate, timeout=900):
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
+            self._check_startup()
             try:
                 message = self.messages.get(timeout=1)
             except queue.Empty:
@@ -101,6 +113,8 @@ class FlutterMachine:
         if restarted.get('code') != 0:
             raise RuntimeError(restarted)
         self.wait(lambda _: self.ready >= 2, timeout=60)
+        self.driver('set_frame_sync', enabled='false')
+        self.driver('waitFor', finderType='ByTooltipMessage', text='Убрать из избранного')
         self.command('app.stop', {'appId': self.app})
         if self.process.wait(timeout=30):
             raise RuntimeError('Нативное приложение завершилось с ошибкой')
@@ -113,6 +127,7 @@ class FlutterMachine:
             except subprocess.TimeoutExpired:
                 self.process.kill()
                 self.process.wait(timeout=10)
+        self.reader.join(timeout=5)
 
 
 def main():
