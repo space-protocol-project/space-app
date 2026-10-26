@@ -45,11 +45,12 @@ jobs:
           APP_TAG: ${{ inputs.app_tag }}
           PREVIOUS_APP_TAG: ${{ inputs.previous_app_tag }}
           VERSION_CODE: ${{ inputs.version_code }}
-        run: >-
-          python3 tools/verify_published_release.py
-          --runtime-tag "$RUNTIME_TAG" --schema "$SCHEMA"
-          --app-tag "$APP_TAG" --previous-app-tag "$PREVIOUS_APP_TAG"
-          --version-code "$VERSION_CODE" --report "$RUNNER_TEMP/public-release.json"
+        run: |
+          python3 -m unittest discover -s tools -p 'verify_published_release_test.py'
+          python3 tools/verify_published_release.py \
+            --runtime-tag "$RUNTIME_TAG" --schema "$SCHEMA" \
+            --app-tag "$APP_TAG" --previous-app-tag "$PREVIOUS_APP_TAG" \
+            --version-code "$VERSION_CODE" --report "$RUNNER_TEMP/public-release.json"
       - uses: actions/upload-artifact@v4
         with:
           name: public-release-verification

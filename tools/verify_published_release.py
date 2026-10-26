@@ -99,14 +99,16 @@ def android_tools():
 
 def apk_metadata(apk, tools):
     badging = subprocess.check_output([str(tools / 'aapt'), 'dump', 'badging', str(apk)], text=True)
-    package = re.search(r"package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'", badging)
-    sdk = re.search(r"sdkVersion:'(\d+)'", badging)
     signature = subprocess.check_output(
         [str(tools / 'apksigner'), 'verify', '--verbose', '--print-certs', str(apk)], text=True)
-    print('\n'.join(line for line in badging.splitlines()
-                    if line.startswith('package:') or 'sdkversion' in line.lower()), flush=True)
-    print(signature, flush=True)
-    certificates = re.findall(r'Signer #\d+ certificate SHA-256 digest: ([a-f0-9]+)', signature)
+    return parse_apk_metadata(badging, signature)
+
+
+def parse_apk_metadata(badging, signature):
+    package = re.search(r"package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'", badging)
+    sdk = re.search(r"sdkVersion:'(\d+)'", badging)
+    certificates = sorted(set(re.findall(
+        r'^.* certificate SHA-256 digest: ([a-f0-9]{64})$', signature, re.MULTILINE)))
     if package is None or sdk is None or not certificates:
         raise ValueError(f'Не получены метаданные APK: package={package is not None}, '
                          f'sdk={sdk is not None}, certificates={bool(certificates)}')
