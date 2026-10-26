@@ -689,23 +689,22 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
     hiddenText: context.strings.feedHiddenComment,
     assets: comment.attachments,
     session: widget.api.attachmentSession,
-    reference: comment.replyToCommentId.isEmpty ? null : TextButton.icon(
+    reference: _commentReference(comment),
+    actions: _commentActions(comment),
+  );
+
+  Widget? _commentReference(FeedComment comment) => comment.replyToCommentId.isEmpty ? null : TextButton.icon(
       key: ValueKey('feed-reply-parent-${comment.id}'),
       onPressed: controller.state.busy ? null : () => _openReply(comment),
       icon: const Icon(Icons.subdirectory_arrow_right, size: 16),
       label: Text(context.strings.feedReplyTo(comment.replyToSequence.toString())),
-    ),
-    actions: Wrap(
+    );
+
+  Widget _commentActions(FeedComment comment) => Wrap(
       spacing: 12,
       runSpacing: 8,
       children: [
-        if (!comment.hidden && widget.api.socialSupported && controller.state.permissions?.comment == true)
-          TextButton.icon(
-            key: ValueKey('feed-reply-${comment.id}'),
-            onPressed: controller.state.busy ? null : () => _reply(comment),
-            icon: const Icon(Icons.reply_outlined, size: 18),
-            label: Text(context.strings.feedReply),
-          ),
+        ..._replyActions(comment),
         if (!comment.hidden)
           TextButton(
             onPressed: controller.state.busy ? null : () => report(comment),
@@ -721,8 +720,19 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
             ),
           ),
       ],
-    ),
-  );
+    );
+
+  List<Widget> _replyActions(FeedComment comment) {
+    if (comment.hidden || !widget.api.socialSupported || controller.state.permissions?.comment != true) return [];
+    return [
+          TextButton.icon(
+            key: ValueKey('feed-reply-${comment.id}'),
+            onPressed: controller.state.busy ? null : () => _reply(comment),
+            icon: const Icon(Icons.reply_outlined, size: 18),
+            label: Text(context.strings.feedReply),
+          ),
+    ];
+  }
   Future<void> _openReply(FeedComment comment) async {
     searchComment = comment.replyToCommentId;
     await controller.open(comment.postId, afterSequence: comment.replyToSequence.toInt() - 1);

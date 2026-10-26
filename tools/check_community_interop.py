@@ -92,7 +92,7 @@ def main():
     parser.add_argument('--server', type=Path, required=True)
     parser.add_argument('--client', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--scenario', choices=['reactions', 'favorites', 'space_search'], required=True)
+    parser.add_argument('--scenario', choices=['reactions', 'favorites', 'space_search', 'feed_social'], required=True)
     args = parser.parse_args()
     if not os.environ.get('SPACE_DATABASE_URL'):
         raise ValueError('Нужна отдельная тестовая SPACE_DATABASE_URL')
