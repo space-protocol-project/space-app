@@ -14,6 +14,7 @@ targets:
           - lib/src/community_favorite_list.dart
           - lib/src/chat_controller.dart
           - lib/src/feed_controller.dart
+          - lib/src/participant_follows.dart
           - lib/src/feed_management.dart
           - lib/src/home_controller.dart
           - lib/src/message_search_controller.dart

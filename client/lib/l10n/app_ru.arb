@@ -1042,5 +1042,16 @@
   "feedRepost": "Репост",
   "feedRepostHint": "Отправьте без текста для репоста или добавьте свою цитату.",
   "feedShare": "Репост или цитата",
-  "@feedReplyTo": {"placeholders": {"number": {"type": "String"}}}
+  "@feedReplyTo": {"placeholders": {"number": {"type": "String"}}},
+  "followAdd": "Подписаться",
+  "followingEmpty": "Вы пока ни на кого не подписаны.",
+  "followingTitle": "Подписки",
+  "followRefresh": "Обновить подписки",
+  "followRemove": "Отписаться",
+  "followRevoked": "Доступ или пространство изменились. Откройте ленту заново.",
+  "followUnavailable": "Участник недоступен",
+  "personalFeed": "Моя лента",
+  "personalFeedEmpty": "Здесь появятся публикации авторов, на которых вы подписаны, из доступных разделов. Подпишитесь на автора у его публикации или комментария.",
+  "personalFeedLimit": "Показаны первые 500 публикаций. Обновите ленту, чтобы увидеть новые.",
+  "personalFeedOpen": "Открыть обсуждение"
 }

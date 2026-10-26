@@ -1042,5 +1042,16 @@
   "feedRepost": "Repost",
   "feedRepostHint": "Send without text to repost, or add your own comment to quote.",
   "feedShare": "Repost or quote",
-  "@feedReplyTo": {"placeholders": {"number": {"type": "String"}}}
+  "@feedReplyTo": {"placeholders": {"number": {"type": "String"}}},
+  "followAdd": "Follow",
+  "followingEmpty": "You are not following anyone yet.",
+  "followingTitle": "Following",
+  "followRefresh": "Refresh following",
+  "followRemove": "Unfollow",
+  "followRevoked": "Access or space changed. Open the feed again.",
+  "followUnavailable": "Participant unavailable",
+  "personalFeed": "My feed",
+  "personalFeedEmpty": "Posts from authors you follow will appear here from sections you can read. Follow an author next to their post or comment.",
+  "personalFeedLimit": "Showing the first 500 posts. Refresh to see newer posts.",
+  "personalFeedOpen": "Open discussion"
 }

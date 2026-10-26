@@ -2,10 +2,13 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:space_client/src/core.dart' show AttachmentSession;
 import 'package:space_client/src/feed_api.dart';
+import 'package:space_client/src/participant_follows_api.dart';
 import 'package:space_client/src/generated/space/v1/feed.pb.dart';
 import 'package:space_client/src/generated/space/v1/space.pb.dart';
 
 class SocialFeed implements FeedApi {
+  @override
+  ParticipantFollowApi? get follows => null;
   final submitted = ValueNotifier('');
   final root = FeedPost(
     id: 'post',

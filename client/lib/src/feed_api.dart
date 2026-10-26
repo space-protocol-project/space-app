@@ -3,6 +3,7 @@ import 'package:fixnum/fixnum.dart';
 import 'core.dart' show AttachmentSession;
 import 'generated/space/v1/feed.pb.dart';
 import 'generated/space/v1/space.pb.dart' show Channel;
+import 'participant_follows_api.dart';
 
 // Необязательное расширение: прежние реализации FeedApi продолжают работать.
 abstract interface class FeedReadApi {
@@ -11,6 +12,7 @@ abstract interface class FeedReadApi {
 }
 
 abstract interface class FeedApi {
+  ParticipantFollowApi? get follows;
   bool get supported;
   bool get socialSupported;
   bool get attachmentsEnabled;

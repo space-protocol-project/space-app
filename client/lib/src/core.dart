@@ -1,5 +1,8 @@
 import 'community_reactions_api.dart';
 import 'community_favorites_api.dart';
+import 'participant_follows_api.dart';
+import 'generated/space/v1/participant_follows.pb.dart' as follows_pb;
+import 'generated/space/v1/participant_follows.connect.spec.dart' as follows_specs;
 import 'generated/space/v1/community_favorites.pb.dart' as favorites_pb;
 import 'generated/space/v1/community_favorites.connect.spec.dart'
     as favorites_specs;
@@ -81,6 +84,7 @@ part 'push_registration.dart';
 part 'voice_rpc.dart';
 part 'forum_rpc.dart';
 part 'feed_rpc.dart';
+part 'participant_follows_rpc.dart';
 part 'community_search_rpc.dart';
 part 'space_search_rpc.dart';
 part 'community_reactions_rpc.dart';
@@ -838,6 +842,7 @@ class SpaceSession
   bool forumSupported = false;
   bool feedSupported = false;
   bool feedSocialSupported = false;
+  bool participantFollowsSupported = false;
   bool feedReadSupported = false;
   bool communitySearchSupported = false;
   bool spaceSearchSupported = false;
@@ -926,6 +931,7 @@ class SpaceSession
     forumSupported = manifest.capabilities.contains('core.forum.v1');
     feedSupported = manifest.capabilities.contains('core.feed.v1');
     feedSocialSupported = manifest.capabilities.contains('core.feed.social.v1');
+    participantFollowsSupported = manifest.capabilities.contains('core.participant.follows.v1');
     feedReadSupported = manifest.capabilities.contains('core.feed.read.v1');
     communityOverviewSupported = manifest.capabilities.contains(
       'core.community.overview.v1',
@@ -1357,6 +1363,7 @@ class SpaceSession
       session.feedSocialSupported = manifest.capabilities.contains(
         'core.feed.social.v1',
       );
+      session.participantFollowsSupported = manifest.capabilities.contains('core.participant.follows.v1');
       session.feedReadSupported = manifest.capabilities.contains(
         'core.feed.read.v1',
       );

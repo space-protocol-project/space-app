@@ -35,6 +35,9 @@ import 'space_frame.dart' show SpaceContentInsets;
 import 'message_composer_controls.dart';
 import 'message_input_surface.dart';
 import 'feed_social.dart';
+import 'participant_follows.dart';
+import 'personal_feed.dart';
+import '../src/participant_follows.dart' show FollowPageKind;
 
 String feedError(BuildContext context, Object error) {
   if (error is! GrpcError) return context.strings.forumFailure;
@@ -309,7 +312,7 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
           channel: state.section?.id ?? '',
           contents: _reactionContents(state),
           active: widget.active && foreground && state.error == null,
-          child: _navigation(state),
+          child: _followScope(state),
         ),
       ),
     ),
@@ -345,6 +348,65 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
     for (final comment in state.comments.where((c) => !c.hidden)) {
       yield comment.authorId;
     }
+  }
+
+  Widget _followScope(FeedState state) => ParticipantFollowScope(
+    api: widget.api.follows,
+    channel: state.section?.id ?? '',
+    ids: _followAuthors(state),
+    active: widget.active && foreground && state.error == null,
+    available: () => mounted && widget.active && foreground,
+    child: _navigation(state),
+  );
+
+  Iterable<String> _followAuthors(FeedState state) sync* {
+    if (state.post != null) {
+      if (!state.post!.hidden) yield state.post!.authorId;
+      for (final comment in state.comments.where((c) => !c.hidden)) {
+        yield comment.authorId;
+      }
+      return;
+    }
+    for (final post in state.posts.where((p) => !p.hidden)) {
+      yield post.authorId;
+    }
+  }
+
+  List<Widget> _followTools() {
+    if (widget.api.follows == null) return [];
+    return [
+      TextButton.icon(key: const ValueKey('open-personal-feed'),
+        onPressed: () => _personalFeed(FollowPageKind.posts),
+        icon: const Icon(Icons.dynamic_feed_outlined),label: Text(context.strings.personalFeed)),
+      IconButton(key: const ValueKey('open-following'),
+        onPressed: () => _personalFeed(FollowPageKind.authors),
+        tooltip: context.strings.followingTitle,icon: const Icon(Icons.people_outline)),
+    ];
+  }
+
+  String _feedCatalog() => controller.state.sections.map((c) =>
+    '${c.id}:${c.revision}:${c.permissions.read}:${c.permissions.visible}:${c.archived}').join('|');
+
+  Future<void> _personalFeed(FollowPageKind kind) async {
+    final api = widget.api.follows;
+    if (api == null) return;
+    final catalog = _feedCatalog(), scope = api.scopeId;
+    bool available() => mounted && widget.active && foreground &&
+      widget.api.follows?.scopeId == scope && _feedCatalog() == catalog;
+    final target = await showPersonalFeed(context, api: api, feed: widget.api,
+      profiles: widget.profiles, channels: controller.state.sections.map((c) => c.id).toSet(),
+      available: available, changes: controller.stream, kind: kind);
+    if (target == null || !available()) return;
+    await _openPersonalTarget(target.post.channelId, target.post.id, scope);
+  }
+
+  Future<void> _openPersonalTarget(String channel, String id, String scope) async {
+    final current = controller;
+    final section = current.state.sections.where((c) => c.id == channel).firstOrNull;
+    if (section == null) return;
+    if (current.state.section?.id != channel) await current.select(section);
+    if (!mounted || !widget.active || !identical(current, controller) || widget.api.follows?.scopeId != scope) return;
+    await current.open(id);
   }
 
   Widget _navigation(FeedState state) => PopScope(
@@ -421,6 +483,7 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
         tooltip: context.strings.forumRefresh,
         icon: const Icon(Icons.refresh),
       ),
+      ..._followTools(),
       if (state.section != null && communityFavoritesFor(widget.api) != null)
         IconButton(
           onPressed: _favorites,
@@ -589,6 +652,7 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
     mentions: post.mentions,
     author: forumAuthor(post.authorName, post.authorId),
     authorId: post.authorId,
+    authorAction: ParticipantFollowButton(principal: post.authorId),
     timestamp: post.createdAtUnix.toInt(),
     hidden: post.hidden,
     hiddenText: context.strings.feedHiddenPost,
@@ -683,6 +747,7 @@ class _FeedAreaState extends State<FeedArea> with WidgetsBindingObserver {
     mentions: comment.mentions,
     author: forumAuthor(comment.authorName, comment.authorId),
     authorId: comment.authorId,
+    authorAction: ParticipantFollowButton(principal: comment.authorId),
     timestamp: comment.createdAtUnix.toInt(),
     hidden: comment.hidden,
     hiddenText: context.strings.feedHiddenComment,
@@ -814,6 +879,7 @@ class FeedEntryCard extends StatelessWidget {
     required this.session,
     required this.actions,
     this.reference,
+    this.authorAction,
   });
   final bool reactionsEnabled;
   final CommunityContentReference? reactionContent;
@@ -825,6 +891,7 @@ class FeedEntryCard extends StatelessWidget {
   final AttachmentSession? session;
   final Widget actions;
   final Widget? reference;
+  final Widget? authorAction;
   @override
   Widget build(BuildContext context) => Card(
     margin: const EdgeInsets.symmetric(vertical: 4),
@@ -854,6 +921,7 @@ class FeedEntryCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (authorAction != null) authorAction!,
               ],
             ),
           const SizedBox(height: 12),

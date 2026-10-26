@@ -10,6 +10,9 @@ class SessionFeedApi
         CommunityFavoriteSource {
   SessionFeedApi(this.session);
   final SpaceSession session;
+  late final _follows = SessionParticipantFollowApi(session);
+  @override
+  ParticipantFollowApi? get follows => session.participantFollowsSupported ? _follows : null;
   late final _reactions = SessionCommunityReactionApi(session);
   late final _favorites = SessionCommunityFavoriteApi(session);
   @override

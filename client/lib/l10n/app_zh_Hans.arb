@@ -411,5 +411,16 @@
   "feedRepost": "转发",
   "feedRepostHint": "直接发送以转发，或添加文字以引用。",
   "feedShare": "转发或引用",
-  "@feedReplyTo": {"placeholders": {"number": {"type": "String"}}}
+  "@feedReplyTo": {"placeholders": {"number": {"type": "String"}}},
+  "followAdd": "关注",
+  "followingEmpty": "你还没有关注任何人。",
+  "followingTitle": "关注",
+  "followRefresh": "刷新关注",
+  "followRemove": "取消关注",
+  "followRevoked": "权限或空间已更改。请重新打开动态。",
+  "followUnavailable": "成员不可用",
+  "personalFeed": "我的动态",
+  "personalFeedEmpty": "这里显示你关注的作者在可访问版块中的帖子。在帖子或评论旁关注作者。",
+  "personalFeedLimit": "显示前500条帖子。刷新以查看新帖子。",
+  "personalFeedOpen": "打开讨论"
 }

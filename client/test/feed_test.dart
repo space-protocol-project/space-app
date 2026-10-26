@@ -7,6 +7,7 @@ import 'package:grpc/grpc.dart';
 import 'package:space_client/l10n/app_localizations.dart';
 import 'package:space_client/src/core.dart' show AttachmentSession;
 import 'package:space_client/src/feed_api.dart';
+import 'package:space_client/src/participant_follows_api.dart';
 import 'package:space_client/src/feed_controller.dart';
 import 'package:space_client/src/feed_management.dart';
 import 'package:space_client/src/generated/space/v1/feed.pb.dart';
@@ -16,6 +17,8 @@ import 'package:space_client/ui/feed.dart';
 import 'package:space_client/ui/feed_management.dart';
 
 class FakeFeed implements FeedApi {
+  @override
+  ParticipantFollowApi? get follows => null;
   @override
   bool socialSupported = true;
   @override
