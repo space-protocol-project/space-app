@@ -93,6 +93,7 @@ jobs:
           flutter analyze
           flutter test --no-pub test/space_search_test.dart test/space_search_widgets_test.dart
       - name: Форматирование серверного поиска
+        if: always()
         run: |
           python3 - <<'PY'
           import glob, subprocess
