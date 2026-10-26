@@ -9,7 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../src/markdown_policy.dart';
 
-// Любой возможный синтаксис оставляем полноценному Markdown-обработчику.
+// Допустимую разметку обрабатывает общий ограниченный Markdown-рендерер.
 final _markdownSyntax = RegExp(
   r'[\n\r\t\\`*_{}\[\]<>()#+|~:/&@]| {2}|^\s|^[-=]|^\d+[.)]|www\.',
 );
@@ -97,8 +97,7 @@ class MessageMarkdown extends StatelessWidget {
 // Только визуальное выделение уже проверенных обращений. Новых уведомлений
 // или действий по имени этот синтаксис не создаёт; исходные UTF-16 spans не меняются.
 class _MentionSyntax extends md.InlineSyntax {
-  _MentionSyntax(List<String> names)
-    : super(_mentionPattern(names));
+  _MentionSyntax(List<String> names) : super(_mentionPattern(names));
   @override
   bool onMatch(md.InlineParser parser, Match match) {
     parser.addNode(md.Element.text('strong', match[0]!));
@@ -107,7 +106,12 @@ class _MentionSyntax extends md.InlineSyntax {
 }
 
 String _mentionPattern(List<String> names) {
-  final labels=names.where((name)=>name.isNotEmpty&&name.length<=160).take(10).toSet().toList()
-    ..sort((a,b)=>b.length.compareTo(a.length));
-  return labels.isEmpty?r'(?!)':labels.map(RegExp.escape).join('|');
+  final labels =
+      names
+          .where((name) => name.isNotEmpty && name.length <= 160)
+          .take(10)
+          .toSet()
+          .toList()
+        ..sort((a, b) => b.length.compareTo(a.length));
+  return labels.isEmpty ? r'(?!)' : labels.map(RegExp.escape).join('|');
 }

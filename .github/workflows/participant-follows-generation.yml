@@ -91,7 +91,7 @@ jobs:
         run: |
           rustup toolchain install 1.99.1 --profile minimal
           flutter analyze
-          flutter test --no-pub test/user_export_test.dart test/user_export_widgets_test.dart test/markdown_security_test.dart test/composer_markdown_test.dart test/participant_follows_test.dart test/feed_test.dart test/feed_social_test.dart test/feed_read_test.dart test/feed_read_visibility_test.dart
+          flutter test --no-pub test/user_export_test.dart test/user_export_widgets_test.dart test/user_export_file_test.dart test/markdown_security_test.dart test/composer_markdown_test.dart test/participant_follows_test.dart test/feed_test.dart test/feed_social_test.dart test/feed_read_test.dart test/feed_read_visibility_test.dart
       - uses: actions/upload-artifact@v4
         if: always()
         with:

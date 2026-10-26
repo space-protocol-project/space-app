@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../l10n/strings.dart';
 import '../src/chat_controller.dart';
-import '../src/file_picker.dart';
+import '../src/user_export_file.dart';
 import '../src/user_export.dart';
 import '../src/generated/space/v1/space.pb.dart' show Channel;
 import 'feed.dart' show feedError;
@@ -39,33 +39,37 @@ class UserExportDialog extends StatefulWidget {
 class _UserExportDialogState extends State<UserExportDialog> with WidgetsBindingObserver {
   final after=TextEditingController(),before=TextEditingController();
   String channel='';
+  bool choosing=false;
+  final files=UserExportFileService();
   StreamSubscription<Object?>? subscription;
   late final api=widget.api;
   late final scope=api.scopeId;
   late final controller=UserExportController(api,channels:_exportChannels(widget.channels).map((c)=>c.id).toSet(),available:_available,
-    write:(path,bytes)=>SpaceFile.fromData(bytes,mimeType:'application/json',name:'space-user-content.json').saveTo(path));
+    write:(path,bytes)=>files.write(path,bytes));
   bool _available()=>mounted&&api.scopeId==scope&&widget.available();
   void _changed(){if(!_available()) controller.invalidate();}
   @override void initState(){super.initState();WidgetsBinding.instance.addObserver(this);subscription=widget.changes?.listen((_)=>_changed());}
-  @override void didChangeAppLifecycleState(AppLifecycleState state){if(state!=AppLifecycleState.resumed) controller.invalidate();}
+  @override void didChangeAppLifecycleState(AppLifecycleState state){if(state!=AppLifecycleState.resumed&&!choosing) controller.invalidate();}
   @override void dispose(){unawaited(subscription?.cancel());WidgetsBinding.instance.removeObserver(this);after.dispose();before.dispose();unawaited(controller.close());super.dispose();}
   Future<void> _prepare() async {
     try {await controller.prepare(userExportSelection(channel,after.text,before.text));}
     catch(error) {if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text(context.strings.userExportInvalidPeriod)));}
   }
   Future<void> _save() async {
+    if(choosing) return;
+    choosing=true;
     try {
       final path=await (widget.chooseDestination??_destination)();
-      if(path!=null) await controller.save(path);
+      if(path!=null) await _saveSelected(path);
     } catch(error) {
       if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text(feedError(context,error))));
-    }
+    } finally {choosing=false;}
   }
-  Future<String?> _destination() async {
-    final destination=await getSaveLocation(suggestedName:'space-user-content-${DateTime.now().millisecondsSinceEpoch}.json',
-      acceptedTypeGroups:const [XTypeGroup(label:'JSON',extensions:['json'])]);
-    return destination?.path;
+  Future<void> _saveSelected(String path) async {
+    if(!_available()||controller.state.revoked||controller.state.document.isEmpty) {await files.discard(path);return;}
+    await controller.save(path);
   }
+  Future<String?> _destination()=>files.choose('space-user-content-${DateTime.now().millisecondsSinceEpoch}.json');
   @override Widget build(BuildContext context)=>BlocBuilder<UserExportController,UserExportState>(bloc:controller,builder:_body);
   Widget _body(BuildContext context,UserExportState state)=>Dialog(child:ConstrainedBox(
     constraints:BoxConstraints(maxWidth:640,maxHeight:MediaQuery.sizeOf(context).height*.9),

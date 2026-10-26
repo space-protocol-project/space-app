@@ -8,12 +8,17 @@ bool canFormatMarkdown(String text) {
 }
 
 bool _boundedMarkdownPrefix(String line) {
-  var quotes=0,spaces=0;
-  for(final unit in line.codeUnits) {
-    if(unit==62) {quotes++;spaces=0;}
-    else if(unit==32||unit==9) {spaces+=unit==9?4:1;}
-    else {return true;}
-    if(quotes>8||spaces>=64) return false;
+  var quotes = 0, spaces = 0;
+  for (final unit in line.codeUnits) {
+    if (unit == 62) {
+      quotes++;
+      spaces = 0;
+    } else if (unit == 32 || unit == 9) {
+      spaces += unit == 9 ? 4 : 1;
+    } else {
+      return true;
+    }
+    if (quotes > 8 || spaces >= 64) return false;
   }
   return true;
 }
@@ -30,7 +35,8 @@ bool _boundedMarkdownBrackets(String text) {
 
 Uri? safeMarkdownLink(String? href) {
   if (href == null || href.length > 2048) return null;
-  if (RegExp(r'[\x00-\x20\x7f-\x9f\u202a-\u202e\u2066-\u2069]').hasMatch(href)) {
+  if (RegExp(r'[\x00-\x20\x7f-\x9f\u202a-\u202e\u2066-\u2069]')
+      .hasMatch(href)) {
     return null;
   }
   final uri = Uri.tryParse(href);
