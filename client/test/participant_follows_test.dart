@@ -12,6 +12,22 @@ FollowTimelineController timeline(FakeFollows api,{bool Function()? available,Fo
  FollowTimelineController(api,kind,channels:{'first','second'},available:available??()=>true);
 
 void main() {
+  test('Поздний ответ авторов не переносится в другое пространство',() async {
+    final api=FakeFollows();final pending=Completer<GetParticipantFollowStatesResponse>();api.readStates=()=>pending.future;
+    final controller=FollowAuthorsController(api,'first',['author'],available:()=>true);addTearDown(controller.close);
+    final loading=controller.refresh();api.scopeId='other';pending.complete(GetParticipantFollowStatesResponse(states:[ParticipantFollowState(principalId:'author',following:true)]));
+    await loading;expect(controller.state.entries,isEmpty);expect(controller.state.busy,isFalse);
+  });
+  test('Сервер не может подставить лишнего автора в состояния',() async {
+    final api=FakeFollows()..readStates=() async=>GetParticipantFollowStatesResponse(states:[ParticipantFollowState(principalId:'unknown')]);
+    final controller=FollowAuthorsController(api,'first',['author'],available:()=>true);addTearDown(controller.close);
+    await controller.refresh();expect(controller.state.entries,isEmpty);expect(controller.state.error,isNotNull);
+  });
+  test('Повтор курсора и пустая продолжаемая страница отклоняются',() async {
+    final api=FakeFollows();api.load=(token) async=>ListPersonalFeedResponse(entries:token.isEmpty?[entry('b',2)]:[entry('a',1)],nextPageToken:'loop');
+    final controller=timeline(api);addTearDown(controller.close);await controller.refresh();await controller.more();expect(controller.state.entries,isEmpty);expect(controller.state.error,isNotNull);
+    api.load=(_) async=>ListPersonalFeedResponse(nextPageToken:'empty');await controller.refresh();expect(controller.state.error,isNotNull);
+  });
   test('Подписка ждёт сервер и передаёт общую ревизию',() async {
     final api=FakeFollows();final controller=FollowAuthorsController(api,'first',['author'],available:()=>true);addTearDown(controller.close);
     await controller.refresh();expect(controller.state.entries,{'author':false});
