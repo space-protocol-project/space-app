@@ -22,7 +22,9 @@ class ProbeVault implements IdentityVault {
 
 Future<void> main() async {
   late PairingServer server;
-  enableFlutterDriverExtension(dataHandler: (_) async => '${server.cancellations}');
+  enableFlutterDriverExtension(
+    handler: (_) async => '${server.cancellations}',
+  );
   SharedPreferences.setMockInitialValues({});
   FlutterError.onError = (details) {
     debugPrint('COMMUNITY_UI_ERROR: ${details.exceptionAsString()}');
@@ -32,19 +34,28 @@ Future<void> main() async {
     debugPrint('COMMUNITY_UI_ERROR: $error');
     return true;
   };
-  server = PairingServer(await HttpServer.bind(InternetAddress.loopbackIPv4, 0));
+  server = PairingServer(
+    await HttpServer.bind(InternetAddress.loopbackIPv4, 0),
+  );
   final controller = ChatController(ProbeVault())..preview = server.discovery;
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    theme: AppPreferences().theme,
-    locale: const Locale('ru'),
-    supportedLocales: AppLocalizations.supportedLocales,
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
-    home: Scaffold(body: SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: PairingStartPanel(controller: controller, onConnected: (_) async {}),
-    )),
-  ));
+  runApp(
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: AppPreferences().theme,
+      locale: const Locale('ru'),
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      home: Scaffold(
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: PairingStartPanel(
+            controller: controller,
+            onConnected: (_) async {},
+          ),
+        ),
+      ),
+    ),
+  );
   WidgetsBinding.instance.addPostFrameCallback((_) {
     Timer(const Duration(seconds: 1), () => debugPrint('COMMUNITY_UI_READY'));
   });
