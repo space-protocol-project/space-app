@@ -1,19 +1,19 @@
 # Пространство на Linux-сервере без домашнего компьютера
 
-Начиная с приложения и runtime v0.3.3. Нужен Linux x64 с glibc,
+Совместимая пара: приложение v0.7.28 и runtime v0.7.22, схема 40. Нужен Linux x64 с glibc,
 обычный пользователь (не root), `curl`, `unzip`, `sha256sum` и доступный TCP 8443.
 Отдельные Go и PostgreSQL не нужны. Участники могут пользоваться Android.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.3.5/packaging/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.7.22/packaging/install.sh | SPACE_VERSION=v0.7.22 sh
 ```
 
-Установщик скачивает последний runtime, проверяет SHA-256 и запускает сервер.
+Команда скачивает закреплённый runtime, проверяет SHA-256 и запускает сервер.
 При первом запуске внешний IP определяется через ipify. Если нужен домен или
 другой внешний порт, передайте адрес явно:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.3.5/packaging/install.sh | sh -s -- -address https://space.example.org:9443 -listen 0.0.0.0:9443
+curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.7.22/packaging/install.sh | SPACE_VERSION=v0.7.22 sh -s -- -address https://space.example.org:9443 -listen 0.0.0.0:9443
 ```
 
 1. Разрешите входящий TCP-порт в файрволе сервера и в панели провайдера.
@@ -34,11 +34,11 @@ curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server
 
 Данные: `~/.local/share/space-server/home/data`; сеть: `home/config.json`.
 Runtime хранится отдельно в `runtimes/<версия>`. `SPACE_HOME` меняет общий каталог,
-`SPACE_VERSION=v0.3.5` закрепляет версию скачивания. Каталоги старых runtime
+`SPACE_VERSION=v0.7.22` закрепляет версию скачивания; без него выбирается последний выпуск. Каталоги старых runtime
 установщик не удаляет. Для последующих запусков без скачивания используйте:
 
 ```sh
-~/.local/share/space-server/runtimes/v0.3.5/space-server start -data ~/.local/share/space-server/home
+~/.local/share/space-server/runtimes/v0.7.22/space-server start -data ~/.local/share/space-server/home
 ```
 
 При существующей конфигурации сервер использует сохранённые адреса. Их можно
@@ -49,18 +49,17 @@ Runtime хранится отдельно в `runtimes/<версия>`. `SPACE_H
 ## Постоянная работа на VPS: systemd
 
 Нужен systemd с пользовательским менеджером. Войдите по SSH обычным пользователем;
-`su` без пользовательской шины может не подойти. Новый режим установщика совместим
-с опубликованным runtime v0.3.3 и новее. Старый установщик из тега v0.3.3 ещё не
-знает `--service`, поэтому для этого режима используйте актуальный установщик:
+`su` без пользовательской шины может не подойти. Для этой пары используйте
+опубликованный установщик и runtime v0.7.22:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/main/packaging/install.sh | sh -s -- --service
+curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.7.22/packaging/install.sh | SPACE_VERSION=v0.7.22 sh -s -- --service
 ```
 
 Адрес и порт можно передать после `--service`:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/main/packaging/install.sh | sh -s -- --service -address https://space.example.org:9443 -listen 0.0.0.0:9443
+curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.7.22/packaging/install.sh | SPACE_VERSION=v0.7.22 sh -s -- --service -address https://space.example.org:9443 -listen 0.0.0.0:9443
 ```
 
 Установщик включает linger для текущего пользователя — службы работают без
