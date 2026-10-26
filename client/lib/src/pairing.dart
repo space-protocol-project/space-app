@@ -46,9 +46,11 @@ class PendingPairing {
     Discovery server, {
     bool administrative = false,
   }) async {
-    final key = await Ed25519().newKeyPair(), channel = _channel(server);
+    final channel = _channel(server);
+    SimpleKeyPair? key;
     Uint8List? seed;
     try {
+      key = await Ed25519().newKeyPair();
       final public = (await key.extractPublicKey()).bytes;
       final result = await AuthServiceClient(channel).createPairing(
         CreatePairingRequest(
@@ -86,7 +88,7 @@ class PendingPairing {
       await channel.shutdown();
       rethrow;
     } finally {
-      key.destroy();
+      key?.destroy();
     }
   }
 
