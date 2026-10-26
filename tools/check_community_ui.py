@@ -103,10 +103,14 @@ class FlutterMachine:
         self.driver('waitFor', finderType='ByTooltipMessage', text='Убрать из избранного')
         self.key('tap', 'open-favorites')
         self.driver('waitFor', finderType='ByText', text='Тема topic')
-        self.driver('tap', finderType='Descendant',
-                    of=json.dumps({'finderType': 'ByType', 'type': 'Dialog'}),
-                    matching=json.dumps({'finderType': 'ByValueKey', 'keyValueType': 'String', 'keyValueString': 'favorite-1:topic'}),
-                    matchRoot='false', firstMatchOnly='true')
+        favorite_in_dialog = {
+            'finderType': 'Descendant',
+            'of': json.dumps({'finderType': 'ByType', 'type': 'Dialog'}),
+            'matching': json.dumps({'finderType': 'ByValueKey', 'keyValueType': 'String', 'keyValueString': 'favorite-1:topic'}),
+            'matchRoot': 'false', 'firstMatchOnly': 'false',
+        }
+        self.driver('waitForTappable', **favorite_in_dialog)
+        self.driver('tap', **favorite_in_dialog)
         self.driver('waitFor', finderType='ByText', text='В этом разделе пока нет избранного.')
         self.driver('tap', finderType='ByTooltipMessage', text='К темам')
         restarted = self.command('app.restart', {'appId': self.app, 'fullRestart': True, 'pause': False})
