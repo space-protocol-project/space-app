@@ -6,10 +6,16 @@ import 'package:space_client/src/participant_follows.dart';
 import 'support/participant_follows.dart';
 import 'package:space_client/ui/participant_follows.dart';
 import 'package:space_client/ui/personal_feed.dart';
+import 'package:space_client/ui/feed.dart';
 import 'feed_test.dart' show app,FakeFeed;
 
 FollowTimelineController timeline(FakeFollows api,{bool Function()? available,FollowPageKind kind=FollowPageKind.posts})=>
  FollowTimelineController(api,kind,channels:{'first','second'},available:available??()=>true);
+
+class FollowingFeed extends FakeFeed {
+  FollowingFeed(this.follows){entries.first..authorId='author'..authorName='Автор пространства';}
+  @override final ParticipantFollowApi follows;
+}
 
 void main() {
   test('Поздний ответ авторов не переносится в другое пространство',() async {
@@ -91,6 +97,15 @@ void main() {
     await tester.pumpAndSettle();expect(find.text('Публикация b'),findsOneWidget);expect(find.byKey(const ValueKey('personal-open-b')),findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('following-tab')));await tester.pumpAndSettle();expect(find.byKey(const ValueKey('unfollow-author')),findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('unfollow-author')));await tester.pumpAndSettle();expect(api.selected,isEmpty);
+    await tester.pumpWidget(const SizedBox());
+  });
+  testWidgets('Подписки и личная лента помещаются на мобильном экране',(tester) async {
+    tester.view.physicalSize=const Size(320,740);tester.view.devicePixelRatio=1;
+    addTearDown(tester.view.resetPhysicalSize);addTearDown(tester.view.resetDevicePixelRatio);
+    final follows=FakeFollows();await tester.pumpWidget(app(FeedArea(api:FollowingFeed(follows))));await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('follow-author')));await tester.tap(find.byKey(const ValueKey('follow-author')));await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('open-personal-feed')));await tester.tap(find.byKey(const ValueKey('open-personal-feed')));await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('personal-feed-tab')),findsOneWidget);expect(tester.takeException(),isNull);
     await tester.pumpWidget(const SizedBox());
   });
 }
