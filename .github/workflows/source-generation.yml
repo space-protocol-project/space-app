@@ -70,6 +70,9 @@ jobs:
           (cd server && buf generate "$SCHEMA" --template buf.connect.gen.yaml)
           (cd app && buf generate "$SCHEMA" --template client/buf.gen.yaml)
           (cd app && buf generate "$SCHEMA" --template client/buf.connect.gen.yaml)
+      - name: Системные зависимости нативных модулей Linux
+        if: inputs.models
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb xauth dbus-x11
       - name: Freezed и переводы
         if: inputs.models
         working-directory: app/client
@@ -92,6 +95,8 @@ jobs:
           rustup toolchain install 1.99.1 --profile minimal
           flutter analyze
           flutter test --no-pub test/space_search_test.dart test/space_search_widgets_test.dart
+          cd ..
+          dbus-run-session -- xvfb-run -a python3 tools/check_space_search_ui.py --output "$RUNNER_TEMP/space-search-ui"
       - name: Форматирование серверного поиска
         if: always()
         run: |
@@ -128,3 +133,9 @@ jobs:
             app/client/test/probes/space_search_probe.dart
             app/client/tool/community_space_search_interoperability.dart
           if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always() && inputs.models
+        with:
+          name: space-search-generation-ui
+          path: ${{ runner.temp }}/space-search-ui/*
+          if-no-files-found: ignore
