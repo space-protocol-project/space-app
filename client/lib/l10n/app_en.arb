@@ -1053,5 +1053,16 @@
   "personalFeed": "My feed",
   "personalFeedEmpty": "Posts from authors you follow will appear here from sections you can read. Follow an author next to their post or comment.",
   "personalFeedLimit": "Showing the first 500 posts. Refresh to see newer posts.",
-  "personalFeedOpen": "Open discussion"
+  "personalFeedOpen": "Open discussion",
+  "userExportTitle": "Export my content",
+  "userExportHelp": "Your ordinary messages, topics, posts and replies as JSON. Attachments include metadata only, without files. MLS, keys and tokens are excluded. Up to 5000 entries and 8 MiB per period.",
+  "userExportSection": "Section",
+  "userExportAll": "All accessible sections",
+  "userExportAfter": "From date (UTC, optional)",
+  "userExportBefore": "Through date (UTC, optional)",
+  "userExportPrepare": "Prepare JSON",
+  "userExportSave": "Save JSON",
+  "userExportReady": "Entries prepared",
+  "userExportSaved": "Export saved",
+  "userExportInvalidPeriod": "Enter valid YYYY-MM-DD dates and a valid period."
 }

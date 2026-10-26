@@ -1,6 +1,9 @@
 import 'community_reactions_api.dart';
 import 'community_favorites_api.dart';
 import 'participant_follows_api.dart';
+import 'user_export_api.dart';
+import 'generated/space/v1/user_export.pb.dart' as user_export_pb;
+import 'generated/space/v1/user_export.connect.spec.dart' as user_export_specs;
 import 'generated/space/v1/participant_follows.pb.dart' as follows_pb;
 import 'generated/space/v1/participant_follows.connect.spec.dart'
     as follows_specs;
@@ -86,6 +89,7 @@ part 'voice_rpc.dart';
 part 'forum_rpc.dart';
 part 'feed_rpc.dart';
 part 'participant_follows_rpc.dart';
+part 'user_export_rpc.dart';
 part 'community_search_rpc.dart';
 part 'space_search_rpc.dart';
 part 'community_reactions_rpc.dart';
@@ -734,6 +738,7 @@ class SpaceSession
         SpaceAdministration,
         CommunityOverviewSource,
         SpaceSearchSource,
+        UserExportSource,
         PersonalNotificationSource {
   final _closing = StreamController<void>.broadcast();
   Stream<void> get closing => _closing.stream;
@@ -843,6 +848,10 @@ class SpaceSession
   bool forumSupported = false;
   bool feedSupported = false;
   bool feedSocialSupported = false;
+  bool userExportSupported = false;
+  late final _userExportApi = SessionUserExportApi(this);
+  @override
+  UserExportApi? get userExport => userExportSupported ? _userExportApi : null;
   bool participantFollowsSupported = false;
   bool feedReadSupported = false;
   bool communitySearchSupported = false;
@@ -932,6 +941,7 @@ class SpaceSession
     forumSupported = manifest.capabilities.contains('core.forum.v1');
     feedSupported = manifest.capabilities.contains('core.feed.v1');
     feedSocialSupported = manifest.capabilities.contains('core.feed.social.v1');
+    userExportSupported = manifest.capabilities.contains('core.user.export.v1');
     participantFollowsSupported = manifest.capabilities.contains(
       'core.participant.follows.v1',
     );
@@ -1366,6 +1376,7 @@ class SpaceSession
       session.feedSocialSupported = manifest.capabilities.contains(
         'core.feed.social.v1',
       );
+      session.userExportSupported = manifest.capabilities.contains('core.user.export.v1');
       session.participantFollowsSupported = manifest.capabilities.contains(
         'core.participant.follows.v1',
       );

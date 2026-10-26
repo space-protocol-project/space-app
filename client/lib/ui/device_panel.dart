@@ -9,6 +9,7 @@ import '../src/chat_controller.dart';
 import '../src/server_workspaces.dart';
 import 'components.dart';
 import 'recovery_panel.dart';
+import 'user_export.dart';
 
 class DevicePanel extends StatefulWidget {
   const DevicePanel({
@@ -102,6 +103,7 @@ class _DevicePanelState extends State<DevicePanel> {
                   if (mounted) setState(() => selected = origin);
                 },
               ),
+              UserExportButton(parent:controller),
             ],
           );
         },

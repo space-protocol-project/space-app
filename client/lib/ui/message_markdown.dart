@@ -4,7 +4,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:url_launcher/url_launcher.dart';
+import '../src/markdown_policy.dart';
 
 // Любой возможный синтаксис оставляем полноценному Markdown-обработчику.
 final _markdownSyntax = RegExp(
@@ -12,8 +14,10 @@ final _markdownSyntax = RegExp(
 );
 
 class MessageMarkdown extends StatelessWidget {
-  const MessageMarkdown({super.key, required this.text});
+  const MessageMarkdown({super.key, required this.text,this.highlightedNames=const [],this.style});
   final String text;
+  final List<String> highlightedNames;
+  final TextStyle? style;
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -21,8 +25,8 @@ class MessageMarkdown extends StatelessWidget {
       fontSize: 15,
       height: 1.45,
       color: colors.onSurface,
-    );
-    if (!_markdownSyntax.hasMatch(text)) {
+    ).merge(style);
+    if (!_markdownSyntax.hasMatch(text)||!canFormatMarkdown(text)) {
       return SelectionArea(
         contextMenuBuilder: MessageContextMenu.contains(context)
             ? (_, _) => const SizedBox.shrink()
@@ -40,6 +44,8 @@ class MessageMarkdown extends StatelessWidget {
             ),
       child: MarkdownBody(
         data: text,
+        extensionSet: md.ExtensionSet.commonMark,
+        inlineSyntaxes: highlightedNames.isEmpty?const []:[_MentionSyntax(highlightedNames)],
         selectable: false,
         softLineBreak: true,
         styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
@@ -65,11 +71,8 @@ class MessageMarkdown extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         onTapLink: (_, href, _) {
-          final uri = Uri.tryParse(href ?? '');
-          if (uri != null &&
-              ['https', 'http'].contains(uri.scheme) &&
-              uri.host.isNotEmpty &&
-              uri.userInfo.isEmpty) {
+          final uri = safeMarkdownLink(href);
+          if (uri != null) {
             unawaited(
               launchUrl(
                 uri,
@@ -80,5 +83,16 @@ class MessageMarkdown extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+// Только визуальное выделение уже проверенных обращений. Новых уведомлений
+// или действий по имени этот синтаксис не создаёт; исходные UTF-16 spans не меняются.
+class _MentionSyntax extends md.InlineSyntax {
+  _MentionSyntax(List<String> names):super((names.toSet().toList()..sort((a,b)=>b.length.compareTo(a.length))).map(RegExp.escape).join('|'));
+  @override
+  bool onMatch(md.InlineParser parser,Match match) {
+    parser.addNode(md.Element.text('strong',match[0]!));
+    return true;
   }
 }

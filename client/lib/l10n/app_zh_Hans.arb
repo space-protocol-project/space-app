@@ -422,5 +422,16 @@
   "personalFeed": "我的动态",
   "personalFeedEmpty": "这里显示你关注的作者在可访问版块中的帖子。在帖子或评论旁关注作者。",
   "personalFeedLimit": "显示前500条帖子。刷新以查看新帖子。",
-  "personalFeedOpen": "打开讨论"
+  "personalFeedOpen": "打开讨论",
+  "userExportTitle": "导出我的内容",
+  "userExportHelp": "将自己的普通消息、主题、帖子和回复导出为 JSON。附件仅包含元数据，不含文件。无 MLS、密钥或令牌。每个时段最多 5000 条、8 MiB。",
+  "userExportSection": "版块",
+  "userExportAll": "所有可访问版块",
+  "userExportAfter": "起始日期（UTC，可选）",
+  "userExportBefore": "结束日期（UTC，包含当天，可选）",
+  "userExportPrepare": "准备 JSON",
+  "userExportSave": "保存 JSON",
+  "userExportReady": "已准备条目",
+  "userExportSaved": "导出已保存",
+  "userExportInvalidPeriod": "请输入有效的 YYYY-MM-DD 日期和时间范围。"
 }

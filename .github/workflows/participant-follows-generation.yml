@@ -1,7 +1,12 @@
-name: Подготовка подписок в CI
+name: Генерация возможностей сообществ в CI
 on:
   workflow_dispatch:
     inputs:
+      feature:
+        description: Контракт для генерации
+        type: choice
+        default: participant_follows
+        options: [participant_follows, user_export]
       protocol_ref:
         required: true
         type: string
@@ -14,6 +19,8 @@ jobs:
   generate:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    env:
+      PROTO_NAME: ${{ inputs.feature }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,16 +55,17 @@ jobs:
           dart pub global activate connectrpc 2.0.1
       - name: Контракт и форматирование
         run: |
+          case "$PROTO_NAME" in participant_follows|user_export) ;; *) exit 1 ;; esac
           (cd protocol && buf lint)
           mkdir -p "$RUNNER_TEMP/feed-schema/space/v1"
           cp protocol/protocol/proto/space/v1/*.proto "$RUNNER_TEMP/feed-schema/space/v1/"
           cp -R protocol/protocol/vendor/. "$RUNNER_TEMP/feed-schema/"
-          (cd protocol && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/participant_follows.proto" --template buf.gen.yaml)
-          (cd server && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/participant_follows.proto" --template buf.gen.yaml)
-          (cd server && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/participant_follows.proto" --template buf.connect.gen.yaml)
-          (cd app && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/participant_follows.proto" --template client/buf.gen.yaml)
-          (cd app && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/participant_follows.proto" --template client/buf.connect.gen.yaml)
-          gofmt -w server/internal/postgres/participant_follows*.go server/internal/postgres/personal_feed*.go server/internal/postgres/store.go server/internal/postgres/admin.go server/internal/postgres/channels_test.go server/internal/transport/connect*.go server/cmd/space-server/main.go
+          (cd protocol && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/$PROTO_NAME.proto" --template buf.gen.yaml)
+          (cd server && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/$PROTO_NAME.proto" --template buf.gen.yaml)
+          (cd server && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/$PROTO_NAME.proto" --template buf.connect.gen.yaml)
+          (cd app && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/$PROTO_NAME.proto" --template client/buf.gen.yaml)
+          (cd app && buf generate "$RUNNER_TEMP/feed-schema" --path "$RUNNER_TEMP/feed-schema/space/v1/$PROTO_NAME.proto" --template client/buf.connect.gen.yaml)
+          gofmt -w server/internal/postgres/participant_follows*.go server/internal/postgres/personal_feed*.go server/internal/postgres/user_export*.go server/internal/postgres/store.go server/internal/postgres/admin.go server/internal/postgres/channels_test.go server/internal/transport/connect*.go server/cmd/space-server/main.go
       - name: Системные зависимости нативных пакетов
         run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev
       - name: Freezed и переводы
@@ -71,19 +79,40 @@ jobs:
           paths = glob.glob('lib/src/participant_follows*.dart') + glob.glob('lib/ui/participant_follows.dart') + glob.glob('test/participant_follows*.dart')
           paths += ['lib/src/core.dart', 'lib/src/feed_api.dart', 'lib/src/feed_rpc.dart', 'lib/ui/feed.dart', 'lib/ui/personal_feed.dart', 'test/feed_test.dart', 'test/support/feed_social.dart']
           paths += glob.glob('tool/community_participant_follows_interoperability.dart') + glob.glob('test/probes/participant_follows_probe.dart') + glob.glob('test/support/participant_follows.dart')
+          paths += glob.glob('lib/src/user_export*.dart') + glob.glob('lib/src/markdown_policy.dart') + glob.glob('lib/ui/user_export.dart')
+          paths += ['lib/ui/device_panel.dart', 'lib/ui/message_markdown.dart', 'lib/ui/community_mentions.dart', 'lib/src/chat_controller.dart']
+          paths += glob.glob('test/user_export*_test.dart') + glob.glob('test/markdown_security_test.dart') + glob.glob('tool/community_user_export_interoperability.dart')
           subprocess.run(['dart', 'format', *[p for p in paths if not p.endswith('.freezed.dart')]], check=True)
           PY
+          dart fix --apply --code=curly_braces_in_flow_control_structures
       - name: Анализ и тесты
         working-directory: app/client
         run: |
           rustup toolchain install 1.99.1 --profile minimal
           flutter analyze
-          flutter test --no-pub test/participant_follows_test.dart test/feed_test.dart test/feed_social_test.dart test/feed_read_test.dart test/feed_read_visibility_test.dart
+          flutter test --no-pub test/user_export_test.dart test/markdown_security_test.dart test/composer_markdown_test.dart test/participant_follows_test.dart test/feed_test.dart test/feed_social_test.dart test/feed_read_test.dart test/feed_read_visibility_test.dart
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: generated-participant-follows
+          name: generated-${{ inputs.feature }}
           path: |
+            protocol/protocol/openapi/space/v1/user_export.swagger.json
+            server/gen/space/v1/user_export*.go
+            server/gen/space/v1/spacev1connect/user_export.connect.go
+            server/internal/postgres/user_export*.go
+            server/internal/transport/connect_user_export.go
+            app/client/lib/src/generated/space/v1/user_export*.dart
+            app/client/lib/src/user_export*.dart
+            app/client/lib/src/markdown_policy.dart
+            app/client/lib/src/chat_controller.dart
+            app/client/lib/ui/user_export.dart
+            app/client/lib/ui/message_markdown.dart
+            app/client/lib/ui/community_mentions.dart
+            app/client/lib/ui/device_panel.dart
+            app/client/test/user_export*_test.dart
+            app/client/test/markdown_security_test.dart
+            app/client/tool/community_user_export_interoperability.dart
+            app/client/pubspec.lock
             protocol/protocol/openapi/space/v1/participant_follows.swagger.json
             server/gen/space/v1/participant_follows*.go
             server/gen/space/v1/spacev1connect/participant_follows.connect.go

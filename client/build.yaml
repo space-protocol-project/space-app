@@ -15,6 +15,7 @@ targets:
           - lib/src/chat_controller.dart
           - lib/src/feed_controller.dart
           - lib/src/participant_follows.dart
+          - lib/src/user_export.dart
           - lib/src/feed_management.dart
           - lib/src/home_controller.dart
           - lib/src/message_search_controller.dart
