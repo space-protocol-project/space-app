@@ -6,11 +6,18 @@ class SessionSpaceSearchApi implements SpaceSearchApi {
   @override
   String get scopeId => '${session.positionScope}|${session.currentGrantId}';
   @override
-  Future<space_search_pb.SearchSpaceResponse> search(String query, String token) async {
+  Future<space_search_pb.SearchSpaceResponse> search(
+    String query,
+    String token,
+  ) async {
     await session._ensureSession();
     return session.channel.unary(
       space_search_specs.SpaceSearchService.searchSpace,
-      space_search_pb.SearchSpaceRequest(query: query, pageToken: token, limit: 20),
+      space_search_pb.SearchSpaceRequest(
+        query: query,
+        pageToken: token,
+        limit: 20,
+      ),
       options: session._options,
     );
   }

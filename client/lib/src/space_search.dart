@@ -25,9 +25,13 @@ abstract class SpaceSearchState with _$SpaceSearchState {
 }
 
 class SpaceSearchController extends Cubit<SpaceSearchState> {
-  SpaceSearchController(this.api, {required Map<String, String> channels,
-    required this.available}) : channels = Map.unmodifiable(channels),
-      scope = api.scopeId, super(const SpaceSearchState());
+  SpaceSearchController(
+    this.api, {
+    required Map<String, String> channels,
+    required this.available,
+  }) : channels = Map.unmodifiable(channels),
+       scope = api.scopeId,
+       super(const SpaceSearchState());
 
   static const resultLimit = 500;
   final SpaceSearchApi api;
@@ -53,7 +57,10 @@ class SpaceSearchController extends Cubit<SpaceSearchState> {
   Future<void> submit(String input) async {
     if (!_current(_generation)) return;
     final query = input.trim();
-    final invalid = query.isEmpty || query.contains('\u0000') || utf8.encode(query).length > 256;
+    final invalid =
+        query.isEmpty ||
+        query.contains('\u0000') ||
+        utf8.encode(query).length > 256;
     ++_generation;
     _tokens.clear();
     emit(SpaceSearchState(query: query, invalid: invalid));
@@ -76,12 +83,21 @@ class SpaceSearchController extends Cubit<SpaceSearchState> {
       final token = append ? before.next : '';
       final response = await api.search(before.query, token);
       if (!_current(generation)) return;
-      final entries = _checkedSpacePage(response, append ? before.results : [], channels);
+      final entries = _checkedSpacePage(
+        response,
+        append ? before.results : [],
+        channels,
+      );
       _checkToken(response.nextPageToken, token, entries.isEmpty);
       final capped = entries.length >= resultLimit;
-      emit(state.copyWith(results: entries.take(resultLimit).toList(),
-        next: capped ? '' : response.nextPageToken, capped: capped,
-        loading: false));
+      emit(
+        state.copyWith(
+          results: entries.take(resultLimit).toList(),
+          next: capped ? '' : response.nextPageToken,
+          capped: capped,
+          loading: false,
+        ),
+      );
     } catch (error) {
       if (!_current(generation)) return;
       emit(SpaceSearchState(query: before.query, error: error));
@@ -96,5 +112,8 @@ class SpaceSearchController extends Cubit<SpaceSearchState> {
   }
 
   @override
-  Future<void> close() { ++_generation; return super.close(); }
+  Future<void> close() {
+    ++_generation;
+    return super.close();
+  }
 }

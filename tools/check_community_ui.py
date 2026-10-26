@@ -9,10 +9,10 @@ import time
 
 
 class FlutterMachine:
-    def __init__(self, client, log):
+    def __init__(self, client, log, target='test/probes/community_favorites_probe.dart'):
         self.process = subprocess.Popen(
             ['flutter', 'run', '--machine', '-d', 'linux', '--debug', '--no-pub',
-             '--enable-software-rendering', '--no-enable-impeller', '--target', 'test/probes/community_favorites_probe.dart'],
+             '--enable-software-rendering', '--no-enable-impeller', '--target', target],
             cwd=client, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             text=True, encoding='utf-8', bufsize=1)
         self.messages = queue.Queue()

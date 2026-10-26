@@ -2894,4 +2894,20 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get communityFavoritesEmpty => 'В этом разделе пока нет избранного.';
+
+  @override
+  String get spaceSearch => 'Поиск в пространстве';
+
+  @override
+  String get spaceSearchHint => 'Поиск в чатах, форуме и ленте';
+
+  @override
+  String get spaceSearchChat => 'Сообщение';
+
+  @override
+  String get spaceSearchChatMode => 'Поиск в выбранном чате и локальном MLS';
+
+  @override
+  String get spaceSearchLimit =>
+      'Показаны первые 500 результатов. Уточните запрос.';
 }

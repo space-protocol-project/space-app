@@ -47,7 +47,8 @@ import 'feed_api.dart';
 import 'community_search_api.dart';
 import 'space_search_api.dart';
 import 'generated/space/v1/space_search.pb.dart' as space_search_pb;
-import 'generated/space/v1/space_search.connect.spec.dart' as space_search_specs;
+import 'generated/space/v1/space_search.connect.spec.dart'
+    as space_search_specs;
 import 'community_mentions_api.dart';
 import 'personal_notifications_api.dart';
 import 'generated/space/v1/personal_notifications.pb.dart' as notifications_pb;
@@ -842,7 +843,8 @@ class SpaceSession
   SpaceSearchApi? _spaceSearch;
   @override
   SpaceSearchApi? get spaceSearch => spaceSearchSupported
-      ? _spaceSearch ??= SessionSpaceSearchApi(this) : null;
+      ? _spaceSearch ??= SessionSpaceSearchApi(this)
+      : null;
   bool communityReactionsSupported = false;
   bool communityFavoritesSupported = false;
   bool communityMentionsSupported = false;
@@ -947,7 +949,9 @@ class SpaceSession
     communitySearchSupported = manifest.capabilities.contains(
       'core.community.search.v1',
     );
-    spaceSearchSupported = manifest.capabilities.contains('core.space.search.v1');
+    spaceSearchSupported = manifest.capabilities.contains(
+      'core.space.search.v1',
+    );
     forumModerationSupported = manifest.capabilities.contains(
       'core.forum.moderation.v1',
     );
@@ -1375,7 +1379,9 @@ class SpaceSession
       session.communitySearchSupported = manifest.capabilities.contains(
         'core.community.search.v1',
       );
-      session.spaceSearchSupported = manifest.capabilities.contains('core.space.search.v1');
+      session.spaceSearchSupported = manifest.capabilities.contains(
+        'core.space.search.v1',
+      );
       session.forumModerationSupported = manifest.capabilities.contains(
         'core.forum.moderation.v1',
       );

@@ -2661,6 +2661,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get communityFavoritesEmpty => '此分区暂无收藏。';
+
+  @override
+  String get spaceSearch => '搜索此空间';
+
+  @override
+  String get spaceSearchHint => '搜索聊天、论坛和动态';
+
+  @override
+  String get spaceSearchChat => '消息';
+
+  @override
+  String get spaceSearchChatMode => '搜索当前聊天与本地 MLS';
+
+  @override
+  String get spaceSearchLimit => '显示前 500 条结果。请缩小搜索范围。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3750,4 +3765,19 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get communityFavoritesEmpty => '此分区暂无收藏。';
+
+  @override
+  String get spaceSearch => '搜索此空间';
+
+  @override
+  String get spaceSearchHint => '搜索聊天、论坛和动态';
+
+  @override
+  String get spaceSearchChat => '消息';
+
+  @override
+  String get spaceSearchChatMode => '搜索当前聊天与本地 MLS';
+
+  @override
+  String get spaceSearchLimit => '显示前 500 条结果。请缩小搜索范围。';
 }

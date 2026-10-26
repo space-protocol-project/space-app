@@ -2877,4 +2877,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get communityFavoritesEmpty => 'No favorites in this section yet.';
+
+  @override
+  String get spaceSearch => 'Search this space';
+
+  @override
+  String get spaceSearchHint => 'Search chats, forums and feeds';
+
+  @override
+  String get spaceSearchChat => 'Message';
+
+  @override
+  String get spaceSearchChatMode => 'Search the selected chat and local MLS';
+
+  @override
+  String get spaceSearchLimit =>
+      'Showing the first 500 results. Refine your search.';
 }

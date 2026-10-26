@@ -137,7 +137,7 @@ jobs:
         run: flutter test --no-pub test/community_reactions_test.dart test/community_reactions_widgets_test.dart test/community_favorites_test.dart test/community_favorites_widgets_test.dart
       - name: Поиск сообществ и персональная сводка
         working-directory: client
-        run: flutter test test/community_search_test.dart test/dashboard_highlights_test.dart
+        run: flutter test test/community_search_test.dart test/dashboard_highlights_test.dart test/space_search_test.dart test/space_search_widgets_test.dart
       - name: Голосовые комнаты и завершение захвата микрофона
         working-directory: client
         run: flutter test test/voice_android_test.dart test/voice_network_test.dart test/voice_audio_test.dart test/voice_transmission_test.dart test/voice_shortcut_test.dart test/voice_microphone_test.dart test/voice_devices_test.dart test/voice_device_call_test.dart test/voice_recovery_test.dart test/voice_controller_test.dart test/voice_widgets_test.dart test/voice_semantics_test.dart test/tooltip_semantics_test.dart test/channels_test.dart
@@ -209,6 +209,18 @@ jobs:
         with:
           name: community-native-ui
           path: ${{ runner.temp }}/community-ui/*
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Нативный общий поиск Linux и горячий перезапуск
+        if: matrix.target == 'linux'
+        shell: bash
+        run: dbus-run-session -- xvfb-run -a python3 tools/check_space_search_ui.py --output "$RUNNER_TEMP/space-search-ui"
+      - name: Журнал нативного общего поиска
+        if: always() && matrix.target == 'linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: space-search-native-ui
+          path: ${{ runner.temp }}/space-search-ui/*
           if-no-files-found: warn
           retention-days: 14
       - name: Нативный запуск Linux из уведомления

@@ -5235,6 +5235,36 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'В этом разделе пока нет избранного.'**
   String get communityFavoritesEmpty;
+
+  /// No description provided for @spaceSearch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поиск в пространстве'**
+  String get spaceSearch;
+
+  /// No description provided for @spaceSearchHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поиск в чатах, форуме и ленте'**
+  String get spaceSearchHint;
+
+  /// No description provided for @spaceSearchChat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщение'**
+  String get spaceSearchChat;
+
+  /// No description provided for @spaceSearchChatMode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поиск в выбранном чате и локальном MLS'**
+  String get spaceSearchChatMode;
+
+  /// No description provided for @spaceSearchLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показаны первые 500 результатов. Уточните запрос.'**
+  String get spaceSearchLimit;
 }
 
 class _AppLocalizationsDelegate

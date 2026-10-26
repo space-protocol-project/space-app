@@ -81,8 +81,16 @@ jobs:
           import glob, subprocess
           paths = glob.glob('lib/src/space_search*.dart') + glob.glob('lib/ui/space_search*.dart')
           paths += ['lib/ui/shell_space_search.dart', 'lib/src/core.dart', 'lib/src/chat_controller.dart', 'lib/ui/shell.dart', 'lib/ui/shell_message_search.dart']
+          paths += glob.glob('test/space_search*_test.dart') + glob.glob('test/support/space_search.dart') + glob.glob('test/probes/space_search_probe.dart')
           subprocess.run(['dart', 'format', *[p for p in paths if not p.endswith('.freezed.dart')]], check=True)
           PY
+      - name: Анализ и целевые проверки общего поиска
+        if: inputs.models
+        working-directory: app/client
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal
+          flutter analyze
+          flutter test --no-pub test/space_search_test.dart test/space_search_widgets_test.dart
       - name: Форматирование серверного поиска
         run: |
           python3 - <<'PY'
@@ -93,6 +101,7 @@ jobs:
           subprocess.run(['gofmt', '-w', *paths], check=True)
           PY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: generated-space-search
           path: |
@@ -112,4 +121,7 @@ jobs:
             server/internal/transport/connect_space_search.go
             server/internal/transport/connect.go
             server/internal/transport/connect_test.go
+            app/client/test/space_search*_test.dart
+            app/client/test/support/space_search.dart
+            app/client/test/probes/space_search_probe.dart
           if-no-files-found: error

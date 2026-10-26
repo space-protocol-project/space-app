@@ -1,7 +1,10 @@
 part of 'space_search.dart';
 
 String spaceSearchView(SpaceSearchKind kind) => switch (kind.value) {
-  1 => 'chat', 2 || 3 => 'forum', 4 || 5 => 'feed', _ => '',
+  1 => 'chat',
+  2 || 3 => 'forum',
+  4 || 5 => 'feed',
+  _ => '',
 };
 
 String spaceSearchKey(SpaceSearchResult result) =>
@@ -16,7 +19,8 @@ void _checkSpaceMetadata(SpaceSearchResult item) {
       item.snippet.runes.length > 240 ||
       !_spaceSearchText(item.snippet, 960) ||
       !_spaceSearchText(item.authorName, 512) ||
-      item.authorId.isEmpty || !_spaceSearchText(item.authorId, 256) ||
+      item.authorId.isEmpty ||
+      !_spaceSearchText(item.authorId, 256) ||
       item.createdAtUnixMs < Int64.ZERO) {
     throw StateError('Некорректные сведения результата поиска');
   }
@@ -24,9 +28,12 @@ void _checkSpaceMetadata(SpaceSearchResult item) {
 
 void _checkSpaceTarget(SpaceSearchResult item, Map<String, String> channels) {
   final view = spaceSearchView(item.kind);
-  if (view.isEmpty || channels[item.channelId] != view ||
-      item.id.isEmpty || !_spaceSearchText(item.id, 256) ||
-      item.parentId.isEmpty || !_spaceSearchText(item.parentId, 256)) {
+  if (view.isEmpty ||
+      channels[item.channelId] != view ||
+      item.id.isEmpty ||
+      !_spaceSearchText(item.id, 256) ||
+      item.parentId.isEmpty ||
+      !_spaceSearchText(item.parentId, 256)) {
     throw StateError('Результат поиска вне доступной области');
   }
   _checkSpacePosition(item, view);
@@ -42,8 +49,11 @@ void _checkSpacePosition(SpaceSearchResult item, String view) {
   }
 }
 
-List<SpaceSearchResult> _checkedSpacePage(SearchSpaceResponse page,
-    List<SpaceSearchResult> previous, Map<String, String> channels) {
+List<SpaceSearchResult> _checkedSpacePage(
+  SearchSpaceResponse page,
+  List<SpaceSearchResult> previous,
+  Map<String, String> channels,
+) {
   if (page.results.length > 50 ||
       (page.results.isEmpty && page.nextPageToken.isNotEmpty)) {
     throw StateError('Некорректный размер страницы поиска');
@@ -54,7 +64,8 @@ List<SpaceSearchResult> _checkedSpacePage(SearchSpaceResponse page,
     final item = source.deepCopy()..freeze();
     _checkSpaceMetadata(item);
     _checkSpaceTarget(item, channels);
-    if (!keys.add(spaceSearchKey(item))) throw StateError('Повтор результата поиска');
+    if (!keys.add(spaceSearchKey(item)))
+      throw StateError('Повтор результата поиска');
     if (result.isNotEmpty && compareSpaceSearch(result.last, item) >= 0) {
       throw StateError('Нарушен порядок результатов поиска');
     }

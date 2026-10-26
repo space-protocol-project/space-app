@@ -252,12 +252,16 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   SpaceSearchApi? get spaceSearch {
     final session = _session;
     if (!connected || accessRemoved) return null;
-    return session is SpaceSearchSource ? (session as SpaceSearchSource).spaceSearch : null;
+    return session is SpaceSearchSource
+        ? (session as SpaceSearchSource).spaceSearch
+        : null;
   }
+
   Future<Content?> searchContent(String channel, int sequence) async {
     if (_session is! HistoryPageSession) return null;
     return notificationContent(channel, sequence);
   }
+
   Future<Content?> notificationMessage(int sequence) async {
     final session = _session, channel = channelId, principal = principalId;
     if (!connected || !canRead || encryptedChannel) return null;
