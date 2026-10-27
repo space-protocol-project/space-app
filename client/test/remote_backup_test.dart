@@ -15,7 +15,7 @@ import 'fixtures/remote_backup.dart';
 const backupPassword = 'длинный отдельный пароль';
 
 void backupTest(String name, Future<void> Function() body) =>
-    backupTest(name,body,timeout:const Timeout(Duration(minutes:4)));
+    test(name,body,timeout:const Timeout(Duration(minutes:4)));
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
