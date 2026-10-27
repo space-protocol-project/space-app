@@ -1,7 +1,7 @@
 name: Подготовка сопряжения v0.8.0
 on:
   push:
-    branches: ['codex/milestone-0-8-pairing']
+    branches: [main]
     paths: ['client/lib/src/pairing*.dart', 'client/test/pairing*_test.dart', 'client/test/probes/pairing_probe.dart', 'tools/check_pairing_ui.py', '.github/workflows/milestone-0-8.yml']
   workflow_dispatch:
 permissions:
