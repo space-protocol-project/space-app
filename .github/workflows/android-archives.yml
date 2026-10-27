@@ -1,12 +1,23 @@
 name: Потоковые архивы Android
 on:
   workflow_dispatch:
+    inputs:
+      quality:
+        description: Анализ, сложность и тесты Dart
+        type: boolean
+        default: true
+      android:
+        description: APK, Kotlin и Android-эмулятор
+        type: boolean
+        default: true
 permissions:
   contents: read
 jobs:
   complexity:
+    if: inputs.quality
     uses: ./.github/workflows/complexity.yml
   quality:
+    if: inputs.quality
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
@@ -49,6 +60,7 @@ jobs:
         run: flutter test
 
   android:
+    if: inputs.android
     runs-on: ubuntu-24.04
     timeout-minutes: 65
     steps:

@@ -80,7 +80,7 @@ class _AndroidArchiveTransferState extends State<AndroidArchiveTransfer> {
       Text(state.cancellable ? strings.archiveCopyProgress(state.bytes ~/ (1024 * 1024)) : strings.archiveCritical),
       if (state.status.isNotEmpty) Text(state.status),
       if (state.cancellable) TextButton(onPressed: state.cancelling ? null : cubit.cancel,
-        child: Text(state.cancelling ? strings.archiveCancelling : strings.close)),
+        child: Text(state.cancelling ? strings.archiveCancelling : strings.recoveryCancel)),
     ];
   }
   List<Widget> _error(BuildContext context, Object error) => [

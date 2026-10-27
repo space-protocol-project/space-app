@@ -8,8 +8,8 @@ import java.io.IOException
 
 /** Только фиксированные принадлежащие приложению файлы; URI — лишь журнал очистки. */
 class ArchiveWorkspace(context: Context) {
-    private val cache = context.cacheDir
-    val root = File(context.noBackupFilesDir, "archive-transfer").apply { mkdirs() }
+    private val cache = context.cacheDir.canonicalFile
+    val root = File(context.noBackupFilesDir, "archive-transfer").canonicalFile.apply { mkdirs() }
     private val journal = AtomicFile(File(root, "state.json"))
     val archive = File(root, "device.spacedevice")
     val partial = File(root, "input.part")
