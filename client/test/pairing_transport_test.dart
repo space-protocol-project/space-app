@@ -41,6 +41,7 @@ class PairingServer {
               state: 'pending',
               publicKey: input.publicKey,
               administrative: input.administrative,
+              fullManagement: input.fullManagement,
               createdAt: Int64(now),
               expiresAt: Int64(now + 300),
             ),

@@ -503,7 +503,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       return;
     }
     DeviceRecord? authority;
-    if (!manager.hasRootAuthority && grant.id != manager.currentGrantId) {
+    if (!manager.hasDeviceAuthority && grant.id != manager.currentGrantId) {
       authority = await _readRevocationAuthority();
       if (authority == null) return;
     }
@@ -574,7 +574,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     hasDeviceManagement: widget.controller.deviceManagement != null,
     hasRootAuthority:
         widget.controller.deviceManagement?.hasRootAuthority == true,
-    canRotate: widget.controller.deviceManagement is RootRotationControl,
+    canRotate: widget.controller.deviceManagement?.hasRootAuthority == true,
     pending: pending,
     message: localizedMessage,
     pairingTools: PairingApprovalPanel(

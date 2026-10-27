@@ -187,7 +187,7 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
     Future<DeviceRecord?> Function() readAuthority,
   ) async {
     if (!await confirm(pair) || !_current(generation)) return (false, null);
-    if (control.hasRootAuthority) return (true, null);
+    if (control.hasRootAuthority || (control.hasDeviceAuthority && !pair.fullManagement)) return (true, null);
     final authority = await readAuthority();
     return (_current(generation) && authority != null, authority);
   }

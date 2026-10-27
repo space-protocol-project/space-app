@@ -5,6 +5,7 @@ targets:
         generate_for:
           - lib/src/directory_backup_cubit.dart
           - lib/src/pairing_cubit.dart
+          - lib/src/pairing_selection.dart
           - lib/src/pairing_approval_cubit.dart
           - lib/src/attachments.dart
           - lib/src/channel_files_controller.dart

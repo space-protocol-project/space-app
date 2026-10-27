@@ -89,7 +89,9 @@ class _PairingApprovalPanelState extends State<PairingApprovalPanel>
     confirm: (pair) => confirm(
       context.strings.pairingPrepareConfirm(
         pair.deviceName,
-        pair.administrative
+        pair.fullManagement
+            ? context.strings.pairingModeFullHelp
+            : pair.administrative
             ? context.strings.pairingManageRequest
             : context.strings.pairingChatRequest,
       ),

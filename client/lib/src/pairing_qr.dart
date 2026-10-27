@@ -6,7 +6,7 @@ import 'generated/space/v1/space.pb.dart';
 import 'recovery_qr.dart';
 import 'space_link_qr.dart';
 
-const pairingQrPrefix = 'space-pairing:v1:';
+const pairingQrPrefix = 'space-pairing:v2:';
 
 // QR содержит только публичный запрос. Poll token и seed сюда не попадают.
 class PairingQr {
@@ -18,10 +18,13 @@ class PairingQr {
     this.id,
     this.publicKey,
     this.administrative,
-    this.expiresAt,
+    this.expiresAt, {
+    this.fullManagement = false,
+  }
   );
   final String serverId, serverKey, origin, code, id, publicKey;
   final bool administrative;
+  final bool fullManagement;
   final int expiresAt;
 
   factory PairingQr.request(Discovery server, CreatePairingResponse request) =>
@@ -34,6 +37,7 @@ class PairingQr {
         url64(request.pairing.publicKey),
         request.pairing.administrative,
         request.pairing.expiresAt.toInt(),
+        fullManagement: request.pairing.fullManagement,
       );
 
   String encode() =>
@@ -48,6 +52,7 @@ class PairingQr {
             'id': id,
             'device': publicKey,
             'manage': administrative,
+            'full': fullManagement,
             'expires': expiresAt,
           }),
         ),
@@ -68,6 +73,7 @@ class PairingQr {
       'id': String id,
       'device': String device,
       'manage': bool manage,
+      'full': bool full,
       'expires': int expires,
     }) {
       final result = PairingQr(
@@ -79,6 +85,7 @@ class PairingQr {
         device,
         manage,
         expires,
+        fullManagement: full,
       );
       result._validate();
       return result;
@@ -127,6 +134,7 @@ class PairingQr {
     if (id != pair.id ||
         publicKey != url64(pair.publicKey) ||
         administrative != pair.administrative ||
+        fullManagement != pair.fullManagement ||
         expiresAt != pair.expiresAt.toInt()) {
       throw const FormatException('QR');
     }

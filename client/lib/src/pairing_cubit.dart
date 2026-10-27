@@ -35,7 +35,7 @@ abstract class PairingState with _$PairingState {
 }
 
 class PairingCubit extends Cubit<PairingState> {
-  PairingCubit(this.controller, {this.create = PendingPairing.start})
+  PairingCubit(this.controller, {this.create = PendingPairing.start, this.checkRecord})
     : super(const PairingState()) {
     _server = controller.preview;
     _subscription = controller.stream.listen((_) {
@@ -47,6 +47,7 @@ class PairingCubit extends Cubit<PairingState> {
   }
   final ChatController controller;
   final Future<PendingPairing> Function(Discovery) create;
+  final Future<void> Function(DeviceRecord)? checkRecord;
   late final StreamSubscription<ChatState> _subscription;
   Discovery? _server;
   PendingPairing? _pending;
@@ -167,6 +168,7 @@ class PairingCubit extends Cubit<PairingState> {
         root,
         current.request.pairing.publicKey,
         administrative: current.request.pairing.administrative,
+        fullManagement: current.request.pairing.fullManagement,
       );
 
   Future<void> _verify(
@@ -210,6 +212,11 @@ class PairingCubit extends Cubit<PairingState> {
     _timer?.cancel();
     _expiry?.cancel();
     try {
+      if (await controller.vault.load(record.origin) != null) {
+        throw StateError('Существующая личность не заменяется сопряжением');
+      }
+      await checkRecord?.call(record);
+      if (!_current(generation)) return false;
       // После передачи запись принадлежит контроллеру, её нельзя стирать при отмене.
       _candidate = null;
       await controller.connect(

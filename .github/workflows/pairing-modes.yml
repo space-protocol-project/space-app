@@ -1,0 +1,96 @@
+name: Режимы сопряжения — совместимая пара
+on:
+  workflow_dispatch:
+    inputs:
+      protocol_ref:
+        type: string
+        required: true
+      server_ref:
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  generate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: app
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-protocol
+          ref: ${{ inputs.protocol_ref }}
+          path: protocol
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: ${{ inputs.server_ref }}
+          path: server
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: server/go.mod
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.8'
+          channel: stable
+          cache: true
+      - name: Генераторы
+        run: |
+          go install github.com/bufbuild/buf/cmd/buf@v1.75.0
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.2
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.32.0
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.32.0
+          dart pub global activate protoc_plugin 25.1.0
+          dart pub global activate connectrpc 2.0.1
+      - name: Генерация контракта
+        run: |
+          mkdir -p "$RUNNER_TEMP/pair-schema"
+          cp -r protocol/protocol/proto/* "$RUNNER_TEMP/pair-schema/"
+          cp -r protocol/protocol/vendor/* "$RUNNER_TEMP/pair-schema/"
+          (cd protocol && buf lint && buf generate "$RUNNER_TEMP/pair-schema" --path space/v1/space.proto --template buf.gen.yaml)
+          (cd server && buf generate "$RUNNER_TEMP/pair-schema" --path space/v1/space.proto --template buf.gen.yaml && buf generate "$RUNNER_TEMP/pair-schema" --path space/v1/space.proto --template buf.connect.gen.yaml)
+          (cd app && buf generate "$RUNNER_TEMP/pair-schema" --path space/v1/space.proto --template client/buf.gen.yaml && buf generate "$RUNNER_TEMP/pair-schema" --path space/v1/space.proto --template client/buf.connect.gen.yaml)
+      - name: Системные зависимости
+        run: |
+          timeout 180s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 -o Acquire::https::Timeout=15 update
+          timeout 480s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 -o Acquire::https::Timeout=15 install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb xauth dbus-x11
+          rustup toolchain install 1.99.1 --profile minimal
+      - name: Freezed, форматирование и анализ
+        working-directory: app/client
+        run: |
+          flutter pub get
+          dart run build_runner build
+          flutter gen-l10n
+          dart format lib/src/pairing*.dart lib/src/core.dart lib/src/root_device_proof.dart lib/ui/pairing*.dart lib/ui/device_panel.dart lib/ui/recovery_panel.dart test/pairing*_test.dart
+          flutter analyze
+          cd ../../server
+          gofmt -w internal/postgres/pairing*.go internal/postgres/challenge.go internal/postgres/recovery.go internal/postgres/store.go internal/postgres/root_retention.go internal/postgres/rotation.go
+      - name: Тесты клиента
+        working-directory: app/client
+        run: flutter test test/pairing_lifetime_test.dart test/pairing_transport_test.dart test/pairing_qr_test.dart test/pairing_cubit_test.dart test/pairing_approval_cubit_test.dart test/pairing_panels_test.dart test/pairing_modes_test.dart test/pairing_selection_test.dart test/recovery_test.dart test/recovery_spaces_test.dart test/device_recovery_batch_test.dart
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pairing-modes-source
+          path: |
+            protocol/protocol/openapi/space/v1/space.swagger.json
+            server/gen/space/v1/space*.go
+            server/gen/space/v1/spacev1connect/space.connect.go
+            server/internal/postgres/pairing*.go
+            server/internal/postgres/challenge.go
+            server/internal/postgres/recovery.go
+            server/internal/postgres/store.go
+            server/internal/postgres/root_retention.go
+            server/internal/postgres/rotation.go
+            app/client/lib/src/generated/space/v1/space*.dart
+            app/client/lib/src/pairing*.dart
+            app/client/lib/src/core.dart
+            app/client/lib/src/root_device_proof.dart
+            app/client/lib/ui/pairing*.dart
+            app/client/lib/ui/device_panel.dart
+            app/client/lib/ui/recovery_panel.dart
+            app/client/lib/l10n/*.dart
+            app/client/test/pairing*_test.dart

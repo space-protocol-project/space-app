@@ -10,6 +10,8 @@ import '../src/server_workspaces.dart';
 import 'components.dart';
 import 'recovery_panel.dart';
 import 'user_export.dart';
+import 'pairing_selection.dart';
+import '../src/directory_repository.dart';
 
 class DevicePanel extends StatefulWidget {
   const DevicePanel({
@@ -18,8 +20,10 @@ class DevicePanel extends StatefulWidget {
     required this.fallback,
     required this.restoreController,
     required this.onRestored,
+    this.directoryRepository,
   });
   final ServerWorkspaces workspaces;
+  final DirectoryRepository? directoryRepository;
   final ChatController fallback;
   final ChatController Function(String origin) restoreController;
   final Future<void> Function(String origin, ChatController controller)
@@ -88,6 +92,12 @@ class _DevicePanelState extends State<DevicePanel> {
                       ..._identityDetails(context, entries, origin, controller),
                   ],
                 ),
+              ),
+              const SizedBox(height: 20),
+              PairingSelectionPanel(
+                controllers: () => widget.workspaces.controllers,
+                onConnected: widget.onRestored,
+                repository: widget.directoryRepository,
               ),
               const SizedBox(height: 20),
               RecoveryPanel(

@@ -116,7 +116,7 @@ Future<List<int>> _verifyParent(
   final scopes = (t['scopes'] as List).cast<String>();
   if (t['grant_id'] != d.parentGrantId ||
       child['authorizer_grant_id'] != d.parentGrantId ||
-      !scopes.contains('identity.recover') ||
+      (!scopes.contains('identity.recover') && !scopes.contains('device.manage')) ||
       (d.scopes.contains('space.manage') && !scopes.contains('space.manage')) ||
       (t['issued_at'] as int) > (child['issued_at'] as int) + 5 ||
       (t['grant_expires_at'] as int) < d.expiresAt.toInt()) {
@@ -137,7 +137,8 @@ Future<List<int>> _verifyParent(
     '',
     expectedScopes: scopes,
     allowHistorical: true,
-    registrationDays: 3650,
+    registrationDays: scopes.contains('device.manage') ? 30 : 3650,
+    pairingId: t['pairing_id'] as String? ?? '',
     expectedPrincipal: identity.principalId,
     expectedEpoch: identity.epoch,
   );

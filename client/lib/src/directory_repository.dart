@@ -114,6 +114,17 @@ class DirectoryRepository {
       directoryRequire(announcement.digest == saved['endpoint_digest']);
     }
   }
+
+  Future<void> checkRecord(DeviceRecord record) async {
+    final state = await read();
+    final pin = (state['catalog'] as Map)[record.origin];
+    if (pin == null) return;
+    final saved = checkedDirectorySpace(pin);
+    directoryRequire(saved['principal_id'] == (await record.identity()).principalId);
+    directoryRequire(saved['server_id'] == record.serverId &&
+        saved['server_key'] == record.serverKey &&
+        saved['tls_fingerprint'] == record.tlsFingerprint);
+  }
 }
 
 String? directoryPinConflict(

@@ -431,6 +431,7 @@ class DeviceRecord {
     this.recoverySeed = const [],
     this.recoveryGrantId = '',
     this.administrative = false,
+    this.fullManagement = false,
     this.rootHistory = const [],
     this.tlsFingerprint = '',
     this.endpoint = '',
@@ -452,6 +453,10 @@ class DeviceRecord {
   List<int> recoverySeed;
   final String recoveryGrantId;
   final bool administrative;
+  final bool fullManagement;
+  List<int> get managementSeed => fullManagement ? deviceSeed : recoverySeed;
+  String get managementGrantId => fullManagement ? grantId : recoveryGrantId;
+  bool get canManageDevices => rootSeed.isNotEmpty || managementSeed.length == 32;
   String grantId;
   final List<Map<String, dynamic>> rootHistory;
   final Map<String, String> mlsChannels;
@@ -482,6 +487,7 @@ class DeviceRecord {
     'recoverySeed': url64(recoverySeed),
     'recoveryGrantId': recoveryGrantId,
     'administrative': administrative,
+    'fullManagement': fullManagement,
     'rootHistory': rootHistory,
     'mlsChannels': mlsChannels,
     'mlsIdentity': ?mlsIdentity,
@@ -514,6 +520,7 @@ class DeviceRecord {
       ),
       recoveryGrantId: data['recoveryGrantId'] as String? ?? '',
       administrative: data['administrative'] as bool? ?? false,
+      fullManagement: data['fullManagement'] as bool? ?? false,
       rootHistory: (data['rootHistory'] as List? ?? [])
           .map((v) => Map<String, dynamic>.from(v as Map))
           .toList(),
@@ -661,6 +668,11 @@ abstract interface class DeviceManagement {
   Future<Map<String, dynamic>> recoveryPayload();
   Future<String> approvePairing(Pairing pairing, {DeviceRecord? authority});
   Future<String> preparePairing(Pairing pairing, {DeviceRecord? authority});
+}
+
+extension DeviceManagementAuthority on DeviceManagement {
+  bool get hasDeviceAuthority => hasRootAuthority ||
+      (this is SpaceSession && (this as SpaceSession).record.fullManagement);
 }
 
 abstract interface class SpaceAdministration {
@@ -1612,7 +1624,7 @@ class SpaceSession
       purpose = 'recovery.device.revoke';
     }
     if (!hasRoot &&
-        credentials.recoverySeed.isEmpty &&
+        credentials.managementSeed.isEmpty &&
         purpose != "auth.login") {
       throw const LocalFailure(
         LocalFailureCode.identityInvalid,
@@ -1669,7 +1681,7 @@ class SpaceSession
       purpose,
       grantId,
       expectedScopes: _authorizationScopes(credentials, target, pairing),
-      authorizerGrantId: delegated ? credentials.recoveryGrantId : '',
+      authorizerGrantId: delegated ? credentials.managementGrantId : '',
       pairingId: pairing?.id ?? '',
       expectedPrincipal: checkedIdentity.principalId,
       expectedEpoch: checkedIdentity.epoch,
@@ -1723,7 +1735,7 @@ class SpaceSession
   ) async => purpose == 'auth.login'
       ? device
       : delegated
-      ? await algorithm.newKeyPairFromSeed(credentials.recoverySeed)
+      ? await algorithm.newKeyPairFromSeed(credentials.managementSeed)
       : root!;
 
   List<String> _authorizationScopes(
@@ -1737,11 +1749,13 @@ class SpaceSession
               'chat.read',
               'chat.write',
               if (pairing.administrative) 'space.manage',
+              if (pairing.fullManagement) 'device.manage',
             ]) ??
       [
         'chat.read',
         'chat.write',
         if (credentials.administrative) 'space.manage',
+        if (credentials.fullManagement) 'device.manage',
       ];
 
   void _validateAuthorizationResult(
@@ -1778,6 +1792,7 @@ class SpaceSession
       request.administrative = credentials.administrative;
       if (pairing != null) {
         request.administrative = pairing.administrative;
+        request.fullManagement = pairing.fullManagement;
         request.pairingId = pairing.id;
       }
     } else if (purpose == 'device.delegate') {
@@ -1787,10 +1802,11 @@ class SpaceSession
       request.grantId = grantId;
     }
     if (purpose == 'device.revoke') request.rootPublicKey = rootPublic;
-    if (delegated) request.recoveryGrantId = credentials.recoveryGrantId;
+    if (delegated) request.recoveryGrantId = credentials.managementGrantId;
     if (pairing != null) {
       request.pairingId = pairing.id;
       request.administrative = pairing.administrative;
+        request.fullManagement = pairing.fullManagement;
     }
     return request;
   }
@@ -2416,7 +2432,7 @@ class SpaceSession
   }) async {
     final credentials = authority ?? record;
 
-    if (credentials.rootSeed.isEmpty && credentials.recoverySeed.length != 32) {
+    if (!credentials.canManageDevices) {
       throw const LocalFailure(
         LocalFailureCode.identityInvalid,
         'Откройте корневую или recovery-карточку для подтверждения',
@@ -2446,6 +2462,7 @@ class SpaceSession
       root,
       pairing.publicKey,
       administrative: pairing.administrative,
+      fullManagement: pairing.fullManagement,
     );
   }
 
@@ -2456,7 +2473,7 @@ class SpaceSession
   }) async {
     final credentials = authority ?? record;
 
-    if (credentials.rootSeed.isEmpty && credentials.recoverySeed.length != 32) {
+    if (!credentials.canManageDevices) {
       throw const LocalFailure(
         LocalFailureCode.identityInvalid,
         'Нужен root или recovery-карточка',
@@ -2486,6 +2503,7 @@ class SpaceSession
       root,
       pairing.publicKey,
       administrative: pairing.administrative,
+      fullManagement: pairing.fullManagement,
     );
   }
 }
@@ -2496,10 +2514,11 @@ Future<String> pairVerificationCode(
   List<int> root,
   List<int> device, {
   bool administrative = false,
+  bool fullManagement = false,
 }) async {
   final bytes = (await Sha256().hash([
     ...utf8.encode(
-      'space/pair-check/v1\u0000$serverId\u0000$pairId\u0000${administrative ? 'manage' : 'chat'}\u0000',
+      'space/pair-check/v2\u0000$serverId\u0000$pairId\u0000${administrative ? 'manage' : 'chat'}\u0000${fullManagement ? 'full' : 'limited'}\u0000',
     ),
     ...root,
     ...device,

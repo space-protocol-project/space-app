@@ -46,6 +46,7 @@ class PendingPairing {
   static Future<PendingPairing> start(
     Discovery server, {
     bool administrative = false,
+    bool fullManagement = false,
   }) async {
     final channel = _channel(server);
     SimpleKeyPair? key;
@@ -57,7 +58,8 @@ class PendingPairing {
         CreatePairingRequest(
           publicKey: public,
           deviceName: 'Новое устройство Flutter',
-          administrative: administrative,
+          administrative: administrative || fullManagement,
+          fullManagement: fullManagement,
         ),
         options: _deadline,
       );
@@ -66,7 +68,8 @@ class PendingPairing {
           !RegExp(r'^pc_[A-Za-z0-9_-]{43}$').hasMatch(result.code) ||
           !RegExp(r'^pt_[A-Za-z0-9_-]{43}$').hasMatch(result.pollToken) ||
           result.pairing.state != 'pending' ||
-          result.pairing.administrative != administrative ||
+          result.pairing.administrative != (administrative || fullManagement) ||
+          result.pairing.fullManagement != fullManagement ||
           url64(result.pairing.publicKey) != url64(public) ||
           result.pairing.expiresAt.toInt() !=
               result.pairing.createdAt.toInt() + 300 ||
@@ -101,6 +104,7 @@ class PendingPairing {
           url64(response.pairing.publicKey) !=
               url64(request.pairing.publicKey) ||
           response.pairing.administrative != request.pairing.administrative ||
+          response.pairing.fullManagement != request.pairing.fullManagement ||
           url64(response.rootPublicKey) !=
               url64(response.pairing.proposedRootPublicKey) ||
           (proposedRoot != null &&
@@ -143,7 +147,7 @@ class PendingPairing {
     final scopes = (parent['scopes'] as List).cast<String>();
     final managed = scopes.contains('space.manage');
     if (parent['grant_id'] != response.parentGrantId ||
-        !scopes.contains('identity.recover') ||
+        (!scopes.contains('identity.recover') && !scopes.contains('device.manage')) ||
         (p.administrative && !managed) ||
         (parent['issued_at'] as int) > (transcript['issued_at'] as int) + 5 ||
         (parent['grant_expires_at'] as int) <
@@ -167,10 +171,11 @@ class PendingPairing {
         'chat.read',
         'chat.write',
         if (managed) 'space.manage',
-        'identity.recover',
+        scopes.contains('device.manage') ? 'device.manage' : 'identity.recover',
       ],
       allowHistorical: true,
-      registrationDays: 3650,
+      registrationDays: scopes.contains('device.manage') ? 30 : 3650,
+      pairingId: parent['pairing_id'] as String? ?? '',
       expectedPrincipal: identity.principalId,
       expectedEpoch: identity.epoch,
     );
@@ -226,6 +231,7 @@ class PendingPairing {
         p.expiresAt != expected.expiresAt ||
         p.createdAt != expected.createdAt ||
         p.administrative != expected.administrative ||
+        p.fullManagement != expected.fullManagement ||
         url64(p.publicKey) != url64(expected.publicKey) ||
         p.expiresAt.toInt() <= DateTime.now().millisecondsSinceEpoch ~/ 1000 ||
         response.rootPublicKey.length != 32 ||
@@ -248,6 +254,9 @@ class PendingPairing {
       );
     }
     final delegated = transcript['purpose'] == 'device.delegate';
+    if (p.fullManagement && delegated) {
+      throw const FormatException('Полный режим требует root-подписи');
+    }
     final signer = await _pairingSigner(
       response,
       transcript,
@@ -269,6 +278,7 @@ class PendingPairing {
         'chat.read',
         'chat.write',
         if (p.administrative) 'space.manage',
+        if (p.fullManagement) 'device.manage',
       ],
       pairingId: p.id,
       allowHistorical: true,
@@ -303,6 +313,7 @@ class PendingPairing {
       deviceSeed: _lifetime.copySeed(),
       grantId: response.grantId,
       administrative: p.administrative,
+      fullManagement: p.fullManagement,
       rootHistory: history,
     );
   }

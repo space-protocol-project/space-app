@@ -8,15 +8,21 @@ import '../l10n/failure_strings.dart';
 import '../l10n/strings.dart';
 import '../src/chat_controller.dart';
 import '../src/pairing_cubit.dart';
+import '../src/pairing.dart';
+import '../src/core.dart';
 
 class PairingStartPanel extends StatefulWidget {
   const PairingStartPanel({
     super.key,
     required this.controller,
     required this.onConnected,
+    this.fullManagement = false,
+    this.checkRecord,
   });
   final ChatController controller;
   final Future<void> Function(String) onConnected;
+  final bool fullManagement;
+  final Future<void> Function(DeviceRecord)? checkRecord;
   @override
   State<PairingStartPanel> createState() => _PairingStartPanelState();
 }
@@ -27,7 +33,7 @@ class _PairingStartPanelState extends State<PairingStartPanel>
   @override
   void initState() {
     super.initState();
-    cubit = PairingCubit(widget.controller);
+    cubit = createCubit();
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -36,9 +42,13 @@ class _PairingStartPanelState extends State<PairingStartPanel>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
       unawaited(cubit.close());
-      cubit = PairingCubit(widget.controller);
+      cubit = createCubit();
     }
   }
+
+  PairingCubit createCubit() => PairingCubit(widget.controller,
+    checkRecord: widget.checkRecord,
+    create: (server) => PendingPairing.start(server, fullManagement: widget.fullManagement));
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {

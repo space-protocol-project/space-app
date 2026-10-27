@@ -1088,5 +1088,14 @@
   "directoryBackupSpaceComplete": "{origin}: подписок — {count}; снимок полный",
   "@directoryBackupSpaceComplete": {"placeholders":{"origin":{"type":"String"},"count":{"type":"int"}}},
   "directoryBackupSpaceIncomplete": "{origin}: подписок в сохранённом снимке — {count}; актуальный список недоступен",
-  "@directoryBackupSpaceIncomplete": {"placeholders":{"origin":{"type":"String"},"count":{"type":"int"}}}
+  "@directoryBackupSpaceIncomplete": {"placeholders":{"origin":{"type":"String"},"count":{"type":"int"}}},
+
+  "pairingModeFull": "Полный режим",
+  "pairingSelectionFailed": "Не удалось подготовить выбор. Проверьте адреса и доверие серверам. Уже сохранённые личности заменять нельзя.",
+  "pairingModeLimited": "Ограниченный режим",
+  "pairingSelectionPrepare": "Подготовить выбранные пространства",
+  "pairingSelectionHelp": "На новом устройстве выберите до 12 известных пространств без сохранённой личности. Для каждого пространства подтвердите отдельный QR и код на исходном устройстве. Для списка пространств можно предварительно восстановить каталог из резервной копии.",
+  "pairingSelectionTitle": "Сопряжение выбранных пространств",
+  "pairingModeFullHelp": "Рабочий доступ, доступные административные действия и управление устройствами в выбранных пространствах. Выдачу подтверждает корневая карточка; корневой секрет не передаётся.",
+  "pairingModeLimitedHelp": "Рабочий доступ только к выбранным пространствам. Подключение и отзыв других устройств, управление корневыми ключами недоступны."
 }
