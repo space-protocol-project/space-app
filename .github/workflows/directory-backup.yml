@@ -5,6 +5,10 @@ on:
     paths: ['client/lib/src/directory*.dart', 'client/lib/ui/directory_backup.dart', 'client/test/directory*_test.dart', 'client/test/fixtures/directory.dart', 'client/test/probes/directory_probe.dart', 'client/lib/l10n/**', 'client/build.yaml', 'tools/check_directory_ui.py', '.github/workflows/directory-backup.yml']
   workflow_dispatch:
     inputs:
+      native:
+        description: Выполнять нативную проверку Linux с горячим перезапуском
+        type: boolean
+        default: true
       android:
         description: Собирать APK и выполнять проверки Android
         type: boolean
@@ -25,6 +29,7 @@ jobs:
           channel: stable
           cache: true
       - name: Зависимости нативных модулей
+        if: github.event_name != 'workflow_dispatch' || inputs.native
         run: |
           sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update
           sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb xauth dbus-x11
@@ -63,9 +68,10 @@ jobs:
           flutter pub get
           flutter analyze
       - name: Нативная проверка каталога и горячий перезапуск
+        if: github.event_name != 'workflow_dispatch' || inputs.native
         run: xvfb-run -a dbus-run-session -- python3 tools/check_directory_ui.py --output "$RUNNER_TEMP/directory-native"
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && (github.event_name != 'workflow_dispatch' || inputs.native)
         with:
           name: directory-native-ui
           path: ${{ runner.temp }}/directory-native
