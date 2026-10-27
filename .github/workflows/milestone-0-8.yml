@@ -2,7 +2,7 @@ name: Подготовка сопряжения v0.8.0
 on:
   push:
     branches: [main]
-    paths: ['client/lib/src/pairing*.dart', 'client/lib/ui/pairing*.dart', 'client/lib/ui/recovery_panel.dart', 'client/lib/ui/camera_scanner.dart', 'client/lib/src/*qr.dart', 'client/lib/l10n/**', 'packages/space_admin_ui/lib/**', 'client/test/pairing*_test.dart', 'client/test/probes/pairing_probe.dart', 'tools/check_pairing_ui.py', '.github/workflows/milestone-0-8.yml']
+    paths: ['client/build.yaml', 'client/lib/src/pairing*.dart', 'client/lib/ui/pairing*.dart', 'client/lib/ui/recovery_panel.dart', 'client/lib/ui/camera_scanner.dart', 'client/lib/src/*qr.dart', 'client/lib/l10n/**', 'packages/space_admin_ui/lib/**', 'client/test/pairing*_test.dart', 'client/test/probes/pairing_probe.dart', 'tools/check_pairing_ui.py', '.github/workflows/milestone-0-8.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -29,7 +29,7 @@ jobs:
         working-directory: client
         run: |
           flutter pub get
-          dart run build_runner build --build-filter='lib/src/pairing*.freezed.dart'
+          dart run build_runner build
           dart format lib/src/pairing*.dart lib/src/recovery_qr.dart lib/src/space_link_qr.dart lib/ui/pairing*.dart lib/ui/recovery_panel.dart lib/ui/camera_scanner.dart test/pairing*_test.dart test/admin_recovery_views_test.dart test/probes/pairing_probe.dart ../packages/space_admin_ui/lib/src/pairing_start_view.dart ../packages/space_admin_ui/lib/src/recovery_tools_view.dart
           dart fix --apply --code=curly_braces_in_flow_control_structures
           flutter analyze
@@ -51,6 +51,7 @@ jobs:
         with:
           name: pairing-lifecycle-source
           path: |
+            client/lib/src/**/*.freezed.dart
             client/lib/src/pairing*.dart
             client/lib/src/recovery_qr.dart
             client/lib/src/space_link_qr.dart

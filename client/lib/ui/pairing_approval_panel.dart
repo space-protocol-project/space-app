@@ -141,11 +141,15 @@ class _PairingApprovalPanelState extends State<PairingApprovalPanel> with Widget
         const SizedBox(height: 12),
         _actions(state),
         if (state.prepared) ..._comparison(state),
-        if (state.busy) const LinearProgressIndicator(),
-        if (message(state).isNotEmpty) ...[const SizedBox(height: 12), Text(message(state))],
+        ..._status(state),
       ]),
     )),
   );
+
+  List<Widget> _status(PairingApprovalState state) => [
+    if (state.busy) const LinearProgressIndicator(),
+    if (message(state).isNotEmpty) ...[const SizedBox(height: 12), Text(message(state))],
+  ];
 
   bool enabled(PairingApprovalState state) => !widget.blocked && !state.busy &&
       widget.controller.connected && widget.controller.deviceManagement != null;

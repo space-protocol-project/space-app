@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/generated/space/v1/space.pb.dart';
@@ -14,15 +13,23 @@ class ApprovalManager implements DeviceManagement {
   @override
   bool get hasRootAuthority => true;
   @override
-  Future<String> preparePairing(Pairing pairing, {DeviceRecord? authority}) async {
+  Future<String> preparePairing(
+    Pairing pairing, {
+    DeviceRecord? authority,
+  }) async {
     preparations++;
     return 'ABCD-EFGH';
   }
+
   @override
-  Future<String> approvePairing(Pairing pairing, {DeviceRecord? authority}) async {
+  Future<String> approvePairing(
+    Pairing pairing, {
+    DeviceRecord? authority,
+  }) async {
     signatures++;
     return 'ABCD-EFGH';
   }
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -32,13 +39,27 @@ void main() {
   late PairingApprovalCubit cubit;
   late CreatePairingResponse request;
   var inspections = 0;
+  var clock = DateTime.now();
   setUp(() {
-    manager = ApprovalManager(); request = testRequest(); inspections = 0;
-    cubit = PairingApprovalCubit(server: testServer, manager: () => manager,
-      inspect: (_, _) async { inspections++; return request.pairing; });
+    clock = DateTime.now();
+    manager = ApprovalManager();
+    request = testRequest();
+    inspections = 0;
+    cubit = PairingApprovalCubit(
+      now: () => clock,
+      server: testServer,
+      manager: () => manager,
+      inspect: (_, _) async {
+        inspections++;
+        return request.pairing;
+      },
+    );
   });
   tearDown(() => cubit.close());
-  Future<void> prepare() => cubit.prepare(confirm: (_) async => true, readAuthority: () async => null);
+  Future<void> prepare() => cubit.prepare(
+    confirm: (_) async => true,
+    readAuthority: () async => null,
+  );
 
   test('Считывание QR только заполняет код', () {
     cubit.readQr(PairingQr.request(testServer(), request).encode());
@@ -48,20 +69,23 @@ void main() {
     expect(manager.signatures, 0);
   });
 
-  test('Требуются подготовка, совпадение SAS и отдельное подтверждение', () async {
-    cubit.setCode(request.code);
-    await prepare();
-    expect(cubit.state.prepared, isTrue);
-    expect(manager.signatures, 0);
-    await cubit.approve('wrong', () async => true);
-    expect(cubit.state.messageKey, 'pairingMismatch');
-    await cubit.approve('abcd efgh', () async => false);
-    expect(manager.signatures, 0);
-    await cubit.approve('abcd efgh', () async => true);
-    expect(manager.signatures, 1);
-    expect(cubit.state.prepared, isFalse);
-    expect(cubit.state.messageKey, 'pairingSigned');
-  });
+  test(
+    'Требуются подготовка, совпадение SAS и отдельное подтверждение',
+    () async {
+      cubit.setCode(request.code);
+      await prepare();
+      expect(cubit.state.prepared, isTrue);
+      expect(manager.signatures, 0);
+      await cubit.approve('wrong', () async => true);
+      expect(cubit.state.messageKey, 'pairingMismatch');
+      await cubit.approve('abcd efgh', () async => false);
+      expect(manager.signatures, 0);
+      await cubit.approve('abcd efgh', () async => true);
+      expect(manager.signatures, 1);
+      expect(cubit.state.prepared, isFalse);
+      expect(cubit.state.messageKey, 'pairingSigned');
+    },
+  );
 
   test('Изменённые права после QR не доходят до подготовки', () async {
     cubit.readQr(PairingQr.request(testServer(), request).encode());
@@ -71,19 +95,25 @@ void main() {
     expect(manager.preparations, 0);
   });
 
-  test('Смена кода или отмена сбрасывает подготовленное подтверждение', () async {
-    cubit.setCode(request.code); await prepare();
-    cubit.setCode('other');
-    await cubit.approve('ABCD-EFGH', () async => true);
-    expect(manager.signatures, 0);
-    expect(cubit.state.verification, isEmpty);
-  });
+  test(
+    'Смена кода или отмена сбрасывает подготовленное подтверждение',
+    () async {
+      cubit.setCode(request.code);
+      await prepare();
+      cubit.setCode('other');
+      await cubit.approve('ABCD-EFGH', () async => true);
+      expect(manager.signatures, 0);
+      expect(cubit.state.verification, isEmpty);
+    },
+  );
 
   test('Отмена во время диалога исключает позднюю подпись', () async {
-    cubit.setCode(request.code); await prepare();
+    cubit.setCode(request.code);
+    await prepare();
     final confirmed = Completer<bool>();
     final signing = cubit.approve('ABCD-EFGH', () => confirmed.future);
-    cubit.reset(); confirmed.complete(true);
+    cubit.reset();
+    confirmed.complete(true);
     await signing;
     expect(manager.signatures, 0);
   });
@@ -91,17 +121,24 @@ void main() {
   test('Отмена во время inspect исключает подготовку', () async {
     final response = Completer<Pairing>();
     await cubit.close();
-    cubit = PairingApprovalCubit(server: testServer, manager: () => manager, inspect: (_, _) => response.future);
+    cubit = PairingApprovalCubit(
+      server: testServer,
+      manager: () => manager,
+      inspect: (_, _) => response.future,
+    );
     cubit.setCode(request.code);
-    final preparing = prepare(); cubit.reset(); response.complete(request.pairing);
+    final preparing = prepare();
+    cubit.reset();
+    response.complete(request.pairing);
     await preparing;
     expect(manager.preparations, 0);
     expect(cubit.state.prepared, isFalse);
   });
 
   test('Истечение между подготовкой и подписью не выдаёт grant', () async {
-    cubit.setCode(request.code); await prepare();
-    request.pairing.expiresAt = Int64(1);
+    cubit.setCode(request.code);
+    await prepare();
+    clock = clock.add(const Duration(minutes: 6));
     await cubit.approve('ABCD-EFGH', () async => true);
     expect(manager.signatures, 0);
   });

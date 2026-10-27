@@ -3008,4 +3008,16 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get userExportInvalidPeriod =>
       'Укажите корректные даты YYYY-MM-DD и период.';
+
+  @override
+  String get pairingNetworkError =>
+      'Не удалось опросить сервер. Проверка повторится автоматически до истечения кода.';
+
+  @override
+  String get pairingVerificationError =>
+      'Подтверждение не прошло проверку. Начните сопряжение заново.';
+
+  @override
+  String get pairingQrInvalid =>
+      'QR повреждён, истёк или относится к другому пространству. Считайте новый QR на подключаемом устройстве.';
 }

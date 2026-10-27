@@ -5445,6 +5445,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Укажите корректные даты YYYY-MM-DD и период.'**
   String get userExportInvalidPeriod;
+
+  /// No description provided for @pairingNetworkError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось опросить сервер. Проверка повторится автоматически до истечения кода.'**
+  String get pairingNetworkError;
+
+  /// No description provided for @pairingVerificationError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подтверждение не прошло проверку. Начните сопряжение заново.'**
+  String get pairingVerificationError;
+
+  /// No description provided for @pairingQrInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'QR повреждён, истёк или относится к другому пространству. Считайте новый QR на подключаемом устройстве.'**
+  String get pairingQrInvalid;
 }
 
 class _AppLocalizationsDelegate

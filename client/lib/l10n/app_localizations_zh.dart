@@ -2769,6 +2769,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get userExportInvalidPeriod => '请输入有效的 YYYY-MM-DD 日期和时间范围。';
+
+  @override
+  String get pairingNetworkError => '无法连接服务器。代码到期前将自动重试。';
+
+  @override
+  String get pairingVerificationError => '验证失败。请重新开始配对。';
+
+  @override
+  String get pairingQrInvalid => '二维码无效、已过期或属于其他空间。请扫描待连接设备上的新二维码。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3966,4 +3975,13 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get userExportInvalidPeriod => '请输入有效的 YYYY-MM-DD 日期和时间范围。';
+
+  @override
+  String get pairingNetworkError => '无法连接服务器。代码到期前将自动重试。';
+
+  @override
+  String get pairingVerificationError => '验证失败。请重新开始配对。';
+
+  @override
+  String get pairingQrInvalid => '二维码无效、已过期或属于其他空间。请扫描待连接设备上的新二维码。';
 }

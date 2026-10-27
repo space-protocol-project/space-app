@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 
 import '../src/file_picker.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -576,7 +577,11 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     canRotate: widget.controller.deviceManagement is RootRotationControl,
     pending: pending,
     message: localizedMessage,
-    pairingTools: PairingApprovalPanel(controller: widget.controller, readAuthority: _readPairingAuthority, blocked: pending),
+    pairingTools: PairingApprovalPanel(
+      controller: widget.controller,
+      readAuthority: _readPairingAuthority,
+      blocked: pending,
+    ),
     currentGrantId: widget.controller.deviceManagement?.currentGrantId ?? '',
     devices: [
       for (final g in devices)

@@ -33,7 +33,11 @@ Future<String?> scanPairingCamera(BuildContext context) => showDialog<String>(
 );
 
 class RecoveryCameraDialog extends StatefulWidget {
-  const RecoveryCameraDialog({super.key, this.spaceLink = false, this.pairing = false});
+  const RecoveryCameraDialog({
+    super.key,
+    this.spaceLink = false,
+    this.pairing = false,
+  });
   final bool spaceLink, pairing;
   @override
   State<RecoveryCameraDialog> createState() => _RecoveryCameraDialogState();
@@ -172,10 +176,7 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
     try {
       photo = await camera.takePicture();
       if ((await photo.length() ?? 0) > 8 * 1024 * 1024) return;
-      final packet = await compute(
-        _decoder,
-        await photo.readAsBytes(),
-      );
+      final packet = await compute(_decoder, await photo.readAsBytes());
       if (packet != null && mounted && token == generation) {
         // Остановка вне frameJob: stop ожидает его завершения.
         timer?.cancel();

@@ -2990,4 +2990,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get userExportInvalidPeriod =>
       'Enter valid YYYY-MM-DD dates and a valid period.';
+
+  @override
+  String get pairingNetworkError =>
+      'Cannot reach the server. Polling will retry until the code expires.';
+
+  @override
+  String get pairingVerificationError =>
+      'Verification failed. Start pairing again.';
+
+  @override
+  String get pairingQrInvalid =>
+      'The QR is invalid, expired, or belongs to another space. Scan a new QR on the device being connected.';
 }

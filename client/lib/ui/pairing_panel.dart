@@ -10,14 +10,19 @@ import '../src/chat_controller.dart';
 import '../src/pairing_cubit.dart';
 
 class PairingStartPanel extends StatefulWidget {
-  const PairingStartPanel({super.key, required this.controller, required this.onConnected});
+  const PairingStartPanel({
+    super.key,
+    required this.controller,
+    required this.onConnected,
+  });
   final ChatController controller;
   final Future<void> Function(String) onConnected;
   @override
   State<PairingStartPanel> createState() => _PairingStartPanelState();
 }
 
-class _PairingStartPanelState extends State<PairingStartPanel> with WidgetsBindingObserver {
+class _PairingStartPanelState extends State<PairingStartPanel>
+    with WidgetsBindingObserver {
   late PairingCubit cubit;
   @override
   void initState() {
@@ -37,7 +42,11 @@ class _PairingStartPanelState extends State<PairingStartPanel> with WidgetsBindi
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if ([AppLifecycleState.paused, AppLifecycleState.detached, AppLifecycleState.hidden].contains(state)) {
+    if ([
+      AppLifecycleState.paused,
+      AppLifecycleState.detached,
+      AppLifecycleState.hidden,
+    ].contains(state)) {
       unawaited(cubit.cancel());
     }
   }
@@ -54,16 +63,32 @@ class _PairingStartPanelState extends State<PairingStartPanel> with WidgetsBindi
     final revision = active.revision;
     final origin = active.candidateOrigin;
     if (origin == null) return;
-    final approved = await showDialog<bool>(context: context, builder: (context) => AlertDialog(
-      title: Text(context.strings.pairingCompareTitle),
-      content: Text(context.strings.pairingAcceptConfirm(active.state.verification, origin)),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.strings.recoveryCancel)),
-        FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(context.strings.pairingMatches)),
-      ],
-    ));
+    final approved = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.strings.pairingCompareTitle),
+        content: Text(
+          context.strings.pairingAcceptConfirm(
+            active.state.verification,
+            origin,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(context.strings.recoveryCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(context.strings.pairingMatches),
+          ),
+        ],
+      ),
+    );
     if (approved != true || !mounted || active != cubit) return;
-    if (await active.accept(revision) && mounted) await widget.onConnected(origin);
+    if (await active.accept(revision) && mounted) {
+      await widget.onConnected(origin);
+    }
   }
 
   String errorText(PairingIssue? issue) => switch (issue) {
@@ -84,7 +109,15 @@ class _PairingStartPanelState extends State<PairingStartPanel> with WidgetsBindi
       connectionBusy: widget.controller.busy,
       connected: widget.controller.connected,
       code: state.code,
-      qrPreview: state.qr == null ? null : Image.memory(state.qr!, width: 240, height: 240, filterQuality: FilterQuality.none, semanticLabel: context.strings.pairingCompareTitle),
+      qrPreview: state.qr == null
+          ? null
+          : Image.memory(
+              state.qr!,
+              width: 240,
+              height: 240,
+              filterQuality: FilterQuality.none,
+              semanticLabel: context.strings.pairingCompareTitle,
+            ),
       signatureVerified: state.verified,
       verification: state.verification,
       error: errorText(state.issue),

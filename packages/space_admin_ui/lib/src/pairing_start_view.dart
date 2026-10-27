@@ -64,7 +64,10 @@ class PairingStartView extends StatelessWidget {
   ) {
     return [
       Text(strings.pairingInstructions),
-      if (qrPreview != null) ...[const SizedBox(height: 12), Center(child: qrPreview!)],
+      if (qrPreview != null) ...[
+        const SizedBox(height: 12),
+        Center(child: qrPreview!),
+      ],
       const SizedBox(height: 10),
       SelectableText(
         code,
