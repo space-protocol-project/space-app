@@ -20,11 +20,11 @@ class RpcRemoteBackup implements RemoteBackupApi {
   final RpcConnection connection;
   static const options = RpcOptions(timeout: Duration(seconds: 30));
   @override
-  Future<BackupHead> put(PutBackupRequest request) => connection.unary(specs.RemoteBackupService.putBackup, request, options: options);
+  Future<BackupHead> put(PutBackupRequest request) async => (await connection.unary(specs.RemoteBackupService.putBackup, request, options: options)).head;
   @override
   Future<GetBackupResponse> get(GetBackupRequest request) => connection.unary(specs.RemoteBackupService.getBackup, request, options: options);
   @override
-  Future<BackupHead> advance(AdvanceBackupWitnessRequest request) => connection.unary(specs.RemoteBackupService.advanceBackupWitness, request, options: options);
+  Future<BackupHead> advance(AdvanceBackupWitnessRequest request) async => (await connection.unary(specs.RemoteBackupService.advanceBackupWitness, request, options: options)).head;
   @override
   Future<ReadBackupWitnessResponse> read(ReadBackupWitnessRequest request) => connection.unary(specs.RemoteBackupService.readBackupWitness, request, options: options);
   @override

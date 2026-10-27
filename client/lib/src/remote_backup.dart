@@ -119,7 +119,7 @@ class RemoteBackupService {
       await _prepare(state,kit,password,witness);
     }
     final pending = directoryMap(state['pending'],'archive,head');
-    final head = BackupHead.fromProto3Json(pending['head']);
+    final head = BackupHead()..mergeFromProto3Json(pending['head']);
     checkRemoteHead(head,kit.id);
     final raw = directoryText(pending['archive'],max:7*1024*1024);
     final archive = Uint8List.fromList(base64Decode(raw));
@@ -178,6 +178,8 @@ class RemoteBackupService {
   }
 
   Future<void> apply(RemoteRestore restore, {required bool replaceSettings}) => _clients(restore.kit,(store,witness) async {
+    final document = restore.plan.document;
+    directoryRequire(document.id == restore.head.id && document.revision == restore.head.revision.toInt() && document.parent == restore.head.parent && restore.plan.digest == restore.head.digest);
     _same(await _witness(restore.kit,witness),restore.head);
     await directory.apply(restore.plan,replaceSettings:replaceSettings);
   });
