@@ -48,6 +48,8 @@ class _Session extends DashboardSession implements MessageSearchSession {
 
 class _LocalSession implements SpaceSession {
   @override
+  bool get remoteBackupsSupported => false;
+  @override
   bool get participantProfilesSupported => false;
   @override
   List<Channel> get availableChannels => const [];

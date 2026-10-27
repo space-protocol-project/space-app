@@ -24,6 +24,8 @@ import 'support/chat_outbox.dart';
 
 class _Session implements SpaceSession {
   @override
+  bool get remoteBackupsSupported => false;
+  @override
   bool get participantProfilesSupported => false;
   @override
   bool get chatMentionsSupported => false;

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:space_client/app.dart';
 import 'package:space_client/src/preferences.dart';
 import 'package:space_client/src/settings_snapshot.dart';
 
 void main() {
+  setUp(() => FlutterSecureStorage.setMockInitialValues({}));
   for (final entry in {
     'ru': [
       'Все ваши пространства — рядом.',
