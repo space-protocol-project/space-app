@@ -10,6 +10,7 @@ import '../src/directory_backup.dart';
 import '../src/directory_backup_cubit.dart';
 import '../src/file_picker.dart';
 import '../src/user_export_file.dart';
+import 'remote_backup.dart';
 
 class DirectoryBackupPanel extends StatefulWidget {
   const DirectoryBackupPanel({
@@ -120,7 +121,7 @@ class _DirectoryBackupPanelState extends State<DirectoryBackupPanel> {
   Widget build(BuildContext context) =>
       BlocBuilder<DirectoryBackupCubit, DirectoryBackupState>(
         bloc: cubit,
-        builder: (context, state) => Card(
+        builder: (context, state) => Column(children: [Card(
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -142,7 +143,7 @@ class _DirectoryBackupPanelState extends State<DirectoryBackupPanel> {
               ],
             ),
           ),
-        ),
+        ), const SizedBox(height:16), RemoteBackupPanel(service:widget.service)]),
       );
   Widget _actions(DirectoryBackupState state) => Wrap(
     spacing: 12,

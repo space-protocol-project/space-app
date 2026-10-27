@@ -1,4 +1,6 @@
 import 'community_reactions_api.dart';
+import 'generated/space/v1/remote_backup.pb.dart' as remote_backup_pb;
+import 'generated/space/v1/remote_backup.connect.spec.dart' as remote_backup_specs;
 import 'community_favorites_api.dart';
 import 'participant_follows_api.dart';
 import 'user_export_api.dart';
@@ -1126,6 +1128,11 @@ class SpaceSession
       _expiresAt = 0;
     },
   );
+
+  Future<void> createRemoteBackupSlot(remote_backup_pb.CreateBackupSlotRequest request) async {
+    await _ensureSession();
+    await channel.unary(remote_backup_specs.RemoteBackupService.createBackupSlot, request, options: _options);
+  }
 
   bool _needsOwnerSetup = false;
   @override

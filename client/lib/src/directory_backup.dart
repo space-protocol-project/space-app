@@ -18,11 +18,13 @@ class DirectoryRestorePlan {
     this.before,
     this.conflicts,
     this.unknown,
+    this.ancestors,
   );
   final DirectoryDocument document;
   final String digest, before;
   final List<String> conflicts;
   final bool unknown;
+  final List<DirectoryDocument> ancestors;
 }
 
 class DirectoryBackupService {
@@ -154,10 +156,12 @@ class DirectoryBackupService {
   Future<void> recordExport(DirectoryDocument document) async {
     final state = await repository.read(), heads = state['heads'] as Map;
     final head = heads[document.id] as Map?;
+    final digest = await document.digest();
+    if (head?['revision'] == document.revision && head?['digest'] == digest) return;
     directoryRequire((head?['digest'] ?? '') == document.parent);
     heads[document.id] = {
       'revision': document.revision,
-      'digest': await document.digest(),
+      'digest': digest,
     };
     final catalog = state['catalog'] as Map;
     for (final space in document.spaces) {
@@ -167,7 +171,7 @@ class DirectoryBackupService {
     await repository.write(state);
   }
 
-  Future<DirectoryRestorePlan> preview(DirectoryDocument document) async {
+  Future<DirectoryRestorePlan> preview(DirectoryDocument document, {List<DirectoryDocument> ancestors = const []}) async {
     final state = await repository.read(),
         digest = await document.digest(),
         conflicts = <String>[];
@@ -175,7 +179,7 @@ class DirectoryBackupService {
       conflicts.add('Сначала завершите прерванное восстановление');
     }
     final head = (state['heads'] as Map)[document.id] as Map?;
-    if (head != null && !_validHead(document, digest, head)) {
+    if (head != null && !await _validAncestry(document, digest, head, ancestors)) {
       conflicts.add('Откат или ветвление копии');
     }
     final catalog = state['catalog'] as Map<String, dynamic>;
@@ -195,6 +199,7 @@ class DirectoryBackupService {
       await _fingerprint(state),
       List.unmodifiable(conflicts),
       head == null,
+      List.unmodifiable(ancestors),
     );
   }
 
@@ -202,6 +207,15 @@ class DirectoryBackupService {
     final revision = head['revision'] as int;
     if (document.revision == revision) return digest == head['digest'];
     return document.revision > revision && document.parent == head['digest'];
+  }
+
+  Future<bool> _validAncestry(DirectoryDocument document, String digest, Map head, List<DirectoryDocument> ancestors) async {
+    var child = document;
+    for (final parent in ancestors) {
+      if (parent.id != document.id || parent.revision != child.revision-1 || await parent.digest() != child.parent) return false;
+      child = parent;
+    }
+    return _validHead(child, ancestors.isEmpty ? digest : await child.digest(), head);
   }
 
   void _conflict(
@@ -227,7 +241,7 @@ class DirectoryBackupService {
     DirectoryRestorePlan plan, {
     required bool replaceSettings,
   }) => repository.exclusive(() async {
-    final latest = await preview(plan.document);
+    final latest = await preview(plan.document, ancestors: plan.ancestors);
     directoryRequire(latest.conflicts.isEmpty && latest.before == plan.before);
     final state = await repository.read(), catalog = state['catalog'] as Map;
     for (final space in plan.document.spaces) {

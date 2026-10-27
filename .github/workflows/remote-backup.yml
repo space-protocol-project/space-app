@@ -1,0 +1,118 @@
+name: Удалённые копии и свидетель версии
+on:
+  workflow_dispatch:
+    inputs:
+      server_ref: {type: string, required: true}
+      protocol_ref: {type: string, required: true}
+      verify: {type: boolean, default: true}
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    services:
+      postgres:
+        image: postgres:17.11
+        env: {POSTGRES_DB: space_test, POSTGRES_USER: space, POSTGRES_PASSWORD: ci-only-password}
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U space -d space_test" --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      SPACE_TEST_DATABASE_URL: postgres://space:ci-only-password@127.0.0.1:5432/space_test?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+        with: {path: app}
+      - uses: actions/checkout@v4
+        with: {repository: space-protocol-project/space-server, ref: '${{ inputs.server_ref }}', path: server}
+      - uses: actions/checkout@v4
+        with: {repository: space-protocol-project/space-protocol, ref: '${{ inputs.protocol_ref }}', path: protocol}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: server/go.mod, cache-dependency-path: server/go.sum}
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - name: Генераторы контракта
+        run: |
+          go install github.com/bufbuild/buf/cmd/buf@v1.75.0
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.2
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.32.0
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.32.0
+          dart pub global activate protoc_plugin 25.1.0
+          dart pub global activate connectrpc 2.0.1
+      - name: Контракт, Freezed, переводы и оформление
+        run: |
+          (cd protocol && buf lint)
+          mkdir -p "$RUNNER_TEMP/remote-schema/space/v1"
+          cp protocol/protocol/proto/space/v1/remote_backup.proto "$RUNNER_TEMP/remote-schema/space/v1/"
+          (cd protocol && buf generate "$RUNNER_TEMP/remote-schema" --template buf.gen.yaml)
+          (cd server && buf generate "$RUNNER_TEMP/remote-schema" --template buf.gen.yaml && buf generate "$RUNNER_TEMP/remote-schema" --template buf.connect.gen.yaml)
+          (cd app && buf generate "$RUNNER_TEMP/remote-schema" --template client/buf.gen.yaml && buf generate "$RUNNER_TEMP/remote-schema" --template client/buf.connect.gen.yaml)
+          cd app/client
+          flutter pub get
+          dart run build_runner build
+          flutter gen-l10n
+          dart format lib/src/remote_backup*.dart lib/src/directory_backup.dart lib/src/core.dart lib/src/user_export_file.dart lib/ui/remote_backup.dart lib/ui/directory_backup.dart
+          find test -name '*remote_backup*.dart' -print0 | xargs -0 -r dart format
+          cd ../../server
+          gofmt -w internal/postgres/remote_backup*.go internal/postgres/store.go internal/postgres/channels_test.go internal/authn/profile.go internal/transport/connect.go internal/transport/connect_remote_backup.go internal/transport/connect_test.go internal/transport/message_limits.go cmd/space-server/main.go
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: remote-backup-source
+          path: |
+            app/client/lib/src/generated/space/v1/remote_backup*.dart
+            app/client/lib/src/remote_backup*.dart
+            app/client/lib/src/directory_backup.dart
+            app/client/lib/src/core.dart
+            app/client/lib/src/user_export_file.dart
+            app/client/lib/ui/remote_backup.dart
+            app/client/lib/ui/directory_backup.dart
+            app/client/lib/l10n/*.dart
+            app/client/test/*remote_backup*.dart
+            app/client/test/fixtures/*remote_backup*.dart
+            server/gen/space/v1/remote_backup*.go
+            server/gen/space/v1/spacev1connect/remote_backup.connect.go
+            server/internal/postgres/remote_backup*.go
+            server/internal/postgres/store.go
+            server/internal/postgres/channels_test.go
+            server/internal/authn/profile.go
+            server/internal/transport/connect.go
+            server/internal/transport/connect_remote_backup.go
+            server/internal/transport/connect_test.go
+            server/internal/transport/message_limits.go
+            server/cmd/space-server/main.go
+            protocol/protocol/openapi/space/v1/remote_backup.swagger.json
+      - name: Сервер, гонки и уязвимости
+        if: inputs.verify
+        working-directory: server
+        run: |
+          go test ./...
+          go test -race ./...
+          go vet ./...
+          go mod verify
+          go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -C cmd/space-server ./...
+      - name: Системные зависимости
+        if: inputs.verify
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb xauth dbus-x11
+      - name: Анализ и тесты клиента
+        if: inputs.verify
+        working-directory: app/client
+        run: |
+          flutter analyze
+          dart run tool/core_import_check.dart
+          flutter test test/directory*_test.dart test/remote_backup*_test.dart test/pairing*_test.dart test/recovery_test.dart test/recovery_spaces_test.dart
+          (cd ../packages/space_admin_ui && flutter pub get && flutter analyze)
+          (cd ../packages/space_directory_noise && dart pub get && dart analyze)
+      - name: Нативный экран и горячий перезапуск
+        if: inputs.verify
+        working-directory: app
+        run: xvfb-run -a dbus-run-session -- python3 tools/check_directory_ui.py --output "$RUNNER_TEMP/remote-native"
+      - uses: actions/upload-artifact@v4
+        if: always() && inputs.verify
+        with: {name: remote-backup-native, path: '${{ runner.temp }}/remote-native'}
+  complexity:
+    if: inputs.verify
+    uses: ./.github/workflows/complexity.yml

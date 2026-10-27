@@ -1140,5 +1140,19 @@
   "directoryTransferComparison": "输入新设备上显示的代码",
   "directoryTransferCopy": "复制二维码请求",
   "directoryTransferHelp": "先在两台设备上打开同一个受信任的空间。仅传输选定的空间、设置和关注列表，不传输密钥和访问权限；恢复后请分别配对各空间。",
-  "directoryTransferRelay": "选择用于传输的受信任空间"
+  "directoryTransferRelay": "选择用于传输的受信任空间",
+  "remoteBackupTitle": "远程备份",
+  "remoteBackupHelp": "使用两个已连接且由独立运营方管理的 HTTPS 空间，分别存储加密备份和最新版本记录。新设备需要保存的恢复套件及单独保管的密码。空间访问权限需通过配对或恢复卡恢复。",
+  "remoteBackupKitHelp": "套件包含备份读写密钥。请保存在此设备之外，并与密码分开保管。获得套件的人可以下载加密备份并干扰后续发布。",
+  "remoteBackupStorage": "存储地址",
+  "remoteBackupWitness": "独立见证服务地址",
+  "remoteBackupSetup": "保存套件并设置",
+  "remoteBackupImportKit": "打开恢复套件",
+  "remoteBackupPublish": "创建或继续发布",
+  "remoteBackupRead": "验证并打开最新备份",
+  "remoteBackupConfigure": "重试服务器设置",
+  "remoteBackupSaved": "备份已上传、回读并经见证服务确认。",
+  "remoteBackupConfigured": "存储和见证服务已就绪。",
+  "remoteBackupVerified": "见证服务确认版本：",
+  "remoteBackupError": "操作未完成。请检查套件、密码、连接和权限。版本、签名或摘要不一致时将阻止恢复。请使用相同密码重试未完成的发布。"
 }
