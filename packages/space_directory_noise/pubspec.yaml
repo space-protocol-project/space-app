@@ -1,0 +1,10 @@
+name: space_directory_noise
+description: Ограниченный канал Noise для передачи каталога Space.
+version: 0.1.0
+publish_to: none
+environment:
+  sdk: ^3.13.7
+dependencies:
+  hooks: ^2.2.0
+  code_assets: ^2.1.0
+  ffi: ^2.1.4

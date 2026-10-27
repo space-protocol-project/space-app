@@ -1,0 +1,94 @@
+name: Подготовка контрактов и Noise каталога
+on:
+  workflow_dispatch:
+    inputs:
+      server_ref:
+        type: string
+        required: true
+      protocol_ref:
+        type: string
+        required: true
+      models:
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  generate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with: {path: app}
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: ${{ inputs.server_ref }}
+          path: server
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-protocol
+          ref: ${{ inputs.protocol_ref }}
+          path: protocol
+      - uses: actions/setup-go@v5
+        with: {go-version-file: server/go.mod}
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.8'
+          channel: stable
+          cache: true
+      - name: Rust
+        run: rustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy
+      - name: Подготовка lock и проверки Noise
+        working-directory: app/native/space_directory_noise
+        run: |
+          cargo +1.99.1 generate-lockfile
+          cargo +1.99.1 fmt
+          cargo +1.99.1 clippy --locked --all-targets -- -D warnings
+          cargo +1.99.1 test --locked
+      - name: Генераторы протокола
+        run: |
+          go install github.com/bufbuild/buf/cmd/buf@v1.75.0
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.2
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.32.0
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.32.0
+          dart pub global activate protoc_plugin 25.1.0
+          dart pub global activate connectrpc 2.0.1
+          mkdir -p "$RUNNER_TEMP/directory-schema/space/v1"
+          cp protocol/protocol/proto/space/v1/directory_pairing.proto "$RUNNER_TEMP/directory-schema/space/v1/"
+          (cd protocol && buf lint && buf generate "$RUNNER_TEMP/directory-schema" --template buf.gen.yaml)
+          (cd server && buf generate "$RUNNER_TEMP/directory-schema" --template buf.gen.yaml && buf generate "$RUNNER_TEMP/directory-schema" --template buf.connect.gen.yaml)
+          (cd app && buf generate "$RUNNER_TEMP/directory-schema" --template client/buf.gen.yaml && buf generate "$RUNNER_TEMP/directory-schema" --template client/buf.connect.gen.yaml)
+      - name: Dart и модели
+        run: |
+          (cd app/client && flutter pub get)
+          (cd app/packages/space_directory_noise && dart pub get && dart analyze)
+          dart format app/packages/space_directory_noise
+          if [ '${{ inputs.models }}' = 'true' ]; then
+            (cd app/client && timeout 300s dart run build_runner build && flutter gen-l10n)
+          fi
+          gofmt -w server/internal/postgres/directory_pairing*.go server/internal/transport/connect_directory_pairing.go server/internal/transport/connect.go server/internal/transport/message_limits.go server/internal/authn/profile.go server/internal/postgres/store.go server/cmd/space-server/main.go
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: directory-pairing-generated-source
+          path: |
+            app/native/space_directory_noise/Cargo.lock
+            app/native/space_directory_noise/src/*.rs
+            app/packages/space_directory_noise/**/*.dart
+            app/packages/space_directory_noise/pubspec.lock
+            app/client/pubspec.lock
+            app/client/lib/src/generated/space/v1/directory_pairing*.dart
+            app/client/lib/src/directory_transfer*.freezed.dart
+            app/client/lib/l10n/app_localizations*.dart
+            protocol/protocol/openapi/space/v1/directory_pairing.swagger.json
+            server/gen/space/v1/directory_pairing*.go
+            server/gen/space/v1/spacev1connect/directory_pairing.connect.go
+            server/internal/postgres/directory_pairing*.go
+            server/internal/transport/connect_directory_pairing.go
+            server/internal/transport/connect.go
+            server/internal/transport/message_limits.go
+            server/internal/authn/profile.go
+            server/internal/postgres/store.go
+            server/cmd/space-server/main.go
