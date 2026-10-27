@@ -8,7 +8,6 @@ import 'package:space_client/src/preferences.dart';
 import 'package:space_client/src/remote_backup.dart';
 import 'package:space_client/src/remote_backup_cubit.dart';
 import 'package:space_client/src/remote_backup_models.dart';
-import 'package:space_client/src/remote_backup_rpc.dart';
 
 import 'fixtures/directory.dart';
 import 'fixtures/remote_backup.dart';
@@ -66,13 +65,7 @@ void main() {
     await controller.preview('вторая операция');
     expect(controller.state.busy, isTrue);
     await controller.close();
-    service.completer.complete(
-      RemoteRestore(
-        kit,
-        BackupHead(id: kit.id),
-        await directory.preview(directoryDocument()),
-      ),
-    );
+    service.completer.completeError(StateError('Поздний ответ после закрытия'));
     await expectLater(work, completes);
   });
 }

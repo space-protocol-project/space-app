@@ -5811,6 +5811,36 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Доступ к копиям отозван на обоих серверах.'**
   String get remoteBackupRevoked;
+
+  /// No description provided for @remoteBackupUnpublished.
+  ///
+  /// In ru, this message translates to:
+  /// **'Найти незавершённую публикацию'**
+  String get remoteBackupUnpublished;
+
+  /// No description provided for @remoteBackupUnpublishedHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Копия загружена, но ещё не подтверждена свидетелем. Проверьте её состав перед публикацией.'**
+  String get remoteBackupUnpublishedHelp;
+
+  /// No description provided for @remoteBackupFinish.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подтвердить публикацию этой копии'**
+  String get remoteBackupFinish;
+
+  /// No description provided for @remoteBackupFinishHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завершить публикацию показанной копии? Будут проверены пароль и неизменность версии. Настройки устройства этой командой не заменяются; применение каталога выполняется отдельно.'**
+  String get remoteBackupFinishHelp;
+
+  /// No description provided for @remoteBackupRestoreFirst.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сначала откройте и примените последнюю подтверждённую копию. Для всех версий цепочки используйте тот же пароль.'**
+  String get remoteBackupRestoreFirst;
 }
 
 class _AppLocalizationsDelegate

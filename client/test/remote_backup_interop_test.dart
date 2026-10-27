@@ -38,8 +38,9 @@ Future<void> waitRemoteRestart(String marker) async {
   await File('$marker.ready').writeAsString('ready', flush: true);
   final deadline = DateTime.now().add(const Duration(seconds: 60));
   while (!await File('$marker.resume').exists()) {
-    if (DateTime.now().isAfter(deadline))
+    if (DateTime.now().isAfter(deadline)) {
       throw TimeoutException('Перезапуск серверов');
+    }
     await Future<void>.delayed(const Duration(milliseconds: 100));
   }
 }
@@ -141,11 +142,14 @@ void main() {
       );
       await waitRemoteRestart(restart);
       await recovery.saveKit(RemoteBackupKit.parse(kit.encode()));
-      final unpublished=await recovery.previewUnpublished(kit,'Отдельный длинный пароль');
-      expect(unpublished.unpublished,isTrue);
-      expect(targetPrefs.origins,isEmpty);
-      await recovery.finishUnpublished(unpublished,'Отдельный длинный пароль');
-      expect(targetPrefs.origins,isEmpty);
+      final unpublished = await recovery.previewUnpublished(
+        kit,
+        'Отдельный длинный пароль',
+      );
+      expect(unpublished.unpublished, isTrue);
+      expect(targetPrefs.origins, isEmpty);
+      await recovery.finishUnpublished(unpublished, 'Отдельный длинный пароль');
+      expect(targetPrefs.origins, isEmpty);
       await RemoteBackupService(source)
           .publish(kit, 'Отдельный длинный пароль');
       final plan = await recovery.preview(

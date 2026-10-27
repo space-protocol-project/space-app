@@ -3207,4 +3207,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get remoteBackupRevoked => 'Backup access revoked on both servers.';
+
+  @override
+  String get remoteBackupUnpublished => 'Find unfinished publication';
+
+  @override
+  String get remoteBackupUnpublishedHelp =>
+      'The backup is uploaded but not confirmed by the witness. Review its contents before publication.';
+
+  @override
+  String get remoteBackupFinish => 'Confirm publication of this backup';
+
+  @override
+  String get remoteBackupFinishHelp =>
+      'Complete publication of this backup? Its password and unchanged version will be verified. This action does not replace device settings; applying the directory is separate.';
+
+  @override
+  String get remoteBackupRestoreFirst =>
+      'First open and apply the latest confirmed backup. Use the same password for every version in this chain.';
 }

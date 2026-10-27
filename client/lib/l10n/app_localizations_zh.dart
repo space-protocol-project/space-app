@@ -2968,6 +2968,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get remoteBackupRevoked => '已撤销两个服务器上的备份访问权限。';
+
+  @override
+  String get remoteBackupUnpublished => '查找未完成的发布';
+
+  @override
+  String get remoteBackupUnpublishedHelp => '备份已上传，但尚未经见证服务确认。请在发布前检查内容。';
+
+  @override
+  String get remoteBackupFinish => '确认发布此备份';
+
+  @override
+  String get remoteBackupFinishHelp =>
+      '是否完成此备份的发布？将验证密码和版本是否保持不变。此操作不会替换设备设置，目录需单独应用。';
+
+  @override
+  String get remoteBackupRestoreFirst => '请先打开并应用最新的已确认备份。此备份链的所有版本应使用相同密码。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4364,4 +4380,20 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get remoteBackupRevoked => '已撤销两个服务器上的备份访问权限。';
+
+  @override
+  String get remoteBackupUnpublished => '查找未完成的发布';
+
+  @override
+  String get remoteBackupUnpublishedHelp => '备份已上传，但尚未经见证服务确认。请在发布前检查内容。';
+
+  @override
+  String get remoteBackupFinish => '确认发布此备份';
+
+  @override
+  String get remoteBackupFinishHelp =>
+      '是否完成此备份的发布？将验证密码和版本是否保持不变。此操作不会替换设备设置，目录需单独应用。';
+
+  @override
+  String get remoteBackupRestoreFirst => '请先打开并应用最新的已确认备份。此备份链的所有版本应使用相同密码。';
 }

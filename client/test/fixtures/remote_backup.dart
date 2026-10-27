@@ -23,8 +23,9 @@ class MemoryBackupApi implements RemoteBackupApi {
   RemoteBackupEndpoint get endpoint => witness ? kit.witness : kit.storage;
   void token(String value, bool write) {
     if (unavailable ||
-        value != (write ? endpoint.writeToken : endpoint.readToken))
+        value != (write ? endpoint.writeToken : endpoint.readToken)) {
       throw StateError('Недоступно');
+    }
   }
 
   @override
@@ -32,8 +33,9 @@ class MemoryBackupApi implements RemoteBackupApi {
     token(request.token, true);
     final previous = versions[request.head.revision.toInt()];
     if (previous != null &&
-        backupHeadText(previous.head) != backupHeadText(request.head))
+        backupHeadText(previous.head) != backupHeadText(request.head)) {
       throw StateError('Конфликт');
+    }
     versions[request.head.revision.toInt()] = GetBackupResponse(
       head: request.head.deepCopy(),
       archive: List.of(request.archive),
@@ -57,8 +59,9 @@ class MemoryBackupApi implements RemoteBackupApi {
     token(request.token, true);
     if (backupHeadText(head) != backupHeadText(request.head)) {
       if (request.head.revision != head.revision + 1 ||
-          request.head.parent != head.digest)
+          request.head.parent != head.digest) {
         throw StateError('Конфликт');
+      }
       head = request.head.deepCopy();
     }
     if (failAdvance) {

@@ -52,7 +52,7 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
   }
 
   void reset() {
-    if (!isClosed && !state.busy)
+    if (!isClosed && !state.busy) {
       emit(
         state.copyWith(
           restore: null,
@@ -61,6 +61,7 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
           message: '',
         ),
       );
+    }
   }
 
   RemoteBackupEndpoint _endpoint(String origin) {
@@ -168,13 +169,16 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
     await service.publish(kit!, password);
     _emit(state.copyWith(message: 'saved'));
   });
-  Future<void> preview(String password, {bool unpublished=false}) => _run(() async {
-    final kit = state.kit;
-    directoryRequire(kit != null);
-    _emit(state.copyWith(restore: null, replaceSettings: false));
-    final restore = unpublished ? await service.previewUnpublished(kit!,password) : await service.preview(kit!, password);
-    _emit(state.copyWith(restore: restore, message: 'preview'));
-  });
+  Future<void> preview(String password, {bool unpublished = false}) =>
+      _run(() async {
+        final kit = state.kit;
+        directoryRequire(kit != null);
+        _emit(state.copyWith(restore: null, replaceSettings: false));
+        final restore = unpublished
+            ? await service.previewUnpublished(kit!, password)
+            : await service.preview(kit!, password);
+        _emit(state.copyWith(restore: restore, message: 'preview'));
+      });
   Future<void> apply() => _run(() async {
     final restore = state.restore;
     if (restore == null || restore.plan.conflicts.isNotEmpty) return;
@@ -182,9 +186,9 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
     _emit(state.copyWith(restore: null, message: 'restored'));
   });
   Future<void> finishUnpublished(String password) => _run(() async {
-    final restore=state.restore;
+    final restore = state.restore;
     directoryRequire(restore != null);
-    await service.finishUnpublished(restore!,password);
-    _emit(state.copyWith(restore:null,message:'saved'));
+    await service.finishUnpublished(restore!, password);
+    _emit(state.copyWith(restore: null, message: 'saved'));
   });
 }

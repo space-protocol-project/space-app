@@ -3226,4 +3226,22 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get remoteBackupRevoked =>
       'Доступ к копиям отозван на обоих серверах.';
+
+  @override
+  String get remoteBackupUnpublished => 'Найти незавершённую публикацию';
+
+  @override
+  String get remoteBackupUnpublishedHelp =>
+      'Копия загружена, но ещё не подтверждена свидетелем. Проверьте её состав перед публикацией.';
+
+  @override
+  String get remoteBackupFinish => 'Подтвердить публикацию этой копии';
+
+  @override
+  String get remoteBackupFinishHelp =>
+      'Завершить публикацию показанной копии? Будут проверены пароль и неизменность версии. Настройки устройства этой командой не заменяются; применение каталога выполняется отдельно.';
+
+  @override
+  String get remoteBackupRestoreFirst =>
+      'Сначала откройте и примените последнюю подтверждённую копию. Для всех версий цепочки используйте тот же пароль.';
 }

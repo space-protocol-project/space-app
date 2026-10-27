@@ -1000,7 +1000,7 @@ class ReadBackupWitnessResponse extends $pb.GeneratedMessage {
   void clearSignature() => $_clearField(3);
 }
 
-/// Раздельные развёртывания: непрозрачное хранилище и свидетель версии.
+/// core.directory.backup.v1: независимые хранилище и свидетель версии.
 class RemoteBackupServiceApi {
   final $pb.RpcClient _client;
 

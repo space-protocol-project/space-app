@@ -9,6 +9,33 @@ on:
 permissions:
   contents: read
 jobs:
+  server:
+    if: inputs.verify && inputs.server_checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17.11
+        env: {POSTGRES_DB: space_test, POSTGRES_USER: space, POSTGRES_PASSWORD: ci-only-password}
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U space -d space_test" --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      SPACE_TEST_DATABASE_URL: postgres://space:ci-only-password@127.0.0.1:5432/space_test?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+        with: {repository: space-protocol-project/space-server, ref: '${{ inputs.server_ref }}', path: server}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: server/go.mod, cache-dependency-path: server/go.sum}
+      - name: Сервер, гонки и уязвимости
+        working-directory: server
+        run: |
+          gofmt -w internal/postgres/remote_backup*.go
+          go test ./internal/postgres -run '^TestRemoteBackup' -count=1
+          go test ./...
+          go test -race ./...
+          go vet ./...
+          go mod verify
+          go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -C cmd/space-server ./...
   quality:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -92,16 +119,6 @@ jobs:
         working-directory: app/client
         run: |
           flutter analyze
-      - name: Сервер, гонки и уязвимости
-        if: inputs.verify && inputs.server_checks
-        working-directory: server
-        run: |
-          go test ./internal/postgres -run '^TestRemoteBackup' -count=1
-          go test ./...
-          go test -race ./...
-          go vet ./...
-          go mod verify
-          go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -C cmd/space-server ./...
       - name: Системные зависимости
         if: inputs.verify
         run: |

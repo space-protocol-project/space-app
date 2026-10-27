@@ -6,7 +6,7 @@
 import "package:connectrpc/connect.dart" as connect;
 import "remote_backup.pb.dart" as spacev1remote_backup;
 
-/// Раздельные развёртывания: непрозрачное хранилище и свидетель версии.
+/// core.directory.backup.v1: независимые хранилище и свидетель версии.
 abstract final class RemoteBackupService {
   /// Fully-qualified name of the RemoteBackupService service.
   static const name = 'space.v1.RemoteBackupService';

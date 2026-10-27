@@ -7,7 +7,7 @@ import "package:connectrpc/connect.dart" as connect;
 import "remote_backup.pb.dart" as spacev1remote_backup;
 import "remote_backup.connect.spec.dart" as specs;
 
-/// Раздельные развёртывания: непрозрачное хранилище и свидетель версии.
+/// core.directory.backup.v1: независимые хранилище и свидетель версии.
 extension type RemoteBackupServiceClient (connect.Transport _transport) {
   Future<spacev1remote_backup.CreateBackupSlotResponse> createBackupSlot(
     spacev1remote_backup.CreateBackupSlotRequest input, {

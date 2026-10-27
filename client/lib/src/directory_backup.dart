@@ -153,12 +153,16 @@ class DirectoryBackupService {
     });
   }
 
-  Future<void> recordExport(DirectoryDocument document, {bool selectOutgoing = true}) async {
+  Future<void> recordExport(
+    DirectoryDocument document, {
+    bool selectOutgoing = true,
+  }) async {
     final state = await repository.read(), heads = state['heads'] as Map;
     final head = heads[document.id] as Map?;
     final digest = await document.digest();
-    if (head?['revision'] == document.revision && head?['digest'] == digest)
+    if (head?['revision'] == document.revision && head?['digest'] == digest) {
       return;
+    }
     directoryRequire((head?['digest'] ?? '') == document.parent);
     heads[document.id] = {'revision': document.revision, 'digest': digest};
     final catalog = state['catalog'] as Map;
@@ -221,8 +225,9 @@ class DirectoryBackupService {
     for (final parent in ancestors) {
       if (parent.id != document.id ||
           parent.revision != child.revision - 1 ||
-          await parent.digest() != child.parent)
+          await parent.digest() != child.parent) {
         return false;
+      }
       child = parent;
     }
     return _validHead(
