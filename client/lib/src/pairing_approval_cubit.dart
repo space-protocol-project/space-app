@@ -194,7 +194,10 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
       return (allowed: true, authority: null);
     }
     final authority = await readAuthority();
-    return (allowed: _current(generation) && authority != null, authority: authority);
+    return (
+      allowed: _current(generation) && authority != null,
+      authority: authority,
+    );
   }
 
   void expire() {

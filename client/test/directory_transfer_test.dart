@@ -25,8 +25,8 @@ Map<String, dynamic> transferQrFields() => {
   'expires': DateTime.now().millisecondsSinceEpoch ~/ 1000 + 300,
 };
 
-String transferQrText(Map<String, dynamic> fields) => directoryTransferPrefix +
-    base64Url.encode(utf8.encode(jsonEncode(fields)));
+String transferQrText(Map<String, dynamic> fields) =>
+    directoryTransferPrefix + base64Url.encode(utf8.encode(jsonEncode(fields)));
 
 Future<(DirectoryNoiseChannel, DirectoryNoiseChannel)> channels() async {
   const engine = NativeDirectoryNoise();
@@ -55,27 +55,46 @@ void main() {
   for (final key in transferQrFields().keys) {
     test('QR каталога: отсутствующее поле $key отклоняется', () {
       final fields = transferQrFields()..remove(key);
-      expect(() => DirectoryTransferQr.parse(transferQrText(fields)), throwsFormatException);
+      expect(
+        () => DirectoryTransferQr.parse(transferQrText(fields)),
+        throwsFormatException,
+      );
     });
     test('QR каталога: null в поле $key отклоняется', () {
       final fields = transferQrFields()..[key] = null;
-      expect(() => DirectoryTransferQr.parse(transferQrText(fields)), throwsFormatException);
+      expect(
+        () => DirectoryTransferQr.parse(transferQrText(fields)),
+        throwsFormatException,
+      );
     });
   }
   test('QR каталога: map pattern не разрешает дополнительные поля', () {
     final fields = transferQrFields()..['extra'] = 'ignored';
-    expect(() => DirectoryTransferQr.parse(transferQrText(fields)), throwsFormatException);
+    expect(
+      () => DirectoryTransferQr.parse(transferQrText(fields)),
+      throwsFormatException,
+    );
   });
   for (final (key, value) in <(String, Object)>[
-    ('v', 1.0), ('v', 2), ('v', true), ('expires', '300'),
+    ('v', 1.0),
+    ('v', 2),
+    ('v', true),
+    ('expires', '300'),
     ('expires', DateTime.now().millisecondsSinceEpoch ~/ 1000 + 3600),
-    ('origin', 'https://space.example/path'), ('server', ''),
-    ('tls', 'invalid'), ('key', 'invalid'), ('public', 'invalid'),
-    ('id', 'dc_${'a' * 43}'), ('code', 'dr_${'a' * 43}'),
+    ('origin', 'https://space.example/path'),
+    ('server', ''),
+    ('tls', 'invalid'),
+    ('key', 'invalid'),
+    ('public', 'invalid'),
+    ('id', 'dc_${'a' * 43}'),
+    ('code', 'dr_${'a' * 43}'),
   ]) {
     test('QR каталога: недопустимое значение $key=$value отклоняется', () {
       final fields = transferQrFields()..[key] = value;
-      expect(() => DirectoryTransferQr.parse(transferQrText(fields)), throwsFormatException);
+      expect(
+        () => DirectoryTransferQr.parse(transferQrText(fields)),
+        throwsFormatException,
+      );
     });
   }
   test(

@@ -66,16 +66,17 @@ class DirectoryTransferQr {
         'code': String code,
         'public': String public,
         'expires': int expires,
-      } => DirectoryTransferQr(
-        directoryAddress(origin),
-        directoryText(server, max: 128),
-        directoryBytes(key, 32),
-        directoryText(tls, max: 64),
-        directoryText(id, max: 46),
-        directoryText(code, max: 46),
-        directoryBytes(public, 32),
-        directoryInt(expires, min: 1),
-      ),
+      } =>
+        DirectoryTransferQr(
+          directoryAddress(origin),
+          directoryText(server, max: 128),
+          directoryBytes(key, 32),
+          directoryText(tls, max: 64),
+          directoryText(id, max: 46),
+          directoryText(code, max: 46),
+          directoryBytes(public, 32),
+          directoryInt(expires, min: 1),
+        ),
       _ => throw const FormatException('Повреждён запрос передачи каталога'),
     };
     result._validate();
