@@ -66,6 +66,11 @@ flutter {
 }
 
 dependencies {
+    constraints {
+        implementation("androidx.test:runner:1.7.0") {
+            because("Одинаковая актуальная версия в приложении и инструментальных тестах AGP")
+        }
+    }
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test:runner:1.7.0")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")

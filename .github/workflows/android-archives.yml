@@ -71,7 +71,9 @@ jobs:
         id: android-cache
         with:
           key: android-archive-${{ runner.os }}-3.47.8-${{ hashFiles('client/pubspec.lock', 'client/android/**/*.gradle.kts', 'client/android/gradle/wrapper/gradle-wrapper.properties', 'native/**/Cargo.lock') }}-${{ github.run_id }}
-          restore-keys: android-archive-${{ runner.os }}-3.47.8-${{ hashFiles('client/pubspec.lock', 'client/android/**/*.gradle.kts', 'client/android/gradle/wrapper/gradle-wrapper.properties', 'native/**/Cargo.lock') }}-
+          restore-keys: |
+            android-archive-${{ runner.os }}-3.47.8-${{ hashFiles('client/pubspec.lock', 'client/android/**/*.gradle.kts', 'client/android/gradle/wrapper/gradle-wrapper.properties', 'native/**/Cargo.lock') }}-
+            android-archive-${{ runner.os }}-3.47.8-
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
