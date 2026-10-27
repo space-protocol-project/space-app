@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/directory_backup.dart';
+import 'package:space_client/src/directory_document.dart';
 import 'package:space_client/src/directory_repository.dart';
 import 'package:space_client/src/directory_transfer_noise.dart';
 import 'package:space_client/src/directory_transfer_qr.dart';
@@ -69,12 +70,17 @@ void main() {
     final preferences=AppPreferences();addTearDown(preferences.close);
     final repository=DirectoryRepository(DirectoryStorage());
     final service=DirectoryBackupService(repository,DirectoryVault(),preferences,()=>{});
-    await service.apply(await service.preview(directoryDocument()),replaceSettings:false);
+    final document=DirectoryDocument.parse({...directoryDocument().data,'spaces':[
+      directorySpace(), {...directorySpace(),'origin':'https://excluded.example','endpoint':'https://excluded.example','server_id':'srv_excluded'},
+    ]});
+    await service.apply(await service.preview(document),replaceSettings:false);
     await service.recordExport(await service.capture());
     final before=await repository.read();
     final first=await service.capture(selectedOrigins:['https://space.example']);
     final second=await service.capture(selectedOrigins:['https://space.example']);
     expect(first.revision,1);expect(first.parent,isEmpty);expect(first.id,isNot(second.id));
+    expect(first.spaces.map((space)=>space['origin']),['https://space.example']);
+    expect(utf8.decode(first.encode()).contains('excluded.example'),isFalse);
     expect(await repository.read(),before);
     await expectLater(service.capture(selectedOrigins:[]),throwsFormatException);
     await expectLater(service.capture(selectedOrigins:['https://unknown.example']),throwsFormatException);

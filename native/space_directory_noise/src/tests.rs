@@ -1,3 +1,4 @@
+// Copyright Space contributors. SPDX-License-Identifier: MIT
 use super::*;
 use session::Session;
 

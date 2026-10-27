@@ -71,6 +71,7 @@ jobs:
         run: |
           flutter pub get
           dart format lib/src/directory_transfer*.dart lib/src/directory_backup.dart lib/ui/directory_transfer.dart lib/ui/device_panel.dart lib/ui/camera_scanner.dart test/directory_transfer*_test.dart
+          dart format ../packages/space_directory_noise
           dart fix --apply --code=curly_braces_in_flow_control_structures
           flutter analyze
           dart run tool/core_import_check.dart

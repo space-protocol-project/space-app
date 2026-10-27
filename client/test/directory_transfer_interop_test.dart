@@ -17,10 +17,15 @@ import 'fixtures/directory.dart';
 class RecordingRelay extends RpcDirectoryRelay {
   RecordingRelay(super.server);
   final records=<List<int>>[];
+  bool loseFirstReply=true;
   @override
-  Future<void> write(WriteDirectoryFrameRequest request) {
+  Future<void> write(WriteDirectoryFrameRequest request) async {
     records.add(List.of(request.data));
-    return super.write(request);
+    await super.write(request);
+    if (loseFirstReply) {
+      loseFirstReply=false;
+      throw const SocketException('Проверка потерянного ответа после commit');
+    }
   }
 }
 
@@ -45,6 +50,8 @@ void main() {
     addTearDown(source.close);addTearDown(target.close);
     final qr=await target.receiveStart();
     await Future.wait([source.sendStart(qr),target.receiveHandshake()]);
+    expect(sourceRelay.records[0],sourceRelay.records[1]);
+    expect(targetRelay.records[0],targetRelay.records[1]);
     expect(source.sas,target.sas);expect(source.sas.length,24);
     await File('$marker.ready').writeAsString('ready');
     final deadline=DateTime.now().add(const Duration(seconds:60));

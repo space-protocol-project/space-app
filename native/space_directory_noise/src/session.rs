@@ -1,3 +1,4 @@
+// Copyright Space contributors. SPDX-License-Identifier: MIT
 use snow::{Builder, HandshakeState, TransportState};
 use subtle::ConstantTimeEq;
 use zeroize::Zeroizing;

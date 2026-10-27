@@ -1,3 +1,4 @@
+// Copyright Space contributors. SPDX-License-Identifier: MIT
 mod session;
 #[cfg(test)]
 mod tests;
@@ -104,6 +105,7 @@ fn operate(session: &mut Session, request: Request) -> Result<Value> {
             Ok(json!({}))
         }
         Request::Seal { data, .. } => {
+            let data = zeroize::Zeroizing::new(data);
             let plain = zeroize::Zeroizing::new(decode(&data, session::MAX_PLAIN)?);
             let frames = session
                 .seal(&plain)?
@@ -203,7 +205,7 @@ pub unsafe extern "C" fn space_directory_noise_call(
     input: *const u8,
     length: usize,
 ) -> *mut c_char {
-    let output = std::panic::catch_unwind(|| {
+    let mut output = std::panic::catch_unwind(|| {
         if input.is_null() || length > 8 * 1024 * 1024 {
             return json!({"ok":false,"error":"input"});
         }
@@ -213,9 +215,20 @@ pub unsafe extern "C" fn space_directory_noise_call(
         }
     })
     .unwrap_or_else(|_| json!({"ok":false,"error":"nativeState"}));
-    CString::new(output.to_string())
+    let serialized = output.to_string();
+    wipe_value(&mut output);
+    CString::new(serialized)
         .map(CString::into_raw)
         .unwrap_or(std::ptr::null_mut())
+}
+
+fn wipe_value(value: &mut Value) {
+    match value {
+        Value::String(text) => text.zeroize(),
+        Value::Array(values) => values.iter_mut().for_each(wipe_value),
+        Value::Object(values) => values.values_mut().for_each(wipe_value),
+        _ => {}
+    }
 }
 
 /// # Safety

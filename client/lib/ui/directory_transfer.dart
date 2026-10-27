@@ -249,6 +249,7 @@ class _DirectoryTransferPanelState extends State<DirectoryTransferPanel>
     final plan = state.plan!;
     return [
       Text(context.strings.directoryBackupPreview(plan.document.spaces.length)),
+      if (plan.unknown) Text(context.strings.directoryBackupUnverified),
       const SizedBox(height: 12),
       ...plan.document.spaces.map((space) => Text(space['origin'] as String)),
       ...plan.conflicts.map(Text.new),

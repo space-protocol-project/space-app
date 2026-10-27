@@ -15,8 +15,13 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       input.outputDirectory.resolve('rust/').toFilePath();
   final environment = <String, String>{'CARGO_TARGET_DIR': targetDirectory};
   if (config.targetOS == OS.android) {
+    final linker = androidLinker(config);
     environment['CARGO_TARGET_${target.toUpperCase().replaceAll('-', '_')}_LINKER'] =
-        androidLinker(config);
+        linker;
+    // cc-rs (ring) не использует CARGO_TARGET_*_LINKER для компиляции C.
+    environment['CC_${target.replaceAll('-', '_')}'] = linker;
+    environment['AR_${target.replaceAll('-', '_')}'] = config.cCompiler!.compiler
+        .resolve('llvm-ar${Platform.isWindows ? '.exe' : ''}').toFilePath();
   }
   await ensureToolchain(root.toFilePath(), environment);
   await run(
