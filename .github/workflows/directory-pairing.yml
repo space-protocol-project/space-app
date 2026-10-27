@@ -56,10 +56,11 @@ jobs:
         options: --health-cmd "pg_isready -U space -d space_test" --health-interval 3s --health-timeout 3s --health-retries 20
     env:
       SPACE_TEST_DATABASE_URL: postgres://space:ci-only-password@127.0.0.1:5432/space_test?sslmode=disable
-      CARGO_TARGET_DIR: ${{ runner.temp }}/rust-target
     steps:
       - uses: actions/checkout@v4
         with: {path: app}
+      - name: Общие результаты Cargo внутри одной проверки
+        run: echo "CARGO_TARGET_DIR=$RUNNER_TEMP/rust-target" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
         with:
           repository: space-protocol-project/space-server
