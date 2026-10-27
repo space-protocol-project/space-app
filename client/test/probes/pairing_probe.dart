@@ -22,9 +22,7 @@ class ProbeVault implements IdentityVault {
 
 Future<void> main() async {
   late PairingServer server;
-  enableFlutterDriverExtension(
-    handler: (_) async => '${server.cancellations}',
-  );
+  enableFlutterDriverExtension(handler: (_) async => '${server.cancellations}');
   SharedPreferences.setMockInitialValues({});
   FlutterError.onError = (details) {
     debugPrint('COMMUNITY_UI_ERROR: ${details.exceptionAsString()}');
