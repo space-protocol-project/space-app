@@ -3089,4 +3089,32 @@ class AppLocalizationsRu extends AppLocalizations {
   String directoryBackupSpaceIncomplete(String origin, int count) {
     return '$origin: подписок в сохранённом снимке — $count; актуальный список недоступен';
   }
+
+  @override
+  String get pairingModeFull => 'Полный режим';
+
+  @override
+  String get pairingSelectionFailed =>
+      'Не удалось подготовить выбор. Проверьте адреса и доверие серверам. Уже сохранённые личности заменять нельзя.';
+
+  @override
+  String get pairingModeLimited => 'Ограниченный режим';
+
+  @override
+  String get pairingSelectionPrepare => 'Подготовить выбранные пространства';
+
+  @override
+  String get pairingSelectionHelp =>
+      'На новом устройстве выберите до 12 известных пространств без сохранённой личности. Для каждого пространства подтвердите отдельный QR и код на исходном устройстве. Для списка пространств можно предварительно восстановить каталог из резервной копии.';
+
+  @override
+  String get pairingSelectionTitle => 'Сопряжение выбранных пространств';
+
+  @override
+  String get pairingModeFullHelp =>
+      'Рабочий доступ, доступные административные действия и управление устройствами в выбранных пространствах. Выдачу подтверждает корневая карточка; корневой секрет не передаётся.';
+
+  @override
+  String get pairingModeLimitedHelp =>
+      'Рабочий доступ только к выбранным пространствам. Подключение и отзыв других устройств, управление корневыми ключами недоступны.';
 }

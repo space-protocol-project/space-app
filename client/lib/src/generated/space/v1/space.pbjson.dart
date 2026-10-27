@@ -181,6 +181,7 @@ const Pairing$json = {
       '5': 12,
       '10': 'proposedRootPublicKey'
     },
+    {'1': 'full_management', '3': 9, '4': 1, '5': 8, '10': 'fullManagement'},
   ],
 };
 
@@ -190,7 +191,8 @@ final $typed_data.Uint8List pairingDescriptor = $convert.base64Decode(
     'FtZRIdCgpwdWJsaWNfa2V5GAMgASgMUglwdWJsaWNLZXkSJgoOYWRtaW5pc3RyYXRpdmUYBCAB'
     'KAhSDmFkbWluaXN0cmF0aXZlEh0KCmNyZWF0ZWRfYXQYBSABKANSCWNyZWF0ZWRBdBIdCgpleH'
     'BpcmVzX2F0GAYgASgDUglleHBpcmVzQXQSFAoFc3RhdGUYByABKAlSBXN0YXRlEjcKGHByb3Bv'
-    'c2VkX3Jvb3RfcHVibGljX2tleRgIIAEoDFIVcHJvcG9zZWRSb290UHVibGljS2V5');
+    'c2VkX3Jvb3RfcHVibGljX2tleRgIIAEoDFIVcHJvcG9zZWRSb290UHVibGljS2V5EicKD2Z1bG'
+    'xfbWFuYWdlbWVudBgJIAEoCFIOZnVsbE1hbmFnZW1lbnQ=');
 
 @$core.Deprecated('Use createPairingRequestDescriptor instead')
 const CreatePairingRequest$json = {
@@ -199,6 +201,7 @@ const CreatePairingRequest$json = {
     {'1': 'public_key', '3': 1, '4': 1, '5': 12, '10': 'publicKey'},
     {'1': 'device_name', '3': 2, '4': 1, '5': 9, '10': 'deviceName'},
     {'1': 'administrative', '3': 3, '4': 1, '5': 8, '10': 'administrative'},
+    {'1': 'full_management', '3': 4, '4': 1, '5': 8, '10': 'fullManagement'},
   ],
 };
 
@@ -206,7 +209,8 @@ const CreatePairingRequest$json = {
 final $typed_data.Uint8List createPairingRequestDescriptor = $convert.base64Decode(
     'ChRDcmVhdGVQYWlyaW5nUmVxdWVzdBIdCgpwdWJsaWNfa2V5GAEgASgMUglwdWJsaWNLZXkSHw'
     'oLZGV2aWNlX25hbWUYAiABKAlSCmRldmljZU5hbWUSJgoOYWRtaW5pc3RyYXRpdmUYAyABKAhS'
-    'DmFkbWluaXN0cmF0aXZl');
+    'DmFkbWluaXN0cmF0aXZlEicKD2Z1bGxfbWFuYWdlbWVudBgEIAEoCFIOZnVsbE1hbmFnZW1lbn'
+    'Q=');
 
 @$core.Deprecated('Use createPairingResponseDescriptor instead')
 const CreatePairingResponse$json = {
@@ -1182,6 +1186,7 @@ const CreateChallengeRequest$json = {
     {'1': 'recovery', '3': 6, '4': 1, '5': 8, '10': 'recovery'},
     {'1': 'recovery_grant_id', '3': 7, '4': 1, '5': 9, '10': 'recoveryGrantId'},
     {'1': 'pairing_id', '3': 8, '4': 1, '5': 9, '10': 'pairingId'},
+    {'1': 'full_management', '3': 9, '4': 1, '5': 8, '10': 'fullManagement'},
   ],
 };
 
@@ -1192,7 +1197,8 @@ final $typed_data.Uint8List createChallengeRequestDescriptor = $convert.base64De
     'GAMgASgMUg9kZXZpY2VQdWJsaWNLZXkSGQoIZ3JhbnRfaWQYBCABKAlSB2dyYW50SWQSJgoOYW'
     'RtaW5pc3RyYXRpdmUYBSABKAhSDmFkbWluaXN0cmF0aXZlEhoKCHJlY292ZXJ5GAYgASgIUghy'
     'ZWNvdmVyeRIqChFyZWNvdmVyeV9ncmFudF9pZBgHIAEoCVIPcmVjb3ZlcnlHcmFudElkEh0KCn'
-    'BhaXJpbmdfaWQYCCABKAlSCXBhaXJpbmdJZA==');
+    'BhaXJpbmdfaWQYCCABKAlSCXBhaXJpbmdJZBInCg9mdWxsX21hbmFnZW1lbnQYCSABKAhSDmZ1'
+    'bGxNYW5hZ2VtZW50');
 
 @$core.Deprecated('Use createChallengeResponseDescriptor instead')
 const CreateChallengeResponse$json = {

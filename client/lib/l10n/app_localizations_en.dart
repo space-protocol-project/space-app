@@ -3071,4 +3071,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String directoryBackupSpaceIncomplete(String origin, int count) {
     return '$origin: $count saved follows; current list unavailable';
   }
+
+  @override
+  String get pairingModeFull => 'Full mode';
+
+  @override
+  String get pairingSelectionFailed =>
+      'Cannot prepare this selection. Check addresses and server trust. Existing saved identities cannot be replaced.';
+
+  @override
+  String get pairingModeLimited => 'Limited mode';
+
+  @override
+  String get pairingSelectionPrepare => 'Prepare selected spaces';
+
+  @override
+  String get pairingSelectionHelp =>
+      'On the new device, select up to 12 known spaces without a saved identity. Confirm a separate QR and verification code for each space on the source device. You can restore a directory backup first.';
+
+  @override
+  String get pairingSelectionTitle => 'Pair selected spaces';
+
+  @override
+  String get pairingModeFullHelp =>
+      'Working access, permitted administrative actions and device management in selected spaces. A root card must authorize this mode; the root secret is never transferred.';
+
+  @override
+  String get pairingModeLimitedHelp =>
+      'Working access to selected spaces only. Cannot pair or revoke other devices or manage root keys.';
 }

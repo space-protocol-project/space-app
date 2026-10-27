@@ -2840,6 +2840,32 @@ class AppLocalizationsZh extends AppLocalizations {
   String directoryBackupSpaceIncomplete(String origin, int count) {
     return '$origin：已保存 $count 个关注；无法获取当前列表';
   }
+
+  @override
+  String get pairingModeFull => '完整模式';
+
+  @override
+  String get pairingSelectionFailed => '无法准备所选空间。请检查地址和服务器信任信息。不能覆盖已保存的身份。';
+
+  @override
+  String get pairingModeLimited => '受限模式';
+
+  @override
+  String get pairingSelectionPrepare => '准备所选空间';
+
+  @override
+  String get pairingSelectionHelp =>
+      '在新设备上选择最多 12 个尚未保存身份的已知空间。在原设备上逐一确认每个空间的二维码和验证码。可以先恢复目录备份。';
+
+  @override
+  String get pairingSelectionTitle => '配对所选空间';
+
+  @override
+  String get pairingModeFullHelp =>
+      '在所选空间内获得工作访问权限、允许的管理操作及设备管理权限。需根卡授权，不会传输根密钥。';
+
+  @override
+  String get pairingModeLimitedHelp => '仅能访问所选空间，不能配对或撤销其他设备，也不能管理根密钥。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4108,4 +4134,30 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String directoryBackupSpaceIncomplete(String origin, int count) {
     return '$origin：已保存 $count 个关注；无法获取当前列表';
   }
+
+  @override
+  String get pairingModeFull => '完整模式';
+
+  @override
+  String get pairingSelectionFailed => '无法准备所选空间。请检查地址和服务器信任信息。不能覆盖已保存的身份。';
+
+  @override
+  String get pairingModeLimited => '受限模式';
+
+  @override
+  String get pairingSelectionPrepare => '准备所选空间';
+
+  @override
+  String get pairingSelectionHelp =>
+      '在新设备上选择最多 12 个尚未保存身份的已知空间。在原设备上逐一确认每个空间的二维码和验证码。可以先恢复目录备份。';
+
+  @override
+  String get pairingSelectionTitle => '配对所选空间';
+
+  @override
+  String get pairingModeFullHelp =>
+      '在所选空间内获得工作访问权限、允许的管理操作及设备管理权限。需根卡授权，不会传输根密钥。';
+
+  @override
+  String get pairingModeLimitedHelp => '仅能访问所选空间，不能配对或撤销其他设备，也不能管理根密钥。';
 }

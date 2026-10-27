@@ -35,8 +35,11 @@ abstract class PairingState with _$PairingState {
 }
 
 class PairingCubit extends Cubit<PairingState> {
-  PairingCubit(this.controller, {this.create = PendingPairing.start, this.checkRecord})
-    : super(const PairingState()) {
+  PairingCubit(
+    this.controller, {
+    this.create = PendingPairing.start,
+    this.checkRecord,
+  }) : super(const PairingState()) {
     _server = controller.preview;
     _subscription = controller.stream.listen((_) {
       if (!identical(_server, controller.preview)) {

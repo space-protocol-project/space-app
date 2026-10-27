@@ -147,7 +147,8 @@ class PendingPairing {
     final scopes = (parent['scopes'] as List).cast<String>();
     final managed = scopes.contains('space.manage');
     if (parent['grant_id'] != response.parentGrantId ||
-        (!scopes.contains('identity.recover') && !scopes.contains('device.manage')) ||
+        (!scopes.contains('identity.recover') &&
+            !scopes.contains('device.manage')) ||
         (p.administrative && !managed) ||
         (parent['issued_at'] as int) > (transcript['issued_at'] as int) + 5 ||
         (parent['grant_expires_at'] as int) <

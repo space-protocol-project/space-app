@@ -20,8 +20,7 @@ class PairingQr {
     this.administrative,
     this.expiresAt, {
     this.fullManagement = false,
-  }
-  );
+  });
   final String serverId, serverKey, origin, code, id, publicKey;
   final bool administrative;
   final bool fullManagement;

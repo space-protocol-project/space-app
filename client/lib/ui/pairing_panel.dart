@@ -40,15 +40,19 @@ class _PairingStartPanelState extends State<PairingStartPanel>
   @override
   void didUpdateWidget(covariant PairingStartPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller != widget.controller || oldWidget.fullManagement != widget.fullManagement) {
+    if (oldWidget.controller != widget.controller ||
+        oldWidget.fullManagement != widget.fullManagement) {
       unawaited(cubit.close());
       cubit = createCubit();
     }
   }
 
-  PairingCubit createCubit() => PairingCubit(widget.controller,
+  PairingCubit createCubit() => PairingCubit(
+    widget.controller,
     checkRecord: widget.checkRecord,
-    create: (server) => PendingPairing.start(server, fullManagement: widget.fullManagement));
+    create: (server) =>
+        PendingPairing.start(server, fullManagement: widget.fullManagement),
+  );
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {

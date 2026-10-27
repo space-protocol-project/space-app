@@ -456,7 +456,8 @@ class DeviceRecord {
   final bool fullManagement;
   List<int> get managementSeed => fullManagement ? deviceSeed : recoverySeed;
   String get managementGrantId => fullManagement ? grantId : recoveryGrantId;
-  bool get canManageDevices => rootSeed.isNotEmpty || managementSeed.length == 32;
+  bool get canManageDevices =>
+      rootSeed.isNotEmpty || managementSeed.length == 32;
   String grantId;
   final List<Map<String, dynamic>> rootHistory;
   final Map<String, String> mlsChannels;
@@ -671,7 +672,8 @@ abstract interface class DeviceManagement {
 }
 
 extension DeviceManagementAuthority on DeviceManagement {
-  bool get hasDeviceAuthority => hasRootAuthority ||
+  bool get hasDeviceAuthority =>
+      hasRootAuthority ||
       (this is SpaceSession && (this as SpaceSession).record.fullManagement);
 }
 
@@ -1806,7 +1808,7 @@ class SpaceSession
     if (pairing != null) {
       request.pairingId = pairing.id;
       request.administrative = pairing.administrative;
-        request.fullManagement = pairing.fullManagement;
+      request.fullManagement = pairing.fullManagement;
     }
     return request;
   }

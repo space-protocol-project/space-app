@@ -120,10 +120,14 @@ class DirectoryRepository {
     final pin = (state['catalog'] as Map)[record.origin];
     if (pin == null) return;
     final saved = checkedDirectorySpace(pin);
-    directoryRequire(saved['principal_id'] == (await record.identity()).principalId);
-    directoryRequire(saved['server_id'] == record.serverId &&
-        saved['server_key'] == record.serverKey &&
-        saved['tls_fingerprint'] == record.tlsFingerprint);
+    directoryRequire(
+      saved['principal_id'] == (await record.identity()).principalId,
+    );
+    directoryRequire(
+      saved['server_id'] == record.serverId &&
+          saved['server_key'] == record.serverKey &&
+          saved['tls_fingerprint'] == record.tlsFingerprint,
+    );
   }
 }
 

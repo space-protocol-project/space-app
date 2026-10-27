@@ -647,6 +647,7 @@ class Pairing extends $pb.GeneratedMessage {
     $fixnum.Int64? expiresAt,
     $core.String? state,
     $core.List<$core.int>? proposedRootPublicKey,
+    $core.bool? fullManagement,
   }) {
     final result = Pairing._();
     if (id != null) result.id = id;
@@ -658,6 +659,7 @@ class Pairing extends $pb.GeneratedMessage {
     if (state != null) result.state = state;
     if (proposedRootPublicKey != null)
       result.proposedRootPublicKey = proposedRootPublicKey;
+    if (fullManagement != null) result.fullManagement = fullManagement;
     return result;
   }
 
@@ -684,6 +686,7 @@ class Pairing extends $pb.GeneratedMessage {
     ..aOS(7, _omitFieldNames ? '' : 'state')
     ..a<$core.List<$core.int>>(
         8, _omitFieldNames ? '' : 'proposedRootPublicKey', $pb.PbFieldType.OY)
+    ..aOB(9, _omitFieldNames ? '' : 'fullManagement')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -778,6 +781,15 @@ class Pairing extends $pb.GeneratedMessage {
   $core.bool hasProposedRootPublicKey() => $_has(7);
   @$pb.TagNumber(8)
   void clearProposedRootPublicKey() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.bool get fullManagement => $_getBF(8);
+  @$pb.TagNumber(9)
+  set fullManagement($core.bool value) => $_setBool(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasFullManagement() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearFullManagement() => $_clearField(9);
 }
 
 class CreatePairingRequest extends $pb.GeneratedMessage {
@@ -785,11 +797,13 @@ class CreatePairingRequest extends $pb.GeneratedMessage {
     $core.List<$core.int>? publicKey,
     $core.String? deviceName,
     $core.bool? administrative,
+    $core.bool? fullManagement,
   }) {
     final result = CreatePairingRequest._();
     if (publicKey != null) result.publicKey = publicKey;
     if (deviceName != null) result.deviceName = deviceName;
     if (administrative != null) result.administrative = administrative;
+    if (fullManagement != null) result.fullManagement = fullManagement;
     return result;
   }
 
@@ -810,6 +824,7 @@ class CreatePairingRequest extends $pb.GeneratedMessage {
         1, _omitFieldNames ? '' : 'publicKey', $pb.PbFieldType.OY)
     ..aOS(2, _omitFieldNames ? '' : 'deviceName')
     ..aOB(3, _omitFieldNames ? '' : 'administrative')
+    ..aOB(4, _omitFieldNames ? '' : 'fullManagement')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -861,6 +876,15 @@ class CreatePairingRequest extends $pb.GeneratedMessage {
   $core.bool hasAdministrative() => $_has(2);
   @$pb.TagNumber(3)
   void clearAdministrative() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get fullManagement => $_getBF(3);
+  @$pb.TagNumber(4)
+  set fullManagement($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasFullManagement() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearFullManagement() => $_clearField(4);
 }
 
 class CreatePairingResponse extends $pb.GeneratedMessage {
@@ -4343,6 +4367,7 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
     $core.bool? recovery,
     $core.String? recoveryGrantId,
     $core.String? pairingId,
+    $core.bool? fullManagement,
   }) {
     final result = CreateChallengeRequest._();
     if (purpose != null) result.purpose = purpose;
@@ -4353,6 +4378,7 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
     if (recovery != null) result.recovery = recovery;
     if (recoveryGrantId != null) result.recoveryGrantId = recoveryGrantId;
     if (pairingId != null) result.pairingId = pairingId;
+    if (fullManagement != null) result.fullManagement = fullManagement;
     return result;
   }
 
@@ -4379,6 +4405,7 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
     ..aOB(6, _omitFieldNames ? '' : 'recovery')
     ..aOS(7, _omitFieldNames ? '' : 'recoveryGrantId')
     ..aOS(8, _omitFieldNames ? '' : 'pairingId')
+    ..aOB(9, _omitFieldNames ? '' : 'fullManagement')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -4481,6 +4508,16 @@ class CreateChallengeRequest extends $pb.GeneratedMessage {
   $core.bool hasPairingId() => $_has(7);
   @$pb.TagNumber(8)
   void clearPairingId() => $_clearField(8);
+
+  /// Только root-подписанный pairing: управление устройствами без root-секрета.
+  @$pb.TagNumber(9)
+  $core.bool get fullManagement => $_getBF(8);
+  @$pb.TagNumber(9)
+  set fullManagement($core.bool value) => $_setBool(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasFullManagement() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearFullManagement() => $_clearField(9);
 }
 
 class CreateChallengeResponse extends $pb.GeneratedMessage {

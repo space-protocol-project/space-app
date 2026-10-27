@@ -5571,6 +5571,54 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'{origin}: подписок в сохранённом снимке — {count}; актуальный список недоступен'**
   String directoryBackupSpaceIncomplete(String origin, int count);
+
+  /// No description provided for @pairingModeFull.
+  ///
+  /// In ru, this message translates to:
+  /// **'Полный режим'**
+  String get pairingModeFull;
+
+  /// No description provided for @pairingSelectionFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось подготовить выбор. Проверьте адреса и доверие серверам. Уже сохранённые личности заменять нельзя.'**
+  String get pairingSelectionFailed;
+
+  /// No description provided for @pairingModeLimited.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ограниченный режим'**
+  String get pairingModeLimited;
+
+  /// No description provided for @pairingSelectionPrepare.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подготовить выбранные пространства'**
+  String get pairingSelectionPrepare;
+
+  /// No description provided for @pairingSelectionHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'На новом устройстве выберите до 12 известных пространств без сохранённой личности. Для каждого пространства подтвердите отдельный QR и код на исходном устройстве. Для списка пространств можно предварительно восстановить каталог из резервной копии.'**
+  String get pairingSelectionHelp;
+
+  /// No description provided for @pairingSelectionTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сопряжение выбранных пространств'**
+  String get pairingSelectionTitle;
+
+  /// No description provided for @pairingModeFullHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Рабочий доступ, доступные административные действия и управление устройствами в выбранных пространствах. Выдачу подтверждает корневая карточка; корневой секрет не передаётся.'**
+  String get pairingModeFullHelp;
+
+  /// No description provided for @pairingModeLimitedHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Рабочий доступ только к выбранным пространствам. Подключение и отзыв других устройств, управление корневыми ключами недоступны.'**
+  String get pairingModeLimitedHelp;
 }
 
 class _AppLocalizationsDelegate
