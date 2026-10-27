@@ -198,7 +198,8 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
   }
 
   void _requirePending(Pairing pair) {
-    if (pair.expiresAt.toInt() <= now().millisecondsSinceEpoch ~/ 1000) {
+    final remaining = pair.expiresAt.toInt() - now().millisecondsSinceEpoch ~/ 1000;
+    if (remaining <= 0 || remaining > 305) {
       throw const PairingApprovalFailure('pairingExpired');
     }
     if (pair.state != 'pending') {

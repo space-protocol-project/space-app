@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:fixnum/fixnum.dart';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/generated/space/v1/space.pb.dart';
@@ -188,5 +190,14 @@ void main() {
     await cubit.approve('ABCD-EFGH', () async => true);
     expect(manager.signatures, 0);
     await changes.close();
+  });
+
+  test('Сервер не может продлить подготовку за пределы срока запроса', () async {
+    request.pairing.expiresAt = Int64(clock.millisecondsSinceEpoch ~/ 1000 + 3600);
+    cubit.setCode(request.code);
+    await prepare();
+    expect(cubit.state.messageKey, 'pairingExpired');
+    expect(cubit.state.prepared, isFalse);
+    expect(manager.preparations, 0);
   });
 }

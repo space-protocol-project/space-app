@@ -86,7 +86,7 @@ class _PairingStartPanelState extends State<PairingStartPanel>
       ),
     );
     if (approved != true || !mounted || active != cubit) return;
-    if (await active.accept(revision) && mounted) {
+    if (await active.accept(revision) && mounted && active == cubit) {
       await widget.onConnected(origin);
     }
   }
