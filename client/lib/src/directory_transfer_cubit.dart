@@ -30,7 +30,7 @@ abstract class DirectoryTransferState with _$DirectoryTransferState {
   const factory DirectoryTransferState({
     @Default(DirectoryTransferStage.idle) DirectoryTransferStage stage,
     @Default(false) bool receiving,
-    @Default(false) bool replaceSettings,
+    @Default(false) bool mergeSettings,
     @Default({}) Map<String, SettingsChoice> settingsChoices,
     @Default('') String qr,
     @Default('') String sas,
@@ -99,9 +99,9 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
     );
   }
 
-  void replaceSettings(bool value) {
+  void mergeSettings(bool value) {
     if (!isClosed && state.stage == DirectoryTransferStage.preview) {
-      emit(state.copyWith(replaceSettings: value, settingsChoices: const {}));
+      emit(state.copyWith(mergeSettings: value, settingsChoices: const {}));
     }
   }
 
@@ -139,7 +139,7 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
         qr: '',
         sas: '',
         plan: null,
-        replaceSettings: false,
+        mergeSettings: false,
         settingsChoices: const {},
       ),
     );
@@ -243,15 +243,15 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
     if (state.stage != DirectoryTransferStage.preview ||
         plan == null ||
         plan.conflicts.isNotEmpty ||
-        !plan.settingsResolved(state.replaceSettings, state.settingsChoices)) {
+        !plan.settingsResolved(state.mergeSettings, state.settingsChoices)) {
       return;
     }
-    final replace = state.replaceSettings;
+    final replace = state.mergeSettings;
     emit(state.copyWith(stage: DirectoryTransferStage.sending));
     await _run((generation) async {
       await service.apply(
         plan,
-        replaceSettings: replace,
+        mergeSettings: replace,
         settingsChoices: state.settingsChoices,
       );
       if (_current(generation)) {

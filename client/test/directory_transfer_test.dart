@@ -190,7 +190,7 @@ void main() {
     });
     await service.apply(
       await service.preview(document),
-      replaceSettings: false,
+      mergeSettings: false,
     );
     await service.recordExport(await service.capture());
     final before = await repository.read();

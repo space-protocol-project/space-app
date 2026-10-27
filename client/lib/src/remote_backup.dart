@@ -348,7 +348,7 @@ class RemoteBackupService {
 
   Future<void> apply(
     RemoteRestore restore, {
-    required bool replaceSettings,
+    required bool mergeSettings,
     Map<String, SettingsChoice> settingsChoices = const {},
   }) => _client(restore.kit, (store) async {
     final document = restore.plan.document;
@@ -360,7 +360,7 @@ class RemoteBackupService {
     _same(await _head(restore.kit, store), restore.head);
     await directory.apply(
       restore.plan,
-      replaceSettings: replaceSettings,
+      mergeSettings: mergeSettings,
       settingsChoices: settingsChoices,
     );
     await _settle(restore);

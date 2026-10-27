@@ -96,7 +96,7 @@ void main() {
       );
       await source.apply(
         await source.preview(directoryDocument(count: 3)),
-        replaceSettings: true,
+        mergeSettings: true,
       );
       final publisher = RemoteBackupService(
         source,
@@ -122,7 +122,7 @@ void main() {
       expect(plan.head.revision.toInt(), 1);
       expect(targetPrefs.origins, isEmpty);
       expect(targetVault.records, isEmpty);
-      await recovery.apply(plan, replaceSettings: false);
+      await recovery.apply(plan, mergeSettings: false);
       expect(targetPrefs.origins, ['https://space.example']);
       expect(targetPrefs.palette, 'gruvbox');
       expect(targetVault.records, isEmpty);

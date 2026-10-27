@@ -115,10 +115,12 @@ class SettingsReplica {
     directoryRequire(utf8.encode(raw).length <= 32768);
     final data = directoryMap(jsonDecode(raw), 'actor,settings,v');
     directoryInt(data['v'], min: 1, max: 1);
-    return SettingsReplica._(
+    final replica = SettingsReplica._(
       directoryBytes(data['actor'], 16),
       SettingsSnapshot.parse(data['settings']),
     );
+    directoryRequire(replica.encode() == raw);
+    return replica;
   }
   String encode() =>
       jsonEncode({'v': 1, 'actor': actor, 'settings': snapshot.data});

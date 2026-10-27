@@ -261,10 +261,10 @@ class _DirectoryTransferPanelState extends State<DirectoryTransferPanel>
       const SizedBox(height: 16),
       DirectorySettingsMergePanel(
         plan: plan,
-        enabled: state.replaceSettings,
+        enabled: state.mergeSettings,
         busy: false,
         choices: state.settingsChoices,
-        onEnabled: cubit.replaceSettings,
+        onEnabled: cubit.mergeSettings,
         onChoice: cubit.chooseSetting,
       ),
       const SizedBox(height: 12),
@@ -272,7 +272,7 @@ class _DirectoryTransferPanelState extends State<DirectoryTransferPanel>
         onPressed:
             plan.conflicts.isNotEmpty ||
                 !plan.settingsResolved(
-                  state.replaceSettings,
+                  state.mergeSettings,
                   state.settingsChoices,
                 )
             ? null

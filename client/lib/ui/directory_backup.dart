@@ -217,10 +217,10 @@ class _DirectoryBackupPanelState extends State<DirectoryBackupPanel> {
       const SizedBox(height: 12),
       DirectorySettingsMergePanel(
         plan: plan,
-        enabled: state.replaceSettings,
+        enabled: state.mergeSettings,
         busy: state.busy,
         choices: state.settingsChoices,
-        onEnabled: cubit.replaceSettings,
+        onEnabled: cubit.mergeSettings,
         onChoice: cubit.chooseSetting,
       ),
       const SizedBox(height: 12),
@@ -229,7 +229,7 @@ class _DirectoryBackupPanelState extends State<DirectoryBackupPanel> {
             state.busy ||
                 plan.conflicts.isNotEmpty ||
                 !plan.settingsResolved(
-                  state.replaceSettings,
+                  state.mergeSettings,
                   state.settingsChoices,
                 )
             ? null

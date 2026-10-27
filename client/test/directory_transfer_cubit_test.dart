@@ -110,7 +110,7 @@ void main() {
     transfer.request.complete(qr());
     await pending;
     expect(cubit.state.stage, DirectoryTransferStage.failed);
-    expect(cubit.state.replaceSettings, isFalse);
+    expect(cubit.state.mergeSettings, isFalse);
   });
   test('Каталог сначала показывается без изменений, явное применение завершается без вложенной блокировки', () async {
     final pending = cubit.start();
@@ -120,7 +120,7 @@ void main() {
     await cubit.confirm('сверено');
     expect(cubit.state.stage, DirectoryTransferStage.preview);
     expect(preferences.origins, isEmpty);
-    expect(cubit.state.replaceSettings, isFalse);
+    expect(cubit.state.mergeSettings, isFalse);
     await cubit.apply().timeout(const Duration(seconds: 5));
     expect(cubit.state.stage, DirectoryTransferStage.done);
     expect(preferences.origins, ['https://space.example']);

@@ -36,7 +36,7 @@ void main() {
     final plan = await service.preview(directoryDocument());
     expect(plan.unknown, isTrue);
     expect(storage.values, isEmpty);
-    await service.apply(plan, replaceSettings: false);
+    await service.apply(plan, mergeSettings: false);
     expect(preferences.palette, 'gruvbox');
     expect(preferences.origins, ['https://space.example']);
     expect(vault.records, isEmpty);
@@ -47,21 +47,21 @@ void main() {
     () async {
       await service.apply(
         await service.preview(directoryDocument()),
-        replaceSettings: true,
+        mergeSettings: true,
       );
       expect(preferences.palette, 'iris');
       await service.apply(
         await service.preview(directoryDocument()),
-        replaceSettings: true,
+        mergeSettings: true,
       );
       expect(preferences.origins.length, 1);
     },
   );
   test('Известный откат и ветвление блокируются', () async {
     final first = directoryDocument();
-    await service.apply(await service.preview(first), replaceSettings: false);
+    await service.apply(await service.preview(first), mergeSettings: false);
     final next = directoryDocument(revision: 2, parent: await first.digest());
-    await service.apply(await service.preview(next), replaceSettings: false);
+    await service.apply(await service.preview(next), mergeSettings: false);
     expect((await service.preview(first)).conflicts, isNotEmpty);
     final fork = directoryDocument(revision: 3, parent: await first.digest());
     expect((await service.preview(fork)).conflicts, isNotEmpty);
@@ -70,12 +70,12 @@ void main() {
     final plan = await service.preview(directoryDocument());
     await preferences.change(palette: 'ocean');
     await expectLater(
-      service.apply(plan, replaceSettings: false),
+      service.apply(plan, mergeSettings: false),
       throwsFormatException,
     );
     await service.apply(
       await service.preview(directoryDocument()),
-      replaceSettings: false,
+      mergeSettings: false,
     );
     final state = await repository.read(), data = state['catalog'] as Map;
     data['https://space.example']['server_key'] = url64(List.filled(32, 9));
@@ -88,7 +88,7 @@ void main() {
       final plan = await service.preview(directoryDocument());
       storage.fail = true;
       await expectLater(
-        service.apply(plan, replaceSettings: true),
+        service.apply(plan, mergeSettings: true),
         throwsStateError,
       );
       expect(preferences.palette, 'gruvbox');
@@ -113,7 +113,7 @@ void main() {
     () async {
       await service.apply(
         await service.preview(directoryDocument()),
-        replaceSettings: false,
+        mergeSettings: false,
       );
       await expectLater(
         repository.checkTrust(
@@ -135,7 +135,7 @@ void main() {
     await expectLater(
       service.apply(
         await service.preview(directoryDocument()),
-        replaceSettings: true,
+        mergeSettings: true,
       ),
       throwsStateError,
     );

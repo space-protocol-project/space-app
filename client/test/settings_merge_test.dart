@@ -152,6 +152,14 @@ void main() {
       throwsFormatException,
     );
   });
+  test('Повторяющиеся JSON-ключи не меняют смысл или digest каталога', () {
+    final raw = utf8.decode(directoryDocument().encode());
+    final repeated = raw.replaceFirst('"v":2', '"v":2,"v":2');
+    expect(() => decodeDirectoryDocument(utf8.encode(repeated)), throwsFormatException);
+    final replica = SettingsReplica();
+    final duplicate = replica.encode().replaceFirst('"v":1', '"v":1,"v":1');
+    expect(() => SettingsReplica.parse(duplicate), throwsFormatException);
+  });
 
   setUp(() => SharedPreferences.setMockInitialValues({}));
   AppPreferences preferences() {
@@ -219,7 +227,7 @@ void main() {
       final backup = service(prefs);
       final plan = await backup.preview(directoryDocument());
       expect(plan.settingsMerge.conflicts, contains('palette'));
-      await backup.apply(plan, replaceSettings: false);
+      await backup.apply(plan, mergeSettings: false);
       expect(prefs.settingsSnapshot.same(before), isTrue);
       expect(prefs.origins, contains('https://space.example'));
     },
@@ -231,7 +239,7 @@ void main() {
     await prefs.change(palette: 'ocean');
     await prefs.change(palette: 'gruvbox');
     await expectLater(
-      backup.apply(plan, replaceSettings: true),
+      backup.apply(plan, mergeSettings: true),
       throwsFormatException,
     );
     expect(storage.values, isEmpty);
@@ -243,20 +251,20 @@ void main() {
     final document = directoryDocument();
     var plan = await backup.preview(document);
     await expectLater(
-      backup.apply(plan, replaceSettings: true),
+      backup.apply(plan, mergeSettings: true),
       throwsFormatException,
     );
     expect(storage.values, isEmpty);
     await backup.apply(
       plan,
-      replaceSettings: true,
+      mergeSettings: true,
       settingsChoices: {'palette': SettingsChoice.local},
     );
     expect(prefs.palette, 'ocean');
     final before = prefs.settingsSnapshot;
     plan = await backup.preview(document);
     expect(plan.settingsMerge.conflicts, isEmpty);
-    await backup.apply(plan, replaceSettings: true);
+    await backup.apply(plan, mergeSettings: true);
     expect(prefs.settingsSnapshot.same(before), isTrue);
   });
   test('После сбоя перед записью настроек повтор сохраняет более поздний локальный выбор', () async {
@@ -265,7 +273,7 @@ void main() {
     final backup = service(prefs, storage);
     final plan = await backup.preview(directoryDocument());
     await expectLater(
-      backup.apply(plan, replaceSettings: true),
+      backup.apply(plan, mergeSettings: true),
       throwsStateError,
     );
     expect((await backup.repository.read())['pending'], isNotNull);

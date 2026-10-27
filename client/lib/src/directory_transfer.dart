@@ -192,7 +192,7 @@ class DirectoryTransfer {
     directoryRequire((await _read(3 + frames.length)).finalRecord);
     final plain = await _noise!.openDirectory(frames);
     try {
-      final document = DirectoryDocument.parse(jsonDecode(utf8.decode(plain)));
+      final document = decodeDirectoryDocument(plain);
       directoryRequire(
         document.spaces.isNotEmpty && document.spaces.length <= 12,
       );

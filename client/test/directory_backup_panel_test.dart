@@ -81,7 +81,7 @@ void main() {
         );
         await cubit.preview(bytes, 'A secure backup password');
       });
-      cubit.replaceSettings(true);
+      cubit.mergeSettings(true);
       expect(cubit.state.plan, isNotNull);
       final strings = lookupAppLocalizations(const Locale('ru'));
       await tester.pumpWidget(
@@ -103,7 +103,7 @@ void main() {
       await tester.tap(find.text(strings.directoryBackupRead));
       await tester.pumpAndSettle();
       expect(cubit.state.plan, isNull);
-      expect(cubit.state.replaceSettings, isFalse);
+      expect(cubit.state.mergeSettings, isFalse);
       expect(find.text(strings.directoryBackupApply), findsNothing);
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump();

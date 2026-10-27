@@ -46,7 +46,7 @@ Future<void> crashSource(
   final hooks = context.hooks;
   await context.service.apply(
     await context.service.preview(crashDocument()),
-    replaceSettings: true,
+    mergeSettings: true,
   );
   final document = await context.service.capture(
     selectedOrigins: incomingOrigins,
@@ -87,7 +87,7 @@ Future<void> crashTarget(
   context.preferences.armed = true;
   await context.service.apply(
     plan,
-    replaceSettings: hooks.replace,
+    mergeSettings: hooks.replace,
     settingsChoices: hooks.replace
         ? {
             for (final key in plan.settingsMerge.conflicts)

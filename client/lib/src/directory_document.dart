@@ -8,6 +8,13 @@ import 'settings_snapshot.dart';
 export 'directory_validation.dart';
 export 'settings_snapshot.dart' show checkedDirectorySettings;
 
+DirectoryDocument decodeDirectoryDocument(List<int> bytes) {
+  directoryRequire(bytes.length <= directoryMaxPlain);
+  final text = utf8.decode(bytes), data = jsonDecode(text);
+  directoryRequire(jsonEncode(data) == text);
+  return DirectoryDocument.parse(data);
+}
+
 Map<String, dynamic> checkedDirectorySpace(Object? value) {
   final data = directoryMap(
     value,

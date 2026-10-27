@@ -19,7 +19,7 @@ part 'remote_backup_cubit.freezed.dart';
 abstract class RemoteBackupState with _$RemoteBackupState {
   const factory RemoteBackupState({
     @Default(false) bool busy,
-    @Default(false) bool replaceSettings,
+    @Default(false) bool mergeSettings,
     @Default({}) Map<String, SettingsChoice> settingsChoices,
     @Default('') String message,
     RemoteBackupKit? kit,
@@ -62,9 +62,9 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
     );
   }
 
-  void replaceSettings(bool value) {
+  void mergeSettings(bool value) {
     if (!isClosed && !state.busy) {
-      emit(state.copyWith(replaceSettings: value, settingsChoices: const {}));
+      emit(state.copyWith(mergeSettings: value, settingsChoices: const {}));
     }
   }
 
@@ -73,7 +73,7 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
       emit(
         state.copyWith(
           restore: null,
-          replaceSettings: false,
+          mergeSettings: false,
           settingsChoices: const {},
           error: null,
           message: '',
@@ -107,7 +107,7 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
           state.copyWith(
             kit: kit,
             restore: null,
-            replaceSettings: false,
+            mergeSettings: false,
             settingsChoices: const {},
           ),
         );
@@ -126,7 +126,7 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
     _emit(
       state.copyWith(
         restore: null,
-        replaceSettings: false,
+        mergeSettings: false,
         settingsChoices: const {},
       ),
     );
@@ -194,7 +194,7 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
     _emit(
       state.copyWith(
         restore: null,
-        replaceSettings: false,
+        mergeSettings: false,
         settingsChoices: const {},
       ),
     );
@@ -204,7 +204,7 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
       state.copyWith(
         kit: kit,
         restore: null,
-        replaceSettings: false,
+        mergeSettings: false,
         settingsChoices: const {},
       ),
     );
@@ -215,7 +215,7 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
     _emit(
       state.copyWith(
         restore: null,
-        replaceSettings: false,
+        mergeSettings: false,
         settingsChoices: const {},
       ),
     );
@@ -228,7 +228,7 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
     _emit(
       state.copyWith(
         restore: null,
-        replaceSettings: false,
+        mergeSettings: false,
         settingsChoices: const {},
       ),
     );
@@ -240,14 +240,14 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
     if (restore == null ||
         restore.plan.conflicts.isNotEmpty ||
         !restore.plan.settingsResolved(
-          state.replaceSettings,
+          state.mergeSettings,
           state.settingsChoices,
         )) {
       return;
     }
     await service.apply(
       restore,
-      replaceSettings: state.replaceSettings,
+      mergeSettings: state.mergeSettings,
       settingsChoices: state.settingsChoices,
     );
     _emit(state.copyWith(restore: null, message: 'restored'));

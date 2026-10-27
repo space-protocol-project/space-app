@@ -50,7 +50,7 @@ void main() {
     remote = connectService(directory);
     await directory.apply(
       await directory.preview(directoryDocument()),
-      replaceSettings: true,
+      mergeSettings: true,
     );
     await remote.saveKit(kit);
   });
@@ -84,7 +84,7 @@ void main() {
     final plan = await recovery.preview(kit, backupPassword);
     expect(plan.plan.unknown, isTrue);
     expect(target.preferences.origins, isEmpty);
-    await recovery.apply(plan, replaceSettings: false);
+    await recovery.apply(plan, mergeSettings: false);
     expect(target.preferences.origins, ['https://space.example']);
     expect(target.preferences.palette, 'gruvbox');
     expect((target.vault as DirectoryVault).records, isEmpty);
@@ -96,7 +96,7 @@ void main() {
     expect(api.head.revision.toInt(), 1);
     final target = fresh(), recovery = connectService(target);
     final plan = await recovery.preview(kit, backupPassword);
-    await recovery.apply(plan, replaceSettings: false);
+    await recovery.apply(plan, mergeSettings: false);
     expect(target.preferences.origins, ['https://space.example']);
     await expectLater(
       connectService(directory).publish(kit, 'другой длинный пароль'),
@@ -113,7 +113,7 @@ void main() {
       await expectLater(remote.publish(kit, backupPassword), throwsStateError);
       await remote.apply(
         await remote.preview(kit, backupPassword),
-        replaceSettings: false,
+        mergeSettings: false,
       );
       expect(
         (jsonDecode(storage.values[RemoteBackupService.storageKey]!)
@@ -155,7 +155,7 @@ void main() {
     final plan = await recovery.preview(kit, backupPassword);
     await remote.publish(kit, backupPassword);
     await expectLater(
-      recovery.apply(plan, replaceSettings: true),
+      recovery.apply(plan, mergeSettings: true),
       throwsFormatException,
     );
     expect(target.preferences.origins, isEmpty);
@@ -167,7 +167,7 @@ void main() {
       final target = fresh(), recovery = connectService(target);
       await recovery.apply(
         await recovery.preview(kit, backupPassword),
-        replaceSettings: false,
+        mergeSettings: false,
       );
       final old = api.head.deepCopy();
       await remote.publish(kit, backupPassword);
@@ -175,12 +175,12 @@ void main() {
       final plan = await recovery.preview(kit, backupPassword);
       expect(plan.plan.ancestors, hasLength(1));
       expect(plan.plan.conflicts, isEmpty);
-      await recovery.apply(plan, replaceSettings: false);
+      await recovery.apply(plan, mergeSettings: false);
       api.head = old;
       final rollback = await recovery.preview(kit, backupPassword);
       expect(rollback.plan.conflicts, isNotEmpty);
       await expectLater(
-        recovery.apply(rollback, replaceSettings: false),
+        recovery.apply(rollback, mergeSettings: false),
         throwsFormatException,
       );
       final clean = await connectService(fresh()).preview(kit, backupPassword);

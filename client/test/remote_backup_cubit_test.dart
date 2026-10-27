@@ -39,9 +39,9 @@ void main() {
       addTearDown(cubit.close);
       final (kit, _) = await memoryBackupNetwork();
       await cubit.importKit(kit.encode());
-      cubit.replaceSettings(true);
+      cubit.mergeSettings(true);
       await cubit.importKit(kit.encode());
-      expect(cubit.state.replaceSettings, isFalse);
+      expect(cubit.state.mergeSettings, isFalse);
       expect(cubit.state.restore, isNull);
       expect((await service.savedKit())!.id, kit.id);
       expect(prefs.origins, isEmpty);

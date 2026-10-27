@@ -241,9 +241,7 @@ class DirectoryArchive {
         position += size;
         offset += size + 16;
       }
-      final text = utf8.decode(plain), data = jsonDecode(text);
-      directoryRequire(jsonEncode(data) == text);
-      return DirectoryDocument.parse(data);
+      return decodeDirectoryDocument(plain);
     } finally {
       plain.fillRange(0, plain.length, 0);
     }

@@ -267,7 +267,7 @@ class DirectoryBackupService {
 
   Future<void> apply(
     DirectoryRestorePlan plan, {
-    required bool replaceSettings,
+    required bool mergeSettings,
     Map<String, SettingsChoice> settingsChoices = const {},
   }) => repository.exclusive(() async {
     final latest = await preview(plan.document, ancestors: plan.ancestors);
@@ -281,7 +281,7 @@ class DirectoryBackupService {
       'revision': plan.document.revision,
       'digest': plan.digest,
     };
-    final merged = replaceSettings
+    final merged = mergeSettings
         ? latest.settingsMerge.resolve(
             preferences.settingsActor,
             settingsChoices,

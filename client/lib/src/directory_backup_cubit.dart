@@ -15,7 +15,7 @@ part 'directory_backup_cubit.freezed.dart';
 abstract class DirectoryBackupState with _$DirectoryBackupState {
   const factory DirectoryBackupState({
     @Default(false) bool busy,
-    @Default(false) bool replaceSettings,
+    @Default(false) bool mergeSettings,
     @Default({}) Map<String, SettingsChoice> settingsChoices,
     @Default('') String message,
     @Default([]) List<String> results,
@@ -42,9 +42,9 @@ class DirectoryBackupCubit extends Cubit<DirectoryBackupState> {
     );
   }
 
-  void replaceSettings(bool value) {
+  void mergeSettings(bool value) {
     if (!isClosed && !state.busy) {
-      emit(state.copyWith(replaceSettings: value, settingsChoices: const {}));
+      emit(state.copyWith(mergeSettings: value, settingsChoices: const {}));
     }
   }
 
@@ -104,7 +104,7 @@ class DirectoryBackupCubit extends Cubit<DirectoryBackupState> {
         emit(
           state.copyWith(
             plan: null,
-            replaceSettings: false,
+            mergeSettings: false,
             settingsChoices: const {},
           ),
         );
@@ -120,12 +120,12 @@ class DirectoryBackupCubit extends Cubit<DirectoryBackupState> {
     final plan = state.plan;
     if (plan == null ||
         plan.conflicts.isNotEmpty ||
-        !plan.settingsResolved(state.replaceSettings, state.settingsChoices)) {
+        !plan.settingsResolved(state.mergeSettings, state.settingsChoices)) {
       return;
     }
     await service.apply(
       plan,
-      replaceSettings: state.replaceSettings,
+      mergeSettings: state.mergeSettings,
       settingsChoices: state.settingsChoices,
     );
     if (_current(generation)) {
