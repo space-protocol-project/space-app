@@ -40,8 +40,9 @@ class _DirectoryTransferPanelState extends State<DirectoryTransferPanel>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed || externalInput || !cubit.active)
+    if (state == AppLifecycleState.resumed || externalInput || !cubit.active) {
       return;
+    }
     unawaited(cubit.cancel());
   }
 
@@ -60,10 +61,11 @@ class _DirectoryTransferPanelState extends State<DirectoryTransferPanel>
       final text = camera ? await scanDirectoryCamera(context) : await _image();
       if (mounted && text != null) request.text = text;
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.strings.directoryBackupError)),
         );
+      }
     } finally {
       externalInput = false;
     }
@@ -76,8 +78,9 @@ class _DirectoryTransferPanelState extends State<DirectoryTransferPanel>
       ],
     );
     if (file == null) return null;
-    if (await file.length() > 8 * 1024 * 1024)
+    if (await file.length() > 8 * 1024 * 1024) {
       throw const FormatException('QR');
+    }
     final text = await compute(
       directoryTransferFromImage,
       await file.readAsBytes(),
@@ -101,8 +104,9 @@ class _DirectoryTransferPanelState extends State<DirectoryTransferPanel>
           context,
           context.strings.directoryBackupConfirm,
         ) &&
-        mounted)
+        mounted) {
       await cubit.apply();
+    }
   }
 
   @override

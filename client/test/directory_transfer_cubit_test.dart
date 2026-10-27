@@ -17,18 +17,24 @@ import 'fixtures/directory.dart';
 import 'pairing_qr_test.dart' show testServer;
 
 class ControlledDirectory extends DirectoryTransfer {
-  ControlledDirectory(Discovery server):super(server,RpcDirectoryRelay(server),const NativeDirectoryNoise());
-  final request=Completer<DirectoryTransferQr>();
-  int closures=0;
+  ControlledDirectory(Discovery server)
+    : super(server, RpcDirectoryRelay(server), const NativeDirectoryNoise());
+  final request = Completer<DirectoryTransferQr>();
+  int closures = 0;
   Completer<void>? closing;
   @override
-  Future<DirectoryTransferQr> receiveStart()=>request.future;
+  Future<DirectoryTransferQr> receiveStart() => request.future;
   @override
   Future<void> receiveHandshake() async {}
   @override
-  Future<DirectoryRestorePlan> receive(DirectoryBackupService service) => service.preview(directoryDocument());
+  Future<DirectoryRestorePlan> receive(DirectoryBackupService service) =>
+      service.preview(directoryDocument());
   @override
-  Future<void> close() async {closures++;await super.close();await closing?.future;}
+  Future<void> close() async {
+    closures++;
+    await super.close();
+    await closing?.future;
+  }
 }
 
 void main() {
@@ -39,59 +45,106 @@ void main() {
   late DirectoryTransferCubit cubit;
   setUp(() {
     SharedPreferences.setMockInitialValues({});
-    preferences=AppPreferences();
-    controller=ChatController(DirectoryVault())..preview=testServer();
-    final service=DirectoryBackupService(DirectoryRepository(DirectoryStorage()),DirectoryVault(),preferences,()=>{});
-    transfer=ControlledDirectory(controller.preview!);
-    cubit=DirectoryTransferCubit(service,controller,create:(_)=>transfer);
+    preferences = AppPreferences();
+    controller = ChatController(DirectoryVault())..preview = testServer();
+    final service = DirectoryBackupService(
+      DirectoryRepository(DirectoryStorage()),
+      DirectoryVault(),
+      preferences,
+      () => {},
+    );
+    transfer = ControlledDirectory(controller.preview!);
+    cubit = DirectoryTransferCubit(
+      service,
+      controller,
+      create: (_) => transfer,
+    );
   });
-  tearDown(() async {await cubit.close();await controller.close();await preferences.close();});
-  DirectoryTransferQr qr()=>DirectoryTransferQr('https://space.example','srv_example',url64(List.filled(32,2)),'',
-    'dt_${'a'*43}','dc_${'b'*43}',url64(List.filled(32,3)),DateTime.now().millisecondsSinceEpoch~/1000+300);
-  test('Поздний ответ после отмены не возвращает QR и состояние сравнения', () async {
-    final pending=cubit.start();
-    await cubit.cancel();
-    transfer.request.complete(qr());await pending;
-    expect(cubit.state.stage,DirectoryTransferStage.idle);
-    expect(cubit.state.qr,isEmpty);expect(transfer.closures,1);
+  tearDown(() async {
+    await cubit.close();
+    await controller.close();
+    await preferences.close();
   });
-  test('Закрытие экрана не оставляет таймер и не публикует поздний результат', () async {
-    final pending=cubit.start();await cubit.close();
-    transfer.request.complete(qr());await pending;
-    expect(cubit.isClosed,isTrue);expect(cubit.state.qr,isEmpty);
-  });
+  DirectoryTransferQr qr() => DirectoryTransferQr(
+    'https://space.example',
+    'srv_example',
+    url64(List.filled(32, 2)),
+    '',
+    'dt_${'a' * 43}',
+    'dc_${'b' * 43}',
+    url64(List.filled(32, 3)),
+    DateTime.now().millisecondsSinceEpoch ~/ 1000 + 300,
+  );
+  test(
+    'Поздний ответ после отмены не возвращает QR и состояние сравнения',
+    () async {
+      final pending = cubit.start();
+      await cubit.cancel();
+      transfer.request.complete(qr());
+      await pending;
+      expect(cubit.state.stage, DirectoryTransferStage.idle);
+      expect(cubit.state.qr, isEmpty);
+      expect(transfer.closures, 1);
+    },
+  );
+  test(
+    'Закрытие экрана не оставляет таймер и не публикует поздний результат',
+    () async {
+      final pending = cubit.start();
+      await cubit.close();
+      transfer.request.complete(qr());
+      await pending;
+      expect(cubit.isClosed, isTrue);
+      expect(cubit.state.qr, isEmpty);
+    },
+  );
   test('Лимит выбора 12 и запрет менять выбор во время обмена', () async {
-    for(var i=0;i<13;i++) {cubit.select('https://space$i.example',true);}
-    expect(cubit.state.selected,hasLength(12));
-    final pending=cubit.start();cubit.select('https://space0.example',false);
-    expect(cubit.state.selected,hasLength(12));
-    await cubit.cancel(expired:true);transfer.request.complete(qr());await pending;
-    expect(cubit.state.stage,DirectoryTransferStage.failed);
-    expect(cubit.state.replaceSettings,isFalse);
+    for (var i = 0; i < 13; i++) {
+      cubit.select('https://space$i.example', true);
+    }
+    expect(cubit.state.selected, hasLength(12));
+    final pending = cubit.start();
+    cubit.select('https://space0.example', false);
+    expect(cubit.state.selected, hasLength(12));
+    await cubit.cancel(expired: true);
+    transfer.request.complete(qr());
+    await pending;
+    expect(cubit.state.stage, DirectoryTransferStage.failed);
+    expect(cubit.state.replaceSettings, isFalse);
   });
   test('Каталог сначала показывается без изменений, явное применение завершается без вложенной блокировки', () async {
-    final pending=cubit.start();transfer.request.complete(qr());await pending;
-    expect(cubit.state.stage,DirectoryTransferStage.compare);
+    final pending = cubit.start();
+    transfer.request.complete(qr());
+    await pending;
+    expect(cubit.state.stage, DirectoryTransferStage.compare);
     await cubit.confirm('сверено');
-    expect(cubit.state.stage,DirectoryTransferStage.preview);
-    expect(preferences.origins,isEmpty);expect(cubit.state.replaceSettings,isFalse);
-    await cubit.apply().timeout(const Duration(seconds:5));
-    expect(cubit.state.stage,DirectoryTransferStage.done);
-    expect(preferences.origins,['https://space.example']);expect(preferences.palette,'gruvbox');
+    expect(cubit.state.stage, DirectoryTransferStage.preview);
+    expect(preferences.origins, isEmpty);
+    expect(cubit.state.replaceSettings, isFalse);
+    await cubit.apply().timeout(const Duration(seconds: 5));
+    expect(cubit.state.stage, DirectoryTransferStage.done);
+    expect(preferences.origins, ['https://space.example']);
+    expect(preferences.palette, 'gruvbox');
   });
-  test('Поздняя первая отмена не сбрасывает уже начатую новую попытку', () async {
-    final old=transfer;
-    old.closing=Completer<void>();
-    final starting=cubit.start();
-    final cancelling=cubit.cancel();
-    await cubit.cancel();
-    transfer=ControlledDirectory(controller.preview!);
-    final next=cubit.start();
-    old.closing!.complete();old.request.complete(qr());
-    await cancelling;await starting;
-    expect(cubit.state.stage,DirectoryTransferStage.waiting);
-    expect(transfer.closures,0);
-    transfer.request.complete(qr());await next;
-    expect(cubit.state.stage,DirectoryTransferStage.compare);
-  });
+  test(
+    'Поздняя первая отмена не сбрасывает уже начатую новую попытку',
+    () async {
+      final old = transfer;
+      old.closing = Completer<void>();
+      final starting = cubit.start();
+      final cancelling = cubit.cancel();
+      await cubit.cancel();
+      transfer = ControlledDirectory(controller.preview!);
+      final next = cubit.start();
+      old.closing!.complete();
+      old.request.complete(qr());
+      await cancelling;
+      await starting;
+      expect(cubit.state.stage, DirectoryTransferStage.waiting);
+      expect(transfer.closures, 0);
+      transfer.request.complete(qr());
+      await next;
+      expect(cubit.state.stage, DirectoryTransferStage.compare);
+    },
+  );
 }

@@ -20,8 +20,11 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
         linker;
     // cc-rs (ring) не использует CARGO_TARGET_*_LINKER для компиляции C.
     environment['CC_${target.replaceAll('-', '_')}'] = linker;
-    environment['AR_${target.replaceAll('-', '_')}'] = config.cCompiler!.compiler
-        .resolve('llvm-ar${Platform.isWindows ? '.exe' : ''}').toFilePath();
+    environment['AR_${target.replaceAll('-', '_')}'] = config
+        .cCompiler!
+        .compiler
+        .resolve('llvm-ar${Platform.isWindows ? '.exe' : ''}')
+        .toFilePath();
   }
   await ensureToolchain(root.toFilePath(), environment);
   await run(
