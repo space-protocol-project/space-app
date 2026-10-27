@@ -1158,5 +1158,10 @@
   "remoteBackupSaveKit": "再次保存套件",
   "remoteBackupRevoke": "撤销套件",
   "remoteBackupRevokeHelp": "是否撤销两个服务器上的备份访问权限？每个服务器都需要所有者的有效会话。此套件将失效，已存储的备份不会删除。失败后请重试撤销。",
-  "remoteBackupRevoked": "已撤销两个服务器上的备份访问权限。"
+  "remoteBackupRevoked": "已撤销两个服务器上的备份访问权限。",
+  "remoteBackupUnpublished": "查找未完成的发布",
+  "remoteBackupUnpublishedHelp": "备份已上传，但尚未经见证服务确认。请在发布前检查内容。",
+  "remoteBackupFinish": "确认发布此备份",
+  "remoteBackupFinishHelp": "是否完成此备份的发布？将验证密码和版本是否保持不变。此操作不会替换设备设置，目录需单独应用。",
+  "remoteBackupRestoreFirst": "请先打开并应用最新的已确认备份。此备份链的所有版本应使用相同密码。"
 }

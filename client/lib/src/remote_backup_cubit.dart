@@ -168,11 +168,11 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
     await service.publish(kit!, password);
     _emit(state.copyWith(message: 'saved'));
   });
-  Future<void> preview(String password) => _run(() async {
+  Future<void> preview(String password, {bool unpublished=false}) => _run(() async {
     final kit = state.kit;
     directoryRequire(kit != null);
     _emit(state.copyWith(restore: null, replaceSettings: false));
-    final restore = await service.preview(kit!, password);
+    final restore = unpublished ? await service.previewUnpublished(kit!,password) : await service.preview(kit!, password);
     _emit(state.copyWith(restore: restore, message: 'preview'));
   });
   Future<void> apply() => _run(() async {
@@ -180,5 +180,11 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
     if (restore == null || restore.plan.conflicts.isNotEmpty) return;
     await service.apply(restore, replaceSettings: state.replaceSettings);
     _emit(state.copyWith(restore: null, message: 'restored'));
+  });
+  Future<void> finishUnpublished(String password) => _run(() async {
+    final restore=state.restore;
+    directoryRequire(restore != null);
+    await service.finishUnpublished(restore!,password);
+    _emit(state.copyWith(restore:null,message:'saved'));
   });
 }

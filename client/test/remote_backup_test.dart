@@ -16,6 +16,7 @@ const backupPassword = 'длинный отдельный пароль';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  group('Удалённые копии', () {
   late DirectoryStorage storage;
   late DirectoryBackupService directory;
   late AppPreferences preferences;
@@ -130,7 +131,7 @@ void main() {
     expect(witness.head.revision.toInt(), 1);
     await connectService(directory).publish(kit, backupPassword);
     expect(store.versions, hasLength(1));
-    expect((await directory.repository.read())['outgoing'], kit.id);
+    expect(((await directory.repository.read())['heads'] as Map)[kit.id]['revision'], 1);
   });
   test('Недоступный свидетель, подмена подписи/challenge и контейнера блокируют preview', () async {
     await remote.publish(kit, backupPassword);
@@ -203,4 +204,48 @@ void main() {
       expect(witness.head.revision.toInt(), 0);
     },
   );
+  test('После потери исходного профиля незавершённая первая копия требует отдельного подтверждения',() async {
+    store.failPut=true;
+    await expectLater(remote.publish(kit,backupPassword),throwsStateError);
+    final target=fresh(), recovery=connectService(target);
+    await recovery.saveKit(kit);
+    final candidate=await recovery.previewUnpublished(kit,backupPassword);
+    expect(candidate.unpublished,isTrue);
+    expect(candidate.needsPrevious,isFalse);
+    expect(target.preferences.origins,isEmpty);
+    await expectLater(recovery.apply(candidate,replaceSettings:false),throwsFormatException);
+    await recovery.finishUnpublished(candidate,backupPassword);
+    expect(witness.head.revision.toInt(),1);
+    expect(target.preferences.origins,isEmpty);
+    await recovery.apply(await recovery.preview(kit,backupPassword),replaceSettings:false);
+    expect(target.preferences.origins,['https://space.example']);
+  });
+  test('Незавершённая следующая копия требует восстановления подтверждённой базы',() async {
+    await remote.publish(kit,backupPassword);
+    store.failPut=true;
+    await expectLater(remote.publish(kit,backupPassword),throwsStateError);
+    final target=fresh(), recovery=connectService(target);
+    await recovery.saveKit(kit);
+    final candidate=await recovery.previewUnpublished(kit,backupPassword);
+    expect(candidate.needsPrevious,isTrue);
+    await expectLater(recovery.finishUnpublished(candidate,backupPassword),throwsFormatException);
+    await recovery.apply(await recovery.preview(kit,backupPassword),replaceSettings:false);
+    await recovery.finishUnpublished(await recovery.previewUnpublished(kit,backupPassword),backupPassword);
+    expect(witness.head.revision.toInt(),2);
+    expect(target.preferences.palette,'gruvbox');
+  });
+  test('Локальная и удалённая цепочки независимы; смена пароля цепочки блокируется до загрузки',() async {
+    final local=await directory.capture();
+    await directory.recordExport(local);
+    await remote.publish(kit,backupPassword);
+    expect((await directory.repository.read())['outgoing'],local.id);
+    final next=await directory.capture();
+    expect(next.id,local.id); expect(next.revision,2);
+    await directory.recordExport(next);
+    await expectLater(remote.publish(kit,'Другой длинный пароль цепочки'),throwsA(anything));
+    expect(store.versions,hasLength(1));
+    await remote.publish(kit,backupPassword);
+    expect(witness.head.revision.toInt(),2);
+  });
+  },timeout:const Timeout(Duration(minutes:4)));
 }

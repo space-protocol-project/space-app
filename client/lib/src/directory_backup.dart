@@ -153,7 +153,7 @@ class DirectoryBackupService {
     });
   }
 
-  Future<void> recordExport(DirectoryDocument document) async {
+  Future<void> recordExport(DirectoryDocument document, {bool selectOutgoing = true}) async {
     final state = await repository.read(), heads = state['heads'] as Map;
     final head = heads[document.id] as Map?;
     final digest = await document.digest();
@@ -165,7 +165,7 @@ class DirectoryBackupService {
     for (final space in document.spaces) {
       catalog[space['origin']] = space;
     }
-    state['outgoing'] = document.id;
+    if (selectOutgoing) state['outgoing'] = document.id;
     await repository.write(state);
   }
 

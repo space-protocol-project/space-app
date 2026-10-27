@@ -1,6 +1,7 @@
 import 'community_reactions_api.dart';
 import 'generated/space/v1/remote_backup.pb.dart' as remote_backup_pb;
-import 'generated/space/v1/remote_backup.connect.spec.dart' as remote_backup_specs;
+import 'generated/space/v1/remote_backup.connect.spec.dart'
+    as remote_backup_specs;
 import 'community_favorites_api.dart';
 import 'participant_follows_api.dart';
 import 'user_export_api.dart';
@@ -990,7 +991,9 @@ class SpaceSession
     spaceSearchSupported = manifest.capabilities.contains(
       'core.space.search.v1',
     );
-    remoteBackupsSupported = manifest.capabilities.contains('core.directory.backup.v1');
+    remoteBackupsSupported = manifest.capabilities.contains(
+      'core.directory.backup.v1',
+    );
     forumModerationSupported = manifest.capabilities.contains(
       'core.forum.moderation.v1',
     );
@@ -1131,14 +1134,29 @@ class SpaceSession
     },
   );
 
-  Future<void> createRemoteBackupSlot(remote_backup_pb.CreateBackupSlotRequest request) async {
-    if (!remoteBackupsSupported) throw const GrpcError.unimplemented('Сервер не поддерживает удалённые копии');
+  Future<void> createRemoteBackupSlot(
+    remote_backup_pb.CreateBackupSlotRequest request,
+  ) async {
+    if (!remoteBackupsSupported) {
+      throw const GrpcError.unimplemented(
+        'Сервер не поддерживает удалённые копии',
+      );
+    }
     await _ensureSession();
-    await channel.unary(remote_backup_specs.RemoteBackupService.createBackupSlot, request, options: _options);
+    await channel.unary(
+      remote_backup_specs.RemoteBackupService.createBackupSlot,
+      request,
+      options: _options,
+    );
   }
+
   Future<void> revokeRemoteBackupSlot(String id) async {
     await _ensureSession();
-    await channel.unary(remote_backup_specs.RemoteBackupService.revokeBackupSlot, remote_backup_pb.RevokeBackupSlotRequest(id:id), options:_options);
+    await channel.unary(
+      remote_backup_specs.RemoteBackupService.revokeBackupSlot,
+      remote_backup_pb.RevokeBackupSlotRequest(id: id),
+      options: _options,
+    );
   }
 
   bool _needsOwnerSetup = false;

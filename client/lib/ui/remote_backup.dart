@@ -94,10 +94,10 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
     if (password != null && mounted) await cubit.publish(password);
   }
 
-  Future<void> preview() async {
+  Future<void> preview({bool unpublished=false}) async {
     cubit.reset();
     final password = await askRecoveryPassword(context, creating: false);
-    if (password != null && mounted) await cubit.preview(password);
+    if (password != null && mounted) await cubit.preview(password,unpublished:unpublished);
   }
 
   Future<void> apply() async {
@@ -118,6 +118,11 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
       await cubit.revoke();
   }
 
+  Future<void> finishUnpublished() async {
+    if (!await confirmRecoveryAction(context,context.strings.remoteBackupFinishHelp) || !mounted) return;
+    final password=await askRecoveryPassword(context,creating:false);
+    if (password != null && mounted) await cubit.finishUnpublished(password);
+  }
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<RemoteBackupCubit, RemoteBackupState>(
@@ -202,6 +207,7 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
           onPressed: state.busy ? null : cubit.configure,
           child: Text(context.strings.remoteBackupConfigure),
         ),
+        TextButton(onPressed:state.busy ? null : () => preview(unpublished:true),child:Text(context.strings.remoteBackupUnpublished)),
         TextButton(
           onPressed: state.busy ? null : () => cubit.exportKit(saveKit),
           child: Text(context.strings.remoteBackupSaveKit),
@@ -240,7 +246,8 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
     final restore = state.restore!, plan = restore.plan;
     return [
       const SizedBox(height: 16),
-      Text('${context.strings.remoteBackupVerified} ${restore.head.revision}'),
+      Text(restore.unpublished ? context.strings.remoteBackupUnpublishedHelp : '${context.strings.remoteBackupVerified} ${restore.head.revision}'),
+      if (restore.needsPrevious) Text(context.strings.remoteBackupRestoreFirst),
       const SizedBox(height: 12),
       Text(context.strings.directoryBackupPreview(plan.document.spaces.length)),
       ...plan.document.spaces.map(
@@ -258,7 +265,7 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
       ),
       ...plan.conflicts.map((value) => Text(value)),
       const SizedBox(height: 12),
-      CheckboxListTile(
+      if (!restore.unpublished) CheckboxListTile(
         contentPadding: EdgeInsets.zero,
         value: state.replaceSettings,
         onChanged: state.busy
@@ -268,8 +275,8 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
       ),
       const SizedBox(height: 12),
       FilledButton(
-        onPressed: state.busy || plan.conflicts.isNotEmpty ? null : apply,
-        child: Text(context.strings.directoryBackupApply),
+        onPressed: state.busy || plan.conflicts.isNotEmpty || restore.needsPrevious ? null : (restore.unpublished ? finishUnpublished : apply),
+        child: Text(restore.unpublished ? context.strings.remoteBackupFinish : context.strings.directoryBackupApply),
       ),
       TextButton(
         onPressed: state.busy ? null : cubit.reset,

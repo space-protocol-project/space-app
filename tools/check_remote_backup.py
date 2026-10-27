@@ -128,7 +128,7 @@ def run(args):
             marker.with_suffix('.resume').write_text('resume')
             if client.wait(timeout=240):
                 raise RuntimeError('Сквозная проверка не пройдена')
-            (args.output / 'report.json').write_text(json.dumps({'result':'passed','https_servers':2,'postgres_schemas':2,'lost_commit_reply':True,'restart_both':True,'restore_without_session':True,'revocation':True}, indent=2) + '\n')
+            (args.output / 'report.json').write_text(json.dumps({'result':'passed','https_servers':2,'postgres_schemas':2,'lost_commit_reply':True,'restart_both':True,'restore_without_session':True,'finish_without_original_profile':True,'revocation':True}, indent=2) + '\n')
         finally:
             if client is not None and client.poll() is None:
                 client.terminate()

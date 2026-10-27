@@ -40,10 +40,13 @@ List<int> backupWitnessText(BackupHead h, String challenge) => utf8.encode(
 Future<String> remoteBackupHash(List<int> bytes) async => url64((await Sha256().hash(bytes)).bytes);
 
 class RemoteRestore {
-  RemoteRestore(this.kit, this.head, this.plan);
+  RemoteRestore(this.kit, this.head, this.plan, {this.previous});
   final RemoteBackupKit kit;
   final BackupHead head;
   final DirectoryRestorePlan plan;
+  final BackupHead? previous;
+  bool get unpublished => previous != null;
+  bool get needsPrevious => unpublished && previous!.revision > Int64.ZERO && plan.unknown;
 }
 
 class RemoteBackupService {
@@ -117,7 +120,7 @@ class RemoteBackupService {
     final state = await _state();
     directoryRequire(jsonEncode(state['kit']) == jsonEncode(kit.data));
     if (state['pending'] == null) {
-      await _prepare(state,kit,password,witness);
+      await _prepare(state,kit,password,store,witness);
     }
     final pending = directoryMap(state['pending'],'archive,head');
     final head = BackupHead()..mergeFromProto3Json(pending['head']);
@@ -126,22 +129,27 @@ class RemoteBackupService {
     final archive = Uint8List.fromList(base64Decode(raw));
     directoryRequire(archive.length <= DirectoryArchive.maxFile);
     final document = await _document(GetBackupResponse(head:head,archive:archive),head,password);
+    directoryRequire((await directory.preview(document)).conflicts.isEmpty);
     final old = await _witness(kit,witness);
     directoryRequire(backupHeadText(old) == backupHeadText(head) || (old.revision.toInt()+1 == document.revision && old.digest == document.parent));
     _same(await store.put(PutBackupRequest(head:head,token:kit.storage.writeToken,archive:archive)),head);
     await _document(await _get(kit,store,document.revision),head,password);
     _same(await witness.advance(AdvanceBackupWitnessRequest(head:head,token:kit.witness.writeToken)),head);
     _same(await _witness(kit,witness),head);
-    await directory.recordExport(document);
+    await directory.recordExport(document,selectOutgoing:false);
     state['pending'] = null;
     await _save(state);
   }));
 
-  Future<void> _prepare(Map<String,dynamic> state, RemoteBackupKit kit, String password, RemoteBackupApi witness) async {
+  Future<void> _prepare(Map<String,dynamic> state, RemoteBackupKit kit, String password, RemoteBackupApi store, RemoteBackupApi witness) async {
     final head = await _witness(kit,witness);
     final local = ((await directory.repository.read())['heads'] as Map)[kit.id] as Map?;
+    directoryRequire(local != null || head.revision == Int64.ZERO);
     if (local != null) {
       directoryRequire(local['revision'] == head.revision.toInt() && local['digest'] == head.digest);
+    }
+    if (head.revision > Int64.ZERO) {
+      await _document(await _get(kit,store,head.revision.toInt()),head,password);
     }
     final captured = await directory.capture();
     final document = DirectoryDocument.parse({...captured.data,'id':kit.id,'revision':head.revision.toInt()+1,'parent':head.digest});
@@ -162,6 +170,37 @@ class RemoteBackupService {
     return RemoteRestore(kit,head,plan);
   });
 
+  Future<RemoteRestore> previewUnpublished(RemoteBackupKit kit, String password) => _clients(kit,(store,witness) async {
+    final previous=await _witness(kit,witness);
+    final response=await _get(kit,store,previous.revision.toInt()+1);
+    final head=response.head;
+    checkRemoteHead(head,kit.id);
+    directoryRequire(head.revision.toInt() == previous.revision.toInt()+1 && head.parent == previous.digest);
+    final document=await _document(response,head,password);
+    final ancestors=await _ancestors(kit,store,document,password);
+    final plan=await directory.preview(document,ancestors:ancestors);
+    _same(await _witness(kit,witness),previous);
+    return RemoteRestore(kit,head,plan,previous:previous);
+  });
+
+  Future<void> finishUnpublished(RemoteRestore restore,String password) async {
+    directoryRequire(restore.unpublished && !restore.needsPrevious);
+    await directory.repository.exclusive(() => _clients(restore.kit,(store,witness) async {
+      _same(await _witness(restore.kit,witness),restore.previous!);
+      final response=await _get(restore.kit,store,restore.head.revision.toInt());
+      final document=await _document(response,restore.head,password);
+      final plan=await directory.preview(document,ancestors:restore.plan.ancestors);
+      directoryRequire(plan.conflicts.isEmpty && plan.before == restore.plan.before);
+      final local=((await directory.repository.read())['heads'] as Map)[restore.kit.id] as Map?;
+      directoryRequire((local?['revision'] ?? 0) == restore.previous!.revision.toInt() && (local?['digest'] ?? '') == restore.previous!.digest);
+      final state=await _state();
+      directoryRequire(jsonEncode(state['kit']) == jsonEncode(restore.kit.data));
+      state['pending']={'head':restore.head.toProto3Json(),'archive':base64Encode(response.archive)};
+      await _save(state);
+    }));
+    await publish(restore.kit,password);
+  }
+
   Future<List<DirectoryDocument>> _ancestors(RemoteBackupKit kit, RemoteBackupApi store, DirectoryDocument latest, String password) async {
     final local = ((await directory.repository.read())['heads'] as Map)[kit.id] as Map?;
     if (local == null) return [];
@@ -179,6 +218,7 @@ class RemoteBackupService {
   }
 
   Future<void> apply(RemoteRestore restore, {required bool replaceSettings}) => _clients(restore.kit,(store,witness) async {
+    directoryRequire(!restore.unpublished);
     final document = restore.plan.document;
     directoryRequire(document.id == restore.head.id && document.revision == restore.head.revision.toInt() && document.parent == restore.head.parent && restore.plan.digest == restore.head.digest);
     _same(await _witness(restore.kit,witness),restore.head);

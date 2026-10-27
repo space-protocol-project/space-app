@@ -140,6 +140,12 @@ void main() {
         throwsFormatException,
       );
       await waitRemoteRestart(restart);
+      await recovery.saveKit(RemoteBackupKit.parse(kit.encode()));
+      final unpublished=await recovery.previewUnpublished(kit,'Отдельный длинный пароль');
+      expect(unpublished.unpublished,isTrue);
+      expect(targetPrefs.origins,isEmpty);
+      await recovery.finishUnpublished(unpublished,'Отдельный длинный пароль');
+      expect(targetPrefs.origins,isEmpty);
       await RemoteBackupService(source)
           .publish(kit, 'Отдельный длинный пароль');
       final plan = await recovery.preview(

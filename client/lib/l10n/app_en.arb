@@ -1158,5 +1158,10 @@
   "remoteBackupSaveKit": "Save kit again",
   "remoteBackupRevoke": "Revoke kit",
   "remoteBackupRevokeHelp": "Revoke backup access on both servers? The owner's active session is required on each server. This kit will stop working; stored containers will remain. Retry revocation after a failure.",
-  "remoteBackupRevoked": "Backup access revoked on both servers."
+  "remoteBackupRevoked": "Backup access revoked on both servers.",
+  "remoteBackupUnpublished": "Find unfinished publication",
+  "remoteBackupUnpublishedHelp": "The backup is uploaded but not confirmed by the witness. Review its contents before publication.",
+  "remoteBackupFinish": "Confirm publication of this backup",
+  "remoteBackupFinishHelp": "Complete publication of this backup? Its password and unchanged version will be verified. This action does not replace device settings; applying the directory is separate.",
+  "remoteBackupRestoreFirst": "First open and apply the latest confirmed backup. Use the same password for every version in this chain."
 }
