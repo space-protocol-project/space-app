@@ -100,6 +100,8 @@ class DirectoryBackupService {
     final api = SessionFeedApi(session).follows;
     if (api == null) return;
     bool active() =>
+        !controller.isClosed &&
+        identical(controllers()[origin], controller) &&
         controller.connected &&
         controller.mlsSession == session &&
         controller.principalId == data['principal_id'];
@@ -265,13 +267,14 @@ class DirectoryBackupService {
     await preferences.changeNotifications(data['notificationMode'] as int);
   }
 
-  Future<List<String>> restoreFollowing() async {
+  Future<List<String>> restoreFollowing({bool Function()? active}) async {
     final state = await repository.read(), result = <String>[];
     for (final raw in (state['catalog'] as Map).values) {
+      if (!(active?.call() ?? true)) break;
       final space = checkedDirectorySpace(raw),
           origin = space['origin'] as String;
       try {
-        result.add(await _restoreFollowing(space));
+        result.add(await _restoreFollowing(space, active));
       } catch (_) {
         result.add(
           '$origin: подписки восстановлены не полностью; проверьте подключение, личность и права. Повтор безопасен.',
@@ -281,7 +284,7 @@ class DirectoryBackupService {
     return result;
   }
 
-  Future<String> _restoreFollowing(Map<String, dynamic> space) async {
+  Future<String> _restoreFollowing(Map<String, dynamic> space, bool Function()? operationActive) async {
     final origin = space['origin'] as String,
         controller = controllers()[space['origin']];
     final session = controller?.mlsSession;
@@ -293,6 +296,9 @@ class DirectoryBackupService {
       throw StateError('Нет доступной ленты');
     }
     bool active() =>
+        (operationActive?.call() ?? true) &&
+        !controller.isClosed &&
+        identical(controllers()[origin], controller) &&
         controller.connected &&
         controller.mlsSession == session &&
         controller.principalId == space['principal_id'];

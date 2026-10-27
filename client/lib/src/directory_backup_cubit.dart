@@ -114,7 +114,7 @@ class DirectoryBackupCubit extends Cubit<DirectoryBackupState> {
     }
   });
   Future<void> restoreFollowing() => _run((generation) async {
-    final result = await service.restoreFollowing();
+    final result = await service.restoreFollowing(active: () => _current(generation));
     if (_current(generation)) {
       emit(state.copyWith(message: 'following', results: result));
     }

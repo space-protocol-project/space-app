@@ -35,7 +35,7 @@ class DirectoryArchive {
     SecretKey? derived;
     try {
       derived = await kdf.deriveKey(secretKey: passwordKey, nonce: salt);
-      return SecretKeyData(await derived.extractBytes(), overwriteWhenDestroyed: true);
+      return SecretKeyData(Uint8List.fromList(await derived.extractBytes()), overwriteWhenDestroyed: true);
     }
     finally { passwordKey.destroy(); derived?.destroy(); }
   }
@@ -82,7 +82,9 @@ class DirectoryArchive {
     final header = Uint8List.sublistView(file, start, start + length);
     final data = directoryMap(jsonDecode(utf8.decode(header)), 'bytes,iterations,kdf,prefix,salt,v,wrap_nonce');
     directoryRequire(jsonEncode(data) == utf8.decode(header));
-    directoryRequire(data['v'] == 1 && data['kdf'] == 'pbkdf2-sha256' && data['iterations'] == 600000);
+    directoryInt(data['v'], min: 1, max: 1);
+    directoryInt(data['iterations'], min: 600000, max: 600000);
+    directoryRequire(data['kdf'] == 'pbkdf2-sha256');
     final plainLength = directoryInt(data['bytes'], min: 1, max: directoryMaxPlain);
     final count = (plainLength + chunkSize - 1) ~/ chunkSize;
     directoryRequire(file.length == start + length + 48 + plainLength + count * 16);

@@ -1084,5 +1084,9 @@
   "directoryBackupConfirm": "Apply the verified directory? Access keys are preserved. Selected settings will be applied; interrupted restoration can be resumed.",
   "directoryBackupFollowsHelp": "Add missing follows for connected spaces with the same identity? Existing follows are kept. Servers check access; results may be partial.",
   "directoryBackupPreview": "Spaces in this backup: {count}",
-  "@directoryBackupPreview": {"placeholders": {"count": {"type": "int"}}}
+  "@directoryBackupPreview": {"placeholders": {"count": {"type": "int"}}},
+  "directoryBackupSpaceComplete": "{origin}: {count} follows; snapshot complete",
+  "@directoryBackupSpaceComplete": {"placeholders":{"origin":{"type":"String"},"count":{"type":"int"}}},
+  "directoryBackupSpaceIncomplete": "{origin}: {count} saved follows; current list unavailable",
+  "@directoryBackupSpaceIncomplete": {"placeholders":{"origin":{"type":"String"},"count":{"type":"int"}}}
 }

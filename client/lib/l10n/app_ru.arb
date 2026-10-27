@@ -1084,5 +1084,9 @@
   "directoryBackupConfirm": "Применить проверенный каталог? Существующие ключи доступа не заменяются. Выбранные настройки будут применены; при сбое можно завершить восстановление повторно.",
   "directoryBackupFollowsHelp": "Добавить отсутствующие подписки для подключённых пространств с той же личностью? Существующие подписки не удаляются. Сервер проверяет права; возможен частичный результат.",
   "directoryBackupPreview": "Пространств в копии: {count}",
-  "@directoryBackupPreview": {"placeholders": {"count": {"type": "int"}}}
+  "@directoryBackupPreview": {"placeholders": {"count": {"type": "int"}}},
+  "directoryBackupSpaceComplete": "{origin}: подписок — {count}; снимок полный",
+  "@directoryBackupSpaceComplete": {"placeholders":{"origin":{"type":"String"},"count":{"type":"int"}}},
+  "directoryBackupSpaceIncomplete": "{origin}: подписок в сохранённом снимке — {count}; актуальный список недоступен",
+  "@directoryBackupSpaceIncomplete": {"placeholders":{"origin":{"type":"String"},"count":{"type":"int"}}}
 }

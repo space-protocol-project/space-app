@@ -13,6 +13,7 @@ class BackupFollowApi implements ParticipantFollowApi {
   final ids = <String>{};
   int revision = 1, calls = 0;
   bool deny = false;
+  void Function()? afterSet;
   @override
   Future<ListFollowingParticipantsResponse> following(String token) async =>
       ListFollowingParticipantsResponse(
@@ -32,6 +33,7 @@ class BackupFollowApi implements ParticipantFollowApi {
     calls++;
     ids.add(request.principalId);
     revision++;
+    afterSet?.call();
     return SetParticipantFollowResponse(
       revision: Int64(revision),
       state: ParticipantFollowState(
@@ -97,4 +99,14 @@ void main() {
       expect(api.calls, 0);
     },
   );
+  test('Отмена после первой подписки останавливает продолжение; повтор дописывает остаток', () async {
+    var active = true;
+    final api = BackupFollowApi()..afterSet = () => active = false;
+    await expectLater(applyDirectoryFollowing(directorySpace(count: 2), api, 'feed', () => active), throwsFormatException);
+    expect(api.calls, 1);
+    active = true; api.afterSet = null;
+    expect(await applyDirectoryFollowing(directorySpace(count: 2), api, 'feed', () => active), 1);
+    expect(api.calls, 2);
+  });
+
 }

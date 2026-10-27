@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:cryptography/cryptography.dart';
 
-import 'core.dart' show url64;
+import 'core.dart' show url64, parseConnectionInput;
 
 const directoryMaxPlain = 4 * 1024 * 1024;
 const directoryMaxInteger = 9007199254740991;
@@ -71,7 +71,7 @@ Map<String, dynamic> checkedDirectorySpace(Object? value) {
     'endpoint,endpoint_digest,endpoint_revision,following,following_revision,following_status,origin,principal_id,server_id,server_key,tls_fingerprint',
   );
   final origin = directoryAddress(data['origin']);
-  directoryRequire(['', '/'].contains(Uri.parse(origin).path));
+  directoryRequire(Uri.parse(origin).path.isEmpty && parseConnectionInput(origin).origin.toString() == origin);
   directoryAddress(data['endpoint']);
   directoryRequire(directoryText(data['server_id'], max: 128).isNotEmpty);
   directoryBytes(data['server_key'], 32);
@@ -125,7 +125,8 @@ class DirectoryDocument {
       value,
       'created,id,kind,parent,revision,settings,spaces,v',
     );
-    directoryRequire(data['kind'] == 'space.directory' && data['v'] == 1);
+    directoryRequire(data['kind'] == 'space.directory');
+    directoryInt(data['v'], min: 1, max: 1);
     directoryBytes(data['id'], 16);
     directoryInt(data['revision'], min: 1);
     final parent = directoryText(data['parent'], max: 43);

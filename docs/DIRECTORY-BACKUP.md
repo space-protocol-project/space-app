@@ -46,6 +46,8 @@ Nonce блока: prefix + uint32 номера начиная с 0. AAD блок
 
 ## Манифест
 
+Компактный JSON без лишних пробелов и избыточных escape-последовательностей;
+повторная сериализация разобранного значения должна совпадать с исходными байтами.
 JSON `kind=space.directory`, `v=1`, `id` (случайные 16 байт base64url),
 `revision` (положительное целое до 2^53-1), `parent` (SHA-256 предыдущего
 манифеста либо пусто для первой копии), `created` (Unix seconds), `settings`,
@@ -57,8 +59,9 @@ language (ru/en/zh-Hans), sendShortcut (enter/shiftEnter), uiScale из теку
 списка приложения, notificationMode (0/1/2). Системное разрешение уведомлений
 не переносится. Устаревшие либо неизвестные значения отвергаются, не нормализуются.
 
-До 100 пространств: origin, endpoint, server_id, server_key (32 байта),
-tls_fingerprint, endpoint_revision, endpoint_digest, principal_id,
+До 100 пространств: origin (канонический адрес без завершающего слеша), endpoint, server_id, server_key (32 байта),
+tls_fingerprint (пусто либо SHA-256 hex), endpoint_revision, endpoint_digest
+(пусто либо SHA-256 в lowercase hex), principal_id,
 following_status (complete/unavailable), following_revision, following (до 4096
 уникальных principal ID). Имена/аватары участников заново получают от сервера.
 Неизвестные поля, повтор origin/server_id, недопустимые адреса и значения

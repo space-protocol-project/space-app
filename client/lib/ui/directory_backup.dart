@@ -56,6 +56,13 @@ class _DirectoryBackupPanelState extends State<DirectoryBackupPanel> {
   }
 
   Future<void> read() async {
+    try { await _read(); }
+    catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.strings.directoryBackupError)));
+    }
+  }
+
+  Future<void> _read() async {
     final file = await openFile(
       acceptedTypeGroups: const [
         XTypeGroup(
@@ -180,9 +187,9 @@ class _DirectoryBackupPanelState extends State<DirectoryBackupPanel> {
       Text(context.strings.directoryBackupPreview(plan.document.spaces.length)),
       if (plan.unknown) Text(context.strings.directoryBackupUnverified),
       ...plan.document.spaces.map(
-        (space) => Text(
-          '${space['origin']} · ${space['following_status']} · ${(space['following'] as List).length}',
-        ),
+        (space) => Text(space['following_status'] == 'complete'
+          ? context.strings.directoryBackupSpaceComplete(space['origin'] as String, (space['following'] as List).length)
+          : context.strings.directoryBackupSpaceIncomplete(space['origin'] as String, (space['following'] as List).length)),
       ),
       ...plan.conflicts.map((conflict) => Text(conflict)),
       const SizedBox(height: 12),
