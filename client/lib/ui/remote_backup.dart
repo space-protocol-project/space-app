@@ -264,6 +264,12 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
         ),
       ),
       ...plan.conflicts.map((value) => Text(value)),
+      ..._restoreActions(state),
+    ];
+  }
+  List<Widget> _restoreActions(RemoteBackupState state) {
+    final restore=state.restore!, plan=restore.plan;
+    return [
       const SizedBox(height: 12),
       if (!restore.unpublished) CheckboxListTile(
         contentPadding: EdgeInsets.zero,

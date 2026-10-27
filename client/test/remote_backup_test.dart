@@ -14,6 +14,9 @@ import 'fixtures/remote_backup.dart';
 
 const backupPassword = 'длинный отдельный пароль';
 
+void backupTest(String name, Future<void> Function() body) =>
+    backupTest(name,body,timeout:const Timeout(Duration(minutes:4)));
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   group('Удалённые копии', () {
@@ -59,7 +62,7 @@ void main() {
     );
     await remote.saveKit(kit);
   });
-  test('Комплект строгий, отдельные credentials и независимые endpoints обязательны', () async {
+  backupTest('Комплект строгий, отдельные credentials и независимые endpoints обязательны', () async {
     final encoded = kit.encode();
     expect(encoded, isNot(contains(backupPassword)));
     expect(RemoteBackupKit.parse(encoded).id, kit.id);
@@ -84,7 +87,7 @@ void main() {
       throwsFormatException,
     );
   });
-  test('Публикация проверяет контейнер и свидетель; чистое устройство требует явного применения', () async {
+  backupTest('Публикация проверяет контейнер и свидетель; чистое устройство требует явного применения', () async {
     await remote.publish(kit, backupPassword);
     expect(store.versions, hasLength(1));
     expect(witness.head.revision.toInt(), 1);
@@ -101,7 +104,7 @@ void main() {
     expect(target.preferences.palette, 'gruvbox');
     expect((target.vault as DirectoryVault).records, isEmpty);
   });
-  test('Потерянный ответ загрузки сохраняет точные байты; холодный повтор завершает ту же ревизию', () async {
+  backupTest('Потерянный ответ загрузки сохраняет точные байты; холодный повтор завершает ту же ревизию', () async {
     store.failPut = true;
     await expectLater(remote.publish(kit, backupPassword), throwsStateError);
     final bytes = List.of(store.versions[1]!.archive);
@@ -125,7 +128,7 @@ void main() {
       isNull,
     );
   });
-  test('Потерянный ответ свидетеля не создаёт новую копию', () async {
+  backupTest('Потерянный ответ свидетеля не создаёт новую копию', () async {
     witness.failAdvance = true;
     await expectLater(remote.publish(kit, backupPassword), throwsStateError);
     expect(witness.head.revision.toInt(), 1);
@@ -133,7 +136,7 @@ void main() {
     expect(store.versions, hasLength(1));
     expect(((await directory.repository.read())['heads'] as Map)[kit.id]['revision'], 1);
   });
-  test('Недоступный свидетель, подмена подписи/challenge и контейнера блокируют preview', () async {
+  backupTest('Недоступный свидетель, подмена подписи/challenge и контейнера блокируют preview', () async {
     await remote.publish(kit, backupPassword);
     final target = fresh(), recovery = connectService(target);
     witness.unavailable = true;
@@ -159,7 +162,7 @@ void main() {
     expect(target.preferences.origins, isEmpty);
     expect((await target.repository.read())['catalog'], isEmpty);
   });
-  test(
+  backupTest(
     'Новый head между preview и применением блокирует старый план',
     () async {
       await remote.publish(kit, backupPassword);
@@ -173,7 +176,7 @@ void main() {
       expect(target.preferences.origins, isEmpty);
     },
   );
-  test('Несколько ревизий проверяются цепочкой, а откат свидетеля не обходит локальный head', () async {
+  backupTest('Несколько ревизий проверяются цепочкой, а откат свидетеля не обходит локальный head', () async {
     await remote.publish(kit, backupPassword);
     final target = fresh(), recovery = connectService(target);
     await recovery.apply(
@@ -195,7 +198,7 @@ void main() {
       throwsFormatException,
     );
   });
-  test(
+  backupTest(
     'Ошибка защищённого журнала происходит до загрузки контейнера',
     () async {
       storage.fail = true;
@@ -204,7 +207,7 @@ void main() {
       expect(witness.head.revision.toInt(), 0);
     },
   );
-  test('После потери исходного профиля незавершённая первая копия требует отдельного подтверждения',() async {
+  backupTest('После потери исходного профиля незавершённая первая копия требует отдельного подтверждения',() async {
     store.failPut=true;
     await expectLater(remote.publish(kit,backupPassword),throwsStateError);
     final target=fresh(), recovery=connectService(target);
@@ -220,7 +223,7 @@ void main() {
     await recovery.apply(await recovery.preview(kit,backupPassword),replaceSettings:false);
     expect(target.preferences.origins,['https://space.example']);
   });
-  test('Незавершённая следующая копия требует восстановления подтверждённой базы',() async {
+  backupTest('Незавершённая следующая копия требует восстановления подтверждённой базы',() async {
     await remote.publish(kit,backupPassword);
     store.failPut=true;
     await expectLater(remote.publish(kit,backupPassword),throwsStateError);
@@ -234,7 +237,7 @@ void main() {
     expect(witness.head.revision.toInt(),2);
     expect(target.preferences.palette,'gruvbox');
   });
-  test('Локальная и удалённая цепочки независимы; смена пароля цепочки блокируется до загрузки',() async {
+  backupTest('Локальная и удалённая цепочки независимы; смена пароля цепочки блокируется до загрузки',() async {
     final local=await directory.capture();
     await directory.recordExport(local);
     await remote.publish(kit,backupPassword);
@@ -247,5 +250,5 @@ void main() {
     await remote.publish(kit,backupPassword);
     expect(witness.head.revision.toInt(),2);
   });
-  },timeout:const Timeout(Duration(minutes:4)));
+  });
 }
