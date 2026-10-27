@@ -88,6 +88,7 @@ void main() {
       tester,
     ) async {
       final controller = SelectionController(SelectionVault());
+      addTearDown(controller.close);
       tester.view.physicalSize = const Size(390, 1200);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
@@ -119,7 +120,6 @@ void main() {
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump();
-      await controller.close();
     });
   }
   test(
