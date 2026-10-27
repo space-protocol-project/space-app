@@ -43,9 +43,17 @@ jobs:
           cache: true
       - name: Системные зависимости с ограничением времени
         run: |
+          printf 'https://archive.ubuntu.com/ubuntu\n' | sudo tee /etc/apt/apt-mirrors.txt
           timeout 180s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 -o Acquire::https::Timeout=15 update
-          timeout 480s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 -o Acquire::https::Timeout=15 install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev
+          cmake --version
+          clang --version
+          ninja --version
+          pkg-config --version
+          timeout 480s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 -o Acquire::https::Timeout=15 install -y --no-install-recommends libgtk-3-dev libx11-dev libxi-dev
           rustup toolchain install 1.99.1 --profile minimal
+      - name: Штатное форматирование серверного исходника
+        working-directory: server
+        run: gofmt -w internal/postgres/pairing*.go internal/postgres/challenge.go internal/postgres/recovery.go internal/postgres/store.go internal/postgres/rotation.go internal/postgres/root_retention.go
       - name: Подготовка совместимой пары
         run: |
           (cd app/client && flutter pub get)
@@ -61,3 +69,14 @@ jobs:
           name: pairing-modes-interop
           path: ${{ runner.temp }}/pairing-modes-interop/interop.log
           if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pairing-server-formatted-source
+          path: |
+            server/internal/postgres/pairing*.go
+            server/internal/postgres/challenge.go
+            server/internal/postgres/recovery.go
+            server/internal/postgres/store.go
+            server/internal/postgres/rotation.go
+            server/internal/postgres/root_retention.go
