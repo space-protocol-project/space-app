@@ -11,6 +11,7 @@ class PairingStartView extends StatelessWidget {
     required this.connectionBusy,
     required this.connected,
     required this.code,
+    this.qrPreview,
     required this.signatureVerified,
     required this.verification,
     required this.error,
@@ -20,6 +21,7 @@ class PairingStartView extends StatelessWidget {
   });
   final bool busy, connectionBusy, connected, signatureVerified;
   final String code, verification, error;
+  final Widget? qrPreview;
   final VoidCallback onStart, onAccept, onCancel;
   @override
   Widget build(BuildContext context) {
@@ -62,6 +64,7 @@ class PairingStartView extends StatelessWidget {
   ) {
     return [
       Text(strings.pairingInstructions),
+      if (qrPreview != null) ...[const SizedBox(height: 12), Center(child: qrPreview!)],
       const SizedBox(height: 10),
       SelectableText(
         code,

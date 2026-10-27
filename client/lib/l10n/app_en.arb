@@ -1064,5 +1064,8 @@
   "userExportSave": "Save JSON",
   "userExportReady": "Entries prepared",
   "userExportSaved": "Export saved",
-  "userExportInvalidPeriod": "Enter valid YYYY-MM-DD dates and a valid period."
+  "userExportInvalidPeriod": "Enter valid YYYY-MM-DD dates and a valid period.",
+  "pairingNetworkError": "Cannot reach the server. Polling will retry until the code expires.",
+  "pairingVerificationError": "Verification failed. Start pairing again.",
+  "pairingQrInvalid": "The QR is invalid, expired, or belongs to another space. Scan a new QR on the device being connected."
 }

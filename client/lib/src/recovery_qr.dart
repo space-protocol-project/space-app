@@ -11,7 +11,10 @@ const recoveryQrPrefix = 'space-recovery:v1:';
 const maxRecoveryImageBytes = 8 * 1024 * 1024;
 const _pngSignature = [137, 80, 78, 71, 13, 10, 26, 10];
 Uint8List recoveryPng(String packet) {
-  final text = recoveryQrPrefix + packet;
+  return qrPng(recoveryQrPrefix + packet);
+}
+
+Uint8List qrPng(String text) {
   if (utf8.encode(text).length > 2800) {
     throw const LocalFailure(
       LocalFailureCode.qrTooLarge,

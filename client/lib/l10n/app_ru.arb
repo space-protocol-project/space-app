@@ -1064,5 +1064,8 @@
   "userExportSave": "Сохранить JSON",
   "userExportReady": "Записей подготовлено",
   "userExportSaved": "Экспорт сохранён",
-  "userExportInvalidPeriod": "Укажите корректные даты YYYY-MM-DD и период."
+  "userExportInvalidPeriod": "Укажите корректные даты YYYY-MM-DD и период.",
+  "pairingNetworkError": "Не удалось опросить сервер. Проверка повторится автоматически до истечения кода.",
+  "pairingVerificationError": "Подтверждение не прошло проверку. Начните сопряжение заново.",
+  "pairingQrInvalid": "QR повреждён, истёк или относится к другому пространству. Считайте новый QR на подключаемом устройстве."
 }

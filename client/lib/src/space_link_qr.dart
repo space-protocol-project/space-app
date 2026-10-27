@@ -7,6 +7,17 @@ import 'package:zxing2/qrcode.dart' as zx;
 import 'core.dart';
 
 String? spaceLinkFromImage(Uint8List bytes) {
+  final text = qrTextFromImage(bytes);
+  if (text == null) return null;
+  try {
+    parseConnectionInput(text);
+    return text;
+  } catch (_) {
+    return null;
+  }
+}
+
+String? qrTextFromImage(Uint8List bytes) {
   try {
     if (bytes.length < 8 || bytes.length > 8 * 1024 * 1024) return null;
     final decoder = img.findDecoderForData(bytes);
@@ -23,7 +34,6 @@ String? spaceLinkFromImage(Uint8List bytes) {
     if (image == null) return null;
     final text = _readLinkQr(image);
     if (text.length > 2048) return null;
-    parseConnectionInput(text);
     return text;
   } catch (_) {
     return null;

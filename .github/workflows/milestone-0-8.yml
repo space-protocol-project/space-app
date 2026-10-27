@@ -2,7 +2,7 @@ name: Подготовка сопряжения v0.8.0
 on:
   push:
     branches: [main]
-    paths: ['client/lib/src/pairing*.dart', 'client/test/pairing*_test.dart', 'client/test/probes/pairing_probe.dart', 'tools/check_pairing_ui.py', '.github/workflows/milestone-0-8.yml']
+    paths: ['client/lib/src/pairing*.dart', 'client/lib/ui/pairing*.dart', 'client/lib/ui/recovery_panel.dart', 'client/lib/ui/camera_scanner.dart', 'client/lib/src/*qr.dart', 'client/lib/l10n/**', 'packages/space_admin_ui/lib/**', 'client/test/pairing*_test.dart', 'client/test/probes/pairing_probe.dart', 'tools/check_pairing_ui.py', '.github/workflows/milestone-0-8.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -29,10 +29,16 @@ jobs:
         working-directory: client
         run: |
           flutter pub get
-          dart format lib/src/pairing.dart lib/src/pairing_lifetime.dart test/pairing_lifetime_test.dart test/pairing_transport_test.dart test/probes/pairing_probe.dart
+          dart run build_runner build --build-filter='lib/src/pairing*.freezed.dart'
+          dart format lib/src/pairing*.dart lib/src/recovery_qr.dart lib/src/space_link_qr.dart lib/ui/pairing*.dart lib/ui/recovery_panel.dart lib/ui/camera_scanner.dart test/pairing*_test.dart test/admin_recovery_views_test.dart test/probes/pairing_probe.dart ../packages/space_admin_ui/lib/src/pairing_start_view.dart ../packages/space_admin_ui/lib/src/recovery_tools_view.dart
           dart fix --apply --code=curly_braces_in_flow_control_structures
           flutter analyze
-          flutter test --no-pub test/pairing_lifetime_test.dart test/pairing_transport_test.dart test/recovery_test.dart test/recovery_spaces_test.dart test/recovery_qr_test.dart test/migration_archive_test.dart test/device_migration_test.dart test/device_recovery_batch_test.dart
+          flutter test --no-pub test/pairing_lifetime_test.dart test/pairing_transport_test.dart test/pairing_qr_test.dart test/pairing_cubit_test.dart test/pairing_approval_cubit_test.dart test/pairing_panels_test.dart test/admin_recovery_views_test.dart test/space_qr_platform_test.dart test/camera_qr_test.dart test/recovery_test.dart test/recovery_spaces_test.dart test/recovery_qr_test.dart test/migration_archive_test.dart test/device_migration_test.dart test/device_recovery_batch_test.dart
+      - name: Анализ пакета интерфейса
+        working-directory: packages/space_admin_ui
+        run: |
+          flutter pub get
+          flutter analyze
       - name: Нативный запрос, отмена и горячий перезапуск
         run: xvfb-run -a dbus-run-session -- python3 tools/check_pairing_ui.py --output "$RUNNER_TEMP/pairing-native"
       - uses: actions/upload-artifact@v4
@@ -45,8 +51,15 @@ jobs:
         with:
           name: pairing-lifecycle-source
           path: |
-            client/lib/src/pairing.dart
-            client/lib/src/pairing_lifetime.dart
-            client/test/pairing_lifetime_test.dart
-            client/test/pairing_transport_test.dart
+            client/lib/src/pairing*.dart
+            client/lib/src/recovery_qr.dart
+            client/lib/src/space_link_qr.dart
+            client/lib/ui/pairing*.dart
+            client/lib/ui/recovery_panel.dart
+            client/lib/ui/camera_scanner.dart
+            client/lib/l10n/app_localizations*.dart
+            packages/space_admin_ui/lib/src/pairing_start_view.dart
+            packages/space_admin_ui/lib/src/recovery_tools_view.dart
+            client/test/pairing*_test.dart
+            client/test/admin_recovery_views_test.dart
             client/test/probes/pairing_probe.dart

@@ -11,7 +11,7 @@ import '../src/generated/space/v1/space.pb.dart';
 import '../src/recovery_card.dart';
 import '../src/recovery_qr.dart';
 import '../src/recovery_spaces.dart';
-import '../src/pairing.dart';
+import 'pairing_approval_panel.dart';
 import '../src/root_rotation.dart' as rotation;
 import '../src/rpc_clients.dart' show AuthServiceClient;
 
@@ -100,18 +100,6 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
       ? recoveryMessage(context.strings, messageKey) ?? message
       : localFailureText(context, failureCode!);
   List<DeviceGrant> devices = [];
-  final pairingCode = TextEditingController();
-  final pairingEntered = TextEditingController();
-  Pairing? preparedPair;
-  DeviceRecord? preparedAuthority;
-  String pairingCheck = '';
-  @override
-  void dispose() {
-    pairingCode.dispose();
-    pairingEntered.dispose();
-    super.dispose();
-  }
-
   List<XTypeGroup> get files => [
     XTypeGroup(
       label: context.strings.recoveryFileLabel,
@@ -529,41 +517,6 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     if (mounted) setState(() => messageKey = 'recoveryRevoked');
   }
 
-  Future<void> approve() async {
-    final server = widget.controller.preview,
-        manager = widget.controller.deviceManagement;
-    if (server == null || manager == null) return;
-    final pair = await inspectPairing(server, pairingCode.text);
-    if (pair.state != 'pending') {
-      throw RecoveryOperationError('pairingAlreadyUsed');
-    }
-    if (!await _confirmPairing(pair)) return;
-    DeviceRecord? authority;
-    if (!manager.hasRootAuthority) {
-      authority = await _readPairingAuthority();
-      if (authority == null) return;
-    }
-    final code = await manager.preparePairing(pair, authority: authority);
-    if (mounted) {
-      setState(() {
-        pairingCheck = code;
-        preparedPair = pair;
-        preparedAuthority = authority;
-        pairingEntered.clear();
-        messageKey = 'pairingReady';
-      });
-    }
-  }
-
-  Future<bool> _confirmPairing(Pairing pair) => confirm(
-    (strings) => strings.pairingPrepareConfirm(
-      pair.deviceName,
-      pair.administrative
-          ? strings.pairingManageRequest
-          : strings.pairingChatRequest,
-    ),
-  );
-
   Future<DeviceRecord?> _readPairingAuthority() async {
     final file = await openFile(acceptedTypeGroups: files);
     if (file == null) return null;
@@ -578,28 +531,6 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
         pass,
       ]),
     );
-  }
-
-  Future<void> finishPairing() async {
-    final manager = widget.controller.deviceManagement, pair = preparedPair;
-    if (manager == null || pair == null) return;
-    if (pairingEntered.text.replaceAll(RegExp(r'[\s-]'), '').toUpperCase() !=
-        pairingCheck.replaceAll('-', '')) {
-      throw RecoveryOperationError('pairingMismatch');
-    }
-    if (!await confirm((strings) => strings.pairingSignConfirm)) {
-      return;
-    }
-    await manager.approvePairing(pair, authority: preparedAuthority);
-    if (mounted) {
-      setState(() {
-        preparedPair = null;
-        preparedAuthority = null;
-        pairingEntered.clear();
-        pairingCode.clear();
-        messageKey = 'pairingSigned';
-      });
-    }
   }
 
   @override
@@ -645,10 +576,7 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     canRotate: widget.controller.deviceManagement is RootRotationControl,
     pending: pending,
     message: localizedMessage,
-    pairingCode: pairingCode,
-    pairingEntered: pairingEntered,
-    pairingCheck: pairingCheck,
-    pairingPrepared: preparedPair != null,
+    pairingTools: PairingApprovalPanel(controller: widget.controller, readAuthority: _readPairingAuthority, blocked: pending),
     currentGrantId: widget.controller.deviceManagement?.currentGrantId ?? '',
     devices: [
       for (final g in devices)
@@ -662,13 +590,6 @@ class _RecoveryPanelState extends State<RecoveryPanel> {
     onRotate: () => run(rotate),
     onRenewRotation: () => run(() => rotate(renew: true)),
     onFinishRotation: () => run(finishRotation),
-    onPreparePairing: () => run(approve),
-    onApprovePairing: () => run(finishPairing),
-    onPairingCodeChanged: (_) => setState(() {
-      preparedPair = null;
-      preparedAuthority = null;
-      pairingCheck = '';
-    }),
     onExport: () => run(export),
     onRestore: () => run(restore),
     onScan: () => run(() async {

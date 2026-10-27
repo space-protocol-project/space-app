@@ -1,194 +1,96 @@
-import '../l10n/failure_strings.dart';
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:space_admin_ui/space_admin_ui.dart';
 
-import '../src/chat_controller.dart';
-import '../src/core.dart';
-import '../src/pairing.dart';
+import '../l10n/failure_strings.dart';
 import '../l10n/strings.dart';
+import '../src/chat_controller.dart';
+import '../src/pairing_cubit.dart';
 
 class PairingStartPanel extends StatefulWidget {
-  const PairingStartPanel({
-    super.key,
-    required this.controller,
-    required this.onConnected,
-  });
+  const PairingStartPanel({super.key, required this.controller, required this.onConnected});
   final ChatController controller;
   final Future<void> Function(String) onConnected;
   @override
   State<PairingStartPanel> createState() => _PairingStartPanelState();
 }
 
-class _PairingStartPanelState extends State<PairingStartPanel> {
-  PendingPairing? pending;
-  DeviceRecord? candidate;
-  Timer? timer;
-  bool busy = false, polling = false;
-  String error = '', verification = '';
-  String? errorKey;
-  String get localizedError => switch (errorKey) {
-    'pairingStartFailed' => context.strings.pairingStartFailed,
-    'pairingExpired' => context.strings.pairingExpired,
-    _ =>
-      error.isNotEmpty && error == widget.controller.error
-          ? chatFailureText(context, widget.controller)
-          : error,
-  };
+class _PairingStartPanelState extends State<PairingStartPanel> with WidgetsBindingObserver {
+  late PairingCubit cubit;
+  @override
+  void initState() {
+    super.initState();
+    cubit = PairingCubit(widget.controller);
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didUpdateWidget(covariant PairingStartPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      unawaited(cubit.close());
+      cubit = PairingCubit(widget.controller);
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if ([AppLifecycleState.paused, AppLifecycleState.detached, AppLifecycleState.hidden].contains(state)) {
+      unawaited(cubit.cancel());
+    }
+  }
+
   @override
   void dispose() {
-    timer?.cancel();
-    unawaited(pending?.close() ?? Future<void>.value());
+    WidgetsBinding.instance.removeObserver(this);
+    unawaited(cubit.close());
     super.dispose();
   }
 
-  Future<void> start() async {
-    final server = widget.controller.preview;
-    if (server == null || busy || pending != null) return;
-    setState(() {
-      busy = true;
-      error = '';
-      errorKey = null;
-    });
-    try {
-      final result = await PendingPairing.start(server);
-      if (!mounted) {
-        await result.close();
-        return;
-      }
-      setState(() => pending = result);
-      timer = Timer.periodic(const Duration(seconds: 2), (_) => poll());
-    } catch (_) {
-      if (mounted) {
-        setState(() => errorKey = 'pairingStartFailed');
-      }
-    } finally {
-      if (mounted) setState(() => busy = false);
-    }
-  }
-
-  Future<void> poll() async {
-    final current = pending;
-    if (current == null || polling || candidate != null) return;
-    polling = true;
-    try {
-      final response = await current.poll();
-      if (!mounted || pending != current) return;
-      if (response.pairing.state == 'cancelled') {
-        throw FormatException(context.strings.pairingCancelled);
-      }
-      if (response.pairing.state == 'approved') {
-        final record = await current.verifiedRecord(response);
-        final code = await pairVerificationCode(
-          current.server.serverId,
-          current.request.pairing.id,
-          record.rootPublicKey,
-          current.request.pairing.publicKey,
-          administrative: current.request.pairing.administrative,
-        );
-        if (!mounted || pending != current) return;
-        timer?.cancel();
-        setState(() {
-          candidate = record;
-          verification = code;
-        });
-      }
-      if (response.pairing.state == 'pending') await _showPendingCode(current);
-    } catch (_) {
-      if (mounted && pending == current) {
-        timer?.cancel();
-        setState(() => errorKey = 'pairingExpired');
-      }
-    } finally {
-      polling = false;
-    }
-  }
-
-  Future<void> _showPendingCode(PendingPairing current) async {
-    if (current.proposedRoot != null) {
-      final code = await pairVerificationCode(
-        current.server.serverId,
-        current.request.pairing.id,
-        current.proposedRoot!,
-        current.request.pairing.publicKey,
-        administrative: current.request.pairing.administrative,
-      );
-      if (mounted && pending == current) setState(() => verification = code);
-    }
-  }
-
-  Future<void> cancel() async {
-    timer?.cancel();
-    final current = pending;
-    setState(() {
-      pending = null;
-      candidate = null;
-      verification = '';
-      error = '';
-      errorKey = null;
-    });
-    await current?.close();
-  }
-
   Future<void> accept() async {
-    final current = pending, record = candidate;
-    if (current == null || record == null || busy) return;
-    final approved = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.strings.pairingCompareTitle),
-        content: Text(
-          context.strings.pairingAcceptConfirm(verification, record.origin),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.strings.recoveryCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(context.strings.pairingMatches),
-          ),
-        ],
-      ),
-    );
-    if (approved != true || !mounted) return;
-    setState(() => busy = true);
-    try {
-      await widget.controller.connect(
-        restoredRecord: record,
-        pairingId: current.request.pairing.id,
-      );
-      if (!mounted) return;
-      if (!widget.controller.connected) {
-        setState(() {
-          errorKey = null;
-          error = widget.controller.error;
-        });
-        return;
-      }
-      current.claimed = true;
-      await current.close();
-      pending = null;
-      await widget.onConnected(record.origin);
-    } finally {
-      if (mounted) setState(() => busy = false);
-    }
+    final active = cubit;
+    final revision = active.revision;
+    final origin = active.candidateOrigin;
+    if (origin == null) return;
+    final approved = await showDialog<bool>(context: context, builder: (context) => AlertDialog(
+      title: Text(context.strings.pairingCompareTitle),
+      content: Text(context.strings.pairingAcceptConfirm(active.state.verification, origin)),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.strings.recoveryCancel)),
+        FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(context.strings.pairingMatches)),
+      ],
+    ));
+    if (approved != true || !mounted || active != cubit) return;
+    if (await active.accept(revision) && mounted) await widget.onConnected(origin);
   }
+
+  String errorText(PairingIssue? issue) => switch (issue) {
+    null => '',
+    PairingIssue.start => context.strings.pairingStartFailed,
+    PairingIssue.cancelled => context.strings.pairingCancelled,
+    PairingIssue.connection => chatFailureText(context, widget.controller),
+    PairingIssue.network => context.strings.pairingNetworkError,
+    PairingIssue.verification => context.strings.pairingVerificationError,
+    PairingIssue.expired => context.strings.pairingExpired,
+  };
 
   @override
-  Widget build(BuildContext context) => PairingStartView(
-    busy: busy,
-    connectionBusy: widget.controller.busy,
-    connected: widget.controller.connected,
-    code: pending?.request.code ?? '',
-    signatureVerified: candidate != null,
-    verification: verification,
-    error: localizedError,
-    onStart: start,
-    onAccept: accept,
-    onCancel: cancel,
+  Widget build(BuildContext context) => BlocBuilder<PairingCubit, PairingState>(
+    bloc: cubit,
+    builder: (context, state) => PairingStartView(
+      busy: state.busy,
+      connectionBusy: widget.controller.busy,
+      connected: widget.controller.connected,
+      code: state.code,
+      qrPreview: state.qr == null ? null : Image.memory(state.qr!, width: 240, height: 240, filterQuality: FilterQuality.none, semanticLabel: context.strings.pairingCompareTitle),
+      signatureVerified: state.verified,
+      verification: state.verification,
+      error: errorText(state.issue),
+      onStart: cubit.start,
+      onAccept: accept,
+      onCancel: cubit.cancel,
+    ),
   );
 }

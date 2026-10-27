@@ -34,18 +34,12 @@ class RecoveryToolsView extends StatelessWidget {
     this.recoveryOptions,
     this.onExportJson,
     required this.message,
-    required this.pairingCode,
-    required this.pairingEntered,
-    required this.pairingCheck,
-    required this.pairingPrepared,
+    required this.pairingTools,
     required this.devices,
     required this.currentGrantId,
     required this.onRotate,
     required this.onRenewRotation,
     required this.onFinishRotation,
-    required this.onPreparePairing,
-    required this.onApprovePairing,
-    required this.onPairingCodeChanged,
     required this.onExport,
     required this.onRestore,
     required this.onScan,
@@ -57,27 +51,24 @@ class RecoveryToolsView extends StatelessWidget {
       hasDeviceManagement,
       hasRootAuthority,
       canRotate,
-      pending,
-      pairingPrepared;
-  final String message, pairingCheck, currentGrantId;
+      pending;
+  final String message, currentGrantId;
   final String progress;
   final bool canCreateQr;
   final VoidCallback? onCreateQr;
   final Widget? qrPreview;
   final Widget? recoveryOptions;
   final VoidCallback? onExportJson;
-  final TextEditingController pairingCode, pairingEntered;
+  final Widget pairingTools;
   final List<RecoveryDeviceView> devices;
   final VoidCallback onRotate,
       onRenewRotation,
       onFinishRotation,
-      onPreparePairing,
-      onApprovePairing,
       onExport,
       onRestore,
       onScan,
       onRefreshDevices;
-  final ValueChanged<String> onPairingCodeChanged, onRevoke;
+  final ValueChanged<String> onRevoke;
   @override
   Widget build(BuildContext context) {
     final strings =
@@ -88,7 +79,7 @@ class RecoveryToolsView extends StatelessWidget {
       children: [
         _rotationTools(context, strings),
         const SizedBox(height: 20),
-        _pairingTools(context, strings),
+        pairingTools,
         const SizedBox(height: 20),
         _recoveryCardTools(context, strings),
         const SizedBox(height: 20),
@@ -128,62 +119,6 @@ class RecoveryToolsView extends StatelessWidget {
               onPressed: pending || !hasServer ? null : onFinishRotation,
               child: Text(strings.rotationFinish),
             ),
-          ],
-        ),
-      );
-
-  Widget _pairingTools(BuildContext context, AdminLocalizations strings) =>
-      RecoverySurface(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              strings.pairingApproveTitle,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            Text(strings.pairingApproveHelp),
-            const SizedBox(height: 12),
-            TextField(
-              scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
-              controller: pairingCode,
-              onChanged: onPairingCodeChanged,
-              decoration: InputDecoration(
-                labelText: strings.pairingCode,
-                hintText: 'pc_…',
-              ),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: pending || !connected || !hasDeviceManagement
-                  ? null
-                  : onPreparePairing,
-              icon: const Icon(Icons.verified_user_outlined),
-              label: Text(strings.pairingPrepare),
-            ),
-            if (pairingCheck.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Text(strings.pairingComparison),
-              SelectableText(
-                pairingCheck,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              if (pairingPrepared) ...[
-                const SizedBox(height: 12),
-                TextField(
-                  scrollPadding: SpaceContentInsets.scrollPaddingOf(context),
-                  controller: pairingEntered,
-                  decoration: InputDecoration(
-                    labelText: strings.pairingEnteredCode,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                FilledButton(
-                  onPressed: pending ? null : onApprovePairing,
-                  child: Text(strings.pairingSign),
-                ),
-              ],
-            ],
           ],
         ),
       );

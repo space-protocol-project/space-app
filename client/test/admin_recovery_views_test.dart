@@ -12,9 +12,6 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
-        final code = TextEditingController(), entered = TextEditingController();
-        addTearDown(code.dispose);
-        addTearDown(entered.dispose);
         var scans = 0;
         void action() {}
         await tester.pumpWidget(
@@ -34,18 +31,12 @@ void main() {
                     canRotate: false,
                     pending: false,
                     message: '',
-                    pairingCode: code,
-                    pairingEntered: entered,
-                    pairingCheck: '',
-                    pairingPrepared: false,
+                    pairingTools: const SizedBox.shrink(),
                     devices: const [],
                     currentGrantId: '',
                     onRotate: action,
                     onRenewRotation: action,
                     onFinishRotation: action,
-                    onPreparePairing: action,
-                    onApprovePairing: action,
-                    onPairingCodeChanged: (_) {},
                     onExport: action,
                     onRestore: action,
                     onScan: () => scans++,

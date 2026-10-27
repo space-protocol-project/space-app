@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 
 import '../src/camera_qr.dart';
 import '../src/space_link_qr.dart';
+import '../src/pairing_qr.dart';
 
 import 'package:space_admin_ui/space_admin_ui.dart';
 
@@ -25,9 +26,15 @@ Future<String?> scanSpaceCamera(BuildContext context) => showDialog<String>(
   builder: (_) => const RecoveryCameraDialog(spaceLink: true),
 );
 
+Future<String?> scanPairingCamera(BuildContext context) => showDialog<String>(
+  context: context,
+  barrierDismissible: false,
+  builder: (_) => const RecoveryCameraDialog(pairing: true),
+);
+
 class RecoveryCameraDialog extends StatefulWidget {
-  const RecoveryCameraDialog({super.key, this.spaceLink = false});
-  final bool spaceLink;
+  const RecoveryCameraDialog({super.key, this.spaceLink = false, this.pairing = false});
+  final bool spaceLink, pairing;
   @override
   State<RecoveryCameraDialog> createState() => _RecoveryCameraDialogState();
 }
@@ -151,6 +158,11 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
     if (mounted) setState(() => capturing = false);
   }
 
+  String? Function(Uint8List) get _decoder {
+    if (widget.pairing) return pairingQrFromImage;
+    return widget.spaceLink ? spaceLinkFromImage : cameraCardInWorker;
+  }
+
   Future<void> readFrame(
     CameraController camera,
     int token, {
@@ -161,7 +173,7 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
       photo = await camera.takePicture();
       if ((await photo.length() ?? 0) > 8 * 1024 * 1024) return;
       final packet = await compute(
-        widget.spaceLink ? spaceLinkFromImage : cameraCardInWorker,
+        _decoder,
         await photo.readAsBytes(),
       );
       if (packet != null && mounted && token == generation) {
