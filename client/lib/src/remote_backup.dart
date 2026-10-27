@@ -69,10 +69,7 @@ final class RemoteRestore {
 }
 
 class RemoteBackupService {
-  RemoteBackupService(
-    this.directory, {
-    this.connect,
-  });
+  RemoteBackupService(this.directory, {this.connect});
   final DirectoryBackupService directory;
   final RemoteBackupApi Function(RemoteBackupEndpoint)? connect;
   static const storageKey = 'space.directory.space-backup.v1';
