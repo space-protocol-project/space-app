@@ -48,22 +48,32 @@ class PairingSelectionCubit extends Cubit<PairingSelectionState> {
     emit(state.copyWith(busy: true, error: ''));
     try {
       // Сначала проверяем весь выбор: существующие личности не заменяются.
-      for (final entry in selected.entries) {
-        await _requireNewIdentity(entry.key, entry.value);
-        if (!_current(generation)) return;
-      }
+      if (!await _checkSelection(selected, generation)) return;
       final catalog = (await repository?.read())?['catalog'] as Map? ?? const {};
-      for (final entry in selected.entries) {
-        if (!_current(generation)) return;
-        await _inspect(entry.key, entry.value!, catalog[entry.key] as Map?);
-        if (!_current(generation)) return;
-      }
+      if (!await _discoverSelection(selected, catalog, generation)) return;
       emit(state.copyWith(prepared: true, revision: state.revision + 1));
     } catch (_) {
       if (_current(generation)) emit(state.copyWith(error: 'pairingSelectionFailed'));
     } finally {
       if (_current(generation)) emit(state.copyWith(busy: false));
     }
+  }
+
+  Future<bool> _checkSelection(Map<String, ChatController?> selected, int generation) async {
+    for (final entry in selected.entries) {
+      await _requireNewIdentity(entry.key, entry.value);
+      if (!_current(generation)) return false;
+    }
+    return true;
+  }
+
+  Future<bool> _discoverSelection(Map<String, ChatController?> selected, Map catalog, int generation) async {
+    for (final entry in selected.entries) {
+      if (!_current(generation)) return false;
+      await _inspect(entry.key, entry.value!, catalog[entry.key] as Map?);
+      if (!_current(generation)) return false;
+    }
+    return true;
   }
 
   Future<void> _requireNewIdentity(String origin, ChatController? controller) async {

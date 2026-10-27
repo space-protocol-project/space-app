@@ -34,23 +34,30 @@ class _PairingSelectionPanelState extends State<PairingSelectionPanel> {
         const SizedBox(height: 12),
         Text(context.strings.pairingSelectionHelp),
         const SizedBox(height: 16),
-        SwitchListTile(contentPadding: EdgeInsets.zero,
-          title: Text(state.fullManagement ? context.strings.pairingModeFull : context.strings.pairingModeLimited),
-          subtitle: Text(state.fullManagement ? context.strings.pairingModeFullHelp : context.strings.pairingModeLimitedHelp),
-          value: state.fullManagement,
-          onChanged: state.busy || state.prepared ? null : cubit.mode),
+        _mode(state),
         const SizedBox(height: 12),
         ..._spaces(state),
         const SizedBox(height: 16),
-        if (state.busy) const LinearProgressIndicator(),
-        if (state.error.isNotEmpty) Text(context.strings.pairingSelectionFailed),
-        if (!state.prepared) OutlinedButton(
-          onPressed: state.busy || state.origins.isEmpty ? null : cubit.prepare,
-          child: Text(context.strings.pairingSelectionPrepare)),
+        ..._status(state),
         if (state.prepared) ..._requests(state),
       ]),
     )),
   );
+
+  Widget _mode(PairingSelectionState state) => SwitchListTile(
+    contentPadding: EdgeInsets.zero,
+    title: Text(state.fullManagement ? context.strings.pairingModeFull : context.strings.pairingModeLimited),
+    subtitle: Text(state.fullManagement ? context.strings.pairingModeFullHelp : context.strings.pairingModeLimitedHelp),
+    value: state.fullManagement,
+    onChanged: state.busy || state.prepared ? null : cubit.mode);
+
+  List<Widget> _status(PairingSelectionState state) => [
+    if (state.busy) const LinearProgressIndicator(),
+    if (state.error.isNotEmpty) Text(context.strings.pairingSelectionFailed),
+    if (!state.prepared) OutlinedButton(
+      onPressed: state.busy || state.origins.isEmpty ? null : cubit.prepare,
+      child: Text(context.strings.pairingSelectionPrepare)),
+  ];
 
   List<Widget> _spaces(PairingSelectionState state) => [
     for (final entry in widget.controllers().entries)
