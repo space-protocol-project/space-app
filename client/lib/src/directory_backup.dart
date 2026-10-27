@@ -271,7 +271,11 @@ class DirectoryBackupService {
     Map<String, SettingsChoice> settingsChoices = const {},
   }) => repository.exclusive(() async {
     final latest = await preview(plan.document, ancestors: plan.ancestors);
-    directoryRequire(latest.conflicts.isEmpty && latest.before == plan.before && latest.digest == plan.digest);
+    directoryRequire(
+      latest.conflicts.isEmpty &&
+          latest.before == plan.before &&
+          latest.digest == plan.digest,
+    );
     final state = await repository.read(), catalog = state['catalog'] as Map;
     for (final space in plan.document.spaces) {
       catalog[space['origin']] = space;

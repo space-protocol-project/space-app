@@ -311,9 +311,19 @@ void main() {
     final prefs = preferences(), storage = DirectoryStorage();
     final backup = service(prefs, storage);
     final plan = await backup.preview(directoryDocument());
-    final changed = DirectoryRestorePlan(plan.document, url64(List.filled(32, 99)),
-        plan.before, plan.conflicts, plan.unknown, plan.ancestors, plan.settingsMerge);
-    await expectLater(backup.apply(changed, mergeSettings: false), throwsFormatException);
+    final changed = DirectoryRestorePlan(
+      plan.document,
+      url64(List.filled(32, 99)),
+      plan.before,
+      plan.conflicts,
+      plan.unknown,
+      plan.ancestors,
+      plan.settingsMerge,
+    );
+    await expectLater(
+      backup.apply(changed, mergeSettings: false),
+      throwsFormatException,
+    );
     expect(storage.values, isEmpty);
   });
   test('Повреждённые ревизии не заменяются молча новыми', () async {
