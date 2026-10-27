@@ -4,6 +4,11 @@ on:
     branches: [main]
     paths: ['client/build.yaml', 'client/lib/src/pairing*.dart', 'client/lib/ui/pairing*.dart', 'client/lib/ui/recovery_panel.dart', 'client/lib/ui/camera_scanner.dart', 'client/lib/src/*qr.dart', 'client/lib/l10n/**', 'packages/space_admin_ui/lib/**', 'client/test/pairing*_test.dart', 'client/test/probes/pairing_probe.dart', 'tools/check_pairing_ui.py', '.github/workflows/milestone-0-8.yml']
   workflow_dispatch:
+    inputs:
+      models:
+        description: Повторно генерировать Freezed; сохранённые модели уже входят в исходники
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -25,11 +30,16 @@ jobs:
           sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb xauth dbus-x11
       - name: Rust
         run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Генерация моделей по явному запросу
+        if: inputs.models
+        working-directory: client
+        run: |
+          flutter pub get
+          timeout 300s dart run build_runner build
       - name: Форматирование, анализ и проверки сопряжения и архивов
         working-directory: client
         run: |
           flutter pub get
-          dart run build_runner build
           dart format lib/src/pairing*.dart lib/src/recovery_qr.dart lib/src/space_link_qr.dart lib/ui/pairing*.dart lib/ui/recovery_panel.dart lib/ui/camera_scanner.dart test/pairing*_test.dart test/admin_recovery_views_test.dart test/probes/pairing_probe.dart tool/community_pairing_modes_interoperability.dart ../packages/space_admin_ui/lib/src/pairing_start_view.dart ../packages/space_admin_ui/lib/src/recovery_tools_view.dart
           dart fix --apply --code=curly_braces_in_flow_control_structures
           flutter analyze
