@@ -349,84 +349,16 @@ class PutBackupResponse extends $pb.GeneratedMessage {
   BackupHead ensureHead() => $_ensure(0);
 }
 
-class AdvanceBackupWitnessResponse extends $pb.GeneratedMessage {
-  factory AdvanceBackupWitnessResponse({
-    BackupHead? head,
-  }) {
-    final result = AdvanceBackupWitnessResponse._();
-    if (head != null) result.head = head;
-    return result;
-  }
-
-  AdvanceBackupWitnessResponse._();
-
-  factory AdvanceBackupWitnessResponse.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      AdvanceBackupWitnessResponse()..mergeFromBuffer(data, registry);
-  factory AdvanceBackupWitnessResponse.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      AdvanceBackupWitnessResponse()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'AdvanceBackupWitnessResponse',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
-      createEmptyInstance: AdvanceBackupWitnessResponse.$_createMessage)
-    ..aOM<BackupHead>(1, _omitFieldNames ? '' : 'head',
-        subBuilder: BackupHead.$_createMessage)
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  AdvanceBackupWitnessResponse clone() => deepCopy();
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  AdvanceBackupWitnessResponse copyWith(
-          void Function(AdvanceBackupWitnessResponse) updates) =>
-      super.copyWith(
-              (message) => updates(message as AdvanceBackupWitnessResponse))
-          as AdvanceBackupWitnessResponse;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  @$core.Deprecated(
-      'Use AdvanceBackupWitnessResponse() / AdvanceBackupWitnessResponse.new instead')
-  static AdvanceBackupWitnessResponse create() =>
-      AdvanceBackupWitnessResponse._();
-  static $pb.GeneratedMessage $_createMessage() =>
-      AdvanceBackupWitnessResponse._();
-  @$core.override
-  AdvanceBackupWitnessResponse createEmptyInstance() =>
-      AdvanceBackupWitnessResponse._();
-  @$core.pragma('dart2js:noInline')
-  static AdvanceBackupWitnessResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AdvanceBackupWitnessResponse>(
-          AdvanceBackupWitnessResponse.$_createMessage);
-  static AdvanceBackupWitnessResponse? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  BackupHead get head => $_getN(0);
-  @$pb.TagNumber(1)
-  set head(BackupHead value) => $_setField(1, value);
-  @$pb.TagNumber(1)
-  $core.bool hasHead() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearHead() => $_clearField(1);
-  @$pb.TagNumber(1)
-  BackupHead ensureHead() => $_ensure(0);
-}
-
 class CreateBackupSlotRequest extends $pb.GeneratedMessage {
   factory CreateBackupSlotRequest({
     $core.String? id,
     $core.List<$core.int>? readHash,
     $core.List<$core.int>? writeHash,
-    $core.bool? witness,
   }) {
     final result = CreateBackupSlotRequest._();
     if (id != null) result.id = id;
     if (readHash != null) result.readHash = readHash;
     if (writeHash != null) result.writeHash = writeHash;
-    if (witness != null) result.witness = witness;
     return result;
   }
 
@@ -448,7 +380,6 @@ class CreateBackupSlotRequest extends $pb.GeneratedMessage {
         2, _omitFieldNames ? '' : 'readHash', $pb.PbFieldType.OY)
     ..a<$core.List<$core.int>>(
         3, _omitFieldNames ? '' : 'writeHash', $pb.PbFieldType.OY)
-    ..aOB(4, _omitFieldNames ? '' : 'witness')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -501,15 +432,6 @@ class CreateBackupSlotRequest extends $pb.GeneratedMessage {
   $core.bool hasWriteHash() => $_has(2);
   @$pb.TagNumber(3)
   void clearWriteHash() => $_clearField(3);
-
-  @$pb.TagNumber(4)
-  $core.bool get witness => $_getBF(3);
-  @$pb.TagNumber(4)
-  set witness($core.bool value) => $_setBool(3, value);
-  @$pb.TagNumber(4)
-  $core.bool hasWitness() => $_has(3);
-  @$pb.TagNumber(4)
-  void clearWitness() => $_clearField(4);
 }
 
 class PutBackupRequest extends $pb.GeneratedMessage {
@@ -751,139 +673,60 @@ class GetBackupResponse extends $pb.GeneratedMessage {
   void clearArchive() => $_clearField(2);
 }
 
-class AdvanceBackupWitnessRequest extends $pb.GeneratedMessage {
-  factory AdvanceBackupWitnessRequest({
-    BackupHead? head,
-    $core.String? token,
-  }) {
-    final result = AdvanceBackupWitnessRequest._();
-    if (head != null) result.head = head;
-    if (token != null) result.token = token;
-    return result;
-  }
-
-  AdvanceBackupWitnessRequest._();
-
-  factory AdvanceBackupWitnessRequest.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      AdvanceBackupWitnessRequest()..mergeFromBuffer(data, registry);
-  factory AdvanceBackupWitnessRequest.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      AdvanceBackupWitnessRequest()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'AdvanceBackupWitnessRequest',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
-      createEmptyInstance: AdvanceBackupWitnessRequest.$_createMessage)
-    ..aOM<BackupHead>(1, _omitFieldNames ? '' : 'head',
-        subBuilder: BackupHead.$_createMessage)
-    ..aOS(2, _omitFieldNames ? '' : 'token')
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  AdvanceBackupWitnessRequest clone() => deepCopy();
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  AdvanceBackupWitnessRequest copyWith(
-          void Function(AdvanceBackupWitnessRequest) updates) =>
-      super.copyWith(
-              (message) => updates(message as AdvanceBackupWitnessRequest))
-          as AdvanceBackupWitnessRequest;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  @$core.Deprecated(
-      'Use AdvanceBackupWitnessRequest() / AdvanceBackupWitnessRequest.new instead')
-  static AdvanceBackupWitnessRequest create() =>
-      AdvanceBackupWitnessRequest._();
-  static $pb.GeneratedMessage $_createMessage() =>
-      AdvanceBackupWitnessRequest._();
-  @$core.override
-  AdvanceBackupWitnessRequest createEmptyInstance() =>
-      AdvanceBackupWitnessRequest._();
-  @$core.pragma('dart2js:noInline')
-  static AdvanceBackupWitnessRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AdvanceBackupWitnessRequest>(
-          AdvanceBackupWitnessRequest.$_createMessage);
-  static AdvanceBackupWitnessRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  BackupHead get head => $_getN(0);
-  @$pb.TagNumber(1)
-  set head(BackupHead value) => $_setField(1, value);
-  @$pb.TagNumber(1)
-  $core.bool hasHead() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearHead() => $_clearField(1);
-  @$pb.TagNumber(1)
-  BackupHead ensureHead() => $_ensure(0);
-
-  @$pb.TagNumber(2)
-  $core.String get token => $_getSZ(1);
-  @$pb.TagNumber(2)
-  set token($core.String value) => $_setString(1, value);
-  @$pb.TagNumber(2)
-  $core.bool hasToken() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearToken() => $_clearField(2);
-}
-
-class ReadBackupWitnessRequest extends $pb.GeneratedMessage {
-  factory ReadBackupWitnessRequest({
+class ReadBackupHeadRequest extends $pb.GeneratedMessage {
+  factory ReadBackupHeadRequest({
     $core.String? id,
     $core.String? token,
     $core.String? challenge,
   }) {
-    final result = ReadBackupWitnessRequest._();
+    final result = ReadBackupHeadRequest._();
     if (id != null) result.id = id;
     if (token != null) result.token = token;
     if (challenge != null) result.challenge = challenge;
     return result;
   }
 
-  ReadBackupWitnessRequest._();
+  ReadBackupHeadRequest._();
 
-  factory ReadBackupWitnessRequest.fromBuffer($core.List<$core.int> data,
+  factory ReadBackupHeadRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      ReadBackupWitnessRequest()..mergeFromBuffer(data, registry);
-  factory ReadBackupWitnessRequest.fromJson($core.String json,
+      ReadBackupHeadRequest()..mergeFromBuffer(data, registry);
+  factory ReadBackupHeadRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      ReadBackupWitnessRequest()..mergeFromJson(json, registry);
+      ReadBackupHeadRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'ReadBackupWitnessRequest',
+      _omitMessageNames ? '' : 'ReadBackupHeadRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
-      createEmptyInstance: ReadBackupWitnessRequest.$_createMessage)
+      createEmptyInstance: ReadBackupHeadRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'token')
     ..aOS(3, _omitFieldNames ? '' : 'challenge')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  ReadBackupWitnessRequest clone() => deepCopy();
+  ReadBackupHeadRequest clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  ReadBackupWitnessRequest copyWith(
-          void Function(ReadBackupWitnessRequest) updates) =>
-      super.copyWith((message) => updates(message as ReadBackupWitnessRequest))
-          as ReadBackupWitnessRequest;
+  ReadBackupHeadRequest copyWith(
+          void Function(ReadBackupHeadRequest) updates) =>
+      super.copyWith((message) => updates(message as ReadBackupHeadRequest))
+          as ReadBackupHeadRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   @$core.Deprecated(
-      'Use ReadBackupWitnessRequest() / ReadBackupWitnessRequest.new instead')
-  static ReadBackupWitnessRequest create() => ReadBackupWitnessRequest._();
-  static $pb.GeneratedMessage $_createMessage() => ReadBackupWitnessRequest._();
+      'Use ReadBackupHeadRequest() / ReadBackupHeadRequest.new instead')
+  static ReadBackupHeadRequest create() => ReadBackupHeadRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ReadBackupHeadRequest._();
   @$core.override
-  ReadBackupWitnessRequest createEmptyInstance() =>
-      ReadBackupWitnessRequest._();
+  ReadBackupHeadRequest createEmptyInstance() => ReadBackupHeadRequest._();
   @$core.pragma('dart2js:noInline')
-  static ReadBackupWitnessRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ReadBackupWitnessRequest>(
-          ReadBackupWitnessRequest.$_createMessage);
-  static ReadBackupWitnessRequest? _defaultInstance;
+  static ReadBackupHeadRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ReadBackupHeadRequest>(
+          ReadBackupHeadRequest.$_createMessage);
+  static ReadBackupHeadRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
@@ -913,32 +756,32 @@ class ReadBackupWitnessRequest extends $pb.GeneratedMessage {
   void clearChallenge() => $_clearField(3);
 }
 
-class ReadBackupWitnessResponse extends $pb.GeneratedMessage {
-  factory ReadBackupWitnessResponse({
+class ReadBackupHeadResponse extends $pb.GeneratedMessage {
+  factory ReadBackupHeadResponse({
     BackupHead? head,
     $core.String? challenge,
     $core.List<$core.int>? signature,
   }) {
-    final result = ReadBackupWitnessResponse._();
+    final result = ReadBackupHeadResponse._();
     if (head != null) result.head = head;
     if (challenge != null) result.challenge = challenge;
     if (signature != null) result.signature = signature;
     return result;
   }
 
-  ReadBackupWitnessResponse._();
+  ReadBackupHeadResponse._();
 
-  factory ReadBackupWitnessResponse.fromBuffer($core.List<$core.int> data,
+  factory ReadBackupHeadResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      ReadBackupWitnessResponse()..mergeFromBuffer(data, registry);
-  factory ReadBackupWitnessResponse.fromJson($core.String json,
+      ReadBackupHeadResponse()..mergeFromBuffer(data, registry);
+  factory ReadBackupHeadResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      ReadBackupWitnessResponse()..mergeFromJson(json, registry);
+      ReadBackupHeadResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'ReadBackupWitnessResponse',
+      _omitMessageNames ? '' : 'ReadBackupHeadResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
-      createEmptyInstance: ReadBackupWitnessResponse.$_createMessage)
+      createEmptyInstance: ReadBackupHeadResponse.$_createMessage)
     ..aOM<BackupHead>(1, _omitFieldNames ? '' : 'head',
         subBuilder: BackupHead.$_createMessage)
     ..aOS(2, _omitFieldNames ? '' : 'challenge')
@@ -947,30 +790,28 @@ class ReadBackupWitnessResponse extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  ReadBackupWitnessResponse clone() => deepCopy();
+  ReadBackupHeadResponse clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  ReadBackupWitnessResponse copyWith(
-          void Function(ReadBackupWitnessResponse) updates) =>
-      super.copyWith((message) => updates(message as ReadBackupWitnessResponse))
-          as ReadBackupWitnessResponse;
+  ReadBackupHeadResponse copyWith(
+          void Function(ReadBackupHeadResponse) updates) =>
+      super.copyWith((message) => updates(message as ReadBackupHeadResponse))
+          as ReadBackupHeadResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
   @$core.Deprecated(
-      'Use ReadBackupWitnessResponse() / ReadBackupWitnessResponse.new instead')
-  static ReadBackupWitnessResponse create() => ReadBackupWitnessResponse._();
-  static $pb.GeneratedMessage $_createMessage() =>
-      ReadBackupWitnessResponse._();
+      'Use ReadBackupHeadResponse() / ReadBackupHeadResponse.new instead')
+  static ReadBackupHeadResponse create() => ReadBackupHeadResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ReadBackupHeadResponse._();
   @$core.override
-  ReadBackupWitnessResponse createEmptyInstance() =>
-      ReadBackupWitnessResponse._();
+  ReadBackupHeadResponse createEmptyInstance() => ReadBackupHeadResponse._();
   @$core.pragma('dart2js:noInline')
-  static ReadBackupWitnessResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ReadBackupWitnessResponse>(
-          ReadBackupWitnessResponse.$_createMessage);
-  static ReadBackupWitnessResponse? _defaultInstance;
+  static ReadBackupHeadResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ReadBackupHeadResponse>(
+          ReadBackupHeadResponse.$_createMessage);
+  static ReadBackupHeadResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
   BackupHead get head => $_getN(0);
@@ -1002,7 +843,7 @@ class ReadBackupWitnessResponse extends $pb.GeneratedMessage {
   void clearSignature() => $_clearField(3);
 }
 
-/// core.directory.backup.v1: независимые хранилище и свидетель версии.
+/// core.directory.backup.v1: зашифрованные копии на сервере пространства.
 class RemoteBackupServiceApi {
   final $pb.RpcClient _client;
 
@@ -1024,14 +865,10 @@ class RemoteBackupServiceApi {
           $pb.ClientContext? ctx, GetBackupRequest request) =>
       _client.invoke<GetBackupResponse>(ctx, 'RemoteBackupService', 'GetBackup',
           request, GetBackupResponse());
-  $async.Future<AdvanceBackupWitnessResponse> advanceBackupWitness(
-          $pb.ClientContext? ctx, AdvanceBackupWitnessRequest request) =>
-      _client.invoke<AdvanceBackupWitnessResponse>(ctx, 'RemoteBackupService',
-          'AdvanceBackupWitness', request, AdvanceBackupWitnessResponse());
-  $async.Future<ReadBackupWitnessResponse> readBackupWitness(
-          $pb.ClientContext? ctx, ReadBackupWitnessRequest request) =>
-      _client.invoke<ReadBackupWitnessResponse>(ctx, 'RemoteBackupService',
-          'ReadBackupWitness', request, ReadBackupWitnessResponse());
+  $async.Future<ReadBackupHeadResponse> readBackupHead(
+          $pb.ClientContext? ctx, ReadBackupHeadRequest request) =>
+      _client.invoke<ReadBackupHeadResponse>(ctx, 'RemoteBackupService',
+          'ReadBackupHead', request, ReadBackupHeadResponse());
 }
 
 const $core.bool _omitFieldNames =

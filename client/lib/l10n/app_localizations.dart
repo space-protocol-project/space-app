@@ -5707,13 +5707,13 @@ abstract class AppLocalizations {
   /// No description provided for @remoteBackupTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Удалённая резервная копия'**
+  /// **'Копии на пространстве'**
   String get remoteBackupTitle;
 
   /// No description provided for @remoteBackupHelp.
   ///
   /// In ru, this message translates to:
-  /// **'Нужны два уже подключённых HTTPS-пространства у независимых операторов: одно хранит зашифрованные копии, другое — отметку последней версии. Для восстановления на новом устройстве нужен сохранённый комплект и отдельно пароль. Доступ к пространствам возвращается через сопряжение или recovery-карточку.'**
+  /// **'Сохраняйте зашифрованные копии на выбранном подключённом пространстве. Его сервер может работать самостоятельно или запускаться приложением через runtime. Для восстановления нужны сохранённый комплект и отдельно пароль. Доступ к пространствам возвращается через сопряжение или recovery-карточку.'**
   String get remoteBackupHelp;
 
   /// No description provided for @remoteBackupKitHelp.
@@ -5725,14 +5725,8 @@ abstract class AppLocalizations {
   /// No description provided for @remoteBackupStorage.
   ///
   /// In ru, this message translates to:
-  /// **'Адрес хранилища'**
+  /// **'Пространство для копий'**
   String get remoteBackupStorage;
-
-  /// No description provided for @remoteBackupWitness.
-  ///
-  /// In ru, this message translates to:
-  /// **'Адрес независимого свидетеля'**
-  String get remoteBackupWitness;
 
   /// No description provided for @remoteBackupSetup.
   ///
@@ -5749,37 +5743,37 @@ abstract class AppLocalizations {
   /// No description provided for @remoteBackupPublish.
   ///
   /// In ru, this message translates to:
-  /// **'Создать или завершить публикацию'**
+  /// **'Создать или завершить копию'**
   String get remoteBackupPublish;
 
   /// No description provided for @remoteBackupRead.
   ///
   /// In ru, this message translates to:
-  /// **'Проверить и открыть последнюю копию'**
+  /// **'Проверить и открыть копию'**
   String get remoteBackupRead;
 
   /// No description provided for @remoteBackupConfigure.
   ///
   /// In ru, this message translates to:
-  /// **'Повторить настройку серверов'**
+  /// **'Повторить настройку пространства'**
   String get remoteBackupConfigure;
 
   /// No description provided for @remoteBackupSaved.
   ///
   /// In ru, this message translates to:
-  /// **'Копия загружена, прочитана обратно и подтверждена свидетелем.'**
+  /// **'Копия сохранена на пространстве и проверена после скачивания.'**
   String get remoteBackupSaved;
 
   /// No description provided for @remoteBackupConfigured.
   ///
   /// In ru, this message translates to:
-  /// **'Хранилище и свидетель готовы.'**
+  /// **'Пространство готово сохранять копии.'**
   String get remoteBackupConfigured;
 
   /// No description provided for @remoteBackupVerified.
   ///
   /// In ru, this message translates to:
-  /// **'Свидетель подтвердил версию:'**
+  /// **'Версия на пространстве:'**
   String get remoteBackupVerified;
 
   /// No description provided for @remoteBackupError.
@@ -5803,44 +5797,20 @@ abstract class AppLocalizations {
   /// No description provided for @remoteBackupRevokeHelp.
   ///
   /// In ru, this message translates to:
-  /// **'Отозвать доступ к копиям на обоих серверах? Потребуется действующий вход владельца на каждом из них. Этот комплект перестанет работать; сохранённые контейнеры не удаляются. При сбое повторите отзыв.'**
+  /// **'Отозвать доступ к копиям на выбранном пространстве? Потребуется действующий вход владельца. Комплект перестанет работать; сохранённые контейнеры не удаляются.'**
   String get remoteBackupRevokeHelp;
 
   /// No description provided for @remoteBackupRevoked.
   ///
   /// In ru, this message translates to:
-  /// **'Доступ к копиям отозван на обоих серверах.'**
+  /// **'Доступ к копиям на пространстве отозван.'**
   String get remoteBackupRevoked;
 
-  /// No description provided for @remoteBackupUnpublished.
+  /// No description provided for @remoteBackupFreshness.
   ///
   /// In ru, this message translates to:
-  /// **'Найти незавершённую публикацию'**
-  String get remoteBackupUnpublished;
-
-  /// No description provided for @remoteBackupUnpublishedHelp.
-  ///
-  /// In ru, this message translates to:
-  /// **'Копия загружена, но ещё не подтверждена свидетелем. Проверьте её состав перед публикацией.'**
-  String get remoteBackupUnpublishedHelp;
-
-  /// No description provided for @remoteBackupFinish.
-  ///
-  /// In ru, this message translates to:
-  /// **'Подтвердить публикацию этой копии'**
-  String get remoteBackupFinish;
-
-  /// No description provided for @remoteBackupFinishHelp.
-  ///
-  /// In ru, this message translates to:
-  /// **'Завершить публикацию показанной копии? Будут проверены пароль и неизменность версии. Настройки устройства этой командой не заменяются; применение каталога выполняется отдельно.'**
-  String get remoteBackupFinishHelp;
-
-  /// No description provided for @remoteBackupRestoreFirst.
-  ///
-  /// In ru, this message translates to:
-  /// **'Сначала откройте и примените последнюю подтверждённую копию. Для всех версий цепочки используйте тот же пароль.'**
-  String get remoteBackupRestoreFirst;
+  /// **'Откат проверяется по локальной истории. После её утраты новизна копии не подтверждается.'**
+  String get remoteBackupFreshness;
 }
 
 class _AppLocalizationsDelegate

@@ -153,22 +153,41 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
         ),
       );
   List<Widget> _setup(RemoteBackupState state) {
-    final spaces=cubit.spaces;
-    final selected=spaces.any((space) => space.origin == selectedSpace) ? selectedSpace : null;
+    final spaces = cubit.spaces;
+    final selected = spaces.any((space) => space.origin == selectedSpace)
+        ? selectedSpace
+        : null;
     return [
       DropdownButtonFormField<String>(
-        initialValue:selected, isExpanded:true,
-        decoration:InputDecoration(labelText:context.strings.remoteBackupStorage),
-        items:spaces.map((space) => DropdownMenuItem(value:space.origin,child:Text(space.title,overflow:TextOverflow.ellipsis))).toList(),
-        onChanged:state.busy ? null : (value) => setState(() => selectedSpace=value),
+        initialValue: selected,
+        isExpanded: true,
+        decoration: InputDecoration(
+          labelText: context.strings.remoteBackupStorage,
+        ),
+        items: spaces
+            .map(
+              (space) => DropdownMenuItem(
+                value: space.origin,
+                child: Text(space.title, overflow: TextOverflow.ellipsis),
+              ),
+            )
+            .toList(),
+        onChanged: state.busy
+            ? null
+            : (value) => setState(() => selectedSpace = value),
       ),
-      const SizedBox(height:16),
-      OutlinedButton(onPressed:state.busy || selected == null ? null : () => cubit.setup(selected,saveKit),child:Text(context.strings.remoteBackupSetup)),
+      const SizedBox(height: 16),
+      OutlinedButton(
+        onPressed: state.busy || selected == null
+            ? null
+            : () => cubit.setup(selected, saveKit),
+        child: Text(context.strings.remoteBackupSetup),
+      ),
     ];
-  }  List<Widget> _configured(RemoteBackupState state) => [
-    Text(
-      '${context.strings.remoteBackupStorage}: ${state.kit!.space.origin}',
-    ),
+  }
+
+  List<Widget> _configured(RemoteBackupState state) => [
+    Text('${context.strings.remoteBackupStorage}: ${state.kit!.space.origin}'),
     const SizedBox(height: 16),
     Wrap(
       spacing: 12,
@@ -250,20 +269,17 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
     final restore = state.restore!, plan = restore.plan;
     return [
       const SizedBox(height: 12),
-        CheckboxListTile(
-          contentPadding: EdgeInsets.zero,
-          value: state.replaceSettings,
-          onChanged: state.busy
-              ? null
-              : (value) => cubit.replaceSettings(value ?? false),
-          title: Text(context.strings.directoryBackupSettings),
-        ),
+      CheckboxListTile(
+        contentPadding: EdgeInsets.zero,
+        value: state.replaceSettings,
+        onChanged: state.busy
+            ? null
+            : (value) => cubit.replaceSettings(value ?? false),
+        title: Text(context.strings.directoryBackupSettings),
+      ),
       const SizedBox(height: 12),
       FilledButton(
-        onPressed:
-            state.busy || plan.conflicts.isNotEmpty
-            ? null
-            : apply,
+        onPressed: state.busy || plan.conflicts.isNotEmpty ? null : apply,
         child: Text(context.strings.directoryBackupApply),
       ),
       TextButton(

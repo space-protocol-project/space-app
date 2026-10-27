@@ -47,22 +47,38 @@ Future<void> waitRemoteRestart(String marker) async {
 
 void main() {
   RemoteNetworkBinding();
-  const origin=String.fromEnvironment('REMOTE_SPACE');
-  const tls=String.fromEnvironment('REMOTE_SPACE_TLS');
-  const authOrigin=String.fromEnvironment('REMOTE_SPACE_AUTH');
-  const restart=String.fromEnvironment('REMOTE_RESTART');  test(
+  const origin = String.fromEnvironment('REMOTE_SPACE');
+  const tls = String.fromEnvironment('REMOTE_SPACE_TLS');
+  const authOrigin = String.fromEnvironment('REMOTE_SPACE_AUTH');
+  const restart = String.fromEnvironment('REMOTE_RESTART');
+  test(
     'Один сервер пространства: атомарная копия и восстановление после перезапуска',
     () async {
       SharedPreferences.setMockInitialValues({});
-      final server=await discover(origin,tlsFingerprint:tls);
-      final sourceVault=DirectoryVault();
-      final session=await SpaceSession.connect(await discover(authOrigin),sourceVault);
+      final server = await discover(origin, tlsFingerprint: tls);
+      final sourceVault = DirectoryVault();
+      final session = await SpaceSession.connect(
+        await discover(authOrigin),
+        sourceVault,
+      );
       addTearDown(session.close);
-      expect(session.server.publicKey,server.publicKey);
-      final kit=RemoteBackupKit.parse(RemoteBackupKit(url64(List.filled(16,17)),RemoteBackupEndpoint.create(origin,tls,url64(server.publicKey))).encode());
-      await session.createRemoteBackupSlot(CreateBackupSlotRequest(id:kit.id,
-        readHash:(await Sha256().hash(utf8.encode(kit.space.readToken))).bytes,
-        writeHash:(await Sha256().hash(utf8.encode(kit.space.writeToken))).bytes));      final sourcePrefs = AppPreferences(), targetPrefs = AppPreferences();
+      expect(session.server.publicKey, server.publicKey);
+      final kit = RemoteBackupKit.parse(
+        RemoteBackupKit(
+          url64(List.filled(16, 17)),
+          RemoteBackupEndpoint.create(origin, tls, url64(server.publicKey)),
+        ).encode(),
+      );
+      await session.createRemoteBackupSlot(
+        CreateBackupSlotRequest(
+          id: kit.id,
+          readHash: (await Sha256().hash(utf8.encode(kit.space.readToken)))
+              .bytes,
+          writeHash: (await Sha256().hash(utf8.encode(kit.space.writeToken)))
+              .bytes,
+        ),
+      );
+      final sourcePrefs = AppPreferences(), targetPrefs = AppPreferences();
       addTearDown(sourcePrefs.close);
       addTearDown(targetPrefs.close);
       final source = DirectoryBackupService(
@@ -93,10 +109,11 @@ void main() {
       );
       final recovery = RemoteBackupService(target);
       await recovery.saveKit(RemoteBackupKit.parse(kit.encode()));
-      final before=await recovery.preview(kit,'Отдельный длинный пароль');
-      expect(before.head.revision.toInt(),1);
-      expect(targetPrefs.origins,isEmpty);
-      await waitRemoteRestart(restart);      await RemoteBackupService(source)
+      final before = await recovery.preview(kit, 'Отдельный длинный пароль');
+      expect(before.head.revision.toInt(), 1);
+      expect(targetPrefs.origins, isEmpty);
+      await waitRemoteRestart(restart);
+      await RemoteBackupService(source)
           .publish(kit, 'Отдельный длинный пароль');
       final plan = await recovery.preview(
         RemoteBackupKit.parse(kit.encode()),
@@ -110,8 +127,14 @@ void main() {
       expect(targetPrefs.palette, 'gruvbox');
       expect(targetVault.records, isEmpty);
       expect(plan.plan.document.spaces.single['following'], hasLength(3));
-      final shared=RpcRemoteBackup.session(session);
-      await shared.read(ReadBackupHeadRequest(id:kit.id,token:kit.space.readToken,challenge:url64(List.filled(32,29))));
+      final shared = RpcRemoteBackup.session(session);
+      await shared.read(
+        ReadBackupHeadRequest(
+          id: kit.id,
+          token: kit.space.readToken,
+          challenge: url64(List.filled(32, 29)),
+        ),
+      );
       await shared.close();
       await session.revokeRemoteBackupSlot(kit.id);
       await session.revokeRemoteBackupSlot(kit.id);

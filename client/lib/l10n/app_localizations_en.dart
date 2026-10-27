@@ -3150,21 +3150,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get directoryTransferRelay => 'Select a trusted space for transfer';
 
   @override
-  String get remoteBackupTitle => 'Remote backup';
+  String get remoteBackupTitle => 'Backups in a space';
 
   @override
   String get remoteBackupHelp =>
-      'Use two connected HTTPS spaces operated independently: encrypted storage and a version witness. A new device needs the saved recovery kit and a separate password. Pairing or a recovery card restores access to spaces.';
+      'Save encrypted backups in a connected space. Its server can run independently or be started by the app using the runtime. Recovery requires the saved kit and a separate password. Pairing or a recovery card restores access to spaces.';
 
   @override
   String get remoteBackupKitHelp =>
       'The kit contains secret backup read and write credentials. Save it outside this device, separately from the password. Anyone with the kit can download encrypted copies and disrupt future publications.';
 
   @override
-  String get remoteBackupStorage => 'Storage address';
-
-  @override
-  String get remoteBackupWitness => 'Independent witness address';
+  String get remoteBackupStorage => 'Space for backups';
 
   @override
   String get remoteBackupSetup => 'Save kit and configure';
@@ -3173,23 +3170,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get remoteBackupImportKit => 'Open recovery kit';
 
   @override
-  String get remoteBackupPublish => 'Create or resume publication';
+  String get remoteBackupPublish => 'Create or resume backup';
 
   @override
-  String get remoteBackupRead => 'Verify and open latest backup';
+  String get remoteBackupRead => 'Verify and open backup';
 
   @override
-  String get remoteBackupConfigure => 'Retry server setup';
+  String get remoteBackupConfigure => 'Retry space setup';
 
   @override
   String get remoteBackupSaved =>
-      'Backup uploaded, read back and confirmed by the witness.';
+      'Backup saved in the space and verified after download.';
 
   @override
-  String get remoteBackupConfigured => 'Storage and witness are ready.';
+  String get remoteBackupConfigured => 'The space is ready to store backups.';
 
   @override
-  String get remoteBackupVerified => 'Witness confirmed version:';
+  String get remoteBackupVerified => 'Version reported by the space:';
 
   @override
   String get remoteBackupError =>
@@ -3203,26 +3200,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get remoteBackupRevokeHelp =>
-      'Revoke backup access on both servers? The owner\'s active session is required on each server. This kit will stop working; stored containers will remain. Retry revocation after a failure.';
+      'Revoke backup access in the selected space? The owner\'s active session is required. The kit will stop working; stored containers will remain.';
 
   @override
-  String get remoteBackupRevoked => 'Backup access revoked on both servers.';
+  String get remoteBackupRevoked => 'Backup access revoked in the space.';
 
   @override
-  String get remoteBackupUnpublished => 'Find unfinished publication';
-
-  @override
-  String get remoteBackupUnpublishedHelp =>
-      'The backup is uploaded but not confirmed by the witness. Review its contents before publication.';
-
-  @override
-  String get remoteBackupFinish => 'Confirm publication of this backup';
-
-  @override
-  String get remoteBackupFinishHelp =>
-      'Complete publication of this backup? Its password and unchanged version will be verified. This action does not replace device settings; applying the directory is separate.';
-
-  @override
-  String get remoteBackupRestoreFirst =>
-      'First open and apply the latest confirmed backup. Use the same password for every version in this chain.';
+  String get remoteBackupFreshness =>
+      'Rollback is checked against local history. After that history is lost, backup freshness cannot be confirmed.';
 }

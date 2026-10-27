@@ -29,10 +29,8 @@ abstract class RemoteBackupServiceBase extends $pb.GeneratedService {
       $pb.ServerContext ctx, $0.PutBackupRequest request);
   $async.Future<$0.GetBackupResponse> getBackup(
       $pb.ServerContext ctx, $0.GetBackupRequest request);
-  $async.Future<$0.AdvanceBackupWitnessResponse> advanceBackupWitness(
-      $pb.ServerContext ctx, $0.AdvanceBackupWitnessRequest request);
-  $async.Future<$0.ReadBackupWitnessResponse> readBackupWitness(
-      $pb.ServerContext ctx, $0.ReadBackupWitnessRequest request);
+  $async.Future<$0.ReadBackupHeadResponse> readBackupHead(
+      $pb.ServerContext ctx, $0.ReadBackupHeadRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
@@ -44,10 +42,8 @@ abstract class RemoteBackupServiceBase extends $pb.GeneratedService {
         return $0.PutBackupRequest();
       case 'GetBackup':
         return $0.GetBackupRequest();
-      case 'AdvanceBackupWitness':
-        return $0.AdvanceBackupWitnessRequest();
-      case 'ReadBackupWitness':
-        return $0.ReadBackupWitnessRequest();
+      case 'ReadBackupHead':
+        return $0.ReadBackupHeadRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -64,11 +60,8 @@ abstract class RemoteBackupServiceBase extends $pb.GeneratedService {
         return putBackup(ctx, request as $0.PutBackupRequest);
       case 'GetBackup':
         return getBackup(ctx, request as $0.GetBackupRequest);
-      case 'AdvanceBackupWitness':
-        return advanceBackupWitness(
-            ctx, request as $0.AdvanceBackupWitnessRequest);
-      case 'ReadBackupWitness':
-        return readBackupWitness(ctx, request as $0.ReadBackupWitnessRequest);
+      case 'ReadBackupHead':
+        return readBackupHead(ctx, request as $0.ReadBackupHeadRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }

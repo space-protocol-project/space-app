@@ -95,27 +95,6 @@ final $typed_data.Uint8List putBackupResponseDescriptor = $convert.base64Decode(
     'ChFQdXRCYWNrdXBSZXNwb25zZRIoCgRoZWFkGAEgASgLMhQuc3BhY2UudjEuQmFja3VwSGVhZF'
     'IEaGVhZA==');
 
-@$core.Deprecated('Use advanceBackupWitnessResponseDescriptor instead')
-const AdvanceBackupWitnessResponse$json = {
-  '1': 'AdvanceBackupWitnessResponse',
-  '2': [
-    {
-      '1': 'head',
-      '3': 1,
-      '4': 1,
-      '5': 11,
-      '6': '.space.v1.BackupHead',
-      '10': 'head'
-    },
-  ],
-};
-
-/// Descriptor for `AdvanceBackupWitnessResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List advanceBackupWitnessResponseDescriptor =
-    $convert.base64Decode(
-        'ChxBZHZhbmNlQmFja3VwV2l0bmVzc1Jlc3BvbnNlEigKBGhlYWQYASABKAsyFC5zcGFjZS52MS'
-        '5CYWNrdXBIZWFkUgRoZWFk');
-
 @$core.Deprecated('Use createBackupSlotRequestDescriptor instead')
 const CreateBackupSlotRequest$json = {
   '1': 'CreateBackupSlotRequest',
@@ -123,15 +102,14 @@ const CreateBackupSlotRequest$json = {
     {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
     {'1': 'read_hash', '3': 2, '4': 1, '5': 12, '10': 'readHash'},
     {'1': 'write_hash', '3': 3, '4': 1, '5': 12, '10': 'writeHash'},
-    {'1': 'witness', '3': 4, '4': 1, '5': 8, '10': 'witness'},
   ],
 };
 
 /// Descriptor for `CreateBackupSlotRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List createBackupSlotRequestDescriptor = $convert.base64Decode(
-    'ChdDcmVhdGVCYWNrdXBTbG90UmVxdWVzdBIOCgJpZBgBIAEoCVICaWQSGwoJcmVhZF9oYXNoGA'
-    'IgASgMUghyZWFkSGFzaBIdCgp3cml0ZV9oYXNoGAMgASgMUgl3cml0ZUhhc2gSGAoHd2l0bmVz'
-    'cxgEIAEoCFIHd2l0bmVzcw==');
+final $typed_data.Uint8List createBackupSlotRequestDescriptor =
+    $convert.base64Decode(
+        'ChdDcmVhdGVCYWNrdXBTbG90UmVxdWVzdBIOCgJpZBgBIAEoCVICaWQSGwoJcmVhZF9oYXNoGA'
+        'IgASgMUghyZWFkSGFzaBIdCgp3cml0ZV9oYXNoGAMgASgMUgl3cml0ZUhhc2g=');
 
 @$core.Deprecated('Use putBackupRequestDescriptor instead')
 const PutBackupRequest$json = {
@@ -191,31 +169,9 @@ final $typed_data.Uint8List getBackupResponseDescriptor = $convert.base64Decode(
     'ChFHZXRCYWNrdXBSZXNwb25zZRIoCgRoZWFkGAEgASgLMhQuc3BhY2UudjEuQmFja3VwSGVhZF'
     'IEaGVhZBIYCgdhcmNoaXZlGAIgASgMUgdhcmNoaXZl');
 
-@$core.Deprecated('Use advanceBackupWitnessRequestDescriptor instead')
-const AdvanceBackupWitnessRequest$json = {
-  '1': 'AdvanceBackupWitnessRequest',
-  '2': [
-    {
-      '1': 'head',
-      '3': 1,
-      '4': 1,
-      '5': 11,
-      '6': '.space.v1.BackupHead',
-      '10': 'head'
-    },
-    {'1': 'token', '3': 2, '4': 1, '5': 9, '10': 'token'},
-  ],
-};
-
-/// Descriptor for `AdvanceBackupWitnessRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List advanceBackupWitnessRequestDescriptor =
-    $convert.base64Decode(
-        'ChtBZHZhbmNlQmFja3VwV2l0bmVzc1JlcXVlc3QSKAoEaGVhZBgBIAEoCzIULnNwYWNlLnYxLk'
-        'JhY2t1cEhlYWRSBGhlYWQSFAoFdG9rZW4YAiABKAlSBXRva2Vu');
-
-@$core.Deprecated('Use readBackupWitnessRequestDescriptor instead')
-const ReadBackupWitnessRequest$json = {
-  '1': 'ReadBackupWitnessRequest',
+@$core.Deprecated('Use readBackupHeadRequestDescriptor instead')
+const ReadBackupHeadRequest$json = {
+  '1': 'ReadBackupHeadRequest',
   '2': [
     {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
     {'1': 'token', '3': 2, '4': 1, '5': 9, '10': 'token'},
@@ -223,15 +179,14 @@ const ReadBackupWitnessRequest$json = {
   ],
 };
 
-/// Descriptor for `ReadBackupWitnessRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List readBackupWitnessRequestDescriptor =
-    $convert.base64Decode(
-        'ChhSZWFkQmFja3VwV2l0bmVzc1JlcXVlc3QSDgoCaWQYASABKAlSAmlkEhQKBXRva2VuGAIgAS'
-        'gJUgV0b2tlbhIcCgljaGFsbGVuZ2UYAyABKAlSCWNoYWxsZW5nZQ==');
+/// Descriptor for `ReadBackupHeadRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List readBackupHeadRequestDescriptor = $convert.base64Decode(
+    'ChVSZWFkQmFja3VwSGVhZFJlcXVlc3QSDgoCaWQYASABKAlSAmlkEhQKBXRva2VuGAIgASgJUg'
+    'V0b2tlbhIcCgljaGFsbGVuZ2UYAyABKAlSCWNoYWxsZW5nZQ==');
 
-@$core.Deprecated('Use readBackupWitnessResponseDescriptor instead')
-const ReadBackupWitnessResponse$json = {
-  '1': 'ReadBackupWitnessResponse',
+@$core.Deprecated('Use readBackupHeadResponseDescriptor instead')
+const ReadBackupHeadResponse$json = {
+  '1': 'ReadBackupHeadResponse',
   '2': [
     {
       '1': 'head',
@@ -246,11 +201,11 @@ const ReadBackupWitnessResponse$json = {
   ],
 };
 
-/// Descriptor for `ReadBackupWitnessResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List readBackupWitnessResponseDescriptor = $convert.base64Decode(
-    'ChlSZWFkQmFja3VwV2l0bmVzc1Jlc3BvbnNlEigKBGhlYWQYASABKAsyFC5zcGFjZS52MS5CYW'
-    'NrdXBIZWFkUgRoZWFkEhwKCWNoYWxsZW5nZRgCIAEoCVIJY2hhbGxlbmdlEhwKCXNpZ25hdHVy'
-    'ZRgDIAEoDFIJc2lnbmF0dXJl');
+/// Descriptor for `ReadBackupHeadResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List readBackupHeadResponseDescriptor = $convert.base64Decode(
+    'ChZSZWFkQmFja3VwSGVhZFJlc3BvbnNlEigKBGhlYWQYASABKAsyFC5zcGFjZS52MS5CYWNrdX'
+    'BIZWFkUgRoZWFkEhwKCWNoYWxsZW5nZRgCIAEoCVIJY2hhbGxlbmdlEhwKCXNpZ25hdHVyZRgD'
+    'IAEoDFIJc2lnbmF0dXJl');
 
 const $core.Map<$core.String, $core.dynamic> RemoteBackupServiceBase$json = {
   '1': 'RemoteBackupService',
@@ -276,14 +231,9 @@ const $core.Map<$core.String, $core.dynamic> RemoteBackupServiceBase$json = {
       '3': '.space.v1.GetBackupResponse'
     },
     {
-      '1': 'AdvanceBackupWitness',
-      '2': '.space.v1.AdvanceBackupWitnessRequest',
-      '3': '.space.v1.AdvanceBackupWitnessResponse'
-    },
-    {
-      '1': 'ReadBackupWitness',
-      '2': '.space.v1.ReadBackupWitnessRequest',
-      '3': '.space.v1.ReadBackupWitnessResponse'
+      '1': 'ReadBackupHead',
+      '2': '.space.v1.ReadBackupHeadRequest',
+      '3': '.space.v1.ReadBackupHeadResponse'
     },
   ],
 };
@@ -300,10 +250,8 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
   '.space.v1.PutBackupResponse': PutBackupResponse$json,
   '.space.v1.GetBackupRequest': GetBackupRequest$json,
   '.space.v1.GetBackupResponse': GetBackupResponse$json,
-  '.space.v1.AdvanceBackupWitnessRequest': AdvanceBackupWitnessRequest$json,
-  '.space.v1.AdvanceBackupWitnessResponse': AdvanceBackupWitnessResponse$json,
-  '.space.v1.ReadBackupWitnessRequest': ReadBackupWitnessRequest$json,
-  '.space.v1.ReadBackupWitnessResponse': ReadBackupWitnessResponse$json,
+  '.space.v1.ReadBackupHeadRequest': ReadBackupHeadRequest$json,
+  '.space.v1.ReadBackupHeadResponse': ReadBackupHeadResponse$json,
 };
 
 /// Descriptor for `RemoteBackupService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
@@ -314,7 +262,5 @@ final $typed_data.Uint8List remoteBackupServiceDescriptor = $convert.base64Decod
     'QaIi5zcGFjZS52MS5SZXZva2VCYWNrdXBTbG90UmVzcG9uc2USRAoJUHV0QmFja3VwEhouc3Bh'
     'Y2UudjEuUHV0QmFja3VwUmVxdWVzdBobLnNwYWNlLnYxLlB1dEJhY2t1cFJlc3BvbnNlEkQKCU'
     'dldEJhY2t1cBIaLnNwYWNlLnYxLkdldEJhY2t1cFJlcXVlc3QaGy5zcGFjZS52MS5HZXRCYWNr'
-    'dXBSZXNwb25zZRJlChRBZHZhbmNlQmFja3VwV2l0bmVzcxIlLnNwYWNlLnYxLkFkdmFuY2VCYW'
-    'NrdXBXaXRuZXNzUmVxdWVzdBomLnNwYWNlLnYxLkFkdmFuY2VCYWNrdXBXaXRuZXNzUmVzcG9u'
-    'c2USXAoRUmVhZEJhY2t1cFdpdG5lc3MSIi5zcGFjZS52MS5SZWFkQmFja3VwV2l0bmVzc1JlcX'
-    'Vlc3QaIy5zcGFjZS52MS5SZWFkQmFja3VwV2l0bmVzc1Jlc3BvbnNl');
+    'dXBSZXNwb25zZRJTCg5SZWFkQmFja3VwSGVhZBIfLnNwYWNlLnYxLlJlYWRCYWNrdXBIZWFkUm'
+    'VxdWVzdBogLnNwYWNlLnYxLlJlYWRCYWNrdXBIZWFkUmVzcG9uc2U=');

@@ -18,8 +18,11 @@ class RpcRemoteBackup implements RemoteBackupApi {
     : connection = RpcConnection.connect(
         Uri.parse(endpoint.origin),
         endpoint.fingerprint,
-      ), ownsConnection = true;
-  RpcRemoteBackup.session(SpaceSession session) : connection=session.channel, ownsConnection=false;
+      ),
+      ownsConnection = true;
+  RpcRemoteBackup.session(SpaceSession session)
+    : connection = session.channel,
+      ownsConnection = false;
   final RpcConnection connection;
   final bool ownsConnection;
   static const options = RpcOptions(timeout: Duration(seconds: 30));
@@ -44,7 +47,9 @@ class RpcRemoteBackup implements RemoteBackupApi {
         options: options,
       );
   @override
-  Future<void> close() async { if(ownsConnection) await connection.shutdown(); }
+  Future<void> close() async {
+    if (ownsConnection) await connection.shutdown();
+  }
 }
 
 Future<void> provisionRemoteBackup(

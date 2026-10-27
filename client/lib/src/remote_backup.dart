@@ -61,16 +61,18 @@ Future<String> remoteBackupHash(List<int> bytes) async =>
 
 final class RemoteRestore {
   RemoteRestore._(RemoteBackupKit kit, BackupHead head, this.plan)
-      : kit=RemoteBackupKit.parse(kit.encode()), head=(head.deepCopy()..freeze());
+    : kit = RemoteBackupKit.parse(kit.encode()),
+      head = (head.deepCopy()..freeze());
   final RemoteBackupKit kit;
   final BackupHead head;
   final DirectoryRestorePlan plan;
 }
+
 class RemoteBackupService {
   RemoteBackupService(
     this.directory, {
-    RemoteBackupApi Function(RemoteBackupEndpoint)? connect,
-  }) : connect = connect;
+    this.connect,
+  });
   final DirectoryBackupService directory;
   final RemoteBackupApi Function(RemoteBackupEndpoint)? connect;
   static const storageKey = 'space.directory.space-backup.v1';
@@ -110,19 +112,31 @@ class RemoteBackupService {
   );
 
   RemoteBackupApi _api(RemoteBackupEndpoint endpoint) {
-    final factory=connect;
-    if(factory != null) return factory(endpoint);
-    final session=directory.controllers()[endpoint.origin]?.mlsSession;
-    if(session != null && session.server.origin.toString() == endpoint.origin && url64(session.server.publicKey) == endpoint.publicKey && session.server.tlsFingerprint.toLowerCase() == endpoint.fingerprint) {
+    final factory = connect;
+    if (factory != null) return factory(endpoint);
+    final session = directory.controllers()[endpoint.origin]?.mlsSession;
+    if (session != null &&
+        session.server.origin.toString() == endpoint.origin &&
+        url64(session.server.publicKey) == endpoint.publicKey &&
+        session.server.tlsFingerprint.toLowerCase() == endpoint.fingerprint) {
       return RpcRemoteBackup.session(session);
     }
     return RpcRemoteBackup(endpoint);
   }
-  Future<T> _client<T>(RemoteBackupKit kit, Future<T> Function(RemoteBackupApi) action) async {
+
+  Future<T> _client<T>(
+    RemoteBackupKit kit,
+    Future<T> Function(RemoteBackupApi) action,
+  ) async {
     RemoteBackupKit.parse(kit.encode());
-    final api=_api(kit.space);
-    try { return await action(api); } finally { await api.close(); }
+    final api = _api(kit.space);
+    try {
+      return await action(api);
+    } finally {
+      await api.close();
+    }
   }
+
   Future<BackupHead> _head(RemoteBackupKit kit, RemoteBackupApi api) async {
     final challenge = url64(DirectoryArchive.random(32));
     final result = await api.read(
@@ -188,27 +202,49 @@ class RemoteBackupService {
     ),
   );
 
-  Future<void> publish(RemoteBackupKit kit, String password) => directory.repository.exclusive(() => _client(kit,(api) async {
-    final state=await _state();
-    directoryRequire(jsonEncode(state['kit']) == jsonEncode(kit.data));
-    if(state['pending'] == null) await _prepare(state,kit,password,api);
-    final pending=directoryMap(state['pending'],'archive,head');
-    final head=BackupHead()..mergeFromProto3Json(pending['head']);
-    checkRemoteHead(head,kit.id);
-    final raw=directoryText(pending['archive'],max:7*1024*1024);
-    final archive=Uint8List.fromList(base64Decode(raw));
-    directoryRequire(archive.length <= DirectoryArchive.maxFile);
-    final document=await _document(GetBackupResponse(head:head,archive:archive),head,password);
-    directoryRequire((await directory.preview(document)).conflicts.isEmpty);
-    final old=await _head(kit,api);
-    directoryRequire(backupHeadText(old) == backupHeadText(head) || (old.revision.toInt()+1 == document.revision && old.digest == head.parent));
-    _same(await api.put(PutBackupRequest(head:head,token:kit.space.writeToken,archive:archive)),head);
-    await _document(await _get(kit,api,document.revision),head,password);
-    _same(await _head(kit,api),head);
-    await directory.recordExport(document,selectOutgoing:false);
-    state['pending']=null;
-    await _save(state);
-  }));
+  Future<void> publish(
+    RemoteBackupKit kit,
+    String password,
+  ) => directory.repository.exclusive(
+    () => _client(kit, (api) async {
+      final state = await _state();
+      directoryRequire(jsonEncode(state['kit']) == jsonEncode(kit.data));
+      if (state['pending'] == null) await _prepare(state, kit, password, api);
+      final pending = directoryMap(state['pending'], 'archive,head');
+      final head = BackupHead()..mergeFromProto3Json(pending['head']);
+      checkRemoteHead(head, kit.id);
+      final raw = directoryText(pending['archive'], max: 7 * 1024 * 1024);
+      final archive = Uint8List.fromList(base64Decode(raw));
+      directoryRequire(archive.length <= DirectoryArchive.maxFile);
+      final document = await _document(
+        GetBackupResponse(head: head, archive: archive),
+        head,
+        password,
+      );
+      directoryRequire((await directory.preview(document)).conflicts.isEmpty);
+      final old = await _head(kit, api);
+      directoryRequire(
+        backupHeadText(old) == backupHeadText(head) ||
+            (old.revision.toInt() + 1 == document.revision &&
+                old.digest == head.parent),
+      );
+      _same(
+        await api.put(
+          PutBackupRequest(
+            head: head,
+            token: kit.space.writeToken,
+            archive: archive,
+          ),
+        ),
+        head,
+      );
+      await _document(await _get(kit, api, document.revision), head, password);
+      _same(await _head(kit, api), head);
+      await directory.recordExport(document, selectOutgoing: false);
+      state['pending'] = null;
+      await _save(state);
+    }),
+  );
   Future<void> _prepare(
     Map<String, dynamic> state,
     RemoteBackupKit kit,
@@ -325,14 +361,18 @@ class RemoteBackupService {
         await _settle(restore);
       });
 
-  Future<void> _settle(RemoteRestore restore) => directory.repository.exclusive(() async {
-    final state=await _state(), pending=state['pending'];
-    if(pending == null || jsonEncode(state['kit']) != jsonEncode(restore.kit.data)) return;
-    final data=directoryMap(pending,'archive,head');
-    final head=BackupHead()..mergeFromProto3Json(data['head']);
-    checkRemoteHead(head,restore.kit.id);
-    if(head.revision > restore.head.revision) return;
-    state['pending']=null;
-    await _save(state);
-  });
+  Future<void> _settle(RemoteRestore restore) =>
+      directory.repository.exclusive(() async {
+        final state = await _state(), pending = state['pending'];
+        if (pending == null ||
+            jsonEncode(state['kit']) != jsonEncode(restore.kit.data)) {
+          return;
+        }
+        final data = directoryMap(pending, 'archive,head');
+        final head = BackupHead()..mergeFromProto3Json(data['head']);
+        checkRemoteHead(head, restore.kit.id);
+        if (head.revision > restore.head.revision) return;
+        state['pending'] = null;
+        await _save(state);
+      });
 }

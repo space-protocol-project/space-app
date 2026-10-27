@@ -7,7 +7,7 @@ import "package:connectrpc/connect.dart" as connect;
 import "remote_backup.pb.dart" as spacev1remote_backup;
 import "remote_backup.connect.spec.dart" as specs;
 
-/// core.directory.backup.v1: независимые хранилище и свидетель версии.
+/// core.directory.backup.v1: зашифрованные копии на сервере пространства.
 extension type RemoteBackupServiceClient (connect.Transport _transport) {
   Future<spacev1remote_backup.CreateBackupSlotResponse> createBackupSlot(
     spacev1remote_backup.CreateBackupSlotRequest input, {
@@ -77,32 +77,15 @@ extension type RemoteBackupServiceClient (connect.Transport _transport) {
     );
   }
 
-  Future<spacev1remote_backup.AdvanceBackupWitnessResponse> advanceBackupWitness(
-    spacev1remote_backup.AdvanceBackupWitnessRequest input, {
+  Future<spacev1remote_backup.ReadBackupHeadResponse> readBackupHead(
+    spacev1remote_backup.ReadBackupHeadRequest input, {
     connect.Headers? headers,
     connect.AbortSignal? signal,
     Function(connect.Headers)? onHeader,
     Function(connect.Headers)? onTrailer,
   }) {
     return connect.Client(_transport).unary(
-      specs.RemoteBackupService.advanceBackupWitness,
-      input,
-      signal: signal,
-      headers: headers,
-      onHeader: onHeader,
-      onTrailer: onTrailer,
-    );
-  }
-
-  Future<spacev1remote_backup.ReadBackupWitnessResponse> readBackupWitness(
-    spacev1remote_backup.ReadBackupWitnessRequest input, {
-    connect.Headers? headers,
-    connect.AbortSignal? signal,
-    Function(connect.Headers)? onHeader,
-    Function(connect.Headers)? onTrailer,
-  }) {
-    return connect.Client(_transport).unary(
-      specs.RemoteBackupService.readBackupWitness,
+      specs.RemoteBackupService.readBackupHead,
       input,
       signal: signal,
       headers: headers,

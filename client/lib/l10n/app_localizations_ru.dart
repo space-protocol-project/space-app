@@ -3168,21 +3168,18 @@ class AppLocalizationsRu extends AppLocalizations {
       'Выберите доверенное пространство для передачи';
 
   @override
-  String get remoteBackupTitle => 'Удалённая резервная копия';
+  String get remoteBackupTitle => 'Копии на пространстве';
 
   @override
   String get remoteBackupHelp =>
-      'Нужны два уже подключённых HTTPS-пространства у независимых операторов: одно хранит зашифрованные копии, другое — отметку последней версии. Для восстановления на новом устройстве нужен сохранённый комплект и отдельно пароль. Доступ к пространствам возвращается через сопряжение или recovery-карточку.';
+      'Сохраняйте зашифрованные копии на выбранном подключённом пространстве. Его сервер может работать самостоятельно или запускаться приложением через runtime. Для восстановления нужны сохранённый комплект и отдельно пароль. Доступ к пространствам возвращается через сопряжение или recovery-карточку.';
 
   @override
   String get remoteBackupKitHelp =>
       'Комплект содержит секретные ключи чтения и записи копий. Сохраните его вне этого устройства, отдельно от пароля. Получивший комплект сможет скачивать зашифрованные копии и нарушить будущие публикации.';
 
   @override
-  String get remoteBackupStorage => 'Адрес хранилища';
-
-  @override
-  String get remoteBackupWitness => 'Адрес независимого свидетеля';
+  String get remoteBackupStorage => 'Пространство для копий';
 
   @override
   String get remoteBackupSetup => 'Сохранить комплект и настроить';
@@ -3191,23 +3188,23 @@ class AppLocalizationsRu extends AppLocalizations {
   String get remoteBackupImportKit => 'Открыть комплект восстановления';
 
   @override
-  String get remoteBackupPublish => 'Создать или завершить публикацию';
+  String get remoteBackupPublish => 'Создать или завершить копию';
 
   @override
-  String get remoteBackupRead => 'Проверить и открыть последнюю копию';
+  String get remoteBackupRead => 'Проверить и открыть копию';
 
   @override
-  String get remoteBackupConfigure => 'Повторить настройку серверов';
+  String get remoteBackupConfigure => 'Повторить настройку пространства';
 
   @override
   String get remoteBackupSaved =>
-      'Копия загружена, прочитана обратно и подтверждена свидетелем.';
+      'Копия сохранена на пространстве и проверена после скачивания.';
 
   @override
-  String get remoteBackupConfigured => 'Хранилище и свидетель готовы.';
+  String get remoteBackupConfigured => 'Пространство готово сохранять копии.';
 
   @override
-  String get remoteBackupVerified => 'Свидетель подтвердил версию:';
+  String get remoteBackupVerified => 'Версия на пространстве:';
 
   @override
   String get remoteBackupError =>
@@ -3221,27 +3218,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get remoteBackupRevokeHelp =>
-      'Отозвать доступ к копиям на обоих серверах? Потребуется действующий вход владельца на каждом из них. Этот комплект перестанет работать; сохранённые контейнеры не удаляются. При сбое повторите отзыв.';
+      'Отозвать доступ к копиям на выбранном пространстве? Потребуется действующий вход владельца. Комплект перестанет работать; сохранённые контейнеры не удаляются.';
 
   @override
-  String get remoteBackupRevoked =>
-      'Доступ к копиям отозван на обоих серверах.';
+  String get remoteBackupRevoked => 'Доступ к копиям на пространстве отозван.';
 
   @override
-  String get remoteBackupUnpublished => 'Найти незавершённую публикацию';
-
-  @override
-  String get remoteBackupUnpublishedHelp =>
-      'Копия загружена, но ещё не подтверждена свидетелем. Проверьте её состав перед публикацией.';
-
-  @override
-  String get remoteBackupFinish => 'Подтвердить публикацию этой копии';
-
-  @override
-  String get remoteBackupFinishHelp =>
-      'Завершить публикацию показанной копии? Будут проверены пароль и неизменность версии. Настройки устройства этой командой не заменяются; применение каталога выполняется отдельно.';
-
-  @override
-  String get remoteBackupRestoreFirst =>
-      'Сначала откройте и примените последнюю подтверждённую копию. Для всех версий цепочки используйте тот же пароль.';
+  String get remoteBackupFreshness =>
+      'Откат проверяется по локальной истории. После её утраты новизна копии не подтверждается.';
 }

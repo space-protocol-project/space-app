@@ -6,7 +6,7 @@
 import "package:connectrpc/connect.dart" as connect;
 import "remote_backup.pb.dart" as spacev1remote_backup;
 
-/// core.directory.backup.v1: независимые хранилище и свидетель версии.
+/// core.directory.backup.v1: зашифрованные копии на сервере пространства.
 abstract final class RemoteBackupService {
   /// Fully-qualified name of the RemoteBackupService service.
   static const name = 'space.v1.RemoteBackupService';
@@ -39,17 +39,10 @@ abstract final class RemoteBackupService {
     spacev1remote_backup.GetBackupResponse.new,
   );
 
-  static const advanceBackupWitness = connect.Spec(
-    '/$name/AdvanceBackupWitness',
+  static const readBackupHead = connect.Spec(
+    '/$name/ReadBackupHead',
     connect.StreamType.unary,
-    spacev1remote_backup.AdvanceBackupWitnessRequest.new,
-    spacev1remote_backup.AdvanceBackupWitnessResponse.new,
-  );
-
-  static const readBackupWitness = connect.Spec(
-    '/$name/ReadBackupWitness',
-    connect.StreamType.unary,
-    spacev1remote_backup.ReadBackupWitnessRequest.new,
-    spacev1remote_backup.ReadBackupWitnessResponse.new,
+    spacev1remote_backup.ReadBackupHeadRequest.new,
+    spacev1remote_backup.ReadBackupHeadResponse.new,
   );
 }

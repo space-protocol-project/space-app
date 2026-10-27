@@ -44,7 +44,10 @@ class RemoteBackupKit {
   final String id;
   final RemoteBackupEndpoint space;
   Map<String, dynamic> get data => {
-    'v': 1, 'kind': 'space.remote-backup', 'id': id, 'space': space.data,
+    'v': 1,
+    'kind': 'space.remote-backup',
+    'id': id,
+    'space': space.data,
   };
   String encode() => jsonEncode(data);
   factory RemoteBackupKit.parse(String raw) {
@@ -52,6 +55,9 @@ class RemoteBackupKit {
     final data = directoryMap(jsonDecode(raw), 'id,kind,space,v');
     directoryInt(data['v'], min: 1, max: 1);
     directoryRequire(data['kind'] == 'space.remote-backup');
-    return RemoteBackupKit(directoryBytes(data['id'], 16), RemoteBackupEndpoint.parse(data['space']));
+    return RemoteBackupKit(
+      directoryBytes(data['id'], 16),
+      RemoteBackupEndpoint.parse(data['space']),
+    );
   }
 }
