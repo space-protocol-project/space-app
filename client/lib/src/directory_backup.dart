@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cryptography/cryptography.dart';
-import 'package:flutter/material.dart' show ThemeMode;
 
 import 'chat_controller.dart';
 import 'core.dart';
@@ -10,6 +9,7 @@ import 'directory_document.dart';
 import 'directory_follows.dart';
 import 'directory_repository.dart';
 import 'preferences.dart';
+import 'settings_snapshot.dart';
 
 class DirectoryRestorePlan {
   DirectoryRestorePlan(
@@ -19,12 +19,16 @@ class DirectoryRestorePlan {
     this.conflicts,
     this.unknown,
     this.ancestors,
+    this.settingsMerge,
   );
   final DirectoryDocument document;
   final String digest, before;
   final List<String> conflicts;
   final bool unknown;
   final List<DirectoryDocument> ancestors;
+  final SettingsMerge settingsMerge;
+  bool settingsResolved(bool enabled, Map<String, SettingsChoice> choices) =>
+      !enabled || settingsMerge.resolved(choices);
 }
 
 class DirectoryBackupService {
@@ -39,18 +43,10 @@ class DirectoryBackupService {
   final AppPreferences preferences;
   final Map<String, ChatController> Function() controllers;
 
-  Map<String, dynamic> settings() => {
-    'themeMode': preferences.themeMode.name,
-    'effects': preferences.effects,
-    'palette': preferences.palette,
-    'language': preferences.language,
-    'sendShortcut': preferences.sendShortcut,
-    'uiScale': preferences.uiScale,
-    'notificationMode': preferences.notificationMode,
-  };
+  Map<String, dynamic> settings() => preferences.settingsValues;
   Future<String> _fingerprint(Map<String, dynamic> state) async => url64(
     (await Sha256().hash(
-      utf8.encode(jsonEncode([state, settings(), preferences.origins])),
+      utf8.encode(jsonEncode([state, preferences.settingsSnapshot.data, preferences.origins])),
     )).bytes,
   );
 
@@ -118,6 +114,7 @@ class DirectoryBackupService {
   }
 
   Future<DirectoryDocument> capture({List<String>? selectedOrigins}) async {
+    final selectedSettings = await preferences.exportSettings();
     final state = await repository.read(),
         catalog = state['catalog'] as Map<String, dynamic>;
     directoryRequire(state['pending'] == null);
@@ -142,13 +139,14 @@ class DirectoryBackupService {
       spaces.add(await _space(origin, catalog));
     }
     return DirectoryDocument.parse({
-      'v': 1,
+      'v': 2,
       'kind': 'space.directory',
       'id': id,
       'revision': head == null ? 1 : (head['revision'] as int) + 1,
       'parent': head == null ? '' : head['digest'],
       'created': DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      'settings': settings(),
+      'settings': selectedSettings.values,
+      'settings_versions': selectedSettings.versions,
       'spaces': spaces,
     });
   }
@@ -206,6 +204,8 @@ class DirectoryBackupService {
       List.unmodifiable(conflicts),
       head == null,
       List.unmodifiable(ancestors),
+      SettingsMerge(preferences.settingsSnapshot, document.settingsSnapshot,
+          unknown: !document.hasSettingsVersions),
     );
   }
 
@@ -259,6 +259,7 @@ class DirectoryBackupService {
   Future<void> apply(
     DirectoryRestorePlan plan, {
     required bool replaceSettings,
+    Map<String, SettingsChoice> settingsChoices = const {},
   }) => repository.exclusive(() async {
     final latest = await preview(plan.document, ancestors: plan.ancestors);
     directoryRequire(latest.conflicts.isEmpty && latest.before == plan.before);
@@ -271,11 +272,19 @@ class DirectoryBackupService {
       'revision': plan.document.revision,
       'digest': plan.digest,
     };
+    final merged = replaceSettings ? latest.settingsMerge.resolve(preferences.settingsActor, settingsChoices) : null;
     state['pending'] = {
       'origins': plan.document.spaces.map((s) => s['origin']).toList(),
-      'settings': replaceSettings ? plan.document.settings : null,
+      'settings': merged == null ? null : {
+        'v': 2, 'before': latest.settingsMerge.local.data, 'after': merged.data,
+      },
     };
-    await repository.write(state);
+    if (merged == null) {
+      await repository.write(state);
+    } else {
+      await preferences.applyMergedSettings(latest.settingsMerge.local, merged,
+          () => repository.write(state));
+    }
     await _finish(state);
   });
 
@@ -286,7 +295,7 @@ class DirectoryBackupService {
     if (pending == null) return;
     final settings = pending['settings'];
     if (settings != null) {
-      await _applySettings(checkedDirectorySettings(settings));
+      await _resumeSettings(settings);
     }
     for (final origin in (pending['origins'] as List).cast<String>().reversed) {
       if (!preferences.origins.contains(origin)) {
@@ -298,16 +307,18 @@ class DirectoryBackupService {
     await repository.write(state);
   }
 
-  Future<void> _applySettings(Map<String, dynamic> data) async {
-    await preferences.change(
-      themeMode: ThemeMode.values.byName(data['themeMode'] as String),
-      effects: data['effects'] as bool,
-      palette: data['palette'] as String,
-      language: data['language'] as String,
-      sendShortcut: data['sendShortcut'] as String,
-      uiScale: (data['uiScale'] as num).toDouble(),
-    );
-    await preferences.changeNotifications(data['notificationMode'] as int);
+  Future<void> _resumeSettings(Object data) async {
+    if (data case {'v': 2}) {
+      final (before, after) = checkedSettingsPending(data);
+      await preferences.resumeMergedSettings(before, after);
+      return;
+    }
+    // Уже подтверждённый журнал предыдущего формата, не новый импорт.
+    final before = preferences.settingsSnapshot;
+    final merge = SettingsMerge(before, SettingsSnapshot.initial(checkedDirectorySettings(data)), unknown: true);
+    final target = merge.resolve(preferences.settingsActor,
+        {for (final key in merge.conflicts) key: SettingsChoice.incoming});
+    await preferences.resumeMergedSettings(before, target);
   }
 
   Future<List<String>> restoreFollowing({bool Function()? active}) async {

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'core.dart';
 import 'directory_document.dart';
 import 'key_vault.dart';
+import 'settings_snapshot.dart';
 
 class DirectoryRepository {
   DirectoryRepository(this.storage);
@@ -78,7 +79,11 @@ class DirectoryRepository {
         (origin) => origin is String && catalog.containsKey(origin),
       ),
     );
-    if (data['settings'] != null) checkedDirectorySettings(data['settings']);
+    switch (data['settings']) {
+      case null: break;
+      case {'v': 2}: checkedSettingsPending(data['settings']);
+      default: checkedDirectorySettings(data['settings']);
+    }
   }
 
   Future<void> write(Map<String, dynamic> data) async {

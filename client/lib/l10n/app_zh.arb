@@ -1079,7 +1079,7 @@
   "directoryBackupCreate": "创建备份",
   "directoryBackupRead": "预览备份",
   "directoryBackupApply": "恢复目录",
-  "directoryBackupSettings": "用备份中的设置替换界面设置",
+  "directoryBackupSettings": "合并设置",
   "directoryBackupFollows": "添加已保存的关注",
   "directoryBackupResume": "完成中断的恢复",
   "directoryBackupUnverified": "此备份没有本地版本记录，无法确认是否为最新版本。",
@@ -1158,5 +1158,14 @@
   "remoteBackupRevoke": "撤销套件",
   "remoteBackupRevokeHelp": "是否撤销所选空间的备份访问权限？需要所有者的有效会话。套件将失效，已存储的备份不会删除。",
   "remoteBackupRevoked": "已撤销空间中的备份访问权限。",
-  "remoteBackupFreshness": "将根据本地历史检查回滚。本地历史丢失后，无法确认备份是否为最新版本。"
+  "remoteBackupFreshness": "将根据本地历史检查回滚。本地历史丢失后，无法确认备份是否为最新版本。",
+  "directorySettingsHelp": "较新的更改将自动合并。请为同时更改的每项设置选择一个值。",
+  "directorySettingsLocal": "保留此设备的值",
+  "directorySettingsIncoming": "使用备份的值",
+  "directorySettingsEffects": "效果",
+  "directorySettingsPalette": "配色",
+  "directorySettingsScale": "界面缩放",
+  "directorySettingsNotifications": "通知",
+  "directorySettingsOn": "开启",
+  "directorySettingsOff": "关闭"
 }

@@ -1,6 +1,7 @@
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/directory_document.dart';
 import 'package:space_client/src/key_vault.dart';
+import 'package:space_client/src/settings_snapshot.dart';
 
 class DirectoryStorage implements SecureKeyStorage {
   final values = <String, String>{};
@@ -55,16 +56,18 @@ Map<String, dynamic> directorySpace({int count = 1}) => {
   ),
 };
 DirectoryDocument directoryDocument({
+  int version = 2,
   int revision = 1,
   String parent = '',
   int count = 1,
 }) => DirectoryDocument.parse({
-  'v': 1,
+  'v': version,
   'kind': 'space.directory',
   'id': url64(List.filled(16, 1)),
   'revision': revision,
   'parent': parent,
   'created': 1793000000,
   'settings': directorySettings(),
+  if (version == 2) 'settings_versions': {for(final key in settingsDefaults.keys) key: {url64(List.filled(16, 12)):1}},
   'spaces': [directorySpace(count: count)],
 });

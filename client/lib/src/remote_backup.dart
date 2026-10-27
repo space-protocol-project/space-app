@@ -12,6 +12,7 @@ import 'directory_backup.dart';
 import 'directory_workers.dart';
 import 'directory_document.dart';
 import 'remote_backup_models.dart';
+import 'settings_snapshot.dart';
 import 'remote_backup_rpc.dart';
 
 String backupHeadText(BackupHead head) => jsonEncode([
@@ -345,7 +346,7 @@ class RemoteBackupService {
     return result;
   }
 
-  Future<void> apply(RemoteRestore restore, {required bool replaceSettings}) =>
+  Future<void> apply(RemoteRestore restore, {required bool replaceSettings, Map<String, SettingsChoice> settingsChoices = const {}}) =>
       _client(restore.kit, (store) async {
         final document = restore.plan.document;
         directoryRequire(
@@ -354,7 +355,7 @@ class RemoteBackupService {
               restore.plan.digest == await document.digest(),
         );
         _same(await _head(restore.kit, store), restore.head);
-        await directory.apply(restore.plan, replaceSettings: replaceSettings);
+        await directory.apply(restore.plan, replaceSettings: replaceSettings, settingsChoices: settingsChoices);
         await _settle(restore);
       });
 

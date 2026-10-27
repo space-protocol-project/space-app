@@ -7,6 +7,7 @@ import 'package:space_client/src/core.dart';
 import 'package:space_client/src/directory_transfer.dart';
 import 'package:space_client/src/directory_transfer_qr.dart';
 import 'package:space_client/src/directory_transfer_rpc.dart';
+import 'package:space_client/src/settings_snapshot.dart';
 
 import 'directory_crash_support.dart';
 import 'directory_crash_verify.dart';
@@ -84,7 +85,8 @@ Future<void> crashTarget(
   await hooks.wait('allow-apply');
   context.storage.armed = true;
   context.preferences.armed = true;
-  await context.service.apply(plan, replaceSettings: hooks.replace);
+  await context.service.apply(plan, replaceSettings: hooks.replace,
+    settingsChoices: hooks.replace ? {for(final key in plan.settingsMerge.conflicts) key: SettingsChoice.incoming} : const {});
   await verifyCrashApplied(context);
 }
 

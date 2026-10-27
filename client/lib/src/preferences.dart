@@ -13,12 +13,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:space_admin_ui/space_admin_ui.dart' show validatedServerIcon;
 
 import 'event_controller.dart';
+import 'settings_snapshot.dart';
 import '../ui/space_appearance.dart';
 
 part 'preferences.freezed.dart';
 
 part 'preferences_events.dart';
 part 'preferences_state.dart';
+part 'preferences_settings.dart';
 
 class AppPreferences
     extends EventController<PreferencesEvent<dynamic>, PreferencesState> {
@@ -31,6 +33,9 @@ class AppPreferences
         event,
         () => switch (event) {
           PreferencesLoaded() => _load(),
+          PreferencesSettingsExported() => _exportSettings(),
+          PreferencesSettingsCommitted() => _commitSettings(event),
+          PreferencesSettingsResumed() => _resumeSettings(event),
           SystemBrightnessChanged() => _systemChanged(event.brightness),
           NotificationsChanged() => _changeNotifications(event.mode),
           PreferencesChanged() => _change(
@@ -52,6 +57,21 @@ class AppPreferences
   }
 
   Future<void> load() => sendRequest(PreferencesLoaded());
+  static const settingsStorageKey = 'space.ui.settings.v2';
+  SettingsReplica _settingsReplica = SettingsReplica();
+  bool _settingsInvalid = false;
+  Map<String, dynamic> get settingsValues => {
+    'themeMode': themeMode.name, 'effects': effects, 'palette': palette,
+    'language': language, 'sendShortcut': sendShortcut, 'uiScale': uiScale,
+    'notificationMode': notificationMode,
+  };
+  SettingsSnapshot get settingsSnapshot => _settingsReplica.snapshot.observe(settingsValues, _settingsReplica.actor);
+  String get settingsActor => _settingsReplica.actor;
+  Future<SettingsSnapshot> exportSettings() => sendRequest(PreferencesSettingsExported());
+  Future<void> applyMergedSettings(SettingsSnapshot before, SettingsSnapshot target,
+      Future<void> Function() persist) => sendRequest(PreferencesSettingsCommitted(before, target, persist));
+  Future<void> resumeMergedSettings(SettingsSnapshot before, SettingsSnapshot target) =>
+      sendRequest(PreferencesSettingsResumed(before, target));
   Future<void> flush() async {
     await _writes;
     if (error.isNotEmpty) throw StateError(error);
@@ -150,21 +170,10 @@ class AppPreferences
     try {
       final data = await SharedPreferences.getInstance();
       if (_disposed) return;
-      _loadThemeMode(data);
-      final mode = data.getInt('space.notifications.mode') ?? 0;
-      notificationMode = [0, 1, 2].contains(mode) ? mode : 0;
-      effects = data.getBool('space.ui.effects') ?? true;
-      uiScale = validUiScale(data.getDouble('space.ui.scale') ?? 1);
-      final savedSend = data.getString('space.ui.sendShortcut');
-      if (['enter', 'shiftEnter'].contains(savedSend)) {
-        sendShortcut = savedSend!;
-      }
-      final savedLanguage = data.getString('space.ui.language');
-      if (languages.contains(savedLanguage)) language = savedLanguage!;
-      final saved = data.getString('space.ui.palette');
-      if (['gruvbox', 'ocean', 'iris'].contains(saved)) palette = saved!;
+      _loadVersionedSettings(data);
       origins.addAll(data.getStringList('space.ui.origins') ?? []);
       _loadServerIcons(data.getString('space.server.icons'));
+      if (!data.containsKey(settingsStorageKey)) await _save();
     } catch (_) {
       error = 'Не удалось загрузить настройки оформления.';
     }
@@ -230,15 +239,10 @@ class AppPreferences
   }
 
   Future<void> _save() {
+    if (_settingsInvalid) throw StateError('Повреждены ревизии настроек');
+    _settingsReplica.snapshot = settingsSnapshot;
     final snapshot = (
-      notificationMode: notificationMode,
-      uiScale: uiScale,
-      dark: dark,
-      themeMode: themeMode,
-      effects: effects,
-      palette: palette,
-      language: language,
-      sendShortcut: sendShortcut,
+      settings: _settingsReplica.encode(),
       origins: List<String>.of(origins),
       icons: jsonEncode(serverIcons),
     );
@@ -246,14 +250,7 @@ class AppPreferences
       try {
         final data = await SharedPreferences.getInstance();
         final results = await Future.wait([
-          data.setInt('space.notifications.mode', snapshot.notificationMode),
-          data.setDouble('space.ui.scale', snapshot.uiScale),
-          data.setBool('space.ui.dark', snapshot.dark),
-          data.setString('space.ui.themeMode', snapshot.themeMode.name),
-          data.setBool('space.ui.effects', snapshot.effects),
-          data.setString('space.ui.palette', snapshot.palette),
-          data.setString('space.ui.language', snapshot.language),
-          data.setString('space.ui.sendShortcut', snapshot.sendShortcut),
+          data.setString(settingsStorageKey, snapshot.settings),
           data.setStringList('space.ui.origins', snapshot.origins),
           data.setString('space.server.icons', snapshot.icons),
         ]);

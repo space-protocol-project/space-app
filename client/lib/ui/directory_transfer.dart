@@ -13,6 +13,7 @@ import '../src/directory_transfer_cubit.dart';
 import '../src/directory_transfer_qr.dart';
 import '../src/file_picker.dart';
 import 'camera_scanner.dart';
+import 'directory_settings_merge.dart';
 import 'components.dart';
 
 class DirectoryTransferPanel extends StatefulWidget {
@@ -258,15 +259,12 @@ class _DirectoryTransferPanelState extends State<DirectoryTransferPanel>
       ...plan.document.spaces.map((space) => Text(space['origin'] as String)),
       ...plan.conflicts.map(Text.new),
       const SizedBox(height: 16),
-      CheckboxListTile(
-        contentPadding: EdgeInsets.zero,
-        value: state.replaceSettings,
-        onChanged: (value) => cubit.replaceSettings(value ?? false),
-        title: Text(context.strings.directoryBackupSettings),
-      ),
+      DirectorySettingsMergePanel(plan: plan, enabled: state.replaceSettings,
+        busy: false, choices: state.settingsChoices,
+        onEnabled: cubit.replaceSettings, onChoice: cubit.chooseSetting),
       const SizedBox(height: 12),
       FilledButton(
-        onPressed: plan.conflicts.isNotEmpty ? null : apply,
+        onPressed: plan.conflicts.isNotEmpty || !plan.settingsResolved(state.replaceSettings, state.settingsChoices) ? null : apply,
         child: Text(context.strings.directoryBackupApply),
       ),
       cancel(),

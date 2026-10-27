@@ -1079,7 +1079,7 @@
   "directoryBackupCreate": "Create backup",
   "directoryBackupRead": "Preview backup",
   "directoryBackupApply": "Restore directory",
-  "directoryBackupSettings": "Replace interface settings with the backup settings",
+  "directoryBackupSettings": "Merge settings",
   "directoryBackupFollows": "Add saved follows",
   "directoryBackupResume": "Finish interrupted restore",
   "directoryBackupUnverified": "This backup has no local version witness. Its freshness is unknown.",
@@ -1158,5 +1158,14 @@
   "remoteBackupRevoke": "Revoke kit",
   "remoteBackupRevokeHelp": "Revoke backup access in the selected space? The owner's active session is required. The kit will stop working; stored containers will remain.",
   "remoteBackupRevoked": "Backup access revoked in the space.",
-  "remoteBackupFreshness": "Rollback is checked against local history. After that history is lost, backup freshness cannot be confirmed."
+  "remoteBackupFreshness": "Rollback is checked against local history. After that history is lost, backup freshness cannot be confirmed.",
+  "directorySettingsHelp": "Newer changes merge automatically. Choose a value for each setting changed concurrently.",
+  "directorySettingsLocal": "Keep on this device",
+  "directorySettingsIncoming": "Use from backup",
+  "directorySettingsEffects": "Effects",
+  "directorySettingsPalette": "Palette",
+  "directorySettingsScale": "Interface scale",
+  "directorySettingsNotifications": "Notifications",
+  "directorySettingsOn": "On",
+  "directorySettingsOff": "Off"
 }

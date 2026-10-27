@@ -12,6 +12,7 @@ import 'package:space_client/src/directory_repository.dart';
 import 'package:space_client/src/key_vault.dart';
 import 'package:space_client/src/preferences.dart';
 import 'package:space_client/src/secure_vault.dart' show PlatformKeyStorage;
+import 'package:space_client/src/settings_snapshot.dart';
 import 'package:space_directory_noise/space_directory_noise.dart';
 
 import '../fixtures/directory.dart' show directoryDocument, directorySpace;
@@ -111,6 +112,12 @@ class CrashPreferences extends AppPreferences {
   final CrashHooks hooks;
   bool armed = false;
   @override
+  Future<void> applyMergedSettings(SettingsSnapshot before, SettingsSnapshot target,
+      Future<void> Function() persist) async {
+    await super.applyMergedSettings(before, target, persist);
+    if (armed) await hooks.hit('settings-written');
+  }
+  @override
   Future<void> change({
     bool? dark,
     ThemeMode? themeMode,
@@ -189,6 +196,7 @@ class CrashContext {
   Future<Map<String, dynamic>> snapshot() async => {
     'state': await repository.read(),
     'settings': service.settings(),
+    'settings_versions': preferences.settingsSnapshot.versions,
     'origins': List.of(preferences.origins),
     'key': await keyDigest(),
   };

@@ -7,6 +7,7 @@ import 'package:space_directory_noise/space_directory_noise.dart';
 import 'chat_controller.dart';
 import 'core.dart';
 import 'directory_backup.dart';
+import 'settings_snapshot.dart';
 import 'directory_document.dart';
 import 'directory_transfer.dart';
 import 'directory_transfer_qr.dart';
@@ -30,6 +31,7 @@ abstract class DirectoryTransferState with _$DirectoryTransferState {
     @Default(DirectoryTransferStage.idle) DirectoryTransferStage stage,
     @Default(false) bool receiving,
     @Default(false) bool replaceSettings,
+    @Default({}) Map<String, SettingsChoice> settingsChoices,
     @Default('') String qr,
     @Default('') String sas,
     @Default([]) List<String> selected,
@@ -84,9 +86,14 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
     }
   }
 
+  void chooseSetting(String key, SettingsChoice choice) {
+    final plan = state.plan;
+    if (isClosed || state.stage != DirectoryTransferStage.preview || plan == null || !plan.settingsMerge.conflicts.contains(key)) return;
+    emit(state.copyWith(settingsChoices: {...state.settingsChoices, key: choice}));
+  }
   void replaceSettings(bool value) {
     if (!isClosed && state.stage == DirectoryTransferStage.preview) {
-      emit(state.copyWith(replaceSettings: value));
+      emit(state.copyWith(replaceSettings: value, settingsChoices: const {}));
     }
   }
 
@@ -124,7 +131,7 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
         qr: '',
         sas: '',
         plan: null,
-        replaceSettings: false,
+        replaceSettings: false, settingsChoices: const {},
       ),
     );
     await _run((generation) async {
@@ -226,13 +233,13 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
     final plan = state.plan;
     if (state.stage != DirectoryTransferStage.preview ||
         plan == null ||
-        plan.conflicts.isNotEmpty) {
+        plan.conflicts.isNotEmpty || !plan.settingsResolved(state.replaceSettings, state.settingsChoices)) {
       return;
     }
     final replace = state.replaceSettings;
     emit(state.copyWith(stage: DirectoryTransferStage.sending));
     await _run((generation) async {
-      await service.apply(plan, replaceSettings: replace);
+      await service.apply(plan, replaceSettings: replace, settingsChoices: state.settingsChoices);
       if (_current(generation)) {
         emit(state.copyWith(stage: DirectoryTransferStage.done, plan: null));
       }

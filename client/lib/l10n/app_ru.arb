@@ -1079,7 +1079,7 @@
   "directoryBackupCreate": "Создать копию",
   "directoryBackupRead": "Проверить копию",
   "directoryBackupApply": "Применить каталог",
-  "directoryBackupSettings": "Заменить настройки интерфейса настройками из копии",
+  "directoryBackupSettings": "Объединить настройки",
   "directoryBackupFollows": "Добавить подписки из каталога",
   "directoryBackupResume": "Завершить прерванное восстановление",
   "directoryBackupUnverified": "Новизна этой копии неизвестна: для неё нет локального свидетеля версии.",
@@ -1158,5 +1158,14 @@
   "remoteBackupRevoke": "Отозвать комплект",
   "remoteBackupRevokeHelp": "Отозвать доступ к копиям на выбранном пространстве? Потребуется действующий вход владельца. Комплект перестанет работать; сохранённые контейнеры не удаляются.",
   "remoteBackupRevoked": "Доступ к копиям на пространстве отозван.",
-  "remoteBackupFreshness": "Откат проверяется по локальной истории. После её утраты новизна копии не подтверждается."
+  "remoteBackupFreshness": "Откат проверяется по локальной истории. После её утраты новизна копии не подтверждается.",
+  "directorySettingsHelp": "Более новые изменения объединятся автоматически. Для разных одновременных изменений выберите значение каждого параметра.",
+  "directorySettingsLocal": "Оставить на этом устройстве",
+  "directorySettingsIncoming": "Взять из копии",
+  "directorySettingsEffects": "Эффекты",
+  "directorySettingsPalette": "Палитра",
+  "directorySettingsScale": "Масштаб интерфейса",
+  "directorySettingsNotifications": "Уведомления",
+  "directorySettingsOn": "Включено",
+  "directorySettingsOff": "Выключено"
 }

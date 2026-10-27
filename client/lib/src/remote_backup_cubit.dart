@@ -9,6 +9,7 @@ import 'core.dart' show url64, SpaceSession;
 import 'directory_archive.dart';
 import 'directory_document.dart';
 import 'remote_backup.dart';
+import 'settings_snapshot.dart';
 import 'remote_backup_models.dart';
 import 'remote_backup_rpc.dart';
 
@@ -19,6 +20,7 @@ abstract class RemoteBackupState with _$RemoteBackupState {
   const factory RemoteBackupState({
     @Default(false) bool busy,
     @Default(false) bool replaceSettings,
+    @Default({}) Map<String, SettingsChoice> settingsChoices,
     @Default('') String message,
     RemoteBackupKit? kit,
     RemoteRestore? restore,
@@ -47,8 +49,13 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
 
   Future<void> load() =>
       _run(() async => _emit(state.copyWith(kit: await service.savedKit())));
+  void chooseSetting(String key, SettingsChoice choice) {
+    final plan = state.restore?.plan;
+    if (isClosed || state.busy || plan == null || !plan.settingsMerge.conflicts.contains(key)) return;
+    emit(state.copyWith(settingsChoices: {...state.settingsChoices, key: choice}));
+  }
   void replaceSettings(bool value) {
-    if (!isClosed && !state.busy) emit(state.copyWith(replaceSettings: value));
+    if (!isClosed && !state.busy) emit(state.copyWith(replaceSettings: value, settingsChoices: const {}));
   }
 
   void reset() {
@@ -56,7 +63,7 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
       emit(
         state.copyWith(
           restore: null,
-          replaceSettings: false,
+          replaceSettings: false, settingsChoices: const {},
           error: null,
           message: '',
         ),
@@ -85,7 +92,7 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
         );
         if (!await save(kit.encode())) return;
         await service.saveKit(kit);
-        _emit(state.copyWith(kit: kit, restore: null, replaceSettings: false));
+        _emit(state.copyWith(kit: kit, restore: null, replaceSettings: false, settingsChoices: const {}));
         await _provision(kit);
         _emit(state.copyWith(message: 'configured'));
       });
@@ -98,7 +105,7 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
   Future<void> revoke() => _run(() async {
     final kit = state.kit;
     directoryRequire(kit != null);
-    _emit(state.copyWith(restore: null, replaceSettings: false));
+    _emit(state.copyWith(restore: null, replaceSettings: false, settingsChoices: const {}));
     await _session(kit!).revokeRemoteBackupSlot(kit.id);
     await service.forgetRevokedKit();
     _emit(state.copyWith(kit: null, message: 'revoked'));
@@ -160,29 +167,29 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
   }
 
   Future<void> importKit(String raw) => _run(() async {
-    _emit(state.copyWith(restore: null, replaceSettings: false));
+    _emit(state.copyWith(restore: null, replaceSettings: false, settingsChoices: const {}));
     final kit = RemoteBackupKit.parse(raw);
     await service.saveKit(kit);
-    _emit(state.copyWith(kit: kit, restore: null, replaceSettings: false));
+    _emit(state.copyWith(kit: kit, restore: null, replaceSettings: false, settingsChoices: const {}));
   });
   Future<void> publish(String password) => _run(() async {
     final kit = state.kit;
     directoryRequire(kit != null);
-    _emit(state.copyWith(restore: null, replaceSettings: false));
+    _emit(state.copyWith(restore: null, replaceSettings: false, settingsChoices: const {}));
     await service.publish(kit!, password);
     _emit(state.copyWith(message: 'saved'));
   });
   Future<void> preview(String password) => _run(() async {
     final kit = state.kit;
     directoryRequire(kit != null);
-    _emit(state.copyWith(restore: null, replaceSettings: false));
+    _emit(state.copyWith(restore: null, replaceSettings: false, settingsChoices: const {}));
     final restore = await service.preview(kit!, password);
     _emit(state.copyWith(restore: restore, message: 'preview'));
   });
   Future<void> apply() => _run(() async {
     final restore = state.restore;
-    if (restore == null || restore.plan.conflicts.isNotEmpty) return;
-    await service.apply(restore, replaceSettings: state.replaceSettings);
+    if (restore == null || restore.plan.conflicts.isNotEmpty || !restore.plan.settingsResolved(state.replaceSettings, state.settingsChoices)) return;
+    await service.apply(restore, replaceSettings: state.replaceSettings, settingsChoices: state.settingsChoices);
     _emit(state.copyWith(restore: null, message: 'restored'));
   });
 }

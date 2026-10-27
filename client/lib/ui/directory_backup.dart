@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:space_admin_ui/space_admin_ui.dart';
 
 import '../l10n/strings.dart';
+import 'directory_settings_merge.dart';
 import '../src/directory_archive.dart';
 import '../src/directory_backup.dart';
 import '../src/directory_backup_cubit.dart';
@@ -214,17 +215,12 @@ class _DirectoryBackupPanelState extends State<DirectoryBackupPanel> {
       ),
       ...plan.conflicts.map((conflict) => Text(conflict)),
       const SizedBox(height: 12),
-      CheckboxListTile(
-        contentPadding: EdgeInsets.zero,
-        value: state.replaceSettings,
-        onChanged: state.busy
-            ? null
-            : (value) => cubit.replaceSettings(value ?? false),
-        title: Text(context.strings.directoryBackupSettings),
-      ),
+      DirectorySettingsMergePanel(plan: plan, enabled: state.replaceSettings,
+        busy: state.busy, choices: state.settingsChoices,
+        onEnabled: cubit.replaceSettings, onChoice: cubit.chooseSetting),
       const SizedBox(height: 12),
       FilledButton(
-        onPressed: state.busy || plan.conflicts.isNotEmpty ? null : apply,
+        onPressed: state.busy || plan.conflicts.isNotEmpty || !plan.settingsResolved(state.replaceSettings, state.settingsChoices) ? null : apply,
         child: Text(context.strings.directoryBackupApply),
       ),
       TextButton(

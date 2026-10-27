@@ -3,67 +3,10 @@ import 'dart:convert';
 import 'package:cryptography/cryptography.dart';
 
 import 'core.dart' show url64, parseConnectionInput;
-
-const directoryMaxPlain = 4 * 1024 * 1024;
-const directoryMaxInteger = 9007199254740991;
-
-void directoryRequire(bool condition) {
-  if (!condition) throw const FormatException('Повреждена копия каталога');
-}
-
-Map<String, dynamic> directoryMap(Object? value, String fields) {
-  directoryRequire(value is Map<String, dynamic>);
-  final map = value as Map<String, dynamic>;
-  final keys = map.keys.toList()..sort();
-  directoryRequire(keys.join(',') == fields);
-  return map;
-}
-
-String directoryText(Object? value, {int max = 1024}) {
-  directoryRequire(value is String);
-  final text = value as String;
-  directoryRequire(utf8.encode(text).length <= max && !text.contains('\u0000'));
-  return text;
-}
-
-int directoryInt(Object? value, {int min = 0, int max = directoryMaxInteger}) {
-  directoryRequire(value is int);
-  final number = value as int;
-  directoryRequire(number >= min && number <= max);
-  return number;
-}
-
-String directoryBytes(Object? value, int length) {
-  final text = directoryText(value, max: 128);
-  final bytes = base64Url.decode(base64Url.normalize(text));
-  directoryRequire(bytes.length == length && url64(bytes) == text);
-  return text;
-}
-
-String directoryAddress(Object? value) {
-  final text = directoryText(value);
-  final uri = Uri.parse(text);
-  directoryRequire(
-    ['http', 'https'].contains(uri.scheme) && uri.host.isNotEmpty,
-  );
-  directoryRequire(uri.userInfo.isEmpty && !uri.hasQuery && !uri.hasFragment);
-  return text;
-}
-
-Map<String, dynamic> checkedDirectorySettings(Object? value) {
-  final data = directoryMap(
-    value,
-    'effects,language,notificationMode,palette,sendShortcut,themeMode,uiScale',
-  );
-  directoryRequire(['system', 'light', 'dark'].contains(data['themeMode']));
-  directoryRequire(data['effects'] is bool);
-  directoryRequire(['gruvbox', 'ocean', 'iris'].contains(data['palette']));
-  directoryRequire(['ru', 'en', 'zh-Hans'].contains(data['language']));
-  directoryRequire(['enter', 'shiftEnter'].contains(data['sendShortcut']));
-  directoryRequire([0.75, 0.9, 1.0, 1.1, 1.25, 1.5].contains(data['uiScale']));
-  directoryInt(data['notificationMode'], max: 2);
-  return Map.unmodifiable(data);
-}
+import 'directory_validation.dart';
+import 'settings_snapshot.dart';
+export 'directory_validation.dart';
+export 'settings_snapshot.dart' show checkedDirectorySettings;
 
 Map<String, dynamic> checkedDirectorySpace(Object? value) {
   final data = directoryMap(
@@ -118,18 +61,23 @@ class DirectoryDocument {
   int get revision => data['revision'] as int;
   String get parent => data['parent'] as String;
   Map<String, dynamic> get settings => data['settings'] as Map<String, dynamic>;
+  bool get hasSettingsVersions => data['v'] == 2;
+  SettingsSnapshot get settingsSnapshot => hasSettingsVersions
+      ? SettingsSnapshot.create(settings, data['settings_versions'])
+      : SettingsSnapshot.initial(settings);
   List<Map<String, dynamic>> get spaces =>
       data['spaces'] as List<Map<String, dynamic>>;
   List<int> encode() => utf8.encode(jsonEncode(data));
   Future<String> digest() async => url64((await Sha256().hash(encode())).bytes);
 
   factory DirectoryDocument.parse(Object? value) {
-    final data = directoryMap(
-      value,
-      'created,id,kind,parent,revision,settings,spaces,v',
-    );
+    directoryRequire(value is Map<String, dynamic>);
+    final version = directoryInt((value as Map<String, dynamic>)['v'], min: 1, max: 2);
+    final fields = version == 1
+        ? 'created,id,kind,parent,revision,settings,spaces,v'
+        : 'created,id,kind,parent,revision,settings,settings_versions,spaces,v';
+    final data = directoryMap(value, fields);
     directoryRequire(data['kind'] == 'space.directory');
-    directoryInt(data['v'], min: 1, max: 1);
     directoryBytes(data['id'], 16);
     directoryInt(data['revision'], min: 1);
     final parent = directoryText(data['parent'], max: 43);
@@ -137,6 +85,7 @@ class DirectoryDocument {
     directoryRequire((data['revision'] == 1) == parent.isEmpty);
     directoryInt(data['created'], min: 1);
     final settings = checkedDirectorySettings(data['settings']);
+    final versioned = version == 2 ? SettingsSnapshot.create(settings, data['settings_versions']) : null;
     final raw = data['spaces'];
     directoryRequire(raw is List && raw.length <= 100);
     final spaces = (raw as List).map(checkedDirectorySpace).toList();
@@ -150,6 +99,7 @@ class DirectoryDocument {
       Map.unmodifiable({
         ...data,
         'settings': settings,
+        if (versioned != null) 'settings_versions': versioned.versions,
         'spaces': List<Map<String, dynamic>>.unmodifiable(spaces),
       }),
     );

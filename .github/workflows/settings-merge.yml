@@ -1,0 +1,93 @@
+name: Слияние настроек каталога
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    services:
+      postgres:
+        image: postgres:17.11
+        env: {POSTGRES_DB: space_test, POSTGRES_USER: space, POSTGRES_PASSWORD: ci-only-password}
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U space -d space_test" --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      SPACE_DATABASE_URL: postgres://space:ci-only-password@127.0.0.1:5432/space_test?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+        with: {path: app}
+      - name: Совместимый сервер
+        run: echo "SPACE_SERVER_REF=$(cat app/.github/space-server.ref)" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+        with: {repository: space-protocol-project/space-server, ref: '${{ env.SPACE_SERVER_REF }}', path: server}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: server/go.mod, cache-dependency-path: server/go.sum}
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Нативные зависимости
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb xauth dbus-x11
+      - name: Генерация и оформление
+        working-directory: app/client
+        run: |
+          flutter pub get
+          dart run build_runner build
+          flutter gen-l10n
+          dart format lib/src/settings_snapshot.dart lib/src/preferences*.dart lib/src/directory*.dart lib/src/remote_backup*.dart lib/ui/directory*.dart lib/ui/remote_backup.dart test/settings*_test.dart test/directory*_test.dart test/fixtures/directory.dart test/probes/directory*.dart
+          dart fix --apply --code=curly_braces_in_flow_control_structures
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: settings-merge-source
+          path: |
+            app/client/lib/src/settings_snapshot.dart
+            app/client/lib/src/preferences*.dart
+            app/client/lib/src/directory*.dart
+            app/client/lib/src/remote_backup*.dart
+            app/client/lib/ui/directory*.dart
+            app/client/lib/ui/remote_backup.dart
+            app/client/lib/l10n/*.dart
+            app/client/test/settings*_test.dart
+            app/client/test/directory*_test.dart
+            app/client/test/fixtures/directory.dart
+            app/client/test/probes/directory*.dart
+      - name: Анализ и все тесты приложения
+        working-directory: app/client
+        run: |
+          flutter analyze
+          dart run tool/core_import_check.dart
+          flutter test
+          (cd ../packages/space_directory_noise && dart pub get && dart analyze)
+          (cd ../packages/space_admin_ui && flutter pub get && flutter analyze)
+      - name: Настоящий обмен и копия на сервере пространства
+        working-directory: server
+        run: |
+          go build -o "$RUNNER_TEMP/space-settings-server" ./cmd/space-server
+          python3 ../app/tools/check_community_interop.py --server "$RUNNER_TEMP/space-settings-server" --client ../app/client --scenario directory_pairing --output "$RUNNER_TEMP/settings-transfer"
+          python3 ../app/tools/check_remote_backup.py --server "$RUNNER_TEMP/space-settings-server" --client ../app/client --output "$RUNNER_TEMP/settings-remote"
+      - name: Нативный экран и горячий перезапуск
+        working-directory: app
+        run: xvfb-run -a dbus-run-session -- python3 tools/check_directory_ui.py --output "$RUNNER_TEMP/settings-native"
+      - name: Сбой, продолжение и ревизии настроек
+        working-directory: app
+        run: |
+          (cd client && flutter build linux --debug --target test/probes/directory_crash_probe.dart)
+          xvfb-run -a python3 tools/check_directory_crash.py --app client/build/linux/x64/debug/bundle/space_client --server "$RUNNER_TEMP/space-settings-server" --output "$RUNNER_TEMP/settings-crash"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: settings-merge-evidence
+          path: |
+            ${{ runner.temp }}/settings-transfer/**/*.log
+            ${{ runner.temp }}/settings-transfer/*.json
+            ${{ runner.temp }}/settings-remote/report.json
+            ${{ runner.temp }}/settings-remote/interop.log
+            ${{ runner.temp }}/settings-native
+            ${{ runner.temp }}/settings-crash/report.json
+            ${{ runner.temp }}/settings-crash/**/*.log

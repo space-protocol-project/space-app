@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'directory_backup.dart';
+import 'settings_snapshot.dart';
 import 'directory_document.dart';
 import 'directory_workers.dart';
 
@@ -15,6 +16,7 @@ abstract class DirectoryBackupState with _$DirectoryBackupState {
   const factory DirectoryBackupState({
     @Default(false) bool busy,
     @Default(false) bool replaceSettings,
+    @Default({}) Map<String, SettingsChoice> settingsChoices,
     @Default('') String message,
     @Default([]) List<String> results,
     DirectoryRestorePlan? plan,
@@ -27,8 +29,13 @@ class DirectoryBackupCubit extends Cubit<DirectoryBackupState> {
   final DirectoryBackupService service;
   int _generation = 0;
   bool _current(int value) => !isClosed && value == _generation;
+  void chooseSetting(String key, SettingsChoice choice) {
+    final plan = state.plan;
+    if (isClosed || state.busy || plan == null || !plan.settingsMerge.conflicts.contains(key)) return;
+    emit(state.copyWith(settingsChoices: {...state.settingsChoices, key: choice}));
+  }
   void replaceSettings(bool value) {
-    if (!isClosed && !state.busy) emit(state.copyWith(replaceSettings: value));
+    if (!isClosed && !state.busy) emit(state.copyWith(replaceSettings: value, settingsChoices: const {}));
   }
 
   void reset() {
@@ -84,7 +91,7 @@ class DirectoryBackupCubit extends Cubit<DirectoryBackupState> {
 
   Future<void> preview(Uint8List file, String password) =>
       _run((generation) async {
-        emit(state.copyWith(plan: null));
+        emit(state.copyWith(plan: null, replaceSettings: false, settingsChoices: const {}));
         final document = DirectoryDocument.parse(
           await compute(openDirectoryWorker, (file, password)),
         );
@@ -95,8 +102,8 @@ class DirectoryBackupCubit extends Cubit<DirectoryBackupState> {
       });
   Future<void> apply() => _run((generation) async {
     final plan = state.plan;
-    if (plan == null || plan.conflicts.isNotEmpty) return;
-    await service.apply(plan, replaceSettings: state.replaceSettings);
+    if (plan == null || plan.conflicts.isNotEmpty || !plan.settingsResolved(state.replaceSettings, state.settingsChoices)) return;
+    await service.apply(plan, replaceSettings: state.replaceSettings, settingsChoices: state.settingsChoices);
     if (_current(generation)) {
       emit(state.copyWith(plan: null, message: 'restored'));
     }
