@@ -88,9 +88,17 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
 
   void chooseSetting(String key, SettingsChoice choice) {
     final plan = state.plan;
-    if (isClosed || state.stage != DirectoryTransferStage.preview || plan == null || !plan.settingsMerge.conflicts.contains(key)) return;
-    emit(state.copyWith(settingsChoices: {...state.settingsChoices, key: choice}));
+    if (isClosed ||
+        state.stage != DirectoryTransferStage.preview ||
+        plan == null ||
+        !plan.settingsMerge.conflicts.contains(key)) {
+      return;
+    }
+    emit(
+      state.copyWith(settingsChoices: {...state.settingsChoices, key: choice}),
+    );
   }
+
   void replaceSettings(bool value) {
     if (!isClosed && state.stage == DirectoryTransferStage.preview) {
       emit(state.copyWith(replaceSettings: value, settingsChoices: const {}));
@@ -131,7 +139,8 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
         qr: '',
         sas: '',
         plan: null,
-        replaceSettings: false, settingsChoices: const {},
+        replaceSettings: false,
+        settingsChoices: const {},
       ),
     );
     await _run((generation) async {
@@ -233,13 +242,18 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
     final plan = state.plan;
     if (state.stage != DirectoryTransferStage.preview ||
         plan == null ||
-        plan.conflicts.isNotEmpty || !plan.settingsResolved(state.replaceSettings, state.settingsChoices)) {
+        plan.conflicts.isNotEmpty ||
+        !plan.settingsResolved(state.replaceSettings, state.settingsChoices)) {
       return;
     }
     final replace = state.replaceSettings;
     emit(state.copyWith(stage: DirectoryTransferStage.sending));
     await _run((generation) async {
-      await service.apply(plan, replaceSettings: replace, settingsChoices: state.settingsChoices);
+      await service.apply(
+        plan,
+        replaceSettings: replace,
+        settingsChoices: state.settingsChoices,
+      );
       if (_current(generation)) {
         emit(state.copyWith(stage: DirectoryTransferStage.done, plan: null));
       }

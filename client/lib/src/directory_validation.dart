@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'core.dart' show url64;
 
 const directoryMaxPlain = 4 * 1024 * 1024;
@@ -46,4 +47,3 @@ String directoryAddress(Object? value) {
   directoryRequire(uri.userInfo.isEmpty && !uri.hasQuery && !uri.hasFragment);
   return text;
 }
-

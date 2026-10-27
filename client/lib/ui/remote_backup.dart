@@ -270,12 +270,25 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
     final restore = state.restore!, plan = restore.plan;
     return [
       const SizedBox(height: 12),
-      DirectorySettingsMergePanel(plan: plan, enabled: state.replaceSettings,
-        busy: state.busy, choices: state.settingsChoices,
-        onEnabled: cubit.replaceSettings, onChoice: cubit.chooseSetting),
+      DirectorySettingsMergePanel(
+        plan: plan,
+        enabled: state.replaceSettings,
+        busy: state.busy,
+        choices: state.settingsChoices,
+        onEnabled: cubit.replaceSettings,
+        onChoice: cubit.chooseSetting,
+      ),
       const SizedBox(height: 12),
       FilledButton(
-        onPressed: state.busy || plan.conflicts.isNotEmpty || !plan.settingsResolved(state.replaceSettings, state.settingsChoices) ? null : apply,
+        onPressed:
+            state.busy ||
+                plan.conflicts.isNotEmpty ||
+                !plan.settingsResolved(
+                  state.replaceSettings,
+                  state.settingsChoices,
+                )
+            ? null
+            : apply,
         child: Text(context.strings.directoryBackupApply),
       ),
       TextButton(

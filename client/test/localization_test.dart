@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:space_client/app.dart';
 import 'package:space_client/src/preferences.dart';
+import 'package:space_client/src/settings_snapshot.dart';
 
 void main() {
   for (final entry in {
@@ -45,7 +46,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('App language'), findsOneWidget);
         final saved = await SharedPreferences.getInstance();
-        expect(saved.getString('space.ui.language'), 'en');
+        expect(SettingsReplica.parse(saved.getString(AppPreferences.settingsStorageKey)!).snapshot.values['language'], 'en');
         expect(tester.takeException(), isNull);
       }
     });

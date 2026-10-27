@@ -346,18 +346,25 @@ class RemoteBackupService {
     return result;
   }
 
-  Future<void> apply(RemoteRestore restore, {required bool replaceSettings, Map<String, SettingsChoice> settingsChoices = const {}}) =>
-      _client(restore.kit, (store) async {
-        final document = restore.plan.document;
-        directoryRequire(
-          document.id == restore.head.id &&
-              document.revision == restore.head.revision.toInt() &&
-              restore.plan.digest == await document.digest(),
-        );
-        _same(await _head(restore.kit, store), restore.head);
-        await directory.apply(restore.plan, replaceSettings: replaceSettings, settingsChoices: settingsChoices);
-        await _settle(restore);
-      });
+  Future<void> apply(
+    RemoteRestore restore, {
+    required bool replaceSettings,
+    Map<String, SettingsChoice> settingsChoices = const {},
+  }) => _client(restore.kit, (store) async {
+    final document = restore.plan.document;
+    directoryRequire(
+      document.id == restore.head.id &&
+          document.revision == restore.head.revision.toInt() &&
+          restore.plan.digest == await document.digest(),
+    );
+    _same(await _head(restore.kit, store), restore.head);
+    await directory.apply(
+      restore.plan,
+      replaceSettings: replaceSettings,
+      settingsChoices: settingsChoices,
+    );
+    await _settle(restore);
+  });
 
   Future<void> _settle(RemoteRestore restore) =>
       directory.repository.exclusive(() async {

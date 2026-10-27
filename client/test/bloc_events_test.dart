@@ -9,6 +9,7 @@ import 'package:space_admin_ui/src/admin_operations.dart';
 import 'package:space_client/src/chat_controller.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/preferences.dart';
+import 'package:space_client/src/settings_snapshot.dart';
 import 'package:space_client/src/server_presence.dart';
 
 import 'channels_test.dart'
@@ -43,7 +44,7 @@ void main() {
       expect(old.origins, isEmpty);
       expect(() => prefs.state.origins.clear(), throwsUnsupportedError);
       final saved = await SharedPreferences.getInstance();
-      expect(saved.getString('space.ui.language'), 'zh-Hans');
+      expect(SettingsReplica.parse(saved.getString(AppPreferences.settingsStorageKey)!).snapshot.values['language'], 'zh-Hans');
       expect(saved.getStringList('space.ui.origins'), [
         'https://server.example',
       ]);

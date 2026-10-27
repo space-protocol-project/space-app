@@ -46,7 +46,13 @@ class DirectoryBackupService {
   Map<String, dynamic> settings() => preferences.settingsValues;
   Future<String> _fingerprint(Map<String, dynamic> state) async => url64(
     (await Sha256().hash(
-      utf8.encode(jsonEncode([state, preferences.settingsSnapshot.data, preferences.origins])),
+      utf8.encode(
+        jsonEncode([
+          state,
+          preferences.settingsSnapshot.data,
+          preferences.origins,
+        ]),
+      ),
     )).bytes,
   );
 
@@ -204,8 +210,11 @@ class DirectoryBackupService {
       List.unmodifiable(conflicts),
       head == null,
       List.unmodifiable(ancestors),
-      SettingsMerge(preferences.settingsSnapshot, document.settingsSnapshot,
-          unknown: !document.hasSettingsVersions),
+      SettingsMerge(
+        preferences.settingsSnapshot,
+        document.settingsSnapshot,
+        unknown: !document.hasSettingsVersions,
+      ),
     );
   }
 
@@ -272,18 +281,30 @@ class DirectoryBackupService {
       'revision': plan.document.revision,
       'digest': plan.digest,
     };
-    final merged = replaceSettings ? latest.settingsMerge.resolve(preferences.settingsActor, settingsChoices) : null;
+    final merged = replaceSettings
+        ? latest.settingsMerge.resolve(
+            preferences.settingsActor,
+            settingsChoices,
+          )
+        : null;
     state['pending'] = {
       'origins': plan.document.spaces.map((s) => s['origin']).toList(),
-      'settings': merged == null ? null : {
-        'v': 2, 'before': latest.settingsMerge.local.data, 'after': merged.data,
-      },
+      'settings': merged == null
+          ? null
+          : {
+              'v': 2,
+              'before': latest.settingsMerge.local.data,
+              'after': merged.data,
+            },
     };
     if (merged == null) {
       await repository.write(state);
     } else {
-      await preferences.applyMergedSettings(latest.settingsMerge.local, merged,
-          () => repository.write(state));
+      await preferences.applyMergedSettings(
+        latest.settingsMerge.local,
+        merged,
+        () => repository.write(state),
+      );
     }
     await _finish(state);
   });
@@ -315,9 +336,14 @@ class DirectoryBackupService {
     }
     // Уже подтверждённый журнал предыдущего формата, не новый импорт.
     final before = preferences.settingsSnapshot;
-    final merge = SettingsMerge(before, SettingsSnapshot.initial(checkedDirectorySettings(data)), unknown: true);
-    final target = merge.resolve(preferences.settingsActor,
-        {for (final key in merge.conflicts) key: SettingsChoice.incoming});
+    final merge = SettingsMerge(
+      before,
+      SettingsSnapshot.initial(checkedDirectorySettings(data)),
+      unknown: true,
+    );
+    final target = merge.resolve(preferences.settingsActor, {
+      for (final key in merge.conflicts) key: SettingsChoice.incoming,
+    });
     await preferences.resumeMergedSettings(before, target);
   }
 

@@ -39,7 +39,7 @@ jobs:
           flutter pub get
           dart run build_runner build
           flutter gen-l10n
-          dart format lib/src/settings_snapshot.dart lib/src/preferences*.dart lib/src/directory*.dart lib/src/remote_backup*.dart lib/ui/directory*.dart lib/ui/remote_backup.dart test/settings*_test.dart test/directory*_test.dart test/fixtures/directory.dart test/probes/directory*.dart
+          dart format lib/src/settings_snapshot.dart lib/src/preferences*.dart lib/src/directory*.dart lib/src/remote_backup*.dart lib/ui/directory*.dart lib/ui/remote_backup.dart test/settings*_test.dart test/directory*_test.dart test/fixtures/directory.dart test/probes/directory*.dart test/bloc_events_test.dart test/localization_test.dart
           dart fix --apply --code=curly_braces_in_flow_control_structures
       - uses: actions/upload-artifact@v4
         if: always()
@@ -54,6 +54,8 @@ jobs:
             app/client/lib/ui/remote_backup.dart
             app/client/lib/l10n/*.dart
             app/client/test/settings*_test.dart
+            app/client/test/bloc_events_test.dart
+            app/client/test/localization_test.dart
             app/client/test/directory*_test.dart
             app/client/test/fixtures/directory.dart
             app/client/test/probes/directory*.dart
@@ -62,6 +64,7 @@ jobs:
         run: |
           flutter analyze
           dart run tool/core_import_check.dart
+          flutter test test/settings*_test.dart
           flutter test
           (cd ../packages/space_directory_noise && dart pub get && dart analyze)
           (cd ../packages/space_admin_ui && flutter pub get && flutter analyze)

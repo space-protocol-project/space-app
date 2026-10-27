@@ -3020,8 +3020,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get directoryBackupApply => 'Restore directory';
 
   @override
-  String get directoryBackupSettings =>
-      'Replace interface settings with the backup settings';
+  String get directoryBackupSettings => 'Merge settings';
 
   @override
   String get directoryBackupFollows => 'Add saved follows';
@@ -3208,4 +3207,32 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get remoteBackupFreshness =>
       'Rollback is checked against local history. After that history is lost, backup freshness cannot be confirmed.';
+
+  @override
+  String get directorySettingsHelp =>
+      'Newer changes merge automatically. Choose a value for each setting changed concurrently.';
+
+  @override
+  String get directorySettingsLocal => 'Keep on this device';
+
+  @override
+  String get directorySettingsIncoming => 'Use from backup';
+
+  @override
+  String get directorySettingsEffects => 'Effects';
+
+  @override
+  String get directorySettingsPalette => 'Palette';
+
+  @override
+  String get directorySettingsScale => 'Interface scale';
+
+  @override
+  String get directorySettingsNotifications => 'Notifications';
+
+  @override
+  String get directorySettingsOn => 'On';
+
+  @override
+  String get directorySettingsOff => 'Off';
 }

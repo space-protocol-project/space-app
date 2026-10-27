@@ -61,17 +61,28 @@ class AppPreferences
   SettingsReplica _settingsReplica = SettingsReplica();
   bool _settingsInvalid = false;
   Map<String, dynamic> get settingsValues => {
-    'themeMode': themeMode.name, 'effects': effects, 'palette': palette,
-    'language': language, 'sendShortcut': sendShortcut, 'uiScale': uiScale,
+    'themeMode': themeMode.name,
+    'effects': effects,
+    'palette': palette,
+    'language': language,
+    'sendShortcut': sendShortcut,
+    'uiScale': uiScale,
     'notificationMode': notificationMode,
   };
-  SettingsSnapshot get settingsSnapshot => _settingsReplica.snapshot.observe(settingsValues, _settingsReplica.actor);
+  SettingsSnapshot get settingsSnapshot =>
+      _settingsReplica.snapshot.observe(settingsValues, _settingsReplica.actor);
   String get settingsActor => _settingsReplica.actor;
-  Future<SettingsSnapshot> exportSettings() => sendRequest(PreferencesSettingsExported());
-  Future<void> applyMergedSettings(SettingsSnapshot before, SettingsSnapshot target,
-      Future<void> Function() persist) => sendRequest(PreferencesSettingsCommitted(before, target, persist));
-  Future<void> resumeMergedSettings(SettingsSnapshot before, SettingsSnapshot target) =>
-      sendRequest(PreferencesSettingsResumed(before, target));
+  Future<SettingsSnapshot> exportSettings() =>
+      sendRequest(PreferencesSettingsExported());
+  Future<void> applyMergedSettings(
+    SettingsSnapshot before,
+    SettingsSnapshot target,
+    Future<void> Function() persist,
+  ) => sendRequest(PreferencesSettingsCommitted(before, target, persist));
+  Future<void> resumeMergedSettings(
+    SettingsSnapshot before,
+    SettingsSnapshot target,
+  ) => sendRequest(PreferencesSettingsResumed(before, target));
   Future<void> flush() async {
     await _writes;
     if (error.isNotEmpty) throw StateError(error);

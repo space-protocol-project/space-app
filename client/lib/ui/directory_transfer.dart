@@ -259,12 +259,24 @@ class _DirectoryTransferPanelState extends State<DirectoryTransferPanel>
       ...plan.document.spaces.map((space) => Text(space['origin'] as String)),
       ...plan.conflicts.map(Text.new),
       const SizedBox(height: 16),
-      DirectorySettingsMergePanel(plan: plan, enabled: state.replaceSettings,
-        busy: false, choices: state.settingsChoices,
-        onEnabled: cubit.replaceSettings, onChoice: cubit.chooseSetting),
+      DirectorySettingsMergePanel(
+        plan: plan,
+        enabled: state.replaceSettings,
+        busy: false,
+        choices: state.settingsChoices,
+        onEnabled: cubit.replaceSettings,
+        onChoice: cubit.chooseSetting,
+      ),
       const SizedBox(height: 12),
       FilledButton(
-        onPressed: plan.conflicts.isNotEmpty || !plan.settingsResolved(state.replaceSettings, state.settingsChoices) ? null : apply,
+        onPressed:
+            plan.conflicts.isNotEmpty ||
+                !plan.settingsResolved(
+                  state.replaceSettings,
+                  state.settingsChoices,
+                )
+            ? null
+            : apply,
         child: Text(context.strings.directoryBackupApply),
       ),
       cancel(),

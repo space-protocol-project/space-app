@@ -85,8 +85,16 @@ Future<void> crashTarget(
   await hooks.wait('allow-apply');
   context.storage.armed = true;
   context.preferences.armed = true;
-  await context.service.apply(plan, replaceSettings: hooks.replace,
-    settingsChoices: hooks.replace ? {for(final key in plan.settingsMerge.conflicts) key: SettingsChoice.incoming} : const {});
+  await context.service.apply(
+    plan,
+    replaceSettings: hooks.replace,
+    settingsChoices: hooks.replace
+        ? {
+            for (final key in plan.settingsMerge.conflicts)
+              key: SettingsChoice.incoming,
+          }
+        : const {},
+  );
   await verifyCrashApplied(context);
 }
 

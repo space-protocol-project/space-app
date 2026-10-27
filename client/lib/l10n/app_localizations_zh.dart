@@ -2796,7 +2796,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get directoryBackupApply => '恢复目录';
 
   @override
-  String get directoryBackupSettings => '用备份中的设置替换界面设置';
+  String get directoryBackupSettings => '合并设置';
 
   @override
   String get directoryBackupFollows => '添加已保存的关注';
@@ -2968,6 +2968,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get remoteBackupFreshness => '将根据本地历史检查回滚。本地历史丢失后，无法确认备份是否为最新版本。';
+
+  @override
+  String get directorySettingsHelp => '较新的更改将自动合并。请为同时更改的每项设置选择一个值。';
+
+  @override
+  String get directorySettingsLocal => '保留此设备的值';
+
+  @override
+  String get directorySettingsIncoming => '使用备份的值';
+
+  @override
+  String get directorySettingsEffects => '效果';
+
+  @override
+  String get directorySettingsPalette => '配色';
+
+  @override
+  String get directorySettingsScale => '界面缩放';
+
+  @override
+  String get directorySettingsNotifications => '通知';
+
+  @override
+  String get directorySettingsOn => '开启';
+
+  @override
+  String get directorySettingsOff => '关闭';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4192,7 +4219,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get directoryBackupApply => '恢复目录';
 
   @override
-  String get directoryBackupSettings => '用备份中的设置替换界面设置';
+  String get directoryBackupSettings => '合并设置';
 
   @override
   String get directoryBackupFollows => '添加已保存的关注';
@@ -4364,4 +4391,31 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get remoteBackupFreshness => '将根据本地历史检查回滚。本地历史丢失后，无法确认备份是否为最新版本。';
+
+  @override
+  String get directorySettingsHelp => '较新的更改将自动合并。请为同时更改的每项设置选择一个值。';
+
+  @override
+  String get directorySettingsLocal => '保留此设备的值';
+
+  @override
+  String get directorySettingsIncoming => '使用备份的值';
+
+  @override
+  String get directorySettingsEffects => '效果';
+
+  @override
+  String get directorySettingsPalette => '配色';
+
+  @override
+  String get directorySettingsScale => '界面缩放';
+
+  @override
+  String get directorySettingsNotifications => '通知';
+
+  @override
+  String get directorySettingsOn => '开启';
+
+  @override
+  String get directorySettingsOff => '关闭';
 }

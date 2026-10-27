@@ -6,7 +6,8 @@ sealed class PreferencesCommand<T> extends PreferencesEvent<T> {}
 
 final class PreferencesLoaded extends PreferencesCommand<void> {}
 
-final class PreferencesSettingsExported extends PreferencesCommand<SettingsSnapshot> {}
+final class PreferencesSettingsExported
+    extends PreferencesCommand<SettingsSnapshot> {}
 
 final class PreferencesSettingsCommitted extends PreferencesCommand<void> {
   PreferencesSettingsCommitted(this.before, this.target, this.persist);

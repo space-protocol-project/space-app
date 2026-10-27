@@ -5497,7 +5497,7 @@ abstract class AppLocalizations {
   /// No description provided for @directoryBackupSettings.
   ///
   /// In ru, this message translates to:
-  /// **'Заменить настройки интерфейса настройками из копии'**
+  /// **'Объединить настройки'**
   String get directoryBackupSettings;
 
   /// No description provided for @directoryBackupFollows.
@@ -5811,6 +5811,60 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Откат проверяется по локальной истории. После её утраты новизна копии не подтверждается.'**
   String get remoteBackupFreshness;
+
+  /// No description provided for @directorySettingsHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Более новые изменения объединятся автоматически. Для разных одновременных изменений выберите значение каждого параметра.'**
+  String get directorySettingsHelp;
+
+  /// No description provided for @directorySettingsLocal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оставить на этом устройстве'**
+  String get directorySettingsLocal;
+
+  /// No description provided for @directorySettingsIncoming.
+  ///
+  /// In ru, this message translates to:
+  /// **'Взять из копии'**
+  String get directorySettingsIncoming;
+
+  /// No description provided for @directorySettingsEffects.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эффекты'**
+  String get directorySettingsEffects;
+
+  /// No description provided for @directorySettingsPalette.
+  ///
+  /// In ru, this message translates to:
+  /// **'Палитра'**
+  String get directorySettingsPalette;
+
+  /// No description provided for @directorySettingsScale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Масштаб интерфейса'**
+  String get directorySettingsScale;
+
+  /// No description provided for @directorySettingsNotifications.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления'**
+  String get directorySettingsNotifications;
+
+  /// No description provided for @directorySettingsOn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включено'**
+  String get directorySettingsOn;
+
+  /// No description provided for @directorySettingsOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выключено'**
+  String get directorySettingsOff;
 }
 
 class _AppLocalizationsDelegate

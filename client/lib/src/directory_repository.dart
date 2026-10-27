@@ -80,9 +80,12 @@ class DirectoryRepository {
       ),
     );
     switch (data['settings']) {
-      case null: break;
-      case {'v': 2}: checkedSettingsPending(data['settings']);
-      default: checkedDirectorySettings(data['settings']);
+      case null:
+        break;
+      case {'v': 2}:
+        checkedSettingsPending(data['settings']);
+      default:
+        checkedDirectorySettings(data['settings']);
     }
   }
 

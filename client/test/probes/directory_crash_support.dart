@@ -112,11 +112,15 @@ class CrashPreferences extends AppPreferences {
   final CrashHooks hooks;
   bool armed = false;
   @override
-  Future<void> applyMergedSettings(SettingsSnapshot before, SettingsSnapshot target,
-      Future<void> Function() persist) async {
+  Future<void> applyMergedSettings(
+    SettingsSnapshot before,
+    SettingsSnapshot target,
+    Future<void> Function() persist,
+  ) async {
     await super.applyMergedSettings(before, target, persist);
     if (armed) await hooks.hit('settings-written');
   }
+
   @override
   Future<void> change({
     bool? dark,

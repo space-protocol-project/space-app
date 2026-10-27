@@ -68,6 +68,10 @@ DirectoryDocument directoryDocument({
   'parent': parent,
   'created': 1793000000,
   'settings': directorySettings(),
-  if (version == 2) 'settings_versions': {for(final key in settingsDefaults.keys) key: {url64(List.filled(16, 12)):1}},
+  if (version == 2)
+    'settings_versions': {
+      for (final key in settingsDefaults.keys)
+        key: {url64(List.filled(16, 12)): 1},
+    },
   'spaces': [directorySpace(count: count)],
 });

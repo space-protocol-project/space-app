@@ -72,7 +72,11 @@ class DirectoryDocument {
 
   factory DirectoryDocument.parse(Object? value) {
     directoryRequire(value is Map<String, dynamic>);
-    final version = directoryInt((value as Map<String, dynamic>)['v'], min: 1, max: 2);
+    final version = directoryInt(
+      (value as Map<String, dynamic>)['v'],
+      min: 1,
+      max: 2,
+    );
     final fields = version == 1
         ? 'created,id,kind,parent,revision,settings,spaces,v'
         : 'created,id,kind,parent,revision,settings,settings_versions,spaces,v';
@@ -85,7 +89,9 @@ class DirectoryDocument {
     directoryRequire((data['revision'] == 1) == parent.isEmpty);
     directoryInt(data['created'], min: 1);
     final settings = checkedDirectorySettings(data['settings']);
-    final versioned = version == 2 ? SettingsSnapshot.create(settings, data['settings_versions']) : null;
+    final versioned = version == 2
+        ? SettingsSnapshot.create(settings, data['settings_versions'])
+        : null;
     final raw = data['spaces'];
     directoryRequire(raw is List && raw.length <= 100);
     final spaces = (raw as List).map(checkedDirectorySpace).toList();
@@ -104,6 +110,7 @@ class DirectoryDocument {
       }),
     );
     directoryRequire(result.encode().length <= directoryMaxPlain);
+    if (version == 2) directoryRequire(utf8.decode(result.encode()) == jsonEncode(data));
     return result;
   }
 }

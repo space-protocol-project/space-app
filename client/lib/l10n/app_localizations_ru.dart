@@ -3038,8 +3038,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get directoryBackupApply => 'Применить каталог';
 
   @override
-  String get directoryBackupSettings =>
-      'Заменить настройки интерфейса настройками из копии';
+  String get directoryBackupSettings => 'Объединить настройки';
 
   @override
   String get directoryBackupFollows => 'Добавить подписки из каталога';
@@ -3226,4 +3225,32 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get remoteBackupFreshness =>
       'Откат проверяется по локальной истории. После её утраты новизна копии не подтверждается.';
+
+  @override
+  String get directorySettingsHelp =>
+      'Более новые изменения объединятся автоматически. Для разных одновременных изменений выберите значение каждого параметра.';
+
+  @override
+  String get directorySettingsLocal => 'Оставить на этом устройстве';
+
+  @override
+  String get directorySettingsIncoming => 'Взять из копии';
+
+  @override
+  String get directorySettingsEffects => 'Эффекты';
+
+  @override
+  String get directorySettingsPalette => 'Палитра';
+
+  @override
+  String get directorySettingsScale => 'Масштаб интерфейса';
+
+  @override
+  String get directorySettingsNotifications => 'Уведомления';
+
+  @override
+  String get directorySettingsOn => 'Включено';
+
+  @override
+  String get directorySettingsOff => 'Выключено';
 }
