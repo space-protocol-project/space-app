@@ -41,6 +41,7 @@ class PendingPairing {
   final CreatePairingResponse request;
   final RpcConnection channel;
   bool claimed = false;
+  bool get expired => _lifetime.expired;
   List<int>? proposedRoot;
   static Future<PendingPairing> start(
     Discovery server, {

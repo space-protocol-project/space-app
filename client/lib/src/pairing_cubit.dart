@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -81,7 +80,7 @@ class PairingCubit extends Cubit<PairingState> {
     }
   }
 
-  bool get _expired => _pending!.request.pairing.expiresAt.toInt() <=
+  bool get _expired => _pending!.expired || _pending!.request.pairing.expiresAt.toInt() <=
       DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
   Future<void> poll() async {
@@ -96,13 +95,17 @@ class PairingCubit extends Cubit<PairingState> {
       await _handleResponse(current, response, generation);
     } catch (error) {
       if (!_current(generation)) return;
-      if (error is LocalFailure || error is FormatException) {
-        await _fail(PairingIssue.verification);
-      } else {
-        emit(state.copyWith(issue: PairingIssue.network));
-      }
+      await _pollFailed(error);
     } finally {
       _polling = false;
+    }
+  }
+
+  Future<void> _pollFailed(Object error) async {
+    if (error is LocalFailure || error is FormatException) {
+      await _fail(PairingIssue.verification);
+    } else {
+      emit(state.copyWith(issue: PairingIssue.network));
     }
   }
 

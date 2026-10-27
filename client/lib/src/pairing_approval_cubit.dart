@@ -10,6 +10,11 @@ import 'pairing_qr.dart';
 
 part 'pairing_approval_cubit.freezed.dart';
 
+class PairingApprovalFailure implements Exception {
+  const PairingApprovalFailure(this.messageKey);
+  final String messageKey;
+}
+
 @freezed
 abstract class PairingApprovalState with _$PairingApprovalState {
   const factory PairingApprovalState({
@@ -64,7 +69,7 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
       _qr = qr;
       emit(state.copyWith(code: qr.code));
     } catch (error) {
-      emit(state.copyWith(error: error));
+      _showError(error);
     }
   }
 
@@ -78,7 +83,7 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
       if (!_current(generation)) return;
       if (text != null) readQr(text);
     } catch (error) {
-      if (_current(generation)) emit(state.copyWith(error: error));
+      if (_current(generation)) _showError(error);
     } finally {
       if (_current(generation)) emit(state.copyWith(busy: false));
     }
@@ -112,7 +117,7 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
       _expiry = Timer(Duration(seconds: pair.expiresAt.toInt() - now().millisecondsSinceEpoch ~/ 1000), expire);
       emit(state.copyWith(prepared: true, verification: code, messageKey: 'pairingReady'));
     } catch (error) {
-      if (_current(generation)) emit(state.copyWith(error: error));
+      if (_current(generation)) _showError(error);
     } finally {
       if (_current(generation)) emit(state.copyWith(busy: false));
     }
@@ -133,9 +138,10 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
   }
 
   void _requirePending(Pairing pair) {
-    if (pair.state != 'pending' || pair.expiresAt.toInt() <= now().millisecondsSinceEpoch ~/ 1000) {
-      throw const FormatException('Сопряжение истекло или уже использовано');
+    if (pair.expiresAt.toInt() <= now().millisecondsSinceEpoch ~/ 1000) {
+      throw const PairingApprovalFailure('pairingExpired');
     }
+    if (pair.state != 'pending') throw const PairingApprovalFailure('pairingAlreadyUsed');
   }
 
   Future<void> approve(String entered, Future<bool> Function() confirm) async {
@@ -151,7 +157,7 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
       reset();
       emit(const PairingApprovalState(messageKey: 'pairingSigned'));
     } catch (error) {
-      if (_current(generation)) emit(state.copyWith(error: error));
+      if (_current(generation)) _showError(error);
     } finally {
       if (_current(generation)) emit(state.copyWith(busy: false));
     }
@@ -163,6 +169,15 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
       return false;
     }
     return await confirm() && _current(generation);
+  }
+
+  void _showError(Object error) {
+    if (error is PairingApprovalFailure) {
+      reset();
+      emit(state.copyWith(error: null, messageKey: error.messageKey));
+    } else {
+      emit(state.copyWith(error: error, messageKey: null));
+    }
   }
 
   @override

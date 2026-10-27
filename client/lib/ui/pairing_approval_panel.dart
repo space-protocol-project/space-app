@@ -118,6 +118,7 @@ class _PairingApprovalPanelState extends State<PairingApprovalPanel> with Widget
       'pairingSigned' => context.strings.pairingSigned,
       'pairingMismatch' => context.strings.pairingMismatch,
       'pairingExpired' => context.strings.pairingExpired,
+      'pairingAlreadyUsed' => context.strings.pairingAlreadyUsed,
       _ => '',
     };
   }

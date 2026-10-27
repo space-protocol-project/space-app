@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as img;
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/generated/space/v1/space.pb.dart';
 import 'package:space_client/src/pairing_qr.dart';
@@ -97,4 +98,14 @@ void main() {
       );
     }
   });
+  test('QR читается из JPEG с полями и поворотом', () {
+    final text = PairingQr.request(testServer(), testRequest()).encode();
+    final qr = img.decodePng(pairingPng(text))!;
+    final frame = img.Image(width: qr.width + 160, height: qr.height + 160, numChannels: 3);
+    img.fill(frame, color: img.ColorRgb8(220, 220, 220));
+    img.compositeImage(frame, qr, dstX: 80, dstY: 80);
+    expect(pairingQrFromImage(img.encodeJpg(frame, quality: 95)), text);
+    expect(pairingQrFromImage(img.encodePng(img.copyRotate(frame, angle: 90))), text);
+  });
+
 }

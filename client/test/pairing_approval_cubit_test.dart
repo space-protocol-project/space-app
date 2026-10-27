@@ -142,4 +142,23 @@ void main() {
     await cubit.approve('ABCD-EFGH', () async => true);
     expect(manager.signatures, 0);
   });
+  test('Поздний QR после отмены не восстанавливает код', () async {
+    final picked = Completer<String?>();
+    final scanning = cubit.scan(() => picked.future);
+    expect(cubit.state.busy, isTrue);
+    cubit.reset();
+    picked.complete(PairingQr.request(testServer(), request).encode());
+    await scanning;
+    expect(cubit.state.code, isEmpty);
+    expect(inspections, 0);
+  });
+
+  test('QR другого пространства отвергается без сетевого запроса', () {
+    final other = Discovery(Uri.parse('https://other.org'), 'other', List.filled(32, 9));
+    cubit.readQr(PairingQr.request(other, request).encode());
+    expect(cubit.state.code, isEmpty);
+    expect(cubit.state.error, isFormatException);
+    expect(inspections, 0);
+  });
+
 }
