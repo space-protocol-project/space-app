@@ -17,13 +17,18 @@ class CrashRelay extends RpcDirectoryRelay {
   @override
   Future<void> write(WriteDirectoryFrameRequest request) async {
     await super.write(request);
-    if (hooks.role == 'source' && request.sequence == 4 && hooks.stage == 'source-first-frame') {
+    if (hooks.role == 'source' &&
+        request.sequence == 4 &&
+        hooks.stage == 'source-first-frame') {
       await hooks.wait('target-frame-seen');
       await hooks.hit('source-first-frame');
     }
   }
+
   @override
-  Future<ReadDirectoryFrameResponse> read(ReadDirectoryFrameRequest request) async {
+  Future<ReadDirectoryFrameResponse> read(
+    ReadDirectoryFrameRequest request,
+  ) async {
     final result = await super.read(request);
     if (hooks.role == 'target' && request.sequence == 4 && result.available) {
       await hooks.signal('target-frame-seen', {'pid': pid});
@@ -32,10 +37,18 @@ class CrashRelay extends RpcDirectoryRelay {
   }
 }
 
-Future<void> crashSource(CrashContext context, DirectoryTransfer transfer) async {
+Future<void> crashSource(
+  CrashContext context,
+  DirectoryTransfer transfer,
+) async {
   final hooks = context.hooks;
-  await context.service.apply(await context.service.preview(crashDocument()), replaceSettings: true);
-  final document = await context.service.capture(selectedOrigins: incomingOrigins);
+  await context.service.apply(
+    await context.service.preview(crashDocument()),
+    replaceSettings: true,
+  );
+  final document = await context.service.capture(
+    selectedOrigins: incomingOrigins,
+  );
   await hooks.signal('expected', document.data);
   await hooks.wait('qr');
   final qr = DirectoryTransferQr.parse(await hooks.read('qr') as String);
@@ -47,7 +60,10 @@ Future<void> crashSource(CrashContext context, DirectoryTransfer transfer) async
   await transfer.send(comparison, document);
 }
 
-Future<void> crashTarget(CrashContext context, DirectoryTransfer transfer) async {
+Future<void> crashTarget(
+  CrashContext context,
+  DirectoryTransfer transfer,
+) async {
   final hooks = context.hooks;
   final qr = await transfer.receiveStart();
   await hooks.signal('qr', qr.encode());
@@ -56,7 +72,10 @@ Future<void> crashTarget(CrashContext context, DirectoryTransfer transfer) async
   await transfer.receiveHandshake();
   await hooks.signal('sas-target', transfer.sas);
   await hooks.wait('sas-source');
-  requireCrash(await hooks.read('sas-source') == transfer.sas, 'Получатель не сверил SAS');
+  requireCrash(
+    await hooks.read('sas-source') == transfer.sas,
+    'Получатель не сверил SAS',
+  );
   final plan = await transfer.receive(context.service);
   await verifyCrashUnapplied(context);
   await hooks.signal('preview-ready');
@@ -71,7 +90,11 @@ Future<void> crashTarget(CrashContext context, DirectoryTransfer transfer) async
 Future<void> runCrashTransfer(CrashContext context) async {
   final hooks = context.hooks;
   final server = await discover(Platform.environment['DIRECTORY_CRASH_RELAY']!);
-  final transfer = DirectoryTransfer(server, CrashRelay(server, hooks), CrashNoise(hooks));
+  final transfer = DirectoryTransfer(
+    server,
+    CrashRelay(server, hooks),
+    CrashNoise(hooks),
+  );
   try {
     if (hooks.role == 'source') {
       await crashSource(context, transfer);
@@ -79,10 +102,16 @@ Future<void> runCrashTransfer(CrashContext context) async {
       await crashTarget(context, transfer);
     }
   } catch (_) {
-    if (hooks.role != 'target' || Platform.environment['DIRECTORY_CRASH_TIMEOUT'] != '1') rethrow;
+    if (hooks.role != 'target' ||
+        Platform.environment['DIRECTORY_CRASH_TIMEOUT'] != '1') {
+      rethrow;
+    }
     final expires = await hooks.read('expires') as int;
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    requireCrash(now >= expires && now <= expires + 15, 'Не соблюдён реальный срок передачи');
+    requireCrash(
+      now >= expires && now <= expires + 15,
+      'Не соблюдён реальный срок передачи',
+    );
     await transfer.close();
     await context.oldHandleRejected();
     await verifyCrashUnapplied(context);
@@ -94,18 +123,23 @@ Future<void> runCrashTransfer(CrashContext context) async {
 
 Future<void> runCrashRole(CrashContext context) async {
   switch (context.hooks.role) {
-    case 'init': await initializeCrashTarget(context);
-    case 'source' || 'target': await runCrashTransfer(context);
+    case 'init':
+      await initializeCrashTarget(context);
+    case 'source' || 'target':
+      await runCrashTransfer(context);
     case 'inspect':
       await context.oldHandleRejected();
       await verifyCrashUnapplied(context);
-    case 'inspect-source': await context.oldHandleRejected('source');
+    case 'inspect-source':
+      await context.oldHandleRejected('source');
     case 'resume':
       await context.oldHandleRejected();
       await context.service.resume();
       await verifyCrashApplied(context);
-    case 'verify': await verifyCrashApplied(context);
-    default: throw StateError('Неизвестная роль стенда');
+    case 'verify':
+      await verifyCrashApplied(context);
+    default:
+      throw StateError('Неизвестная роль стенда');
   }
 }
 
