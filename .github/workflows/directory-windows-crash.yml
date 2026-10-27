@@ -2,16 +2,22 @@ name: Аварийное восстановление каталога Windows D
 on:
   workflow_dispatch:
     inputs:
+      quality:
+        description: Анализ, сложность и целевые тесты Dart
+        type: boolean
+        default: true
       windows:
-        description: Выполнять нативный сценарий Windows; анализ и тесты запускаются всегда
+        description: Выполнять нативный сценарий Windows
         type: boolean
         default: true
 permissions:
   contents: read
 jobs:
   complexity:
+    if: inputs.quality
     uses: ./.github/workflows/complexity.yml
   quality:
+    if: inputs.quality
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -62,6 +68,11 @@ jobs:
         with: {go-version-file: server/go.mod, cache-dependency-path: server/go.sum}
       - uses: subosito/flutter-action@v2
         with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - uses: actions/cache/restore@v4
+        id: probe-cache
+        with:
+          path: app/client/build/windows/x64/runner/Debug
+          key: windows-dpapi-crash-v1-${{ hashFiles('app/client/lib/**', 'app/client/test/probes/**', 'app/client/test/fixtures/directory.dart', 'app/client/pubspec.*', 'app/client/windows/**', 'app/packages/**', 'app/native/**') }}
       - name: Сборка сервера и настоящего Flutter-стенда
         run: |
           rustup toolchain install 1.99.1 --profile minimal
@@ -73,9 +84,16 @@ jobs:
           Push-Location app/client
           flutter pub get
           if ($LASTEXITCODE) { throw 'Зависимости не получены' }
-          flutter build windows --debug --target test/probes/directory_crash_probe.dart --dart-define=SPACE_VAULT_CRASH_TEST=true
-          if ($LASTEXITCODE) { throw 'Flutter-стенд не собран' }
+          if ('${{ steps.probe-cache.outputs.cache-hit }}' -ne 'true') {
+            flutter build windows --debug --target test/probes/directory_crash_probe.dart --dart-define=SPACE_VAULT_CRASH_TEST=true
+            if ($LASTEXITCODE) { throw 'Flutter-стенд не собран' }
+          }
           Pop-Location
+      - uses: actions/cache/save@v4
+        if: steps.probe-cache.outputs.cache-hit != 'true'
+        with:
+          path: app/client/build/windows/x64/runner/Debug
+          key: ${{ steps.probe-cache.outputs.cache-primary-key }}
       - name: Завершение процессов, DPAPI и холодное восстановление
         run: ./app/tools/check_directory_windows.ps1 -Server "$env:RUNNER_TEMP/space-directory-server.exe" -OutputDirectory "$env:RUNNER_TEMP/directory-windows-crash"
       - uses: actions/upload-artifact@v4
@@ -84,6 +102,7 @@ jobs:
           name: directory-windows-crash
           path: |
             ${{ runner.temp }}/directory-windows-crash/report.json
+            ${{ runner.temp }}/directory-windows-crash/cases/report.json
             ${{ runner.temp }}/directory-windows-crash/**/*.log
             ${{ runner.temp }}/directory-windows-crash/**/killed-*.json
             ${{ runner.temp }}/directory-windows-crash/**/checkpoint-*.json

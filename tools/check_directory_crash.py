@@ -7,6 +7,7 @@ from pathlib import Path
 import signal
 import shutil
 import subprocess
+import sys
 import time
 
 from check_community_interop import free_ports, ready, stop
@@ -213,6 +214,8 @@ def apply_cases(args, origin, reports):
 
 
 def main():
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--app', type=Path, required=True)
     parser.add_argument('--server', type=Path, required=True)
