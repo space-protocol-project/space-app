@@ -117,7 +117,9 @@ class DirectoryDocument {
       }),
     );
     directoryRequire(result.encode().length <= directoryMaxPlain);
-    if (version == 2) directoryRequire(utf8.decode(result.encode()) == jsonEncode(data));
+    if (version == 2) {
+      directoryRequire(utf8.decode(result.encode()) == jsonEncode(data));
+    }
     return result;
   }
 }

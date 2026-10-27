@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RemoteBackupState {
 
- bool get busy; bool get replaceSettings; Map<String, SettingsChoice> get settingsChoices; String get message; RemoteBackupKit? get kit; RemoteRestore? get restore; Object? get error;
+ bool get busy; bool get mergeSettings; Map<String, SettingsChoice> get settingsChoices; String get message; RemoteBackupKit? get kit; RemoteRestore? get restore; Object? get error;
 /// Create a copy of RemoteBackupState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,20 +27,20 @@ $RemoteBackupStateCopyWith<RemoteBackupState> get copyWith => _$RemoteBackupStat
 @override
 bool operator ==(Object other) {
   final _this = this as RemoteBackupState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RemoteBackupState&&(identical(other.busy, _this.busy) || other.busy == _this.busy)&&(identical(other.replaceSettings, _this.replaceSettings) || other.replaceSettings == _this.replaceSettings)&&const DeepCollectionEquality().equals(other.settingsChoices, _this.settingsChoices)&&(identical(other.message, _this.message) || other.message == _this.message)&&(identical(other.kit, _this.kit) || other.kit == _this.kit)&&(identical(other.restore, _this.restore) || other.restore == _this.restore)&&const DeepCollectionEquality().equals(other.error, _this.error));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RemoteBackupState&&(identical(other.busy, _this.busy) || other.busy == _this.busy)&&(identical(other.mergeSettings, _this.mergeSettings) || other.mergeSettings == _this.mergeSettings)&&const DeepCollectionEquality().equals(other.settingsChoices, _this.settingsChoices)&&(identical(other.message, _this.message) || other.message == _this.message)&&(identical(other.kit, _this.kit) || other.kit == _this.kit)&&(identical(other.restore, _this.restore) || other.restore == _this.restore)&&const DeepCollectionEquality().equals(other.error, _this.error));
 }
 
 
 @override
 int get hashCode {
   final _this = this as RemoteBackupState;
-  return Object.hash(runtimeType,_this.busy,_this.replaceSettings,const DeepCollectionEquality().hash(_this.settingsChoices),_this.message,_this.kit,_this.restore,const DeepCollectionEquality().hash(_this.error));
+  return Object.hash(runtimeType,_this.busy,_this.mergeSettings,const DeepCollectionEquality().hash(_this.settingsChoices),_this.message,_this.kit,_this.restore,const DeepCollectionEquality().hash(_this.error));
 }
 
 @override
 String toString() {
   final _this = this as RemoteBackupState;
-  return 'RemoteBackupState(busy: ${_this.busy}, replaceSettings: ${_this.replaceSettings}, settingsChoices: ${_this.settingsChoices}, message: ${_this.message}, kit: ${_this.kit}, restore: ${_this.restore}, error: ${_this.error})';
+  return 'RemoteBackupState(busy: ${_this.busy}, mergeSettings: ${_this.mergeSettings}, settingsChoices: ${_this.settingsChoices}, message: ${_this.message}, kit: ${_this.kit}, restore: ${_this.restore}, error: ${_this.error})';
 }
 
 
@@ -51,7 +51,7 @@ abstract mixin class $RemoteBackupStateCopyWith<$Res>  {
   factory $RemoteBackupStateCopyWith(RemoteBackupState value, $Res Function(RemoteBackupState) _then) = _$RemoteBackupStateCopyWithImpl;
 @useResult
 $Res call({
- bool busy, bool replaceSettings, Map<String, SettingsChoice> settingsChoices, String message, RemoteBackupKit? kit, RemoteRestore? restore, Object? error
+ bool busy, bool mergeSettings, Map<String, SettingsChoice> settingsChoices, String message, RemoteBackupKit? kit, RemoteRestore? restore, Object? error
 });
 
 
@@ -68,10 +68,10 @@ class _$RemoteBackupStateCopyWithImpl<$Res>
 
 /// Create a copy of RemoteBackupState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? busy = null,Object? replaceSettings = null,Object? settingsChoices = null,Object? message = null,Object? kit = freezed,Object? restore = freezed,Object? error = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? busy = null,Object? mergeSettings = null,Object? settingsChoices = null,Object? message = null,Object? kit = freezed,Object? restore = freezed,Object? error = freezed,}) {
   return _then(RemoteBackupState(
 busy: null == busy ? _self.busy : busy // ignore: cast_nullable_to_non_nullable
-as bool,replaceSettings: null == replaceSettings ? _self.replaceSettings : replaceSettings // ignore: cast_nullable_to_non_nullable
+as bool,mergeSettings: null == mergeSettings ? _self.mergeSettings : mergeSettings // ignore: cast_nullable_to_non_nullable
 as bool,settingsChoices: null == settingsChoices ? _self.settingsChoices : settingsChoices // ignore: cast_nullable_to_non_nullable
 as Map<String, SettingsChoice>,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,kit: freezed == kit ? _self.kit : kit // ignore: cast_nullable_to_non_nullable
@@ -161,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool busy,  bool replaceSettings,  Map<String, SettingsChoice> settingsChoices,  String message,  RemoteBackupKit? kit,  RemoteRestore? restore,  Object? error)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool busy,  bool mergeSettings,  Map<String, SettingsChoice> settingsChoices,  String message,  RemoteBackupKit? kit,  RemoteRestore? restore,  Object? error)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RemoteBackupState() when $default != null:
-return $default(_that.busy,_that.replaceSettings,_that.settingsChoices,_that.message,_that.kit,_that.restore,_that.error);case _:
+return $default(_that.busy,_that.mergeSettings,_that.settingsChoices,_that.message,_that.kit,_that.restore,_that.error);case _:
   return orElse();
 
 }
@@ -182,10 +182,10 @@ return $default(_that.busy,_that.replaceSettings,_that.settingsChoices,_that.mes
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool busy,  bool replaceSettings,  Map<String, SettingsChoice> settingsChoices,  String message,  RemoteBackupKit? kit,  RemoteRestore? restore,  Object? error)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool busy,  bool mergeSettings,  Map<String, SettingsChoice> settingsChoices,  String message,  RemoteBackupKit? kit,  RemoteRestore? restore,  Object? error)  $default,) {final _that = this;
 switch (_that) {
 case _RemoteBackupState():
-return $default(_that.busy,_that.replaceSettings,_that.settingsChoices,_that.message,_that.kit,_that.restore,_that.error);case _:
+return $default(_that.busy,_that.mergeSettings,_that.settingsChoices,_that.message,_that.kit,_that.restore,_that.error);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +202,10 @@ return $default(_that.busy,_that.replaceSettings,_that.settingsChoices,_that.mes
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool busy,  bool replaceSettings,  Map<String, SettingsChoice> settingsChoices,  String message,  RemoteBackupKit? kit,  RemoteRestore? restore,  Object? error)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool busy,  bool mergeSettings,  Map<String, SettingsChoice> settingsChoices,  String message,  RemoteBackupKit? kit,  RemoteRestore? restore,  Object? error)?  $default,) {final _that = this;
 switch (_that) {
 case _RemoteBackupState() when $default != null:
-return $default(_that.busy,_that.replaceSettings,_that.settingsChoices,_that.message,_that.kit,_that.restore,_that.error);case _:
+return $default(_that.busy,_that.mergeSettings,_that.settingsChoices,_that.message,_that.kit,_that.restore,_that.error);case _:
   return null;
 
 }
@@ -217,11 +217,11 @@ return $default(_that.busy,_that.replaceSettings,_that.settingsChoices,_that.mes
 
 
 class _RemoteBackupState implements RemoteBackupState {
-  const _RemoteBackupState({this.busy = false, this.replaceSettings = false,  Map<String, SettingsChoice> settingsChoices = const {}, this.message = '', this.kit, this.restore, this.error}): _settingsChoices = settingsChoices;
+  const _RemoteBackupState({this.busy = false, this.mergeSettings = false,  Map<String, SettingsChoice> settingsChoices = const {}, this.message = '', this.kit, this.restore, this.error}): _settingsChoices = settingsChoices;
   
 
 @override@JsonKey() final  bool busy;
-@override@JsonKey() final  bool replaceSettings;
+@override@JsonKey() final  bool mergeSettings;
  final  Map<String, SettingsChoice> _settingsChoices;
 @override@JsonKey() Map<String, SettingsChoice> get settingsChoices {
   if (_settingsChoices is EqualUnmodifiableMapView) return _settingsChoices;
@@ -244,18 +244,18 @@ _$RemoteBackupStateCopyWith<_RemoteBackupState> get copyWith => __$RemoteBackupS
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RemoteBackupState&&(identical(other.busy, busy) || other.busy == busy)&&(identical(other.replaceSettings, replaceSettings) || other.replaceSettings == replaceSettings)&&const DeepCollectionEquality().equals(other.settingsChoices, _settingsChoices)&&(identical(other.message, message) || other.message == message)&&(identical(other.kit, kit) || other.kit == kit)&&(identical(other.restore, restore) || other.restore == restore)&&const DeepCollectionEquality().equals(other.error, error));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RemoteBackupState&&(identical(other.busy, busy) || other.busy == busy)&&(identical(other.mergeSettings, mergeSettings) || other.mergeSettings == mergeSettings)&&const DeepCollectionEquality().equals(other.settingsChoices, _settingsChoices)&&(identical(other.message, message) || other.message == message)&&(identical(other.kit, kit) || other.kit == kit)&&(identical(other.restore, restore) || other.restore == restore)&&const DeepCollectionEquality().equals(other.error, error));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,busy,replaceSettings,const DeepCollectionEquality().hash(_settingsChoices),message,kit,restore,const DeepCollectionEquality().hash(error));
+    return Object.hash(runtimeType,busy,mergeSettings,const DeepCollectionEquality().hash(_settingsChoices),message,kit,restore,const DeepCollectionEquality().hash(error));
 }
 
 @override
 String toString() {
-    return 'RemoteBackupState(busy: $busy, replaceSettings: $replaceSettings, settingsChoices: $settingsChoices, message: $message, kit: $kit, restore: $restore, error: $error)';
+    return 'RemoteBackupState(busy: $busy, mergeSettings: $mergeSettings, settingsChoices: $settingsChoices, message: $message, kit: $kit, restore: $restore, error: $error)';
 }
 
 
@@ -266,7 +266,7 @@ abstract mixin class _$RemoteBackupStateCopyWith<$Res> implements $RemoteBackupS
   factory _$RemoteBackupStateCopyWith(_RemoteBackupState value, $Res Function(_RemoteBackupState) _then) = __$RemoteBackupStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool busy, bool replaceSettings, Map<String, SettingsChoice> settingsChoices, String message, RemoteBackupKit? kit, RemoteRestore? restore, Object? error
+ bool busy, bool mergeSettings, Map<String, SettingsChoice> settingsChoices, String message, RemoteBackupKit? kit, RemoteRestore? restore, Object? error
 });
 
 
@@ -283,10 +283,10 @@ class __$RemoteBackupStateCopyWithImpl<$Res>
 
 /// Create a copy of RemoteBackupState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? busy = null,Object? replaceSettings = null,Object? settingsChoices = null,Object? message = null,Object? kit = freezed,Object? restore = freezed,Object? error = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? busy = null,Object? mergeSettings = null,Object? settingsChoices = null,Object? message = null,Object? kit = freezed,Object? restore = freezed,Object? error = freezed,}) {
   return _then(_RemoteBackupState(
 busy: null == busy ? _self.busy : busy // ignore: cast_nullable_to_non_nullable
-as bool,replaceSettings: null == replaceSettings ? _self.replaceSettings : replaceSettings // ignore: cast_nullable_to_non_nullable
+as bool,mergeSettings: null == mergeSettings ? _self.mergeSettings : mergeSettings // ignore: cast_nullable_to_non_nullable
 as bool,settingsChoices: null == settingsChoices ? _self._settingsChoices : settingsChoices // ignore: cast_nullable_to_non_nullable
 as Map<String, SettingsChoice>,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,kit: freezed == kit ? _self.kit : kit // ignore: cast_nullable_to_non_nullable

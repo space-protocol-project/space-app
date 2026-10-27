@@ -155,7 +155,10 @@ void main() {
   test('Повторяющиеся JSON-ключи не меняют смысл или digest каталога', () {
     final raw = utf8.decode(directoryDocument().encode());
     final repeated = raw.replaceFirst('"v":2', '"v":2,"v":2');
-    expect(() => decodeDirectoryDocument(utf8.encode(repeated)), throwsFormatException);
+    expect(
+      () => decodeDirectoryDocument(utf8.encode(repeated)),
+      throwsFormatException,
+    );
     final replica = SettingsReplica();
     final duplicate = replica.encode().replaceFirst('"v":1', '"v":1,"v":1');
     expect(() => SettingsReplica.parse(duplicate), throwsFormatException);

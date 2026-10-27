@@ -79,13 +79,17 @@ extension _VersionedPreferences on AppPreferences {
     final mode = data.getInt('space.notifications.mode') ?? 0;
     notificationMode = [0, 1, 2].contains(mode) ? mode : 0;
     effects = data.getBool('space.ui.effects') ?? true;
-    uiScale = AppPreferences.validUiScale(data.getDouble('space.ui.scale') ?? 1);
+    uiScale = AppPreferences.validUiScale(
+      data.getDouble('space.ui.scale') ?? 1,
+    );
     final savedSend = data.getString('space.ui.sendShortcut');
     if (['enter', 'shiftEnter'].contains(savedSend)) {
       sendShortcut = savedSend!;
     }
     final savedLanguage = data.getString('space.ui.language');
-    if (AppPreferences.languages.contains(savedLanguage)) language = savedLanguage!;
+    if (AppPreferences.languages.contains(savedLanguage)) {
+      language = savedLanguage!;
+    }
     final saved = data.getString('space.ui.palette');
     if (['gruvbox', 'ocean', 'iris'].contains(saved)) palette = saved!;
   }

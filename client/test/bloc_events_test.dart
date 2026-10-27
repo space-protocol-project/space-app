@@ -44,7 +44,12 @@ void main() {
       expect(old.origins, isEmpty);
       expect(() => prefs.state.origins.clear(), throwsUnsupportedError);
       final saved = await SharedPreferences.getInstance();
-      expect(SettingsReplica.parse(saved.getString(AppPreferences.settingsStorageKey)!).snapshot.values['language'], 'zh-Hans');
+      expect(
+        SettingsReplica.parse(
+          saved.getString(AppPreferences.settingsStorageKey)!,
+        ).snapshot.values['language'],
+        'zh-Hans',
+      );
       expect(saved.getStringList('space.ui.origins'), [
         'https://server.example',
       ]);

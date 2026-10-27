@@ -46,7 +46,12 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('App language'), findsOneWidget);
         final saved = await SharedPreferences.getInstance();
-        expect(SettingsReplica.parse(saved.getString(AppPreferences.settingsStorageKey)!).snapshot.values['language'], 'en');
+        expect(
+          SettingsReplica.parse(
+            saved.getString(AppPreferences.settingsStorageKey)!,
+          ).snapshot.values['language'],
+          'en',
+        );
         expect(tester.takeException(), isNull);
       }
     });

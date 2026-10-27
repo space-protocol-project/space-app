@@ -188,10 +188,7 @@ void main() {
         },
       ],
     });
-    await service.apply(
-      await service.preview(document),
-      mergeSettings: false,
-    );
+    await service.apply(await service.preview(document), mergeSettings: false);
     await service.recordExport(await service.capture());
     final before = await repository.read();
     final first = await service.capture(
