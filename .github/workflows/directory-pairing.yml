@@ -21,6 +21,10 @@ on:
         description: Полный набор Flutter вместо целевых проверок передачи
         type: boolean
         default: true
+      crash:
+        description: SIGKILL процессов, холодный профиль и настоящий пятиминутный срок
+        type: boolean
+        default: true
 permissions:
   contents: read
 jobs:
@@ -97,6 +101,7 @@ jobs:
           flutter pub get
           dart format lib/src/directory_transfer*.dart lib/src/directory_backup.dart lib/ui/directory_transfer.dart lib/ui/device_panel.dart lib/ui/camera_scanner.dart test/directory_transfer*_test.dart
           dart format test/probes/directory_transfer_probe.dart
+          dart format test/probes/directory_crash*.dart
           dart format lib/src/pairing_approval_cubit.dart lib/src/pairing_selection.dart test/pairing*_test.dart
           dart format ../packages/space_directory_noise
           dart fix --apply --code=curly_braces_in_flow_control_structures
@@ -105,7 +110,7 @@ jobs:
           if [ '${{ inputs.full_client }}' = 'true' ]; then
             flutter test
           else
-            flutter test test/directory_transfer_test.dart test/directory_transfer_cubit_test.dart test/directory_transfer_panel_test.dart test/pairing*_test.dart test/recovery_test.dart test/recovery_spaces_test.dart
+            flutter test test/directory*_test.dart test/pairing*_test.dart test/recovery_test.dart test/recovery_spaces_test.dart
           fi
           (cd ../packages/space_directory_noise && dart pub get && dart analyze)
           (cd ../packages/space_admin_ui && flutter pub get && flutter analyze)
@@ -135,10 +140,30 @@ jobs:
             app/client/test/directory_transfer*_test.dart
             app/client/test/pairing*_test.dart
             app/client/test/probes/directory_transfer_probe.dart
+            app/client/test/probes/directory_crash*.dart
             app/packages/space_directory_noise/**/*.dart
             server/internal/postgres/directory_pairing*.go
             ${{ runner.temp }}/directory-interop
             ${{ runner.temp }}/directory-native
+      - name: Нативный стенд аварийного восстановления
+        if: inputs.crash
+        working-directory: app/client
+        run: flutter build linux --debug --target test/probes/directory_crash_probe.dart
+      - name: SIGKILL, повторный запуск и восстановление каталога
+        if: inputs.crash
+        working-directory: app
+        env:
+          SPACE_DATABASE_URL: postgres://space:ci-only-password@127.0.0.1:5432/space_test?sslmode=disable
+        run: xvfb-run -a python3 tools/check_directory_crash.py --app client/build/linux/x64/debug/bundle/space_client --server "$RUNNER_TEMP/space-directory-server" --output "$RUNNER_TEMP/directory-crash"
+      - uses: actions/upload-artifact@v4
+        if: always() && inputs.crash
+        with:
+          name: directory-crash-recovery
+          path: |
+            ${{ runner.temp }}/directory-crash/report.json
+            ${{ runner.temp }}/directory-crash/**/*.log
+            ${{ runner.temp }}/directory-crash/**/killed-*.json
+            ${{ runner.temp }}/directory-crash/**/checkpoint-*.json
   android:
     if: inputs.platforms
     runs-on: ubuntu-24.04
