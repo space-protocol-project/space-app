@@ -67,6 +67,7 @@ jobs:
           dart format lib/src/pairing*.dart lib/src/core.dart lib/src/directory_repository.dart lib/src/root_device_proof.dart lib/ui/pairing*.dart lib/ui/device_panel.dart lib/ui/recovery_panel.dart test/pairing*_test.dart tool/community_pairing_modes_interoperability.dart
           dart fix --apply --code=curly_braces_in_flow_control_structures
           flutter analyze
+          (cd ../packages/space_admin_ui && flutter pub get && flutter analyze)
           cd ../../server
           gofmt -w internal/postgres/pairing*.go internal/postgres/challenge.go internal/postgres/recovery.go internal/postgres/store.go internal/postgres/root_retention.go internal/postgres/rotation.go
       - name: Тесты клиента
@@ -97,3 +98,4 @@ jobs:
             app/client/lib/l10n/*.dart
             app/client/test/pairing*_test.dart
             app/client/tool/community_pairing_modes_interoperability.dart
+            app/packages/space_admin_ui/lib/src/recovery_tools_view.dart

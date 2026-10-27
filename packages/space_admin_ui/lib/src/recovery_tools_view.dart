@@ -75,7 +75,7 @@ class RecoveryToolsView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _rotationTools(context, strings),
+        if (canRotate) _rotationTools(context, strings),
         const SizedBox(height: 20),
         pairingTools,
         const SizedBox(height: 20),
