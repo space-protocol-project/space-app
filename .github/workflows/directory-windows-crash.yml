@@ -72,7 +72,7 @@ jobs:
         id: probe-cache
         with:
           path: app/client/build/windows/x64/runner/Debug
-          key: windows-dpapi-crash-v1-${{ hashFiles('app/client/lib/**', 'app/client/test/probes/**', 'app/client/test/fixtures/directory.dart', 'app/client/pubspec.*', 'app/client/windows/**', 'app/packages/**', 'app/native/**') }}
+          key: windows-dpapi-crash-flutter-3.47.8-v1-${{ hashFiles('app/client/**', 'app/packages/**', 'app/native/**', 'app/.github/workflows/directory-windows-crash.yml') }}
       - name: Сборка сервера и настоящего Flutter-стенда
         run: |
           rustup toolchain install 1.99.1 --profile minimal
