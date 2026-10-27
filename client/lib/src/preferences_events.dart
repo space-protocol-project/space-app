@@ -4,28 +4,30 @@ sealed class PreferencesEvent<T> extends RequestEvent<T> {}
 
 sealed class PreferencesCommand<T> extends PreferencesEvent<T> {}
 
-final class PreferencesLoaded extends PreferencesCommand<void> {}
+sealed class PreferencesVoidCommand extends PreferencesCommand<void> {}
+
+final class PreferencesLoaded extends PreferencesVoidCommand {}
 
 final class PreferencesSettingsExported
     extends PreferencesCommand<SettingsSnapshot> {}
 
-final class PreferencesSettingsCommitted extends PreferencesCommand<void> {
+final class PreferencesSettingsCommitted extends PreferencesVoidCommand {
   PreferencesSettingsCommitted(this.before, this.target, this.persist);
   final SettingsSnapshot before, target;
   final Future<void> Function() persist;
 }
 
-final class PreferencesSettingsResumed extends PreferencesCommand<void> {
+final class PreferencesSettingsResumed extends PreferencesVoidCommand {
   PreferencesSettingsResumed(this.before, this.target);
   final SettingsSnapshot before, target;
 }
 
-final class NotificationsChanged extends PreferencesCommand<void> {
+final class NotificationsChanged extends PreferencesVoidCommand {
   NotificationsChanged(this.mode);
   final int mode;
 }
 
-final class PreferencesChanged extends PreferencesCommand<void> {
+final class PreferencesChanged extends PreferencesVoidCommand {
   PreferencesChanged({
     this.dark,
     this.themeMode,
@@ -41,17 +43,17 @@ final class PreferencesChanged extends PreferencesCommand<void> {
   final String? palette, language, sendShortcut;
 }
 
-final class ServerRemembered extends PreferencesCommand<void> {
+final class ServerRemembered extends PreferencesVoidCommand {
   ServerRemembered(this.origin);
   final String origin;
 }
 
-final class ServerForgotten extends PreferencesCommand<void> {
+final class ServerForgotten extends PreferencesVoidCommand {
   ServerForgotten(this.origin);
   final String origin;
 }
 
-final class ServerIconCached extends PreferencesCommand<void> {
+final class ServerIconCached extends PreferencesVoidCommand {
   ServerIconCached(this.origin, Object? value)
     : value = validatedServerIcon(value);
   final String origin;
@@ -63,7 +65,7 @@ final class PreferencesStatePublished extends PreferencesEvent<void> {
   final PreferencesState state;
 }
 
-final class SystemBrightnessChanged extends PreferencesCommand<void> {
+final class SystemBrightnessChanged extends PreferencesVoidCommand {
   SystemBrightnessChanged(this.brightness);
   final Brightness brightness;
 }

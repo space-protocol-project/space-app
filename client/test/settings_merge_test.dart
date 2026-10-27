@@ -291,6 +291,16 @@ void main() {
     await backup.resume();
     expect(prefs.settingsSnapshot.same(stable), isTrue);
   });
+  test('Типизированный экспорт возвращает снимок и сохраняет порядок команд', () async {
+    final prefs = preferences();
+    final captured = prefs.exportSettings();
+    final changed = prefs.change(palette: 'ocean');
+    final snapshot = await captured;
+    await changed;
+    expect(snapshot.values['palette'], 'gruvbox');
+    expect(prefs.palette, 'ocean');
+    expect((await prefs.exportSettings()).same(prefs.settingsSnapshot), isTrue);
+  });
   test('Повреждённые ревизии не заменяются молча новыми', () async {
     SharedPreferences.setMockInitialValues({
       AppPreferences.settingsStorageKey: '{"v":999}',

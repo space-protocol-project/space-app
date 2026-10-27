@@ -29,11 +29,17 @@ class AppPreferences
       (event, emit) => event.runAndComplete(() => emit(event.state)),
     );
     on<PreferencesCommand<dynamic>>(
-      (event, _) => handleRequest(
-        event,
-        () => switch (event) {
+      (event, _) => switch (event) {
+        PreferencesSettingsExported() => handleRequest<SettingsSnapshot>(event, _exportSettings),
+        PreferencesVoidCommand() => _handleCommand(event),
+      },
+      transformer: sequential(),
+    );
+  }
+
+  Future<void> _handleCommand(PreferencesVoidCommand event) =>
+      handleRequest<void>(event, () => switch (event) {
           PreferencesLoaded() => _load(),
-          PreferencesSettingsExported() => _exportSettings(),
           PreferencesSettingsCommitted() => _commitSettings(event),
           PreferencesSettingsResumed() => _resumeSettings(event),
           SystemBrightnessChanged() => _systemChanged(event.brightness),
@@ -50,11 +56,7 @@ class AppPreferences
           ServerRemembered() => _remember(event.origin),
           ServerForgotten() => _forget(event.origin),
           ServerIconCached() => _cacheServerIcon(event.origin, event.value),
-        },
-      ),
-      transformer: sequential(),
-    );
-  }
+        });
 
   Future<void> load() => sendRequest(PreferencesLoaded());
   static const settingsStorageKey = versionedSettingsStorageKey;
