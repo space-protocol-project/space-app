@@ -10,6 +10,8 @@ import 'directory_transfer_noise.dart';
 import 'directory_transfer_qr.dart';
 import 'directory_transfer_rpc.dart';
 
+typedef _TransferLease = ({String id, String token, int created, int expires});
+
 /// Одна попытка передачи. Секреты и полномочия не попадают в состояние экрана.
 class DirectoryTransfer {
   DirectoryTransfer(this.server, this.relay, this.engine);
@@ -40,13 +42,8 @@ class DirectoryTransfer {
     }
   }
 
-  void _lease(
-    String id,
-    String token,
-    int created,
-    int expires,
-    String prefix,
-  ) {
+  void _lease(_TransferLease lease, {required String prefix}) {
+    final (:id, :token, :created, :expires) = lease;
     _id = id;
     _token = token;
     _expires = expires;
@@ -80,13 +77,12 @@ class DirectoryTransfer {
     final lease = await relay.create(
       CreateDirectoryTransferRequest(profile: directoryNoiseProfile),
     );
-    _lease(
-      lease.id,
-      lease.ownerToken,
-      lease.createdAt.toInt(),
-      lease.expiresAt.toInt(),
-      'dr',
-    );
+    _lease((
+      id: lease.id,
+      token: lease.ownerToken,
+      created: lease.createdAt.toInt(),
+      expires: lease.expiresAt.toInt(),
+    ), prefix: 'dr');
     directoryRequire(RegExp(r'^dc_[A-Za-z0-9_-]{43}$').hasMatch(lease.code));
     final qr = DirectoryTransferQr(
       server.origin.toString(),
@@ -121,13 +117,12 @@ class DirectoryTransfer {
     _begin();
     qr.checkServer(server);
     final lease = await relay.open(OpenDirectoryTransferRequest(code: qr.code));
-    _lease(
-      lease.id,
-      lease.peerToken,
-      lease.createdAt.toInt(),
-      lease.expiresAt.toInt(),
-      'ds',
-    );
+    _lease((
+      id: lease.id,
+      token: lease.peerToken,
+      created: lease.createdAt.toInt(),
+      expires: lease.expiresAt.toInt(),
+    ), prefix: 'ds');
     directoryRequire(lease.id == qr.id && _expires == qr.expires);
     await _channel(false, qr);
     await _noise!.readHandshake(await _control(0));

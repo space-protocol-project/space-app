@@ -13,6 +13,21 @@ import 'package:space_directory_noise/space_directory_noise.dart';
 
 import 'fixtures/directory.dart';
 
+Map<String, dynamic> transferQrFields() => {
+  'v': 1,
+  'origin': 'https://space.example',
+  'server': 'srv_example',
+  'key': url64(List.filled(32, 2)),
+  'tls': '',
+  'id': 'dt_${'a' * 43}',
+  'code': 'dc_${'b' * 43}',
+  'public': url64(List.filled(32, 3)),
+  'expires': DateTime.now().millisecondsSinceEpoch ~/ 1000 + 300,
+};
+
+String transferQrText(Map<String, dynamic> fields) => directoryTransferPrefix +
+    base64Url.encode(utf8.encode(jsonEncode(fields)));
+
 Future<(DirectoryNoiseChannel, DirectoryNoiseChannel)> channels() async {
   const engine = NativeDirectoryNoise();
   final receiver = await DirectoryNoiseChannel.open(
@@ -37,6 +52,32 @@ Future<(DirectoryNoiseChannel, DirectoryNoiseChannel)> channels() async {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  for (final key in transferQrFields().keys) {
+    test('QR каталога: отсутствующее поле $key отклоняется', () {
+      final fields = transferQrFields()..remove(key);
+      expect(() => DirectoryTransferQr.parse(transferQrText(fields)), throwsFormatException);
+    });
+    test('QR каталога: null в поле $key отклоняется', () {
+      final fields = transferQrFields()..[key] = null;
+      expect(() => DirectoryTransferQr.parse(transferQrText(fields)), throwsFormatException);
+    });
+  }
+  test('QR каталога: map pattern не разрешает дополнительные поля', () {
+    final fields = transferQrFields()..['extra'] = 'ignored';
+    expect(() => DirectoryTransferQr.parse(transferQrText(fields)), throwsFormatException);
+  });
+  for (final (key, value) in <(String, Object)>[
+    ('v', 1.0), ('v', 2), ('v', true), ('expires', '300'),
+    ('expires', DateTime.now().millisecondsSinceEpoch ~/ 1000 + 3600),
+    ('origin', 'https://space.example/path'), ('server', ''),
+    ('tls', 'invalid'), ('key', 'invalid'), ('public', 'invalid'),
+    ('id', 'dc_${'a' * 43}'), ('code', 'dr_${'a' * 43}'),
+  ]) {
+    test('QR каталога: недопустимое значение $key=$value отклоняется', () {
+      final fields = transferQrFields()..[key] = value;
+      expect(() => DirectoryTransferQr.parse(transferQrText(fields)), throwsFormatException);
+    });
+  }
   test(
     'Настоящий Noise через FFI: без двух подтверждений каталог недоступен',
     () async {

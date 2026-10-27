@@ -74,8 +74,8 @@ class PairingSelectionCubit extends Cubit<PairingSelectionState> {
     Map<String, ChatController?> selected,
     int generation,
   ) async {
-    for (final entry in selected.entries) {
-      await _requireNewIdentity(entry.key, entry.value);
+    for (final MapEntry(:key, :value) in selected.entries) {
+      await _requireNewIdentity(key, value);
       if (!_current(generation)) return false;
     }
     return true;
@@ -86,9 +86,9 @@ class PairingSelectionCubit extends Cubit<PairingSelectionState> {
     Map catalog,
     int generation,
   ) async {
-    for (final entry in selected.entries) {
+    for (final MapEntry(:key, :value) in selected.entries) {
       if (!_current(generation)) return false;
-      await _inspect(entry.key, entry.value!, catalog[entry.key] as Map?);
+      await _inspect(key, value!, catalog[key] as Map?);
       if (!_current(generation)) return false;
     }
     return true;

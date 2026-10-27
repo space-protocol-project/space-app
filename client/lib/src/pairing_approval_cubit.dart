@@ -142,7 +142,7 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
       if (!_current(generation)) return;
       _qr?.checkPair(pair);
       _requirePending(pair);
-      final (allowed, authority) = await _selectAuthority(
+      final (:allowed, :authority) = await _selectAuthority(
         pair,
         control,
         generation,
@@ -179,20 +179,22 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
     }
   }
 
-  Future<(bool, DeviceRecord?)> _selectAuthority(
+  Future<({bool allowed, DeviceRecord? authority})> _selectAuthority(
     Pairing pair,
     DeviceManagement control,
     int generation,
     Future<bool> Function(Pairing) confirm,
     Future<DeviceRecord?> Function() readAuthority,
   ) async {
-    if (!await confirm(pair) || !_current(generation)) return (false, null);
+    if (!await confirm(pair) || !_current(generation)) {
+      return (allowed: false, authority: null);
+    }
     if (control.hasRootAuthority ||
         (control.hasDeviceAuthority && !pair.fullManagement)) {
-      return (true, null);
+      return (allowed: true, authority: null);
     }
     final authority = await readAuthority();
-    return (_current(generation) && authority != null, authority);
+    return (allowed: _current(generation) && authority != null, authority: authority);
   }
 
   void expire() {

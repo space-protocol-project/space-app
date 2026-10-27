@@ -97,6 +97,7 @@ jobs:
           flutter pub get
           dart format lib/src/directory_transfer*.dart lib/src/directory_backup.dart lib/ui/directory_transfer.dart lib/ui/device_panel.dart lib/ui/camera_scanner.dart test/directory_transfer*_test.dart
           dart format test/probes/directory_transfer_probe.dart
+          dart format lib/src/pairing_approval_cubit.dart lib/src/pairing_selection.dart test/pairing*_test.dart
           dart format ../packages/space_directory_noise
           dart fix --apply --code=curly_braces_in_flow_control_structures
           flutter analyze
@@ -104,7 +105,7 @@ jobs:
           if [ '${{ inputs.full_client }}' = 'true' ]; then
             flutter test
           else
-            flutter test test/directory_transfer_test.dart test/directory_transfer_cubit_test.dart test/directory_transfer_panel_test.dart
+            flutter test test/directory_transfer_test.dart test/directory_transfer_cubit_test.dart test/directory_transfer_panel_test.dart test/pairing*_test.dart test/recovery_test.dart test/recovery_spaces_test.dart
           fi
           (cd ../packages/space_directory_noise && dart pub get && dart analyze)
           (cd ../packages/space_admin_ui && flutter pub get && flutter analyze)
@@ -126,10 +127,13 @@ jobs:
           path: |
             app/client/lib/src/directory_transfer*.dart
             app/client/lib/src/directory_backup.dart
+            app/client/lib/src/pairing_approval_cubit.dart
+            app/client/lib/src/pairing_selection.dart
             app/client/lib/ui/directory_transfer.dart
             app/client/lib/ui/device_panel.dart
             app/client/lib/ui/camera_scanner.dart
             app/client/test/directory_transfer*_test.dart
+            app/client/test/pairing*_test.dart
             app/client/test/probes/directory_transfer_probe.dart
             app/packages/space_directory_noise/**/*.dart
             server/internal/postgres/directory_pairing*.go

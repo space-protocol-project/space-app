@@ -69,9 +69,7 @@ class _DevicePanelState extends State<DevicePanel> {
         bloc: widget.workspaces,
         builder: (context, _) {
           final entries = widget.workspaces.controllers;
-          final selection = _selection(entries);
-          final origin = selection.origin;
-          final controller = selection.controller;
+          final (:origin, :controller) = _selection(entries);
           return PageBody(
             title: context.strings.myDevice,
             description: context.strings.myDeviceDescription,

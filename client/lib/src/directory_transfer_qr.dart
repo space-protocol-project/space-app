@@ -56,29 +56,43 @@ class DirectoryTransferQr {
       'code,expires,id,key,origin,public,server,tls,v',
     );
     directoryInt(data['v'], min: 1, max: 1);
-    final origin = directoryAddress(data['origin']);
+    final result = switch (data) {
+      {
+        'origin': String origin,
+        'server': String server,
+        'key': String key,
+        'tls': String tls,
+        'id': String id,
+        'code': String code,
+        'public': String public,
+        'expires': int expires,
+      } => DirectoryTransferQr(
+        directoryAddress(origin),
+        directoryText(server, max: 128),
+        directoryBytes(key, 32),
+        directoryText(tls, max: 64),
+        directoryText(id, max: 46),
+        directoryText(code, max: 46),
+        directoryBytes(public, 32),
+        directoryInt(expires, min: 1),
+      ),
+      _ => throw const FormatException('Повреждён запрос передачи каталога'),
+    };
+    result._validate();
+    return result;
+  }
+
+  void _validate() {
     directoryRequire(
       origin.length <= 512 &&
           Uri.parse(origin).path.isEmpty &&
           parseConnectionInput(origin).origin.toString() == origin,
     );
-    final tls = directoryText(data['tls'], max: 64);
     directoryRequire(tls.isEmpty || RegExp(r'^[0-9a-fA-F]{64}$').hasMatch(tls));
-    final result = DirectoryTransferQr(
-      origin,
-      directoryText(data['server'], max: 128),
-      directoryBytes(data['key'], 32),
-      tls,
-      directoryText(data['id'], max: 46),
-      directoryText(data['code'], max: 46),
-      directoryBytes(data['public'], 32),
-      directoryInt(data['expires'], min: 1),
-    );
-    directoryRequire(RegExp(r'^dt_[A-Za-z0-9_-]{43}$').hasMatch(result.id));
-    directoryRequire(RegExp(r'^dc_[A-Za-z0-9_-]{43}$').hasMatch(result.code));
-    directoryRequire(result.server.isNotEmpty);
-    result.ensureActive();
-    return result;
+    directoryRequire(RegExp(r'^dt_[A-Za-z0-9_-]{43}$').hasMatch(id));
+    directoryRequire(RegExp(r'^dc_[A-Za-z0-9_-]{43}$').hasMatch(code));
+    directoryRequire(server.isNotEmpty);
+    ensureActive();
   }
 
   void ensureActive() {
