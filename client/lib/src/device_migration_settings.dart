@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'settings_snapshot.dart';
 
 // Переносим пользовательское состояние, но не пути установщиков и команду
 // автоматического запуска сервера после обновления на прежней ОС.
@@ -15,6 +16,11 @@ void validateDeviceSettings(Map<String, dynamic> settings) {
     if (!portablePreference(entry.key) || !_validValue(entry.value)) {
       throw const FormatException('Некорректные настройки устройства');
     }
+  }
+  if (settings.containsKey(versionedSettingsStorageKey)) {
+    final raw = settings[versionedSettingsStorageKey];
+    if (raw is! String) throw const FormatException('Повреждены настройки устройства');
+    SettingsReplica.parse(raw);
   }
 }
 
@@ -33,6 +39,13 @@ Future<void> writeDeviceSettings(
   for (final entry in settings.entries) {
     final saved = await _write(preferences, entry.key, entry.value);
     if (!saved) throw StateError('Не удалось сохранить настройки устройства');
+  }
+  // В старом архиве нет новой записи: она не должна перекрыть его параметры.
+  if (!settings.containsKey(versionedSettingsStorageKey) &&
+      preferences.containsKey(versionedSettingsStorageKey)) {
+    if (!await preferences.remove(versionedSettingsStorageKey)) {
+      throw StateError('Не удалось подготовить восстановление настроек');
+    }
   }
 }
 

@@ -3,6 +3,8 @@ import 'dart:math';
 
 import 'directory_validation.dart';
 
+const versionedSettingsStorageKey = 'space.ui.settings.v2';
+
 const settingsDefaults = <String, dynamic>{
   'themeMode': 'dark',
   'effects': true,

@@ -57,7 +57,7 @@ class AppPreferences
   }
 
   Future<void> load() => sendRequest(PreferencesLoaded());
-  static const settingsStorageKey = 'space.ui.settings.v2';
+  static const settingsStorageKey = versionedSettingsStorageKey;
   SettingsReplica _settingsReplica = SettingsReplica();
   bool _settingsInvalid = false;
   Map<String, dynamic> get settingsValues => {

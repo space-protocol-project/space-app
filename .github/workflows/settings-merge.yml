@@ -42,12 +42,14 @@ jobs:
           flutter gen-l10n
           dart format lib/src/settings_snapshot.dart lib/src/preferences*.dart lib/src/directory*.dart lib/src/remote_backup*.dart lib/ui/directory*.dart lib/ui/remote_backup.dart test/settings*_test.dart test/directory*_test.dart test/remote_backup*_test.dart test/fixtures/directory.dart test/probes/directory*.dart test/bloc_events_test.dart test/localization_test.dart
           dart fix --apply --code=curly_braces_in_flow_control_structures
+          dart format lib/src/device_migration_settings.dart
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: settings-merge-source
           path: |
             app/client/lib/src/settings_snapshot.dart
+            app/client/lib/src/device_migration_settings.dart
             app/client/lib/src/preferences*.dart
             app/client/lib/src/directory*.dart
             app/client/lib/src/remote_backup*.dart
@@ -61,12 +63,15 @@ jobs:
             app/client/test/remote_backup*_test.dart
             app/client/test/fixtures/directory.dart
             app/client/test/probes/directory*.dart
-      - name: Анализ и все тесты приложения
+      - name: Анализ и проверки слияния
         working-directory: app/client
         run: |
           flutter analyze
           dart run tool/core_import_check.dart
           flutter test test/settings*_test.dart
+      - name: Все тесты приложения и анализ пакетов
+        working-directory: app/client
+        run: |
           flutter test
           (cd ../packages/space_directory_noise && dart pub get && dart analyze)
           (cd ../packages/space_admin_ui && flutter pub get && flutter analyze)
