@@ -193,26 +193,36 @@ void main() {
     await changes.close();
   });
 
-  test('Сервер не может продлить подготовку за пределы срока запроса', () async {
-    request.pairing.expiresAt = Int64(clock.millisecondsSinceEpoch ~/ 1000 + 3600);
-    cubit.setCode(request.code);
-    await prepare();
-    expect(cubit.state.messageKey, 'pairingExpired');
-    expect(cubit.state.prepared, isFalse);
-    expect(manager.preparations, 0);
-  });
-
-  test('Даже с допустимой разницей часов подготовка живёт не более пяти минут', () {
-    fakeAsync((time) {
-      request.pairing.expiresAt = Int64(clock.millisecondsSinceEpoch ~/ 1000 + 305);
+  test(
+    'Сервер не может продлить подготовку за пределы срока запроса',
+    () async {
+      request.pairing.expiresAt = Int64(
+        clock.millisecondsSinceEpoch ~/ 1000 + 3600,
+      );
       cubit.setCode(request.code);
-      unawaited(prepare());
-      time.flushMicrotasks();
-      expect(cubit.state.prepared, isTrue);
-      time.elapse(const Duration(minutes: 5));
-      expect(cubit.state.prepared, isFalse);
+      await prepare();
       expect(cubit.state.messageKey, 'pairingExpired');
-      expect(manager.signatures, 0);
-    });
-  });
+      expect(cubit.state.prepared, isFalse);
+      expect(manager.preparations, 0);
+    },
+  );
+
+  test(
+    'Даже с допустимой разницей часов подготовка живёт не более пяти минут',
+    () {
+      fakeAsync((time) {
+        request.pairing.expiresAt = Int64(
+          clock.millisecondsSinceEpoch ~/ 1000 + 305,
+        );
+        cubit.setCode(request.code);
+        unawaited(prepare());
+        time.flushMicrotasks();
+        expect(cubit.state.prepared, isTrue);
+        time.elapse(const Duration(minutes: 5));
+        expect(cubit.state.prepared, isFalse);
+        expect(cubit.state.messageKey, 'pairingExpired');
+        expect(manager.signatures, 0);
+      });
+    },
+  );
 }
