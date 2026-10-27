@@ -29,7 +29,11 @@ abstract class PairingApprovalState with _$PairingApprovalState {
 
 class PairingApprovalCubit extends Cubit<PairingApprovalState> {
   PairingApprovalCubit({required this.server, required this.manager,
-    this.inspect = inspectPairing, this.now = DateTime.now}) : super(const PairingApprovalState());
+    this.inspect = inspectPairing, this.now = DateTime.now, Stream<Object?>? contextChanges}) : super(const PairingApprovalState()) {
+    _server = server();
+    _manager = manager();
+    _subscription = contextChanges?.listen((_) => _contextChanged());
+  }
   final DateTime Function() now;
   final Discovery? Function() server;
   final DeviceManagement? Function() manager;
@@ -40,6 +44,17 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
   PairingQr? _qr;
   Timer? _expiry;
   bool _closing = false;
+  Discovery? _server;
+  DeviceManagement? _manager;
+  StreamSubscription<Object?>? _subscription;
+
+  void _contextChanged() {
+    final selected = server(), control = manager();
+    if (identical(_server, selected) && identical(_manager, control)) return;
+    _server = selected;
+    _manager = control;
+    reset();
+  }
 
   bool _current(int generation) => !isClosed && !_closing && generation == _generation;
 
@@ -184,6 +199,7 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
   Future<void> close() async {
     _closing = true;
     reset();
+    await _subscription?.cancel();
     await super.close();
   }
 }

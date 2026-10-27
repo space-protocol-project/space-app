@@ -26,39 +26,31 @@ class PairingApprovalPanel extends StatefulWidget {
 }
 
 class _PairingApprovalPanelState extends State<PairingApprovalPanel> with WidgetsBindingObserver {
-  late final cubit = PairingApprovalCubit(server: () => widget.controller.preview,
-      manager: () => widget.controller.deviceManagement);
+  late PairingApprovalCubit cubit;
   final code = TextEditingController(), entered = TextEditingController();
-  StreamSubscription<ChatState>? subscription;
-  Discovery? server;
-  DeviceManagement? manager;
   bool externalInput = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    watchController();
+    cubit = createCubit();
   }
 
-  void watchController() {
-    server = widget.controller.preview;
-    manager = widget.controller.deviceManagement;
-    subscription = widget.controller.stream.listen((_) {
-      if (identical(server, widget.controller.preview) && identical(manager, widget.controller.deviceManagement)) return;
-      server = widget.controller.preview;
-      manager = widget.controller.deviceManagement;
-      cubit.reset();
-    });
+  PairingApprovalCubit createCubit() {
+    final controller = widget.controller;
+    return PairingApprovalCubit(server: () => controller.preview,
+      manager: () => controller.deviceManagement, contextChanges: controller.stream);
   }
 
   @override
   void didUpdateWidget(covariant PairingApprovalPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
-      unawaited(subscription?.cancel());
-      cubit.reset();
-      watchController();
+      unawaited(cubit.close());
+      cubit = createCubit();
+      code.clear();
+      entered.clear();
     }
   }
 
@@ -70,7 +62,6 @@ class _PairingApprovalPanelState extends State<PairingApprovalPanel> with Widget
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    unawaited(subscription?.cancel());
     unawaited(cubit.close());
     code.dispose();
     entered.dispose();

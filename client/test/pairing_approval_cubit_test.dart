@@ -161,4 +161,21 @@ void main() {
     expect(inspections, 0);
   });
 
+  test('Смена пространства сбрасывает подготовку внутри Cubit', () async {
+    final changes = StreamController<Object?>();
+    var selected = testServer();
+    await cubit.close();
+    cubit = PairingApprovalCubit(server: () => selected, manager: () => manager,
+      inspect: (_, _) async => request.pairing, contextChanges: changes.stream);
+    cubit.setCode(request.code);
+    await prepare();
+    selected = Discovery(Uri.parse('https://other.org'), 'other', List.filled(32, 9));
+    changes.add(null);
+    await Future<void>.delayed(Duration.zero);
+    expect(cubit.state.prepared, isFalse);
+    await cubit.approve('ABCD-EFGH', () async => true);
+    expect(manager.signatures, 0);
+    await changes.close();
+  });
+
 }

@@ -34,18 +34,6 @@ jobs:
           dart fix --apply --code=curly_braces_in_flow_control_structures
           flutter analyze
           flutter test --no-pub test/pairing_lifetime_test.dart test/pairing_transport_test.dart test/pairing_qr_test.dart test/pairing_cubit_test.dart test/pairing_approval_cubit_test.dart test/pairing_panels_test.dart test/admin_recovery_views_test.dart test/space_qr_platform_test.dart test/camera_qr_test.dart test/recovery_test.dart test/recovery_spaces_test.dart test/recovery_qr_test.dart test/migration_archive_test.dart test/device_migration_test.dart test/device_recovery_batch_test.dart
-      - name: Анализ пакета интерфейса
-        working-directory: packages/space_admin_ui
-        run: |
-          flutter pub get
-          flutter analyze
-      - name: Нативный запрос, отмена и горячий перезапуск
-        run: xvfb-run -a dbus-run-session -- python3 tools/check_pairing_ui.py --output "$RUNNER_TEMP/pairing-native"
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: pairing-native-ui
-          path: ${{ runner.temp }}/pairing-native
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -64,3 +52,15 @@ jobs:
             client/test/pairing*_test.dart
             client/test/admin_recovery_views_test.dart
             client/test/probes/pairing_probe.dart
+      - name: Анализ пакета интерфейса
+        working-directory: packages/space_admin_ui
+        run: |
+          flutter pub get
+          flutter analyze
+      - name: Нативный запрос, отмена и горячий перезапуск
+        run: xvfb-run -a dbus-run-session -- python3 tools/check_pairing_ui.py --output "$RUNNER_TEMP/pairing-native"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pairing-native-ui
+          path: ${{ runner.temp }}/pairing-native
