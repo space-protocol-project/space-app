@@ -5,12 +5,21 @@ on:
       server_ref:
         type: string
         required: true
+      platforms:
+        description: Проверять Rust на трёх ОС и собирать Android
+        type: boolean
+        default: true
+      server_checks:
+        description: Повторять весь набор Go; сквозная проверка выполняется всегда
+        type: boolean
+        default: true
 permissions:
   contents: read
 jobs:
   complexity:
     uses: ./.github/workflows/complexity.yml
   noise:
+    if: inputs.platforms
     strategy:
       matrix:
         os: [ubuntu-24.04, windows-2025, macos-15]
@@ -58,6 +67,7 @@ jobs:
           timeout 180s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 update
           timeout 480s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 install -y --no-install-recommends libgtk-3-dev libx11-dev libxi-dev
       - name: Сервер, гонки и анализ
+        if: inputs.server_checks
         working-directory: server
         run: |
           gofmt -w internal/postgres/directory_pairing*.go
@@ -96,9 +106,11 @@ jobs:
             app/client/lib/ui/device_panel.dart
             app/client/lib/ui/camera_scanner.dart
             app/client/test/directory_transfer*_test.dart
+            app/packages/space_directory_noise/**/*.dart
             server/internal/postgres/directory_pairing*.go
             ${{ runner.temp }}/directory-interop
   android:
+    if: inputs.platforms
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:

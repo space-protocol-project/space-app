@@ -111,15 +111,10 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
 
   Future<void> start({String? qr}) async {
     if (isClosed || _closing || active || _server == null) return;
+    if (state.stage != DirectoryTransferStage.idle) return;
     final receiving = qr == null;
     if (!receiving && state.selected.isEmpty) return;
     ++_generation;
-    final transfer = create(_server!);
-    _transfer = transfer;
-    _expiry = Timer(
-      const Duration(minutes: 5),
-      () => unawaited(cancel(expired: true)),
-    );
     emit(
       state.copyWith(
         stage: DirectoryTransferStage.waiting,
@@ -131,28 +126,39 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
       ),
     );
     await _run((generation) async {
-      if (receiving) {
-        final request = await transfer.receiveStart();
-        if (!_current(generation)) return;
-        emit(state.copyWith(qr: request.encode()));
-        await transfer.receiveHandshake();
+      final transfer = create(_server!);
+      _transfer = transfer;
+      _expiry = Timer(const Duration(minutes: 5), () => unawaited(cancel(expired: true)));
+      if (qr == null) {
+        await _startReceiving(transfer, generation);
       } else {
-        final request = DirectoryTransferQr.parse(qr);
-        request.checkServer(_server!);
-        _document = await service.repository.exclusive(
-          () => service.capture(selectedOrigins: state.selected),
-        );
-        if (!_current(generation)) return;
-        await transfer.sendStart(request);
+        await _startSending(transfer, qr, generation);
       }
-      if (_current(generation))
-        emit(
-          state.copyWith(
-            stage: DirectoryTransferStage.compare,
-            sas: transfer.sas,
-          ),
-        );
+      _comparison(transfer, generation);
     });
+  }
+
+  Future<void> _startReceiving(DirectoryTransfer transfer, int generation) async {
+    final request = await transfer.receiveStart();
+    if (!_current(generation)) return;
+    emit(state.copyWith(qr: request.encode()));
+    await transfer.receiveHandshake();
+  }
+
+  Future<void> _startSending(DirectoryTransfer transfer, String qr, int generation) async {
+    final request = DirectoryTransferQr.parse(qr);
+    request.checkServer(_server!);
+    final selected = state.selected;
+    final document = await service.repository.exclusive(() => service.capture(selectedOrigins: selected));
+    if (!_current(generation)) return;
+    _document = document;
+    await transfer.sendStart(request);
+  }
+
+  void _comparison(DirectoryTransfer transfer, int generation) {
+    if (_current(generation)) {
+      emit(state.copyWith(stage: DirectoryTransferStage.compare, sas: transfer.sas));
+    }
   }
 
   Future<void> confirm(String comparison) async {
@@ -160,29 +166,26 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
       return;
     final transfer = _transfer!;
     emit(state.copyWith(stage: DirectoryTransferStage.sending));
-    await _run((generation) async {
-      if (state.receiving) {
-        final plan = await transfer.receive(service);
-        if (!_current(generation)) return;
-        await _dispose();
-        if (_current(generation))
-          emit(
-            state.copyWith(
-              stage: DirectoryTransferStage.preview,
-              plan: plan,
-              qr: '',
-              sas: '',
-            ),
-          );
-      } else {
-        await transfer.send(comparison, _document!);
-        await _dispose();
-        if (_current(generation))
-          emit(
-            state.copyWith(stage: DirectoryTransferStage.done, qr: '', sas: ''),
-          );
-      }
-    });
+    await _run((generation) => state.receiving
+      ? _receive(transfer, generation)
+      : _send(transfer, comparison, generation));
+  }
+
+  Future<void> _receive(DirectoryTransfer transfer, int generation) async {
+    final plan = await transfer.receive(service);
+    if (!_current(generation)) return;
+    await _dispose();
+    if (_current(generation)) {
+      emit(state.copyWith(stage: DirectoryTransferStage.preview, plan: plan, qr: '', sas: ''));
+    }
+  }
+
+  Future<void> _send(DirectoryTransfer transfer, String comparison, int generation) async {
+    await transfer.send(comparison, _document!);
+    await _dispose();
+    if (_current(generation)) {
+      emit(state.copyWith(stage: DirectoryTransferStage.done, qr: '', sas: ''));
+    }
   }
 
   Future<void> apply() async {

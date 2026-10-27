@@ -20,8 +20,14 @@ class DirectoryTransfer {
   String _id = '', _token = '';
   int _expires = 0;
   final _age = Stopwatch()..start();
-  bool _closed = false, _delivered = false;
+  bool _closed = false, _delivered = false, _started = false;
   String get sas => _noise?.sas ?? '';
+
+  void _begin() {
+    _active();
+    if (_started) throw StateError('Directory transfer already started');
+    _started = true;
+  }
 
   void _active() {
     if (_closed || _age.elapsed.inSeconds >= 300) {
@@ -70,7 +76,7 @@ class DirectoryTransfer {
   }
 
   Future<DirectoryTransferQr> receiveStart() async {
-    _active();
+    _begin();
     final lease = await relay.create(
       CreateDirectoryTransferRequest(profile: directoryNoiseProfile),
     );
@@ -112,7 +118,7 @@ class DirectoryTransfer {
   }
 
   Future<void> sendStart(DirectoryTransferQr qr) async {
-    _active();
+    _begin();
     qr.checkServer(server);
     final lease = await relay.open(OpenDirectoryTransferRequest(code: qr.code));
     _lease(

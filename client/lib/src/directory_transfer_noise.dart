@@ -25,10 +25,19 @@ class DirectoryNoiseChannel {
       'context': context,
       'expected': expected == null ? null : base64.encode(expected),
     });
-    final handle = directoryInt(response['handle'], min: 1),
-        public = base64Decode(response['public'] as String);
-    directoryRequire(public.length == 32);
-    return DirectoryNoiseChannel._(engine, handle, public);
+    final handle = directoryInt(response['handle'], min: 1);
+    try {
+      final public = base64Decode(response['public'] as String);
+      directoryRequire(public.length == 32);
+      return DirectoryNoiseChannel._(engine, handle, public);
+    } catch (_) {
+      try {
+        await engine.execute({'op': 'close', 'handle': handle});
+      } catch (_) {
+        // Ошибка ответа не оставляет доступный для продолжения канал.
+      }
+      rethrow;
+    }
   }
 
   Future<Map<String, dynamic>> _call(
