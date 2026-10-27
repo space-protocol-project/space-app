@@ -1167,5 +1167,18 @@
   "directorySettingsScale": "Interface scale",
   "directorySettingsNotifications": "Notifications",
   "directorySettingsOn": "On",
-  "directorySettingsOff": "Off"
+  "directorySettingsOff": "Off",
+  "archiveStreamingHelp": "Large archives use the system document picker without loading the whole file into memory. Import needs space for the archive and extraction. Passwords are not stored.",
+  "archiveCopyProgress": "Copied: {megabytes} MiB",
+  "@archiveCopyProgress": {"placeholders": {"megabytes": {"type": "int"}}},
+  "archiveCritical": "Preparing or applying the archive. Cancellation is unavailable now to preserve keys and data.",
+  "archiveCancelling": "Cancelling and cleaning up…",
+  "archiveRetry": "Check and resume",
+  "archiveSave": "Save archive to a document",
+  "archiveRetained": "A private transfer copy is retained. Previous keys may have been stopped. Finish saving; the copy remains available after an error.",
+  "archiveImportReady": "The archive is copied into the app. Enter its password to validate and restore it. An interrupted restore can use this same archive again.",
+  "archiveSaved": "The document was written and verified by reading it back. The private copy remains available for another export.",
+  "archiveDeleteTitle": "Delete the private copy?",
+  "archiveDeleteHelp": "Only the app's copy is deleted. If previous keys were stopped, this may be the only recovery archive. First confirm that the external copy and password are available.",
+  "archiveDelete": "Delete private copy"
 }

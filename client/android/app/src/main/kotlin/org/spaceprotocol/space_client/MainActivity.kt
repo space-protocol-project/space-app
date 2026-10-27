@@ -11,9 +11,11 @@ class MainActivity : FlutterActivity() {
     private var notifications: NotificationsBridge? = null
     private var voice: VoiceBridge? = null
     private var userExport: UserExportBridge? = null
+    private var archives: ArchiveBridge? = null
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         SecureStorageSync.register(this, flutterEngine.dartExecutor.binaryMessenger)
+        archives = ArchiveBridge(this, MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "space/archive-documents"))
         userExport = UserExportBridge(this, MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "space/user-export"))
         voice = VoiceBridge(this, MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "space/voice-session"))
         notifications = NotificationsBridge(this, MethodChannel(flutterEngine.dartExecutor.binaryMessenger,"space/notification-activation"))
@@ -21,6 +23,8 @@ class MainActivity : FlutterActivity() {
     }
     override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); notifications?.intent(intent) }
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        archives?.close()
+        archives = null
         userExport?.close()
         userExport = null
         voice?.close()
@@ -32,6 +36,7 @@ class MainActivity : FlutterActivity() {
         notifications?.permissionFinished(requestCode)
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (archives?.activityResult(requestCode, resultCode, data) == true) return
         if (userExport?.activityResult(requestCode, resultCode, data) == true) return
         super.onActivityResult(requestCode, resultCode, data)
     }

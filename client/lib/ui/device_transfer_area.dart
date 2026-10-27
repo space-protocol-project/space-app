@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import '../l10n/strings.dart';
 import 'components.dart';
 import 'migration_password_dialog.dart';
+import 'android_archive_transfer.dart';
 
 typedef DeviceTransferAction = Future<void> Function(
   String path,
@@ -91,7 +92,9 @@ class _DeviceTransferAreaState extends State<DeviceTransferArea> {
   }
 
   @override
-  Widget build(BuildContext context) => SurfaceCard(
+  Widget build(BuildContext context) => Platform.isAndroid
+      ? AndroidArchiveTransfer(export: widget.export, restore: widget.restore)
+      : SurfaceCard(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

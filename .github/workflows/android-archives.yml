@@ -1,0 +1,92 @@
+name: Потоковые архивы Android
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Зависимости тестов
+        run: |
+          timeout 180s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 update
+          timeout 480s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev
+      - name: Генерация и оформление
+        working-directory: client
+        run: |
+          flutter pub get
+          dart run build_runner build
+          flutter gen-l10n
+          dart format lib/src/archive*.dart lib/ui/android_archive_transfer.dart lib/ui/device_transfer_area.dart test/archive*_test.dart
+          dart fix --apply --code=curly_braces_in_flow_control_structures
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-archives-source
+          path: |
+            client/lib/src/archive*.dart
+            client/lib/ui/android_archive_transfer.dart
+            client/lib/ui/device_transfer_area.dart
+            client/lib/l10n/app_localizations*.dart
+            client/test/archive*_test.dart
+      - name: Анализ и проверки архивов
+        working-directory: client
+        run: |
+          flutter analyze
+          flutter test test/archive*_test.dart test/migration_archive_test.dart test/device_migration_test.dart test/device_migration_files_test.dart test/device_transfer_area_test.dart test/recovery_test.dart test/recovery_spaces_test.dart
+      - name: Все тесты приложения
+        working-directory: client
+        run: flutter test
+
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Модели и APK
+        working-directory: client
+        run: |
+          flutter pub get
+          dart run build_runner build
+          flutter gen-l10n
+          flutter build apk --debug
+      - name: Kotlin и инструментальные тесты
+        working-directory: client/android
+        run: ./gradlew :app:testDebugUnitTest :app:assembleDebugAndroidTest
+      - name: Доступ эмулятора к KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: ContentResolver на Android-эмуляторе
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          ram-size: 2048M
+          disk-size: 4096M
+          disable-animations: true
+          script: cd client/android && ./gradlew :app:connectedDebugAndroidTest
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-archives-reports
+          path: |
+            client/android/app/build/reports/tests
+            client/android/app/build/reports/androidTests
+            client/android/app/build/outputs/androidTest-results
+            client/build/app/reports
+            client/build/app/outputs/androidTest-results
