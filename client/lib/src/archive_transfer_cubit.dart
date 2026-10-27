@@ -8,6 +8,7 @@ part 'archive_transfer_cubit.freezed.dart';
 
 typedef ArchiveTransferAction = Future<void> Function(
   String path, String password, void Function(String) progress,
+  Future<void> Function() beforeCommit,
 );
 
 @freezed
@@ -77,7 +78,7 @@ class ArchiveTransferCubit extends Cubit<ArchiveTransferState> {
     final pending = state.pending ?? await documents.prepare();
     _publish(state.copyWith(pending: pending));
     if (pending.mode != ArchiveMode.exporting) throw StateError('Начато восстановление');
-    if (!pending.complete) await export(pending.path, password, _status);
+    if (!pending.complete) await export(pending.path, password, _status, () async {});
     await documents.ready();
     _publish(state.copyWith(pending: await documents.status()));
   });
@@ -94,9 +95,10 @@ class ArchiveTransferCubit extends Cubit<ArchiveTransferState> {
     if (pending == null || pending.mode != ArchiveMode.importing) {
       throw StateError('Нет архива восстановления');
     }
-    await documents.applying();
-    _publish(state.copyWith(pending: await documents.status()));
-    await restore(pending.path, password, _status);
+    await restore(pending.path, password, _status, () async {
+      await documents.applying();
+      _publish(state.copyWith(pending: await documents.status()));
+    });
     await documents.complete();
     _publish(state.copyWith(pending: null, finished: true));
   });
@@ -104,6 +106,11 @@ class ArchiveTransferCubit extends Cubit<ArchiveTransferState> {
   Future<void> discard() => _run(() async {
     await documents.discard();
     _publish(const ArchiveTransferState(busy: true));
+  });
+
+  Future<void> acknowledgeCleanup() => _run(() async {
+    await documents.acknowledgeCleanup();
+    _publish(state.copyWith(pending: await documents.status()));
   });
 
   Future<void> cancel() async {

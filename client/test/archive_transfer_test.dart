@@ -36,6 +36,8 @@ class Documents implements ArchiveDocuments {
   @override
   Future<void> complete() async { completed++; current = null; }
   @override
+  Future<void> acknowledgeCleanup() async {}
+  @override
   Future<void> cancel() async {
     cancelled++;
     saving?.completeError(PlatformException(code: 'cancelled'));
@@ -46,11 +48,11 @@ class Documents implements ArchiveDocuments {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  Future<void> noAction(String path, String password, void Function(String) progress) async {}
+  Future<void> noAction(String path, String password, void Function(String) progress, Future<void> Function() beforeCommit) async {}
   test('Экспорт сохраняется при отмене SAF и возобновляется без повторной остановки ключей', () async {
     final files = Documents();
     var exports = 0;
-    final first = ArchiveTransferCubit(files, export: (_, _, _) async { exports++; }, restore: noAction);
+    final first = ArchiveTransferCubit(files, export: (_, _, _, _) async { exports++; }, restore: noAction);
     await first.prepare('password');
     expect(first.state.pending!.complete, isTrue);
     files.saving = Completer<bool>();
@@ -65,7 +67,7 @@ void main() {
     expect(files.discarded, 0);
     await first.close();
     files.saving = null;
-    final second = ArchiveTransferCubit(files, export: (_, _, _) async { exports++; }, restore: noAction);
+    final second = ArchiveTransferCubit(files, export: (_, _, _, _) async { exports++; }, restore: noAction);
     await second.load();
     await second.save();
     expect(second.state.saved, isTrue);
@@ -75,7 +77,7 @@ void main() {
   });
   test('Отмена запрещена во время изменения ключей; второй контроллер не начинает перенос', () async {
     final files = Documents(), barrier = Completer<void>();
-    final first = ArchiveTransferCubit(files, export: (_, _, _) => barrier.future, restore: noAction);
+    final first = ArchiveTransferCubit(files, export: (_, _, _, _) => barrier.future, restore: noAction);
     final running = first.prepare('password');
     await Future<void>.delayed(Duration.zero);
     await first.cancel();
@@ -93,7 +95,8 @@ void main() {
   test('Ошибка применения сохраняет тот же архив; повтор удаляет копию только после успеха', () async {
     final files = Documents();
     var attempts = 0;
-    final cubit = ArchiveTransferCubit(files, export: noAction, restore: (_, _, _) async {
+    final cubit = ArchiveTransferCubit(files, export: noAction, restore: (_, _, _, beforeCommit) async {
+      await beforeCommit();
       if (++attempts == 1) throw StateError('Запись прервана');
     });
     await cubit.pick();
@@ -110,7 +113,7 @@ void main() {
   test('Ошибка подготовки не удаляет pending и позволяет повтор', () async {
     final files = Documents();
     var attempts = 0;
-    final cubit = ArchiveTransferCubit(files, restore: noAction, export: (_, _, _) async {
+    final cubit = ArchiveTransferCubit(files, restore: noAction, export: (_, _, _, _) async {
       if (++attempts == 1) throw StateError('Остановка до commit');
     });
     await cubit.prepare('password');
@@ -118,6 +121,19 @@ void main() {
     await cubit.prepare('password');
     expect(attempts, 2);
     expect(files.prepared, 1);
+    await cubit.close();
+  });
+  test('Неверный пароль до записи данных позволяет отказаться от импортированной копии', () async {
+    final files = Documents();
+    final cubit = ArchiveTransferCubit(files, export: noAction, restore: (_, _, _, _) async {
+      throw const FormatException('Пароль не подходит');
+    });
+    await cubit.pick();
+    await cubit.apply('wrong');
+    expect(files.current!.phase, ArchivePhase.ready);
+    expect(files.discarded, 0);
+    await cubit.discard();
+    expect(files.current, isNull);
     await cubit.close();
   });
   test('Канал передаёт только команды, строгие метаданные и 64-битный прогресс', () async {

@@ -11,12 +11,9 @@ import '../l10n/strings.dart';
 import 'components.dart';
 import 'migration_password_dialog.dart';
 import 'android_archive_transfer.dart';
+import '../src/archive_transfer_cubit.dart';
 
-typedef DeviceTransferAction = Future<void> Function(
-  String path,
-  String password,
-  void Function(String) progress,
-);
+typedef DeviceTransferAction = ArchiveTransferAction;
 
 class DeviceTransferArea extends StatefulWidget {
   const DeviceTransferArea({
@@ -224,7 +221,7 @@ class _TransferOperationState extends State<_TransferOperation> {
     try {
       await widget.action(widget.path, widget.password, (text) {
         if (mounted) setState(() => status = text);
-      });
+      }, () async {});
       if (mounted) setState(() => finished = true);
     } catch (problem) {
       if (mounted) setState(() => error = problem.toString());

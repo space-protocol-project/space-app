@@ -22,8 +22,8 @@ void main() {
           home: Scaffold(
             body: SingleChildScrollView(
               child: DeviceTransferArea(
-                export: (_, _, _) async {},
-                restore: (path, password, progress) async {
+                export: (_, _, _, _) async {},
+                restore: (path, password, progress, beforeCommit) async {
                   expect(password, 'пароль переноса');
                   imported = path;
                   throw StateError('Проверяемая ошибка');

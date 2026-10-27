@@ -24,7 +24,7 @@ jobs:
           flutter pub get
           dart run build_runner build
           flutter gen-l10n
-          dart format lib/src/archive*.dart lib/ui/android_archive_transfer.dart lib/ui/device_transfer_area.dart test/archive*_test.dart
+          dart format lib/src/archive*.dart lib/src/device_migration_import.dart lib/ui/android_archive_transfer.dart lib/ui/device_transfer_area.dart lib/ui/shell.dart test/archive*_test.dart test/device_transfer_area_test.dart
           dart fix --apply --code=curly_braces_in_flow_control_structures
       - uses: actions/upload-artifact@v4
         if: always()
@@ -32,10 +32,13 @@ jobs:
           name: android-archives-source
           path: |
             client/lib/src/archive*.dart
+            client/lib/src/device_migration_import.dart
             client/lib/ui/android_archive_transfer.dart
             client/lib/ui/device_transfer_area.dart
+            client/lib/ui/shell.dart
             client/lib/l10n/app_localizations*.dart
             client/test/archive*_test.dart
+            client/test/device_transfer_area_test.dart
       - name: Анализ и проверки архивов
         working-directory: client
         run: |

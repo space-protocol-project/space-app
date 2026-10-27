@@ -1180,5 +1180,8 @@
   "archiveSaved": "The document was written and verified by reading it back. The private copy remains available for another export.",
   "archiveDeleteTitle": "Delete the private copy?",
   "archiveDeleteHelp": "Only the app's copy is deleted. If previous keys were stopped, this may be the only recovery archive. First confirm that the external copy and password are available.",
-  "archiveDelete": "Delete private copy"
+  "archiveDelete": "Delete private copy",
+  "archiveManualCleanup": "Clean up at the provider",
+  "archiveManualCleanupHelp": "Delete the unfinished Space-device document in the chosen location using the system file manager. Confirm only after deleting it: the app will stop retrying automatic cleanup. The private archive is retained.",
+  "archiveCleanupConfirmed": "Document deleted manually"
 }

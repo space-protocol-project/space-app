@@ -25,9 +25,10 @@ class ArchiveBridge(private val activity: MainActivity, private val channel: Met
             "import" -> choose(false, result)
             "save" -> choose(true, result)
             else -> execute(result) { cancel ->
-                documents.recover()
+                if (call.method != "acknowledgeCleanup") documents.recover()
                 when (call.method) {
                     "status" -> documents.workspace.status()
+                    "acknowledgeCleanup" -> { documents.acknowledgeCleanup(); null }
                     "prepare" -> { documents.workspace.begin("export"); documents.workspace.status() }
                     "ready" -> { requireMode("export"); documents.workspace.readyFile(); documents.workspace.phase("ready"); null }
                     "applying" -> { requireMode("import"); documents.workspace.readyFile(); documents.workspace.phase("applying"); null }

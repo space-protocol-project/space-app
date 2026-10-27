@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../l10n/strings.dart';
@@ -43,6 +44,17 @@ class _AndroidArchiveTransferState extends State<AndroidArchiveTransfer> {
     ));
     if (confirmed == true) await cubit.discard();
   }
+  Future<void> _acknowledgeCleanup() async {
+    final confirmed = await showDialog<bool>(context: context, builder: (context) => AlertDialog(
+      title: Text(context.strings.archiveManualCleanup),
+      content: Text(context.strings.archiveManualCleanupHelp),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.strings.close)),
+        TextButton(onPressed: () => Navigator.pop(context, true), child: Text(context.strings.archiveCleanupConfirmed)),
+      ],
+    ));
+    if (confirmed == true) await cubit.acknowledgeCleanup();
+  }
   @override
   Widget build(BuildContext context) => BlocBuilder<ArchiveTransferCubit, ArchiveTransferState>(
     bloc: cubit,
@@ -76,6 +88,8 @@ class _AndroidArchiveTransferState extends State<AndroidArchiveTransfer> {
     Text('$error', style: TextStyle(color: Theme.of(context).colorScheme.error)),
     const SizedBox(height: 8),
     TextButton(onPressed: cubit.load, child: Text(context.strings.archiveRetry)),
+    if (error is PlatformException && error.code == 'cleanup_failed')
+      TextButton(onPressed: _acknowledgeCleanup, child: Text(context.strings.archiveManualCleanup)),
   ];
 
   List<Widget> _actions(BuildContext context, ArchiveTransferState state) {

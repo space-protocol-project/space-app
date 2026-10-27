@@ -907,10 +907,10 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   }
 
   Widget deviceTransferArea() => DeviceTransferArea(
-    export: (path, password, progress) async =>
+    export: (path, password, progress, beforeCommit) async =>
         (await _deviceMigration(progress)).export(path, password),
-    restore: (path, password, progress) async =>
-        (await _deviceMigration(progress)).restore(path, password),
+    restore: (path, password, progress, beforeCommit) async =>
+        (await _deviceMigration(progress)).restore(path, password, beforeApply: beforeCommit),
   );
 
   Future<void> createOwnSpace() async {

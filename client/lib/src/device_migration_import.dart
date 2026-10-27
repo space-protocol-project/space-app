@@ -1,7 +1,7 @@
 part of 'device_migration.dart';
 
 extension DeviceMigrationImport on DeviceMigration {
-  Future<void> restore(String path, String password, {String? publicIP}) async {
+  Future<void> restore(String path, String password, {String? publicIP, Future<void> Function()? beforeApply}) async {
     final temporary = await Directory.systemTemp.createTemp('space-migration-');
     try {
       _status('Проверка пароля и всех блоков архива…');
@@ -41,6 +41,7 @@ extension DeviceMigrationImport on DeviceMigration {
       }
       final secrets = Map<String, String>.from(payload['secrets'] as Map);
       await validateDeviceSecrets(records, secrets);
+      await beforeApply?.call();
       await _writeMarker(DeviceMigration.importKey, '$id:pending');
       _status('Восстановление пространств, истории и настроек…');
       if (report != null) {

@@ -36,6 +36,13 @@ class ArchiveDocuments(private val context: Context, val workspace: ArchiveWorks
         workspace.write(state.apply { remove("cleanup") })
         release(uri)
     }
+    fun acknowledgeCleanup() {
+        val state = workspace.read() ?: return
+        if (!state.has("cleanup")) return
+        val uri = Uri.parse(state.getString("cleanup"))
+        workspace.write(state.apply { remove("cleanup") })
+        release(uri)
+    }
 
     private fun signal(cancel: ArchiveCancellation): CancellationSignal {
         val signal = CancellationSignal()
@@ -71,7 +78,13 @@ class ArchiveDocuments(private val context: Context, val workspace: ArchiveWorks
     fun registerCreated(uri: Uri, flags: Int) {
         val state = requireNotNull(workspace.read())
         check(state.getString("mode") == "export")
-        workspace.write(state.put("cleanup", uri.toString()))
+        try {
+            workspace.write(state.put("cleanup", uri.toString()))
+        } catch (error: Exception) {
+            try { DocumentsContract.deleteDocument(resolver, uri) }
+            catch (_: Exception) { throw ArchiveCleanupFailed() }
+            throw error
+        }
         try {
             resolver.takePersistableUriPermission(uri, flags and
                 (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION))

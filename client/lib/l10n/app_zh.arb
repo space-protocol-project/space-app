@@ -1180,5 +1180,8 @@
   "archiveSaved": "文档已写入并重新读取验证。私有副本仍可再次导出。",
   "archiveDeleteTitle": "删除私有副本？",
   "archiveDeleteHelp": "仅删除应用内的副本。如果旧密钥已停用，这可能是唯一的恢复归档。请先确认外部副本和密码可用。",
-  "archiveDelete": "删除私有副本"
+  "archiveDelete": "删除私有副本",
+  "archiveManualCleanup": "在提供程序中清理",
+  "archiveManualCleanupHelp": "请使用系统文件管理器删除所选位置中未完成的 Space-device 文档。仅在删除后确认：应用将停止自动清理重试。私有归档将保留。",
+  "archiveCleanupConfirmed": "已手动删除文档"
 }

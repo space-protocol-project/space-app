@@ -16,7 +16,7 @@ class ArchiveWorkspace {
       'phase': String phase,
       'path': String path,
       'complete': bool complete,
-    } when value is Map && value.length == 4 && path.isNotEmpty) {
+    } when value.length == 4 && path.isNotEmpty) {
       return ArchiveWorkspace(
         switch (mode) {
           'export' => ArchiveMode.exporting,
@@ -39,6 +39,7 @@ abstract interface class ArchiveDocuments {
   Future<void> applying();
   Future<void> discard();
   Future<void> complete();
+  Future<void> acknowledgeCleanup();
   Future<void> cancel();
   void dispose();
 }
@@ -76,6 +77,8 @@ class AndroidArchiveDocuments implements ArchiveDocuments {
   Future<void> discard() => channel.invokeMethod<void>('discard');
   @override
   Future<void> complete() => channel.invokeMethod<void>('complete');
+  @override
+  Future<void> acknowledgeCleanup() => channel.invokeMethod<void>('acknowledgeCleanup');
   @override
   Future<void> cancel() => channel.invokeMethod<void>('cancel');
   @override
