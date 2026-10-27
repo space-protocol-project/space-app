@@ -14,6 +14,11 @@ import 'package:space_client/src/preferences.dart';
 
 import 'fixtures/directory.dart';
 
+class DirectoryNetworkBinding extends AutomatedTestWidgetsFlutterBinding {
+  @override
+  bool get overrideHttpClient => false;
+}
+
 class RecordingRelay extends RpcDirectoryRelay {
   RecordingRelay(super.server);
   final records=<List<int>>[];
@@ -30,7 +35,7 @@ class RecordingRelay extends RpcDirectoryRelay {
 }
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  DirectoryNetworkBinding();
   const origin=String.fromEnvironment('DIRECTORY_RELAY');
   const marker=String.fromEnvironment('DIRECTORY_RESTART');
   test('Два настоящих Noise клиента, Connect relay, перезапуск и явное применение', () async {
