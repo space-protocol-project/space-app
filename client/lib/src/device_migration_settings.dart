@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'settings_snapshot.dart';
 
 // Переносим пользовательское состояние, но не пути установщиков и команду
@@ -19,7 +20,9 @@ void validateDeviceSettings(Map<String, dynamic> settings) {
   }
   if (settings.containsKey(versionedSettingsStorageKey)) {
     final raw = settings[versionedSettingsStorageKey];
-    if (raw is! String) throw const FormatException('Повреждены настройки устройства');
+    if (raw is! String) {
+      throw const FormatException('Повреждены настройки устройства');
+    }
     SettingsReplica.parse(raw);
   }
 }

@@ -40,9 +40,8 @@ jobs:
           flutter pub get
           dart run build_runner build
           flutter gen-l10n
-          dart format lib/src/settings_snapshot.dart lib/src/preferences*.dart lib/src/directory*.dart lib/src/remote_backup*.dart lib/ui/directory*.dart lib/ui/remote_backup.dart test/settings*_test.dart test/directory*_test.dart test/remote_backup*_test.dart test/fixtures/directory.dart test/probes/directory*.dart test/bloc_events_test.dart test/localization_test.dart
+          dart format lib/src/device_migration_settings.dart lib/src/settings_snapshot.dart lib/src/preferences*.dart lib/src/directory*.dart lib/src/remote_backup*.dart lib/ui/directory*.dart lib/ui/remote_backup.dart test/settings*_test.dart test/directory*_test.dart test/remote_backup*_test.dart test/fixtures/directory.dart test/probes/directory*.dart test/bloc_events_test.dart test/localization_test.dart
           dart fix --apply --code=curly_braces_in_flow_control_structures
-          dart format lib/src/device_migration_settings.dart
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -291,15 +291,30 @@ void main() {
     await backup.resume();
     expect(prefs.settingsSnapshot.same(stable), isTrue);
   });
-  test('Типизированный экспорт возвращает снимок и сохраняет порядок команд', () async {
-    final prefs = preferences();
-    final captured = prefs.exportSettings();
-    final changed = prefs.change(palette: 'ocean');
-    final snapshot = await captured;
-    await changed;
-    expect(snapshot.values['palette'], 'gruvbox');
-    expect(prefs.palette, 'ocean');
-    expect((await prefs.exportSettings()).same(prefs.settingsSnapshot), isTrue);
+  test(
+    'Типизированный экспорт возвращает снимок и сохраняет порядок команд',
+    () async {
+      final prefs = preferences();
+      final captured = prefs.exportSettings();
+      final changed = prefs.change(palette: 'ocean');
+      final snapshot = await captured;
+      await changed;
+      expect(snapshot.values['palette'], 'gruvbox');
+      expect(prefs.palette, 'ocean');
+      expect(
+        (await prefs.exportSettings()).same(prefs.settingsSnapshot),
+        isTrue,
+      );
+    },
+  );
+  test('Подмена digest плана блокируется до записи локальной головы', () async {
+    final prefs = preferences(), storage = DirectoryStorage();
+    final backup = service(prefs, storage);
+    final plan = await backup.preview(directoryDocument());
+    final changed = DirectoryRestorePlan(plan.document, url64(List.filled(32, 99)),
+        plan.before, plan.conflicts, plan.unknown, plan.ancestors, plan.settingsMerge);
+    await expectLater(backup.apply(changed, mergeSettings: false), throwsFormatException);
+    expect(storage.values, isEmpty);
   });
   test('Повреждённые ревизии не заменяются молча новыми', () async {
     SharedPreferences.setMockInitialValues({
