@@ -2102,6 +2102,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
                               prepareInstall: prepareAppInstall,
                             ),
                             DevicePanel(
+                              directoryService: directoryService,
                               directoryRepository: directoryRepository,
                               workspaces: workspaces,
                               fallback: deviceController,

@@ -11,6 +11,7 @@ import 'package:flutter/foundation.dart';
 import '../src/camera_qr.dart';
 import '../src/space_link_qr.dart';
 import '../src/pairing_qr.dart';
+import '../src/directory_transfer_qr.dart';
 
 import 'package:space_admin_ui/space_admin_ui.dart';
 
@@ -32,13 +33,20 @@ Future<String?> scanPairingCamera(BuildContext context) => showDialog<String>(
   builder: (_) => const RecoveryCameraDialog(pairing: true),
 );
 
+Future<String?> scanDirectoryCamera(BuildContext context) => showDialog<String>(
+  context: context,
+  barrierDismissible: false,
+  builder: (_) => const RecoveryCameraDialog(directory: true),
+);
+
 class RecoveryCameraDialog extends StatefulWidget {
   const RecoveryCameraDialog({
     super.key,
     this.spaceLink = false,
     this.pairing = false,
+    this.directory = false,
   });
-  final bool spaceLink, pairing;
+  final bool spaceLink, pairing, directory;
   @override
   State<RecoveryCameraDialog> createState() => _RecoveryCameraDialogState();
 }
@@ -163,6 +171,7 @@ class _RecoveryCameraDialogState extends State<RecoveryCameraDialog>
   }
 
   String? Function(Uint8List) get _decoder {
+    if (widget.directory) return directoryTransferFromImage;
     if (widget.pairing) return pairingQrFromImage;
     return widget.spaceLink ? spaceLinkFromImage : cameraCardInWorker;
   }

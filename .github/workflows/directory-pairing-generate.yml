@@ -65,6 +65,7 @@ jobs:
           (cd app/client && flutter pub get)
           (cd app/packages/space_directory_noise && dart pub get && dart analyze)
           dart format app/packages/space_directory_noise
+          dart format app/client/lib/src/directory_transfer*.dart app/client/lib/src/directory_backup.dart app/client/lib/ui/directory_transfer.dart app/client/lib/ui/device_panel.dart app/client/lib/ui/camera_scanner.dart
           if [ '${{ inputs.models }}' = 'true' ]; then
             (cd app/client && timeout 300s dart run build_runner build && flutter gen-l10n)
           fi
@@ -81,6 +82,11 @@ jobs:
             app/client/pubspec.lock
             app/client/lib/src/generated/space/v1/directory_pairing*.dart
             app/client/lib/src/directory_transfer*.freezed.dart
+            app/client/lib/src/directory_transfer*.dart
+            app/client/lib/src/directory_backup.dart
+            app/client/lib/ui/directory_transfer.dart
+            app/client/lib/ui/device_panel.dart
+            app/client/lib/ui/camera_scanner.dart
             app/client/lib/l10n/app_localizations*.dart
             protocol/protocol/openapi/space/v1/directory_pairing.swagger.json
             server/gen/space/v1/directory_pairing*.go

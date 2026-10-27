@@ -115,16 +115,20 @@ class DirectoryBackupService {
     }
   }
 
-  Future<DirectoryDocument> capture() async {
+  Future<DirectoryDocument> capture({List<String>? selectedOrigins}) async {
     final state = await repository.read(),
         catalog = state['catalog'] as Map<String, dynamic>;
     directoryRequire(state['pending'] == null);
-    final id = (state['outgoing'] as String).isEmpty
+    final id = selectedOrigins != null || (state['outgoing'] as String).isEmpty
         ? url64(DirectoryArchive.random(16))
         : state['outgoing'] as String;
-    final head = (state['heads'] as Map)[id] as Map?;
+    final head = selectedOrigins == null ? (state['heads'] as Map)[id] as Map? : null;
     final spaces = <Map<String, dynamic>>[];
-    final origins = preferences.origins.toSet().toList();
+    final origins = selectedOrigins ?? preferences.origins.toSet().toList();
+    if (selectedOrigins != null) {
+      directoryRequire(origins.isNotEmpty && origins.length <= 12 && origins.toSet().length == origins.length);
+      directoryRequire(origins.every(preferences.origins.contains));
+    }
     directoryRequire(origins.length <= 100);
     for (final origin in origins) {
       spaces.add(await _space(origin, catalog));

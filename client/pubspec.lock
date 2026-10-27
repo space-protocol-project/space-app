@@ -1218,6 +1218,13 @@ packages:
       relative: true
     source: path
     version: "0.0.0"
+  space_directory_noise:
+    dependency: "direct main"
+    description:
+      path: "../packages/space_directory_noise"
+      relative: true
+    source: path
+    version: "0.1.0"
   space_mls_native:
     dependency: "direct main"
     description:

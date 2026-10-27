@@ -1042,7 +1042,13 @@
   "feedRepost": "Репост",
   "feedRepostHint": "Отправьте без текста для репоста или добавьте свою цитату.",
   "feedShare": "Репост или цитата",
-  "@feedReplyTo": {"placeholders": {"number": {"type": "String"}}},
+  "@feedReplyTo": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
   "followAdd": "Подписаться",
   "followingEmpty": "Вы пока ни на кого не подписаны.",
   "followingTitle": "Подписки",
@@ -1084,12 +1090,35 @@
   "directoryBackupConfirm": "Применить проверенный каталог? Существующие ключи доступа не заменяются. Выбранные настройки будут применены; при сбое можно завершить восстановление повторно.",
   "directoryBackupFollowsHelp": "Добавить отсутствующие подписки для подключённых пространств с той же личностью? Существующие подписки не удаляются. Сервер проверяет права; возможен частичный результат.",
   "directoryBackupPreview": "Пространств в копии: {count}",
-  "@directoryBackupPreview": {"placeholders": {"count": {"type": "int"}}},
+  "@directoryBackupPreview": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "directoryBackupSpaceComplete": "{origin}: подписок — {count}; снимок полный",
-  "@directoryBackupSpaceComplete": {"placeholders":{"origin":{"type":"String"},"count":{"type":"int"}}},
+  "@directoryBackupSpaceComplete": {
+    "placeholders": {
+      "origin": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "directoryBackupSpaceIncomplete": "{origin}: подписок в сохранённом снимке — {count}; актуальный список недоступен",
-  "@directoryBackupSpaceIncomplete": {"placeholders":{"origin":{"type":"String"},"count":{"type":"int"}}},
-
+  "@directoryBackupSpaceIncomplete": {
+    "placeholders": {
+      "origin": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "pairingModeFull": "Полный режим",
   "pairingSelectionFailed": "Не удалось подготовить выбор. Проверьте адреса и доверие серверам. Уже сохранённые личности заменять нельзя.",
   "pairingModeLimited": "Ограниченный режим",
@@ -1097,5 +1126,19 @@
   "pairingSelectionHelp": "На новом устройстве выберите до 12 известных пространств без сохранённой личности. Для каждого пространства подтвердите отдельный QR и код на исходном устройстве. Для списка пространств можно предварительно восстановить каталог из резервной копии.",
   "pairingSelectionTitle": "Сопряжение выбранных пространств",
   "pairingModeFullHelp": "Рабочий доступ, доступные административные действия и управление устройствами в выбранных пространствах. Выдачу подтверждает корневая карточка; корневой секрет не передаётся.",
-  "pairingModeLimitedHelp": "Рабочий доступ только к выбранным пространствам. Подключение и отзыв других устройств, управление корневыми ключами недоступны."
+  "pairingModeLimitedHelp": "Рабочий доступ только к выбранным пространствам. Подключение и отзыв других устройств, управление корневыми ключами недоступны.",
+  "directoryTransferSend": "Передать выбранное",
+  "directoryTransferError": "Передача отменена или не прошла проверку. Проверьте подключение и начните заново с новым QR-запросом.",
+  "directoryTransferConfirm": "Коды совпадают — продолжить",
+  "directoryTransferWaiting": "Ожидаем второе устройство. Запрос действует 5 минут.",
+  "directoryTransferTitle": "Передать каталог на другое устройство",
+  "directoryTransferReceive": "Получить каталог",
+  "directoryTransferCompareHelp": "Сравните код на обоих устройствах лично или через доверенную связь. Если хотя бы один символ отличается — отмените передачу. Не сравнивайте коды через этот сервер.",
+  "directoryTransferSelect": "На исходном устройстве выберите до 12 пространств",
+  "directoryTransferDone": "Готово. Доступ к пространствам оформляется отдельно через сопряжение; подписки можно применить после входа в настройках резервных копий.",
+  "directoryTransferRequest": "QR-запрос с нового устройства",
+  "directoryTransferComparison": "Введите код с нового устройства",
+  "directoryTransferCopy": "Скопировать QR-запрос",
+  "directoryTransferHelp": "Сначала откройте одно и то же доверенное пространство на обоих устройствах. Передаются выбранные пространства, настройки и список подписок. Ключи и доступ не передаются: после восстановления выполните сопряжение для каждого пространства отдельно.",
+  "directoryTransferRelay": "Выберите доверенное пространство для передачи"
 }
