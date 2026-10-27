@@ -127,7 +127,7 @@ class _AndroidArchiveTransferState extends State<AndroidArchiveTransfer> {
     return [Text(strings.archiveRetained), const SizedBox(height: 12),
       FilledButton(onPressed: pending.complete ? cubit.save : () => _password(importing: false),
         child: Text(pending.complete ? strings.archiveSave : strings.archiveRetry)),
-      if (pending.complete) TextButton(onPressed: _discard, child: Text(strings.archiveDelete)),
+      TextButton(onPressed: _discard, child: Text(strings.archiveDelete)),
     ];
   }
 }

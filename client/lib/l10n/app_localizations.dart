@@ -5865,6 +5865,96 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Выключено'**
   String get directorySettingsOff;
+
+  /// No description provided for @archiveStreamingHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Большие архивы копируются через системный выбор документов без загрузки целиком в память. Для импорта нужно место под архив и распаковку. Пароль не сохраняется.'**
+  String get archiveStreamingHelp;
+
+  /// No description provided for @archiveCopyProgress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировано: {megabytes} МиБ'**
+  String archiveCopyProgress(int megabytes);
+
+  /// No description provided for @archiveCritical.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подготовка или применение архива. Отмена сейчас недоступна, чтобы сохранить ключи и данные.'**
+  String get archiveCritical;
+
+  /// No description provided for @archiveCancelling.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отмена и очистка…'**
+  String get archiveCancelling;
+
+  /// No description provided for @archiveRetry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверить и продолжить'**
+  String get archiveRetry;
+
+  /// No description provided for @archiveSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить архив в документ'**
+  String get archiveSave;
+
+  /// No description provided for @archiveRetained.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приватная копия переноса сохранена. Прежние ключи могли быть остановлены. Завершите сохранение; при ошибке копия останется для повтора.'**
+  String get archiveRetained;
+
+  /// No description provided for @archiveImportReady.
+  ///
+  /// In ru, this message translates to:
+  /// **'Архив скопирован в приложение. Введите пароль, чтобы проверить его и восстановить данные. Начатое восстановление можно повторить этим же архивом.'**
+  String get archiveImportReady;
+
+  /// No description provided for @archiveSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Документ записан и проверен повторным чтением. Приватная копия сохранена для повторного экспорта.'**
+  String get archiveSaved;
+
+  /// No description provided for @archiveDeleteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить приватную копию?'**
+  String get archiveDeleteTitle;
+
+  /// No description provided for @archiveDeleteHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удаляется только копия в приложении. Если исходные ключи уже остановлены, это может быть единственный архив восстановления. Сначала убедитесь, что внешняя копия и пароль доступны.'**
+  String get archiveDeleteHelp;
+
+  /// No description provided for @archiveDelete.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить приватную копию'**
+  String get archiveDelete;
+
+  /// No description provided for @archiveManualCleanup.
+  ///
+  /// In ru, this message translates to:
+  /// **'Очистка у провайдера'**
+  String get archiveManualCleanup;
+
+  /// No description provided for @archiveManualCleanupHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалите незавершённый документ Space-device в выбранном месте через системный файловый менеджер. Подтвердите только после удаления: приложение перестанет повторять автоматическую очистку. Приватный архив сохранится.'**
+  String get archiveManualCleanupHelp;
+
+  /// No description provided for @archiveCleanupConfirmed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Документ удалён вручную'**
+  String get archiveCleanupConfirmed;
 }
 
 class _AppLocalizationsDelegate

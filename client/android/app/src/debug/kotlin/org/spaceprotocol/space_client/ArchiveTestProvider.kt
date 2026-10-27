@@ -35,6 +35,8 @@ class ArchiveTestProvider : DocumentsProvider() {
     }
     override fun openDocument(id: String, mode: String, signal: CancellationSignal?): ParcelFileDescriptor {
         signal?.throwIfCanceled()
+        if (id == "fail-write" && mode.contains("w")) throw IOException("Нет места у провайдера")
+        if (id == "corrupt" && mode == "r") file(id).writeBytes(byteArrayOf(9))
         return ParcelFileDescriptor.open(file(id), ParcelFileDescriptor.parseMode(mode))
     }
 }

@@ -3235,4 +3235,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get directorySettingsOff => 'Off';
+
+  @override
+  String get archiveStreamingHelp =>
+      'Large archives use the system document picker without loading the whole file into memory. Import needs space for the archive and extraction. Passwords are not stored.';
+
+  @override
+  String archiveCopyProgress(int megabytes) {
+    return 'Copied: $megabytes MiB';
+  }
+
+  @override
+  String get archiveCritical =>
+      'Preparing or applying the archive. Cancellation is unavailable now to preserve keys and data.';
+
+  @override
+  String get archiveCancelling => 'Cancelling and cleaning up…';
+
+  @override
+  String get archiveRetry => 'Check and resume';
+
+  @override
+  String get archiveSave => 'Save archive to a document';
+
+  @override
+  String get archiveRetained =>
+      'A private transfer copy is retained. Previous keys may have been stopped. Finish saving; the copy remains available after an error.';
+
+  @override
+  String get archiveImportReady =>
+      'The archive is copied into the app. Enter its password to validate and restore it. An interrupted restore can use this same archive again.';
+
+  @override
+  String get archiveSaved =>
+      'The document was written and verified by reading it back. The private copy remains available for another export.';
+
+  @override
+  String get archiveDeleteTitle => 'Delete the private copy?';
+
+  @override
+  String get archiveDeleteHelp =>
+      'Only the app\'s copy is deleted. If previous keys were stopped, this may be the only recovery archive. First confirm that the external copy and password are available.';
+
+  @override
+  String get archiveDelete => 'Delete private copy';
+
+  @override
+  String get archiveManualCleanup => 'Clean up at the provider';
+
+  @override
+  String get archiveManualCleanupHelp =>
+      'Delete the unfinished Space-device document in the chosen location using the system file manager. Confirm only after deleting it: the app will stop retrying automatic cleanup. The private archive is retained.';
+
+  @override
+  String get archiveCleanupConfirmed => 'Document deleted manually';
 }

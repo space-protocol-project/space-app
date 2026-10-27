@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +18,8 @@ class Documents implements ArchiveDocuments {
   void Function(int)? progress;
   ArchiveWorkspace? current;
   Completer<bool>? saving;
-  int prepared = 0, discarded = 0, cancelled = 0, completed = 0;
+  int prepared = 0, discarded = 0, cancelled = 0, completed = 0, saves = 0;
+  Completer<void>? readiness;
   @override
   Future<ArchiveWorkspace?> status() async => current;
   @override
@@ -32,11 +32,14 @@ class Documents implements ArchiveDocuments {
     ArchiveMode.importing, ArchivePhase.ready, '/private/input', true,
   );
   @override
-  Future<void> ready() async { current = ArchiveWorkspace(current!.mode, ArchivePhase.ready, current!.path, true); }
+  Future<void> ready() async {
+    await readiness?.future;
+    current = ArchiveWorkspace(current!.mode, ArchivePhase.ready, current!.path, true);
+  }
   @override
   Future<void> applying() async { current = ArchiveWorkspace(current!.mode, ArchivePhase.applying, current!.path, true); }
   @override
-  Future<bool> save() async => saving == null ? true : saving!.future;
+  Future<bool> save() async { saves++; return saving == null ? true : saving!.future; }
   @override
   Future<void> discard() async { discarded++; current = null; }
   @override
@@ -116,6 +119,20 @@ void main() {
     await running;
     await first.close();
     await second.close();
+  });
+  test('Отмена до открытия SAF не теряется между проверкой архива и диалогом', () async {
+    final files = Documents();
+    final cubit = ArchiveTransferCubit(files, export: noAction, restore: noAction);
+    await cubit.prepare('password');
+    files.readiness = Completer<void>();
+    final saving = cubit.save();
+    await Future<void>.delayed(Duration.zero);
+    await cubit.cancel();
+    files.readiness!.complete();
+    await saving;
+    expect(files.saves, 0);
+    expect(files.current, isNotNull);
+    await cubit.close();
   });
   test('Ошибка применения сохраняет тот же архив; повтор удаляет копию только после успеха', () async {
     final files = Documents();

@@ -22,7 +22,7 @@ class ArchiveDocumentsTest {
         val workspace = workspace()
         workspace.read()?.let { workspace.write(it.apply { remove("cleanup") }) }
         workspace.discard()
-        for (id in listOf("input", "output", "deny-delete")) providerFile(id).delete()
+        for (id in listOf("input", "output", "deny-delete", "fail-write", "corrupt")) providerFile(id).delete()
     }
     private fun largeInput() {
         FileOutputStream(providerFile("input")).use { output ->
@@ -121,5 +121,20 @@ class ArchiveDocumentsTest {
         assertFalse(temporary.exists())
         assertTrue(retained.exists())
         retained.delete(); unrelated.delete()
+    }
+    @Test fun writeFailureOrReadBackMismatchNeverConfirmsExportOrDeletesPrivateCopy() {
+        val io = documents()
+        io.workspace.begin("export")
+        io.workspace.archive.writeBytes(ByteArray(100000))
+        io.workspace.phase("ready")
+        for (id in listOf("fail-write", "corrupt")) {
+            io.registerCreated(uri(id), 0)
+            try { io.exportDocument(uri(id), ArchiveCancellation()) { }; fail("Ожидался отказ") }
+            catch (_: java.io.IOException) { }
+            catch (_: IllegalStateException) { }
+            assertFalse(providerFile(id).exists())
+            assertFalse(workspace().read()!!.has("cleanup"))
+            assertEquals(100000L, workspace().readyFile().length())
+        }
     }
 }

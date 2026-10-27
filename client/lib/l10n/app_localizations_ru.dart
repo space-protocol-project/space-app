@@ -3253,4 +3253,58 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get directorySettingsOff => 'Выключено';
+
+  @override
+  String get archiveStreamingHelp =>
+      'Большие архивы копируются через системный выбор документов без загрузки целиком в память. Для импорта нужно место под архив и распаковку. Пароль не сохраняется.';
+
+  @override
+  String archiveCopyProgress(int megabytes) {
+    return 'Скопировано: $megabytes МиБ';
+  }
+
+  @override
+  String get archiveCritical =>
+      'Подготовка или применение архива. Отмена сейчас недоступна, чтобы сохранить ключи и данные.';
+
+  @override
+  String get archiveCancelling => 'Отмена и очистка…';
+
+  @override
+  String get archiveRetry => 'Проверить и продолжить';
+
+  @override
+  String get archiveSave => 'Сохранить архив в документ';
+
+  @override
+  String get archiveRetained =>
+      'Приватная копия переноса сохранена. Прежние ключи могли быть остановлены. Завершите сохранение; при ошибке копия останется для повтора.';
+
+  @override
+  String get archiveImportReady =>
+      'Архив скопирован в приложение. Введите пароль, чтобы проверить его и восстановить данные. Начатое восстановление можно повторить этим же архивом.';
+
+  @override
+  String get archiveSaved =>
+      'Документ записан и проверен повторным чтением. Приватная копия сохранена для повторного экспорта.';
+
+  @override
+  String get archiveDeleteTitle => 'Удалить приватную копию?';
+
+  @override
+  String get archiveDeleteHelp =>
+      'Удаляется только копия в приложении. Если исходные ключи уже остановлены, это может быть единственный архив восстановления. Сначала убедитесь, что внешняя копия и пароль доступны.';
+
+  @override
+  String get archiveDelete => 'Удалить приватную копию';
+
+  @override
+  String get archiveManualCleanup => 'Очистка у провайдера';
+
+  @override
+  String get archiveManualCleanupHelp =>
+      'Удалите незавершённый документ Space-device в выбранном месте через системный файловый менеджер. Подтвердите только после удаления: приложение перестанет повторять автоматическую очистку. Приватный архив сохранится.';
+
+  @override
+  String get archiveCleanupConfirmed => 'Документ удалён вручную';
 }

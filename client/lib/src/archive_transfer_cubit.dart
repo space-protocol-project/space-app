@@ -86,6 +86,7 @@ class ArchiveTransferCubit extends Cubit<ArchiveTransferState> {
   Future<void> save() => _run(() async {
     if (state.pending?.mode != ArchiveMode.exporting) throw StateError('Нет готового экспорта');
     await documents.ready();
+    if (state.cancelling || isClosed) throw PlatformException(code: 'cancelled');
     final saved = await documents.save();
     _publish(state.copyWith(saved: saved, finished: saved));
   }, cancellable: true);

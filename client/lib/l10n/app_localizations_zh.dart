@@ -2995,6 +2995,56 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get directorySettingsOff => '关闭';
+
+  @override
+  String get archiveStreamingHelp =>
+      '大文件通过系统文档选择器传输，无需将整个文件载入内存。导入需要归档和解压空间。不保存密码。';
+
+  @override
+  String archiveCopyProgress(int megabytes) {
+    return '已复制：$megabytes MiB';
+  }
+
+  @override
+  String get archiveCritical => '正在准备或应用归档。为保护密钥和数据，此时无法取消。';
+
+  @override
+  String get archiveCancelling => '正在取消并清理…';
+
+  @override
+  String get archiveRetry => '检查并继续';
+
+  @override
+  String get archiveSave => '将归档保存到文档';
+
+  @override
+  String get archiveRetained => '已保留私有迁移副本。旧密钥可能已停用。请完成保存；出错后仍可重试。';
+
+  @override
+  String get archiveImportReady => '归档已复制到应用。输入密码以验证并恢复。中断后可使用同一归档重试。';
+
+  @override
+  String get archiveSaved => '文档已写入并重新读取验证。私有副本仍可再次导出。';
+
+  @override
+  String get archiveDeleteTitle => '删除私有副本？';
+
+  @override
+  String get archiveDeleteHelp =>
+      '仅删除应用内的副本。如果旧密钥已停用，这可能是唯一的恢复归档。请先确认外部副本和密码可用。';
+
+  @override
+  String get archiveDelete => '删除私有副本';
+
+  @override
+  String get archiveManualCleanup => '在提供程序中清理';
+
+  @override
+  String get archiveManualCleanupHelp =>
+      '请使用系统文件管理器删除所选位置中未完成的 Space-device 文档。仅在删除后确认：应用将停止自动清理重试。私有归档将保留。';
+
+  @override
+  String get archiveCleanupConfirmed => '已手动删除文档';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
