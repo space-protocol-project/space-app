@@ -3079,4 +3079,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String directoryBackupPreview(int count) {
     return 'Пространств в копии: $count';
   }
+
+  @override
+  String directoryBackupSpaceComplete(String origin, int count) {
+    return '$origin: подписок — $count; снимок полный';
+  }
+
+  @override
+  String directoryBackupSpaceIncomplete(String origin, int count) {
+    return '$origin: подписок в сохранённом снимке — $count; актуальный список недоступен';
+  }
 }

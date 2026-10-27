@@ -82,7 +82,10 @@ class DirectoryRepository {
   }
 
   Future<void> write(Map<String, dynamic> data) async {
-    directoryRequire((data['catalog'] as Map).length <= 100 && (data['heads'] as Map).length <= 1000);
+    directoryRequire(
+      (data['catalog'] as Map).length <= 100 &&
+          (data['heads'] as Map).length <= 1000,
+    );
     _heads(data['heads'] as Map<String, dynamic>);
     _pending(data['pending'], data['catalog'] as Map<String, dynamic>);
     final raw = jsonEncode(data);

@@ -5559,6 +5559,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Пространств в копии: {count}'**
   String directoryBackupPreview(int count);
+
+  /// No description provided for @directoryBackupSpaceComplete.
+  ///
+  /// In ru, this message translates to:
+  /// **'{origin}: подписок — {count}; снимок полный'**
+  String directoryBackupSpaceComplete(String origin, int count);
+
+  /// No description provided for @directoryBackupSpaceIncomplete.
+  ///
+  /// In ru, this message translates to:
+  /// **'{origin}: подписок в сохранённом снимке — {count}; актуальный список недоступен'**
+  String directoryBackupSpaceIncomplete(String origin, int count);
 }
 
 class _AppLocalizationsDelegate

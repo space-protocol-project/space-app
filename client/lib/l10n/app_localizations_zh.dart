@@ -2830,6 +2830,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String directoryBackupPreview(int count) {
     return '备份中的空间数量：$count';
   }
+
+  @override
+  String directoryBackupSpaceComplete(String origin, int count) {
+    return '$origin：关注 $count 位参与者；快照完整';
+  }
+
+  @override
+  String directoryBackupSpaceIncomplete(String origin, int count) {
+    return '$origin：已保存 $count 个关注；无法获取当前列表';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4087,5 +4097,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   @override
   String directoryBackupPreview(int count) {
     return '备份中的空间数量：$count';
+  }
+
+  @override
+  String directoryBackupSpaceComplete(String origin, int count) {
+    return '$origin：关注 $count 位参与者；快照完整';
+  }
+
+  @override
+  String directoryBackupSpaceIncomplete(String origin, int count) {
+    return '$origin：已保存 $count 个关注；无法获取当前列表';
   }
 }

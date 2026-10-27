@@ -71,7 +71,10 @@ Map<String, dynamic> checkedDirectorySpace(Object? value) {
     'endpoint,endpoint_digest,endpoint_revision,following,following_revision,following_status,origin,principal_id,server_id,server_key,tls_fingerprint',
   );
   final origin = directoryAddress(data['origin']);
-  directoryRequire(Uri.parse(origin).path.isEmpty && parseConnectionInput(origin).origin.toString() == origin);
+  directoryRequire(
+    Uri.parse(origin).path.isEmpty &&
+        parseConnectionInput(origin).origin.toString() == origin,
+  );
   directoryAddress(data['endpoint']);
   directoryRequire(directoryText(data['server_id'], max: 128).isNotEmpty);
   directoryBytes(data['server_key'], 32);

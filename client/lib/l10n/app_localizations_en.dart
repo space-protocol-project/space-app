@@ -3061,4 +3061,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String directoryBackupPreview(int count) {
     return 'Spaces in this backup: $count';
   }
+
+  @override
+  String directoryBackupSpaceComplete(String origin, int count) {
+    return '$origin: $count follows; snapshot complete';
+  }
+
+  @override
+  String directoryBackupSpaceIncomplete(String origin, int count) {
+    return '$origin: $count saved follows; current list unavailable';
+  }
 }

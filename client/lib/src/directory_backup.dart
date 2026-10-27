@@ -284,7 +284,10 @@ class DirectoryBackupService {
     return result;
   }
 
-  Future<String> _restoreFollowing(Map<String, dynamic> space, bool Function()? operationActive) async {
+  Future<String> _restoreFollowing(
+    Map<String, dynamic> space,
+    bool Function()? operationActive,
+  ) async {
     final origin = space['origin'] as String,
         controller = controllers()[space['origin']];
     final session = controller?.mlsSession;

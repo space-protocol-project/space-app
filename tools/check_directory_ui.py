@@ -2,7 +2,6 @@
 import argparse
 import json
 from pathlib import Path
-import time
 
 from check_community_ui import FlutterMachine
 

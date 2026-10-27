@@ -102,11 +102,27 @@ void main() {
   test('Отмена после первой подписки останавливает продолжение; повтор дописывает остаток', () async {
     var active = true;
     final api = BackupFollowApi()..afterSet = () => active = false;
-    await expectLater(applyDirectoryFollowing(directorySpace(count: 2), api, 'feed', () => active), throwsFormatException);
+    await expectLater(
+      applyDirectoryFollowing(
+        directorySpace(count: 2),
+        api,
+        'feed',
+        () => active,
+      ),
+      throwsFormatException,
+    );
     expect(api.calls, 1);
-    active = true; api.afterSet = null;
-    expect(await applyDirectoryFollowing(directorySpace(count: 2), api, 'feed', () => active), 1);
+    active = true;
+    api.afterSet = null;
+    expect(
+      await applyDirectoryFollowing(
+        directorySpace(count: 2),
+        api,
+        'feed',
+        () => active,
+      ),
+      1,
+    );
     expect(api.calls, 2);
   });
-
 }

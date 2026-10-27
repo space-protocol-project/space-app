@@ -154,8 +154,18 @@ void main() {
   });
   test('Версия должна быть целой, адрес пространства — каноническим', () {
     final valid = directoryDocument().data;
-    expect(() => DirectoryDocument.parse({...valid, 'v': 1.0}), throwsFormatException);
-    expect(() => DirectoryDocument.parse({...valid, 'spaces': [{...directorySpace(), 'origin': 'https://space.example/'}]}), throwsFormatException);
+    expect(
+      () => DirectoryDocument.parse({...valid, 'v': 1.0}),
+      throwsFormatException,
+    );
+    expect(
+      () => DirectoryDocument.parse({
+        ...valid,
+        'spaces': [
+          {...directorySpace(), 'origin': 'https://space.example/'},
+        ],
+      }),
+      throwsFormatException,
+    );
   });
-
 }
