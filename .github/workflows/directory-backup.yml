@@ -1,0 +1,66 @@
+name: Зашифрованный каталог v0.8.0
+on:
+  push:
+    branches: [main]
+    paths: ['client/lib/src/directory*.dart', 'client/lib/ui/directory_backup.dart', 'client/test/directory*_test.dart', 'client/test/fixtures/directory.dart', 'client/test/probes/directory_probe.dart', 'client/lib/l10n/**', 'client/build.yaml', 'tools/check_directory_ui.py', '.github/workflows/directory-backup.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.8'
+          channel: stable
+          cache: true
+      - name: Зависимости нативных модулей
+        run: |
+          sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update
+          sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb xauth dbus-x11
+      - name: Rust
+        run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Генерация, форматирование и анализ каталога
+        working-directory: client
+        run: |
+          flutter pub get
+          dart run build_runner build
+          dart format lib/src/directory*.dart lib/src/chat_controller.dart lib/src/user_export_file.dart lib/ui/directory_backup.dart lib/ui/shell.dart lib/ui/panels.dart test/directory*_test.dart test/fixtures/directory.dart test/probes/directory_probe.dart
+          dart fix --apply --code=curly_braces_in_flow_control_structures
+          flutter analyze
+      - name: Тесты формата и восстановления
+        working-directory: client
+        run: flutter test --no-pub test/directory_archive_test.dart test/directory_backup_test.dart test/directory_follows_test.dart test/directory_backup_cubit_test.dart test/directory_backup_panel_test.dart test/user_export_file_test.dart test/recovery_test.dart test/recovery_spaces_test.dart test/migration_archive_test.dart
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: directory-backup-source
+          path: |
+            client/lib/src/**/*.freezed.dart
+            client/lib/src/directory*.dart
+            client/lib/src/chat_controller.dart
+            client/lib/src/user_export_file.dart
+            client/lib/ui/directory_backup.dart
+            client/lib/ui/shell.dart
+            client/lib/ui/panels.dart
+            client/lib/l10n/app_localizations*.dart
+            client/test/directory*_test.dart
+            client/test/fixtures/directory.dart
+            client/test/probes/directory_probe.dart
+      - name: Анализ пакета интерфейса
+        working-directory: packages/space_admin_ui
+        run: |
+          flutter pub get
+          flutter analyze
+      - name: Нативный запрос, отмена и горячий перезапуск
+        run: xvfb-run -a dbus-run-session -- python3 tools/check_directory_ui.py --output "$RUNNER_TEMP/directory-native"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: directory-native-ui
+          path: ${{ runner.temp }}/directory-native

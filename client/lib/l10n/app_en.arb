@@ -1067,5 +1067,22 @@
   "userExportInvalidPeriod": "Enter valid YYYY-MM-DD dates and a valid period.",
   "pairingNetworkError": "Cannot reach the server. Polling will retry until the code expires.",
   "pairingVerificationError": "Verification failed. Start pairing again.",
-  "pairingQrInvalid": "The QR is invalid, expired, or belongs to another space. Scan a new QR on the device being connected."
+  "pairingQrInvalid": "The QR is invalid, expired, or belongs to another space. Scan a new QR on the device being connected.",
+  "directoryBackupTitle": "Encrypted directory backup",
+  "directoryBackupHelp": "Spaces, settings and follows without device keys or history. Use at least 12 password characters. Recover access with a recovery card or pairing.",
+  "directoryBackupCreate": "Create backup",
+  "directoryBackupRead": "Preview backup",
+  "directoryBackupApply": "Restore directory",
+  "directoryBackupSettings": "Replace interface settings with the backup settings",
+  "directoryBackupFollows": "Add saved follows",
+  "directoryBackupResume": "Finish interrupted restore",
+  "directoryBackupUnverified": "This backup has no local version witness. Its freshness is unknown.",
+  "directoryBackupResults": "Space results (incomplete follow snapshots are listed when saving):",
+  "directoryBackupSaved": "Backup saved and verified. Store the password separately.",
+  "directoryBackupRestored": "Local restore completed. Restore follows separately after signing in with the same identity.",
+  "directoryBackupError": "Operation incomplete. Check the password, backup integrity and storage access. An interrupted restore can be resumed.",
+  "directoryBackupConfirm": "Apply the verified directory? Access keys are preserved. Selected settings will be applied; interrupted restoration can be resumed.",
+  "directoryBackupFollowsHelp": "Add missing follows for connected spaces with the same identity? Existing follows are kept. Servers check access; results may be partial.",
+  "directoryBackupPreview": "Spaces in this backup: {count}",
+  "@directoryBackupPreview": {"placeholders": {"count": {"type": "int"}}}
 }

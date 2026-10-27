@@ -11,12 +11,12 @@ class UserExportFileService {
     : android = android ?? Platform.isAndroid;
   final bool android;
   static const channel = MethodChannel('space/user-export');
-  Future<String?> choose(String name) async {
-    if (android) return channel.invokeMethod<String>('choose', {'name': name});
+  Future<String?> choose(String name, {bool binary = false}) async {
+    if (android) return channel.invokeMethod<String>('choose', {'name': name, 'binary': binary});
     return (await getSaveLocation(
       suggestedName: name,
-      acceptedTypeGroups: const [
-        XTypeGroup(label: 'JSON', extensions: ['json']),
+      acceptedTypeGroups: [
+        XTypeGroup(label: binary ? 'Space backup' : 'JSON', extensions: [binary ? 'spacebackup' : 'json']),
       ],
     ))?.path;
   }

@@ -53,6 +53,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   ChatController(
     this.vault, {
     this.openSession = SpaceSession.connect,
+    this.checkDirectoryTrust,
     this.retryDelay = defaultRetryDelay,
     this.openMlsArchive = openSavedMlsArchive,
     ChannelPositionStore? positions,
@@ -870,6 +871,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
   Timer? _catalogRetryTimer;
   Completer<void>? _catalogRetryDone;
   final Future<LiveSession> Function(Discovery, IdentityVault) openSession;
+  final Future<void> Function(Discovery)? checkDirectoryTrust;
   final Duration Function(int) retryDelay;
   Timer? _retryTimer;
   Completer<void>? _retryDone;
@@ -1022,6 +1024,7 @@ class ChatController extends EventController<ChatEvent<dynamic>, ChatState> {
       );
       final saved = await vault.load(server.origin.toString());
       if (saved != null) checkTrust(server, saved);
+      await checkDirectoryTrust?.call(server);
       fingerprint = await server.fingerprint();
       final invite = input.invitationToken;
       if (invite.isNotEmpty) {

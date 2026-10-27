@@ -20,21 +20,21 @@ class UserExportBridge(private val activity: MainActivity, private val channel: 
     private fun handle(call: MethodCall, result: MethodChannel.Result) {
         if (closed) { result.error("closed", "Окно закрыто", null); return }
         when (call.method) {
-            "choose" -> choose(call.argument<String>("name"), result)
+            "choose" -> choose(call.argument<String>("name"), call.argument<Boolean>("binary") == true, result)
             "write" -> write(call, result)
             "discard" -> discard(call.argument<String>("uri"), result)
             else -> result.notImplemented()
         }
     }
-    private fun choose(name: String?, result: MethodChannel.Result) {
+    private fun choose(name: String?, binary: Boolean, result: MethodChannel.Result) {
         if (picker != null || writing) { result.error("busy", "Диалог сохранения уже открыт", null); return }
-        if (name == null || !UserExportPolicy.validName(name)) { result.error("invalid", "Некорректное имя экспорта", null); return }
+        if (name == null || !UserExportPolicy.validName(name, binary)) { result.error("invalid", "Некорректное имя экспорта", null); return }
         destination = null
         picker = result
         try {
             val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
-                type = "application/json"
+                type = if (binary) "application/octet-stream" else "application/json"
                 putExtra(Intent.EXTRA_TITLE, name)
             }
             activity.startActivityForResult(intent, requestCode)

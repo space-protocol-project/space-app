@@ -175,6 +175,7 @@ class SettingsPanel extends StatelessWidget {
     this.prepareInstall,
     this.requestNotificationPermission,
     this.deviceTransfer,
+    this.directoryBackup,
     this.voiceDevices,
     this.voiceSettings,
   });
@@ -183,6 +184,7 @@ class SettingsPanel extends StatelessWidget {
   final Future<bool> Function()? requestNotificationPermission;
   final AppPreferences preferences;
   final Widget? deviceTransfer;
+  final Widget? directoryBackup;
   final VoiceDevices? voiceDevices;
   final Widget? voiceSettings;
   @override
@@ -292,6 +294,7 @@ class SettingsPanel extends StatelessWidget {
       ],
       const SizedBox(height: 24),
       AppUpdatesView(updates: updates, prepareInstall: prepareInstall),
+      if (directoryBackup != null) ...[const SizedBox(height: 24), directoryBackup!],
       if (deviceTransfer != null) ...[
         const SizedBox(height: 24),
         deviceTransfer!,

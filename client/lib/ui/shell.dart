@@ -58,6 +58,9 @@ import '../src/device_migration.dart';
 import '../src/saved_drafts.dart';
 import '../src/app_shutdown.dart';
 import 'device_transfer_area.dart';
+import 'directory_backup.dart';
+import '../src/directory_backup.dart';
+import '../src/directory_repository.dart';
 
 import 'package:path_provider/path_provider.dart';
 
@@ -167,12 +170,15 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     notificationFocused = state == AppLifecycleState.resumed;
   }
 
+  late final directoryRepository = DirectoryRepository(const PlatformKeyStorage());
+  late final directoryService = DirectoryBackupService(directoryRepository, initialController.vault,
+      widget.preferences, () => workspaces.controllers);
   late final ChatController initialController =
-      widget.controller ?? ChatController(SecureIdentityVault());
+      widget.controller ?? ChatController(SecureIdentityVault(), checkDirectoryTrust: directoryRepository.checkTrust);
   ChatController? activeController;
   final transientControllers = <ChatController>{};
   ChatController createTransient() {
-    final target = ChatController(initialController.vault);
+    final target = ChatController(initialController.vault, checkDirectoryTrust: directoryRepository.checkTrust);
     transientControllers.add(target);
     return target;
   }
@@ -181,7 +187,8 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
 
   ChatController get controller => activeController ?? initialController;
   late final workspaces =
-      widget.workspaces ?? ServerWorkspaces(vault: initialController.vault);
+      widget.workspaces ?? ServerWorkspaces(vault: initialController.vault,
+        create: (_) => ChatController(initialController.vault, checkDirectoryTrust: directoryRepository.checkTrust));
   bool dashboard = true;
   bool applicationSettings = false;
   bool devicePage = false;
@@ -2062,6 +2069,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
                             SettingsPanel(
                               preferences: widget.preferences,
                               deviceTransfer: deviceTransferArea(),
+                              directoryBackup: DirectoryBackupPanel(service: directoryService),
                               voiceDevices: voice.devices,
                               voiceSettings: VoiceDevicesSettings(
                                 devices: voice.devices,
