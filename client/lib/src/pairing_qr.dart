@@ -65,6 +65,7 @@ class PairingQr {
     final data = jsonDecode(
       utf8.decode(base64Url.decode(text.substring(pairingQrPrefix.length))),
     );
+    if (data is! Map || data.length != 9) throw const FormatException('QR');
     if (data case {
       'server': String server,
       'key': String key,
@@ -94,6 +95,7 @@ class PairingQr {
   }
 
   void _validate() {
+    if (fullManagement && !administrative) throw const FormatException('QR');
     if (!RegExp(r'^pc_[A-Za-z0-9_-]{43}$').hasMatch(code) ||
         !RegExp(r'^pr_[A-Za-z0-9_-]{43}$').hasMatch(id) ||
         !RegExp(r'^[A-Za-z0-9_-]{43}$').hasMatch(serverKey) ||

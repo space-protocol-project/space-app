@@ -40,7 +40,7 @@ class _PairingStartPanelState extends State<PairingStartPanel>
   @override
   void didUpdateWidget(covariant PairingStartPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller != widget.controller) {
+    if (oldWidget.controller != widget.controller || oldWidget.fullManagement != widget.fullManagement) {
       unawaited(cubit.close());
       cubit = createCubit();
     }

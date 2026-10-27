@@ -49,31 +49,36 @@ class PairingSelectionCubit extends Cubit<PairingSelectionState> {
     try {
       // Сначала проверяем весь выбор: существующие личности не заменяются.
       for (final entry in selected.entries) {
-        final controller = entry.value;
-        if (controller == null || controller.connected || controller.busy ||
-            await controller.vault.load(entry.key) != null) {
-          throw StateError('identity');
-        }
+        await _requireNewIdentity(entry.key, entry.value);
         if (!_current(generation)) return;
       }
       final catalog = (await repository?.read())?['catalog'] as Map? ?? const {};
       for (final entry in selected.entries) {
         if (!_current(generation)) return;
-        final controller = entry.value!;
-        final saved = catalog[entry.key] as Map?;
-        await controller.inspect(saved?['endpoint'] as String? ?? entry.key,
-            tlsFingerprint: saved?['tls_fingerprint'] as String? ?? '');
+        await _inspect(entry.key, entry.value!, catalog[entry.key] as Map?);
         if (!_current(generation)) return;
-        if (controller.preview?.origin.toString() != entry.key ||
-            !identical(controllers()[entry.key], controller)) {
-          throw StateError('discovery');
-        }
       }
       emit(state.copyWith(prepared: true, revision: state.revision + 1));
     } catch (_) {
       if (_current(generation)) emit(state.copyWith(error: 'pairingSelectionFailed'));
     } finally {
       if (_current(generation)) emit(state.copyWith(busy: false));
+    }
+  }
+
+  Future<void> _requireNewIdentity(String origin, ChatController? controller) async {
+    if (controller == null || controller.connected || controller.busy ||
+        await controller.vault.load(origin).timeout(const Duration(seconds: 10)) != null) {
+      throw StateError('identity');
+    }
+  }
+
+  Future<void> _inspect(String origin, ChatController controller, Map? saved) async {
+    await controller.inspect(saved?['endpoint'] as String? ?? origin,
+        tlsFingerprint: saved?['tls_fingerprint'] as String? ?? '');
+    if (controller.preview?.origin.toString() != origin ||
+        !identical(controllers()[origin], controller)) {
+      throw StateError('discovery');
     }
   }
 

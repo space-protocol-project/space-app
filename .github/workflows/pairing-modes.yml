@@ -64,7 +64,8 @@ jobs:
           flutter pub get
           dart run build_runner build
           flutter gen-l10n
-          dart format lib/src/pairing*.dart lib/src/core.dart lib/src/root_device_proof.dart lib/ui/pairing*.dart lib/ui/device_panel.dart lib/ui/recovery_panel.dart test/pairing*_test.dart
+          dart format lib/src/pairing*.dart lib/src/core.dart lib/src/directory_repository.dart lib/src/root_device_proof.dart lib/ui/pairing*.dart lib/ui/device_panel.dart lib/ui/recovery_panel.dart test/pairing*_test.dart tool/community_pairing_modes_interoperability.dart
+          dart fix --apply --code=curly_braces_in_flow_control_structures
           flutter analyze
           cd ../../server
           gofmt -w internal/postgres/pairing*.go internal/postgres/challenge.go internal/postgres/recovery.go internal/postgres/store.go internal/postgres/root_retention.go internal/postgres/rotation.go
@@ -88,9 +89,11 @@ jobs:
             app/client/lib/src/generated/space/v1/space*.dart
             app/client/lib/src/pairing*.dart
             app/client/lib/src/core.dart
+            app/client/lib/src/directory_repository.dart
             app/client/lib/src/root_device_proof.dart
             app/client/lib/ui/pairing*.dart
             app/client/lib/ui/device_panel.dart
             app/client/lib/ui/recovery_panel.dart
             app/client/lib/l10n/*.dart
             app/client/test/pairing*_test.dart
+            app/client/tool/community_pairing_modes_interoperability.dart
