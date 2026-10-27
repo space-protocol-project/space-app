@@ -48,7 +48,7 @@ jobs:
       - name: Генерация контракта
         run: |
           mkdir -p "$RUNNER_TEMP/pair-schema/space/v1"
-          cp protocol/protocol/proto/space/v1/space.proto protocol/protocol/proto/space/v1/community_mentions.proto "$RUNNER_TEMP/pair-schema/space/v1/"
+          cp -r protocol/protocol/proto/* "$RUNNER_TEMP/pair-schema/"
           cp -r protocol/protocol/vendor/* "$RUNNER_TEMP/pair-schema/"
           (cd protocol && buf lint && buf generate "$RUNNER_TEMP/pair-schema" --template buf.gen.yaml)
           (cd server && buf generate "$RUNNER_TEMP/pair-schema" --template buf.gen.yaml && buf generate "$RUNNER_TEMP/pair-schema" --template buf.connect.gen.yaml)
