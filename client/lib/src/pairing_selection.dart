@@ -20,7 +20,7 @@ abstract class PairingSelectionState with _$PairingSelectionState {
 
 class PairingSelectionCubit extends Cubit<PairingSelectionState> {
   PairingSelectionCubit(this.controllers, {this.repository})
-      : super(const PairingSelectionState());
+    : super(const PairingSelectionState());
   final Map<String, ChatController> Function() controllers;
   final DirectoryRepository? repository;
   int _generation = 0;
@@ -30,7 +30,11 @@ class PairingSelectionCubit extends Cubit<PairingSelectionState> {
     if (isClosed || state.busy || state.prepared) return;
     if (!controllers().containsKey(origin)) return;
     final next = {...state.origins};
-    if (selected) { next.add(origin); } else { next.remove(origin); }
+    if (selected) {
+      next.add(origin);
+    } else {
+      next.remove(origin);
+    }
     if (next.length > 12) return;
     emit(state.copyWith(origins: next, error: ''));
   }
@@ -42,24 +46,34 @@ class PairingSelectionCubit extends Cubit<PairingSelectionState> {
   }
 
   Future<void> prepare() async {
-    if (isClosed || state.busy || state.prepared || state.origins.isEmpty) return;
+    if (isClosed || state.busy || state.prepared || state.origins.isEmpty) {
+      return;
+    }
     final generation = ++_generation;
-    final selected = {for (final origin in state.origins) origin: controllers()[origin]};
+    final selected = {
+      for (final origin in state.origins) origin: controllers()[origin],
+    };
     emit(state.copyWith(busy: true, error: ''));
     try {
       // Сначала проверяем весь выбор: существующие личности не заменяются.
       if (!await _checkSelection(selected, generation)) return;
-      final catalog = (await repository?.read())?['catalog'] as Map? ?? const {};
+      final catalog =
+          (await repository?.read())?['catalog'] as Map? ?? const {};
       if (!await _discoverSelection(selected, catalog, generation)) return;
       emit(state.copyWith(prepared: true, revision: state.revision + 1));
     } catch (_) {
-      if (_current(generation)) emit(state.copyWith(error: 'pairingSelectionFailed'));
+      if (_current(generation)) {
+        emit(state.copyWith(error: 'pairingSelectionFailed'));
+      }
     } finally {
       if (_current(generation)) emit(state.copyWith(busy: false));
     }
   }
 
-  Future<bool> _checkSelection(Map<String, ChatController?> selected, int generation) async {
+  Future<bool> _checkSelection(
+    Map<String, ChatController?> selected,
+    int generation,
+  ) async {
     for (final entry in selected.entries) {
       await _requireNewIdentity(entry.key, entry.value);
       if (!_current(generation)) return false;
@@ -67,7 +81,11 @@ class PairingSelectionCubit extends Cubit<PairingSelectionState> {
     return true;
   }
 
-  Future<bool> _discoverSelection(Map<String, ChatController?> selected, Map catalog, int generation) async {
+  Future<bool> _discoverSelection(
+    Map<String, ChatController?> selected,
+    Map catalog,
+    int generation,
+  ) async {
     for (final entry in selected.entries) {
       if (!_current(generation)) return false;
       await _inspect(entry.key, entry.value!, catalog[entry.key] as Map?);
@@ -76,16 +94,30 @@ class PairingSelectionCubit extends Cubit<PairingSelectionState> {
     return true;
   }
 
-  Future<void> _requireNewIdentity(String origin, ChatController? controller) async {
-    if (controller == null || controller.connected || controller.busy ||
-        await controller.vault.load(origin).timeout(const Duration(seconds: 10)) != null) {
+  Future<void> _requireNewIdentity(
+    String origin,
+    ChatController? controller,
+  ) async {
+    if (controller == null ||
+        controller.connected ||
+        controller.busy ||
+        await controller.vault
+                .load(origin)
+                .timeout(const Duration(seconds: 10)) !=
+            null) {
       throw StateError('identity');
     }
   }
 
-  Future<void> _inspect(String origin, ChatController controller, Map? saved) async {
-    await controller.inspect(saved?['endpoint'] as String? ?? origin,
-        tlsFingerprint: saved?['tls_fingerprint'] as String? ?? '');
+  Future<void> _inspect(
+    String origin,
+    ChatController controller,
+    Map? saved,
+  ) async {
+    await controller.inspect(
+      saved?['endpoint'] as String? ?? origin,
+      tlsFingerprint: saved?['tls_fingerprint'] as String? ?? '',
+    );
     if (controller.preview?.origin.toString() != origin ||
         !identical(controllers()[origin], controller)) {
       throw StateError('discovery');
@@ -98,5 +130,8 @@ class PairingSelectionCubit extends Cubit<PairingSelectionState> {
   }
 
   @override
-  Future<void> close() { ++_generation; return super.close(); }
+  Future<void> close() {
+    ++_generation;
+    return super.close();
+  }
 }
