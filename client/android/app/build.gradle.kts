@@ -70,6 +70,9 @@ dependencies {
         implementation("androidx.test:runner:1.7.0") {
             because("Одинаковая актуальная версия в приложении и инструментальных тестах AGP")
         }
+        implementation("androidx.test:core:1.7.0") {
+            because("Согласованный runtime для AndroidJUnit4 и SDK integration_test")
+        }
     }
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test:runner:1.7.0")
