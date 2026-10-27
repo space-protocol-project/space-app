@@ -122,11 +122,17 @@ class DirectoryBackupService {
     final id = selectedOrigins != null || (state['outgoing'] as String).isEmpty
         ? url64(DirectoryArchive.random(16))
         : state['outgoing'] as String;
-    final head = selectedOrigins == null ? (state['heads'] as Map)[id] as Map? : null;
+    final head = selectedOrigins == null
+        ? (state['heads'] as Map)[id] as Map?
+        : null;
     final spaces = <Map<String, dynamic>>[];
     final origins = selectedOrigins ?? preferences.origins.toSet().toList();
     if (selectedOrigins != null) {
-      directoryRequire(origins.isNotEmpty && origins.length <= 12 && origins.toSet().length == origins.length);
+      directoryRequire(
+        origins.isNotEmpty &&
+            origins.length <= 12 &&
+            origins.toSet().length == origins.length,
+      );
       directoryRequire(origins.every(preferences.origins.contains));
     }
     directoryRequire(origins.length <= 100);

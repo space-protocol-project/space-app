@@ -3099,4 +3099,53 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pairingModeLimitedHelp =>
       'Working access to selected spaces only. Cannot pair or revoke other devices or manage root keys.';
+
+  @override
+  String get directoryTransferSend => 'Send selected';
+
+  @override
+  String get directoryTransferError =>
+      'The transfer was cancelled or failed verification. Check the connection and start again with a new QR request.';
+
+  @override
+  String get directoryTransferConfirm => 'Codes match — continue';
+
+  @override
+  String get directoryTransferWaiting =>
+      'Waiting for the other device. The request expires in 5 minutes.';
+
+  @override
+  String get directoryTransferTitle => 'Transfer directory to another device';
+
+  @override
+  String get directoryTransferReceive => 'Receive directory';
+
+  @override
+  String get directoryTransferCompareHelp =>
+      'Compare the code on both devices in person or over a trusted channel. Cancel if any character differs. Do not compare codes through this server.';
+
+  @override
+  String get directoryTransferSelect =>
+      'On the source device, select up to 12 spaces';
+
+  @override
+  String get directoryTransferDone =>
+      'Done. Pair each space separately for access; following lists can be applied after signing in through backup settings.';
+
+  @override
+  String get directoryTransferRequest => 'QR request from the new device';
+
+  @override
+  String get directoryTransferComparison =>
+      'Enter the code shown on the new device';
+
+  @override
+  String get directoryTransferCopy => 'Copy QR request';
+
+  @override
+  String get directoryTransferHelp =>
+      'Open the same trusted space on both devices first. Selected spaces, preferences and following lists are transferred. Keys and access are excluded: pair each space separately after restoring.';
+
+  @override
+  String get directoryTransferRelay => 'Select a trusted space for transfer';
 }

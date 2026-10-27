@@ -2866,6 +2866,50 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pairingModeLimitedHelp => '仅能访问所选空间，不能配对或撤销其他设备，也不能管理根密钥。';
+
+  @override
+  String get directoryTransferSend => '发送所选内容';
+
+  @override
+  String get directoryTransferError => '传输已取消或验证失败。请检查连接并使用新的二维码请求重新开始。';
+
+  @override
+  String get directoryTransferConfirm => '代码相同，继续';
+
+  @override
+  String get directoryTransferWaiting => '正在等待另一台设备。请求在 5 分钟后过期。';
+
+  @override
+  String get directoryTransferTitle => '将目录传输到另一台设备';
+
+  @override
+  String get directoryTransferReceive => '接收目录';
+
+  @override
+  String get directoryTransferCompareHelp =>
+      '请当面或通过受信任的渠道比较两台设备上的代码。如有任何字符不同，请取消传输。不要通过此服务器比较代码。';
+
+  @override
+  String get directoryTransferSelect => '在源设备上选择最多 12 个空间';
+
+  @override
+  String get directoryTransferDone => '完成。请分别配对各空间以获得访问权限；登录后可在备份设置中应用关注列表。';
+
+  @override
+  String get directoryTransferRequest => '来自新设备的二维码请求';
+
+  @override
+  String get directoryTransferComparison => '输入新设备上显示的代码';
+
+  @override
+  String get directoryTransferCopy => '复制二维码请求';
+
+  @override
+  String get directoryTransferHelp =>
+      '先在两台设备上打开同一个受信任的空间。仅传输选定的空间、设置和关注列表，不传输密钥和访问权限；恢复后请分别配对各空间。';
+
+  @override
+  String get directoryTransferRelay => '选择用于传输的受信任空间';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4160,4 +4204,48 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get pairingModeLimitedHelp => '仅能访问所选空间，不能配对或撤销其他设备，也不能管理根密钥。';
+
+  @override
+  String get directoryTransferSend => '发送所选内容';
+
+  @override
+  String get directoryTransferError => '传输已取消或验证失败。请检查连接并使用新的二维码请求重新开始。';
+
+  @override
+  String get directoryTransferConfirm => '代码相同，继续';
+
+  @override
+  String get directoryTransferWaiting => '正在等待另一台设备。请求在 5 分钟后过期。';
+
+  @override
+  String get directoryTransferTitle => '将目录传输到另一台设备';
+
+  @override
+  String get directoryTransferReceive => '接收目录';
+
+  @override
+  String get directoryTransferCompareHelp =>
+      '请当面或通过受信任的渠道比较两台设备上的代码。如有任何字符不同，请取消传输。不要通过此服务器比较代码。';
+
+  @override
+  String get directoryTransferSelect => '在源设备上选择最多 12 个空间';
+
+  @override
+  String get directoryTransferDone => '完成。请分别配对各空间以获得访问权限；登录后可在备份设置中应用关注列表。';
+
+  @override
+  String get directoryTransferRequest => '来自新设备的二维码请求';
+
+  @override
+  String get directoryTransferComparison => '输入新设备上显示的代码';
+
+  @override
+  String get directoryTransferCopy => '复制二维码请求';
+
+  @override
+  String get directoryTransferHelp =>
+      '先在两台设备上打开同一个受信任的空间。仅传输选定的空间、设置和关注列表，不传输密钥和访问权限；恢复后请分别配对各空间。';
+
+  @override
+  String get directoryTransferRelay => '选择用于传输的受信任空间';
 }

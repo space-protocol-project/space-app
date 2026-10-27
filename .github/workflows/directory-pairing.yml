@@ -1,0 +1,117 @@
+name: Зашифрованная передача каталога
+on:
+  workflow_dispatch:
+    inputs:
+      server_ref:
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  noise:
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, windows-2025, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy
+      - working-directory: native/space_directory_noise
+        run: |
+          cargo +1.99.1 fmt --check
+          cargo +1.99.1 clippy --locked --all-targets -- -D warnings
+          cargo +1.99.1 test --locked
+      - if: runner.os == 'Linux'
+        working-directory: native/space_directory_noise
+        run: |
+          cargo +1.99.1 install cargo-audit --version 0.22.2 --locked
+          cargo +1.99.1 audit
+  quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:17.11
+        env: {POSTGRES_DB: space_test, POSTGRES_USER: space, POSTGRES_PASSWORD: ci-only-password}
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U space -d space_test" --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      SPACE_TEST_DATABASE_URL: postgres://space:ci-only-password@127.0.0.1:5432/space_test?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+        with: {path: app}
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: ${{ inputs.server_ref }}
+          path: server
+      - uses: actions/setup-go@v5
+        with: {go-version-file: server/go.mod}
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Системные зависимости
+        run: |
+          printf 'https://archive.ubuntu.com/ubuntu\n' | sudo tee /etc/apt/apt-mirrors.txt
+          timeout 180s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 update
+          timeout 480s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 install -y --no-install-recommends libgtk-3-dev libx11-dev libxi-dev
+      - name: Сервер, гонки и анализ
+        working-directory: server
+        run: |
+          gofmt -w internal/postgres/directory_pairing*.go
+          go test ./...
+          go test -race ./...
+          go vet ./...
+          go mod verify
+          go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -C cmd/space-server ./...
+      - name: Dart, пакеты и полный набор тестов
+        working-directory: app/client
+        run: |
+          flutter pub get
+          dart format lib/src/directory_transfer*.dart lib/src/directory_backup.dart lib/ui/directory_transfer.dart lib/ui/device_panel.dart lib/ui/camera_scanner.dart test/directory_transfer*_test.dart
+          dart fix --apply --code=curly_braces_in_flow_control_structures
+          flutter analyze
+          dart run tool/core_import_check.dart
+          flutter test
+          (cd ../packages/space_directory_noise && dart pub get && dart analyze)
+          (cd ../packages/space_admin_ui && flutter pub get && flutter analyze)
+      - name: Настоящий Connect relay и два Noise-клиента
+        working-directory: server
+        env:
+          SPACE_DATABASE_URL: postgres://space:ci-only-password@127.0.0.1:5432/space_test?sslmode=disable
+        run: |
+          go build -o "$RUNNER_TEMP/space-directory-server" ./cmd/space-server
+          python3 ../app/tools/check_community_interop.py --server "$RUNNER_TEMP/space-directory-server" --client ../app/client --scenario directory_pairing --output "$RUNNER_TEMP/directory-interop"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: directory-pairing-checked-source
+          path: |
+            app/client/lib/src/directory_transfer*.dart
+            app/client/lib/src/directory_backup.dart
+            app/client/lib/ui/directory_transfer.dart
+            app/client/lib/ui/device_panel.dart
+            app/client/lib/ui/camera_scanner.dart
+            app/client/test/directory_transfer*_test.dart
+            server/internal/postgres/directory_pairing*.go
+            ${{ runner.temp }}/directory-interop
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Android, сборка без устройства
+        working-directory: client
+        run: |
+          flutter pub get
+          flutter build apk --debug
+      - name: Android SAF и приватный runtime
+        working-directory: client/android
+        run: ./gradlew :app:testDebugUnitTest :flutter_webrtc:testDebugUnitTest

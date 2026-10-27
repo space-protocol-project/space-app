@@ -28,11 +28,19 @@ class DirectoryTransfer {
       throw StateError('Directory transfer closed');
     }
     if (_expires != 0) {
-      directoryRequire(DateTime.now().millisecondsSinceEpoch ~/ 1000 < _expires);
+      directoryRequire(
+        DateTime.now().millisecondsSinceEpoch ~/ 1000 < _expires,
+      );
     }
   }
 
-  void _lease(String id, String token, int created, int expires, String prefix) {
+  void _lease(
+    String id,
+    String token,
+    int created,
+    int expires,
+    String prefix,
+  ) {
     _id = id;
     _token = token;
     _expires = expires;
@@ -45,9 +53,14 @@ class DirectoryTransfer {
   }
 
   Future<void> _channel(bool initiator, DirectoryTransferQr qr) async {
-    final channel = await DirectoryNoiseChannel.open(engine,
-      initiator: initiator, context: qr.context,
-      expected: initiator ? null : base64Url.decode(base64Url.normalize(qr.public)));
+    final channel = await DirectoryNoiseChannel.open(
+      engine,
+      initiator: initiator,
+      context: qr.context,
+      expected: initiator
+          ? null
+          : base64Url.decode(base64Url.normalize(qr.public)),
+    );
     if (_closed) {
       await channel.close();
       throw StateError('Directory transfer cancelled');
@@ -58,15 +71,39 @@ class DirectoryTransfer {
 
   Future<DirectoryTransferQr> receiveStart() async {
     _active();
-    final lease = await relay.create(CreateDirectoryTransferRequest(profile: directoryNoiseProfile));
-    _lease(lease.id, lease.ownerToken, lease.createdAt.toInt(), lease.expiresAt.toInt(), 'dr');
+    final lease = await relay.create(
+      CreateDirectoryTransferRequest(profile: directoryNoiseProfile),
+    );
+    _lease(
+      lease.id,
+      lease.ownerToken,
+      lease.createdAt.toInt(),
+      lease.expiresAt.toInt(),
+      'dr',
+    );
     directoryRequire(RegExp(r'^dc_[A-Za-z0-9_-]{43}$').hasMatch(lease.code));
-    final qr = DirectoryTransferQr(server.origin.toString(), server.serverId,
-      url64(server.publicKey), server.tlsFingerprint, _id, lease.code, '', _expires);
+    final qr = DirectoryTransferQr(
+      server.origin.toString(),
+      server.serverId,
+      url64(server.publicKey),
+      server.tlsFingerprint,
+      _id,
+      lease.code,
+      '',
+      _expires,
+    );
     await _channel(true, qr);
     await _put(0, await _noise!.writeHandshake());
-    return DirectoryTransferQr(qr.origin, qr.server, qr.key, qr.tls,
-      qr.id, qr.code, url64(_noise!.public), qr.expires);
+    return DirectoryTransferQr(
+      qr.origin,
+      qr.server,
+      qr.key,
+      qr.tls,
+      qr.id,
+      qr.code,
+      url64(_noise!.public),
+      qr.expires,
+    );
   }
 
   Future<void> receiveHandshake() async {
@@ -78,7 +115,13 @@ class DirectoryTransfer {
     _active();
     qr.checkServer(server);
     final lease = await relay.open(OpenDirectoryTransferRequest(code: qr.code));
-    _lease(lease.id, lease.peerToken, lease.createdAt.toInt(), lease.expiresAt.toInt(), 'ds');
+    _lease(
+      lease.id,
+      lease.peerToken,
+      lease.createdAt.toInt(),
+      lease.expiresAt.toInt(),
+      'ds',
+    );
     directoryRequire(lease.id == qr.id && _expires == qr.expires);
     await _channel(false, qr);
     await _noise!.readHandshake(await _control(0));
@@ -87,10 +130,19 @@ class DirectoryTransfer {
     _active();
   }
 
-  Future<void> _put(int sequence, List<int> data, {bool finalRecord = false}) async {
+  Future<void> _put(
+    int sequence,
+    List<int> data, {
+    bool finalRecord = false,
+  }) async {
     _active();
-    final request = WriteDirectoryFrameRequest(id: _id, token: _token,
-      sequence: sequence, data: data, finalRecord: finalRecord);
+    final request = WriteDirectoryFrameRequest(
+      id: _id,
+      token: _token,
+      sequence: sequence,
+      data: data,
+      finalRecord: finalRecord,
+    );
     try {
       await relay.write(request);
     } catch (_) {
@@ -104,7 +156,9 @@ class DirectoryTransfer {
   Future<ReadDirectoryFrameResponse> _read(int sequence) async {
     while (true) {
       _active();
-      final frame = await relay.read(ReadDirectoryFrameRequest(id: _id, token: _token, sequence: sequence));
+      final frame = await relay.read(
+        ReadDirectoryFrameRequest(id: _id, token: _token, sequence: sequence),
+      );
       _active();
       directoryRequire(frame.expiresAt.toInt() == _expires);
       if (frame.available) {
@@ -138,7 +192,9 @@ class DirectoryTransfer {
     final plain = await _noise!.openDirectory(frames);
     try {
       final document = DirectoryDocument.parse(jsonDecode(utf8.decode(plain)));
-      directoryRequire(document.spaces.isNotEmpty && document.spaces.length <= 12);
+      directoryRequire(
+        document.spaces.isNotEmpty && document.spaces.length <= 12,
+      );
       directoryRequire(document.revision == 1 && document.parent.isEmpty);
       final plan = await service.preview(document);
       _active();
@@ -175,7 +231,9 @@ class DirectoryTransfer {
     await _noise?.close();
     try {
       if (_id.isNotEmpty && !_delivered) {
-        await relay.close(CloseDirectoryTransferRequest(id: _id, token: _token));
+        await relay.close(
+          CloseDirectoryTransferRequest(id: _id, token: _token),
+        );
       }
     } catch (_) {
       // Истёкший либо уже удалённый relay не возобновляется.

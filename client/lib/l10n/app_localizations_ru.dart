@@ -3117,4 +3117,53 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get pairingModeLimitedHelp =>
       'Рабочий доступ только к выбранным пространствам. Подключение и отзыв других устройств, управление корневыми ключами недоступны.';
+
+  @override
+  String get directoryTransferSend => 'Передать выбранное';
+
+  @override
+  String get directoryTransferError =>
+      'Передача отменена или не прошла проверку. Проверьте подключение и начните заново с новым QR-запросом.';
+
+  @override
+  String get directoryTransferConfirm => 'Коды совпадают — продолжить';
+
+  @override
+  String get directoryTransferWaiting =>
+      'Ожидаем второе устройство. Запрос действует 5 минут.';
+
+  @override
+  String get directoryTransferTitle => 'Передать каталог на другое устройство';
+
+  @override
+  String get directoryTransferReceive => 'Получить каталог';
+
+  @override
+  String get directoryTransferCompareHelp =>
+      'Сравните код на обоих устройствах лично или через доверенную связь. Если хотя бы один символ отличается — отмените передачу. Не сравнивайте коды через этот сервер.';
+
+  @override
+  String get directoryTransferSelect =>
+      'На исходном устройстве выберите до 12 пространств';
+
+  @override
+  String get directoryTransferDone =>
+      'Готово. Доступ к пространствам оформляется отдельно через сопряжение; подписки можно применить после входа в настройках резервных копий.';
+
+  @override
+  String get directoryTransferRequest => 'QR-запрос с нового устройства';
+
+  @override
+  String get directoryTransferComparison => 'Введите код с нового устройства';
+
+  @override
+  String get directoryTransferCopy => 'Скопировать QR-запрос';
+
+  @override
+  String get directoryTransferHelp =>
+      'Сначала откройте одно и то же доверенное пространство на обоих устройствах. Передаются выбранные пространства, настройки и список подписок. Ключи и доступ не передаются: после восстановления выполните сопряжение для каждого пространства отдельно.';
+
+  @override
+  String get directoryTransferRelay =>
+      'Выберите доверенное пространство для передачи';
 }

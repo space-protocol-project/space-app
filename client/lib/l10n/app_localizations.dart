@@ -5619,6 +5619,90 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Рабочий доступ только к выбранным пространствам. Подключение и отзыв других устройств, управление корневыми ключами недоступны.'**
   String get pairingModeLimitedHelp;
+
+  /// No description provided for @directoryTransferSend.
+  ///
+  /// In ru, this message translates to:
+  /// **'Передать выбранное'**
+  String get directoryTransferSend;
+
+  /// No description provided for @directoryTransferError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Передача отменена или не прошла проверку. Проверьте подключение и начните заново с новым QR-запросом.'**
+  String get directoryTransferError;
+
+  /// No description provided for @directoryTransferConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Коды совпадают — продолжить'**
+  String get directoryTransferConfirm;
+
+  /// No description provided for @directoryTransferWaiting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ожидаем второе устройство. Запрос действует 5 минут.'**
+  String get directoryTransferWaiting;
+
+  /// No description provided for @directoryTransferTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Передать каталог на другое устройство'**
+  String get directoryTransferTitle;
+
+  /// No description provided for @directoryTransferReceive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Получить каталог'**
+  String get directoryTransferReceive;
+
+  /// No description provided for @directoryTransferCompareHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сравните код на обоих устройствах лично или через доверенную связь. Если хотя бы один символ отличается — отмените передачу. Не сравнивайте коды через этот сервер.'**
+  String get directoryTransferCompareHelp;
+
+  /// No description provided for @directoryTransferSelect.
+  ///
+  /// In ru, this message translates to:
+  /// **'На исходном устройстве выберите до 12 пространств'**
+  String get directoryTransferSelect;
+
+  /// No description provided for @directoryTransferDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Готово. Доступ к пространствам оформляется отдельно через сопряжение; подписки можно применить после входа в настройках резервных копий.'**
+  String get directoryTransferDone;
+
+  /// No description provided for @directoryTransferRequest.
+  ///
+  /// In ru, this message translates to:
+  /// **'QR-запрос с нового устройства'**
+  String get directoryTransferRequest;
+
+  /// No description provided for @directoryTransferComparison.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите код с нового устройства'**
+  String get directoryTransferComparison;
+
+  /// No description provided for @directoryTransferCopy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировать QR-запрос'**
+  String get directoryTransferCopy;
+
+  /// No description provided for @directoryTransferHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сначала откройте одно и то же доверенное пространство на обоих устройствах. Передаются выбранные пространства, настройки и список подписок. Ключи и доступ не передаются: после восстановления выполните сопряжение для каждого пространства отдельно.'**
+  String get directoryTransferHelp;
+
+  /// No description provided for @directoryTransferRelay.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите доверенное пространство для передачи'**
+  String get directoryTransferRelay;
 }
 
 class _AppLocalizationsDelegate

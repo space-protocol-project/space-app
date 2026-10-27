@@ -14,7 +14,15 @@ import 'directory_transfer_rpc.dart';
 
 part 'directory_transfer_cubit.freezed.dart';
 
-enum DirectoryTransferStage { idle, waiting, compare, sending, preview, done, failed }
+enum DirectoryTransferStage {
+  idle,
+  waiting,
+  compare,
+  sending,
+  preview,
+  done,
+  failed,
+}
 
 @freezed
 abstract class DirectoryTransferState with _$DirectoryTransferState {
@@ -30,11 +38,18 @@ abstract class DirectoryTransferState with _$DirectoryTransferState {
 }
 
 class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
-  DirectoryTransferCubit(this.service, this.controller, {
+  DirectoryTransferCubit(
+    this.service,
+    this.controller, {
     DirectoryTransfer Function(Discovery)? create,
-  }) : create = create ?? ((server) => DirectoryTransfer(server,
-    RpcDirectoryRelay(server), const NativeDirectoryNoise())),
-    super(const DirectoryTransferState()) {
+  }) : create =
+           create ??
+           ((server) => DirectoryTransfer(
+             server,
+             RpcDirectoryRelay(server),
+             const NativeDirectoryNoise(),
+           )),
+       super(const DirectoryTransferState()) {
     _server = controller.preview;
     _subscription = controller.stream.listen((_) {
       if (!identical(_server, controller.preview)) {
@@ -53,14 +68,21 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
   Timer? _expiry;
   int _generation = 0;
   bool _closing = false;
-  bool _current(int generation) => !isClosed && !_closing && generation == _generation;
+  bool _current(int generation) =>
+      !isClosed && !_closing && generation == _generation;
   bool get active => _transfer != null;
   void select(String origin, bool value) {
     if (isClosed || active) return;
     final selected = state.selected.toSet();
-    if (value) { selected.add(origin); } else { selected.remove(origin); }
-    if (selected.length <= 12) emit(state.copyWith(selected: selected.toList()));
+    if (value) {
+      selected.add(origin);
+    } else {
+      selected.remove(origin);
+    }
+    if (selected.length <= 12)
+      emit(state.copyWith(selected: selected.toList()));
   }
+
   void replaceSettings(bool value) {
     if (!isClosed && state.stage == DirectoryTransferStage.preview) {
       emit(state.copyWith(replaceSettings: value));
@@ -74,7 +96,15 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
     } catch (_) {
       if (_current(generation)) {
         await _dispose();
-        if (_current(generation)) emit(state.copyWith(stage: DirectoryTransferStage.failed, qr: '', sas: '', plan: null));
+        if (_current(generation))
+          emit(
+            state.copyWith(
+              stage: DirectoryTransferStage.failed,
+              qr: '',
+              sas: '',
+              plan: null,
+            ),
+          );
       }
     }
   }
@@ -86,9 +116,20 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
     ++_generation;
     final transfer = create(_server!);
     _transfer = transfer;
-    _expiry = Timer(const Duration(minutes: 5), () => unawaited(cancel(expired: true)));
-    emit(state.copyWith(stage: DirectoryTransferStage.waiting, receiving: receiving,
-      qr: '', sas: '', plan: null, replaceSettings: false));
+    _expiry = Timer(
+      const Duration(minutes: 5),
+      () => unawaited(cancel(expired: true)),
+    );
+    emit(
+      state.copyWith(
+        stage: DirectoryTransferStage.waiting,
+        receiving: receiving,
+        qr: '',
+        sas: '',
+        plan: null,
+        replaceSettings: false,
+      ),
+    );
     await _run((generation) async {
       if (receiving) {
         final request = await transfer.receiveStart();
@@ -98,16 +139,25 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
       } else {
         final request = DirectoryTransferQr.parse(qr);
         request.checkServer(_server!);
-        _document = await service.repository.exclusive(() => service.capture(selectedOrigins: state.selected));
+        _document = await service.repository.exclusive(
+          () => service.capture(selectedOrigins: state.selected),
+        );
         if (!_current(generation)) return;
         await transfer.sendStart(request);
       }
-      if (_current(generation)) emit(state.copyWith(stage: DirectoryTransferStage.compare, sas: transfer.sas));
+      if (_current(generation))
+        emit(
+          state.copyWith(
+            stage: DirectoryTransferStage.compare,
+            sas: transfer.sas,
+          ),
+        );
     });
   }
 
   Future<void> confirm(String comparison) async {
-    if (state.stage != DirectoryTransferStage.compare || _transfer == null) return;
+    if (state.stage != DirectoryTransferStage.compare || _transfer == null)
+      return;
     final transfer = _transfer!;
     emit(state.copyWith(stage: DirectoryTransferStage.sending));
     await _run((generation) async {
@@ -115,23 +165,40 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
         final plan = await transfer.receive(service);
         if (!_current(generation)) return;
         await _dispose();
-        if (_current(generation)) emit(state.copyWith(stage: DirectoryTransferStage.preview, plan: plan, qr: '', sas: ''));
+        if (_current(generation))
+          emit(
+            state.copyWith(
+              stage: DirectoryTransferStage.preview,
+              plan: plan,
+              qr: '',
+              sas: '',
+            ),
+          );
       } else {
         await transfer.send(comparison, _document!);
         await _dispose();
-        if (_current(generation)) emit(state.copyWith(stage: DirectoryTransferStage.done, qr: '', sas: ''));
+        if (_current(generation))
+          emit(
+            state.copyWith(stage: DirectoryTransferStage.done, qr: '', sas: ''),
+          );
       }
     });
   }
 
   Future<void> apply() async {
     final plan = state.plan;
-    if (state.stage != DirectoryTransferStage.preview || plan == null || plan.conflicts.isNotEmpty) return;
+    if (state.stage != DirectoryTransferStage.preview ||
+        plan == null ||
+        plan.conflicts.isNotEmpty)
+      return;
     final replace = state.replaceSettings;
     emit(state.copyWith(stage: DirectoryTransferStage.sending));
     await _run((generation) async {
-      await service.repository.exclusive(() => service.apply(plan, replaceSettings: replace));
-      if (_current(generation)) emit(state.copyWith(stage: DirectoryTransferStage.done, plan: null));
+      await service.repository.exclusive(
+        () => service.apply(plan, replaceSettings: replace),
+      );
+      if (_current(generation))
+        emit(state.copyWith(stage: DirectoryTransferStage.done, plan: null));
     });
   }
 
@@ -147,10 +214,17 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
   Future<void> cancel({bool expired = false}) async {
     ++_generation;
     await _dispose();
-    if (!isClosed && !_closing) emit(DirectoryTransferState(
-      selected: state.selected,
-      stage: expired ? DirectoryTransferStage.failed : DirectoryTransferStage.idle));
+    if (!isClosed && !_closing)
+      emit(
+        DirectoryTransferState(
+          selected: state.selected,
+          stage: expired
+              ? DirectoryTransferStage.failed
+              : DirectoryTransferStage.idle,
+        ),
+      );
   }
+
   @override
   Future<void> close() async {
     _closing = true;

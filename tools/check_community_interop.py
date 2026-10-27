@@ -64,8 +64,13 @@ def probe(args, log):
     server = client = None
     try:
         server = start()
+        client_command = ['dart', 'run', f'tool/community_{args.scenario}_interoperability.dart', origin, str(marker)]
+        if args.scenario == 'directory_pairing':
+            client_command = ['flutter', 'test', 'test/directory_transfer_interop_test.dart',
+                              f'--dart-define=DIRECTORY_RELAY={origin}',
+                              f'--dart-define=DIRECTORY_RESTART={marker}']
         client = subprocess.Popen(
-            ['dart', 'run', f'tool/community_{args.scenario}_interoperability.dart', origin, str(marker)],
+            client_command,
             cwd=args.client, env=environment, stdin=subprocess.DEVNULL, stdout=log, stderr=log)
         deadline = time.monotonic() + 600
         while not marker.with_suffix('.ready').exists():
@@ -92,7 +97,7 @@ def main():
     parser.add_argument('--server', type=Path, required=True)
     parser.add_argument('--client', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--scenario', choices=['reactions', 'favorites', 'space_search', 'feed_social', 'participant_follows', 'user_export', 'pairing_modes'], required=True)
+    parser.add_argument('--scenario', choices=['reactions', 'favorites', 'space_search', 'feed_social', 'participant_follows', 'user_export', 'pairing_modes', 'directory_pairing'], required=True)
     args = parser.parse_args()
     if not os.environ.get('SPACE_DATABASE_URL'):
         raise ValueError('Нужна отдельная тестовая SPACE_DATABASE_URL')
