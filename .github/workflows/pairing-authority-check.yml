@@ -1,0 +1,63 @@
+name: Проверка полномочий сопряжённых устройств
+on:
+  workflow_dispatch:
+    inputs:
+      server_ref:
+        description: Проверяемый коммит сервера
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  interop:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17.11
+        env:
+          POSTGRES_DB: space_pairing_modes
+          POSTGRES_USER: space
+          POSTGRES_PASSWORD: ci-only-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U space -d space_pairing_modes"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: app
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: ${{ inputs.server_ref }}
+          path: server
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.8'
+          channel: stable
+          cache: true
+      - name: Системные зависимости с ограничением времени
+        run: |
+          timeout 180s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 -o Acquire::https::Timeout=15 update
+          timeout 480s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 -o Acquire::https::Timeout=15 install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev
+          rustup toolchain install 1.99.1 --profile minimal
+      - name: Подготовка совместимой пары
+        run: |
+          (cd app/client && flutter pub get)
+          (cd server && go build -o "$RUNNER_TEMP/space-server" ./cmd/space-server)
+      - name: Настоящие клиенты, полномочия и перезапуск
+        env:
+          SPACE_DATABASE_URL: postgres://space:ci-only-password@127.0.0.1:5432/space_pairing_modes?sslmode=disable
+        run: |
+          python3 app/tools/check_community_interop.py --server "$RUNNER_TEMP/space-server" --client app/client --scenario pairing_modes --output "$RUNNER_TEMP/pairing-modes-interop"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pairing-modes-interop
+          path: ${{ runner.temp }}/pairing-modes-interop/interop.log
+          if-no-files-found: ignore
