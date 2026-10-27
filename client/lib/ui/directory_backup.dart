@@ -56,6 +56,7 @@ class _DirectoryBackupPanelState extends State<DirectoryBackupPanel> {
   }
 
   Future<void> read() async {
+    cubit.reset();
     try {
       await _read();
     } catch (_) {

@@ -4,6 +4,11 @@ on:
     branches: [main]
     paths: ['client/lib/src/directory*.dart', 'client/lib/ui/directory_backup.dart', 'client/test/directory*_test.dart', 'client/test/fixtures/directory.dart', 'client/test/probes/directory_probe.dart', 'client/lib/l10n/**', 'client/build.yaml', 'tools/check_directory_ui.py', '.github/workflows/directory-backup.yml']
   workflow_dispatch:
+    inputs:
+      android:
+        description: Собирать APK и выполнять проверки Android
+        type: boolean
+        default: true
 permissions:
   contents: read
 jobs:
@@ -66,6 +71,7 @@ jobs:
           path: ${{ runner.temp }}/directory-native
 
   android:
+    if: github.event_name != 'workflow_dispatch' || inputs.android
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
