@@ -124,7 +124,7 @@ void main() {
     expect(rollback.plan.conflicts,isNotEmpty);
     await expectLater(recovery.apply(rollback,replaceSettings:false),throwsFormatException);
   });
-  test('Ошибка защищённого журнала происходит до сети',() async {
+  test('Ошибка защищённого журнала происходит до загрузки контейнера',() async {
     storage.fail=true;
     await expectLater(remote.publish(kit,backupPassword),throwsStateError);
     expect(store.versions,isEmpty); expect(witness.head.revision.toInt(),0);

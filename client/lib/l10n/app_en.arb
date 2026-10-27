@@ -1154,5 +1154,9 @@
   "remoteBackupSaved": "Backup uploaded, read back and confirmed by the witness.",
   "remoteBackupConfigured": "Storage and witness are ready.",
   "remoteBackupVerified": "Witness confirmed version:",
-  "remoteBackupError": "Operation incomplete. Check the kit, password, connection and permissions. Version, signature or digest mismatches block recovery. Retry an unfinished publication with the same password."
+  "remoteBackupError": "Operation incomplete. Check the kit, password, connection and permissions. Version, signature or digest mismatches block recovery. Retry an unfinished publication with the same password.",
+  "remoteBackupSaveKit": "Save kit again",
+  "remoteBackupRevoke": "Revoke kit",
+  "remoteBackupRevokeHelp": "Revoke backup access on both servers? The owner's active session is required on each server. This kit will stop working; stored containers will remain. Retry revocation after a failure.",
+  "remoteBackupRevoked": "Backup access revoked on both servers."
 }

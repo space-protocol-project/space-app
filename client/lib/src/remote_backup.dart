@@ -79,6 +79,7 @@ class RemoteBackupService {
     state['kit'] = RemoteBackupKit.parse(kit.encode()).data;
     await _save(state);
   });
+  Future<void> forgetRevokedKit() => directory.repository.exclusive(() async => _save({'v':1,'kit':null,'pending':null}));
 
   Future<T> _clients<T>(RemoteBackupKit kit, Future<T> Function(RemoteBackupApi, RemoteBackupApi) action) async {
     RemoteBackupKit.parse(kit.encode());

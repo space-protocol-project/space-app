@@ -65,6 +65,9 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
   Future<void> apply() async {
     if (await confirmRecoveryAction(context,context.strings.directoryBackupConfirm) && mounted) await cubit.apply();
   }
+  Future<void> revoke() async {
+    if (await confirmRecoveryAction(context,context.strings.remoteBackupRevokeHelp) && mounted) await cubit.revoke();
+  }
   @override
   Widget build(BuildContext context) => BlocBuilder<RemoteBackupCubit,RemoteBackupState>(
     bloc:cubit,
@@ -100,6 +103,8 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
       OutlinedButton(onPressed:state.busy ? null : publish,child:Text(context.strings.remoteBackupPublish)),
       OutlinedButton(onPressed:state.busy ? null : preview,child:Text(context.strings.remoteBackupRead)),
       TextButton(onPressed:state.busy ? null : cubit.configure,child:Text(context.strings.remoteBackupConfigure)),
+      TextButton(onPressed:state.busy ? null : () => cubit.exportKit(saveKit),child:Text(context.strings.remoteBackupSaveKit)),
+      TextButton(onPressed:state.busy ? null : revoke,child:Text(context.strings.remoteBackupRevoke)),
     ]),
   ];
   List<Widget> _result(RemoteBackupState state) => [
@@ -107,6 +112,7 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
     if (state.message == 'saved') ...[const SizedBox(height:12),Text(context.strings.remoteBackupSaved)],
     if (state.message == 'configured') ...[const SizedBox(height:12),Text(context.strings.remoteBackupConfigured)],
     if (state.message == 'restored') ...[const SizedBox(height:12),Text(context.strings.directoryBackupRestored)],
+    if (state.message == 'revoked') ...[const SizedBox(height:12),Text(context.strings.remoteBackupRevoked)],
     if (state.restore != null) ..._preview(state),
   ];
   List<Widget> _preview(RemoteBackupState state) {

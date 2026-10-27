@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:cryptography/cryptography.dart';
@@ -67,6 +66,25 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
     await _provision(kit!);
     _emit(state.copyWith(message:'configured'));
   });
+  Future<void> revoke() => _run(() async {
+    final kit=state.kit;
+    directoryRequire(kit != null);
+    _emit(state.copyWith(restore:null,replaceSettings:false));
+    for (final endpoint in [kit!.storage,kit.witness]) {
+      final session=service.directory.controllers()[endpoint.origin]?.mlsSession;
+      directoryRequire(session != null);
+      final server=session!.server;
+      directoryRequire(server.origin.toString() == endpoint.origin && url64(server.publicKey) == endpoint.publicKey && server.tlsFingerprint.toLowerCase() == endpoint.fingerprint);
+      await session.revokeRemoteBackupSlot(kit.id);
+    }
+    await service.forgetRevokedKit();
+    _emit(state.copyWith(kit:null,message:'revoked'));
+  });
+  Future<void> exportKit(Future<bool> Function(String) save) => _run(() async {
+    final kit=state.kit;
+    directoryRequire(kit != null);
+    await save(kit!.encode());
+  });
   Future<void> _provision(RemoteBackupKit kit) async {
     for (final (endpoint,witness) in [(kit.storage,false),(kit.witness,true)]) {
       final session = service.directory.controllers()[endpoint.origin]?.mlsSession;
@@ -81,6 +99,7 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
     return (await Sha256().hash(utf8.encode(value))).bytes;
   }
   Future<void> importKit(String raw) => _run(() async {
+    _emit(state.copyWith(restore:null,replaceSettings:false));
     final kit = RemoteBackupKit.parse(raw);
     await service.saveKit(kit);
     _emit(state.copyWith(kit:kit,restore:null,replaceSettings:false));

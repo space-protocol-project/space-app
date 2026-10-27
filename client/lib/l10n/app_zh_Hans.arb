@@ -523,5 +523,9 @@
   "remoteBackupSaved": "备份已上传、回读并经见证服务确认。",
   "remoteBackupConfigured": "存储和见证服务已就绪。",
   "remoteBackupVerified": "见证服务确认版本：",
-  "remoteBackupError": "操作未完成。请检查套件、密码、连接和权限。版本、签名或摘要不一致时将阻止恢复。请使用相同密码重试未完成的发布。"
+  "remoteBackupError": "操作未完成。请检查套件、密码、连接和权限。版本、签名或摘要不一致时将阻止恢复。请使用相同密码重试未完成的发布。",
+  "remoteBackupSaveKit": "再次保存套件",
+  "remoteBackupRevoke": "撤销套件",
+  "remoteBackupRevokeHelp": "是否撤销两个服务器上的备份访问权限？每个服务器都需要所有者的有效会话。此套件将失效，已存储的备份不会删除。失败后请重试撤销。",
+  "remoteBackupRevoked": "已撤销两个服务器上的备份访问权限。"
 }

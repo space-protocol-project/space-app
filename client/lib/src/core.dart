@@ -1133,6 +1133,10 @@ class SpaceSession
     await _ensureSession();
     await channel.unary(remote_backup_specs.RemoteBackupService.createBackupSlot, request, options: _options);
   }
+  Future<void> revokeRemoteBackupSlot(String id) async {
+    await _ensureSession();
+    await channel.unary(remote_backup_specs.RemoteBackupService.revokeBackupSlot, remote_backup_pb.RevokeBackupSlotRequest(id:id), options:_options);
+  }
 
   bool _needsOwnerSetup = false;
   @override
