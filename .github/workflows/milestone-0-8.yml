@@ -30,10 +30,10 @@ jobs:
         run: |
           flutter pub get
           dart run build_runner build
-          dart format lib/src/pairing*.dart lib/src/recovery_qr.dart lib/src/space_link_qr.dart lib/ui/pairing*.dart lib/ui/recovery_panel.dart lib/ui/camera_scanner.dart test/pairing*_test.dart test/admin_recovery_views_test.dart test/probes/pairing_probe.dart ../packages/space_admin_ui/lib/src/pairing_start_view.dart ../packages/space_admin_ui/lib/src/recovery_tools_view.dart
+          dart format lib/src/pairing*.dart lib/src/recovery_qr.dart lib/src/space_link_qr.dart lib/ui/pairing*.dart lib/ui/recovery_panel.dart lib/ui/camera_scanner.dart test/pairing*_test.dart test/admin_recovery_views_test.dart test/probes/pairing_probe.dart tool/community_pairing_modes_interoperability.dart ../packages/space_admin_ui/lib/src/pairing_start_view.dart ../packages/space_admin_ui/lib/src/recovery_tools_view.dart
           dart fix --apply --code=curly_braces_in_flow_control_structures
           flutter analyze
-          flutter test --no-pub test/pairing_lifetime_test.dart test/pairing_transport_test.dart test/pairing_qr_test.dart test/pairing_cubit_test.dart test/pairing_approval_cubit_test.dart test/pairing_panels_test.dart test/admin_recovery_views_test.dart test/space_qr_platform_test.dart test/camera_qr_test.dart test/recovery_test.dart test/recovery_spaces_test.dart test/recovery_qr_test.dart test/migration_archive_test.dart test/device_migration_test.dart test/device_recovery_batch_test.dart
+          flutter test --no-pub test/pairing_lifetime_test.dart test/pairing_transport_test.dart test/pairing_qr_test.dart test/pairing_cubit_test.dart test/pairing_approval_cubit_test.dart test/pairing_panels_test.dart test/pairing_modes_test.dart test/pairing_selection_test.dart test/admin_recovery_views_test.dart test/space_qr_platform_test.dart test/camera_qr_test.dart test/recovery_test.dart test/recovery_spaces_test.dart test/recovery_qr_test.dart test/migration_archive_test.dart test/device_migration_test.dart test/device_recovery_batch_test.dart
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -52,6 +52,7 @@ jobs:
             client/test/pairing*_test.dart
             client/test/admin_recovery_views_test.dart
             client/test/probes/pairing_probe.dart
+            client/tool/community_pairing_modes_interoperability.dart
       - name: Анализ пакета интерфейса
         working-directory: packages/space_admin_ui
         run: |
