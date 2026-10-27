@@ -28,8 +28,13 @@ abstract class PairingApprovalState with _$PairingApprovalState {
 }
 
 class PairingApprovalCubit extends Cubit<PairingApprovalState> {
-  PairingApprovalCubit({required this.server, required this.manager,
-    this.inspect = inspectPairing, this.now = DateTime.now, Stream<Object?>? contextChanges}) : super(const PairingApprovalState()) {
+  PairingApprovalCubit({
+    required this.server,
+    required this.manager,
+    this.inspect = inspectPairing,
+    this.now = DateTime.now,
+    Stream<Object?>? contextChanges,
+  }) : super(const PairingApprovalState()) {
     _server = server();
     _manager = manager();
     _subscription = contextChanges?.listen((_) => _contextChanged());
@@ -56,7 +61,8 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
     reset();
   }
 
-  bool _current(int generation) => !isClosed && !_closing && generation == _generation;
+  bool _current(int generation) =>
+      !isClosed && !_closing && generation == _generation;
 
   void reset() {
     ++_generation;
@@ -109,19 +115,40 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
     required Future<DeviceRecord?> Function() readAuthority,
   }) async {
     final selected = server(), control = manager();
-    if (isClosed || _closing || state.busy || selected == null || control == null) return;
+    if (isClosed ||
+        _closing ||
+        state.busy ||
+        selected == null ||
+        control == null) {
+      return;
+    }
     final generation = ++_generation;
     _pair = null;
     _authority = null;
     _expiry?.cancel();
-    emit(state.copyWith(busy: true, prepared: false, verification: '', error: null, messageKey: null));
+    emit(
+      state.copyWith(
+        busy: true,
+        prepared: false,
+        verification: '',
+        error: null,
+        messageKey: null,
+      ),
+    );
     try {
       _qr?.checkServer(selected);
-      final pair = (await inspect(selected, state.code.trim())).deepCopy()..freeze();
+      final pair = (await inspect(selected, state.code.trim())).deepCopy()
+        ..freeze();
       if (!_current(generation)) return;
       _qr?.checkPair(pair);
       _requirePending(pair);
-      final (allowed, authority) = await _selectAuthority(pair, control, generation, confirm, readAuthority);
+      final (allowed, authority) = await _selectAuthority(
+        pair,
+        control,
+        generation,
+        confirm,
+        readAuthority,
+      );
       if (!allowed) return;
       _requirePending(pair);
       final code = await control.preparePairing(pair, authority: authority);
@@ -129,8 +156,20 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
       _requirePending(pair);
       _pair = pair;
       _authority = authority;
-      _expiry = Timer(Duration(seconds: pair.expiresAt.toInt() - now().millisecondsSinceEpoch ~/ 1000), expire);
-      emit(state.copyWith(prepared: true, verification: code, messageKey: 'pairingReady'));
+      _expiry = Timer(
+        Duration(
+          seconds:
+              pair.expiresAt.toInt() - now().millisecondsSinceEpoch ~/ 1000,
+        ),
+        expire,
+      );
+      emit(
+        state.copyWith(
+          prepared: true,
+          verification: code,
+          messageKey: 'pairingReady',
+        ),
+      );
     } catch (error) {
       if (_current(generation)) _showError(error);
     } finally {
@@ -138,9 +177,13 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
     }
   }
 
-  Future<(bool, DeviceRecord?)> _selectAuthority(Pairing pair, DeviceManagement control,
-      int generation, Future<bool> Function(Pairing) confirm,
-      Future<DeviceRecord?> Function() readAuthority) async {
+  Future<(bool, DeviceRecord?)> _selectAuthority(
+    Pairing pair,
+    DeviceManagement control,
+    int generation,
+    Future<bool> Function(Pairing) confirm,
+    Future<DeviceRecord?> Function() readAuthority,
+  ) async {
     if (!await confirm(pair) || !_current(generation)) return (false, null);
     if (control.hasRootAuthority) return (true, null);
     final authority = await readAuthority();
@@ -149,19 +192,25 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
 
   void expire() {
     reset();
-    if (!isClosed && !_closing) emit(const PairingApprovalState(messageKey: 'pairingExpired'));
+    if (!isClosed && !_closing) {
+      emit(const PairingApprovalState(messageKey: 'pairingExpired'));
+    }
   }
 
   void _requirePending(Pairing pair) {
     if (pair.expiresAt.toInt() <= now().millisecondsSinceEpoch ~/ 1000) {
       throw const PairingApprovalFailure('pairingExpired');
     }
-    if (pair.state != 'pending') throw const PairingApprovalFailure('pairingAlreadyUsed');
+    if (pair.state != 'pending') {
+      throw const PairingApprovalFailure('pairingAlreadyUsed');
+    }
   }
 
   Future<void> approve(String entered, Future<bool> Function() confirm) async {
     final control = manager(), pair = _pair, generation = _generation;
-    if (isClosed || _closing || state.busy || control == null || pair == null) return;
+    if (isClosed || _closing || state.busy || control == null || pair == null) {
+      return;
+    }
     emit(state.copyWith(busy: true, messageKey: null, error: null));
     try {
       _requirePending(pair);
@@ -178,8 +227,13 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
     }
   }
 
-  Future<bool> _confirmSignature(String entered, Future<bool> Function() confirm, int generation) async {
-    if (entered.replaceAll(RegExp(r'[\s-]'), '').toUpperCase() != state.verification.replaceAll('-', '')) {
+  Future<bool> _confirmSignature(
+    String entered,
+    Future<bool> Function() confirm,
+    int generation,
+  ) async {
+    if (entered.replaceAll(RegExp(r'[\s-]'), '').toUpperCase() !=
+        state.verification.replaceAll('-', '')) {
       emit(state.copyWith(messageKey: 'pairingMismatch'));
       return false;
     }

@@ -18,7 +18,6 @@ class PairingVault implements IdentityVault {
 }
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
   late PairingServer server;
   late ChatController controller;
   setUp(() async {

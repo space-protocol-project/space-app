@@ -154,7 +154,11 @@ void main() {
   });
 
   test('QR другого пространства отвергается без сетевого запроса', () {
-    final other = Discovery(Uri.parse('https://other.org'), 'other', List.filled(32, 9));
+    final other = Discovery(
+      Uri.parse('https://other.org'),
+      'other',
+      List.filled(32, 9),
+    );
     cubit.readQr(PairingQr.request(other, request).encode());
     expect(cubit.state.code, isEmpty);
     expect(cubit.state.error, isFormatException);
@@ -165,11 +169,19 @@ void main() {
     final changes = StreamController<Object?>();
     var selected = testServer();
     await cubit.close();
-    cubit = PairingApprovalCubit(server: () => selected, manager: () => manager,
-      inspect: (_, _) async => request.pairing, contextChanges: changes.stream);
+    cubit = PairingApprovalCubit(
+      server: () => selected,
+      manager: () => manager,
+      inspect: (_, _) async => request.pairing,
+      contextChanges: changes.stream,
+    );
     cubit.setCode(request.code);
     await prepare();
-    selected = Discovery(Uri.parse('https://other.org'), 'other', List.filled(32, 9));
+    selected = Discovery(
+      Uri.parse('https://other.org'),
+      'other',
+      List.filled(32, 9),
+    );
     changes.add(null);
     await Future<void>.delayed(Duration.zero);
     expect(cubit.state.prepared, isFalse);
@@ -177,5 +189,4 @@ void main() {
     expect(manager.signatures, 0);
     await changes.close();
   });
-
 }

@@ -16,8 +16,12 @@ import '../src/pairing_qr.dart';
 import 'camera_scanner.dart';
 
 class PairingApprovalPanel extends StatefulWidget {
-  const PairingApprovalPanel({super.key, required this.controller,
-    required this.readAuthority, this.blocked = false});
+  const PairingApprovalPanel({
+    super.key,
+    required this.controller,
+    required this.readAuthority,
+    this.blocked = false,
+  });
   final ChatController controller;
   final Future<DeviceRecord?> Function() readAuthority;
   final bool blocked;
@@ -25,7 +29,8 @@ class PairingApprovalPanel extends StatefulWidget {
   State<PairingApprovalPanel> createState() => _PairingApprovalPanelState();
 }
 
-class _PairingApprovalPanelState extends State<PairingApprovalPanel> with WidgetsBindingObserver {
+class _PairingApprovalPanelState extends State<PairingApprovalPanel>
+    with WidgetsBindingObserver {
   late PairingApprovalCubit cubit;
   final code = TextEditingController(), entered = TextEditingController();
   bool externalInput = false;
@@ -39,8 +44,11 @@ class _PairingApprovalPanelState extends State<PairingApprovalPanel> with Widget
 
   PairingApprovalCubit createCubit() {
     final controller = widget.controller;
-    return PairingApprovalCubit(server: () => controller.preview,
-      manager: () => controller.deviceManagement, contextChanges: controller.stream);
+    return PairingApprovalCubit(
+      server: () => controller.preview,
+      manager: () => controller.deviceManagement,
+      contextChanges: controller.stream,
+    );
   }
 
   @override
@@ -56,7 +64,14 @@ class _PairingApprovalPanelState extends State<PairingApprovalPanel> with Widget
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (!externalInput && [AppLifecycleState.paused, AppLifecycleState.hidden, AppLifecycleState.detached].contains(state)) cubit.reset();
+    if (!externalInput &&
+        [
+          AppLifecycleState.paused,
+          AppLifecycleState.hidden,
+          AppLifecycleState.detached,
+        ].contains(state)) {
+      cubit.reset();
+    }
   }
 
   @override
@@ -71,16 +86,31 @@ class _PairingApprovalPanelState extends State<PairingApprovalPanel> with Widget
   Future<bool> confirm(String text) => confirmRecoveryAction(context, text);
 
   Future<void> prepare() => cubit.prepare(
-    confirm: (pair) => confirm(context.strings.pairingPrepareConfirm(pair.deviceName,
-      pair.administrative ? context.strings.pairingManageRequest : context.strings.pairingChatRequest)),
+    confirm: (pair) => confirm(
+      context.strings.pairingPrepareConfirm(
+        pair.deviceName,
+        pair.administrative
+            ? context.strings.pairingManageRequest
+            : context.strings.pairingChatRequest,
+      ),
+    ),
     readAuthority: () => withExternalInput(widget.readAuthority),
   );
 
   Future<String?> pickImage() async {
-    final file = await openFile(acceptedTypeGroups: const [XTypeGroup(label: 'QR',
-      extensions: ['png', 'jpg', 'jpeg'], mimeTypes: ['image/png', 'image/jpeg'])]);
+    final file = await openFile(
+      acceptedTypeGroups: const [
+        XTypeGroup(
+          label: 'QR',
+          extensions: ['png', 'jpg', 'jpeg'],
+          mimeTypes: ['image/png', 'image/jpeg'],
+        ),
+      ],
+    );
     if (file == null) return null;
-    if (await file.length() > 8 * 1024 * 1024) throw const FormatException('QR');
+    if (await file.length() > 8 * 1024 * 1024) {
+      throw const FormatException('QR');
+    }
     final text = await compute(pairingQrFromImage, await file.readAsBytes());
     if (text == null) throw const FormatException('QR');
     return text;
@@ -95,15 +125,23 @@ class _PairingApprovalPanelState extends State<PairingApprovalPanel> with Widget
     }
   }
 
-  Future<void> scan({bool camera = false}) => cubit.scan(() => withExternalInput(
-    () => camera ? scanPairingCamera(context) : pickImage()));
+  Future<void> scan({bool camera = false}) => cubit.scan(
+    () => withExternalInput(
+      () => camera ? scanPairingCamera(context) : pickImage(),
+    ),
+  );
 
-  AdminLocalizations get adminStrings => AdminLocalizations.of(context) ??
-      lookupAdminLocalizations(Locale(Localizations.localeOf(context).languageCode));
+  AdminLocalizations get adminStrings =>
+      AdminLocalizations.of(context) ??
+      lookupAdminLocalizations(
+        Locale(Localizations.localeOf(context).languageCode),
+      );
 
   String message(PairingApprovalState state) {
     if (state.error is FormatException) return context.strings.pairingQrInvalid;
-    if (state.error != null) return localFailureText(context, classifyFailure(state.error!));
+    if (state.error != null) {
+      return localFailureText(context, classifyFailure(state.error!));
+    }
     return switch (state.messageKey) {
       'pairingReady' => context.strings.pairingReady,
       'pairingSigned' => context.strings.pairingSigned,
@@ -115,56 +153,107 @@ class _PairingApprovalPanelState extends State<PairingApprovalPanel> with Widget
   }
 
   @override
-  Widget build(BuildContext context) => BlocConsumer<PairingApprovalCubit, PairingApprovalState>(
-    bloc: cubit,
-    listener: (_, state) {
-      if (code.text != state.code) code.text = state.code;
-      if (!state.prepared) entered.clear();
-    },
-    builder: (context, state) => Card(child: Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(adminStrings.pairingApproveTitle, style: Theme.of(context).textTheme.titleLarge),
-        const SizedBox(height: 12),
-        Text(adminStrings.pairingApproveHelp),
-        const SizedBox(height: 12),
-        TextField(controller: code, enabled: !state.busy && !widget.blocked,
-          onChanged: cubit.setCode, decoration: InputDecoration(labelText: adminStrings.pairingCode, hintText: 'pc_…')),
-        const SizedBox(height: 12),
-        _actions(state),
-        if (state.prepared) ..._comparison(state),
-        ..._status(state),
-      ]),
-    )),
-  );
+  Widget build(BuildContext context) =>
+      BlocConsumer<PairingApprovalCubit, PairingApprovalState>(
+        bloc: cubit,
+        listener: (_, state) {
+          if (code.text != state.code) code.text = state.code;
+          if (!state.prepared) entered.clear();
+        },
+        builder: (context, state) => Card(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  adminStrings.pairingApproveTitle,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 12),
+                Text(adminStrings.pairingApproveHelp),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: code,
+                  enabled: !state.busy && !widget.blocked,
+                  onChanged: cubit.setCode,
+                  decoration: InputDecoration(
+                    labelText: adminStrings.pairingCode,
+                    hintText: 'pc_…',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _actions(state),
+                if (state.prepared) ..._comparison(state),
+                ..._status(state),
+              ],
+            ),
+          ),
+        ),
+      );
 
   List<Widget> _status(PairingApprovalState state) => [
     if (state.busy) const LinearProgressIndicator(),
-    if (message(state).isNotEmpty) ...[const SizedBox(height: 12), Text(message(state))],
+    if (message(state).isNotEmpty) ...[
+      const SizedBox(height: 12),
+      Text(message(state)),
+    ],
   ];
 
-  bool enabled(PairingApprovalState state) => !widget.blocked && !state.busy &&
-      widget.controller.connected && widget.controller.deviceManagement != null;
+  bool enabled(PairingApprovalState state) =>
+      !widget.blocked &&
+      !state.busy &&
+      widget.controller.connected &&
+      widget.controller.deviceManagement != null;
 
-  Widget _actions(PairingApprovalState state) => Wrap(spacing: 12, runSpacing: 12, children: [
-    OutlinedButton.icon(onPressed: enabled(state) ? () => scan(camera: true) : null,
-      icon: const Icon(Icons.qr_code_scanner), label: Text(context.strings.spaceQrCamera)),
-    OutlinedButton.icon(onPressed: enabled(state) ? scan : null,
-      icon: const Icon(Icons.image_outlined), label: Text(context.strings.spaceQrImage)),
-    OutlinedButton.icon(onPressed: enabled(state) ? prepare : null,
-      icon: const Icon(Icons.verified_user_outlined), label: Text(adminStrings.pairingPrepare)),
-  ]);
+  Widget _actions(PairingApprovalState state) => Wrap(
+    spacing: 12,
+    runSpacing: 12,
+    children: [
+      OutlinedButton.icon(
+        onPressed: enabled(state) ? () => scan(camera: true) : null,
+        icon: const Icon(Icons.qr_code_scanner),
+        label: Text(context.strings.spaceQrCamera),
+      ),
+      OutlinedButton.icon(
+        onPressed: enabled(state) ? scan : null,
+        icon: const Icon(Icons.image_outlined),
+        label: Text(context.strings.spaceQrImage),
+      ),
+      OutlinedButton.icon(
+        onPressed: enabled(state) ? prepare : null,
+        icon: const Icon(Icons.verified_user_outlined),
+        label: Text(adminStrings.pairingPrepare),
+      ),
+    ],
+  );
 
   List<Widget> _comparison(PairingApprovalState state) => [
-    const SizedBox(height: 12), Text(adminStrings.pairingComparison),
-    SelectableText(state.verification, style: Theme.of(context).textTheme.titleLarge),
     const SizedBox(height: 12),
-    TextField(controller: entered, enabled: enabled(state),
-      decoration: InputDecoration(labelText: adminStrings.pairingEnteredCode)),
+    Text(adminStrings.pairingComparison),
+    SelectableText(
+      state.verification,
+      style: Theme.of(context).textTheme.titleLarge,
+    ),
     const SizedBox(height: 12),
-    FilledButton(onPressed: enabled(state) ? () => cubit.approve(entered.text,
-      () => confirm(context.strings.pairingSignConfirm)) : null,
-      child: Text(adminStrings.pairingSign)),
-    TextButton(onPressed: state.busy ? null : cubit.reset, child: Text(context.strings.recoveryCancel)),
+    TextField(
+      controller: entered,
+      enabled: enabled(state),
+      decoration: InputDecoration(labelText: adminStrings.pairingEnteredCode),
+    ),
+    const SizedBox(height: 12),
+    FilledButton(
+      onPressed: enabled(state)
+          ? () => cubit.approve(
+              entered.text,
+              () => confirm(context.strings.pairingSignConfirm),
+            )
+          : null,
+      child: Text(adminStrings.pairingSign),
+    ),
+    TextButton(
+      onPressed: state.busy ? null : cubit.reset,
+      child: Text(context.strings.recoveryCancel),
+    ),
   ];
 }

@@ -12,7 +12,10 @@ import 'pairing_qr_test.dart' show testServer;
 Widget host(Widget child, String language) => MaterialApp(
   locale: Locale(language),
   supportedLocales: AppLocalizations.supportedLocales,
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  localizationsDelegates: [
+    ...AppLocalizations.localizationsDelegates,
+    AdminLocalizations.delegate,
+  ],
   home: Scaffold(body: SingleChildScrollView(child: child)),
 );
 

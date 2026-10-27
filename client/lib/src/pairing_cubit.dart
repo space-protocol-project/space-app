@@ -13,7 +13,14 @@ import 'generated/space/v1/space.pb.dart';
 
 part 'pairing_cubit.freezed.dart';
 
-enum PairingIssue { start, expired, cancelled, verification, network, connection }
+enum PairingIssue {
+  start,
+  expired,
+  cancelled,
+  verification,
+  network,
+  connection,
+}
 
 @freezed
 abstract class PairingState with _$PairingState {
@@ -29,7 +36,7 @@ abstract class PairingState with _$PairingState {
 
 class PairingCubit extends Cubit<PairingState> {
   PairingCubit(this.controller, {this.create = PendingPairing.start})
-      : super(const PairingState()) {
+    : super(const PairingState()) {
     _server = controller.preview;
     _subscription = controller.stream.listen((_) {
       if (!identical(_server, controller.preview)) {
@@ -52,26 +59,48 @@ class PairingCubit extends Cubit<PairingState> {
   String? get candidateOrigin => _candidate?.origin;
   int get revision => _generation;
 
-  bool _current(int generation) => !isClosed && !_closing && generation == _generation;
+  bool _current(int generation) =>
+      !isClosed && !_closing && generation == _generation;
 
   Future<void> start() async {
     final server = controller.preview;
-    if (isClosed || _closing || state.busy || _pending != null || server == null) return;
+    if (isClosed ||
+        _closing ||
+        state.busy ||
+        _pending != null ||
+        server == null) {
+      return;
+    }
     final generation = ++_generation;
     emit(const PairingState(busy: true));
     PendingPairing? result;
     try {
       result = await create(server);
-      if (!_current(generation)) { await result.close(); return; }
+      if (!_current(generation)) {
+        await result.close();
+        return;
+      }
       _pending = result;
-      final qr = await compute(pairingPng, PairingQr.request(server, result.request).encode());
+      final qr = await compute(
+        pairingPng,
+        PairingQr.request(server, result.request).encode(),
+      );
       if (!_current(generation)) return;
       emit(PairingState(code: result.request.code, qr: qr));
-      final expires = DateTime.fromMillisecondsSinceEpoch(result.request.pairing.expiresAt.toInt() * 1000);
+      final expires = DateTime.fromMillisecondsSinceEpoch(
+        result.request.pairing.expiresAt.toInt() * 1000,
+      );
       final remaining = expires.difference(DateTime.now());
-      _expiry = Timer(remaining > const Duration(minutes: 5) ? const Duration(minutes: 5) : remaining,
-          () => unawaited(_fail(PairingIssue.expired)));
-      _timer = Timer.periodic(const Duration(seconds: 2), (_) => unawaited(poll()));
+      _expiry = Timer(
+        remaining > const Duration(minutes: 5)
+            ? const Duration(minutes: 5)
+            : remaining,
+        () => unawaited(_fail(PairingIssue.expired)),
+      );
+      _timer = Timer.periodic(
+        const Duration(seconds: 2),
+        (_) => unawaited(poll()),
+      );
     } catch (_) {
       await result?.close();
       if (!_current(generation)) return;
@@ -80,13 +109,18 @@ class PairingCubit extends Cubit<PairingState> {
     }
   }
 
-  bool get _expired => _pending!.expired || _pending!.request.pairing.expiresAt.toInt() <=
-      DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  bool get _expired =>
+      _pending!.expired ||
+      _pending!.request.pairing.expiresAt.toInt() <=
+          DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
   Future<void> poll() async {
     final current = _pending, generation = _generation;
     if (isClosed || current == null) return;
-    if (_expired) { await _fail(PairingIssue.expired); return; }
+    if (_expired) {
+      await _fail(PairingIssue.expired);
+      return;
+    }
     if (_polling || _candidate != null || state.busy) return;
     _polling = true;
     try {
@@ -109,46 +143,76 @@ class PairingCubit extends Cubit<PairingState> {
     }
   }
 
-  Future<void> _handleResponse(PendingPairing current, PollPairingResponse response, int generation) async {
+  Future<void> _handleResponse(
+    PendingPairing current,
+    PollPairingResponse response,
+    int generation,
+  ) async {
     switch (response.pairing.state) {
-        case 'cancelled': await _fail(PairingIssue.cancelled);
-        case 'approved': await _verify(current, response, generation);
-        case 'pending': await _showCode(current, generation);
-        default: await _fail(PairingIssue.verification);
-      }
+      case 'cancelled':
+        await _fail(PairingIssue.cancelled);
+      case 'approved':
+        await _verify(current, response, generation);
+      case 'pending':
+        await _showCode(current, generation);
+      default:
+        await _fail(PairingIssue.verification);
+    }
   }
 
-  Future<String> _code(PendingPairing current, List<int> root) => pairVerificationCode(
-    current.server.serverId, current.request.pairing.id, root,
-    current.request.pairing.publicKey,
-    administrative: current.request.pairing.administrative,
-  );
+  Future<String> _code(PendingPairing current, List<int> root) =>
+      pairVerificationCode(
+        current.server.serverId,
+        current.request.pairing.id,
+        root,
+        current.request.pairing.publicKey,
+        administrative: current.request.pairing.administrative,
+      );
 
-  Future<void> _verify(PendingPairing current, PollPairingResponse response, int generation) async {
+  Future<void> _verify(
+    PendingPairing current,
+    PollPairingResponse response,
+    int generation,
+  ) async {
     final record = await current.verifiedRecord(response);
     final code = await _code(current, record.rootPublicKey);
-    if (!_current(generation)) { _erase(record); return; }
+    if (!_current(generation)) {
+      _erase(record);
+      return;
+    }
     _candidate = record;
     emit(state.copyWith(verified: true, verification: code, issue: null));
   }
 
   Future<void> _showCode(PendingPairing current, int generation) async {
     var code = '';
-    if (current.proposedRoot != null) code = await _code(current, current.proposedRoot!);
-    if (_current(generation)) emit(state.copyWith(verification: code, issue: null));
+    if (current.proposedRoot != null) {
+      code = await _code(current, current.proposedRoot!);
+    }
+    if (_current(generation)) {
+      emit(state.copyWith(verification: code, issue: null));
+    }
   }
 
   Future<bool> accept(int revision) async {
     final current = _pending, record = _candidate, generation = _generation;
-    if (!_current(revision) || current == null || record == null || state.busy) return false;
-    if (_expired) { await _fail(PairingIssue.expired); return false; }
+    if (!_current(revision) || current == null || record == null || state.busy) {
+      return false;
+    }
+    if (_expired) {
+      await _fail(PairingIssue.expired);
+      return false;
+    }
     emit(state.copyWith(busy: true, issue: null));
     _timer?.cancel();
     _expiry?.cancel();
     try {
       // После передачи запись принадлежит контроллеру, её нельзя стирать при отмене.
       _candidate = null;
-      await controller.connect(restoredRecord: record, pairingId: current.request.pairing.id);
+      await controller.connect(
+        restoredRecord: record,
+        pairingId: current.request.pairing.id,
+      );
       if (!_current(generation)) return false;
       if (!controller.connected) {
         await _fail(PairingIssue.connection);
@@ -164,7 +228,9 @@ class PairingCubit extends Cubit<PairingState> {
   }
 
   void _erase(DeviceRecord? record) {
-    if (record != null) record.deviceSeed.fillRange(0, record.deviceSeed.length, 0);
+    if (record != null) {
+      record.deviceSeed.fillRange(0, record.deviceSeed.length, 0);
+    }
   }
 
   Future<void> _fail(PairingIssue issue) async {
