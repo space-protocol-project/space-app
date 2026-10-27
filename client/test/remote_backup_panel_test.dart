@@ -49,7 +49,8 @@ void main() {
         await tester.pumpAndSettle();
         final strings = lookupAppLocalizations(Locale(language));
         expect(find.text(strings.remoteBackupTitle), findsOneWidget);
-        expect(find.byType(TextField), findsNWidgets(2));
+        expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
+      expect(find.byType(TextField), findsNothing);
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox());
         await tester.pumpAndSettle();

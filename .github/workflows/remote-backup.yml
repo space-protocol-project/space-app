@@ -1,4 +1,4 @@
-name: Удалённые копии и свидетель версии
+name: Копии на сервере пространства
 on:
   workflow_dispatch:
     inputs:
@@ -26,10 +26,21 @@ jobs:
         with: {repository: space-protocol-project/space-server, ref: '${{ inputs.server_ref }}', path: server}
       - uses: actions/setup-go@v5
         with: {go-version-file: server/go.mod, cache-dependency-path: server/go.sum}
+      - uses: actions/checkout@v4
+        with: {repository: space-protocol-project/space-protocol, ref: '${{ inputs.protocol_ref }}', path: protocol}
+      - name: Актуальный контракт сервера пространства
+        run: |
+          go install github.com/bufbuild/buf/cmd/buf@v1.75.0
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.2
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.32.0
+          mkdir -p "$RUNNER_TEMP/space-backup-schema/space/v1"
+          cp protocol/protocol/proto/space/v1/remote_backup.proto "$RUNNER_TEMP/space-backup-schema/space/v1/"
+          (cd server && buf generate "$RUNNER_TEMP/space-backup-schema" --template buf.gen.yaml && buf generate "$RUNNER_TEMP/space-backup-schema" --template buf.connect.gen.yaml)
       - name: Сервер, гонки и уязвимости
         working-directory: server
         run: |
-          gofmt -w internal/postgres/remote_backup*.go
+          gofmt -w internal/postgres/remote_backup*.go internal/postgres/store.go internal/authn/profile.go internal/transport/connect.go internal/transport/connect_remote_backup.go
           go test ./internal/postgres -run '^TestRemoteBackup' -count=1
           go test ./...
           go test -race ./...
@@ -137,7 +148,7 @@ jobs:
         if: inputs.verify
         working-directory: app
         run: xvfb-run -a dbus-run-session -- python3 tools/check_directory_ui.py --output "$RUNNER_TEMP/remote-native"
-      - name: Два HTTPS сервера, независимый свидетель и перезапуск
+      - name: Один сервер пространства, атомарная копия и перезапуск
         if: inputs.verify
         working-directory: server
         env:

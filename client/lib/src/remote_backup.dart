@@ -52,39 +52,28 @@ void checkRemoteHead(BackupHead head, String id) {
   directoryRequire(head.digest == remoteChainDigest(head));
 }
 
-List<int> backupWitnessText(BackupHead h, String challenge) => utf8.encode(
-  'space/backup-witness/v1\n$challenge\n${h.id}\n${h.revision}\n${h.digest}\n${h.parent}\n${h.archiveDigest}',
+List<int> backupHeadProof(BackupHead h, String challenge) => utf8.encode(
+  'space/backup-head/v1\n$challenge\n${h.id}\n${h.revision}\n${h.digest}\n${h.parent}\n${h.archiveDigest}',
 );
 
 Future<String> remoteBackupHash(List<int> bytes) async =>
     url64((await Sha256().hash(bytes)).bytes);
 
 final class RemoteRestore {
-  RemoteRestore._(
-    RemoteBackupKit kit,
-    BackupHead head,
-    this.plan, {
-    BackupHead? previous,
-  }) : kit = RemoteBackupKit.parse(kit.encode()),
-       head = (head.deepCopy()..freeze()),
-       previous = previous == null ? null : (previous.deepCopy()..freeze());
+  RemoteRestore._(RemoteBackupKit kit, BackupHead head, this.plan)
+      : kit=RemoteBackupKit.parse(kit.encode()), head=(head.deepCopy()..freeze());
   final RemoteBackupKit kit;
   final BackupHead head;
   final DirectoryRestorePlan plan;
-  final BackupHead? previous;
-  bool get unpublished => previous != null;
-  bool get needsPrevious =>
-      unpublished && previous!.revision > Int64.ZERO && plan.unknown;
 }
-
 class RemoteBackupService {
   RemoteBackupService(
     this.directory, {
     RemoteBackupApi Function(RemoteBackupEndpoint)? connect,
-  }) : connect = connect ?? RpcRemoteBackup.new;
+  }) : connect = connect;
   final DirectoryBackupService directory;
-  final RemoteBackupApi Function(RemoteBackupEndpoint) connect;
-  static const storageKey = 'space.directory.remote.v1';
+  final RemoteBackupApi Function(RemoteBackupEndpoint)? connect;
+  static const storageKey = 'space.directory.space-backup.v1';
 
   Future<Map<String, dynamic>> _state() async {
     final raw = await directory.repository.storage.read(key: storageKey);
@@ -120,41 +109,37 @@ class RemoteBackupService {
     () async => _save({'v': 1, 'kit': null, 'pending': null}),
   );
 
-  Future<T> _clients<T>(
-    RemoteBackupKit kit,
-    Future<T> Function(RemoteBackupApi, RemoteBackupApi) action,
-  ) async {
-    RemoteBackupKit.parse(kit.encode());
-    final store = connect(kit.storage);
-    try {
-      final witness = connect(kit.witness);
-      try {
-        return await action(store, witness);
-      } finally {
-        await witness.close();
-      }
-    } finally {
-      await store.close();
+  RemoteBackupApi _api(RemoteBackupEndpoint endpoint) {
+    final factory=connect;
+    if(factory != null) return factory(endpoint);
+    final session=directory.controllers()[endpoint.origin]?.mlsSession;
+    if(session != null && session.server.origin.toString() == endpoint.origin && url64(session.server.publicKey) == endpoint.publicKey && session.server.tlsFingerprint.toLowerCase() == endpoint.fingerprint) {
+      return RpcRemoteBackup.session(session);
     }
+    return RpcRemoteBackup(endpoint);
   }
-
-  Future<BackupHead> _witness(RemoteBackupKit kit, RemoteBackupApi api) async {
+  Future<T> _client<T>(RemoteBackupKit kit, Future<T> Function(RemoteBackupApi) action) async {
+    RemoteBackupKit.parse(kit.encode());
+    final api=_api(kit.space);
+    try { return await action(api); } finally { await api.close(); }
+  }
+  Future<BackupHead> _head(RemoteBackupKit kit, RemoteBackupApi api) async {
     final challenge = url64(DirectoryArchive.random(32));
     final result = await api.read(
-      ReadBackupWitnessRequest(
+      ReadBackupHeadRequest(
         id: kit.id,
-        token: kit.witness.readToken,
+        token: kit.space.readToken,
         challenge: challenge,
       ),
     );
     directoryRequire(result.challenge == challenge && result.hasHead());
     checkRemoteHead(result.head, kit.id);
     final valid = await Ed25519().verify(
-      backupWitnessText(result.head, challenge),
+      backupHeadProof(result.head, challenge),
       signature: Signature(
         result.signature,
         publicKey: SimplePublicKey(
-          base64Url.decode(base64Url.normalize(kit.witness.publicKey)),
+          base64Url.decode(base64Url.normalize(kit.space.publicKey)),
           type: KeyPairType.ed25519,
         ),
       ),
@@ -198,78 +183,39 @@ class RemoteBackupService {
   ) => store.get(
     GetBackupRequest(
       id: kit.id,
-      token: kit.storage.readToken,
+      token: kit.space.readToken,
       revision: Int64(revision),
     ),
   );
 
-  Future<void> publish(RemoteBackupKit kit, String password) =>
-      directory.repository.exclusive(
-        () => _clients(kit, (store, witness) async {
-          final state = await _state();
-          directoryRequire(jsonEncode(state['kit']) == jsonEncode(kit.data));
-          if (state['pending'] == null) {
-            await _prepare(state, kit, password, store, witness);
-          }
-          final pending = directoryMap(state['pending'], 'archive,head');
-          final head = BackupHead()..mergeFromProto3Json(pending['head']);
-          checkRemoteHead(head, kit.id);
-          final raw = directoryText(pending['archive'], max: 7 * 1024 * 1024);
-          final archive = Uint8List.fromList(base64Decode(raw));
-          directoryRequire(archive.length <= DirectoryArchive.maxFile);
-          final document = await _document(
-            GetBackupResponse(head: head, archive: archive),
-            head,
-            password,
-          );
-          directoryRequire(
-            (await directory.preview(document)).conflicts.isEmpty,
-          );
-          final old = await _witness(kit, witness);
-          directoryRequire(
-            backupHeadText(old) == backupHeadText(head) ||
-                (old.revision.toInt() + 1 == document.revision &&
-                    old.digest == head.parent),
-          );
-          _same(
-            await store.put(
-              PutBackupRequest(
-                head: head,
-                token: kit.storage.writeToken,
-                archive: archive,
-              ),
-            ),
-            head,
-          );
-          await _document(
-            await _get(kit, store, document.revision),
-            head,
-            password,
-          );
-          _same(
-            await witness.advance(
-              AdvanceBackupWitnessRequest(
-                head: head,
-                token: kit.witness.writeToken,
-              ),
-            ),
-            head,
-          );
-          _same(await _witness(kit, witness), head);
-          await directory.recordExport(document, selectOutgoing: false);
-          state['pending'] = null;
-          await _save(state);
-        }),
-      );
-
+  Future<void> publish(RemoteBackupKit kit, String password) => directory.repository.exclusive(() => _client(kit,(api) async {
+    final state=await _state();
+    directoryRequire(jsonEncode(state['kit']) == jsonEncode(kit.data));
+    if(state['pending'] == null) await _prepare(state,kit,password,api);
+    final pending=directoryMap(state['pending'],'archive,head');
+    final head=BackupHead()..mergeFromProto3Json(pending['head']);
+    checkRemoteHead(head,kit.id);
+    final raw=directoryText(pending['archive'],max:7*1024*1024);
+    final archive=Uint8List.fromList(base64Decode(raw));
+    directoryRequire(archive.length <= DirectoryArchive.maxFile);
+    final document=await _document(GetBackupResponse(head:head,archive:archive),head,password);
+    directoryRequire((await directory.preview(document)).conflicts.isEmpty);
+    final old=await _head(kit,api);
+    directoryRequire(backupHeadText(old) == backupHeadText(head) || (old.revision.toInt()+1 == document.revision && old.digest == head.parent));
+    _same(await api.put(PutBackupRequest(head:head,token:kit.space.writeToken,archive:archive)),head);
+    await _document(await _get(kit,api,document.revision),head,password);
+    _same(await _head(kit,api),head);
+    await directory.recordExport(document,selectOutgoing:false);
+    state['pending']=null;
+    await _save(state);
+  }));
   Future<void> _prepare(
     Map<String, dynamic> state,
     RemoteBackupKit kit,
     String password,
     RemoteBackupApi store,
-    RemoteBackupApi witness,
   ) async {
-    final head = await _witness(kit, witness);
+    final head = await _head(kit, store);
     final local =
         ((await directory.repository.read())['heads'] as Map)[kit.id] as Map?;
     directoryRequire(local != null || head.revision == Int64.ZERO);
@@ -318,8 +264,8 @@ class RemoteBackupService {
   }
 
   Future<RemoteRestore> preview(RemoteBackupKit kit, String password) =>
-      _clients(kit, (store, witness) async {
-        final head = await _witness(kit, witness);
+      _client(kit, (store) async {
+        final head = await _head(kit, store);
         directoryRequire(head.revision > Int64.ZERO);
         final document = await _document(
           await _get(kit, store, head.revision.toInt()),
@@ -334,68 +280,9 @@ class RemoteBackupService {
           password,
         );
         final plan = await directory.preview(document, ancestors: ancestors);
-        _same(await _witness(kit, witness), head);
+        _same(await _head(kit, store), head);
         return RemoteRestore._(kit, head, plan);
       });
-
-  Future<RemoteRestore> previewUnpublished(
-    RemoteBackupKit kit,
-    String password,
-  ) => _clients(kit, (store, witness) async {
-    final previous = await _witness(kit, witness);
-    final response = await _get(kit, store, previous.revision.toInt() + 1);
-    final head = response.head;
-    checkRemoteHead(head, kit.id);
-    directoryRequire(
-      head.revision.toInt() == previous.revision.toInt() + 1 &&
-          head.parent == previous.digest,
-    );
-    final document = await _document(response, head, password);
-    final ancestors = await _ancestors(kit, store, document, head, password);
-    final plan = await directory.preview(document, ancestors: ancestors);
-    _same(await _witness(kit, witness), previous);
-    return RemoteRestore._(kit, head, plan, previous: previous);
-  });
-
-  Future<void> finishUnpublished(RemoteRestore restore, String password) async {
-    directoryRequire(restore.unpublished && !restore.needsPrevious);
-    await directory.repository.exclusive(
-      () => _clients(restore.kit, (store, witness) async {
-        _same(await _witness(restore.kit, witness), restore.previous!);
-        final response = await _get(
-          restore.kit,
-          store,
-          restore.head.revision.toInt(),
-        );
-        final document = await _document(response, restore.head, password);
-        final plan = await directory.preview(
-          document,
-          ancestors: restore.plan.ancestors,
-        );
-        directoryRequire(
-          plan.conflicts.isEmpty && plan.before == restore.plan.before,
-        );
-        final local =
-            ((await directory.repository.read())['heads']
-                    as Map)[restore.kit.id]
-                as Map?;
-        directoryRequire(
-          (local?['revision'] ?? 0) == restore.previous!.revision.toInt() &&
-              (local?['digest'] ?? '') == document.parent,
-        );
-        final state = await _state();
-        directoryRequire(
-          jsonEncode(state['kit']) == jsonEncode(restore.kit.data),
-        );
-        state['pending'] = {
-          'head': restore.head.toProto3Json(),
-          'archive': base64Encode(response.archive),
-        };
-        await _save(state);
-      }),
-    );
-    await publish(restore.kit, password);
-  }
 
   Future<List<DirectoryDocument>> _ancestors(
     RemoteBackupKit kit,
@@ -426,15 +313,26 @@ class RemoteBackupService {
   }
 
   Future<void> apply(RemoteRestore restore, {required bool replaceSettings}) =>
-      _clients(restore.kit, (store, witness) async {
-        directoryRequire(!restore.unpublished);
+      _client(restore.kit, (store) async {
         final document = restore.plan.document;
         directoryRequire(
           document.id == restore.head.id &&
               document.revision == restore.head.revision.toInt() &&
               restore.plan.digest == await document.digest(),
         );
-        _same(await _witness(restore.kit, witness), restore.head);
+        _same(await _head(restore.kit, store), restore.head);
         await directory.apply(restore.plan, replaceSettings: replaceSettings);
+        await _settle(restore);
       });
+
+  Future<void> _settle(RemoteRestore restore) => directory.repository.exclusive(() async {
+    final state=await _state(), pending=state['pending'];
+    if(pending == null || jsonEncode(state['kit']) != jsonEncode(restore.kit.data)) return;
+    final data=directoryMap(pending,'archive,head');
+    final head=BackupHead()..mergeFromProto3Json(data['head']);
+    checkRemoteHead(head,restore.kit.id);
+    if(head.revision > restore.head.revision) return;
+    state['pending']=null;
+    await _save(state);
+  });
 }

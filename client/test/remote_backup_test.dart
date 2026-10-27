@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,292 +7,136 @@ import 'package:space_client/src/directory_repository.dart';
 import 'package:space_client/src/preferences.dart';
 import 'package:space_client/src/remote_backup.dart';
 import 'package:space_client/src/remote_backup_models.dart';
-
 import 'fixtures/directory.dart';
 import 'fixtures/remote_backup.dart';
 
-const backupPassword = 'длинный отдельный пароль';
-
-void backupTest(String name, Future<void> Function() body) =>
-    test(name, body, timeout: const Timeout(Duration(minutes: 4)));
-
+const backupPassword='длинный отдельный пароль';
+void backupTest(String name,Future<void> Function() body) => test(name,body,timeout:const Timeout(Duration(minutes:4)));
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  group('Удалённые копии', () {
-    late DirectoryStorage storage;
-    late DirectoryBackupService directory;
-    late AppPreferences preferences;
-    late RemoteBackupKit kit;
-    late MemoryBackupApi store, witness;
-    late RemoteBackupService remote;
-    RemoteBackupService connectService(DirectoryBackupService service) =>
-        RemoteBackupService(
-          service,
-          connect: (endpoint) =>
-              endpoint.origin == kit.storage.origin ? store : witness,
-        );
-    DirectoryBackupService fresh() {
-      final prefs = AppPreferences();
-      addTearDown(prefs.close);
-      return DirectoryBackupService(
-        DirectoryRepository(DirectoryStorage()),
-        DirectoryVault(),
-        prefs,
-        () => {},
-      );
+  late DirectoryStorage storage;
+  late DirectoryBackupService directory;
+  late RemoteBackupKit kit;
+  late MemoryBackupApi api;
+  late RemoteBackupService remote;
+  RemoteBackupService connectService(DirectoryBackupService value) => RemoteBackupService(value,connect:(_) => api);
+  DirectoryBackupService fresh() {
+    final preferences=AppPreferences(); addTearDown(preferences.close);
+    return DirectoryBackupService(DirectoryRepository(DirectoryStorage()),DirectoryVault(),preferences,() => {});
+  }
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    storage=DirectoryStorage();
+    final preferences=AppPreferences(); addTearDown(preferences.close);
+    directory=DirectoryBackupService(DirectoryRepository(storage),DirectoryVault(),preferences,() => {});
+    (kit,api)=await memoryBackupNetwork();
+    remote=connectService(directory);
+    await directory.apply(await directory.preview(directoryDocument()),replaceSettings:true);
+    await remote.saveKit(kit);
+  });
+  backupTest('Комплект содержит ровно одно пространство и два разных ключа доступа',() async {
+    expect(RemoteBackupKit.parse(kit.encode()).space.origin,'https://space.example');
+    final fields=jsonDecode(kit.encode()) as Map<String,dynamic>;
+    for(final field in ['kind','v','id','space']) {
+      final invalid=Map<String,dynamic>.from(fields)..remove(field);
+      expect(() => RemoteBackupKit.parse(jsonEncode(invalid)),throwsFormatException);
     }
-
-    setUp(() async {
-      SharedPreferences.setMockInitialValues({});
-      storage = DirectoryStorage();
-      preferences = AppPreferences();
-      addTearDown(preferences.close);
-      directory = DirectoryBackupService(
-        DirectoryRepository(storage),
-        DirectoryVault(),
-        preferences,
-        () => {},
-      );
-      (kit, store, witness) = await memoryBackupNetwork();
-      remote = connectService(directory);
-      await directory.apply(
-        await directory.preview(directoryDocument()),
-        replaceSettings: true,
-      );
-      await remote.saveKit(kit);
-    });
-    backupTest('Комплект строгий, отдельные credentials и независимые endpoints обязательны', () async {
-      final encoded = kit.encode();
-      expect(encoded, isNot(contains(backupPassword)));
-      expect(RemoteBackupKit.parse(encoded).id, kit.id);
-      for (final field in ['kind', 'v', 'id', 'storage', 'witness']) {
-        final data = jsonDecode(encoded) as Map<String, dynamic>;
-        data.remove(field);
-        expect(
-          () => RemoteBackupKit.parse(jsonEncode(data)),
-          throwsFormatException,
-        );
-      }
-      final data = jsonDecode(encoded) as Map<String, dynamic>;
-      data['extra'] = true;
-      expect(
-        () => RemoteBackupKit.parse(jsonEncode(data)),
-        throwsFormatException,
-      );
-      final endpoints = jsonDecode(encoded) as Map<String, dynamic>;
-      endpoints['witness'] = endpoints['storage'];
-      expect(
-        () => RemoteBackupKit.parse(jsonEncode(endpoints)),
-        throwsFormatException,
-      );
-    });
-    backupTest('Публикация проверяет контейнер и свидетель; чистое устройство требует явного применения', () async {
-      await remote.publish(kit, backupPassword);
-      expect(store.versions, hasLength(1));
-      expect(witness.head.revision.toInt(), 1);
-      expect(
-        utf8.decode(store.versions[1]!.archive, allowMalformed: true),
-        isNot(contains('space.example')),
-      );
-      final target = fresh(), recovery = connectService(target);
-      final plan = await recovery.preview(kit, backupPassword);
-      expect(target.preferences.origins, isEmpty);
-      expect(plan.plan.conflicts, isEmpty);
-      await recovery.apply(plan, replaceSettings: false);
-      expect(target.preferences.origins, ['https://space.example']);
-      expect(target.preferences.palette, 'gruvbox');
-      expect((target.vault as DirectoryVault).records, isEmpty);
-    });
-    backupTest('Потерянный ответ загрузки сохраняет точные байты; холодный повтор завершает ту же ревизию', () async {
-      store.failPut = true;
-      await expectLater(remote.publish(kit, backupPassword), throwsStateError);
-      final bytes = List.of(store.versions[1]!.archive);
-      expect(witness.head.revision.toInt(), 0);
-      await expectLater(
-        remote.preview(kit, backupPassword),
-        throwsFormatException,
-      );
-      final resumed = connectService(directory);
-      await expectLater(
-        resumed.publish(kit, 'другой длинный пароль'),
-        throwsA(anything),
-      );
-      await resumed.publish(kit, backupPassword);
-      expect(store.versions[1]!.archive, bytes);
-      expect(store.versions, hasLength(1));
-      expect(witness.head.revision.toInt(), 1);
-      expect(
-        (jsonDecode(storage.values[RemoteBackupService.storageKey]!)
-            as Map)['pending'],
-        isNull,
-      );
-    });
-    backupTest('Потерянный ответ свидетеля не создаёт новую копию', () async {
-      witness.failAdvance = true;
-      await expectLater(remote.publish(kit, backupPassword), throwsStateError);
-      expect(witness.head.revision.toInt(), 1);
-      await connectService(directory).publish(kit, backupPassword);
-      expect(store.versions, hasLength(1));
-      expect(
-        ((await directory.repository.read())['heads']
-            as Map)[kit.id]['revision'],
-        1,
-      );
-    });
-    backupTest('Недоступный свидетель, подмена подписи/challenge и контейнера блокируют preview', () async {
-      await remote.publish(kit, backupPassword);
-      final target = fresh(), recovery = connectService(target);
-      witness.unavailable = true;
-      await expectLater(
-        recovery.preview(kit, backupPassword),
-        throwsStateError,
-      );
-      witness.unavailable = false;
-      witness.badSignature = true;
-      await expectLater(
-        recovery.preview(kit, backupPassword),
-        throwsFormatException,
-      );
-      witness.badSignature = false;
-      witness.badChallenge = true;
-      await expectLater(
-        recovery.preview(kit, backupPassword),
-        throwsFormatException,
-      );
-      witness.badChallenge = false;
-      store.versions[1]!.archive[0] ^= 1;
-      await expectLater(
-        recovery.preview(kit, backupPassword),
-        throwsFormatException,
-      );
-      expect(target.preferences.origins, isEmpty);
-      expect((await target.repository.read())['catalog'], isEmpty);
-    });
-    backupTest(
-      'Новый head между preview и применением блокирует старый план',
-      () async {
-        await remote.publish(kit, backupPassword);
-        final target = fresh(), recovery = connectService(target);
-        final plan = await recovery.preview(kit, backupPassword);
-        await remote.publish(kit, backupPassword);
-        await expectLater(
-          recovery.apply(plan, replaceSettings: true),
-          throwsFormatException,
-        );
-        expect(target.preferences.origins, isEmpty);
-      },
-    );
-    backupTest('Несколько ревизий проверяются цепочкой, а откат свидетеля не обходит локальный head', () async {
-      await remote.publish(kit, backupPassword);
-      final target = fresh(), recovery = connectService(target);
-      await recovery.apply(
-        await recovery.preview(kit, backupPassword),
-        replaceSettings: false,
-      );
-      final old = witness.head.deepCopy();
-      await remote.publish(kit, backupPassword);
-      await remote.publish(kit, backupPassword);
-      final plan = await recovery.preview(kit, backupPassword);
-      expect(plan.plan.ancestors, hasLength(1));
-      expect(plan.plan.conflicts, isEmpty);
-      await recovery.apply(plan, replaceSettings: false);
-      witness.head = old;
-      final rollback = await recovery.preview(kit, backupPassword);
-      expect(rollback.plan.conflicts, isNotEmpty);
-      await expectLater(
-        recovery.apply(rollback, replaceSettings: false),
-        throwsFormatException,
-      );
-    });
-    backupTest(
-      'Ошибка защищённого журнала происходит до загрузки контейнера',
-      () async {
-        storage.fail = true;
-        await expectLater(
-          remote.publish(kit, backupPassword),
-          throwsStateError,
-        );
-        expect(store.versions, isEmpty);
-        expect(witness.head.revision.toInt(), 0);
-      },
-    );
-    backupTest(
-      'Внешние головы связывают ciphertext и не раскрывают digest манифеста',
-      () async {
-        await remote.publish(kit, backupPassword);
-        final first = await remote.preview(kit, backupPassword);
-        final plain = first.plan.digest, chain = first.head.digest;
-        expect(chain, remoteChainDigest(first.head));
-        expect(chain, isNot(plain));
-        await remote.publish(kit, backupPassword);
-        final second = await remote.preview(kit, backupPassword);
-        expect(second.plan.document.parent, plain);
-        expect(second.head.parent, chain);
-        expect(backupHeadText(second.head), isNot(contains(plain)));
-        expect(second.head.digest, remoteChainDigest(second.head));
-      },
-    );
-    backupTest('После потери исходного профиля незавершённая первая копия требует отдельного подтверждения', () async {
-      store.failPut = true;
-      await expectLater(remote.publish(kit, backupPassword), throwsStateError);
-      final target = fresh(), recovery = connectService(target);
-      await recovery.saveKit(kit);
-      final candidate = await recovery.previewUnpublished(kit, backupPassword);
-      expect(candidate.unpublished, isTrue);
-      expect(candidate.needsPrevious, isFalse);
-      expect(target.preferences.origins, isEmpty);
-      await expectLater(
-        recovery.apply(candidate, replaceSettings: false),
-        throwsFormatException,
-      );
-      await recovery.finishUnpublished(candidate, backupPassword);
-      expect(witness.head.revision.toInt(), 1);
-      expect(target.preferences.origins, isEmpty);
-      await recovery.apply(
-        await recovery.preview(kit, backupPassword),
-        replaceSettings: false,
-      );
-      expect(target.preferences.origins, ['https://space.example']);
-    });
-    backupTest('Незавершённая следующая копия требует восстановления подтверждённой базы', () async {
-      await remote.publish(kit, backupPassword);
-      store.failPut = true;
-      await expectLater(remote.publish(kit, backupPassword), throwsStateError);
-      final target = fresh(), recovery = connectService(target);
-      await recovery.saveKit(kit);
-      final candidate = await recovery.previewUnpublished(kit, backupPassword);
-      expect(candidate.needsPrevious, isTrue);
-      await expectLater(
-        recovery.finishUnpublished(candidate, backupPassword),
-        throwsFormatException,
-      );
-      await recovery.apply(
-        await recovery.preview(kit, backupPassword),
-        replaceSettings: false,
-      );
-      await recovery.finishUnpublished(
-        await recovery.previewUnpublished(kit, backupPassword),
-        backupPassword,
-      );
-      expect(witness.head.revision.toInt(), 2);
-      expect(target.preferences.palette, 'gruvbox');
-    });
-    backupTest('Локальная и удалённая цепочки независимы; смена пароля цепочки блокируется до загрузки', () async {
-      final local = await directory.capture();
-      await directory.recordExport(local);
-      await remote.publish(kit, backupPassword);
-      expect((await directory.repository.read())['outgoing'], local.id);
-      final next = await directory.capture();
-      expect(next.id, local.id);
-      expect(next.revision, 2);
-      await directory.recordExport(next);
-      await expectLater(
-        remote.publish(kit, 'Другой длинный пароль цепочки'),
-        throwsA(anything),
-      );
-      expect(store.versions, hasLength(1));
-      await remote.publish(kit, backupPassword);
-      expect(witness.head.revision.toInt(), 2);
-    });
+    fields['witness']=fields['space'];
+    expect(() => RemoteBackupKit.parse(jsonEncode(fields)),throwsFormatException);
+    expect(kit.encode(),isNot(contains(backupPassword)));
+  });
+  backupTest('Один сервер пространства сохраняет копию; применение отдельно и без рабочих ключей',() async {
+    await remote.publish(kit,backupPassword);
+    expect(api.versions,hasLength(1));
+    final target=fresh(), recovery=connectService(target);
+    final plan=await recovery.preview(kit,backupPassword);
+    expect(plan.plan.unknown,isTrue);
+    expect(target.preferences.origins,isEmpty);
+    await recovery.apply(plan,replaceSettings:false);
+    expect(target.preferences.origins,['https://space.example']);
+    expect(target.preferences.palette,'gruvbox');
+    expect((target.vault as DirectoryVault).records,isEmpty);
+  });
+  backupTest('Потеря ответа не отделяет контейнер от головы; чистый профиль уже может восстановиться',() async {
+    api.failPut=true;
+    await expectLater(remote.publish(kit,backupPassword),throwsStateError);
+    final bytes=List.of(api.versions[1]!.archive);
+    expect(api.head.revision.toInt(),1);
+    final target=fresh(), recovery=connectService(target);
+    final plan=await recovery.preview(kit,backupPassword);
+    await recovery.apply(plan,replaceSettings:false);
+    expect(target.preferences.origins,['https://space.example']);
+    await expectLater(connectService(directory).publish(kit,'другой длинный пароль'),throwsA(anything));
+    await connectService(directory).publish(kit,backupPassword);
+    expect(api.versions[1]!.archive,bytes);
+    expect(api.versions,hasLength(1));
+  });
+  backupTest('После явного восстановления очищается покрытая им очередь публикации',() async {
+    api.failPut=true;
+    await expectLater(remote.publish(kit,backupPassword),throwsStateError);
+    await remote.apply(await remote.preview(kit,backupPassword),replaceSettings:false);
+    expect((jsonDecode(storage.values[RemoteBackupService.storageKey]!) as Map)['pending'],isNull);
+    await remote.publish(kit,backupPassword);
+    expect(api.head.revision.toInt(),2);
+  });
+  backupTest('Подмена подписи, challenge, ciphertext и недоступность пространства блокируют восстановление',() async {
+    await remote.publish(kit,backupPassword);
+    final target=fresh(), recovery=connectService(target);
+    api.unavailable=true;
+    await expectLater(recovery.preview(kit,backupPassword),throwsStateError);
+    api.unavailable=false; api.badSignature=true;
+    await expectLater(recovery.preview(kit,backupPassword),throwsFormatException);
+    api.badSignature=false; api.badChallenge=true;
+    await expectLater(recovery.preview(kit,backupPassword),throwsFormatException);
+    api.badChallenge=false;
+    api.versions[1]!.archive[0]^=1;
+    await expectLater(recovery.preview(kit,backupPassword),throwsFormatException);
+    expect(target.preferences.origins,isEmpty);
+  });
+  backupTest('Изменение версии после preview блокирует применение',() async {
+    await remote.publish(kit,backupPassword);
+    final target=fresh(), recovery=connectService(target);
+    final plan=await recovery.preview(kit,backupPassword);
+    await remote.publish(kit,backupPassword);
+    await expectLater(recovery.apply(plan,replaceSettings:true),throwsFormatException);
+    expect(target.preferences.origins,isEmpty);
+  });
+  backupTest('Известный откат отклоняется; пропущенные ревизии проверяются цепочкой',() async {
+    await remote.publish(kit,backupPassword);
+    final target=fresh(), recovery=connectService(target);
+    await recovery.apply(await recovery.preview(kit,backupPassword),replaceSettings:false);
+    final old=api.head.deepCopy();
+    await remote.publish(kit,backupPassword); await remote.publish(kit,backupPassword);
+    final plan=await recovery.preview(kit,backupPassword);
+    expect(plan.plan.ancestors,hasLength(1));
+    expect(plan.plan.conflicts,isEmpty);
+    await recovery.apply(plan,replaceSettings:false);
+    api.head=old;
+    final rollback=await recovery.preview(kit,backupPassword);
+    expect(rollback.plan.conflicts,isNotEmpty);
+    await expectLater(recovery.apply(rollback,replaceSettings:false),throwsFormatException);
+    final clean=await connectService(fresh()).preview(kit,backupPassword);
+    expect(clean.plan.unknown,isTrue);
+  });
+  backupTest('Ошибка защищённой записи происходит до загрузки',() async {
+    storage.fail=true;
+    await expectLater(remote.publish(kit,backupPassword),throwsStateError);
+    expect(api.versions,isEmpty);
+  });
+  backupTest('Наружу передаются хеши ciphertext, локальные файловые цепочки независимы',() async {
+    final local=await directory.capture(); await directory.recordExport(local);
+    await remote.publish(kit,backupPassword);
+    final first=await remote.preview(kit,backupPassword);
+    expect(first.head.digest,isNot(first.plan.digest));
+    final next=await directory.capture();
+    expect(next.id,local.id); expect(next.revision,2);
+    await directory.recordExport(next);
+    await expectLater(remote.publish(kit,'другой длинный пароль цепочки'),throwsA(anything));
+    expect(api.versions,hasLength(1));
+    await remote.publish(kit,backupPassword);
+    final second=await remote.preview(kit,backupPassword);
+    expect(second.head.parent,first.head.digest);
+    expect(second.plan.document.parent,first.plan.digest);
+    expect(backupHeadText(second.head),isNot(contains(first.plan.digest)));
   });
 }

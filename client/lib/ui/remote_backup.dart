@@ -26,8 +26,7 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
   late final cubit =
       widget.controller ??
       RemoteBackupCubit(RemoteBackupService(widget.service));
-  final storageOrigin = TextEditingController(),
-      witnessOrigin = TextEditingController();
+  String? selectedSpace;
   final files = UserExportFileService();
   @override
   void initState() {
@@ -37,8 +36,6 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
 
   @override
   void dispose() {
-    storageOrigin.dispose();
-    witnessOrigin.dispose();
     if (widget.controller == null) unawaited(cubit.close());
     super.dispose();
   }
@@ -96,11 +93,11 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
     if (password != null && mounted) await cubit.publish(password);
   }
 
-  Future<void> preview({bool unpublished = false}) async {
+  Future<void> preview() async {
     cubit.reset();
     final password = await askRecoveryPassword(context, creating: false);
     if (password != null && mounted) {
-      await cubit.preview(password, unpublished: unpublished);
+      await cubit.preview(password);
     }
   }
 
@@ -122,18 +119,6 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
         mounted) {
       await cubit.revoke();
     }
-  }
-
-  Future<void> finishUnpublished() async {
-    if (!await confirmRecoveryAction(
-          context,
-          context.strings.remoteBackupFinishHelp,
-        ) ||
-        !mounted) {
-      return;
-    }
-    final password = await askRecoveryPassword(context, creating: false);
-    if (password != null && mounted) await cubit.finishUnpublished(password);
   }
 
   @override
@@ -167,41 +152,22 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
           ),
         ),
       );
-  List<Widget> _setup(RemoteBackupState state) => [
-    TextField(
-      controller: storageOrigin,
-      enabled: !state.busy,
-      decoration: InputDecoration(
-        labelText: context.strings.remoteBackupStorage,
+  List<Widget> _setup(RemoteBackupState state) {
+    final spaces=cubit.spaces;
+    final selected=spaces.any((space) => space.origin == selectedSpace) ? selectedSpace : null;
+    return [
+      DropdownButtonFormField<String>(
+        initialValue:selected, isExpanded:true,
+        decoration:InputDecoration(labelText:context.strings.remoteBackupStorage),
+        items:spaces.map((space) => DropdownMenuItem(value:space.origin,child:Text(space.title,overflow:TextOverflow.ellipsis))).toList(),
+        onChanged:state.busy ? null : (value) => setState(() => selectedSpace=value),
       ),
-    ),
-    const SizedBox(height: 12),
-    TextField(
-      controller: witnessOrigin,
-      enabled: !state.busy,
-      decoration: InputDecoration(
-        labelText: context.strings.remoteBackupWitness,
-      ),
-    ),
-    const SizedBox(height: 16),
-    OutlinedButton(
-      onPressed: state.busy
-          ? null
-          : () => cubit.setup(
-              storageOrigin.text.trim(),
-              witnessOrigin.text.trim(),
-              saveKit,
-            ),
-      child: Text(context.strings.remoteBackupSetup),
-    ),
-  ];
-  List<Widget> _configured(RemoteBackupState state) => [
+      const SizedBox(height:16),
+      OutlinedButton(onPressed:state.busy || selected == null ? null : () => cubit.setup(selected,saveKit),child:Text(context.strings.remoteBackupSetup)),
+    ];
+  }  List<Widget> _configured(RemoteBackupState state) => [
     Text(
-      '${context.strings.remoteBackupStorage}: ${state.kit!.storage.origin}',
-    ),
-    const SizedBox(height: 8),
-    Text(
-      '${context.strings.remoteBackupWitness}: ${state.kit!.witness.origin}',
+      '${context.strings.remoteBackupStorage}: ${state.kit!.space.origin}',
     ),
     const SizedBox(height: 16),
     Wrap(
@@ -219,10 +185,6 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
         TextButton(
           onPressed: state.busy ? null : cubit.configure,
           child: Text(context.strings.remoteBackupConfigure),
-        ),
-        TextButton(
-          onPressed: state.busy ? null : () => preview(unpublished: true),
-          child: Text(context.strings.remoteBackupUnpublished),
         ),
         TextButton(
           onPressed: state.busy ? null : () => cubit.exportKit(saveKit),
@@ -262,12 +224,8 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
     final restore = state.restore!, plan = restore.plan;
     return [
       const SizedBox(height: 16),
-      Text(
-        restore.unpublished
-            ? context.strings.remoteBackupUnpublishedHelp
-            : '${context.strings.remoteBackupVerified} ${restore.head.revision}',
-      ),
-      if (restore.needsPrevious) Text(context.strings.remoteBackupRestoreFirst),
+      Text('${context.strings.remoteBackupVerified} ${restore.head.revision}'),
+      Text(context.strings.remoteBackupFreshness),
       const SizedBox(height: 12),
       Text(context.strings.directoryBackupPreview(plan.document.spaces.length)),
       ...plan.document.spaces.map(
@@ -292,7 +250,6 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
     final restore = state.restore!, plan = restore.plan;
     return [
       const SizedBox(height: 12),
-      if (!restore.unpublished)
         CheckboxListTile(
           contentPadding: EdgeInsets.zero,
           value: state.replaceSettings,
@@ -304,14 +261,10 @@ class _RemoteBackupPanelState extends State<RemoteBackupPanel> {
       const SizedBox(height: 12),
       FilledButton(
         onPressed:
-            state.busy || plan.conflicts.isNotEmpty || restore.needsPrevious
+            state.busy || plan.conflicts.isNotEmpty
             ? null
-            : (restore.unpublished ? finishUnpublished : apply),
-        child: Text(
-          restore.unpublished
-              ? context.strings.remoteBackupFinish
-              : context.strings.directoryBackupApply,
-        ),
+            : apply,
+        child: Text(context.strings.directoryBackupApply),
       ),
       TextButton(
         onPressed: state.busy ? null : cubit.reset,

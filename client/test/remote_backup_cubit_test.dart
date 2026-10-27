@@ -37,7 +37,7 @@ void main() {
       final service = RemoteBackupService(directory),
           cubit = RemoteBackupCubit(service);
       addTearDown(cubit.close);
-      final (kit, _, _) = await memoryBackupNetwork();
+      final (kit, _) = await memoryBackupNetwork();
       await cubit.importKit(kit.encode());
       cubit.replaceSettings(true);
       await cubit.importKit(kit.encode());
@@ -59,7 +59,7 @@ void main() {
     );
     final service = WaitingRemoteBackup(directory);
     final controller = RemoteBackupCubit(service);
-    final (kit, _, _) = await memoryBackupNetwork();
+    final (kit, _) = await memoryBackupNetwork();
     await controller.importKit(kit.encode());
     final work = controller.preview('пароль');
     await controller.preview('вторая операция');

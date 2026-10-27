@@ -47,66 +47,22 @@ Future<void> waitRemoteRestart(String marker) async {
 
 void main() {
   RemoteNetworkBinding();
-  const storageOrigin = String.fromEnvironment('REMOTE_STORAGE');
-  const witnessOrigin = String.fromEnvironment('REMOTE_WITNESS');
-  const storageTls = String.fromEnvironment('REMOTE_STORAGE_TLS');
-  const witnessTls = String.fromEnvironment('REMOTE_WITNESS_TLS');
-  const storageAuth = String.fromEnvironment('REMOTE_STORAGE_AUTH');
-  const witnessAuth = String.fromEnvironment('REMOTE_WITNESS_AUTH');
-  const restart = String.fromEnvironment('REMOTE_RESTART');
-  test(
-    'Два HTTPS/Connect сервера, изолированные схемы PostgreSQL, потерянный ответ и восстановление после перезапуска',
+  const origin=String.fromEnvironment('REMOTE_SPACE');
+  const tls=String.fromEnvironment('REMOTE_SPACE_TLS');
+  const authOrigin=String.fromEnvironment('REMOTE_SPACE_AUTH');
+  const restart=String.fromEnvironment('REMOTE_RESTART');  test(
+    'Один сервер пространства: атомарная копия и восстановление после перезапуска',
     () async {
       SharedPreferences.setMockInitialValues({});
-      final server = await discover(storageOrigin, tlsFingerprint: storageTls);
-      final witnessServer = await discover(
-        witnessOrigin,
-        tlsFingerprint: witnessTls,
-      );
-      final sourceVault = DirectoryVault();
-      final storageSession = await SpaceSession.connect(
-        await discover(storageAuth),
-        sourceVault,
-      );
-      addTearDown(storageSession.close);
-      final witnessSession = await SpaceSession.connect(
-        await discover(witnessAuth),
-        sourceVault,
-      );
-      addTearDown(witnessSession.close);
-      expect(storageSession.server.publicKey, server.publicKey);
-      expect(witnessSession.server.publicKey, witnessServer.publicKey);
-      final kit = RemoteBackupKit.parse(
-        RemoteBackupKit(
-          url64(List.filled(16, 17)),
-          RemoteBackupEndpoint.create(
-            storageOrigin,
-            storageTls,
-            url64(server.publicKey),
-          ),
-          RemoteBackupEndpoint.create(
-            witnessOrigin,
-            witnessTls,
-            url64(witnessServer.publicKey),
-          ),
-        ).encode(),
-      );
-      for (final (endpoint, session, witness) in [
-        (kit.storage, storageSession, false),
-        (kit.witness, witnessSession, true),
-      ]) {
-        await session.createRemoteBackupSlot(
-          CreateBackupSlotRequest(
-            id: kit.id,
-            witness: witness,
-            readHash: (await Sha256().hash(utf8.encode(endpoint.readToken)))
-                .bytes,
-            writeHash: (await Sha256().hash(utf8.encode(endpoint.writeToken)))
-                .bytes,
-          ),
-        );
-      }
-      final sourcePrefs = AppPreferences(), targetPrefs = AppPreferences();
+      final server=await discover(origin,tlsFingerprint:tls);
+      final sourceVault=DirectoryVault();
+      final session=await SpaceSession.connect(await discover(authOrigin),sourceVault);
+      addTearDown(session.close);
+      expect(session.server.publicKey,server.publicKey);
+      final kit=RemoteBackupKit.parse(RemoteBackupKit(url64(List.filled(16,17)),RemoteBackupEndpoint.create(origin,tls,url64(server.publicKey))).encode());
+      await session.createRemoteBackupSlot(CreateBackupSlotRequest(id:kit.id,
+        readHash:(await Sha256().hash(utf8.encode(kit.space.readToken))).bytes,
+        writeHash:(await Sha256().hash(utf8.encode(kit.space.writeToken))).bytes));      final sourcePrefs = AppPreferences(), targetPrefs = AppPreferences();
       addTearDown(sourcePrefs.close);
       addTearDown(targetPrefs.close);
       final source = DirectoryBackupService(
@@ -136,21 +92,11 @@ void main() {
         throwsA(isA<SocketException>()),
       );
       final recovery = RemoteBackupService(target);
-      await expectLater(
-        recovery.preview(kit, 'Отдельный длинный пароль'),
-        throwsFormatException,
-      );
-      await waitRemoteRestart(restart);
       await recovery.saveKit(RemoteBackupKit.parse(kit.encode()));
-      final unpublished = await recovery.previewUnpublished(
-        kit,
-        'Отдельный длинный пароль',
-      );
-      expect(unpublished.unpublished, isTrue);
-      expect(targetPrefs.origins, isEmpty);
-      await recovery.finishUnpublished(unpublished, 'Отдельный длинный пароль');
-      expect(targetPrefs.origins, isEmpty);
-      await RemoteBackupService(source)
+      final before=await recovery.preview(kit,'Отдельный длинный пароль');
+      expect(before.head.revision.toInt(),1);
+      expect(targetPrefs.origins,isEmpty);
+      await waitRemoteRestart(restart);      await RemoteBackupService(source)
           .publish(kit, 'Отдельный длинный пароль');
       final plan = await recovery.preview(
         RemoteBackupKit.parse(kit.encode()),
@@ -164,15 +110,18 @@ void main() {
       expect(targetPrefs.palette, 'gruvbox');
       expect(targetVault.records, isEmpty);
       expect(plan.plan.document.spaces.single['following'], hasLength(3));
-      await storageSession.revokeRemoteBackupSlot(kit.id);
-      await witnessSession.revokeRemoteBackupSlot(kit.id);
-      await witnessSession.revokeRemoteBackupSlot(kit.id);
+      final shared=RpcRemoteBackup.session(session);
+      await shared.read(ReadBackupHeadRequest(id:kit.id,token:kit.space.readToken,challenge:url64(List.filled(32,29))));
+      await shared.close();
+      await session.revokeRemoteBackupSlot(kit.id);
+      await session.revokeRemoteBackupSlot(kit.id);
+      await session.revokeRemoteBackupSlot(kit.id);
       await expectLater(
         recovery.preview(kit, 'Отдельный длинный пароль'),
         throwsA(anything),
       );
     },
-    skip: storageOrigin.isEmpty,
+    skip: origin.isEmpty,
     timeout: const Timeout(Duration(minutes: 8)),
   );
 }

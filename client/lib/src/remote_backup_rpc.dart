@@ -9,8 +9,7 @@ export 'generated/space/v1/remote_backup.pb.dart';
 abstract interface class RemoteBackupApi {
   Future<BackupHead> put(PutBackupRequest request);
   Future<GetBackupResponse> get(GetBackupRequest request);
-  Future<BackupHead> advance(AdvanceBackupWitnessRequest request);
-  Future<ReadBackupWitnessResponse> read(ReadBackupWitnessRequest request);
+  Future<ReadBackupHeadResponse> read(ReadBackupHeadRequest request);
   Future<void> close();
 }
 
@@ -19,8 +18,10 @@ class RpcRemoteBackup implements RemoteBackupApi {
     : connection = RpcConnection.connect(
         Uri.parse(endpoint.origin),
         endpoint.fingerprint,
-      );
+      ), ownsConnection = true;
+  RpcRemoteBackup.session(SpaceSession session) : connection=session.channel, ownsConnection=false;
   final RpcConnection connection;
+  final bool ownsConnection;
   static const options = RpcOptions(timeout: Duration(seconds: 30));
   @override
   Future<BackupHead> put(PutBackupRequest request) async =>
@@ -36,21 +37,14 @@ class RpcRemoteBackup implements RemoteBackupApi {
     options: options,
   );
   @override
-  Future<BackupHead> advance(AdvanceBackupWitnessRequest request) async =>
-      (await connection.unary(
-        specs.RemoteBackupService.advanceBackupWitness,
-        request,
-        options: options,
-      )).head;
-  @override
-  Future<ReadBackupWitnessResponse> read(ReadBackupWitnessRequest request) =>
+  Future<ReadBackupHeadResponse> read(ReadBackupHeadRequest request) =>
       connection.unary(
-        specs.RemoteBackupService.readBackupWitness,
+        specs.RemoteBackupService.readBackupHead,
         request,
         options: options,
       );
   @override
-  Future<void> close() => connection.shutdown();
+  Future<void> close() async { if(ownsConnection) await connection.shutdown(); }
 }
 
 Future<void> provisionRemoteBackup(

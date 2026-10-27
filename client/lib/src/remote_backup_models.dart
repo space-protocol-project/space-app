@@ -40,38 +40,18 @@ class RemoteBackupEndpoint {
 }
 
 class RemoteBackupKit {
-  RemoteBackupKit(this.id, this.storage, this.witness);
+  RemoteBackupKit(this.id, this.space);
   final String id;
-  final RemoteBackupEndpoint storage, witness;
+  final RemoteBackupEndpoint space;
   Map<String, dynamic> get data => {
-    'v': 1,
-    'kind': 'space.remote-backup',
-    'id': id,
-    'storage': storage.data,
-    'witness': witness.data,
+    'v': 1, 'kind': 'space.remote-backup', 'id': id, 'space': space.data,
   };
   String encode() => jsonEncode(data);
   factory RemoteBackupKit.parse(String raw) {
     directoryRequire(utf8.encode(raw).length <= 8192);
-    final data = directoryMap(jsonDecode(raw), 'id,kind,storage,v,witness');
+    final data = directoryMap(jsonDecode(raw), 'id,kind,space,v');
     directoryInt(data['v'], min: 1, max: 1);
     directoryRequire(data['kind'] == 'space.remote-backup');
-    final id = directoryBytes(data['id'], 16);
-    final storage = RemoteBackupEndpoint.parse(data['storage']);
-    final witness = RemoteBackupEndpoint.parse(data['witness']);
-    directoryRequire(
-      storage.origin != witness.origin &&
-          storage.publicKey != witness.publicKey,
-    );
-    directoryRequire(
-      {
-            storage.readToken,
-            storage.writeToken,
-            witness.readToken,
-            witness.writeToken,
-          }.length ==
-          4,
-    );
-    return RemoteBackupKit(id, storage, witness);
+    return RemoteBackupKit(directoryBytes(data['id'], 16), RemoteBackupEndpoint.parse(data['space']));
   }
 }

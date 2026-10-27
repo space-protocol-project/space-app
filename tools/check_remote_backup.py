@@ -1,4 +1,4 @@
-"""Настоящие HTTPS/Connect хранилище и свидетель с изолированными схемами PostgreSQL в GitHub CI."""
+"""Сервер пространства: сохранение копии, потерянный ответ и перезапуск в GitHub CI."""
 import argparse
 import hashlib
 import http.client
@@ -85,7 +85,7 @@ def run(args):
     marker = args.output / 'restart'
     with (args.output / 'interop.log').open('w', encoding='utf-8') as log:
         try:
-            for role in ['storage', 'witness']:
+            for role in ['space']:
                 subprocess.run(['psql', database, '-v', 'ON_ERROR_STOP=1', '-c', f'CREATE SCHEMA remote_{role}'], check=True, stdout=log, stderr=log)
                 environment = dict(os.environ)
                 environment['SPACE_DATABASE_URL'] = database + f'&search_path=remote_{role}'
@@ -105,7 +105,7 @@ def run(args):
                 proxies.append(proxy)
                 threads.append(thread)
             defines = []
-            for role, proxy, auth_origin in zip(['STORAGE', 'WITNESS'], proxies, origins):
+            for role, proxy, auth_origin in zip(['SPACE'], proxies, origins):
                 der = ssl.PEM_cert_to_DER_cert((args.output / f'{role.lower()}.pem').read_text())
                 fingerprint = hashlib.sha256(der).hexdigest()
                 defines += [f'--dart-define=REMOTE_{role}=https://127.0.0.1:{proxy.server_port}', f'--dart-define=REMOTE_{role}_TLS={fingerprint}', f'--dart-define=REMOTE_{role}_AUTH={auth_origin}']
@@ -128,7 +128,7 @@ def run(args):
             marker.with_suffix('.resume').write_text('resume')
             if client.wait(timeout=240):
                 raise RuntimeError('Сквозная проверка не пройдена')
-            (args.output / 'report.json').write_text(json.dumps({'result':'passed','https_servers':2,'postgres_schemas':2,'lost_commit_reply':True,'restart_both':True,'restore_without_session':True,'finish_without_original_profile':True,'revocation':True}, indent=2) + '\n')
+            (args.output / 'report.json').write_text(json.dumps({'result':'passed','space_servers':1,'postgres_schemas':1,'lost_commit_reply':True,'restart':True,'restore_without_session':True,'atomic_head_and_archive':True,'revocation':True}, indent=2) + '\n')
         finally:
             if client is not None and client.poll() is None:
                 client.terminate()
@@ -156,7 +156,7 @@ def main():
         run(args)
     finally:
         print((args.output / 'interop.log').read_text(encoding='utf-8', errors='replace'))
-    print('REMOTE_BACKUP_INTEROP_OK: HTTPS, независимый свидетель, перезапуск и отзыв')
+    print('REMOTE_BACKUP_INTEROP_OK: один сервер пространства, атомарная копия, перезапуск и отзыв')
 
 
 if __name__ == '__main__':
