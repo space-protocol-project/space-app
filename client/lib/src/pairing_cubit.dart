@@ -196,7 +196,10 @@ class PairingCubit extends Cubit<PairingState> {
 
   Future<bool> accept(int revision) async {
     final current = _pending, record = _candidate, generation = _generation;
-    if (!_current(revision) || current == null || record == null || state.busy) {
+    if (!_current(revision) ||
+        current == null ||
+        record == null ||
+        state.busy) {
       return false;
     }
     if (_expired) {
