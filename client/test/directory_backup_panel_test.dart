@@ -12,26 +12,50 @@ import 'fixtures/directory.dart';
 
 void main() {
   for (final language in ['ru', 'en', 'zh']) {
-    testWidgets('Копии: узкий экран и крупный шрифт ($language)', (tester) async {
+    testWidgets('Копии: узкий экран и крупный шрифт ($language)', (
+      tester,
+    ) async {
       SharedPreferences.setMockInitialValues({});
       tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize); addTearDown(tester.view.resetDevicePixelRatio);
-      final preferences = AppPreferences(); addTearDown(preferences.close);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final preferences = AppPreferences();
+      addTearDown(preferences.close);
       final storage = DirectoryStorage();
       final strings = lookupAppLocalizations(Locale(language));
-      await tester.pumpWidget(MaterialApp(locale: Locale(language),
-        supportedLocales: AppLocalizations.supportedLocales,
-        localizationsDelegates: [...AppLocalizations.localizationsDelegates, AdminLocalizations.delegate],
-        home: Scaffold(body: SingleChildScrollView(child: MediaQuery(
-          data: const MediaQueryData(textScaler: TextScaler.linear(2)),
-          child: DirectoryBackupPanel(service: DirectoryBackupService(DirectoryRepository(storage), DirectoryVault(), preferences, () => {})),
-        )))));
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: Locale(language),
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: [
+            ...AppLocalizations.localizationsDelegates,
+            AdminLocalizations.delegate,
+          ],
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: MediaQuery(
+                data: const MediaQueryData(textScaler: TextScaler.linear(2)),
+                child: DirectoryBackupPanel(
+                  service: DirectoryBackupService(
+                    DirectoryRepository(storage),
+                    DirectoryVault(),
+                    preferences,
+                    () => {},
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(find.text(strings.directoryBackupTitle), findsOneWidget);
       expect(find.text(strings.directoryBackupApply), findsNothing);
-      expect(storage.values, isEmpty); expect(tester.takeException(), isNull);
-      await tester.pumpWidget(const SizedBox.shrink()); await tester.pump();
+      expect(storage.values, isEmpty);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
     });
   }
 }

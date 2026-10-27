@@ -294,7 +294,10 @@ class SettingsPanel extends StatelessWidget {
       ],
       const SizedBox(height: 24),
       AppUpdatesView(updates: updates, prepareInstall: prepareInstall),
-      if (directoryBackup != null) ...[const SizedBox(height: 24), directoryBackup!],
+      if (directoryBackup != null) ...[
+        const SizedBox(height: 24),
+        directoryBackup!,
+      ],
       if (deviceTransfer != null) ...[
         const SizedBox(height: 24),
         deviceTransfer!,

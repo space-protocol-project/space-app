@@ -64,3 +64,29 @@ jobs:
         with:
           name: directory-native-ui
           path: ${{ runner.temp }}/directory-native
+
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.8'
+          channel: stable
+          cache: true
+      - name: Rust
+        run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Генерация моделей и сборка Android без устройства
+        working-directory: client
+        run: |
+          flutter pub get
+          dart run build_runner build
+          flutter build apk --debug
+      - name: Проверки Android SAF и приватного runtime
+        working-directory: client/android
+        run: ./gradlew :app:testDebugUnitTest :flutter_webrtc:testDebugUnitTest

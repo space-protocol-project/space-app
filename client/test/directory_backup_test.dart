@@ -2,11 +2,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:space_client/src/core.dart';
 import 'package:space_client/src/directory_backup.dart';
-import 'package:space_client/src/directory_document.dart';
 import 'package:space_client/src/directory_repository.dart';
 import 'package:space_client/src/preferences.dart';
 
 import 'fixtures/directory.dart';
+
+class InterruptedPreferences extends AppPreferences {
+  bool fail = true;
+  @override Future<void> remember(String origin) {
+    if (fail) throw StateError('interrupted');
+    return super.remember(origin);
+  }
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -74,5 +81,30 @@ void main() {
   test('Закрепление из восстановленного каталога не даёт принять другой сервер', () async {
     await service.apply(await service.preview(directoryDocument()), replaceSettings: false);
     await expectLater(repository.checkTrust(Discovery(Uri.parse('https://space.example'), 'other', List.filled(32, 2))), throwsFormatException);
+  });
+  test('Сбой после записи журнала можно завершить; новая копия не затирает незавершённый план', () async {
+    await preferences.close();
+    final broken = InterruptedPreferences(); preferences = broken;
+    service = DirectoryBackupService(repository, vault, preferences, () => {});
+    await expectLater(service.apply(await service.preview(directoryDocument()), replaceSettings: true), throwsStateError);
+    expect((await repository.read())['pending'], isNotNull);
+    expect((await service.preview(directoryDocument())).conflicts, isNotEmpty);
+    broken.fail = false;
+    await service.resume();
+    expect((await repository.read())['pending'], isNull);
+    expect(preferences.origins.length, 1);
+  });
+  test('Экспорт действующего доступа не копирует секреты, offline отмечается явно', () async {
+    final record = DeviceRecord(origin: 'https://space.example', serverId: 'srv_example',
+      serverKey: url64(List.filled(32, 2)), tlsFingerprint: 'a' * 64,
+      rootSeed: List.filled(32, 3), deviceSeed: List.filled(32, 4), grantId: 'private_grant');
+    await vault.save(record); await preferences.remember(record.origin);
+    final document = await service.capture();
+    final text = document.data.toString();
+    expect(text, isNot(contains('private_grant')));
+    expect(text, isNot(contains('rootSeed'))); expect(text, isNot(contains('deviceSeed')));
+    expect(document.spaces.single['following_status'], 'unavailable');
+    final conflict = await service.preview(directoryDocument());
+    expect(conflict.conflicts, isNotEmpty);
   });
 }

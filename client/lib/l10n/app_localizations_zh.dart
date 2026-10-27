@@ -2778,6 +2778,58 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pairingQrInvalid => '二维码无效、已过期或属于其他空间。请扫描待连接设备上的新二维码。';
+
+  @override
+  String get directoryBackupTitle => '加密目录备份';
+
+  @override
+  String get directoryBackupHelp =>
+      '备份空间、设置和关注，不含设备密钥和历史记录。密码至少12个字符。访问权限需通过恢复卡或配对恢复。';
+
+  @override
+  String get directoryBackupCreate => '创建备份';
+
+  @override
+  String get directoryBackupRead => '预览备份';
+
+  @override
+  String get directoryBackupApply => '恢复目录';
+
+  @override
+  String get directoryBackupSettings => '用备份中的设置替换界面设置';
+
+  @override
+  String get directoryBackupFollows => '添加已保存的关注';
+
+  @override
+  String get directoryBackupResume => '完成中断的恢复';
+
+  @override
+  String get directoryBackupUnverified => '此备份没有本地版本记录，无法确认是否为最新版本。';
+
+  @override
+  String get directoryBackupResults => '空间结果（保存时列出不完整的关注快照）：';
+
+  @override
+  String get directoryBackupSaved => '备份已保存并验证。请单独保存密码。';
+
+  @override
+  String get directoryBackupRestored => '本地恢复已完成。请使用相同身份登录后单独恢复关注。';
+
+  @override
+  String get directoryBackupError => '操作未完成。请检查密码、备份完整性和存储访问权限。可继续中断的恢复。';
+
+  @override
+  String get directoryBackupConfirm => '应用已验证的目录？访问密钥将保留。将应用所选设置；中断后可继续恢复。';
+
+  @override
+  String get directoryBackupFollowsHelp =>
+      '为已连接且身份相同的空间添加缺失的关注？将保留现有关注。服务器会检查权限，结果可能不完整。';
+
+  @override
+  String directoryBackupPreview(int count) {
+    return '备份中的空间数量：$count';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3984,4 +4036,56 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get pairingQrInvalid => '二维码无效、已过期或属于其他空间。请扫描待连接设备上的新二维码。';
+
+  @override
+  String get directoryBackupTitle => '加密目录备份';
+
+  @override
+  String get directoryBackupHelp =>
+      '备份空间、设置和关注，不含设备密钥和历史记录。密码至少12个字符。访问权限需通过恢复卡或配对恢复。';
+
+  @override
+  String get directoryBackupCreate => '创建备份';
+
+  @override
+  String get directoryBackupRead => '预览备份';
+
+  @override
+  String get directoryBackupApply => '恢复目录';
+
+  @override
+  String get directoryBackupSettings => '用备份中的设置替换界面设置';
+
+  @override
+  String get directoryBackupFollows => '添加已保存的关注';
+
+  @override
+  String get directoryBackupResume => '完成中断的恢复';
+
+  @override
+  String get directoryBackupUnverified => '此备份没有本地版本记录，无法确认是否为最新版本。';
+
+  @override
+  String get directoryBackupResults => '空间结果（保存时列出不完整的关注快照）：';
+
+  @override
+  String get directoryBackupSaved => '备份已保存并验证。请单独保存密码。';
+
+  @override
+  String get directoryBackupRestored => '本地恢复已完成。请使用相同身份登录后单独恢复关注。';
+
+  @override
+  String get directoryBackupError => '操作未完成。请检查密码、备份完整性和存储访问权限。可继续中断的恢复。';
+
+  @override
+  String get directoryBackupConfirm => '应用已验证的目录？访问密钥将保留。将应用所选设置；中断后可继续恢复。';
+
+  @override
+  String get directoryBackupFollowsHelp =>
+      '为已连接且身份相同的空间添加缺失的关注？将保留现有关注。服务器会检查权限，结果可能不完整。';
+
+  @override
+  String directoryBackupPreview(int count) {
+    return '备份中的空间数量：$count';
+  }
 }

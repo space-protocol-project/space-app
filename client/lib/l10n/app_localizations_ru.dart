@@ -3020,4 +3020,63 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get pairingQrInvalid =>
       'QR повреждён, истёк или относится к другому пространству. Считайте новый QR на подключаемом устройстве.';
+
+  @override
+  String get directoryBackupTitle => 'Резервная копия каталога';
+
+  @override
+  String get directoryBackupHelp =>
+      'Пространства, настройки и подписки без рабочих ключей и истории. Пароль — не менее 12 символов. Для возврата доступа нужна recovery-карточка или сопряжение.';
+
+  @override
+  String get directoryBackupCreate => 'Создать копию';
+
+  @override
+  String get directoryBackupRead => 'Проверить копию';
+
+  @override
+  String get directoryBackupApply => 'Применить каталог';
+
+  @override
+  String get directoryBackupSettings =>
+      'Заменить настройки интерфейса настройками из копии';
+
+  @override
+  String get directoryBackupFollows => 'Добавить подписки из каталога';
+
+  @override
+  String get directoryBackupResume => 'Завершить прерванное восстановление';
+
+  @override
+  String get directoryBackupUnverified =>
+      'Новизна этой копии неизвестна: для неё нет локального свидетеля версии.';
+
+  @override
+  String get directoryBackupResults =>
+      'Результаты по пространствам (при сохранении перечислены неполные снимки подписок):';
+
+  @override
+  String get directoryBackupSaved =>
+      'Копия сохранена и проверена. Сохраните пароль отдельно.';
+
+  @override
+  String get directoryBackupRestored =>
+      'Локальное восстановление завершено. Подписки применяются отдельной командой после входа той же личности.';
+
+  @override
+  String get directoryBackupError =>
+      'Операция не завершена. Проверьте пароль, целостность копии и доступ к хранилищу. Незавершённое применение можно повторить.';
+
+  @override
+  String get directoryBackupConfirm =>
+      'Применить проверенный каталог? Существующие ключи доступа не заменяются. Выбранные настройки будут применены; при сбое можно завершить восстановление повторно.';
+
+  @override
+  String get directoryBackupFollowsHelp =>
+      'Добавить отсутствующие подписки для подключённых пространств с той же личностью? Существующие подписки не удаляются. Сервер проверяет права; возможен частичный результат.';
+
+  @override
+  String directoryBackupPreview(int count) {
+    return 'Пространств в копии: $count';
+  }
 }

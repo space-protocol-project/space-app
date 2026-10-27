@@ -17,29 +17,52 @@ import '../fixtures/directory.dart';
 
 Future<void> main() async {
   late DirectoryBackupCubit cubit;
-  enableFlutterDriverExtension(handler: (message) async {
-    if (message == 'preview') {
-      final file = await DirectoryArchive.seal(directoryDocument(), 'A secure backup password');
-      await cubit.preview(file, 'A secure backup password');
+  enableFlutterDriverExtension(
+    handler: (message) async {
+      if (message == 'preview') {
+        final file = await DirectoryArchive.seal(
+          directoryDocument(),
+          'A secure backup password',
+        );
+        await cubit.preview(file, 'A secure backup password');
+        return cubit.state.message;
+      }
       return cubit.state.message;
-    }
-    return cubit.state.message;
-  });
+    },
+  );
   SharedPreferences.setMockInitialValues({});
   FlutterError.onError = (details) {
     debugPrint('COMMUNITY_UI_ERROR: ${details.exceptionAsString()}');
     FlutterError.presentError(details);
   };
   PlatformDispatcher.instance.onError = (error, stack) {
-    debugPrint('COMMUNITY_UI_ERROR: $error'); return true;
+    debugPrint('COMMUNITY_UI_ERROR: $error');
+    return true;
   };
   final preferences = AppPreferences();
-  final service = DirectoryBackupService(DirectoryRepository(DirectoryStorage()), DirectoryVault(), preferences, () => {});
+  final service = DirectoryBackupService(
+    DirectoryRepository(DirectoryStorage()),
+    DirectoryVault(),
+    preferences,
+    () => {},
+  );
   cubit = DirectoryBackupCubit(service);
-  runApp(MaterialApp(locale: const Locale('ru'),
-    localizationsDelegates: [...AppLocalizations.localizationsDelegates, AdminLocalizations.delegate],
-    supportedLocales: AppLocalizations.supportedLocales, theme: preferences.theme,
-    home: Scaffold(body: SingleChildScrollView(child: DirectoryBackupPanel(service: service, controller: cubit)))));
+  runApp(
+    MaterialApp(
+      locale: const Locale('ru'),
+      localizationsDelegates: [
+        ...AppLocalizations.localizationsDelegates,
+        AdminLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      theme: preferences.theme,
+      home: Scaffold(
+        body: SingleChildScrollView(
+          child: DirectoryBackupPanel(service: service, controller: cubit),
+        ),
+      ),
+    ),
+  );
   WidgetsBinding.instance.addPostFrameCallback((_) {
     Timer(const Duration(seconds: 1), () => debugPrint('COMMUNITY_UI_READY'));
   });

@@ -5463,6 +5463,102 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'QR повреждён, истёк или относится к другому пространству. Считайте новый QR на подключаемом устройстве.'**
   String get pairingQrInvalid;
+
+  /// No description provided for @directoryBackupTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Резервная копия каталога'**
+  String get directoryBackupTitle;
+
+  /// No description provided for @directoryBackupHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пространства, настройки и подписки без рабочих ключей и истории. Пароль — не менее 12 символов. Для возврата доступа нужна recovery-карточка или сопряжение.'**
+  String get directoryBackupHelp;
+
+  /// No description provided for @directoryBackupCreate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать копию'**
+  String get directoryBackupCreate;
+
+  /// No description provided for @directoryBackupRead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверить копию'**
+  String get directoryBackupRead;
+
+  /// No description provided for @directoryBackupApply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Применить каталог'**
+  String get directoryBackupApply;
+
+  /// No description provided for @directoryBackupSettings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заменить настройки интерфейса настройками из копии'**
+  String get directoryBackupSettings;
+
+  /// No description provided for @directoryBackupFollows.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить подписки из каталога'**
+  String get directoryBackupFollows;
+
+  /// No description provided for @directoryBackupResume.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завершить прерванное восстановление'**
+  String get directoryBackupResume;
+
+  /// No description provided for @directoryBackupUnverified.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новизна этой копии неизвестна: для неё нет локального свидетеля версии.'**
+  String get directoryBackupUnverified;
+
+  /// No description provided for @directoryBackupResults.
+  ///
+  /// In ru, this message translates to:
+  /// **'Результаты по пространствам (при сохранении перечислены неполные снимки подписок):'**
+  String get directoryBackupResults;
+
+  /// No description provided for @directoryBackupSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Копия сохранена и проверена. Сохраните пароль отдельно.'**
+  String get directoryBackupSaved;
+
+  /// No description provided for @directoryBackupRestored.
+  ///
+  /// In ru, this message translates to:
+  /// **'Локальное восстановление завершено. Подписки применяются отдельной командой после входа той же личности.'**
+  String get directoryBackupRestored;
+
+  /// No description provided for @directoryBackupError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Операция не завершена. Проверьте пароль, целостность копии и доступ к хранилищу. Незавершённое применение можно повторить.'**
+  String get directoryBackupError;
+
+  /// No description provided for @directoryBackupConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Применить проверенный каталог? Существующие ключи доступа не заменяются. Выбранные настройки будут применены; при сбое можно завершить восстановление повторно.'**
+  String get directoryBackupConfirm;
+
+  /// No description provided for @directoryBackupFollowsHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить отсутствующие подписки для подключённых пространств с той же личностью? Существующие подписки не удаляются. Сервер проверяет права; возможен частичный результат.'**
+  String get directoryBackupFollowsHelp;
+
+  /// No description provided for @directoryBackupPreview.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пространств в копии: {count}'**
+  String directoryBackupPreview(int count);
 }
 
 class _AppLocalizationsDelegate

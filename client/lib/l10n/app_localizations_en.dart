@@ -3002,4 +3002,63 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pairingQrInvalid =>
       'The QR is invalid, expired, or belongs to another space. Scan a new QR on the device being connected.';
+
+  @override
+  String get directoryBackupTitle => 'Encrypted directory backup';
+
+  @override
+  String get directoryBackupHelp =>
+      'Spaces, settings and follows without device keys or history. Use at least 12 password characters. Recover access with a recovery card or pairing.';
+
+  @override
+  String get directoryBackupCreate => 'Create backup';
+
+  @override
+  String get directoryBackupRead => 'Preview backup';
+
+  @override
+  String get directoryBackupApply => 'Restore directory';
+
+  @override
+  String get directoryBackupSettings =>
+      'Replace interface settings with the backup settings';
+
+  @override
+  String get directoryBackupFollows => 'Add saved follows';
+
+  @override
+  String get directoryBackupResume => 'Finish interrupted restore';
+
+  @override
+  String get directoryBackupUnverified =>
+      'This backup has no local version witness. Its freshness is unknown.';
+
+  @override
+  String get directoryBackupResults =>
+      'Space results (incomplete follow snapshots are listed when saving):';
+
+  @override
+  String get directoryBackupSaved =>
+      'Backup saved and verified. Store the password separately.';
+
+  @override
+  String get directoryBackupRestored =>
+      'Local restore completed. Restore follows separately after signing in with the same identity.';
+
+  @override
+  String get directoryBackupError =>
+      'Operation incomplete. Check the password, backup integrity and storage access. An interrupted restore can be resumed.';
+
+  @override
+  String get directoryBackupConfirm =>
+      'Apply the verified directory? Access keys are preserved. Selected settings will be applied; interrupted restoration can be resumed.';
+
+  @override
+  String get directoryBackupFollowsHelp =>
+      'Add missing follows for connected spaces with the same identity? Existing follows are kept. Servers check access; results may be partial.';
+
+  @override
+  String directoryBackupPreview(int count) {
+    return 'Spaces in this backup: $count';
+  }
 }

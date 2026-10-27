@@ -31,9 +31,13 @@ class DirectoryArchive {
   }
 
   static Future<SecretKey> _derive(String passphrase, List<int> salt) async {
-    final passwordKey = SecretKeyData(utf8.encode(passphrase));
-    try { return await kdf.deriveKey(secretKey: passwordKey, nonce: salt); }
-    finally { passwordKey.destroy(); }
+    final passwordKey = SecretKeyData(utf8.encode(passphrase), overwriteWhenDestroyed: true);
+    SecretKey? derived;
+    try {
+      derived = await kdf.deriveKey(secretKey: passwordKey, nonce: salt);
+      return SecretKeyData(await derived.extractBytes(), overwriteWhenDestroyed: true);
+    }
+    finally { passwordKey.destroy(); derived?.destroy(); }
   }
 
   static Future<Uint8List> seal(DirectoryDocument document, String passphrase) async {
@@ -43,7 +47,7 @@ class DirectoryArchive {
     final header = utf8.encode(jsonEncode({'v': 1, 'kdf': 'pbkdf2-sha256', 'iterations': 600000,
       'salt': base64Encode(salt), 'wrap_nonce': base64Encode(wrapNonce),
       'prefix': base64Encode(prefix), 'bytes': plain.length}));
-    final dek = SecretKeyData(random(32));
+    final dek = SecretKeyData(random(32), overwriteWhenDestroyed: true);
     SecretKey? kek;
     try {
       kek = await _derive(passphrase, salt);
@@ -88,7 +92,7 @@ class DirectoryArchive {
     SecretKeyData? dek;
     try {
       dek = SecretKeyData(await cipher.decrypt(SecretBox(wrapped.sublist(0, 32), nonce: nonce, mac: Mac(wrapped.sublist(32))),
-          secretKey: kek, aad: aad('wrap', header)));
+          secretKey: kek, aad: aad('wrap', header)), overwriteWhenDestroyed: true);
       return await _openChunks(file, start + length + 48, plainLength, dek, prefix, header, wrapped);
     } finally { dek?.destroy(); kek.destroy(); }
   }
