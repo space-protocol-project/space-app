@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fixnum/fixnum.dart';
+import 'package:fake_async/fake_async.dart';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/core.dart';
@@ -199,5 +200,19 @@ void main() {
     expect(cubit.state.messageKey, 'pairingExpired');
     expect(cubit.state.prepared, isFalse);
     expect(manager.preparations, 0);
+  });
+
+  test('Даже с допустимой разницей часов подготовка живёт не более пяти минут', () {
+    fakeAsync((time) {
+      request.pairing.expiresAt = Int64(clock.millisecondsSinceEpoch ~/ 1000 + 305);
+      cubit.setCode(request.code);
+      unawaited(prepare());
+      time.flushMicrotasks();
+      expect(cubit.state.prepared, isTrue);
+      time.elapse(const Duration(minutes: 5));
+      expect(cubit.state.prepared, isFalse);
+      expect(cubit.state.messageKey, 'pairingExpired');
+      expect(manager.signatures, 0);
+    });
   });
 }

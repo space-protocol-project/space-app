@@ -158,8 +158,8 @@ class PairingApprovalCubit extends Cubit<PairingApprovalState> {
       _authority = authority;
       _expiry = Timer(
         Duration(
-          seconds:
-              pair.expiresAt.toInt() - now().millisecondsSinceEpoch ~/ 1000,
+          seconds: (pair.expiresAt.toInt() - now().millisecondsSinceEpoch ~/ 1000)
+              .clamp(0, 300).toInt(),
         ),
         expire,
       );
