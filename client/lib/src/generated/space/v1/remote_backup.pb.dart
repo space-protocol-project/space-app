@@ -93,6 +93,7 @@ class BackupHead extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearRevision() => $_clearField(2);
 
+  /// SHA-256 цепочки ciphertext; отпечаток открытого манифеста не раскрывается.
   @$pb.TagNumber(3)
   $core.String get digest => $_getSZ(2);
   @$pb.TagNumber(3)
@@ -102,6 +103,7 @@ class BackupHead extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   void clearDigest() => $_clearField(3);
 
+  /// Предыдущий digest цепочки либо пустая строка у первой версии.
   @$pb.TagNumber(4)
   $core.String get parent => $_getSZ(3);
   @$pb.TagNumber(4)

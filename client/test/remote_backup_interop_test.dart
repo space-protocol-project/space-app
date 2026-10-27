@@ -55,7 +55,7 @@ void main() {
   const witnessAuth = String.fromEnvironment('REMOTE_WITNESS_AUTH');
   const restart = String.fromEnvironment('REMOTE_RESTART');
   test(
-    'Два HTTPS/Connect сервера, отдельные БД, потерянный ответ и восстановление после перезапуска',
+    'Два HTTPS/Connect сервера, изолированные схемы PostgreSQL, потерянный ответ и восстановление после перезапуска',
     () async {
       SharedPreferences.setMockInitialValues({});
       final server = await discover(storageOrigin, tlsFingerprint: storageTls);

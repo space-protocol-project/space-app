@@ -22,13 +22,19 @@ String backupHeadText(BackupHead head) => jsonEncode([
   head.archiveDigest,
 ]);
 
-String remoteChainDigest(BackupHead head) => url64(crypto.sha256.convert(utf8.encode(
-  'space/backup-chain/v1\n${head.id}\n${head.revision}\n${head.parent}\n${head.archiveDigest}',
-)).bytes);
+String remoteChainDigest(BackupHead head) => url64(
+  crypto.sha256
+      .convert(
+        utf8.encode(
+          'space/backup-chain/v1\n${head.id}\n${head.revision}\n${head.parent}\n${head.archiveDigest}',
+        ),
+      )
+      .bytes,
+);
 
 void checkRemoteHead(BackupHead head, String id) {
   directoryRequire(head.id == id);
-  directoryBytes(head.id,16);
+  directoryBytes(head.id, 16);
   final revision = directoryInt(head.revision.toInt());
   if (revision == 0) {
     directoryRequire(
@@ -54,8 +60,14 @@ Future<String> remoteBackupHash(List<int> bytes) async =>
     url64((await Sha256().hash(bytes)).bytes);
 
 final class RemoteRestore {
-  RemoteRestore._(RemoteBackupKit kit, BackupHead head, this.plan, {BackupHead? previous})
-      : kit=RemoteBackupKit.parse(kit.encode()), head = (head.deepCopy()..freeze()), previous = previous == null ? null : (previous.deepCopy()..freeze());
+  RemoteRestore._(
+    RemoteBackupKit kit,
+    BackupHead head,
+    this.plan, {
+    BackupHead? previous,
+  }) : kit = RemoteBackupKit.parse(kit.encode()),
+       head = (head.deepCopy()..freeze()),
+       previous = previous == null ? null : (previous.deepCopy()..freeze());
   final RemoteBackupKit kit;
   final BackupHead head;
   final DirectoryRestorePlan plan;
@@ -159,7 +171,7 @@ class RemoteBackupService {
     BackupHead head,
     String password,
   ) async {
-    checkRemoteHead(head,head.id);
+    checkRemoteHead(head, head.id);
     directoryRequire(
       response.hasHead() && response.archive.length <= DirectoryArchive.maxFile,
     );
@@ -271,7 +283,9 @@ class RemoteBackupService {
       parent = await previous.digest();
     }
     if (local != null) {
-      directoryRequire(local['revision'] == head.revision.toInt() && local['digest'] == parent);
+      directoryRequire(
+        local['revision'] == head.revision.toInt() && local['digest'] == parent,
+      );
     }
     final captured = await directory.capture();
     final document = DirectoryDocument.parse({
@@ -312,7 +326,13 @@ class RemoteBackupService {
           head,
           password,
         );
-        final ancestors = await _ancestors(kit, store, document, head, password);
+        final ancestors = await _ancestors(
+          kit,
+          store,
+          document,
+          head,
+          password,
+        );
         final plan = await directory.preview(document, ancestors: ancestors);
         _same(await _witness(kit, witness), head);
         return RemoteRestore._(kit, head, plan);
@@ -399,7 +419,7 @@ class RemoteBackupService {
             response.head.revision.toInt() == child.revision - 1,
       );
       child = await _document(response, response.head, password);
-      childHead=response.head;
+      childHead = response.head;
       result.add(child);
     }
     return result;

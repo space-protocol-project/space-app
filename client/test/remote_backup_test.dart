@@ -217,19 +217,22 @@ void main() {
         expect(witness.head.revision.toInt(), 0);
       },
     );
-    backupTest('Внешние головы связывают ciphertext и не раскрывают digest манифеста',() async {
-      await remote.publish(kit,backupPassword);
-      final first=await remote.preview(kit,backupPassword);
-      final plain=first.plan.digest, chain=first.head.digest;
-      expect(chain,remoteChainDigest(first.head));
-      expect(chain,isNot(plain));
-      await remote.publish(kit,backupPassword);
-      final second=await remote.preview(kit,backupPassword);
-      expect(second.plan.document.parent,plain);
-      expect(second.head.parent,chain);
-      expect(backupHeadText(second.head),isNot(contains(plain)));
-      expect(second.head.digest,remoteChainDigest(second.head));
-    });
+    backupTest(
+      'Внешние головы связывают ciphertext и не раскрывают digest манифеста',
+      () async {
+        await remote.publish(kit, backupPassword);
+        final first = await remote.preview(kit, backupPassword);
+        final plain = first.plan.digest, chain = first.head.digest;
+        expect(chain, remoteChainDigest(first.head));
+        expect(chain, isNot(plain));
+        await remote.publish(kit, backupPassword);
+        final second = await remote.preview(kit, backupPassword);
+        expect(second.plan.document.parent, plain);
+        expect(second.head.parent, chain);
+        expect(backupHeadText(second.head), isNot(contains(plain)));
+        expect(second.head.digest, remoteChainDigest(second.head));
+      },
+    );
     backupTest('После потери исходного профиля незавершённая первая копия требует отдельного подтверждения', () async {
       store.failPut = true;
       await expectLater(remote.publish(kit, backupPassword), throwsStateError);

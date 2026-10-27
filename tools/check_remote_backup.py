@@ -1,4 +1,4 @@
-"""Настоящие HTTPS/Connect хранилище и свидетель с раздельными БД в GitHub CI."""
+"""Настоящие HTTPS/Connect хранилище и свидетель с изолированными схемами PostgreSQL в GitHub CI."""
 import argparse
 import hashlib
 import http.client
