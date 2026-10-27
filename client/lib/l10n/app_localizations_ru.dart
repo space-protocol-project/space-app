@@ -3166,4 +3166,64 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get directoryTransferRelay =>
       'Выберите доверенное пространство для передачи';
+
+  @override
+  String get remoteBackupTitle => 'Удалённая резервная копия';
+
+  @override
+  String get remoteBackupHelp =>
+      'Нужны два уже подключённых HTTPS-пространства у независимых операторов: одно хранит зашифрованные копии, другое — отметку последней версии. Для восстановления на новом устройстве нужен сохранённый комплект и отдельно пароль. Доступ к пространствам возвращается через сопряжение или recovery-карточку.';
+
+  @override
+  String get remoteBackupKitHelp =>
+      'Комплект содержит секретные ключи чтения и записи копий. Сохраните его вне этого устройства, отдельно от пароля. Получивший комплект сможет скачивать зашифрованные копии и нарушить будущие публикации.';
+
+  @override
+  String get remoteBackupStorage => 'Адрес хранилища';
+
+  @override
+  String get remoteBackupWitness => 'Адрес независимого свидетеля';
+
+  @override
+  String get remoteBackupSetup => 'Сохранить комплект и настроить';
+
+  @override
+  String get remoteBackupImportKit => 'Открыть комплект восстановления';
+
+  @override
+  String get remoteBackupPublish => 'Создать или завершить публикацию';
+
+  @override
+  String get remoteBackupRead => 'Проверить и открыть последнюю копию';
+
+  @override
+  String get remoteBackupConfigure => 'Повторить настройку серверов';
+
+  @override
+  String get remoteBackupSaved =>
+      'Копия загружена, прочитана обратно и подтверждена свидетелем.';
+
+  @override
+  String get remoteBackupConfigured => 'Хранилище и свидетель готовы.';
+
+  @override
+  String get remoteBackupVerified => 'Свидетель подтвердил версию:';
+
+  @override
+  String get remoteBackupError =>
+      'Операция не завершена. Проверьте комплект, пароль, подключение и права. При несовпадении версии, подписи или отпечатков восстановление блокируется. Незавершённую публикацию повторите с тем же паролем.';
+
+  @override
+  String get remoteBackupSaveKit => 'Сохранить комплект ещё раз';
+
+  @override
+  String get remoteBackupRevoke => 'Отозвать комплект';
+
+  @override
+  String get remoteBackupRevokeHelp =>
+      'Отозвать доступ к копиям на обоих серверах? Потребуется действующий вход владельца на каждом из них. Этот комплект перестанет работать; сохранённые контейнеры не удаляются. При сбое повторите отзыв.';
+
+  @override
+  String get remoteBackupRevoked =>
+      'Доступ к копиям отозван на обоих серверах.';
 }

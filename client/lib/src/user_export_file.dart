@@ -11,7 +11,11 @@ class UserExportFileService {
     : android = android ?? Platform.isAndroid;
   final bool android;
   static const channel = MethodChannel('space/user-export');
-  Future<String?> choose(String name, {bool binary = false, String? extension}) async {
+  Future<String?> choose(
+    String name, {
+    bool binary = false,
+    String? extension,
+  }) async {
     if (android) {
       return channel.invokeMethod<String>('choose', {
         'name': name,

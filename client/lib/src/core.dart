@@ -865,6 +865,7 @@ class SpaceSession
   bool feedSupported = false;
   bool feedSocialSupported = false;
   bool userExportSupported = false;
+  bool remoteBackupsSupported = false;
   late final _userExportApi = SessionUserExportApi(this);
   @override
   UserExportApi? get userExport => userExportSupported ? _userExportApi : null;
@@ -989,6 +990,7 @@ class SpaceSession
     spaceSearchSupported = manifest.capabilities.contains(
       'core.space.search.v1',
     );
+    remoteBackupsSupported = manifest.capabilities.contains('core.directory.backup.v1');
     forumModerationSupported = manifest.capabilities.contains(
       'core.forum.moderation.v1',
     );
@@ -1130,6 +1132,7 @@ class SpaceSession
   );
 
   Future<void> createRemoteBackupSlot(remote_backup_pb.CreateBackupSlotRequest request) async {
+    if (!remoteBackupsSupported) throw const GrpcError.unimplemented('Сервер не поддерживает удалённые копии');
     await _ensureSession();
     await channel.unary(remote_backup_specs.RemoteBackupService.createBackupSlot, request, options: _options);
   }

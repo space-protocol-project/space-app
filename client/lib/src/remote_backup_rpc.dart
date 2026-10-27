@@ -16,19 +16,44 @@ abstract interface class RemoteBackupApi {
 
 class RpcRemoteBackup implements RemoteBackupApi {
   RpcRemoteBackup(RemoteBackupEndpoint endpoint)
-      : connection = RpcConnection.connect(Uri.parse(endpoint.origin), endpoint.fingerprint);
+    : connection = RpcConnection.connect(
+        Uri.parse(endpoint.origin),
+        endpoint.fingerprint,
+      );
   final RpcConnection connection;
   static const options = RpcOptions(timeout: Duration(seconds: 30));
   @override
-  Future<BackupHead> put(PutBackupRequest request) async => (await connection.unary(specs.RemoteBackupService.putBackup, request, options: options)).head;
+  Future<BackupHead> put(PutBackupRequest request) async =>
+      (await connection.unary(
+        specs.RemoteBackupService.putBackup,
+        request,
+        options: options,
+      )).head;
   @override
-  Future<GetBackupResponse> get(GetBackupRequest request) => connection.unary(specs.RemoteBackupService.getBackup, request, options: options);
+  Future<GetBackupResponse> get(GetBackupRequest request) => connection.unary(
+    specs.RemoteBackupService.getBackup,
+    request,
+    options: options,
+  );
   @override
-  Future<BackupHead> advance(AdvanceBackupWitnessRequest request) async => (await connection.unary(specs.RemoteBackupService.advanceBackupWitness, request, options: options)).head;
+  Future<BackupHead> advance(AdvanceBackupWitnessRequest request) async =>
+      (await connection.unary(
+        specs.RemoteBackupService.advanceBackupWitness,
+        request,
+        options: options,
+      )).head;
   @override
-  Future<ReadBackupWitnessResponse> read(ReadBackupWitnessRequest request) => connection.unary(specs.RemoteBackupService.readBackupWitness, request, options: options);
+  Future<ReadBackupWitnessResponse> read(ReadBackupWitnessRequest request) =>
+      connection.unary(
+        specs.RemoteBackupService.readBackupWitness,
+        request,
+        options: options,
+      );
   @override
   Future<void> close() => connection.shutdown();
 }
 
-Future<void> provisionRemoteBackup(SpaceSession session, CreateBackupSlotRequest request) => session.createRemoteBackupSlot(request);
+Future<void> provisionRemoteBackup(
+  SpaceSession session,
+  CreateBackupSlotRequest request,
+) => session.createRemoteBackupSlot(request);

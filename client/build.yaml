@@ -3,6 +3,7 @@ targets:
     builders:
       freezed:
         generate_for:
+          - lib/src/remote_backup_cubit.dart
           - lib/src/directory_transfer_cubit.dart
           - lib/src/directory_backup_cubit.dart
           - lib/src/pairing_cubit.dart

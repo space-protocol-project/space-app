@@ -5703,6 +5703,114 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Выберите доверенное пространство для передачи'**
   String get directoryTransferRelay;
+
+  /// No description provided for @remoteBackupTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалённая резервная копия'**
+  String get remoteBackupTitle;
+
+  /// No description provided for @remoteBackupHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нужны два уже подключённых HTTPS-пространства у независимых операторов: одно хранит зашифрованные копии, другое — отметку последней версии. Для восстановления на новом устройстве нужен сохранённый комплект и отдельно пароль. Доступ к пространствам возвращается через сопряжение или recovery-карточку.'**
+  String get remoteBackupHelp;
+
+  /// No description provided for @remoteBackupKitHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Комплект содержит секретные ключи чтения и записи копий. Сохраните его вне этого устройства, отдельно от пароля. Получивший комплект сможет скачивать зашифрованные копии и нарушить будущие публикации.'**
+  String get remoteBackupKitHelp;
+
+  /// No description provided for @remoteBackupStorage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес хранилища'**
+  String get remoteBackupStorage;
+
+  /// No description provided for @remoteBackupWitness.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес независимого свидетеля'**
+  String get remoteBackupWitness;
+
+  /// No description provided for @remoteBackupSetup.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить комплект и настроить'**
+  String get remoteBackupSetup;
+
+  /// No description provided for @remoteBackupImportKit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть комплект восстановления'**
+  String get remoteBackupImportKit;
+
+  /// No description provided for @remoteBackupPublish.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать или завершить публикацию'**
+  String get remoteBackupPublish;
+
+  /// No description provided for @remoteBackupRead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверить и открыть последнюю копию'**
+  String get remoteBackupRead;
+
+  /// No description provided for @remoteBackupConfigure.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторить настройку серверов'**
+  String get remoteBackupConfigure;
+
+  /// No description provided for @remoteBackupSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Копия загружена, прочитана обратно и подтверждена свидетелем.'**
+  String get remoteBackupSaved;
+
+  /// No description provided for @remoteBackupConfigured.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хранилище и свидетель готовы.'**
+  String get remoteBackupConfigured;
+
+  /// No description provided for @remoteBackupVerified.
+  ///
+  /// In ru, this message translates to:
+  /// **'Свидетель подтвердил версию:'**
+  String get remoteBackupVerified;
+
+  /// No description provided for @remoteBackupError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Операция не завершена. Проверьте комплект, пароль, подключение и права. При несовпадении версии, подписи или отпечатков восстановление блокируется. Незавершённую публикацию повторите с тем же паролем.'**
+  String get remoteBackupError;
+
+  /// No description provided for @remoteBackupSaveKit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить комплект ещё раз'**
+  String get remoteBackupSaveKit;
+
+  /// No description provided for @remoteBackupRevoke.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отозвать комплект'**
+  String get remoteBackupRevoke;
+
+  /// No description provided for @remoteBackupRevokeHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отозвать доступ к копиям на обоих серверах? Потребуется действующий вход владельца на каждом из них. Этот комплект перестанет работать; сохранённые контейнеры не удаляются. При сбое повторите отзыв.'**
+  String get remoteBackupRevokeHelp;
+
+  /// No description provided for @remoteBackupRevoked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ к копиям отозван на обоих серверах.'**
+  String get remoteBackupRevoked;
 }
 
 class _AppLocalizationsDelegate

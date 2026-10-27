@@ -157,12 +157,10 @@ class DirectoryBackupService {
     final state = await repository.read(), heads = state['heads'] as Map;
     final head = heads[document.id] as Map?;
     final digest = await document.digest();
-    if (head?['revision'] == document.revision && head?['digest'] == digest) return;
+    if (head?['revision'] == document.revision && head?['digest'] == digest)
+      return;
     directoryRequire((head?['digest'] ?? '') == document.parent);
-    heads[document.id] = {
-      'revision': document.revision,
-      'digest': digest,
-    };
+    heads[document.id] = {'revision': document.revision, 'digest': digest};
     final catalog = state['catalog'] as Map;
     for (final space in document.spaces) {
       catalog[space['origin']] = space;
@@ -171,7 +169,10 @@ class DirectoryBackupService {
     await repository.write(state);
   }
 
-  Future<DirectoryRestorePlan> preview(DirectoryDocument document, {List<DirectoryDocument> ancestors = const []}) async {
+  Future<DirectoryRestorePlan> preview(
+    DirectoryDocument document, {
+    List<DirectoryDocument> ancestors = const [],
+  }) async {
     final state = await repository.read(),
         digest = await document.digest(),
         conflicts = <String>[];
@@ -179,7 +180,8 @@ class DirectoryBackupService {
       conflicts.add('Сначала завершите прерванное восстановление');
     }
     final head = (state['heads'] as Map)[document.id] as Map?;
-    if (head != null && !await _validAncestry(document, digest, head, ancestors)) {
+    if (head != null &&
+        !await _validAncestry(document, digest, head, ancestors)) {
       conflicts.add('Откат или ветвление копии');
     }
     final catalog = state['catalog'] as Map<String, dynamic>;
@@ -209,13 +211,25 @@ class DirectoryBackupService {
     return document.revision > revision && document.parent == head['digest'];
   }
 
-  Future<bool> _validAncestry(DirectoryDocument document, String digest, Map head, List<DirectoryDocument> ancestors) async {
+  Future<bool> _validAncestry(
+    DirectoryDocument document,
+    String digest,
+    Map head,
+    List<DirectoryDocument> ancestors,
+  ) async {
     var child = document;
     for (final parent in ancestors) {
-      if (parent.id != document.id || parent.revision != child.revision-1 || await parent.digest() != child.parent) return false;
+      if (parent.id != document.id ||
+          parent.revision != child.revision - 1 ||
+          await parent.digest() != child.parent)
+        return false;
       child = parent;
     }
-    return _validHead(child, ancestors.isEmpty ? digest : await child.digest(), head);
+    return _validHead(
+      child,
+      ancestors.isEmpty ? digest : await child.digest(),
+      head,
+    );
   }
 
   void _conflict(

@@ -17,8 +17,12 @@ class RemoteBackupEndpoint {
     final data = directoryMap(value, 'key,origin,read,tls,write');
     final origin = directoryAddress(data['origin']);
     final uri = Uri.parse(origin);
-    directoryRequire(uri.scheme == 'https' && uri.path.isEmpty && uri.toString() == origin);
-    directoryRequire(RegExp(r'^[a-f0-9]{64}$').hasMatch(directoryText(data['tls'])));
+    directoryRequire(
+      uri.scheme == 'https' && uri.path.isEmpty && uri.toString() == origin,
+    );
+    directoryRequire(
+      RegExp(r'^[a-f0-9]{64}$').hasMatch(directoryText(data['tls'])),
+    );
     directoryBytes(data['key'], 32);
     directoryBytes(data['read'], 32);
     directoryBytes(data['write'], 32);
@@ -27,7 +31,9 @@ class RemoteBackupEndpoint {
   }
   factory RemoteBackupEndpoint.create(String origin, String tls, String key) =>
       RemoteBackupEndpoint.parse({
-        'origin': origin, 'tls': tls.toLowerCase(), 'key': key,
+        'origin': origin,
+        'tls': tls.toLowerCase(),
+        'key': key,
         'read': url64(DirectoryArchive.random(32)),
         'write': url64(DirectoryArchive.random(32)),
       });
@@ -38,8 +44,11 @@ class RemoteBackupKit {
   final String id;
   final RemoteBackupEndpoint storage, witness;
   Map<String, dynamic> get data => {
-    'v': 1, 'kind': 'space.remote-backup', 'id': id,
-    'storage': storage.data, 'witness': witness.data,
+    'v': 1,
+    'kind': 'space.remote-backup',
+    'id': id,
+    'storage': storage.data,
+    'witness': witness.data,
   };
   String encode() => jsonEncode(data);
   factory RemoteBackupKit.parse(String raw) {
@@ -50,8 +59,19 @@ class RemoteBackupKit {
     final id = directoryBytes(data['id'], 16);
     final storage = RemoteBackupEndpoint.parse(data['storage']);
     final witness = RemoteBackupEndpoint.parse(data['witness']);
-    directoryRequire(storage.origin != witness.origin && storage.publicKey != witness.publicKey);
-    directoryRequire({storage.readToken,storage.writeToken,witness.readToken,witness.writeToken}.length == 4);
+    directoryRequire(
+      storage.origin != witness.origin &&
+          storage.publicKey != witness.publicKey,
+    );
+    directoryRequire(
+      {
+            storage.readToken,
+            storage.writeToken,
+            witness.readToken,
+            witness.writeToken,
+          }.length ==
+          4,
+    );
     return RemoteBackupKit(id, storage, witness);
   }
 }

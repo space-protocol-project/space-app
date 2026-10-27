@@ -2910,6 +2910,64 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get directoryTransferRelay => '选择用于传输的受信任空间';
+
+  @override
+  String get remoteBackupTitle => '远程备份';
+
+  @override
+  String get remoteBackupHelp =>
+      '使用两个已连接且由独立运营方管理的 HTTPS 空间，分别存储加密备份和最新版本记录。新设备需要保存的恢复套件及单独保管的密码。空间访问权限需通过配对或恢复卡恢复。';
+
+  @override
+  String get remoteBackupKitHelp =>
+      '套件包含备份读写密钥。请保存在此设备之外，并与密码分开保管。获得套件的人可以下载加密备份并干扰后续发布。';
+
+  @override
+  String get remoteBackupStorage => '存储地址';
+
+  @override
+  String get remoteBackupWitness => '独立见证服务地址';
+
+  @override
+  String get remoteBackupSetup => '保存套件并设置';
+
+  @override
+  String get remoteBackupImportKit => '打开恢复套件';
+
+  @override
+  String get remoteBackupPublish => '创建或继续发布';
+
+  @override
+  String get remoteBackupRead => '验证并打开最新备份';
+
+  @override
+  String get remoteBackupConfigure => '重试服务器设置';
+
+  @override
+  String get remoteBackupSaved => '备份已上传、回读并经见证服务确认。';
+
+  @override
+  String get remoteBackupConfigured => '存储和见证服务已就绪。';
+
+  @override
+  String get remoteBackupVerified => '见证服务确认版本：';
+
+  @override
+  String get remoteBackupError =>
+      '操作未完成。请检查套件、密码、连接和权限。版本、签名或摘要不一致时将阻止恢复。请使用相同密码重试未完成的发布。';
+
+  @override
+  String get remoteBackupSaveKit => '再次保存套件';
+
+  @override
+  String get remoteBackupRevoke => '撤销套件';
+
+  @override
+  String get remoteBackupRevokeHelp =>
+      '是否撤销两个服务器上的备份访问权限？每个服务器都需要所有者的有效会话。此套件将失效，已存储的备份不会删除。失败后请重试撤销。';
+
+  @override
+  String get remoteBackupRevoked => '已撤销两个服务器上的备份访问权限。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4248,4 +4306,62 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get directoryTransferRelay => '选择用于传输的受信任空间';
+
+  @override
+  String get remoteBackupTitle => '远程备份';
+
+  @override
+  String get remoteBackupHelp =>
+      '使用两个已连接且由独立运营方管理的 HTTPS 空间，分别存储加密备份和最新版本记录。新设备需要保存的恢复套件及单独保管的密码。空间访问权限需通过配对或恢复卡恢复。';
+
+  @override
+  String get remoteBackupKitHelp =>
+      '套件包含备份读写密钥。请保存在此设备之外，并与密码分开保管。获得套件的人可以下载加密备份并干扰后续发布。';
+
+  @override
+  String get remoteBackupStorage => '存储地址';
+
+  @override
+  String get remoteBackupWitness => '独立见证服务地址';
+
+  @override
+  String get remoteBackupSetup => '保存套件并设置';
+
+  @override
+  String get remoteBackupImportKit => '打开恢复套件';
+
+  @override
+  String get remoteBackupPublish => '创建或继续发布';
+
+  @override
+  String get remoteBackupRead => '验证并打开最新备份';
+
+  @override
+  String get remoteBackupConfigure => '重试服务器设置';
+
+  @override
+  String get remoteBackupSaved => '备份已上传、回读并经见证服务确认。';
+
+  @override
+  String get remoteBackupConfigured => '存储和见证服务已就绪。';
+
+  @override
+  String get remoteBackupVerified => '见证服务确认版本：';
+
+  @override
+  String get remoteBackupError =>
+      '操作未完成。请检查套件、密码、连接和权限。版本、签名或摘要不一致时将阻止恢复。请使用相同密码重试未完成的发布。';
+
+  @override
+  String get remoteBackupSaveKit => '再次保存套件';
+
+  @override
+  String get remoteBackupRevoke => '撤销套件';
+
+  @override
+  String get remoteBackupRevokeHelp =>
+      '是否撤销两个服务器上的备份访问权限？每个服务器都需要所有者的有效会话。此套件将失效，已存储的备份不会删除。失败后请重试撤销。';
+
+  @override
+  String get remoteBackupRevoked => '已撤销两个服务器上的备份访问权限。';
 }

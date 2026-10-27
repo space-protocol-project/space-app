@@ -31,97 +31,154 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
   final RemoteBackupService service;
   Future<void> _run(Future<void> Function() action) async {
     if (isClosed || state.busy) return;
-    emit(state.copyWith(busy:true,error:null,message:''));
-    try { await action(); } catch(error) {
-      if (!isClosed) emit(state.copyWith(error:error));
+    emit(state.copyWith(busy: true, error: null, message: ''));
+    try {
+      await action();
+    } catch (error) {
+      if (!isClosed) emit(state.copyWith(error: error));
     } finally {
-      if (!isClosed) emit(state.copyWith(busy:false));
+      if (!isClosed) emit(state.copyWith(busy: false));
     }
   }
-  void _emit(RemoteBackupState value) { if (!isClosed) emit(value); }
-  Future<void> load() => _run(() async => _emit(state.copyWith(kit:await service.savedKit())));
+
+  void _emit(RemoteBackupState value) {
+    if (!isClosed) emit(value);
+  }
+
+  Future<void> load() =>
+      _run(() async => _emit(state.copyWith(kit: await service.savedKit())));
   void replaceSettings(bool value) {
-    if (!isClosed && !state.busy) emit(state.copyWith(replaceSettings:value));
+    if (!isClosed && !state.busy) emit(state.copyWith(replaceSettings: value));
   }
+
   void reset() {
-    if (!isClosed && !state.busy) emit(state.copyWith(restore:null,replaceSettings:false,error:null,message:''));
+    if (!isClosed && !state.busy)
+      emit(
+        state.copyWith(
+          restore: null,
+          replaceSettings: false,
+          error: null,
+          message: '',
+        ),
+      );
   }
+
   RemoteBackupEndpoint _endpoint(String origin) {
     final session = service.directory.controllers()[origin]?.mlsSession;
     directoryRequire(session != null);
     final server = session!.server;
-    return RemoteBackupEndpoint.create(server.origin.toString(),server.tlsFingerprint,url64(server.publicKey));
+    return RemoteBackupEndpoint.create(
+      server.origin.toString(),
+      server.tlsFingerprint,
+      url64(server.publicKey),
+    );
   }
-  Future<void> setup(String storageOrigin, String witnessOrigin, Future<bool> Function(String) save) => _run(() async {
-    final kit = RemoteBackupKit.parse(RemoteBackupKit(url64(DirectoryArchive.random(16)),_endpoint(storageOrigin),_endpoint(witnessOrigin)).encode());
+
+  Future<void> setup(
+    String storageOrigin,
+    String witnessOrigin,
+    Future<bool> Function(String) save,
+  ) => _run(() async {
+    final kit = RemoteBackupKit.parse(
+      RemoteBackupKit(
+        url64(DirectoryArchive.random(16)),
+        _endpoint(storageOrigin),
+        _endpoint(witnessOrigin),
+      ).encode(),
+    );
     if (!await save(kit.encode())) return;
     await service.saveKit(kit);
-    _emit(state.copyWith(kit:kit,restore:null,replaceSettings:false));
+    _emit(state.copyWith(kit: kit, restore: null, replaceSettings: false));
     await _provision(kit);
-    _emit(state.copyWith(message:'configured'));
+    _emit(state.copyWith(message: 'configured'));
   });
   Future<void> configure() => _run(() async {
     final kit = state.kit;
     directoryRequire(kit != null);
     await _provision(kit!);
-    _emit(state.copyWith(message:'configured'));
+    _emit(state.copyWith(message: 'configured'));
   });
   Future<void> revoke() => _run(() async {
-    final kit=state.kit;
+    final kit = state.kit;
     directoryRequire(kit != null);
-    _emit(state.copyWith(restore:null,replaceSettings:false));
-    for (final endpoint in [kit!.storage,kit.witness]) {
-      final session=service.directory.controllers()[endpoint.origin]?.mlsSession;
+    _emit(state.copyWith(restore: null, replaceSettings: false));
+    for (final endpoint in [kit!.storage, kit.witness]) {
+      final session = service.directory
+          .controllers()[endpoint.origin]
+          ?.mlsSession;
       directoryRequire(session != null);
-      final server=session!.server;
-      directoryRequire(server.origin.toString() == endpoint.origin && url64(server.publicKey) == endpoint.publicKey && server.tlsFingerprint.toLowerCase() == endpoint.fingerprint);
+      final server = session!.server;
+      directoryRequire(
+        server.origin.toString() == endpoint.origin &&
+            url64(server.publicKey) == endpoint.publicKey &&
+            server.tlsFingerprint.toLowerCase() == endpoint.fingerprint,
+      );
       await session.revokeRemoteBackupSlot(kit.id);
     }
     await service.forgetRevokedKit();
-    _emit(state.copyWith(kit:null,message:'revoked'));
+    _emit(state.copyWith(kit: null, message: 'revoked'));
   });
   Future<void> exportKit(Future<bool> Function(String) save) => _run(() async {
-    final kit=state.kit;
+    final kit = state.kit;
     directoryRequire(kit != null);
     await save(kit!.encode());
   });
   Future<void> _provision(RemoteBackupKit kit) async {
-    for (final (endpoint,witness) in [(kit.storage,false),(kit.witness,true)]) {
-      final session = service.directory.controllers()[endpoint.origin]?.mlsSession;
+    for (final (endpoint, witness) in [
+      (kit.storage, false),
+      (kit.witness, true),
+    ]) {
+      final session = service.directory
+          .controllers()[endpoint.origin]
+          ?.mlsSession;
       directoryRequire(session != null);
       final server = session!.server;
-      directoryRequire(server.origin.toString() == endpoint.origin && url64(server.publicKey) == endpoint.publicKey && server.tlsFingerprint.toLowerCase() == endpoint.fingerprint);
-      await provisionRemoteBackup(session,CreateBackupSlotRequest(id:kit.id,witness:witness,readHash:await _hash(endpoint.readToken),writeHash:await _hash(endpoint.writeToken)));
+      directoryRequire(
+        server.origin.toString() == endpoint.origin &&
+            url64(server.publicKey) == endpoint.publicKey &&
+            server.tlsFingerprint.toLowerCase() == endpoint.fingerprint,
+      );
+      await provisionRemoteBackup(
+        session,
+        CreateBackupSlotRequest(
+          id: kit.id,
+          witness: witness,
+          readHash: await _hash(endpoint.readToken),
+          writeHash: await _hash(endpoint.writeToken),
+        ),
+      );
     }
   }
+
   Future<List<int>> _hash(String value) async {
     // Сервер хранит SHA-256 точной UTF-8 capability, не её декодированных байтов.
     return (await Sha256().hash(utf8.encode(value))).bytes;
   }
+
   Future<void> importKit(String raw) => _run(() async {
-    _emit(state.copyWith(restore:null,replaceSettings:false));
+    _emit(state.copyWith(restore: null, replaceSettings: false));
     final kit = RemoteBackupKit.parse(raw);
     await service.saveKit(kit);
-    _emit(state.copyWith(kit:kit,restore:null,replaceSettings:false));
+    _emit(state.copyWith(kit: kit, restore: null, replaceSettings: false));
   });
   Future<void> publish(String password) => _run(() async {
     final kit = state.kit;
     directoryRequire(kit != null);
-    _emit(state.copyWith(restore:null,replaceSettings:false));
-    await service.publish(kit!,password);
-    _emit(state.copyWith(message:'saved'));
+    _emit(state.copyWith(restore: null, replaceSettings: false));
+    await service.publish(kit!, password);
+    _emit(state.copyWith(message: 'saved'));
   });
   Future<void> preview(String password) => _run(() async {
     final kit = state.kit;
     directoryRequire(kit != null);
-    _emit(state.copyWith(restore:null,replaceSettings:false));
-    final restore = await service.preview(kit!,password);
-    _emit(state.copyWith(restore:restore,message:'preview'));
+    _emit(state.copyWith(restore: null, replaceSettings: false));
+    final restore = await service.preview(kit!, password);
+    _emit(state.copyWith(restore: restore, message: 'preview'));
   });
   Future<void> apply() => _run(() async {
     final restore = state.restore;
     if (restore == null || restore.plan.conflicts.isNotEmpty) return;
-    await service.apply(restore,replaceSettings:state.replaceSettings);
-    _emit(state.copyWith(restore:null,message:'restored'));
+    await service.apply(restore, replaceSettings: state.replaceSettings);
+    _emit(state.copyWith(restore: null, message: 'restored'));
   });
 }

@@ -15,41 +15,64 @@ import 'fixtures/remote_backup.dart';
 
 class WaitingRemoteBackup extends RemoteBackupService {
   WaitingRemoteBackup(super.directory);
-  final completer=Completer<RemoteRestore>();
+  final completer = Completer<RemoteRestore>();
   @override
-  Future<RemoteRestore> preview(RemoteBackupKit kit,String password) => completer.future;
+  Future<RemoteRestore> preview(RemoteBackupKit kit, String password) =>
+      completer.future;
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  test('Импорт комплекта сбрасывает старое подтверждение и не требует авторизации',() async {
+  test(
+    'Импорт комплекта сбрасывает старое подтверждение и не требует авторизации',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = AppPreferences();
+      addTearDown(prefs.close);
+      final directory = DirectoryBackupService(
+        DirectoryRepository(DirectoryStorage()),
+        DirectoryVault(),
+        prefs,
+        () => {},
+      );
+      final service = RemoteBackupService(directory),
+          cubit = RemoteBackupCubit(service);
+      addTearDown(cubit.close);
+      final (kit, _, _) = await memoryBackupNetwork();
+      await cubit.importKit(kit.encode());
+      cubit.replaceSettings(true);
+      await cubit.importKit(kit.encode());
+      expect(cubit.state.replaceSettings, isFalse);
+      expect(cubit.state.restore, isNull);
+      expect((await service.savedKit())!.id, kit.id);
+      expect(prefs.origins, isEmpty);
+    },
+  );
+  test('Закрытый Cubit не публикует поздний preview; повтор не запускает вторую операцию', () async {
     SharedPreferences.setMockInitialValues({});
-    final prefs=AppPreferences(); addTearDown(prefs.close);
-    final directory=DirectoryBackupService(DirectoryRepository(DirectoryStorage()),DirectoryVault(),prefs,() => {});
-    final service=RemoteBackupService(directory), cubit=RemoteBackupCubit(service);
-    addTearDown(cubit.close);
-    final (kit,_,_)=await memoryBackupNetwork();
-    await cubit.importKit(kit.encode());
-    cubit.replaceSettings(true);
-    await cubit.importKit(kit.encode());
-    expect(cubit.state.replaceSettings,isFalse);
-    expect(cubit.state.restore,isNull);
-    expect((await service.savedKit())!.id,kit.id);
-    expect(prefs.origins,isEmpty);
-  });
-  test('Закрытый Cubit не публикует поздний preview; повтор не запускает вторую операцию',() async {
-    SharedPreferences.setMockInitialValues({});
-    final prefs=AppPreferences(); addTearDown(prefs.close);
-    final directory=DirectoryBackupService(DirectoryRepository(DirectoryStorage()),DirectoryVault(),prefs,() => {});
-    final service=WaitingRemoteBackup(directory);
-    final controller=RemoteBackupCubit(service);
-    final (kit,_,_)=await memoryBackupNetwork();
+    final prefs = AppPreferences();
+    addTearDown(prefs.close);
+    final directory = DirectoryBackupService(
+      DirectoryRepository(DirectoryStorage()),
+      DirectoryVault(),
+      prefs,
+      () => {},
+    );
+    final service = WaitingRemoteBackup(directory);
+    final controller = RemoteBackupCubit(service);
+    final (kit, _, _) = await memoryBackupNetwork();
     await controller.importKit(kit.encode());
-    final work=controller.preview('пароль');
+    final work = controller.preview('пароль');
     await controller.preview('вторая операция');
-    expect(controller.state.busy,isTrue);
+    expect(controller.state.busy, isTrue);
     await controller.close();
-    service.completer.complete(RemoteRestore(kit,BackupHead(id:kit.id),await directory.preview(directoryDocument())));
-    await expectLater(work,completes);
+    service.completer.complete(
+      RemoteRestore(
+        kit,
+        BackupHead(id: kit.id),
+        await directory.preview(directoryDocument()),
+      ),
+    );
+    await expectLater(work, completes);
   });
 }

@@ -5,6 +5,7 @@ on:
       server_ref: {type: string, required: true}
       protocol_ref: {type: string, required: true}
       verify: {type: boolean, default: true}
+      server_checks: {type: boolean, default: true}
 permissions:
   contents: read
 jobs:
@@ -51,8 +52,9 @@ jobs:
           flutter pub get
           dart run build_runner build
           flutter gen-l10n
-          dart format lib/src/remote_backup*.dart lib/src/directory_backup.dart lib/src/core.dart lib/src/user_export_file.dart lib/ui/remote_backup.dart lib/ui/directory_backup.dart
+          dart format lib/src/remote_backup*.dart lib/src/directory_backup*.dart lib/src/directory_workers.dart lib/src/core.dart lib/src/user_export_file.dart lib/ui/remote_backup.dart lib/ui/directory_backup.dart
           find test -name '*remote_backup*.dart' -print0 | xargs -0 -r dart format
+          dart fix --apply --code=curly_braces_in_flow_control_structures
           cd ../../server
           gofmt -w internal/postgres/remote_backup*.go internal/postgres/store.go internal/postgres/channels_test.go internal/authn/profile.go internal/transport/connect.go internal/transport/connect_remote_backup.go internal/transport/connect_test.go internal/transport/message_limits.go cmd/space-server/main.go
       - uses: actions/upload-artifact@v4
@@ -63,6 +65,8 @@ jobs:
             app/client/lib/src/generated/space/v1/remote_backup*.dart
             app/client/lib/src/remote_backup*.dart
             app/client/lib/src/directory_backup.dart
+            app/client/lib/src/directory_backup_cubit.dart
+            app/client/lib/src/directory_workers.dart
             app/client/lib/src/core.dart
             app/client/lib/src/user_export_file.dart
             app/client/lib/ui/remote_backup.dart
@@ -74,6 +78,7 @@ jobs:
             server/gen/space/v1/spacev1connect/remote_backup.connect.go
             server/internal/postgres/remote_backup*.go
             server/internal/postgres/store.go
+            server/internal/postgres/admin.go
             server/internal/postgres/channels_test.go
             server/internal/authn/profile.go
             server/internal/transport/connect.go
@@ -89,7 +94,7 @@ jobs:
           flutter analyze
           dart run tool/core_import_check.dart
       - name: Сервер, гонки и уязвимости
-        if: inputs.verify
+        if: inputs.verify && inputs.server_checks
         working-directory: server
         run: |
           go test ./internal/postgres -run '^TestRemoteBackup' -count=1

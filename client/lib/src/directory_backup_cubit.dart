@@ -4,17 +4,11 @@ import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'directory_archive.dart';
 import 'directory_backup.dart';
 import 'directory_document.dart';
+import 'directory_workers.dart';
 
 part 'directory_backup_cubit.freezed.dart';
-
-Future<Uint8List> sealDirectoryWorker((Map<String, dynamic>, String) input) =>
-    DirectoryArchive.seal(DirectoryDocument.parse(input.$1), input.$2);
-Future<Map<String, dynamic>> openDirectoryWorker(
-  (Uint8List, String) input,
-) async => (await DirectoryArchive.open(input.$1, input.$2)).data;
 
 @freezed
 abstract class DirectoryBackupState with _$DirectoryBackupState {

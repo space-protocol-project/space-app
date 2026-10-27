@@ -121,29 +121,35 @@ class _DirectoryBackupPanelState extends State<DirectoryBackupPanel> {
   Widget build(BuildContext context) =>
       BlocBuilder<DirectoryBackupCubit, DirectoryBackupState>(
         bloc: cubit,
-        builder: (context, state) => Column(children: [Card(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  context.strings.directoryBackupTitle,
-                  style: Theme.of(context).textTheme.titleLarge,
+        builder: (context, state) => Column(
+          children: [
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.strings.directoryBackupTitle,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(context.strings.directoryBackupHelp),
+                    const SizedBox(height: 16),
+                    _actions(state),
+                    if (state.busy) ...[
+                      const SizedBox(height: 12),
+                      const LinearProgressIndicator(),
+                    ],
+                    ..._result(state),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                Text(context.strings.directoryBackupHelp),
-                const SizedBox(height: 16),
-                _actions(state),
-                if (state.busy) ...[
-                  const SizedBox(height: 12),
-                  const LinearProgressIndicator(),
-                ],
-                ..._result(state),
-              ],
+              ),
             ),
-          ),
-        ), const SizedBox(height:16), RemoteBackupPanel(service:widget.service)]),
+            const SizedBox(height: 16),
+            RemoteBackupPanel(service: widget.service),
+          ],
+        ),
       );
   Widget _actions(DirectoryBackupState state) => Wrap(
     spacing: 12,

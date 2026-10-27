@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart' show compute;
 import 'core.dart' show url64;
 import 'directory_archive.dart';
 import 'directory_backup.dart';
-import 'directory_backup_cubit.dart' show openDirectoryWorker, sealDirectoryWorker;
+import 'directory_workers.dart';
 import 'directory_document.dart';
 import 'remote_backup_models.dart';
 import 'remote_backup_rpc.dart';

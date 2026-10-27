@@ -3148,4 +3148,63 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get directoryTransferRelay => 'Select a trusted space for transfer';
+
+  @override
+  String get remoteBackupTitle => 'Remote backup';
+
+  @override
+  String get remoteBackupHelp =>
+      'Use two connected HTTPS spaces operated independently: encrypted storage and a version witness. A new device needs the saved recovery kit and a separate password. Pairing or a recovery card restores access to spaces.';
+
+  @override
+  String get remoteBackupKitHelp =>
+      'The kit contains secret backup read and write credentials. Save it outside this device, separately from the password. Anyone with the kit can download encrypted copies and disrupt future publications.';
+
+  @override
+  String get remoteBackupStorage => 'Storage address';
+
+  @override
+  String get remoteBackupWitness => 'Independent witness address';
+
+  @override
+  String get remoteBackupSetup => 'Save kit and configure';
+
+  @override
+  String get remoteBackupImportKit => 'Open recovery kit';
+
+  @override
+  String get remoteBackupPublish => 'Create or resume publication';
+
+  @override
+  String get remoteBackupRead => 'Verify and open latest backup';
+
+  @override
+  String get remoteBackupConfigure => 'Retry server setup';
+
+  @override
+  String get remoteBackupSaved =>
+      'Backup uploaded, read back and confirmed by the witness.';
+
+  @override
+  String get remoteBackupConfigured => 'Storage and witness are ready.';
+
+  @override
+  String get remoteBackupVerified => 'Witness confirmed version:';
+
+  @override
+  String get remoteBackupError =>
+      'Operation incomplete. Check the kit, password, connection and permissions. Version, signature or digest mismatches block recovery. Retry an unfinished publication with the same password.';
+
+  @override
+  String get remoteBackupSaveKit => 'Save kit again';
+
+  @override
+  String get remoteBackupRevoke => 'Revoke kit';
+
+  @override
+  String get remoteBackupRevokeHelp =>
+      'Revoke backup access on both servers? The owner\'s active session is required on each server. This kit will stop working; stored containers will remain. Retry revocation after a failure.';
+
+  @override
+  String get remoteBackupRevoked => 'Backup access revoked on both servers.';
 }
