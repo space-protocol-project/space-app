@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,10 @@ import 'package:space_client/src/archive_documents.dart';
 import 'package:space_client/src/archive_transfer_cubit.dart';
 import 'package:space_client/l10n/app_localizations.dart';
 import 'package:space_client/ui/android_archive_transfer.dart';
+import 'package:space_client/src/migration_archive.dart';
+import 'package:crypto/crypto.dart' as crypto;
+import 'package:path/path.dart' as p;
+import 'support/temp_directory.dart';
 
 class Documents implements ArchiveDocuments {
   @override
@@ -48,6 +54,25 @@ class Documents implements ArchiveDocuments {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  test('Архив больше прежнего лимита 16 МиБ шифруется и проверяется потоком', () async {
+    final root = await Directory.systemTemp.createTemp('space-archive-stream-test-');
+    addTearDown(() => deleteTestDirectory(root, prefix: 'space-archive-stream-test-'));
+    final source = File(p.join(root.path, 'source.zip'));
+    final output = await source.open(mode: FileMode.writeOnly);
+    final block = Uint8List.fromList(List.generate(65536, (i) => i % 251));
+    try {
+      for (var i = 0; i < 273; i++) { await output.writeFrom(block); }
+      await output.flush();
+    } finally { await output.close(); }
+    final archive = File(p.join(root.path, 'archive.spacedevice'));
+    await MigrationArchive.write(server: source, device: {'v': 1, 'kind': 'test'}, password: 'password', destination: archive);
+    await MigrationArchive.commit(archive);
+    expect(await archive.length(), greaterThan(16 * 1024 * 1024));
+    final restored = File(p.join(root.path, 'restored.zip'));
+    await MigrationArchive.read(source: archive, password: 'password', server: restored);
+    expect(await restored.length(), await source.length());
+    expect(await crypto.sha256.bind(restored.openRead()).first, await crypto.sha256.bind(source.openRead()).first);
+  });
   Future<void> noAction(String path, String password, void Function(String) progress, Future<void> Function() beforeCommit) async {}
   test('Экспорт сохраняется при отмене SAF и возобновляется без повторной остановки ключей', () async {
     final files = Documents();

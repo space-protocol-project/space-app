@@ -111,4 +111,15 @@ class ArchiveDocumentsTest {
         assertEquals("applying", workspace().read()!!.getString("phase"))
         assertEquals(2L, workspace().readyFile().length())
     }
+    @Test fun orphanedWorkingFilesCleanedWithoutFollowingLinksOrTouchingOtherCache() {
+        val temporary = File(context.cacheDir, "space-migration-ci").apply { mkdirs() }
+        File(temporary, "plain.zip").writeBytes(byteArrayOf(1, 2))
+        val unrelated = File(context.cacheDir, "archive-unrelated-ci").apply { mkdirs() }
+        val retained = File(unrelated, "keep").apply { writeBytes(byteArrayOf(3)) }
+        android.system.Os.symlink(unrelated.path, File(temporary, "link").path)
+        workspace().removeMigrationTemporaries()
+        assertFalse(temporary.exists())
+        assertTrue(retained.exists())
+        retained.delete(); unrelated.delete()
+    }
 }

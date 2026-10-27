@@ -8,6 +8,7 @@ import java.io.IOException
 
 /** Только фиксированные принадлежащие приложению файлы; URI — лишь журнал очистки. */
 class ArchiveWorkspace(context: Context) {
+    private val cache = context.cacheDir
     val root = File(context.noBackupFilesDir, "archive-transfer").apply { mkdirs() }
     private val journal = AtomicFile(File(root, "state.json"))
     val archive = File(root, "device.spacedevice")
@@ -61,6 +62,19 @@ class ArchiveWorkspace(context: Context) {
         return file
     }
     fun removePartial() { delete(ownedFile(partial)) }
+    fun removeMigrationTemporaries() {
+        val entries = cache.listFiles() ?: throw IOException("Недоступен временный каталог")
+        for (entry in entries) {
+            if (entry.name.startsWith("space-migration-") && entry.isDirectory &&
+                entry.canonicalFile == entry.absoluteFile) removeTree(entry)
+        }
+    }
+    private fun removeTree(file: File) {
+        if (file.canonicalFile == file.absoluteFile && file.isDirectory) {
+            for (child in file.listFiles() ?: throw IOException("Недоступен временный каталог")) removeTree(child)
+        }
+        delete(file)
+    }
     fun discard() {
         val state = read() ?: return
         check(!state.has("cleanup")) { "Не завершена очистка документа" }
@@ -68,7 +82,7 @@ class ArchiveWorkspace(context: Context) {
         journal.delete()
     }
     private fun delete(file: File) {
-        if (file.exists() && !file.delete()) throw IOException("Не удалось удалить временный файл")
+        if (!file.delete() && file.exists()) throw IOException("Не удалось удалить временный файл")
     }
     fun status(): Map<String, Any>? = read()?.let {
         mapOf("mode" to it.getString("mode"), "phase" to it.getString("phase"),

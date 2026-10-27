@@ -15,6 +15,7 @@ class ArchiveBridge(private val activity: MainActivity, private val channel: Met
     private var picker: MethodChannel.Result? = null
     private var exporting = false
     private var closed = false
+    private var recovered = false
     init { channel.setMethodCallHandler(::handle) }
 
     private fun handle(call: MethodCall, result: MethodChannel.Result) {
@@ -25,7 +26,7 @@ class ArchiveBridge(private val activity: MainActivity, private val channel: Met
             "import" -> choose(false, result)
             "save" -> choose(true, result)
             else -> execute(result) { cancel ->
-                if (call.method != "acknowledgeCleanup") documents.recover()
+                if (call.method != "acknowledgeCleanup") recover()
                 when (call.method) {
                     "status" -> documents.workspace.status()
                     "acknowledgeCleanup" -> { documents.acknowledgeCleanup(); null }
@@ -48,6 +49,13 @@ class ArchiveBridge(private val activity: MainActivity, private val channel: Met
     }
     private fun requireMode(mode: String) {
         check(documents.workspace.read()?.getString("mode") == mode) { "Другой режим переноса" }
+    }
+    private fun recover() {
+        documents.recover()
+        if (!recovered) {
+            documents.workspace.removeMigrationTemporaries()
+            recovered = true
+        }
     }
     private fun choose(save: Boolean, result: MethodChannel.Result) {
         active = ArchiveCancellation()
@@ -85,7 +93,7 @@ class ArchiveBridge(private val activity: MainActivity, private val channel: Met
                 true
             } else {
                 token.check()
-                documents.recover()
+                recover()
                 documents.importDocument(uri, token, ::progress)
                 documents.workspace.status()
             }
