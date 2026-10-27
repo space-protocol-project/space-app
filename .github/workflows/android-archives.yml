@@ -65,6 +65,19 @@ jobs:
     timeout-minutes: 65
     steps:
       - uses: actions/checkout@v4
+      - name: Место для APK и эмулятора на временном runner
+        run: sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+      - uses: actions/cache/restore@v4
+        id: android-cache
+        with:
+          key: android-archive-${{ runner.os }}-3.47.8-${{ hashFiles('client/pubspec.lock', 'client/android/**/*.gradle.kts', 'client/android/gradle/wrapper/gradle-wrapper.properties', 'native/**/Cargo.lock') }}-${{ github.run_id }}
+          restore-keys: android-archive-${{ runner.os }}-3.47.8-${{ hashFiles('client/pubspec.lock', 'client/android/**/*.gradle.kts', 'client/android/gradle/wrapper/gradle-wrapper.properties', 'native/**/Cargo.lock') }}-
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            client/android/.gradle
+            client/build
+            client/.dart_tool/hooks_runner
       - uses: actions/setup-java@v4
         with: {distribution: temurin, java-version: '21'}
       - uses: subosito/flutter-action@v2
@@ -105,3 +118,13 @@ jobs:
             client/android/app/build/outputs/androidTest-results
             client/build/app/reports
             client/build/app/outputs/androidTest-results
+      - uses: actions/cache/save@v4
+        if: always() && steps.android-cache.outputs.cache-hit != 'true'
+        with:
+          key: ${{ steps.android-cache.outputs.cache-primary-key }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            client/android/.gradle
+            client/build
+            client/.dart_tool/hooks_runner

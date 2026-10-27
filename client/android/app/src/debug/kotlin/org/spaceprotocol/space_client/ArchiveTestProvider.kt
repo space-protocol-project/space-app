@@ -19,11 +19,11 @@ class ArchiveTestProvider : DocumentsProvider() {
     override fun onCreate() = true
     override fun queryRoots(projection: Array<out String>?): Cursor = MatrixCursor(arrayOf(
         Root.COLUMN_ROOT_ID, Root.COLUMN_DOCUMENT_ID, Root.COLUMN_TITLE, Root.COLUMN_FLAGS, Root.COLUMN_MIME_TYPES
-    )).apply { addRow(arrayOf("archives", "root", "Space CI archives", Root.FLAG_SUPPORTS_CREATE, "*/*")) }
+    )).apply { addRow(arrayOf<Any?>("archives", "root", "Space CI archives", Root.FLAG_SUPPORTS_CREATE, "*/*")) }
     override fun queryDocument(id: String, projection: Array<out String>?): Cursor = MatrixCursor(arrayOf(
         Document.COLUMN_DOCUMENT_ID, Document.COLUMN_DISPLAY_NAME, Document.COLUMN_MIME_TYPE,
         Document.COLUMN_FLAGS, Document.COLUMN_SIZE
-    )).apply { addRow(arrayOf(id, "$id.spacedevice", "application/octet-stream",
+    )).apply { addRow(arrayOf<Any?>(id, "$id.spacedevice", "application/octet-stream",
         Document.FLAG_SUPPORTS_WRITE or Document.FLAG_SUPPORTS_DELETE, null)) }
     override fun queryChildDocuments(id: String, projection: Array<out String>?, sortOrder: String?): Cursor =
         MatrixCursor(arrayOf(Document.COLUMN_DOCUMENT_ID))
