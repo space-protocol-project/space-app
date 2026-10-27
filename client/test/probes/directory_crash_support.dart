@@ -1,4 +1,4 @@
-// Стенд CI: файлы имитируют защищённое хранилище; настоящие секреты пользователя не используются.
+// Windows использует настоящее системное хранилище, Linux — файловую фикстуру.
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -11,6 +11,7 @@ import 'package:space_client/src/directory_document.dart';
 import 'package:space_client/src/directory_repository.dart';
 import 'package:space_client/src/key_vault.dart';
 import 'package:space_client/src/preferences.dart';
+import 'package:space_client/src/secure_vault.dart' show PlatformKeyStorage;
 import 'package:space_directory_noise/space_directory_noise.dart';
 
 import '../fixtures/directory.dart' show directoryDocument, directorySpace;
@@ -68,6 +69,7 @@ class CrashStorage implements SecureKeyStorage {
       File('${hooks.profile.path}/vault/${url64(utf8.encode(key))}.json');
   @override
   Future<String?> read({required String key}) async {
+    if (Platform.isWindows) return const PlatformKeyStorage().read(key: key);
     final file = _file(key);
     return await file.exists() ? file.readAsString() : null;
   }
@@ -77,7 +79,17 @@ class CrashStorage implements SecureKeyStorage {
     final journal = key == DirectoryRepository.key;
     final pending = journal && (jsonDecode(value) as Map)['pending'] != null;
     if (armed && pending) await hooks.hit('journal-before');
-    await atomicCrashFile(_file(key), value);
+    if (Platform.isWindows) {
+      if (armed && pending && hooks.stage == 'encrypted-journal') {
+        await hooks.signal('checkpoint-${hooks.role}', {
+          'pid': pid,
+          'stage': 'encrypted-journal',
+        });
+      }
+      await const PlatformKeyStorage().write(key: key, value: value);
+    } else {
+      await atomicCrashFile(_file(key), value);
+    }
     if (armed && journal) {
       await hooks.hit(pending ? 'journal-written' : 'journal-cleared');
     }
@@ -85,6 +97,10 @@ class CrashStorage implements SecureKeyStorage {
 
   @override
   Future<void> delete({required String key}) async {
+    if (Platform.isWindows) {
+      await const PlatformKeyStorage().delete(key: key);
+      return;
+    }
     final file = _file(key);
     if (await file.exists()) await file.delete();
   }

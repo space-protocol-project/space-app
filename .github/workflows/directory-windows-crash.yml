@@ -1,0 +1,80 @@
+name: Аварийное восстановление каталога Windows DPAPI
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Анализ, оформление и целевые тесты
+        working-directory: client
+        run: |
+          flutter pub get
+          dart format test/probes/directory_crash*.dart
+          flutter analyze
+          flutter test test/directory*_test.dart test/pairing*_test.dart test/recovery_test.dart test/recovery_spaces_test.dart
+          (cd ../packages/space_directory_noise && dart pub get && dart analyze)
+          (cd ../packages/space_admin_ui && flutter pub get && flutter analyze)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: directory-windows-checked-source
+          path: |
+            client/test/probes/directory_crash*.dart
+            client/pubspec.lock
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+        with: {path: app}
+      - name: Совместимый сервер
+        run: |
+          $ref = (Get-Content app/.github/space-server.ref -Raw).Trim()
+          "SPACE_SERVER_REF=$ref" >> $env:GITHUB_ENV
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: ${{ env.SPACE_SERVER_REF }}
+          path: server
+      - uses: actions/setup-go@v5
+        with: {go-version-file: server/go.mod, cache-dependency-path: server/go.sum}
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - name: Сборка сервера и настоящего Flutter-стенда
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal
+          if ($LASTEXITCODE) { throw 'Rust не установлен' }
+          Push-Location server
+          go build -o "$env:RUNNER_TEMP/space-directory-server.exe" ./cmd/space-server
+          if ($LASTEXITCODE) { throw 'Сервер не собран' }
+          Pop-Location
+          Push-Location app/client
+          flutter pub get
+          if ($LASTEXITCODE) { throw 'Зависимости не получены' }
+          flutter build windows --debug --target test/probes/directory_crash_probe.dart --dart-define=SPACE_VAULT_CRASH_TEST=true
+          if ($LASTEXITCODE) { throw 'Flutter-стенд не собран' }
+          Pop-Location
+      - name: Завершение процессов, DPAPI и холодное восстановление
+        run: ./app/tools/check_directory_windows.ps1 -Server "$env:RUNNER_TEMP/space-directory-server.exe" -OutputDirectory "$env:RUNNER_TEMP/directory-windows-crash"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: directory-windows-crash
+          path: |
+            ${{ runner.temp }}/directory-windows-crash/report.json
+            ${{ runner.temp }}/directory-windows-crash/**/*.log
+            ${{ runner.temp }}/directory-windows-crash/**/killed-*.json
+            ${{ runner.temp }}/directory-windows-crash/**/checkpoint-*.json
+            ${{ runner.temp }}/directory-windows-crash/**/storage-proof.json

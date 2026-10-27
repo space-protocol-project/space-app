@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import signal
+import shutil
 import subprocess
 import time
 
@@ -35,9 +36,18 @@ class CrashRun:
         })
         log = (self.root / f'{role}-{len(self.processes)}.log').open('w', encoding='utf-8')
         self.logs.append(log)
-        # Отдельный D-Bus нужен каждому GtkApplication с одинаковым application-id.
-        process = subprocess.Popen(['dbus-run-session', '--', str(self.args.app.resolve())],
-                                   env=environment, stdout=log, stderr=log, start_new_session=True)
+        command = ['dbus-run-session', '--', str(self.args.app.resolve())]
+        if os.name == 'nt':
+            # Mutex вычисляется по пути exe. Разные профили запускаются параллельно.
+            bundle = profile / 'bundle'
+            if not bundle.exists():
+                shutil.copytree(self.args.app.resolve().parent, bundle)
+            command = [str(bundle / self.args.app.name)]
+            if role == 'target' and self.stage == 'encrypted-journal':
+                environment['SPACE_VAULT_DRILL_KEY'] = 'space.directory.v1'
+                environment['SPACE_VAULT_DRILL_READY'] = str(self.root / 'encrypted-ready')
+        process = subprocess.Popen(command, env=environment, stdout=log, stderr=log,
+                                   start_new_session=os.name != 'nt')
         self.processes.append(process)
         return process
 
@@ -64,12 +74,30 @@ class CrashRun:
     def kill(self, process, role):
         marker = self.wait_file(f'checkpoint-{role}', [process])
         actual_pid = marker['pid']
-        if process.poll() is not None or os.getpgid(actual_pid) != process.pid or process.pid == os.getpgrp():
+        if self.stage == 'encrypted-journal':
+            deadline = time.monotonic() + 25
+            while not (self.root / 'encrypted-ready').exists():
+                if process.poll() is not None or time.monotonic() >= deadline:
+                    raise RuntimeError('Нет контрольной точки внутри DPAPI-записи')
+                time.sleep(.02)
+        self.terminate(process, actual_pid)
+        (self.root / f'killed-{role}.json').write_text(json.dumps(marker), encoding='utf-8')
+
+    def terminate(self, process, actual_pid):
+        if process.poll() is not None:
+            raise RuntimeError('Процесс уже завершился')
+        if os.name == 'nt':
+            if actual_pid != process.pid:
+                raise RuntimeError('PID не принадлежит созданному процессу')
+            process.kill()
+            if process.wait(timeout=15) == 0:
+                raise RuntimeError('Не подтверждено принудительное завершение')
+            return
+        if os.getpgid(actual_pid) != process.pid or process.pid == os.getpgrp():
             raise RuntimeError('Чужой процесс либо неверная группа; SIGKILL запрещён')
         os.killpg(process.pid, signal.SIGKILL)
         if process.wait(timeout=15) != -signal.SIGKILL:
             raise RuntimeError('Не подтверждено принудительное завершение процесса')
-        (self.root / f'killed-{role}.json').write_text(json.dumps(marker), encoding='utf-8')
 
     def pair(self, allow_apply=True):
         if allow_apply:
@@ -82,8 +110,7 @@ class CrashRun:
     def cleanup(self):
         for process in self.processes:
             if process.poll() is None:
-                os.killpg(process.pid, signal.SIGKILL)
-                process.wait(timeout=15)
+                self.terminate(process, process.pid)
         for log in self.logs:
             log.close()
 
@@ -126,11 +153,7 @@ def transfer_cases(args, origin, reports):
                     case.wait_file('checkpoint-source', [source, target])
                     # Получатель уже принял первый зашифрованный кадр.
                     actual_pid = case.wait_file('target-frame-seen', [source, target])['pid']
-                    if os.getpgid(actual_pid) != target.pid:
-                        raise RuntimeError('Неверный PID получателя')
-                    os.killpg(target.pid, signal.SIGKILL)
-                    if target.wait(timeout=15) != -signal.SIGKILL:
-                        raise RuntimeError('Получатель не завершён через SIGKILL')
+                    case.terminate(target, actual_pid)
                     (case.root / 'killed-target.json').write_text(json.dumps({'pid': actual_pid, 'stage': 'partial-frame-received'}), encoding='utf-8')
                     case.kill(source, 'source')
                 else:
@@ -169,6 +192,8 @@ def apply_cases(args, origin, reports):
     points = [('journal-before', False), ('journal-written', False), ('journal-written', True),
               ('settings-written', True), ('origin-written', False), ('origin-written', True),
               ('journal-cleared', False), ('journal-cleared', True)]
+    if os.name == 'nt':
+        points.append(('encrypted-journal', False))
     for stage, replace in points:
         name = f'{stage}-settings-{int(replace)}'
         case = CrashRun(args, origin, args.output / name, replace=replace, stage=stage)
@@ -177,10 +202,11 @@ def apply_cases(args, origin, reports):
             source, target = case.pair()
             case.kill(target, 'target')
             case.finish(source, 'source')
-            case.run('inspect' if stage == 'journal-before' else 'resume')
+            unapplied = stage in ('journal-before', 'encrypted-journal')
+            case.run('inspect' if unapplied else 'resume')
             reports.append({'case': name, 'result': 'passed'})
             print(f'DIRECTORY_CRASH_CASE_OK: {name}', flush=True)
-            if stage == 'journal-before':
+            if unapplied:
                 fresh_retry(args, origin, case, reports)
         finally:
             case.cleanup()
@@ -220,7 +246,8 @@ def main():
         (args.output / 'report.json').write_text(json.dumps(reports, indent=2) + '\n', encoding='utf-8')
         for file in sorted(args.output.rglob('*.log')):
             print(f'\n{file.relative_to(args.output)}\n{file.read_text(encoding="utf-8", errors="replace")}')
-    print(f'DIRECTORY_CRASH_CI_OK: {len(reports)} проверок с SIGKILL и холодным запуском')
+    storage = 'Windows DPAPI' if os.name == 'nt' else 'Linux file fixture'
+    print(f'DIRECTORY_CRASH_CI_OK: {len(reports)} проверок, {storage}, принудительное завершение и холодный запуск')
 
 
 if __name__ == '__main__':
