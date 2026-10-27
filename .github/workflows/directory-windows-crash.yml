@@ -1,6 +1,11 @@
 name: Аварийное восстановление каталога Windows DPAPI
 on:
   workflow_dispatch:
+    inputs:
+      windows:
+        description: Выполнять нативный сценарий Windows; анализ и тесты запускаются всегда
+        type: boolean
+        default: true
 permissions:
   contents: read
 jobs:
@@ -14,6 +19,10 @@ jobs:
       - uses: subosito/flutter-action@v2
         with: {flutter-version: '3.47.8', channel: stable, cache: true}
       - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Нативные зависимости тестов Linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev
       - name: Анализ, оформление и целевые тесты
         working-directory: client
         run: |
@@ -31,6 +40,7 @@ jobs:
             client/test/probes/directory_crash*.dart
             client/pubspec.lock
   windows:
+    if: inputs.windows
     runs-on: windows-2025
     timeout-minutes: 45
     defaults:

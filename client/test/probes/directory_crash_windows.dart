@@ -31,9 +31,14 @@ Future<void> verifyCrashWindowsStorage() async {
   final bytes = await file.readAsBytes();
   // Заголовок DPAPI; чтение записей и сверка содержимого выполняются отдельно.
   if (bytes.length < 20 ||
-      bytes[0] != 1 || bytes[1] != 0 || bytes[2] != 0 || bytes[3] != 0 ||
+      bytes[0] != 1 ||
+      bytes[1] != 0 ||
+      bytes[2] != 0 ||
+      bytes[3] != 0 ||
       await Directory('$profile/vault').exists()) {
-    throw StateError('Стенд не подтвердил настоящий DPAPI без файловой фикстуры');
+    throw StateError(
+      'Стенд не подтвердил настоящий DPAPI без файловой фикстуры',
+    );
   }
   final control = Platform.environment['DIRECTORY_CRASH_CONTROL']!;
   await File('$control/storage-proof.json').writeAsString(
