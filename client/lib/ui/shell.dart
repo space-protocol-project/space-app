@@ -910,7 +910,8 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     export: (path, password, progress, beforeCommit) async =>
         (await _deviceMigration(progress)).export(path, password),
     restore: (path, password, progress, beforeCommit) async =>
-        (await _deviceMigration(progress)).restore(path, password, beforeApply: beforeCommit),
+        (await _deviceMigration(progress))
+            .restore(path, password, beforeApply: beforeCommit),
   );
 
   Future<void> createOwnSpace() async {

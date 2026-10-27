@@ -7,7 +7,9 @@ import 'archive_documents.dart';
 part 'archive_transfer_cubit.freezed.dart';
 
 typedef ArchiveTransferAction = Future<void> Function(
-  String path, String password, void Function(String) progress,
+  String path,
+  String password,
+  void Function(String) progress,
   Future<void> Function() beforeCommit,
 );
 
@@ -27,8 +29,11 @@ abstract class ArchiveTransferState with _$ArchiveTransferState {
 }
 
 class ArchiveTransferCubit extends Cubit<ArchiveTransferState> {
-  ArchiveTransferCubit(this.documents, {required this.export, required this.restore})
-    : super(const ArchiveTransferState()) {
+  ArchiveTransferCubit(
+    this.documents, {
+    required this.export,
+    required this.restore,
+  }) : super(const ArchiveTransferState()) {
     documents.progress = (bytes) {
       if (!isClosed && state.busy && state.cancellable) {
         emit(state.copyWith(bytes: bytes));
@@ -40,18 +45,36 @@ class ArchiveTransferCubit extends Cubit<ArchiveTransferState> {
   // Не допускает второго изменения ключей при повторном открытии экрана.
   static bool _operating = false;
 
-  void _publish(ArchiveTransferState next) { if (!isClosed) emit(next); }
+  void _publish(ArchiveTransferState next) {
+    if (!isClosed) emit(next);
+  }
+
   void _status(String value) => _publish(state.copyWith(status: value));
 
-  Future<void> _run(Future<void> Function() action, {bool cancellable = false}) async {
+  Future<void> _run(
+    Future<void> Function() action, {
+    bool cancellable = false,
+  }) async {
     if (state.busy || isClosed) return;
     if (_operating) {
-      _publish(state.copyWith(error: StateError('Дождитесь завершения текущего переноса')));
+      _publish(
+        state.copyWith(
+          error: StateError('Дождитесь завершения текущего переноса'),
+        ),
+      );
       return;
     }
     _operating = true;
-    _publish(state.copyWith(busy: true, cancellable: cancellable, cancelling: false,
-      error: null, bytes: 0, status: ''));
+    _publish(
+      state.copyWith(
+        busy: true,
+        cancellable: cancellable,
+        cancelling: false,
+        error: null,
+        bytes: 0,
+        status: '',
+      ),
+    );
     try {
       await action();
     } on PlatformException catch (error) {
@@ -60,7 +83,9 @@ class ArchiveTransferCubit extends Cubit<ArchiveTransferState> {
       _publish(state.copyWith(error: error));
     } finally {
       _operating = false;
-      _publish(state.copyWith(busy: false, cancellable: false, cancelling: false));
+      _publish(
+        state.copyWith(busy: false, cancellable: false, cancelling: false),
+      );
       if (isClosed) documents.dispose();
     }
   }
@@ -70,23 +95,33 @@ class ArchiveTransferCubit extends Cubit<ArchiveTransferState> {
   });
 
   Future<void> pick() => _run(() async {
-    if (state.pending != null) throw StateError('Сначала завершите прежний перенос');
+    if (state.pending != null) {
+      throw StateError('Сначала завершите прежний перенос');
+    }
     _publish(state.copyWith(pending: await documents.pick()));
   }, cancellable: true);
 
   Future<void> prepare(String password) => _run(() async {
     final pending = state.pending ?? await documents.prepare();
     _publish(state.copyWith(pending: pending));
-    if (pending.mode != ArchiveMode.exporting) throw StateError('Начато восстановление');
-    if (!pending.complete) await export(pending.path, password, _status, () async {});
+    if (pending.mode != ArchiveMode.exporting) {
+      throw StateError('Начато восстановление');
+    }
+    if (!pending.complete) {
+      await export(pending.path, password, _status, () async {});
+    }
     await documents.ready();
     _publish(state.copyWith(pending: await documents.status()));
   });
 
   Future<void> save() => _run(() async {
-    if (state.pending?.mode != ArchiveMode.exporting) throw StateError('Нет готового экспорта');
+    if (state.pending?.mode != ArchiveMode.exporting) {
+      throw StateError('Нет готового экспорта');
+    }
     await documents.ready();
-    if (state.cancelling || isClosed) throw PlatformException(code: 'cancelled');
+    if (state.cancelling || isClosed) {
+      throw PlatformException(code: 'cancelled');
+    }
     final saved = await documents.save();
     _publish(state.copyWith(saved: saved, finished: saved));
   }, cancellable: true);
@@ -117,8 +152,11 @@ class ArchiveTransferCubit extends Cubit<ArchiveTransferState> {
   Future<void> cancel() async {
     if (!state.busy || !state.cancellable || state.cancelling) return;
     _publish(state.copyWith(cancelling: true));
-    try { await documents.cancel(); }
-    catch (error) { _publish(state.copyWith(error: error)); }
+    try {
+      await documents.cancel();
+    } catch (error) {
+      _publish(state.copyWith(error: error));
+    }
   }
 
   @override

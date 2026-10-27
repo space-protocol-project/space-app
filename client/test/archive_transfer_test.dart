@@ -11,6 +11,7 @@ import 'package:space_client/ui/android_archive_transfer.dart';
 import 'package:space_client/src/migration_archive.dart';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:path/path.dart' as p;
+
 import 'support/temp_directory.dart';
 
 class Documents implements ArchiveDocuments {
@@ -25,25 +26,60 @@ class Documents implements ArchiveDocuments {
   @override
   Future<ArchiveWorkspace> prepare() async {
     prepared++;
-    return current = const ArchiveWorkspace(ArchiveMode.exporting, ArchivePhase.preparing, '/private/archive', false);
+    return current = const ArchiveWorkspace(
+      ArchiveMode.exporting,
+      ArchivePhase.preparing,
+      '/private/archive',
+      false,
+    );
   }
+
   @override
   Future<ArchiveWorkspace?> pick() async => current = const ArchiveWorkspace(
-    ArchiveMode.importing, ArchivePhase.ready, '/private/input', true,
+    ArchiveMode.importing,
+    ArchivePhase.ready,
+    '/private/input',
+    true,
   );
   @override
   Future<void> ready() async {
     await readiness?.future;
-    current = ArchiveWorkspace(current!.mode, ArchivePhase.ready, current!.path, true);
+    current = ArchiveWorkspace(
+      current!.mode,
+      ArchivePhase.ready,
+      current!.path,
+      true,
+    );
   }
+
   @override
-  Future<void> applying() async { current = ArchiveWorkspace(current!.mode, ArchivePhase.applying, current!.path, true); }
+  Future<void> applying() async {
+    current = ArchiveWorkspace(
+      current!.mode,
+      ArchivePhase.applying,
+      current!.path,
+      true,
+    );
+  }
+
   @override
-  Future<bool> save() async { saves++; return saving == null ? true : saving!.future; }
+  Future<bool> save() async {
+    saves++;
+    return saving == null ? true : saving!.future;
+  }
+
   @override
-  Future<void> discard() async { discarded++; current = null; }
+  Future<void> discard() async {
+    discarded++;
+    current = null;
+  }
+
   @override
-  Future<void> complete() async { completed++; current = null; }
+  Future<void> complete() async {
+    completed++;
+    current = null;
+  }
+
   @override
   Future<void> acknowledgeCleanup() async {}
   @override
@@ -51,36 +87,71 @@ class Documents implements ArchiveDocuments {
     cancelled++;
     saving?.completeError(PlatformException(code: 'cancelled'));
   }
+
   @override
   void dispose() {}
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  test('Архив больше прежнего лимита 16 МиБ шифруется и проверяется потоком', () async {
-    final root = await Directory.systemTemp.createTemp('space-archive-stream-test-');
-    addTearDown(() => deleteTestDirectory(root, prefix: 'space-archive-stream-test-'));
-    final source = File(p.join(root.path, 'source.zip'));
-    final output = await source.open(mode: FileMode.writeOnly);
-    final block = Uint8List.fromList(List.generate(65536, (i) => i % 251));
-    try {
-      for (var i = 0; i < 273; i++) { await output.writeFrom(block); }
-      await output.flush();
-    } finally { await output.close(); }
-    final archive = File(p.join(root.path, 'archive.spacedevice'));
-    await MigrationArchive.write(server: source, device: {'v': 1, 'kind': 'test'}, password: 'password', destination: archive);
-    await MigrationArchive.commit(archive);
-    expect(await archive.length(), greaterThan(16 * 1024 * 1024));
-    final restored = File(p.join(root.path, 'restored.zip'));
-    await MigrationArchive.read(source: archive, password: 'password', server: restored);
-    expect(await restored.length(), await source.length());
-    expect(await crypto.sha256.bind(restored.openRead()).first, await crypto.sha256.bind(source.openRead()).first);
-  });
-  Future<void> noAction(String path, String password, void Function(String) progress, Future<void> Function() beforeCommit) async {}
+  test(
+    'Архив больше прежнего лимита 16 МиБ шифруется и проверяется потоком',
+    () async {
+      final root = await Directory.systemTemp.createTemp(
+        'space-archive-stream-test-',
+      );
+      addTearDown(
+        () => deleteTestDirectory(root, prefix: 'space-archive-stream-test-'),
+      );
+      final source = File(p.join(root.path, 'source.zip'));
+      final output = await source.open(mode: FileMode.writeOnly);
+      final block = Uint8List.fromList(List.generate(65536, (i) => i % 251));
+      try {
+        for (var i = 0; i < 273; i++) {
+          await output.writeFrom(block);
+        }
+        await output.flush();
+      } finally {
+        await output.close();
+      }
+      final archive = File(p.join(root.path, 'archive.spacedevice'));
+      await MigrationArchive.write(
+        server: source,
+        device: {'v': 1, 'kind': 'test'},
+        password: 'password',
+        destination: archive,
+      );
+      await MigrationArchive.commit(archive);
+      expect(await archive.length(), greaterThan(16 * 1024 * 1024));
+      final restored = File(p.join(root.path, 'restored.zip'));
+      await MigrationArchive.read(
+        source: archive,
+        password: 'password',
+        server: restored,
+      );
+      expect(await restored.length(), await source.length());
+      expect(
+        await crypto.sha256.bind(restored.openRead()).first,
+        await crypto.sha256.bind(source.openRead()).first,
+      );
+    },
+  );
+  Future<void> noAction(
+    String path,
+    String password,
+    void Function(String) progress,
+    Future<void> Function() beforeCommit,
+  ) async {}
   test('Экспорт сохраняется при отмене SAF и возобновляется без повторной остановки ключей', () async {
     final files = Documents();
     var exports = 0;
-    final first = ArchiveTransferCubit(files, export: (_, _, _, _) async { exports++; }, restore: noAction);
+    final first = ArchiveTransferCubit(
+      files,
+      export: (_, _, _, _) async {
+        exports++;
+      },
+      restore: noAction,
+    );
     await first.prepare('password');
     expect(first.state.pending!.complete, isTrue);
     files.saving = Completer<bool>();
@@ -95,7 +166,13 @@ void main() {
     expect(files.discarded, 0);
     await first.close();
     files.saving = null;
-    final second = ArchiveTransferCubit(files, export: (_, _, _, _) async { exports++; }, restore: noAction);
+    final second = ArchiveTransferCubit(
+      files,
+      export: (_, _, _, _) async {
+        exports++;
+      },
+      restore: noAction,
+    );
     await second.load();
     await second.save();
     expect(second.state.saved, isTrue);
@@ -105,13 +182,21 @@ void main() {
   });
   test('Отмена запрещена во время изменения ключей; второй контроллер не начинает перенос', () async {
     final files = Documents(), barrier = Completer<void>();
-    final first = ArchiveTransferCubit(files, export: (_, _, _, _) => barrier.future, restore: noAction);
+    final first = ArchiveTransferCubit(
+      files,
+      export: (_, _, _, _) => barrier.future,
+      restore: noAction,
+    );
     final running = first.prepare('password');
     await Future<void>.delayed(Duration.zero);
     await first.cancel();
     expect(files.cancelled, 0);
     final secondFiles = Documents();
-    final second = ArchiveTransferCubit(secondFiles, export: noAction, restore: noAction);
+    final second = ArchiveTransferCubit(
+      secondFiles,
+      export: noAction,
+      restore: noAction,
+    );
     await second.prepare('password');
     expect(second.state.error, isStateError);
     expect(secondFiles.prepared, 0);
@@ -120,27 +205,38 @@ void main() {
     await first.close();
     await second.close();
   });
-  test('Отмена до открытия SAF не теряется между проверкой архива и диалогом', () async {
-    final files = Documents();
-    final cubit = ArchiveTransferCubit(files, export: noAction, restore: noAction);
-    await cubit.prepare('password');
-    files.readiness = Completer<void>();
-    final saving = cubit.save();
-    await Future<void>.delayed(Duration.zero);
-    await cubit.cancel();
-    files.readiness!.complete();
-    await saving;
-    expect(files.saves, 0);
-    expect(files.current, isNotNull);
-    await cubit.close();
-  });
+  test(
+    'Отмена до открытия SAF не теряется между проверкой архива и диалогом',
+    () async {
+      final files = Documents();
+      final cubit = ArchiveTransferCubit(
+        files,
+        export: noAction,
+        restore: noAction,
+      );
+      await cubit.prepare('password');
+      files.readiness = Completer<void>();
+      final saving = cubit.save();
+      await Future<void>.delayed(Duration.zero);
+      await cubit.cancel();
+      files.readiness!.complete();
+      await saving;
+      expect(files.saves, 0);
+      expect(files.current, isNotNull);
+      await cubit.close();
+    },
+  );
   test('Ошибка применения сохраняет тот же архив; повтор удаляет копию только после успеха', () async {
     final files = Documents();
     var attempts = 0;
-    final cubit = ArchiveTransferCubit(files, export: noAction, restore: (_, _, _, beforeCommit) async {
-      await beforeCommit();
-      if (++attempts == 1) throw StateError('Запись прервана');
-    });
+    final cubit = ArchiveTransferCubit(
+      files,
+      export: noAction,
+      restore: (_, _, _, beforeCommit) async {
+        await beforeCommit();
+        if (++attempts == 1) throw StateError('Запись прервана');
+      },
+    );
     await cubit.pick();
     await cubit.apply('password');
     expect(cubit.state.error, isStateError);
@@ -155,9 +251,13 @@ void main() {
   test('Ошибка подготовки не удаляет pending и позволяет повтор', () async {
     final files = Documents();
     var attempts = 0;
-    final cubit = ArchiveTransferCubit(files, restore: noAction, export: (_, _, _, _) async {
-      if (++attempts == 1) throw StateError('Остановка до commit');
-    });
+    final cubit = ArchiveTransferCubit(
+      files,
+      restore: noAction,
+      export: (_, _, _, _) async {
+        if (++attempts == 1) throw StateError('Остановка до commit');
+      },
+    );
     await cubit.prepare('password');
     expect(files.discarded, 0);
     await cubit.prepare('password');
@@ -167,9 +267,13 @@ void main() {
   });
   test('Неверный пароль до записи данных позволяет отказаться от импортированной копии', () async {
     final files = Documents();
-    final cubit = ArchiveTransferCubit(files, export: noAction, restore: (_, _, _, _) async {
-      throw const FormatException('Пароль не подходит');
-    });
+    final cubit = ArchiveTransferCubit(
+      files,
+      export: noAction,
+      restore: (_, _, _, _) async {
+        throw const FormatException('Пароль не подходит');
+      },
+    );
     await cubit.pick();
     await cubit.apply('wrong');
     expect(files.current!.phase, ArchivePhase.ready);
@@ -178,47 +282,95 @@ void main() {
     expect(files.current, isNull);
     await cubit.close();
   });
-  test('Канал передаёт только команды, строгие метаданные и 64-битный прогресс', () async {
-    final calls = <MethodCall>[];
-    final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
-    messenger.setMockMethodCallHandler(AndroidArchiveDocuments.channel, (call) async {
-      calls.add(call);
-      if (call.method == 'status') return {'mode': 'export', 'phase': 'ready', 'path': '/private/archive', 'complete': true};
-      return null;
-    });
-    addTearDown(() => messenger.setMockMethodCallHandler(AndroidArchiveDocuments.channel, null));
-    final files = AndroidArchiveDocuments();
-    expect((await files.status())!.mode, ArchiveMode.exporting);
-    await files.cancel();
-    expect(calls.map((call) => call.method), ['status', 'cancel']);
-    expect(calls.every((call) => call.arguments == null), isTrue);
-    expect(() => ArchiveWorkspace.parse({'mode': 'export', 'phase': 'ready', 'path': '/x', 'complete': true, 'extra': 1}), throwsFormatException);
-    files.dispose();
-  });
-  for (final locale in [const Locale('ru'), const Locale('en'), const Locale('zh')]) {
-    testWidgets('Сохранённый экспорт виден после запуска, узкий экран и крупный шрифт $locale', (tester) async {
-      tester.view.physicalSize = const Size(360, 1400);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      final files = Documents()..current = const ArchiveWorkspace(
-        ArchiveMode.exporting, ArchivePhase.ready, '/private/archive', true,
+  test(
+    'Канал передаёт только команды, строгие метаданные и 64-битный прогресс',
+    () async {
+      final calls = <MethodCall>[];
+      final messenger =
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+      messenger.setMockMethodCallHandler(AndroidArchiveDocuments.channel, (
+        call,
+      ) async {
+        calls.add(call);
+        if (call.method == 'status') {
+          return {
+            'mode': 'export',
+            'phase': 'ready',
+            'path': '/private/archive',
+            'complete': true,
+          };
+        }
+        return null;
+      });
+      addTearDown(
+        () => messenger.setMockMethodCallHandler(
+          AndroidArchiveDocuments.channel,
+          null,
+        ),
       );
-      await tester.pumpWidget(MaterialApp(
-        locale: locale,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: MediaQuery(data: const MediaQueryData(textScaler: TextScaler.linear(2)),
-          child: Scaffold(body: SingleChildScrollView(child: AndroidArchiveTransfer(
-            export: noAction, restore: noAction, documents: files,
-          )))),
-      ));
-      await tester.pumpAndSettle();
-      expect(find.byType(FilledButton), findsOneWidget);
-      expect(find.byType(TextButton), findsOneWidget);
-      expect(tester.takeException(), isNull);
-      expect(files.discarded, 0);
-      await tester.pumpWidget(const SizedBox());
-    });
+      final files = AndroidArchiveDocuments();
+      expect((await files.status())!.mode, ArchiveMode.exporting);
+      await files.cancel();
+      expect(calls.map((call) => call.method), ['status', 'cancel']);
+      expect(calls.every((call) => call.arguments == null), isTrue);
+      expect(
+        () => ArchiveWorkspace.parse({
+          'mode': 'export',
+          'phase': 'ready',
+          'path': '/x',
+          'complete': true,
+          'extra': 1,
+        }),
+        throwsFormatException,
+      );
+      files.dispose();
+    },
+  );
+  for (final locale in [
+    const Locale('ru'),
+    const Locale('en'),
+    const Locale('zh'),
+  ]) {
+    testWidgets(
+      'Сохранённый экспорт виден после запуска, узкий экран и крупный шрифт $locale',
+      (tester) async {
+        tester.view.physicalSize = const Size(360, 1400);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        final files = Documents()
+          ..current = const ArchiveWorkspace(
+            ArchiveMode.exporting,
+            ArchivePhase.ready,
+            '/private/archive',
+            true,
+          );
+        await tester.pumpWidget(
+          MaterialApp(
+            locale: locale,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: MediaQuery(
+              data: const MediaQueryData(textScaler: TextScaler.linear(2)),
+              child: Scaffold(
+                body: SingleChildScrollView(
+                  child: AndroidArchiveTransfer(
+                    export: noAction,
+                    restore: noAction,
+                    documents: files,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byType(FilledButton), findsOneWidget);
+        expect(find.byType(TextButton), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        expect(files.discarded, 0);
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
   }
 }

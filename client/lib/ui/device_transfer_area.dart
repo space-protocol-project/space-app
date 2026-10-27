@@ -92,57 +92,61 @@ class _DeviceTransferAreaState extends State<DeviceTransferArea> {
   Widget build(BuildContext context) => Platform.isAndroid
       ? AndroidArchiveTransfer(export: widget.export, restore: widget.restore)
       : SurfaceCard(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          context.strings.deviceTransferTitle,
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(height: 8),
-        Text(context.strings.deviceTransferHelp),
-        const SizedBox(height: 20),
-        LayoutBuilder(
-          builder: (context, size) {
-            final tiles = [
-              _tile(
-                Icons.move_up_outlined,
-                context.strings.deviceTransferExport,
-                context.strings.deviceTransferExportHelp,
-                _export,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                context.strings.deviceTransferTitle,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-              DropTarget(
-                enabled: !busy,
-                onEnter: (_) => setState(() => dragging = true),
-                onLeave: () => setState(() => dragging = false),
-                onDrop: _drop,
-                child: _tile(
-                  Icons.move_down_outlined,
-                  context.strings.deviceTransferRestore,
-                  context.strings.deviceTransferRestoreHelp,
-                  _pick,
-                  highlighted: dragging,
-                ),
+              const SizedBox(height: 8),
+              Text(context.strings.deviceTransferHelp),
+              const SizedBox(height: 20),
+              LayoutBuilder(
+                builder: (context, size) {
+                  final tiles = [
+                    _tile(
+                      Icons.move_up_outlined,
+                      context.strings.deviceTransferExport,
+                      context.strings.deviceTransferExportHelp,
+                      _export,
+                    ),
+                    DropTarget(
+                      enabled: !busy,
+                      onEnter: (_) => setState(() => dragging = true),
+                      onLeave: () => setState(() => dragging = false),
+                      onDrop: _drop,
+                      child: _tile(
+                        Icons.move_down_outlined,
+                        context.strings.deviceTransferRestore,
+                        context.strings.deviceTransferRestoreHelp,
+                        _pick,
+                        highlighted: dragging,
+                      ),
+                    ),
+                  ];
+                  if (size.maxWidth < 560) {
+                    return Column(
+                      children: [
+                        tiles[0],
+                        const SizedBox(height: 12),
+                        tiles[1],
+                      ],
+                    );
+                  }
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: tiles[0]),
+                      const SizedBox(width: 12),
+                      Expanded(child: tiles[1]),
+                    ],
+                  );
+                },
               ),
-            ];
-            if (size.maxWidth < 560) {
-              return Column(
-                children: [tiles[0], const SizedBox(height: 12), tiles[1]],
-              );
-            }
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: tiles[0]),
-                const SizedBox(width: 12),
-                Expanded(child: tiles[1]),
-              ],
-            );
-          },
-        ),
-      ],
-    ),
-  );
+            ],
+          ),
+        );
 
   Widget _tile(
     IconData icon,

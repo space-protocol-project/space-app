@@ -12,7 +12,12 @@ import 'components.dart';
 import 'migration_password_dialog.dart';
 
 class AndroidArchiveTransfer extends StatefulWidget {
-  const AndroidArchiveTransfer({super.key, required this.export, required this.restore, this.documents});
+  const AndroidArchiveTransfer({
+    super.key,
+    required this.export,
+    required this.restore,
+    this.documents,
+  });
   final ArchiveTransferAction export, restore;
   final ArchiveDocuments? documents;
   @override
@@ -20,76 +25,147 @@ class AndroidArchiveTransfer extends StatefulWidget {
 }
 
 class _AndroidArchiveTransferState extends State<AndroidArchiveTransfer> {
-  late final cubit = ArchiveTransferCubit(widget.documents ?? AndroidArchiveDocuments(),
-    export: widget.export, restore: widget.restore);
+  late final cubit = ArchiveTransferCubit(
+    widget.documents ?? AndroidArchiveDocuments(),
+    export: widget.export,
+    restore: widget.restore,
+  );
   @override
-  void initState() { super.initState(); unawaited(cubit.load()); }
+  void initState() {
+    super.initState();
+    unawaited(cubit.load());
+  }
+
   @override
-  void dispose() { unawaited(cubit.close()); super.dispose(); }
+  void dispose() {
+    unawaited(cubit.close());
+    super.dispose();
+  }
 
   Future<void> _password({required bool importing}) async {
-    final password = await migrationPassword(context, importing: importing, device: true);
+    final password = await migrationPassword(
+      context,
+      importing: importing,
+      device: true,
+    );
     if (password == null || !mounted) return;
-    if (importing) { await cubit.apply(password); }
-    else { await cubit.prepare(password); }
+    if (importing) {
+      await cubit.apply(password);
+    } else {
+      await cubit.prepare(password);
+    }
   }
+
   Future<void> _discard() async {
-    final confirmed = await showDialog<bool>(context: context, builder: (context) => AlertDialog(
-      title: Text(context.strings.archiveDeleteTitle),
-      content: Text(context.strings.archiveDeleteHelp),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.strings.close)),
-        TextButton(onPressed: () => Navigator.pop(context, true), child: Text(context.strings.archiveDelete)),
-      ],
-    ));
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.strings.archiveDeleteTitle),
+        content: Text(context.strings.archiveDeleteHelp),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(context.strings.close),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(context.strings.archiveDelete),
+          ),
+        ],
+      ),
+    );
     if (confirmed == true) await cubit.discard();
   }
+
   Future<void> _acknowledgeCleanup() async {
-    final confirmed = await showDialog<bool>(context: context, builder: (context) => AlertDialog(
-      title: Text(context.strings.archiveManualCleanup),
-      content: Text(context.strings.archiveManualCleanupHelp),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.strings.close)),
-        TextButton(onPressed: () => Navigator.pop(context, true), child: Text(context.strings.archiveCleanupConfirmed)),
-      ],
-    ));
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.strings.archiveManualCleanup),
+        content: Text(context.strings.archiveManualCleanupHelp),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(context.strings.close),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(context.strings.archiveCleanupConfirmed),
+          ),
+        ],
+      ),
+    );
     if (confirmed == true) await cubit.acknowledgeCleanup();
   }
+
   @override
-  Widget build(BuildContext context) => BlocBuilder<ArchiveTransferCubit, ArchiveTransferState>(
-    bloc: cubit,
-    builder: (context, state) {
-      final strings = context.strings;
-      return PopScope(canPop: !state.busy, child: SurfaceCard(child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(strings.deviceTransferTitle, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 12),
-          Text(strings.archiveStreamingHelp),
-          const SizedBox(height: 20),
-          if (state.busy) ..._progress(context, state) else ..._actions(context, state),
-          if (state.error != null) ..._error(context, state.error!),
-        ],
-      )));
-    },
-  );
+  Widget build(BuildContext context) =>
+      BlocBuilder<ArchiveTransferCubit, ArchiveTransferState>(
+        bloc: cubit,
+        builder: (context, state) {
+          final strings = context.strings;
+          return PopScope(
+            canPop: !state.busy,
+            child: SurfaceCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    strings.deviceTransferTitle,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(strings.archiveStreamingHelp),
+                  const SizedBox(height: 20),
+                  if (state.busy)
+                    ..._progress(context, state)
+                  else
+                    ..._actions(context, state),
+                  if (state.error != null) ..._error(context, state.error!),
+                ],
+              ),
+            ),
+          );
+        },
+      );
 
   List<Widget> _progress(BuildContext context, ArchiveTransferState state) {
     final strings = context.strings;
-    return [const LinearProgressIndicator(), const SizedBox(height: 12),
-      Text(state.cancellable ? strings.archiveCopyProgress(state.bytes ~/ (1024 * 1024)) : strings.archiveCritical),
+    return [
+      const LinearProgressIndicator(),
+      const SizedBox(height: 12),
+      Text(
+        state.cancellable
+            ? strings.archiveCopyProgress(state.bytes ~/ (1024 * 1024))
+            : strings.archiveCritical,
+      ),
       if (state.status.isNotEmpty) Text(state.status),
-      if (state.cancellable) TextButton(onPressed: state.cancelling ? null : cubit.cancel,
-        child: Text(state.cancelling ? strings.archiveCancelling : strings.recoveryCancel)),
+      if (state.cancellable)
+        TextButton(
+          onPressed: state.cancelling ? null : cubit.cancel,
+          child: Text(
+            state.cancelling ? strings.archiveCancelling : strings.recoveryCancel,
+          ),
+        ),
     ];
   }
+
   List<Widget> _error(BuildContext context, Object error) => [
     const SizedBox(height: 16),
-    Text('$error', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+    Text(
+      '$error',
+      style: TextStyle(color: Theme.of(context).colorScheme.error),
+    ),
     const SizedBox(height: 8),
-    TextButton(onPressed: cubit.load, child: Text(context.strings.archiveRetry)),
+    TextButton(
+      onPressed: cubit.load,
+      child: Text(context.strings.archiveRetry),
+    ),
     if (error is PlatformException && error.code == 'cleanup_failed')
-      TextButton(onPressed: _acknowledgeCleanup, child: Text(context.strings.archiveManualCleanup)),
+      TextButton(
+        onPressed: _acknowledgeCleanup,
+        child: Text(context.strings.archiveManualCleanup),
+      ),
   ];
 
   List<Widget> _actions(BuildContext context, ArchiveTransferState state) {
@@ -97,24 +173,41 @@ class _AndroidArchiveTransferState extends State<AndroidArchiveTransfer> {
     if (state.finished) return _finished(context, state);
     if (pending == null) {
       return [
-        FilledButton(onPressed: () => _password(importing: false), child: Text(strings.deviceTransferExport)),
+        FilledButton(
+          onPressed: () => _password(importing: false),
+          child: Text(strings.deviceTransferExport),
+        ),
         const SizedBox(height: 12),
-        OutlinedButton(onPressed: cubit.pick, child: Text(strings.deviceTransferRestore)),
+        OutlinedButton(
+          onPressed: cubit.pick,
+          child: Text(strings.deviceTransferRestore),
+        ),
       ];
     }
     if (pending.mode == ArchiveMode.exporting) {
       return _exportActions(context, pending);
     }
-    return [Text(strings.archiveImportReady), const SizedBox(height: 12),
-      FilledButton(onPressed: () => _password(importing: true), child: Text(strings.deviceTransferRestore)),
-      if (pending.phase != ArchivePhase.applying) TextButton(onPressed: _discard, child: Text(strings.archiveDelete)),
+    return [
+      Text(strings.archiveImportReady),
+      const SizedBox(height: 12),
+      FilledButton(
+        onPressed: () => _password(importing: true),
+        child: Text(strings.deviceTransferRestore),
+      ),
+      if (pending.phase != ArchivePhase.applying)
+        TextButton(onPressed: _discard, child: Text(strings.archiveDelete)),
     ];
   }
+
   List<Widget> _finished(BuildContext context, ArchiveTransferState state) {
     final strings = context.strings;
-    return [Text(state.saved ? strings.archiveSaved : strings.deviceTransferFinished),
+    return [
+      Text(state.saved ? strings.archiveSaved : strings.deviceTransferFinished),
       const SizedBox(height: 12),
-      FilledButton(onPressed: () => exit(0), child: Text(strings.deviceTransferClose)),
+      FilledButton(
+        onPressed: () => exit(0),
+        child: Text(strings.deviceTransferClose),
+      ),
       if (state.saved) ...[
         const SizedBox(height: 12),
         TextButton(onPressed: cubit.save, child: Text(strings.archiveSave)),
@@ -122,11 +215,20 @@ class _AndroidArchiveTransferState extends State<AndroidArchiveTransfer> {
       ],
     ];
   }
+
   List<Widget> _exportActions(BuildContext context, ArchiveWorkspace pending) {
     final strings = context.strings;
-    return [Text(strings.archiveRetained), const SizedBox(height: 12),
-      FilledButton(onPressed: pending.complete ? cubit.save : () => _password(importing: false),
-        child: Text(pending.complete ? strings.archiveSave : strings.archiveRetry)),
+    return [
+      Text(strings.archiveRetained),
+      const SizedBox(height: 12),
+      FilledButton(
+        onPressed: pending.complete
+            ? cubit.save
+            : () => _password(importing: false),
+        child: Text(
+          pending.complete ? strings.archiveSave : strings.archiveRetry,
+        ),
+      ),
       TextButton(onPressed: _discard, child: Text(strings.archiveDelete)),
     ];
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 
 enum ArchiveMode { exporting, importing }
+
 enum ArchivePhase { preparing, ready, applying }
 
 class ArchiveWorkspace {
@@ -11,18 +12,23 @@ class ArchiveWorkspace {
   final bool complete;
 
   factory ArchiveWorkspace.parse(Object? value) {
-    if (value case {
-      'mode': String mode,
-      'phase': String phase,
-      'path': String path,
-      'complete': bool complete,
-    } when value.length == 4 && path.isNotEmpty) {
+    if (value
+        case {
+          'mode': String mode,
+          'phase': String phase,
+          'path': String path,
+          'complete': bool complete,
+        }
+        when value.length == 4 && path.isNotEmpty) {
       return ArchiveWorkspace(
         switch (mode) {
           'export' => ArchiveMode.exporting,
           'import' => ArchiveMode.importing,
           _ => throw const FormatException('Неизвестный режим архива'),
-        }, ArchivePhase.values.byName(phase), path, complete,
+        },
+        ArchivePhase.values.byName(phase),
+        path,
+        complete,
       );
     }
     throw const FormatException('Повреждено состояние переноса');
@@ -61,6 +67,7 @@ class AndroidArchiveDocuments implements ArchiveDocuments {
     final value = await channel.invokeMethod<Object?>(method);
     return value == null ? null : ArchiveWorkspace.parse(value);
   }
+
   @override
   Future<ArchiveWorkspace?> status() => _workspace('status');
   @override
@@ -78,7 +85,8 @@ class AndroidArchiveDocuments implements ArchiveDocuments {
   @override
   Future<void> complete() => channel.invokeMethod<void>('complete');
   @override
-  Future<void> acknowledgeCleanup() => channel.invokeMethod<void>('acknowledgeCleanup');
+  Future<void> acknowledgeCleanup() =>
+      channel.invokeMethod<void>('acknowledgeCleanup');
   @override
   Future<void> cancel() => channel.invokeMethod<void>('cancel');
   @override
