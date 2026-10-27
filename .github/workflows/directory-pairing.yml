@@ -13,6 +13,10 @@ on:
         description: Повторять весь набор Go; сквозная проверка выполняется всегда
         type: boolean
         default: true
+      native:
+        description: Нативный экран Linux с началом Noise, отменой и горячим перезапуском
+        type: boolean
+        default: true
 permissions:
   contents: read
 jobs:
@@ -65,7 +69,12 @@ jobs:
         run: |
           printf 'https://archive.ubuntu.com/ubuntu\n' | sudo tee /etc/apt/apt-mirrors.txt
           timeout 180s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 update
-          timeout 480s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 install -y --no-install-recommends libgtk-3-dev libx11-dev libxi-dev
+          timeout 480s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 install -y --no-install-recommends libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb xauth dbus-x11
+      - name: Ограничения relay с настоящей PostgreSQL
+        working-directory: server
+        run: |
+          gofmt -w internal/postgres/directory_pairing*.go
+          go test -race ./internal/postgres -run '^TestDirectoryPairing' -count=1
       - name: Сервер, гонки и анализ
         if: inputs.server_checks
         working-directory: server
@@ -81,6 +90,7 @@ jobs:
         run: |
           flutter pub get
           dart format lib/src/directory_transfer*.dart lib/src/directory_backup.dart lib/ui/directory_transfer.dart lib/ui/device_panel.dart lib/ui/camera_scanner.dart test/directory_transfer*_test.dart
+          dart format test/probes/directory_transfer_probe.dart
           dart format ../packages/space_directory_noise
           dart fix --apply --code=curly_braces_in_flow_control_structures
           flutter analyze
@@ -95,6 +105,10 @@ jobs:
         run: |
           go build -o "$RUNNER_TEMP/space-directory-server" ./cmd/space-server
           python3 ../app/tools/check_community_interop.py --server "$RUNNER_TEMP/space-directory-server" --client ../app/client --scenario directory_pairing --output "$RUNNER_TEMP/directory-interop"
+      - name: Нативный экран и горячий перезапуск
+        if: inputs.native
+        working-directory: app
+        run: xvfb-run -a dbus-run-session -- python3 tools/check_directory_transfer_ui.py --output "$RUNNER_TEMP/directory-native"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -106,9 +120,11 @@ jobs:
             app/client/lib/ui/device_panel.dart
             app/client/lib/ui/camera_scanner.dart
             app/client/test/directory_transfer*_test.dart
+            app/client/test/probes/directory_transfer_probe.dart
             app/packages/space_directory_noise/**/*.dart
             server/internal/postgres/directory_pairing*.go
             ${{ runner.temp }}/directory-interop
+            ${{ runner.temp }}/directory-native
   android:
     if: inputs.platforms
     runs-on: ubuntu-24.04

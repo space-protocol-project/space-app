@@ -20,12 +20,15 @@ class ControlledDirectory extends DirectoryTransfer {
   ControlledDirectory(Discovery server):super(server,RpcDirectoryRelay(server),const NativeDirectoryNoise());
   final request=Completer<DirectoryTransferQr>();
   int closures=0;
+  Completer<void>? closing;
   @override
   Future<DirectoryTransferQr> receiveStart()=>request.future;
   @override
   Future<void> receiveHandshake() async {}
   @override
-  Future<void> close() async {closures++;await super.close();}
+  Future<DirectoryRestorePlan> receive(DirectoryBackupService service) => service.preview(directoryDocument());
+  @override
+  Future<void> close() async {closures++;await super.close();await closing?.future;}
 }
 
 void main() {
@@ -65,5 +68,30 @@ void main() {
     await cubit.cancel(expired:true);transfer.request.complete(qr());await pending;
     expect(cubit.state.stage,DirectoryTransferStage.failed);
     expect(cubit.state.replaceSettings,isFalse);
+  });
+  test('Каталог сначала показывается без изменений, явное применение завершается без вложенной блокировки', () async {
+    final pending=cubit.start();transfer.request.complete(qr());await pending;
+    expect(cubit.state.stage,DirectoryTransferStage.compare);
+    await cubit.confirm('сверено');
+    expect(cubit.state.stage,DirectoryTransferStage.preview);
+    expect(preferences.origins,isEmpty);expect(cubit.state.replaceSettings,isFalse);
+    await cubit.apply().timeout(const Duration(seconds:5));
+    expect(cubit.state.stage,DirectoryTransferStage.done);
+    expect(preferences.origins,['https://space.example']);expect(preferences.palette,'gruvbox');
+  });
+  test('Поздняя первая отмена не сбрасывает уже начатую новую попытку', () async {
+    final old=transfer;
+    old.closing=Completer<void>();
+    final starting=cubit.start();
+    final cancelling=cubit.cancel();
+    await cubit.cancel();
+    transfer=ControlledDirectory(controller.preview!);
+    final next=cubit.start();
+    old.closing!.complete();old.request.complete(qr());
+    await cancelling;await starting;
+    expect(cubit.state.stage,DirectoryTransferStage.waiting);
+    expect(transfer.closures,0);
+    transfer.request.complete(qr());await next;
+    expect(cubit.state.stage,DirectoryTransferStage.compare);
   });
 }
