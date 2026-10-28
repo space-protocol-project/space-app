@@ -28,6 +28,14 @@ jobs:
         with: {go-version-file: server-source/go.mod, cache-dependency-path: server-source/go.sum}
       - uses: subosito/flutter-action@v2
         with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - uses: actions/cache/restore@v4
+        id: native-cache
+        with:
+          path: |
+            client/build
+            client/.dart_tool/hooks_runner
+          key: clean-install-windows-3.47.8-v1-${{ hashFiles('client/pubspec.lock', 'native/**/Cargo.lock', 'client/windows/**', 'client/test/probes/clean_install*.dart') }}
+          restore-keys: clean-install-windows-3.47.8-v1-
       - name: Подготовка, анализ и проверки переноса
         working-directory: client
         shell: pwsh
@@ -61,6 +69,13 @@ jobs:
           flutter build windows --debug --target test/probes/clean_install_probe.dart
           if ($LASTEXITCODE) { throw 'Стенд не собран' }
           Pop-Location
+      - uses: actions/cache/save@v4
+        if: always() && steps.native-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            client/build
+            client/.dart_tool/hooks_runner
+          key: ${{ steps.native-cache.outputs.cache-primary-key }}
       - name: Экспорт, удаление исходного профиля, восстановление и холодный запуск
         shell: pwsh
         run: ./tools/check_clean_install.ps1 -OutputDirectory "$env:RUNNER_TEMP/clean-install"

@@ -7,6 +7,17 @@ $temporary = [IO.Path]::GetFullPath($env:RUNNER_TEMP).TrimEnd('\') + '\'
 if (!$work.StartsWith($temporary, [StringComparison]::OrdinalIgnoreCase)) { throw 'Нужен каталог RUNNER_TEMP.' }
 if (Test-Path -LiteralPath $work) { throw 'Нужен новый каталог сценария.' }
 New-Item -ItemType Directory -Path $work | Out-Null
+# initdb ограничивает административный token. Нужны прямые права пользователя,
+# а не унаследованные права группы Administrators каталога runner.
+$owner = [Security.Principal.WindowsIdentity]::GetCurrent().User
+$acl = [Security.AccessControl.DirectorySecurity]::new()
+$acl.SetOwner($owner)
+$acl.SetAccessRuleProtection($true, $false)
+foreach ($sid in @($owner, [Security.Principal.SecurityIdentifier]::new('S-1-5-18'))) {
+    $rule = [Security.AccessControl.FileSystemAccessRule]::new($sid, 'FullControl', 'ContainerInherit,ObjectInherit', 'None', 'Allow')
+    $acl.AddAccessRule($rule)
+}
+Set-Acl -LiteralPath $work -AclObject $acl
 $manifest = Get-Content -LiteralPath (Join-Path $appRoot 'client/assets/home/runtime-manifest.json') -Raw | ConvertFrom-Json
 $descriptor = $manifest.'windows-x64'
 $expectedUrl = 'https://github.com/space-protocol-project/space-server/releases/download/' + $descriptor.version + '/Space-home-windows-x64.zip'
