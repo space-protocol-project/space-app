@@ -36,7 +36,7 @@ jobs:
           if ($LASTEXITCODE) { throw 'Rust не установлен' }
           flutter pub get
           if ($LASTEXITCODE) { throw 'Зависимости не получены' }
-          dart format test/probes/clean_install*.dart
+          dart format test/probes/clean_install_support.dart test/probes/clean_install_data.dart test/probes/clean_install_probe.dart
           if ($LASTEXITCODE) { throw 'Форматирование не прошло' }
           flutter gen-l10n
           if ($LASTEXITCODE) { throw 'Локализация не собрана' }
