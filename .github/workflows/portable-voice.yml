@@ -1,0 +1,19 @@
+name: Перенос настроек голоса
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  voice:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - name: Анализ и целевые тесты
+        working-directory: client
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test test/directory_voice_format_test.dart test/portable_voice_profile_test.dart test/portable_voice_merge_test.dart test/portable_voice_store_test.dart test/voice_devices_test.dart
