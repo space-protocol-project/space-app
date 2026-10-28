@@ -1086,6 +1086,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    voice.devices.portableActor = null;
     widget.shutdown?.prepare = null;
     unawaited(personalNotifications.close());
     if (widget.voiceController == null) unawaited(voice.close());
