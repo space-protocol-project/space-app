@@ -292,9 +292,11 @@ class RevokeBackupSlotResponse extends $pb.GeneratedMessage {
 class PutBackupResponse extends $pb.GeneratedMessage {
   factory PutBackupResponse({
     BackupHead? head,
+    $core.bool? confirmed,
   }) {
     final result = PutBackupResponse._();
     if (head != null) result.head = head;
+    if (confirmed != null) result.confirmed = confirmed;
     return result;
   }
 
@@ -313,6 +315,7 @@ class PutBackupResponse extends $pb.GeneratedMessage {
       createEmptyInstance: PutBackupResponse.$_createMessage)
     ..aOM<BackupHead>(1, _omitFieldNames ? '' : 'head',
         subBuilder: BackupHead.$_createMessage)
+    ..aOB(2, _omitFieldNames ? '' : 'confirmed')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -347,6 +350,15 @@ class PutBackupResponse extends $pb.GeneratedMessage {
   void clearHead() => $_clearField(1);
   @$pb.TagNumber(1)
   BackupHead ensureHead() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.bool get confirmed => $_getBF(1);
+  @$pb.TagNumber(2)
+  set confirmed($core.bool value) => $_setBool(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasConfirmed() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearConfirmed() => $_clearField(2);
 }
 
 class CreateBackupSlotRequest extends $pb.GeneratedMessage {
@@ -439,11 +451,13 @@ class PutBackupRequest extends $pb.GeneratedMessage {
     BackupHead? head,
     $core.String? token,
     $core.List<$core.int>? archive,
+    $core.bool? confirm,
   }) {
     final result = PutBackupRequest._();
     if (head != null) result.head = head;
     if (token != null) result.token = token;
     if (archive != null) result.archive = archive;
+    if (confirm != null) result.confirm = confirm;
     return result;
   }
 
@@ -465,6 +479,7 @@ class PutBackupRequest extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'token')
     ..a<$core.List<$core.int>>(
         3, _omitFieldNames ? '' : 'archive', $pb.PbFieldType.OY)
+    ..aOB(4, _omitFieldNames ? '' : 'confirm')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -517,6 +532,16 @@ class PutBackupRequest extends $pb.GeneratedMessage {
   $core.bool hasArchive() => $_has(2);
   @$pb.TagNumber(3)
   void clearArchive() => $_clearField(3);
+
+  /// Подтверждение отправляется только после повторного чтения и проверки.
+  @$pb.TagNumber(4)
+  $core.bool get confirm => $_getBF(3);
+  @$pb.TagNumber(4)
+  set confirm($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasConfirm() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearConfirm() => $_clearField(4);
 }
 
 class GetBackupRequest extends $pb.GeneratedMessage {

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cryptography/cryptography.dart';
 
 import 'core.dart' show url64, parseConnectionInput;
+import 'directory_ancestry.dart';
 import 'directory_validation.dart';
 import 'settings_snapshot.dart';
 export 'directory_validation.dart';
@@ -68,7 +69,10 @@ class DirectoryDocument {
   int get revision => data['revision'] as int;
   String get parent => data['parent'] as String;
   Map<String, dynamic> get settings => data['settings'] as Map<String, dynamic>;
-  bool get hasSettingsVersions => data['v'] == 2;
+  bool get hasSettingsVersions => (data['v'] as int) >= 2;
+  DirectoryAncestry? get ancestry => data['v'] == 3
+      ? DirectoryAncestry.parse(data['ancestry'], revision, parent)
+      : null;
   SettingsSnapshot get settingsSnapshot => hasSettingsVersions
       ? SettingsSnapshot.create(settings, data['settings_versions'])
       : SettingsSnapshot.initial(settings);
@@ -82,11 +86,14 @@ class DirectoryDocument {
     final version = directoryInt(
       (value as Map<String, dynamic>)['v'],
       min: 1,
-      max: 2,
+      max: 3,
     );
-    final fields = version == 1
-        ? 'created,id,kind,parent,revision,settings,spaces,v'
-        : 'created,id,kind,parent,revision,settings,settings_versions,spaces,v';
+    final fields = switch (version) {
+      1 => 'created,id,kind,parent,revision,settings,spaces,v',
+      2 =>
+        'created,id,kind,parent,revision,settings,settings_versions,spaces,v',
+      _ => 'ancestry,created,id,kind,parent,revision,settings,settings_versions,spaces,v',
+    };
     final data = directoryMap(value, fields);
     directoryRequire(data['kind'] == 'space.directory');
     directoryBytes(data['id'], 16);
@@ -94,9 +101,16 @@ class DirectoryDocument {
     final parent = directoryText(data['parent'], max: 43);
     if (parent.isNotEmpty) directoryBytes(parent, 32);
     directoryRequire((data['revision'] == 1) == parent.isEmpty);
+    final ancestry = version == 3
+        ? DirectoryAncestry.parse(
+            data['ancestry'],
+            data['revision'] as int,
+            parent,
+          )
+        : null;
     directoryInt(data['created'], min: 1);
     final settings = checkedDirectorySettings(data['settings']);
-    final versioned = version == 2
+    final versioned = version >= 2
         ? SettingsSnapshot.create(settings, data['settings_versions'])
         : null;
     final raw = data['spaces'];
@@ -111,13 +125,18 @@ class DirectoryDocument {
     final result = DirectoryDocument._(
       Map.unmodifiable({
         ...data,
+        if (ancestry != null)
+          'ancestry': Map<String, dynamic>.unmodifiable({
+            'first_revision': ancestry.firstRevision,
+            'digests': ancestry.digests,
+          }),
         'settings': settings,
         if (versioned != null) 'settings_versions': versioned.versions,
         'spaces': List<Map<String, dynamic>>.unmodifiable(spaces),
       }),
     );
     directoryRequire(result.encode().length <= directoryMaxPlain);
-    if (version == 2) {
+    if (version >= 2) {
       directoryRequire(utf8.decode(result.encode()) == jsonEncode(data));
     }
     return result;

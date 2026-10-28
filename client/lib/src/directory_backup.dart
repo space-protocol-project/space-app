@@ -230,6 +230,13 @@ class DirectoryBackupService {
     Map head,
     List<DirectoryDocument> ancestors,
   ) async {
+    final ancestry = document.ancestry;
+    if (ancestry != null && document.revision > (head['revision'] as int)) {
+      return ancestry.contains(
+        head['revision'] as int,
+        head['digest'] as String,
+      );
+    }
     var child = document;
     for (final parent in ancestors) {
       if (parent.id != document.id ||

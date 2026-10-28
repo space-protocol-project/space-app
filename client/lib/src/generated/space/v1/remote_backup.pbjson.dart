@@ -87,13 +87,14 @@ const PutBackupResponse$json = {
       '6': '.space.v1.BackupHead',
       '10': 'head'
     },
+    {'1': 'confirmed', '3': 2, '4': 1, '5': 8, '10': 'confirmed'},
   ],
 };
 
 /// Descriptor for `PutBackupResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List putBackupResponseDescriptor = $convert.base64Decode(
     'ChFQdXRCYWNrdXBSZXNwb25zZRIoCgRoZWFkGAEgASgLMhQuc3BhY2UudjEuQmFja3VwSGVhZF'
-    'IEaGVhZA==');
+    'IEaGVhZBIcCgljb25maXJtZWQYAiABKAhSCWNvbmZpcm1lZA==');
 
 @$core.Deprecated('Use createBackupSlotRequestDescriptor instead')
 const CreateBackupSlotRequest$json = {
@@ -125,13 +126,15 @@ const PutBackupRequest$json = {
     },
     {'1': 'token', '3': 2, '4': 1, '5': 9, '10': 'token'},
     {'1': 'archive', '3': 3, '4': 1, '5': 12, '10': 'archive'},
+    {'1': 'confirm', '3': 4, '4': 1, '5': 8, '10': 'confirm'},
   ],
 };
 
 /// Descriptor for `PutBackupRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List putBackupRequestDescriptor = $convert.base64Decode(
     'ChBQdXRCYWNrdXBSZXF1ZXN0EigKBGhlYWQYASABKAsyFC5zcGFjZS52MS5CYWNrdXBIZWFkUg'
-    'RoZWFkEhQKBXRva2VuGAIgASgJUgV0b2tlbhIYCgdhcmNoaXZlGAMgASgMUgdhcmNoaXZl');
+    'RoZWFkEhQKBXRva2VuGAIgASgJUgV0b2tlbhIYCgdhcmNoaXZlGAMgASgMUgdhcmNoaXZlEhgK'
+    'B2NvbmZpcm0YBCABKAhSB2NvbmZpcm0=');
 
 @$core.Deprecated('Use getBackupRequestDescriptor instead')
 const GetBackupRequest$json = {

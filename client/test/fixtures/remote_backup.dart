@@ -14,6 +14,7 @@ class MemoryBackupApi implements RemoteBackupApi {
   BackupHead head;
   final versions = <int, GetBackupResponse>{};
   bool failPut = false,
+      failConfirm = false,
       badSignature = false,
       badChallenge = false,
       unavailable = false;
@@ -25,8 +26,18 @@ class MemoryBackupApi implements RemoteBackupApi {
   }
 
   @override
-  Future<BackupHead> put(PutBackupRequest request) async {
+  Future<PutBackupResponse> put(PutBackupRequest request) async {
     token(request.token, true);
+    if (request.confirm) {
+      if (backupHeadText(request.head) != backupHeadText(head)) {
+        throw StateError('Голова изменилась');
+      }
+      if (failConfirm) {
+        failConfirm = false;
+        throw StateError('Ответ на подтверждение потерян');
+      }
+      return PutBackupResponse(head: head.deepCopy(), confirmed: true);
+    }
     final previous = versions[request.head.revision.toInt()];
     if (previous != null &&
         backupHeadText(previous.head) != backupHeadText(request.head)) {
@@ -41,7 +52,7 @@ class MemoryBackupApi implements RemoteBackupApi {
       failPut = false;
       throw StateError('Ответ после commit потерян');
     }
-    return head.deepCopy();
+    return PutBackupResponse(head: head.deepCopy());
   }
 
   @override

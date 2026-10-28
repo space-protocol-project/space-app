@@ -24,7 +24,7 @@ class LostBackupReply extends RpcRemoteBackup {
   LostBackupReply(super.endpoint);
   static bool lose = true;
   @override
-  Future<BackupHead> put(PutBackupRequest request) async {
+  Future<PutBackupResponse> put(PutBackupRequest request) async {
     final result = await super.put(request);
     if (lose) {
       lose = false;

@@ -227,18 +227,30 @@ class RemoteBackupService {
                 old.digest == head.parent),
       );
       _same(
-        await api.put(
+        (await api.put(
           PutBackupRequest(
             head: head,
             token: kit.space.writeToken,
             archive: archive,
           ),
-        ),
+        )).head,
         head,
       );
       await _document(await _get(kit, api, document.revision), head, password);
       _same(await _head(kit, api), head);
       await directory.recordExport(document, selectOutgoing: false);
+      if (document.ancestry != null) {
+        final confirmation = await api.put(
+          PutBackupRequest(
+            head: head,
+            token: kit.space.writeToken,
+            archive: archive,
+            confirm: true,
+          ),
+        );
+        _same(confirmation.head, head);
+        directoryRequire(confirmation.confirmed);
+      }
       state['pending'] = null;
       await _save(state);
     }),
@@ -254,6 +266,10 @@ class RemoteBackupService {
         ((await directory.repository.read())['heads'] as Map)[kit.id] as Map?;
     directoryRequire(local != null || head.revision == Int64.ZERO);
     var parent = '';
+    var ancestry = <String, dynamic>{
+      'first_revision': 1,
+      'digests': <String>[],
+    };
     if (head.revision > Int64.ZERO) {
       final previous = await _document(
         await _get(kit, store, head.revision.toInt()),
@@ -261,6 +277,7 @@ class RemoteBackupService {
         password,
       );
       parent = await previous.digest();
+      ancestry = await _extendAncestry(kit, store, previous, head, password);
     }
     if (local != null) {
       directoryRequire(
@@ -270,6 +287,8 @@ class RemoteBackupService {
     final captured = await directory.capture();
     final document = DirectoryDocument.parse({
       ...captured.data,
+      'v': 3,
+      'ancestry': ancestry,
       'id': kit.id,
       'revision': head.revision.toInt() + 1,
       'parent': parent,
@@ -295,6 +314,31 @@ class RemoteBackupService {
       'archive': base64Encode(archive),
     };
     await _save(state);
+  }
+
+  Future<Map<String, dynamic>> _extendAncestry(
+    RemoteBackupKit kit,
+    RemoteBackupApi store,
+    DirectoryDocument previous,
+    BackupHead previousHead,
+    String password,
+  ) async {
+    final known = previous.ancestry;
+    if (known != null) return known.append(await previous.digest());
+    final digests = <String>[await previous.digest()];
+    var child = previous;
+    var childHead = previousHead;
+    while (child.revision > 1) {
+      final response = await _get(kit, store, child.revision - 1);
+      checkRemoteHead(response.head, kit.id);
+      directoryRequire(response.head.digest == childHead.parent);
+      final parent = await _document(response, response.head, password);
+      directoryRequire(await parent.digest() == child.parent);
+      digests.add(await parent.digest());
+      child = parent;
+      childHead = response.head;
+    }
+    return {'first_revision': 1, 'digests': digests.reversed.toList()};
   }
 
   Future<RemoteRestore> preview(RemoteBackupKit kit, String password) =>
@@ -328,6 +372,7 @@ class RemoteBackupService {
     final local =
         ((await directory.repository.read())['heads'] as Map)[kit.id] as Map?;
     if (local == null) return [];
+    if (latest.ancestry != null) return [];
     final result = <DirectoryDocument>[];
     var child = latest;
     var childHead = latestHead;

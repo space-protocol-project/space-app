@@ -7,7 +7,7 @@ import 'rpc_connection.dart';
 export 'generated/space/v1/remote_backup.pb.dart';
 
 abstract interface class RemoteBackupApi {
-  Future<BackupHead> put(PutBackupRequest request);
+  Future<PutBackupResponse> put(PutBackupRequest request);
   Future<GetBackupResponse> get(GetBackupRequest request);
   Future<ReadBackupHeadResponse> read(ReadBackupHeadRequest request);
   Future<void> close();
@@ -27,12 +27,11 @@ class RpcRemoteBackup implements RemoteBackupApi {
   final bool ownsConnection;
   static const options = RpcOptions(timeout: Duration(seconds: 30));
   @override
-  Future<BackupHead> put(PutBackupRequest request) async =>
-      (await connection.unary(
-        specs.RemoteBackupService.putBackup,
-        request,
-        options: options,
-      )).head;
+  Future<PutBackupResponse> put(PutBackupRequest request) => connection.unary(
+    specs.RemoteBackupService.putBackup,
+    request,
+    options: options,
+  );
   @override
   Future<GetBackupResponse> get(GetBackupRequest request) => connection.unary(
     specs.RemoteBackupService.getBackup,

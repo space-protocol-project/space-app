@@ -161,6 +161,43 @@ void main() {
     expect(target.preferences.origins, isEmpty);
   });
   backupTest(
+    'После очистки пропущенные ревизии проверяются внутри новой копии',
+    () async {
+      await remote.publish(kit, backupPassword);
+      final recovery = connectService(fresh());
+      await recovery.apply(
+        await recovery.preview(kit, backupPassword),
+        mergeSettings: false,
+      );
+      await remote.publish(kit, backupPassword);
+      await remote.publish(kit, backupPassword);
+      api.versions.remove(2);
+      final plan = await recovery.preview(kit, backupPassword);
+      expect(plan.plan.conflicts, isEmpty);
+      await recovery.apply(plan, mergeSettings: false);
+    },
+  );
+  backupTest(
+    'Повтор подтверждения после потери ответа сохраняет журнал и те же байты',
+    () async {
+      api.failConfirm = true;
+      await expectLater(remote.publish(kit, backupPassword), throwsStateError);
+      final bytes = List.of(api.versions[1]!.archive);
+      expect(
+        (jsonDecode(storage.values[RemoteBackupService.storageKey]!)
+            as Map)['pending'],
+        isNotNull,
+      );
+      await remote.publish(kit, backupPassword);
+      expect(api.versions[1]!.archive, bytes);
+      expect(
+        (jsonDecode(storage.values[RemoteBackupService.storageKey]!)
+            as Map)['pending'],
+        isNull,
+      );
+    },
+  );
+  backupTest(
     'Известный откат отклоняется; пропущенные ревизии проверяются цепочкой',
     () async {
       await remote.publish(kit, backupPassword);
@@ -173,7 +210,7 @@ void main() {
       await remote.publish(kit, backupPassword);
       await remote.publish(kit, backupPassword);
       final plan = await recovery.preview(kit, backupPassword);
-      expect(plan.plan.ancestors, hasLength(1));
+      expect(plan.plan.ancestors, isEmpty);
       expect(plan.plan.conflicts, isEmpty);
       await recovery.apply(plan, mergeSettings: false);
       api.head = old;
