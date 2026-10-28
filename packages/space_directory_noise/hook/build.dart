@@ -14,6 +14,9 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       Platform.environment['CARGO_TARGET_DIR'] ??
       input.outputDirectory.resolve('rust/').toFilePath();
   final environment = <String, String>{'CARGO_TARGET_DIR': targetDirectory};
+  if (config.targetOS == OS.macOS) {
+    environment['SDKROOT'] = await macosSdkPath();
+  }
   if (config.targetOS == OS.android) {
     final linker = androidLinker(config);
     environment['CARGO_TARGET_${target.toUpperCase().replaceAll('-', '_')}_LINKER'] =
@@ -91,6 +94,19 @@ String androidLinker(CodeConfig config) {
   return compiler
       .resolve('$triple${config.android.targetNdkApi}-clang$suffix')
       .toFilePath();
+}
+
+Future<String> macosSdkPath() async {
+  final result = await Process.run('xcrun', [
+    '--sdk',
+    'macosx',
+    '--show-sdk-path',
+  ]);
+  final path = result.stdout.toString().trim();
+  if (result.exitCode != 0 || path.isEmpty || !await Directory(path).exists()) {
+    throw StateError('Не найден SDK macOS: ${result.stderr}');
+  }
+  return path;
 }
 
 Future<void> run(
