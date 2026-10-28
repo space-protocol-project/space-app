@@ -9,6 +9,9 @@ import 'package:space_client/src/voice_device_preferences.dart';
 import 'package:space_client/src/voice_media.dart';
 import 'package:space_client/src/voice_audio_settings.dart';
 import 'package:space_client/src/portable_voice_profile.dart';
+import 'package:space_client/src/portable_voice_merge.dart';
+import 'package:space_client/src/portable_voice_store.dart';
+import 'package:space_client/src/core.dart' show url64;
 
 import 'package:space_client/src/voice_devices.dart';
 
@@ -62,6 +65,31 @@ void main() {
     expect(saved.audio.inputGain, 1.5);
     expect(saved.audio.pushToTalk, isTrue);
     expect(saved.audio.noiseMode, VoiceNoiseSuppression.disabled);
+  });
+
+  test('Журнал восстанавливает профиль через контроллер и повтор безопасен', () async {
+    final actor = url64(List.filled(16, 1));
+    final remote = url64(List.filled(16, 2));
+    await SavedVoiceDevicePreferences().save(
+      const VoiceDeviceChoice(input: 'mic', audio: VoiceAudioSettings(pushToTalk: true)),
+    );
+    final controller = VoiceDevices(backend: DevicesBackend())
+      ..portableActor = () => actor;
+    addTearDown(controller.close);
+    await controller.refresh();
+    final before = await controller.exportPortableVoice(actor);
+    final after = PortableVoiceSnapshot(
+      PortableVoiceProfile.fromAudio(const VoiceAudioSettings().withProfile(VoiceInputProfile.studio)),
+      {remote: 1},
+    );
+    final journal = {'v': 1, 'before': before.data, 'after': after.data};
+    await controller.resumePortableVoice(journal, actor);
+    await controller.resumePortableVoice(journal, actor);
+    final choice = await SavedVoiceDevicePreferences().load();
+    expect(choice.input, 'mic');
+    expect(choice.audio.pushToTalk, isTrue);
+    expect(choice.audio.noiseMode, VoiceNoiseSuppression.disabled);
+    expect((await PortableVoiceStore().read(before.profile)).clock, {remote: 1});
   });
 
   test('Смена идентификатора восстанавливает только единственное устройство с прежним именем', () async {
