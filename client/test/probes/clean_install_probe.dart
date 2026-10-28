@@ -15,6 +15,7 @@ import 'package:space_client/src/mls/files.dart';
 import '../../tool/attachment_policy_fixture.dart';
 import '../../tool/home_transfer_drill.dart' as transfer;
 import 'clean_install_support.dart';
+import 'clean_install_data.dart';
 import 'directory_crash_windows.dart';
 
 Future<void> seedCleanPeer(CleanContext c, transfer.RunningSpace running,
@@ -69,8 +70,7 @@ Future<void> seedCleanInstall(CleanContext c) async {
       final preferences = await SharedPreferences.getInstance();
       requireClean(await preferences.setStringList('space.ui.origins', [owner.record.origin]), 'Не сохранены пространства');
       requireClean(await preferences.setString('space.ui.palette', 'iris'), 'Не сохранена палитра');
-      requireClean(await preferences.setString('space.voice.shortcut', 'Control+Space'), 'Не сохранена клавиша');
-      await c.storage.write(key: 'space.drafts.v1', value: 'Черновик чистой установки');
+      await seedCleanData(c, owner);
     } finally { await owner.close(); }
   } finally { await running.stop(); }
   final home = await c.home(source: true);
@@ -109,8 +109,7 @@ Future<void> restoreCleanInstall(CleanContext c) async {
 Future<void> verifyCleanSettings(CleanContext c, {required String palette}) async {
   final preferences = await SharedPreferences.getInstance();
   requireClean(preferences.getString('space.ui.palette') == palette, 'Не сохранена палитра');
-  requireClean(preferences.getString('space.voice.shortcut') == 'Control+Space', 'Не сохранена клавиша');
-  requireClean(await c.storage.read(key: 'space.drafts.v1') == 'Черновик чистой установки', 'Потерян черновик');
+  await verifyCleanData(c);
   final marker = await c.storage.read(key: DeviceMigration.importKey);
   requireClean(marker != null && marker.endsWith(':complete'), 'Импорт не завершён');
   final files = await Directory(p.join(c.profile.path, 'system-storage')).list().toList();
