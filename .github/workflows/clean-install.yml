@@ -62,6 +62,8 @@ jobs:
       - name: Нативный стенд и сервер
         shell: pwsh
         run: |
+          go -C server-source test ./internal/home -run '^TestBackup(DestinationBoundaries|WindowsVolumes|RejectsSubstAlias)$' -v
+          if ($LASTEXITCODE) { throw 'Границы копий не проверены' }
           go build -C server-source -o "$env:RUNNER_TEMP/space-clean-server.exe" ./cmd/space-server
           if ($LASTEXITCODE) { throw 'Сервер не собран' }
           "CLEAN_INSTALL_SERVER=$env:RUNNER_TEMP/space-clean-server.exe" >> $env:GITHUB_ENV
