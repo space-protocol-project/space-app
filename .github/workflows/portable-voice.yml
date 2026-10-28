@@ -20,4 +20,4 @@ jobs:
         run: |
           flutter pub get
           flutter analyze
-          flutter test test/directory_voice_format_test.dart test/portable_voice_profile_test.dart test/portable_voice_merge_test.dart test/portable_voice_store_test.dart test/voice_devices_test.dart
+          flutter test test/directory_voice_format_test.dart test/portable_voice_profile_test.dart test/portable_voice_merge_test.dart test/portable_voice_store_test.dart test/voice_devices_test.dart test/voice_audio_test.dart

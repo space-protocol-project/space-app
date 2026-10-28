@@ -251,14 +251,16 @@ class VoiceDevices extends Cubit<VoiceDevicesState> {
         return previous.observe(profile, actor);
       });
 
-  Future<void> updateAudio(VoiceAudioSettings settings) =>
-      PortableVoiceStore().exclusive(() async {
+  Future<void> updateAudio(VoiceAudioSettings settings) {
+    if (portableActor == null) return _updateAudio(settings);
+    return PortableVoiceStore().exclusive(() async {
         try {
           await _savePortableAudio(settings);
         } catch (error) {
           _publish(error: error.toString());
         }
       });
+  }
 
   Future<void> _savePortableAudio(VoiceAudioSettings settings) async {
     final actor = portableActor?.call();
