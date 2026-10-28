@@ -5,6 +5,9 @@ $appRoot = Split-Path $PSScriptRoot -Parent
 $work = [IO.Path]::GetFullPath($OutputDirectory)
 $temporary = [IO.Path]::GetFullPath($env:RUNNER_TEMP).TrimEnd('\') + '\'
 if (!$work.StartsWith($temporary, [StringComparison]::OrdinalIgnoreCase)) { throw 'Нужен каталог RUNNER_TEMP.' }
+if ([IO.Path]::GetPathRoot([IO.Path]::GetTempPath()) -eq [IO.Path]::GetPathRoot($work)) {
+    throw 'Для регрессии экспорта нужны разные диски профиля и системного TEMP.'
+}
 if (Test-Path -LiteralPath $work) { throw 'Нужен новый каталог сценария.' }
 New-Item -ItemType Directory -Path $work | Out-Null
 # initdb ограничивает административный token. Нужны прямые права пользователя,
@@ -60,7 +63,7 @@ foreach ($phase in @('source', 'source-check', 'restore', 'verify', 'verify-agai
     }
 }
 if (($results.pid | Select-Object -Unique).Count -ne 5) { throw 'Фазы не подтвердили независимые процессы.' }
-@{ success = $true; backend = 'Windows DPAPI'; source_deleted = $true; empty_password = $true;
+@{ success = $true; backend = 'Windows DPAPI'; source_deleted = $true; empty_password = $true; cross_volume = $true;
     phases = $results; runtime = $descriptor.version } | ConvertTo-Json -Depth 6 |
     Set-Content -LiteralPath (Join-Path $work 'report.json') -Encoding utf8
 Write-Output 'Чистое восстановление: DPAPI, PostgreSQL, MLS, вложение и два холодных запуска прошли.'
