@@ -23,7 +23,9 @@ void requireClean(bool condition, String message) {
 }
 
 String cleanHash(List<int> bytes) => crypto.sha256.convert(bytes).toString();
-final cleanFileBytes = Uint8List.fromList(List.generate(300000, (i) => i % 251));
+final cleanFileBytes = Uint8List.fromList(
+  List.generate(300000, (i) => i % 251),
+);
 
 // Фикстура только второго участника; владелец использует настоящий DPAPI.
 class CleanPeerStorage implements SecureKeyStorage {
@@ -35,6 +37,7 @@ class CleanPeerStorage implements SecureKeyStorage {
     final value = file(key);
     return await value.exists() ? value.readAsString() : null;
   }
+
   @override
   Future<void> write({required String key, required String value}) async {
     await root.create(recursive: true);
@@ -42,6 +45,7 @@ class CleanPeerStorage implements SecureKeyStorage {
     await next.writeAsString(value, flush: true);
     await next.rename(file(key).path);
   }
+
   @override
   Future<void> delete({required String key}) async {
     final value = file(key);
@@ -63,7 +67,8 @@ class CleanContext {
   Directory get files => Directory(p.join(profile.path, 'files'));
   File get archive => File(p.join(work.path, 'device.spacedevice'));
   File get expectedFile => File(p.join(work.path, 'expected.json'));
-  CleanPeerStorage get peerStorage => CleanPeerStorage(Directory(p.join(work.path, 'peer')));
+  CleanPeerStorage get peerStorage =>
+      CleanPeerStorage(Directory(p.join(work.path, 'peer')));
   Future<Map<String, dynamic>> expected() async =>
       jsonDecode(await expectedFile.readAsString()) as Map<String, dynamic>;
 
@@ -71,41 +76,56 @@ class CleanContext {
     await homeRoot.create(recursive: true);
     final result = NativeMigrationHome(homeRoot, executable, runtime);
     if (source) {
-      result.network = HomeNetwork([ServerEndpoint.parse('203.0.113.10', 8443)],
-        identityOrigin: (await expected())['origin'] as String);
+      result.network = HomeNetwork([
+        ServerEndpoint.parse('203.0.113.10', 8443),
+      ], identityOrigin: (await expected())['origin'] as String);
       result.ip = '203.0.113.10';
     }
     return result;
   }
 
-  Future<DeviceMigration> migration(NativeMigrationHome home) async => DeviceMigration(
-    home: home,
-    devices: HomeMigration(vault: vault, storage: storage,
-      locks: () async => Directory(p.join(profile.path, 'locks'))),
-    preferences: await SharedPreferences.getInstance(),
-    directory: () async => files,
-    stop: () async {},
-  );
+  Future<DeviceMigration> migration(NativeMigrationHome home) async =>
+      DeviceMigration(
+        home: home,
+        devices: HomeMigration(
+          vault: vault,
+          storage: storage,
+          locks: () async => Directory(p.join(profile.path, 'locks')),
+        ),
+        preferences: await SharedPreferences.getInstance(),
+        directory: () async => files,
+        stop: () async {},
+      );
 }
 
 Future<MlsClient> cleanClient(
-  SpaceSession session, SecureKeyStorage storage, Directory locks,
+  SpaceSession session,
+  SecureKeyStorage storage,
+  Directory locks,
 ) async {
   final record = session.record;
-  final public = await (await Ed25519().newKeyPairFromSeed(record.deviceSeed)).extractPublicKey();
-  final scope = record.mlsIdentity ?? {
-    'server_id': record.serverId,
-    'principal_id': session.principalId,
-    'grant_id': record.grantId,
-    'public_key': public.bytes,
-  };
+  final public = await (await Ed25519().newKeyPairFromSeed(record.deviceSeed))
+      .extractPublicKey();
+  final scope =
+      record.mlsIdentity ??
+      {
+        'server_id': record.serverId,
+        'principal_id': session.principalId,
+        'grant_id': record.grantId,
+        'public_key': public.bytes,
+      };
   record.mlsIdentity = scope;
   await session.vault.save(record);
   return MlsClient(
     connection: session.channel,
     options: () => session.mlsOptions(expectedGrant: record.grantId),
-    local: MlsLocalStore(storage: storage, engine: NativeMlsEngine(),
-      scope: scope, deviceSeed: record.deviceSeed, lockDirectory: locks,
-      requireExisting: scope['grant_id'] != record.grantId),
+    local: MlsLocalStore(
+      storage: storage,
+      engine: NativeMlsEngine(),
+      scope: scope,
+      deviceSeed: record.deviceSeed,
+      lockDirectory: locks,
+      requireExisting: scope['grant_id'] != record.grantId,
+    ),
   );
 }
