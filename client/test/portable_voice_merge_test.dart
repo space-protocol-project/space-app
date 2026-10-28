@@ -85,4 +85,26 @@ void main() {
     });
     expect(pending.after.profile, studio);
   });
+
+  test('Повтор журнала идемпотентен и не стирает позднее изменение', () async {
+    final before = PortableVoiceSnapshot(speech, {a: 1});
+    final after = PortableVoiceSnapshot(studio, {a: 1, b: 1});
+    var current = before.observe(studio, a).observe(speech, a);
+    var writes = 0;
+    final journal = {'v': 1, 'before': before.data, 'after': after.data};
+    Future<void> resume() => resumePortableVoicePending(
+      value: journal,
+      actor: a,
+      read: () async => current,
+      write: (value) async {
+        writes++;
+        current = value;
+      },
+    );
+    await resume();
+    await resume();
+    expect(current.profile, speech);
+    expect(current.clock, {a: 4, b: 1});
+    expect(writes, 1);
+  });
 }

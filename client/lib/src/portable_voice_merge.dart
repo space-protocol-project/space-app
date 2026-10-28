@@ -93,3 +93,18 @@ checkedPortableVoicePending(Object? value) {
   }
   return (before: before, after: after);
 }
+
+/// Возобновляет подтверждённую операцию; журнал очищает вызывающий код.
+/// Вызов и остальные изменения профиля выполняются в одной очереди.
+Future<void> resumePortableVoicePending({
+  required Object value,
+  required String actor,
+  required Future<PortableVoiceSnapshot> Function() read,
+  required Future<void> Function(PortableVoiceSnapshot) write,
+}) async {
+  final (:before, :after) = checkedPortableVoicePending(value);
+  final current = await read();
+  final result = resumePortableVoice(before, after, current, actor);
+  if (result == current) return;
+  await write(result);
+}

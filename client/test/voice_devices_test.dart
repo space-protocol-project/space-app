@@ -7,6 +7,8 @@ import 'package:space_client/ui/voice_devices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:space_client/src/voice_device_preferences.dart';
 import 'package:space_client/src/voice_media.dart';
+import 'package:space_client/src/voice_audio_settings.dart';
+import 'package:space_client/src/portable_voice_profile.dart';
 
 import 'package:space_client/src/voice_devices.dart';
 
@@ -40,6 +42,27 @@ class FailingDevicePreferences extends SavedVoiceDevicePreferences {
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
+
+  test('Перенос обработки сохраняет выбор устройства и способ передачи', () async {
+    await SavedVoiceDevicePreferences().save(
+      const VoiceDeviceChoice(
+        input: 'mic',
+        audio: VoiceAudioSettings(inputGain: 1.5, pushToTalk: true),
+      ),
+    );
+    final controller = VoiceDevices(backend: DevicesBackend());
+    addTearDown(controller.close);
+    await controller.refresh();
+    final profile = PortableVoiceProfile.fromAudio(
+      const VoiceAudioSettings().withProfile(VoiceInputProfile.studio),
+    );
+    await controller.applyPortableProfile(profile);
+    final saved = await SavedVoiceDevicePreferences().load();
+    expect(saved.input, 'mic');
+    expect(saved.audio.inputGain, 1.5);
+    expect(saved.audio.pushToTalk, isTrue);
+    expect(saved.audio.noiseMode, VoiceNoiseSuppression.disabled);
+  });
 
   test('Смена идентификатора восстанавливает только единственное устройство с прежним именем', () async {
     await SavedVoiceDevicePreferences().save(

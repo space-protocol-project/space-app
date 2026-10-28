@@ -7,6 +7,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import 'voice_device_preferences.dart';
 import 'voice_audio_settings.dart';
+import 'portable_voice_profile.dart';
 import 'voice_platform.dart';
 import 'voice_audio_native.dart';
 
@@ -201,6 +202,18 @@ class VoiceDevices extends Cubit<VoiceDevicesState> {
   bool _available(VoiceDevice device) => state.devices.any(
     (current) => current.id == device.id && current.input == device.input,
   );
+
+  /// Применяет обработку к выбранному устройству, сохраняя локальные параметры.
+  Future<void> applyPortableProfile(PortableVoiceProfile profile) async {
+    final refreshing = _refreshing;
+    if (refreshing != null) await refreshing;
+    if (_choice == null && !isClosed) await refresh();
+    if (isClosed || state.busy || _choice == null || !state.ready) {
+      throw StateError('Аудиоустройство не готово к восстановлению');
+    }
+    await updateAudio(profile.apply(_choice!.audio));
+    if (state.error.isNotEmpty) throw StateError(state.error);
+  }
 
   Future<void> updateAudio(VoiceAudioSettings settings) async {
     final refreshing = _refreshing;
