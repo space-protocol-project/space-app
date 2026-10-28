@@ -262,6 +262,8 @@ class VoiceDevices extends Cubit<VoiceDevicesState> {
 
   Future<void> _savePortableAudio(VoiceAudioSettings settings) async {
     final actor = portableActor?.call();
+    final refreshing = _refreshing;
+    if (refreshing != null) await refreshing;
     if (_choice == null && !isClosed) await refresh();
     if (isClosed || state.busy || _choice == null) return;
     final store = PortableVoiceStore();
