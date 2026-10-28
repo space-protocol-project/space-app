@@ -301,50 +301,11 @@ class DirectoryBackupService {
     Map<String, SettingsChoice> settingsChoices = const {},
   }) => repository.exclusive(() async {
     final latest = await preview(plan.document, ancestors: plan.ancestors);
-    directoryRequire(
-      latest.conflicts.isEmpty &&
-          latest.before == plan.before &&
-          latest.digest == plan.digest &&
-          jsonEncode(latest.voiceMerge?.local.data) ==
-              jsonEncode(plan.voiceMerge?.local.data) &&
-          latest.settingsResolved(mergeSettings, settingsChoices),
-    );
-    final state = await repository.read(), catalog = state['catalog'] as Map;
-    for (final space in plan.document.spaces) {
-      catalog[space['origin']] = space;
-    }
-    directoryRequire(catalog.length <= 100);
-    (state['heads'] as Map)[plan.document.id] = {
-      'revision': plan.document.revision,
-      'digest': plan.digest,
-    };
-    final merged = mergeSettings
-        ? latest.settingsMerge.resolve(preferences.settingsActor, {
-            for (final entry in settingsChoices.entries)
-              if (entry.key != 'voiceProfile') entry.key: entry.value,
-          })
-        : null;
-    state['pending'] = {
-      'origins': plan.document.spaces.map((s) => s['origin']).toList(),
-      'settings': merged == null
-          ? null
-          : {
-              'v': 2,
-              'before': latest.settingsMerge.local.data,
-              'after': merged.data,
-            },
-      if (merged != null && latest.voiceMerge != null)
-        'voice': {
-          'v': 1,
-          'before': latest.voiceMerge!.local.data,
-          'after': latest.voiceMerge!
-              .resolve(
-                preferences.settingsActor,
-                settingsChoices['voiceProfile'],
-              )
-              .data,
-        },
-    };
+    _checkRestorePlan(plan, latest, mergeSettings, settingsChoices);
+    final state = await repository.read();
+    _recordRestoredCatalog(state, plan);
+    final merged = _mergeRestoreSettings(latest, mergeSettings, settingsChoices);
+    state['pending'] = _restoreJournal(plan, latest, merged, settingsChoices);
     if (merged == null) {
       await repository.write(state);
     } else {
@@ -356,6 +317,51 @@ class DirectoryBackupService {
     }
     await _finish(state);
   });
+
+  void _checkRestorePlan(DirectoryRestorePlan plan, DirectoryRestorePlan latest,
+      bool mergeSettings, Map<String, SettingsChoice> choices) {
+    directoryRequire(latest.conflicts.isEmpty && latest.before == plan.before &&
+        latest.digest == plan.digest &&
+        jsonEncode(latest.voiceMerge?.local.data) == jsonEncode(plan.voiceMerge?.local.data) &&
+        latest.settingsResolved(mergeSettings, choices));
+  }
+
+  void _recordRestoredCatalog(Map<String, dynamic> state, DirectoryRestorePlan plan) {
+    final catalog = state['catalog'] as Map;
+    for (final space in plan.document.spaces) {
+      catalog[space['origin']] = space;
+    }
+    directoryRequire(catalog.length <= 100);
+    (state['heads'] as Map)[plan.document.id] = {
+      'revision': plan.document.revision, 'digest': plan.digest,
+    };
+  }
+
+  SettingsSnapshot? _mergeRestoreSettings(DirectoryRestorePlan plan, bool enabled,
+      Map<String, SettingsChoice> choices) {
+    if (!enabled) return null;
+    return plan.settingsMerge.resolve(preferences.settingsActor, {
+      for (final entry in choices.entries)
+        if (entry.key != 'voiceProfile') entry.key: entry.value,
+    });
+  }
+
+  Map<String, dynamic> _restoreJournal(DirectoryRestorePlan plan,
+      DirectoryRestorePlan latest, SettingsSnapshot? merged,
+      Map<String, SettingsChoice> choices) {
+    final voice = latest.voiceMerge;
+    return {
+      'origins': plan.document.spaces.map((s) => s['origin']).toList(),
+      'settings': merged == null ? null : {
+        'v': 2, 'before': latest.settingsMerge.local.data, 'after': merged.data,
+      },
+      if (merged != null && voice != null)
+        'voice': {
+          'v': 1, 'before': voice.local.data,
+          'after': voice.resolve(preferences.settingsActor, choices['voiceProfile']).data,
+        },
+    };
+  }
 
   Future<void> resume() =>
       repository.exclusive(() async => _finish(await repository.read()));
