@@ -1,11 +1,11 @@
 # Пространство на Linux-сервере без домашнего компьютера
 
-Совместимая пара: приложение v0.7.28 и runtime v0.7.22, схема 40. Нужен Linux x64 с glibc,
+Совместимая пара: приложение v0.8.0 и сервер/runtime v0.8.0, схема 46. Нужен Linux x64 с glibc,
 обычный пользователь (не root), `curl`, `unzip`, `sha256sum` и доступный TCP 8443.
 Отдельные Go и PostgreSQL не нужны. Участники могут пользоваться Android.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.7.22/packaging/install.sh | SPACE_VERSION=v0.7.22 sh
+curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.8.0/packaging/install.sh | SPACE_VERSION=v0.8.0 sh
 ```
 
 Команда скачивает закреплённый runtime, проверяет SHA-256 и запускает сервер.
@@ -13,7 +13,7 @@ curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server
 другой внешний порт, передайте адрес явно:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.7.22/packaging/install.sh | SPACE_VERSION=v0.7.22 sh -s -- -address https://space.example.org:9443 -listen 0.0.0.0:9443
+curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.8.0/packaging/install.sh | SPACE_VERSION=v0.8.0 sh -s -- -address https://space.example.org:9443 -listen 0.0.0.0:9443
 ```
 
 1. Разрешите входящий TCP-порт в файрволе сервера и в панели провайдера.
@@ -53,13 +53,13 @@ Runtime хранится отдельно в `runtimes/<версия>`. `SPACE_H
 опубликованный установщик и runtime v0.7.22:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.7.22/packaging/install.sh | SPACE_VERSION=v0.7.22 sh -s -- --service
+curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.8.0/packaging/install.sh | SPACE_VERSION=v0.8.0 sh -s -- --service
 ```
 
 Адрес и порт можно передать после `--service`:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.7.22/packaging/install.sh | SPACE_VERSION=v0.7.22 sh -s -- --service -address https://space.example.org:9443 -listen 0.0.0.0:9443
+curl -fsSL https://raw.githubusercontent.com/space-protocol-project/space-server/v0.8.0/packaging/install.sh | SPACE_VERSION=v0.8.0 sh -s -- --service -address https://space.example.org:9443 -listen 0.0.0.0:9443
 ```
 
 Установщик включает linger для текущего пользователя — службы работают без
