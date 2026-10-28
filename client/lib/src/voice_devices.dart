@@ -8,6 +8,8 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'voice_device_preferences.dart';
 import 'voice_audio_settings.dart';
 import 'portable_voice_profile.dart';
+import 'portable_voice_store.dart';
+import 'portable_voice_merge.dart';
 import 'voice_platform.dart';
 import 'voice_audio_native.dart';
 
@@ -93,6 +95,7 @@ class VoiceDevices extends Cubit<VoiceDevicesState> {
   Future<void>? _refreshing;
   String _saveError = '';
   Future<void> Function(VoiceAudioSettings)? onAudioChanged;
+  String Function()? portableActor;
   Future<void> Function()? beforeDeviceChanged;
 
   void _publish({
@@ -205,17 +208,75 @@ class VoiceDevices extends Cubit<VoiceDevicesState> {
 
   /// Применяет обработку к выбранному устройству, сохраняя локальные параметры.
   Future<void> applyPortableProfile(PortableVoiceProfile profile) async {
+    await PortableVoiceStore().exclusive(() => _applyPortableProfile(profile));
+  }
+
+  Future<void> _applyPortableProfile(PortableVoiceProfile profile) async {
     final refreshing = _refreshing;
     if (refreshing != null) await refreshing;
     if (_choice == null && !isClosed) await refresh();
     if (isClosed || state.busy || _choice == null || !state.ready) {
       throw StateError('Аудиоустройство не готово к восстановлению');
     }
-    await updateAudio(profile.apply(_choice!.audio));
+    await _updateAudio(profile.apply(_choice!.audio));
     if (state.error.isNotEmpty) throw StateError(state.error);
   }
 
-  Future<void> updateAudio(VoiceAudioSettings settings) async {
+  Future<void> resumePortableVoice(Object pending, String actor) =>
+      PortableVoiceStore().resume(
+        pending: pending,
+        actor: actor,
+        currentProfile: () async {
+          if (_choice == null) await refresh();
+          if (isClosed || state.busy || _choice == null || !state.ready) {
+            throw StateError('Аудиоустройство не готово к восстановлению');
+          }
+          return PortableVoiceProfile.fromAudio(_choice!.audio);
+        },
+        apply: _applyPortableProfile,
+      );
+
+  Future<PortableVoiceSnapshot> exportPortableVoice(String actor) =>
+      PortableVoiceStore().exclusive(() async {
+        if (isClosed || state.busy) {
+          throw StateError('Аудиоустройство не готово к копированию');
+        }
+        final choice = _choice ?? await preferences.load();
+        if (isClosed || state.busy) {
+          throw StateError('Аудиоустройство не готово к копированию');
+        }
+        final store = PortableVoiceStore();
+        final profile = PortableVoiceProfile.fromAudio(choice.audio);
+        final previous = await store.read(profile);
+        return previous.observe(profile, actor);
+      });
+
+  Future<void> updateAudio(VoiceAudioSettings settings) =>
+      PortableVoiceStore().exclusive(() async {
+        try {
+          await _savePortableAudio(settings);
+        } catch (error) {
+          _publish(error: error.toString());
+        }
+      });
+
+  Future<void> _savePortableAudio(VoiceAudioSettings settings) async {
+    final actor = portableActor?.call();
+    if (_choice == null && !isClosed) await refresh();
+    if (isClosed || state.busy || _choice == null) return;
+    final store = PortableVoiceStore();
+    final previous = actor == null
+        ? null
+        : await store.read(PortableVoiceProfile.fromAudio(_choice!.audio));
+    await _updateAudio(settings);
+    if (actor != null && previous != null && state.error.isEmpty) {
+      await store.write(
+        previous.observe(PortableVoiceProfile.fromAudio(_choice!.audio), actor),
+      );
+    }
+  }
+
+  Future<void> _updateAudio(VoiceAudioSettings settings) async {
     final refreshing = _refreshing;
     if (refreshing != null) await refreshing;
     if (_choice == null && !isClosed) await refresh();

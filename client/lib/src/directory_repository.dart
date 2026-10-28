@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'core.dart';
 import 'directory_document.dart';
 import 'key_vault.dart';
+import 'portable_voice_merge.dart';
 import 'settings_snapshot.dart';
 
 class DirectoryRepository {
@@ -71,8 +72,16 @@ class DirectoryRepository {
 
   void _pending(Object? value, Map<String, dynamic> catalog) {
     if (value == null) return;
-    final data = directoryMap(value, 'origins,settings'),
+    final hasVoice =
+        value is Map<String, dynamic> && value.containsKey('voice');
+    final data = directoryMap(
+          value,
+          hasVoice ? 'origins,settings,voice' : 'origins,settings',
+        ),
         origins = data['origins'];
+    if (hasVoice && data['voice'] != null) {
+      checkedPortableVoicePending(data['voice']);
+    }
     directoryRequire(origins is List && origins.length <= 100);
     directoryRequire(
       (origins as List).every(

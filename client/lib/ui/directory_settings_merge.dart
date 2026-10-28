@@ -33,7 +33,7 @@ class DirectorySettingsMergePanel extends StatelessWidget {
       if (enabled) ...[
         Text(context.strings.directorySettingsHelp),
         const SizedBox(height: 12),
-        ...plan.settingsMerge.conflicts.map((key) => _conflict(context, key)),
+        ...plan.settingConflicts.map((key) => _conflict(context, key)),
       ],
     ],
   );
@@ -60,7 +60,13 @@ class DirectorySettingsMergePanel extends StatelessWidget {
                 enabled: !busy,
                 title: Text(context.strings.directorySettingsLocal),
                 subtitle: Text(
-                  _value(context, key, plan.settingsMerge.local.values[key]),
+                  _value(
+                    context,
+                    key,
+                    key == 'voiceProfile'
+                        ? plan.voiceMerge!.local.profile.data
+                        : plan.settingsMerge.local.values[key],
+                  ),
                 ),
               ),
               RadioListTile<SettingsChoice>(
@@ -68,7 +74,13 @@ class DirectorySettingsMergePanel extends StatelessWidget {
                 enabled: !busy,
                 title: Text(context.strings.directorySettingsIncoming),
                 subtitle: Text(
-                  _value(context, key, plan.settingsMerge.incoming.values[key]),
+                  _value(
+                    context,
+                    key,
+                    key == 'voiceProfile'
+                        ? plan.voiceMerge!.incoming!.profile.data
+                        : plan.settingsMerge.incoming.values[key],
+                  ),
                 ),
               ),
             ],
@@ -86,11 +98,13 @@ class DirectorySettingsMergePanel extends StatelessWidget {
     'palette' => context.strings.directorySettingsPalette,
     'uiScale' => context.strings.directorySettingsScale,
     'notificationMode' => context.strings.directorySettingsNotifications,
+    'voiceProfile' => context.strings.voiceSettingsTitle,
     _ => throw StateError('Неизвестный параметр'),
   };
 
   String _value(BuildContext context, String key, Object? value) =>
       switch ((key, value)) {
+        ('voiceProfile', Map profile) => _voiceValue(context, profile),
         ('notificationMode', 0) => context.strings.notificationsOff,
         ('notificationMode', 1) => context.strings.notificationsPrivate,
         ('notificationMode', 2) => context.strings.notificationsPreview,
@@ -101,6 +115,23 @@ class DirectorySettingsMergePanel extends StatelessWidget {
         ('sendShortcut', 'shiftEnter') => 'Shift+Enter',
         _ => _style(context, value),
       };
+  String _voiceValue(BuildContext context, Map profile) {
+    final strings = context.strings;
+    final mode = switch (profile['noiseMode']) {
+      'deepFilter' => 'DeepFilterNet3',
+      'webrtc' => strings.voiceNoiseWebRtc,
+      _ => strings.voiceNoiseOff,
+    };
+    String setting(Object? enabled) => enabled == true
+        ? strings.directorySettingsOn
+        : strings.directorySettingsOff;
+    return '${strings.voiceNoiseSuppression}: $mode\n'
+        '${strings.voiceEchoCancellation}: ${setting(profile['echoCancellation'])}\n'
+        '${strings.voiceAutoGain}: ${setting(profile['autoGainControl'])}\n'
+        '${strings.voiceHighPass}: ${setting(profile['highPassFilter'])}\n'
+        '${strings.voiceProfileCustom}: ${setting(profile['customProfile'])}';
+  }
+
   String _style(BuildContext context, Object? value) => switch (value) {
     'ocean' => context.strings.ocean,
     'iris' => context.strings.iris,

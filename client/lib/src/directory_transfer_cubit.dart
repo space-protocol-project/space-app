@@ -91,7 +91,7 @@ class DirectoryTransferCubit extends Cubit<DirectoryTransferState> {
     if (isClosed ||
         state.stage != DirectoryTransferStage.preview ||
         plan == null ||
-        !plan.settingsMerge.conflicts.contains(key)) {
+        !plan.settingConflicts.contains(key)) {
       return;
     }
     emit(

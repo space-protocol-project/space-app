@@ -178,6 +178,12 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
     initialController.vault,
     widget.preferences,
     () => workspaces.controllers,
+    readVoice: () =>
+        voice.devices.exportPortableVoice(widget.preferences.settingsActor),
+    resumeVoice: (pending) => voice.devices.resumePortableVoice(
+      pending,
+      widget.preferences.settingsActor,
+    ),
   );
   late final ChatController initialController =
       widget.controller ??
@@ -572,6 +578,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    voice.devices.portableActor = () => widget.preferences.settingsActor;
     widget.shutdown?.prepare = prepareExit;
     WidgetsBinding.instance.addObserver(this);
     mlsNotificationTimer = Timer.periodic(

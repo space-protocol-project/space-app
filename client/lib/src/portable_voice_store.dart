@@ -52,4 +52,21 @@ class PortableVoiceStore {
     await write(next);
     return next;
   });
+
+  /// Применение и обычные изменения должны использовать эту же очередь.
+  Future<void> resume({
+    required Object pending,
+    required String actor,
+    required Future<PortableVoiceProfile> Function() currentProfile,
+    required Future<void> Function(PortableVoiceProfile) apply,
+  }) => exclusive(() async {
+    final (:before, :after) = checkedPortableVoicePending(pending);
+    final actual = await currentProfile();
+    final saved = await read(actual);
+    final current = saved.observe(actual, actor);
+    if (!identical(current, saved)) await write(current);
+    final result = resumePortableVoice(before, after, current, actor);
+    if (result.profile != actual) await apply(result.profile);
+    if (!identical(result, current)) await write(result);
+  });
 }

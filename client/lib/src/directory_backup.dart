@@ -9,6 +9,7 @@ import 'directory_document.dart';
 import 'directory_follows.dart';
 import 'directory_repository.dart';
 import 'preferences.dart';
+import 'portable_voice_merge.dart';
 import 'settings_snapshot.dart';
 
 class DirectoryRestorePlan {
@@ -19,16 +20,22 @@ class DirectoryRestorePlan {
     this.conflicts,
     this.unknown,
     this.ancestors,
-    this.settingsMerge,
-  );
+    this.settingsMerge, {
+    this.voiceMerge,
+  });
   final DirectoryDocument document;
   final String digest, before;
   final List<String> conflicts;
   final bool unknown;
   final List<DirectoryDocument> ancestors;
   final SettingsMerge settingsMerge;
+  final PortableVoiceMerge? voiceMerge;
+  List<String> get settingConflicts => [
+    ...settingsMerge.conflicts,
+    if (voiceMerge?.conflict == true) 'voiceProfile',
+  ];
   bool settingsResolved(bool enabled, Map<String, SettingsChoice> choices) =>
-      !enabled || settingsMerge.resolved(choices);
+      !enabled || settingConflicts.every(choices.containsKey);
 }
 
 class DirectoryBackupService {
@@ -36,12 +43,16 @@ class DirectoryBackupService {
     this.repository,
     this.vault,
     this.preferences,
-    this.controllers,
-  );
+    this.controllers, {
+    this.resumeVoice,
+    this.readVoice,
+  });
   final DirectoryRepository repository;
   final IdentityVault vault;
   final AppPreferences preferences;
   final Map<String, ChatController> Function() controllers;
+  final Future<void> Function(Object pending)? resumeVoice;
+  final Future<PortableVoiceSnapshot> Function()? readVoice;
 
   Map<String, dynamic> settings() => preferences.settingsValues;
   Future<String> _fingerprint(Map<String, dynamic> state) async => url64(
@@ -121,6 +132,7 @@ class DirectoryBackupService {
 
   Future<DirectoryDocument> capture({List<String>? selectedOrigins}) async {
     final selectedSettings = await preferences.exportSettings();
+    final voice = await readVoice?.call();
     final state = await repository.read(),
         catalog = state['catalog'] as Map<String, dynamic>;
     directoryRequire(state['pending'] == null);
@@ -145,7 +157,7 @@ class DirectoryBackupService {
       spaces.add(await _space(origin, catalog));
     }
     return DirectoryDocument.parse({
-      'v': 2,
+      'v': voice == null ? 2 : 4,
       'kind': 'space.directory',
       'id': id,
       'revision': head == null ? 1 : (head['revision'] as int) + 1,
@@ -154,6 +166,7 @@ class DirectoryBackupService {
       'settings': selectedSettings.values,
       'settings_versions': selectedSettings.versions,
       'spaces': spaces,
+      if (voice != null) 'voice_settings': voice.data,
     });
   }
 
@@ -187,9 +200,13 @@ class DirectoryBackupService {
     if (state['pending'] != null) {
       conflicts.add('Сначала завершите прерванное восстановление');
     }
-    if (document.voiceSettings != null) {
+    if (document.voiceSettings != null &&
+        (readVoice == null || resumeVoice == null)) {
       conflicts.add('Восстановление настроек голоса ещё не поддерживается');
     }
+    final localVoice = document.voiceSettings == null
+        ? null
+        : await readVoice?.call();
     final head = (state['heads'] as Map)[document.id] as Map?;
     if (head != null &&
         !await _validAncestry(document, digest, head, ancestors)) {
@@ -218,6 +235,9 @@ class DirectoryBackupService {
         document.settingsSnapshot,
         unknown: !document.hasSettingsVersions,
       ),
+      voiceMerge: localVoice == null
+          ? null
+          : PortableVoiceMerge(localVoice, document.voiceSettings),
     );
   }
 
@@ -284,7 +304,10 @@ class DirectoryBackupService {
     directoryRequire(
       latest.conflicts.isEmpty &&
           latest.before == plan.before &&
-          latest.digest == plan.digest,
+          latest.digest == plan.digest &&
+          jsonEncode(latest.voiceMerge?.local.data) ==
+              jsonEncode(plan.voiceMerge?.local.data) &&
+          latest.settingsResolved(mergeSettings, settingsChoices),
     );
     final state = await repository.read(), catalog = state['catalog'] as Map;
     for (final space in plan.document.spaces) {
@@ -296,10 +319,10 @@ class DirectoryBackupService {
       'digest': plan.digest,
     };
     final merged = mergeSettings
-        ? latest.settingsMerge.resolve(
-            preferences.settingsActor,
-            settingsChoices,
-          )
+        ? latest.settingsMerge.resolve(preferences.settingsActor, {
+            for (final entry in settingsChoices.entries)
+              if (entry.key != 'voiceProfile') entry.key: entry.value,
+          })
         : null;
     state['pending'] = {
       'origins': plan.document.spaces.map((s) => s['origin']).toList(),
@@ -310,6 +333,17 @@ class DirectoryBackupService {
               'before': latest.settingsMerge.local.data,
               'after': merged.data,
             },
+      if (merged != null && latest.voiceMerge != null)
+        'voice': {
+          'v': 1,
+          'before': latest.voiceMerge!.local.data,
+          'after': latest.voiceMerge!
+              .resolve(
+                preferences.settingsActor,
+                settingsChoices['voiceProfile'],
+              )
+              .data,
+        },
     };
     if (merged == null) {
       await repository.write(state);
@@ -331,6 +365,12 @@ class DirectoryBackupService {
     final settings = pending['settings'];
     if (settings != null) {
       await _resumeSettings(settings);
+    }
+    final voice = pending['voice'];
+    if (voice != null) {
+      final resume = resumeVoice;
+      if (resume == null) throw StateError('Восстановление голоса недоступно');
+      await resume(voice);
     }
     for (final origin in (pending['origins'] as List).cast<String>().reversed) {
       if (!preferences.origins.contains(origin)) {

@@ -54,7 +54,7 @@ class RemoteBackupCubit extends Cubit<RemoteBackupState> {
     if (isClosed ||
         state.busy ||
         plan == null ||
-        !plan.settingsMerge.conflicts.contains(key)) {
+        !plan.settingConflicts.contains(key)) {
       return;
     }
     emit(

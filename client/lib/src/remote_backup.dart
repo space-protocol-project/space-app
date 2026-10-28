@@ -287,7 +287,7 @@ class RemoteBackupService {
     final captured = await directory.capture();
     final document = DirectoryDocument.parse({
       ...captured.data,
-      'v': 3,
+      'v': captured.voiceSettings == null ? 3 : 5,
       'ancestry': ancestry,
       'id': kit.id,
       'revision': head.revision.toInt() + 1,
