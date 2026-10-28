@@ -1,0 +1,72 @@
+name: Полное восстановление на чистой установке
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['client/test/probes/clean_install*.dart', 'tools/check_clean_install.ps1', '.github/workflows/clean-install.yml']
+permissions:
+  contents: read
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: Совместимая версия сервера
+        shell: pwsh
+        run: |
+          $ref = (Get-Content .github/space-server.ref -Raw).Trim()
+          "SPACE_SERVER_REF=$ref" >> $env:GITHUB_ENV
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: ${{ env.SPACE_SERVER_REF }}
+          path: server-source
+      - uses: actions/setup-go@v5
+        with: {go-version-file: server-source/go.mod, cache-dependency-path: server-source/go.sum}
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - name: Подготовка, анализ и проверки переноса
+        working-directory: client
+        shell: pwsh
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal
+          if ($LASTEXITCODE) { throw 'Rust не установлен' }
+          flutter pub get
+          if ($LASTEXITCODE) { throw 'Зависимости не получены' }
+          dart format test/probes/clean_install*.dart
+          if ($LASTEXITCODE) { throw 'Форматирование не прошло' }
+          flutter gen-l10n
+          if ($LASTEXITCODE) { throw 'Локализация не собрана' }
+          flutter analyze
+          if ($LASTEXITCODE) { throw 'Анализ не прошёл' }
+          flutter test test/migration_password_dialog_test.dart test/migration_archive_test.dart test/device_migration_test.dart test/device_migration_files_test.dart
+          if ($LASTEXITCODE) { throw 'Проверки переноса не прошли' }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: clean-install-source
+          path: |
+            client/test/probes/clean_install*.dart
+            client/lib/l10n/app_localizations*.dart
+      - name: Нативный стенд и сервер
+        shell: pwsh
+        run: |
+          go build -C server-source -o "$env:RUNNER_TEMP/space-clean-server.exe" ./cmd/space-server
+          if ($LASTEXITCODE) { throw 'Сервер не собран' }
+          "CLEAN_INSTALL_SERVER=$env:RUNNER_TEMP/space-clean-server.exe" >> $env:GITHUB_ENV
+          Push-Location client
+          flutter build windows --debug --target test/probes/clean_install_probe.dart
+          if ($LASTEXITCODE) { throw 'Стенд не собран' }
+          Pop-Location
+      - name: Экспорт, удаление исходного профиля, восстановление и холодный запуск
+        shell: pwsh
+        run: ./tools/check_clean_install.ps1 -OutputDirectory "$env:RUNNER_TEMP/clean-install"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: clean-install-report
+          path: ${{ runner.temp }}/clean-install/report.json
+          if-no-files-found: warn
