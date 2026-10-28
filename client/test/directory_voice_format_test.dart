@@ -52,6 +52,24 @@ void main() {
     expect(() => DirectoryDocument.parse(invalid), throwsFormatException);
   });
 
+  test('Формат серверной копии сохраняет и голос, и защищённую цепочку', () {
+    final voice = PortableVoiceSnapshot(
+      PortableVoiceProfile.fromAudio(const VoiceAudioSettings()),
+      {},
+    );
+    final data = {
+      ...directoryDocument().data,
+      'v': 5,
+      'voice_settings': voice.data,
+      'ancestry': {'first_revision': 1, 'digests': <String>[]},
+    };
+    final document = DirectoryDocument.parse(data);
+    final restored = decodeDirectoryDocument(document.encode());
+    expect(restored.voiceSettings!.profile, voice.profile);
+    expect(restored.ancestry!.digests, isEmpty);
+    expect(restored.encode(), document.encode());
+  });
+
   test('Неподключённое восстановление профиля не применяется молча', () async {
     final preferences = AppPreferences();
     addTearDown(preferences.close);
