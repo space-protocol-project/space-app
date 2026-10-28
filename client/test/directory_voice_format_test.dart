@@ -10,8 +10,17 @@ import 'package:space_client/src/settings_snapshot.dart';
 import 'package:space_client/src/portable_voice_merge.dart';
 import 'package:space_client/src/portable_voice_profile.dart';
 import 'package:space_client/src/voice_audio_settings.dart';
+import 'package:space_client/src/voice_devices.dart';
+import 'package:space_client/src/voice_device_preferences.dart';
 
 import 'fixtures/directory.dart';
+
+class _VoiceBackend implements VoiceDeviceBackend {
+  @override
+  Future<List<VoiceDevice>> devices() async => [];
+  @override
+  Future<void> select(VoiceDevice device) async {}
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -146,4 +155,44 @@ void main() {
       expect(local.profile, studio);
     },
   );
+  test('Голосовой журнал завершается после сбоя через контроллер', () async {
+    await SavedVoiceDevicePreferences().save(
+      const VoiceDeviceChoice(audio: VoiceAudioSettings(pushToTalk: true)),
+    );
+    final preferences = AppPreferences();
+    final devices = VoiceDevices(backend: _VoiceBackend())
+      ..portableActor = () => preferences.settingsActor;
+    addTearDown(preferences.close);
+    addTearDown(devices.close);
+    final repository = DirectoryRepository(DirectoryStorage());
+    var fail = true;
+    final service = DirectoryBackupService(
+      repository, DirectoryVault(), preferences, () => {},
+      readVoice: () => devices.exportPortableVoice(preferences.settingsActor),
+      resumeVoice: (pending) async {
+        await devices.resumePortableVoice(pending, preferences.settingsActor);
+        if (fail) throw StateError('Обрыв после применения');
+      },
+    );
+    final captured = await service.capture();
+    final incoming = DirectoryDocument.parse({
+      ...captured.data,
+      'voice_settings': PortableVoiceSnapshot(
+        PortableVoiceProfile.fromAudio(
+          const VoiceAudioSettings().withProfile(VoiceInputProfile.studio),
+        ),
+        {},
+      ).data,
+    });
+    final plan = await service.preview(incoming);
+    await expectLater(service.apply(plan, mergeSettings: true,
+      settingsChoices: {'voiceProfile': SettingsChoice.incoming}), throwsStateError);
+    expect((await repository.read())['pending'], isNotNull);
+    fail = false;
+    await service.resume();
+    expect((await repository.read())['pending'], isNull);
+    final saved = await SavedVoiceDevicePreferences().load();
+    expect(saved.audio.noiseMode, VoiceNoiseSuppression.disabled);
+    expect(saved.audio.pushToTalk, isTrue);
+  });
 }
