@@ -187,6 +187,9 @@ class DirectoryBackupService {
     if (state['pending'] != null) {
       conflicts.add('Сначала завершите прерванное восстановление');
     }
+    if (document.voiceSettings != null) {
+      conflicts.add('Восстановление настроек голоса ещё не поддерживается');
+    }
     final head = (state['heads'] as Map)[document.id] as Map?;
     if (head != null &&
         !await _validAncestry(document, digest, head, ancestors)) {

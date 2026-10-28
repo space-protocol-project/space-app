@@ -5,6 +5,7 @@ import 'package:cryptography/cryptography.dart';
 import 'core.dart' show url64, parseConnectionInput;
 import 'directory_ancestry.dart';
 import 'directory_validation.dart';
+import 'portable_voice_merge.dart';
 import 'settings_snapshot.dart';
 export 'directory_validation.dart';
 export 'settings_snapshot.dart' show checkedDirectorySettings;
@@ -70,8 +71,11 @@ class DirectoryDocument {
   String get parent => data['parent'] as String;
   Map<String, dynamic> get settings => data['settings'] as Map<String, dynamic>;
   bool get hasSettingsVersions => (data['v'] as int) >= 2;
-  DirectoryAncestry? get ancestry => data['v'] == 3
+  DirectoryAncestry? get ancestry => data['v'] == 3 || data['v'] == 5
       ? DirectoryAncestry.parse(data['ancestry'], revision, parent)
+      : null;
+  PortableVoiceSnapshot? get voiceSettings => (data['v'] as int) >= 4
+      ? PortableVoiceSnapshot.parse(data['voice_settings'])
       : null;
   SettingsSnapshot get settingsSnapshot => hasSettingsVersions
       ? SettingsSnapshot.create(settings, data['settings_versions'])
@@ -86,13 +90,15 @@ class DirectoryDocument {
     final version = directoryInt(
       (value as Map<String, dynamic>)['v'],
       min: 1,
-      max: 3,
+      max: 5,
     );
     final fields = switch (version) {
       1 => 'created,id,kind,parent,revision,settings,spaces,v',
       2 =>
         'created,id,kind,parent,revision,settings,settings_versions,spaces,v',
-      _ => 'ancestry,created,id,kind,parent,revision,settings,settings_versions,spaces,v',
+      3 => 'ancestry,created,id,kind,parent,revision,settings,settings_versions,spaces,v',
+      4 => 'created,id,kind,parent,revision,settings,settings_versions,spaces,v,voice_settings',
+      _ => 'ancestry,created,id,kind,parent,revision,settings,settings_versions,spaces,v,voice_settings',
     };
     final data = directoryMap(value, fields);
     directoryRequire(data['kind'] == 'space.directory');
@@ -101,12 +107,15 @@ class DirectoryDocument {
     final parent = directoryText(data['parent'], max: 43);
     if (parent.isNotEmpty) directoryBytes(parent, 32);
     directoryRequire((data['revision'] == 1) == parent.isEmpty);
-    final ancestry = version == 3
+    final ancestry = version == 3 || version == 5
         ? DirectoryAncestry.parse(
             data['ancestry'],
             data['revision'] as int,
             parent,
           )
+        : null;
+    final voice = version >= 4
+        ? PortableVoiceSnapshot.parse(data['voice_settings'])
         : null;
     directoryInt(data['created'], min: 1);
     final settings = checkedDirectorySettings(data['settings']);
@@ -125,6 +134,11 @@ class DirectoryDocument {
     final result = DirectoryDocument._(
       Map.unmodifiable({
         ...data,
+        if (voice != null)
+          'voice_settings': Map<String, dynamic>.unmodifiable({
+            'profile': Map<String, Object>.unmodifiable(voice.profile.data),
+            'clock': voice.clock,
+          }),
         if (ancestry != null)
           'ancestry': Map<String, dynamic>.unmodifiable({
             'first_revision': ancestry.firstRevision,
