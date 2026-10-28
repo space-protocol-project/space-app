@@ -24,6 +24,7 @@ void main() {
   HttpOverrides.global = null;
   final runtime = Platform.environment['SPACE_HOME_RUNTIME'];
   final executable = Platform.environment['SPACE_RESTORE_EXECUTABLE'];
+  final bindHost = Platform.isMacOS ? '127.0.0.1' : '127.0.0.3';
   test(
     'Перенос всего устройства: настоящие PostgreSQL, сервер, MLS и файл',
     () async {
@@ -42,7 +43,7 @@ void main() {
           runtime!,
           original,
           '203.0.113.10',
-          bindHost: '127.0.0.3',
+          bindHost: bindHost,
         );
         final sourceStorage = MemoryMlsStorage();
         final sourceVault = KeyIdentityVault(sourceStorage);
@@ -132,7 +133,7 @@ void main() {
           runtime,
           restored,
           '203.0.113.10',
-          bindHost: '127.0.0.3',
+          bindHost: bindHost,
         );
         session = await SpaceSession.connect(running.discovery, targetVault);
         expect(session.record.grantId, record.grantId);
