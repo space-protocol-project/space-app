@@ -22,12 +22,19 @@ Future<void> verifyCrashLinuxStorage(CrashHooks hooks) async {
     'Нужен системный Secret Service',
   );
   final result = await Process.run('secret-tool', [
-    'lookup', 'account', 'org.spaceprotocol.space_client.secureStorage',
+    'lookup',
+    'account',
+    'org.spaceprotocol.space_client.secureStorage',
   ]);
   // Содержимое секрета не выводится и не попадает в контрольные файлы.
-  requireCrash(result.exitCode == 0, 'Независимое чтение Secret Service не удалось');
+  requireCrash(
+    result.exitCode == 0,
+    'Независимое чтение Secret Service не удалось',
+  );
   final stored = readCrashSecret(result.stdout);
-  final journal = await const PlatformKeyStorage().read(key: DirectoryRepository.key);
+  final journal = await const PlatformKeyStorage().read(
+    key: DirectoryRepository.key,
+  );
   requireCrash(
     journal != null && stored[DirectoryRepository.key] == journal,
     'Каталог плагина отличается от записи Secret Service',
@@ -40,7 +47,8 @@ Future<void> verifyCrashLinuxStorage(CrashHooks hooks) async {
   final bytes = await keyring.readAsBytes();
   requireCrash(
     bytes.length > 16 &&
-        ascii.decode(bytes.take(12).toList(), allowInvalid: true) == 'GnomeKeyring' &&
+        ascii.decode(bytes.take(12).toList(), allowInvalid: true) ==
+            'GnomeKeyring' &&
         !utf8.decode(bytes, allowMalformed: true).contains(journal!),
     'Не подтверждён зашифрованный файл GNOME Keyring',
   );
