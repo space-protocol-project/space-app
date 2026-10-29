@@ -11,11 +11,19 @@ jobs:
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-protocol
+          ref: d324ce5
+          path: .local/p1-protocol
+      - name: Проверка общего примера UI
+        run: cmp client/test/fixtures/extensions_p1/ui.json .local/p1-protocol/docs/extensions/p1/ui.json
       - uses: subosito/flutter-action@v2
         with: {flutter-version: '3.47.8', channel: stable, cache: true}
       - run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev
       - run: rustup toolchain install 1.99.1 --profile minimal
       - name: Анализ и тесты прототипа
+        shell: bash
         working-directory: client
         run: |
           flutter pub get

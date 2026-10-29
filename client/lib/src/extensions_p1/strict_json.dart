@@ -41,7 +41,9 @@ class _Keys {
     need('"');
     while (offset < text.length) {
       final character = text[offset++];
-      if (character == '"') return jsonDecode(text.substring(start, offset)) as String;
+      if (character == '"') {
+        return jsonDecode(text.substring(start, offset)) as String;
+      }
       if (character == '\\') offset++;
     }
     throw const FormatException('Строка JSON');
@@ -52,10 +54,17 @@ class _Keys {
     space();
     if (offset >= text.length) throw const FormatException('Пустое значение');
     switch (text[offset]) {
-      case '{': object(depth); return;
-      case '[': array(depth); return;
-      case '"': string(); return;
-      default: scalar();
+      case '{':
+        object(depth);
+        return;
+      case '[':
+        array(depth);
+        return;
+      case '"':
+        string();
+        return;
+      default:
+        scalar();
     }
   }
 
@@ -66,7 +75,9 @@ class _Keys {
     }
     if (start == offset) throw const FormatException('Значение JSON');
     final value = jsonDecode(text.substring(start, offset));
-    if (value is num && !value.isFinite) throw const FormatException('Бесконечное число');
+    if (value is num && !value.isFinite) {
+      throw const FormatException('Бесконечное число');
+    }
   }
 
   void object(int depth) {
@@ -84,7 +95,9 @@ class _Keys {
   void array(int depth) {
     need('[');
     if (take(']')) return;
-    do { value(depth + 1); } while (take(','));
+    do {
+      value(depth + 1);
+    } while (take(','));
     need(']');
   }
 }
