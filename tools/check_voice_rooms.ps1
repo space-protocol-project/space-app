@@ -67,6 +67,16 @@ try {
   go build -o $serverExe ./cmd/space-server
   if($LASTEXITCODE -ne 0){throw 'Server build failed'}
  } finally {Pop-Location}
+ # Сборка может идти дольше срока жизни TURN; сначала готовим клиент.
+ # После очистки переносимого Rust используем обычную установленную цепочку.
+ if(Test-Path -LiteralPath (Join-Path $appRoot '.local/mls/space-mls-tools/cargo/bin/rustup.exe')){
+  . (Join-Path $PSScriptRoot 'mls_environment.ps1')
+ }
+ Push-Location (Join-Path $appRoot 'client')
+ try {
+  flutter build windows --release --no-pub --target tool/voice_desktop_probe.dart > (Join-Path $work 'flutter-build.log') 2>&1
+  if($LASTEXITCODE -ne 0){throw 'Voice probe build failed'}
+ } finally {Pop-Location}
  & $serverExe -first-owner > (Join-Path $work 'owner-setup.log') 2>&1
  if($LASTEXITCODE -ne 0){throw 'Owner setup failed'}
  if($Relay -ne 'direct'){
@@ -110,15 +120,6 @@ try {
   if($ready.Elapsed.TotalSeconds -gt 30){throw 'Server timeout'}
   Start-Sleep -Milliseconds 100
  }
- # После очистки переносимого Rust используем обычную установленную цепочку.
- if(Test-Path -LiteralPath (Join-Path $appRoot '.local/mls/space-mls-tools/cargo/bin/rustup.exe')){
-  . (Join-Path $PSScriptRoot 'mls_environment.ps1')
- }
- Push-Location (Join-Path $appRoot 'client')
- try {
-  flutter build windows --release --no-pub --target tool/voice_desktop_probe.dart > (Join-Path $work 'flutter-build.log') 2>&1
-  if($LASTEXITCODE -ne 0){throw 'Voice probe build failed'}
- } finally {Pop-Location}
  $bundle=Join-Path $appRoot 'client/build/windows/x64/runner/Release'
  $env:SPACE_VOICE_DESKTOP_CHECK='1'
  foreach($role in @('A','B')){
