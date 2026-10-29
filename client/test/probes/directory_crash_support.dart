@@ -90,7 +90,10 @@ class CrashStorage implements SecureKeyStorage {
         'stage': 'encrypted-journal',
       });
     }
-    await const PlatformKeyStorage().write(key: crashStorageKey(key), value: value);
+    await const PlatformKeyStorage().write(
+      key: crashStorageKey(key),
+      value: value,
+    );
     if (armed && journal) {
       await hooks.hit(pending ? 'journal-written' : 'journal-cleared');
     }
