@@ -1,0 +1,33 @@
+name: P1 declarative UI prototype
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  ui:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Анализ и тесты прототипа
+        working-directory: client
+        run: |
+          flutter pub get
+          dart format lib/src/extensions_p1 lib/ui/extensions_p1.dart test/extensions_p1_test.dart
+          flutter analyze
+          flutter test test/extensions_p1_test.dart --reporter expanded | tee p1-ui.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-ui
+          path: |
+            client/p1-ui.txt
+            client/lib/src/extensions_p1
+            client/lib/ui/extensions_p1.dart
+            client/test/extensions_p1_test.dart

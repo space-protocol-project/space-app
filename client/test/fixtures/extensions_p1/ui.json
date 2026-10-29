@@ -1,0 +1,35 @@
+{
+  "ui_api": "space.ui.p1",
+  "strings": {
+    "en": {
+      "title": "Polls",
+      "question": "Choose a time",
+      "vote": "Vote"
+    },
+    "ru": {
+      "title": "Опросы",
+      "question": "Выберите время",
+      "vote": "Проголосовать"
+    }
+  },
+  "body": [
+    {
+      "id": "poll",
+      "component": "section.v1",
+      "label_key": "title",
+      "children": [
+        {
+          "id": "question",
+          "component": "text.v1",
+          "label_key": "question"
+        },
+        {
+          "id": "vote",
+          "component": "button.v1",
+          "label_key": "vote",
+          "command": "vote"
+        }
+      ]
+    }
+  ]
+}
