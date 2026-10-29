@@ -18,8 +18,12 @@ final failures = <String>[];
 
 bool containsText(Element element, String text) {
   final widget = element.widget;
-  if (widget is Text && (widget.data ?? '').contains(text)) return true;
-  if (widget is RichText && widget.text.toPlainText().contains(text)) return true;
+  if (widget is Text && (widget.data ?? '').contains(text)) {
+    return true;
+  }
+  if (widget is RichText && widget.text.toPlainText().contains(text)) {
+    return true;
+  }
   var found = false;
   element.visitChildren((child) {
     if (!found) found = containsText(child, text);
@@ -68,8 +72,9 @@ Future<void> measure(Directory work, String origin) async {
       await session.adminRequest('/api/v1/channels', method: 'POST',
           body: {'channelId': id, 'title': id, 'viewType': view});
     }
-    await File('${work.path}/ready.json').writeAsString(
-        jsonEncode({'principal': session.principalId}), flush: true);
+    final ready = File('${work.path}/ready.tmp');
+    await ready.writeAsString(jsonEncode({'principal': session.principalId}), flush: true);
+    await ready.rename('${work.path}/ready.json');
     await waitFor(() => File('${work.path}/seeded').existsSync());
     await session.refreshChannels();
     chat = ChatController(vault, openSession: (_, _) async => session)
@@ -98,7 +103,9 @@ Future<void> main() async {
   if (Platform.environment['SPACE_P0_MEMORY_CHECK'] != '1') exit(2);
   final origin = Platform.environment['SPACE_P0_ORIGIN'] ?? '';
   final uri = Uri.tryParse(origin);
-  if (uri == null || uri.scheme != 'http' || !InternetAddress(uri.host).isLoopback) exit(2);
+  if (uri == null || uri.scheme != 'http' || !InternetAddress(uri.host).isLoopback) {
+    exit(2);
+  }
   final work = Directory(Platform.environment['SPACE_P0_WORK']!);
   WidgetsFlutterBinding.ensureInitialized();
   FlutterError.onError = (details) {
