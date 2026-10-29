@@ -41,7 +41,15 @@ jobs:
         with:
           name: p0-voice-tcp-recovery
           retention-days: 30
+          include-hidden-files: true
+          if-no-files-found: error
           path: |
             space-app/.local/voice-check-*/A.json
             space-app/.local/voice-check-*/B.json
             space-app/.local/voice-check-*/*.log
+            space-app/.local/voice-check-*/A-failure
+            space-app/.local/voice-check-*/B-failure
+            space-app/.local/voice-check-*/*-offer-ms
+            space-app/.local/voice-check-*/*-answer-ms
+            space-app/.local/voice-check-*/*-candidate-types
+            space-app/.local/voice-check-*/*-inbound-stats
