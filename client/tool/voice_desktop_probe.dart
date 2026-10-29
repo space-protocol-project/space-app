@@ -396,6 +396,9 @@ Future<void> borisControls(Directory work, VoiceController controller) async {
 
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isLinux && Platform.environment['SPACE_VOICE_DESKTOP_CHECK'] == '1') {
+    args = [for (final key in ['SPACE_VOICE_ORIGIN', 'SPACE_VOICE_WORK', 'SPACE_VOICE_ROLE']) Platform.environment[key]!];
+  }
   if (Platform.isAndroid &&
       const bool.fromEnvironment('SPACE_VOICE_ANDROID_CHECK')) {
     args = await androidProbeArguments();
@@ -403,7 +406,7 @@ Future<void> main(List<String> args) async {
   if (!(Platform.isAndroid &&
           const bool.fromEnvironment('SPACE_VOICE_ANDROID_CHECK')) &&
       (Platform.environment['SPACE_VOICE_DESKTOP_CHECK'] != '1' ||
-          !Platform.isWindows)) {
+          !(Platform.isWindows || Platform.isLinux))) {
     exit(2);
   }
   if (args.length != 3) {
