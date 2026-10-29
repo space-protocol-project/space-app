@@ -203,7 +203,7 @@ Future<void> sampleAudio(Directory work, String role, String phase, ProbeMedia m
   await flag(work, '$role-$phase-metrics.json', jsonEncode(samples));
   if (checkPcm) {
     double energy(Map<String, Object> sample) =>
-        (sample['reports'] as List).cast<Map<String, dynamic>>()
+        (sample['reports'] as List).cast<Map<dynamic, dynamic>>()
             .where((report) => report['type'] == 'inbound-rtp')
             .fold(0.0, (sum, report) => sum + ((report['totalAudioEnergy'] as num?)?.toDouble() ?? 0));
     if (energy(samples.last) <= energy(samples.first)) {
