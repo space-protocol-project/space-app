@@ -5,11 +5,11 @@ runtime v0.7.23. Версия `0.8.0+60` опубликована с runtime v0.
 [релизный CI](https://github.com/space-protocol-project/space-app/actions/runs/40769298048)
 прошёл для Windows, Linux, macOS и Android. [Сервер/runtime v0.8.0](https://github.com/space-protocol-project/space-server/releases/tag/v0.8.0)
 также опубликован: [релизный CI](https://github.com/space-protocol-project/space-server/actions/runs/40787489975) успешен на трёх ОС. Схема остаётся
-46, новых форматов или миграций данных этот серверный выпуск не добавляет. Опубликованное приложение сохраняет закрепление v0.7.25.
+46, новых форматов или миграций данных этот серверный выпуск не добавляет. [Клиент v0.8.1+61](https://github.com/space-protocol-project/space-app/releases/tag/v0.8.1) теперь закрепляет runtime v0.8.0.
 Срез режимов сопряжения расширяет экспериментальный API и схему до 42;
 непрозрачный relay каталога добавляет схему 43, копии на сервере пространства — 45,
 подтверждённое хранение версий — 46.
-Голосовой профиль 3 и опубликованный каталог runtime не меняются.
+Голосовой профиль 3 сохранён. [CI клиента v0.8.1](https://github.com/space-protocol-project/space-app/actions/runs/40791498361) и [публичная проверка](https://github.com/space-protocol-project/space-app/actions/runs/40870483924) успешны: четыре установщика, подпись Android и каталог runtime v0.8.0. Обновление действующего сервера остаётся явным действием владельца.
 
 [Проверка публичных файлов v0.8.0](https://github.com/space-protocol-project/space-app/actions/runs/40790949328)
 подтвердила размеры, SHA-256, целостность архивов и схему 46 для трёх платформ.
