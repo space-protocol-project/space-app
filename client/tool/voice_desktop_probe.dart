@@ -17,12 +17,38 @@ import 'package:space_client/src/voice_devices.dart';
 import 'package:space_client/src/voice_shortcut.dart';
 import 'package:space_client/src/voice_platform.dart';
 import 'package:space_client/src/voice_transmission.dart';
+import 'package:space_client/src/generated/space/v1/voice.pb.dart' as pb;
 import 'package:space_client/ui/voice_rooms.dart';
 import 'package:space_client/l10n/app_localizations.dart';
 
 import 'home_vault.dart';
 part 'voice_desktop_checks.dart';
 part 'voice_android_checks.dart';
+
+class ProbeSignaling extends SessionVoiceSignaling {
+  const ProbeSignaling(super.session);
+
+  Future<T> trace<T>(String operation, Future<T> Function() call) async {
+    final clock = Stopwatch()..start();
+    debugPrint('VOICE_SIGNAL_BEGIN $operation');
+    try {
+      final result = await call();
+      debugPrint('VOICE_SIGNAL_END $operation ${clock.elapsedMilliseconds}');
+      return result;
+    } catch (error) {
+      debugPrint('VOICE_SIGNAL_ERROR $operation $error');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<pb.JoinVoiceRoomResponse> join(String room, String offer) =>
+      trace('join', () => super.join(room, offer));
+
+  @override
+  Future<pb.VoiceRoomState> update(String room, String id, bool muted, bool deafened) =>
+      trace('update', () => super.update(room, id, muted, deafened));
+}
 
 class ProbePreferences implements VoiceDevicePreferences {
   VoiceDeviceChoice value = VoiceDeviceChoice(audio: voiceDefaultAudio);
@@ -205,7 +231,7 @@ Future<void> scenario(Directory work, String origin, String role) async {
     }
     await flag(work, '$role-progress', 'join');
     await controller
-        .join(SessionVoiceSignaling(session), room, 'Проверка голоса')
+        .join(ProbeSignaling(session), room, 'Проверка голоса')
         .timeout(const Duration(seconds: 20));
     await waitUntil(
       () =>

@@ -24,13 +24,13 @@ jobs:
       - run: rustup toolchain install 1.99.1 --profile minimal
       - run: flutter pub get
         working-directory: space-app/client
-      - uses: actions/cache@v4
+      - uses: actions/cache/restore@v4
+        id: voice-cache
         with:
           path: |
             space-app/client/build
             space-app/client/.dart_tool/hooks_runner
           key: p0-voice-windows-v1-${{ hashFiles('space-app/client/pubspec.lock', 'space-app/native/**/Cargo.lock', 'space-app/client/windows/**') }}
-          save-always: true
       - name: Анализ и регрессия голоса
         working-directory: space-app/client
         run: |
@@ -49,9 +49,18 @@ jobs:
           if ((Get-Item $archive).Length -ne $entry.bytes -or (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne $entry.sha256) { throw 'Архив не прошёл проверку' }
           Expand-Archive -LiteralPath $archive -DestinationPath (Join-Path $env:RUNNER_TEMP 'voice-runtime')
       - name: Два Windows-клиента, TURN TCP и перезапуск сервера
+        env:
+          PION_LOG_DEBUG: ice,turn
         shell: pwsh
         working-directory: space-app
         run: ./tools/check_voice_rooms.ps1 -Runtime "$env:RUNNER_TEMP/voice-runtime" -Relay tcp -Recovery
+      - uses: actions/cache/save@v4
+        if: always() && steps.voice-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            space-app/client/build
+            space-app/client/.dart_tool/hooks_runner
+          key: ${{ steps.voice-cache.outputs.cache-primary-key }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -69,3 +78,4 @@ jobs:
             space-app/.local/voice-check-*/*-answer-ms
             space-app/.local/voice-check-*/*-candidate-types
             space-app/.local/voice-check-*/*-inbound-stats
+            space-app/.local/voice-check-*/*-media
