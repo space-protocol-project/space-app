@@ -22,7 +22,7 @@ void probeKey(
 Future<void> expectTransmission(ProbeMedia media, bool value) async {
   await Future<void>.delayed(const Duration(milliseconds: 100));
   if (media.transmitting != value) {
-    throw StateError('Неверное состояние нативной передачи: ожидается $value');
+    throw StateError('РќРµРІРµСЂРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РЅР°С‚РёРІРЅРѕР№ РїРµСЂРµРґР°С‡Рё: РѕР¶РёРґР°РµС‚СЃСЏ $value');
   }
 }
 
@@ -34,11 +34,11 @@ Future<void> checkPushToTalk(
     AppLifecycleState.resumed,
   );
   await controller.devices.updateAudio(
-    voiceDefaultAudio.copyWith(pushToTalk: true),
+    probeAudio.copyWith(pushToTalk: true),
   );
   if (!controller.devices.state.audio.pushToTalk || controller.state.muted) {
     throw StateError(
-      'Режим рации не применён: ${controller.devices.state.error}; ${controller.state.error}',
+      'Р РµР¶РёРј СЂР°С†РёРё РЅРµ РїСЂРёРјРµРЅС‘РЅ: ${controller.devices.state.error}; ${controller.state.error}',
     );
   }
   await expectTransmission(media, false);
@@ -61,7 +61,7 @@ Future<void> checkPushToTalk(
   await expectTransmission(media, false);
   probeKey(LogicalKeyboardKey.f8, PhysicalKeyboardKey.f8, false);
   await controller.devices.updateAudio(
-    voiceDefaultAudio.copyWith(
+    probeAudio.copyWith(
       pushToTalk: true,
       shortcut: VoiceShortcut(key: LogicalKeyboardKey.f9, control: true),
     ),
@@ -83,7 +83,7 @@ Future<void> checkPushToTalk(
   );
   await expectTransmission(media, false);
   probeKey(LogicalKeyboardKey.f9, PhysicalKeyboardKey.f9, false);
-  await controller.devices.updateAudio(voiceDefaultAudio);
+  await controller.devices.updateAudio(probeAudio);
 }
 
 Future<void> checkReconnect(
@@ -101,7 +101,7 @@ Future<void> checkReconnect(
   });
   try {
     await controller.devices.updateAudio(
-      voiceDefaultAudio.copyWith(pushToTalk: true),
+      probeAudio.copyWith(pushToTalk: true),
     );
     WidgetsBinding.instance.handleAppLifecycleStateChanged(
       AppLifecycleState.resumed,
@@ -115,7 +115,7 @@ Future<void> checkReconnect(
     if (!controller.state.muted ||
         media.length < 2 ||
         media.last.transmitting) {
-      throw StateError('Переподключение не остановило микрофон');
+      throw StateError('РџРµСЂРµРїРѕРґРєР»СЋС‡РµРЅРёРµ РЅРµ РѕСЃС‚Р°РЅРѕРІРёР»Рѕ РјРёРєСЂРѕС„РѕРЅ');
     }
     await flag(work, '$role-recovered', 'ready');
     if (Platform.isAndroid) await androidProbeBarrier('foreground-restored');
@@ -123,7 +123,7 @@ Future<void> checkReconnect(
     if (role == 'B') await barrier(work, 'A-resumed-microphone');
     await controller.toggleMicrophone();
     if (controller.state.muted) {
-      throw StateError('Микрофон не включился вручную после восстановления');
+      throw StateError('РњРёРєСЂРѕС„РѕРЅ РЅРµ РІРєР»СЋС‡РёР»СЃСЏ РІСЂСѓС‡РЅСѓСЋ РїРѕСЃР»Рµ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ');
     }
     await expectTransmission(media.last, false);
     probeKey(LogicalKeyboardKey.f8, PhysicalKeyboardKey.f8, false);
@@ -134,7 +134,7 @@ Future<void> checkReconnect(
     await expectTransmission(media.last, true);
     probeKey(LogicalKeyboardKey.f8, PhysicalKeyboardKey.f8, false);
     await expectTransmission(media.last, false);
-    await controller.devices.updateAudio(voiceDefaultAudio);
+    await controller.devices.updateAudio(probeAudio);
     await flag(work, '$role-resumed-microphone', 'ready');
     await barrier(
       work,

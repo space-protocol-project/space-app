@@ -25,6 +25,13 @@ import 'home_vault.dart';
 part 'voice_desktop_checks.dart';
 part 'voice_android_checks.dart';
 
+bool get checkPcm => Platform.environment['SPACE_VOICE_PCM_CHECK'] == '1';
+VoiceAudioSettings get probeAudio => checkPcm
+    ? voiceDefaultAudio.copyWith(noiseMode: VoiceNoiseSuppression.disabled,
+        echoCancellation: false, autoGainControl: false, highPassFilter: false,
+        automaticSensitivity: false, thresholdDb: -60)
+    : voiceDefaultAudio;
+
 class ProbeSignaling extends SessionVoiceSignaling {
   const ProbeSignaling(super.session);
 
@@ -51,7 +58,7 @@ class ProbeSignaling extends SessionVoiceSignaling {
 }
 
 class ProbePreferences implements VoiceDevicePreferences {
-  VoiceDeviceChoice value = VoiceDeviceChoice(audio: voiceDefaultAudio);
+  VoiceDeviceChoice value = VoiceDeviceChoice(audio: probeAudio);
   @override
   Future<VoiceDeviceChoice> load() async => value;
   @override
@@ -61,7 +68,7 @@ class ProbePreferences implements VoiceDevicePreferences {
 }
 
 class ProbeMedia extends NativeVoiceMedia {
-  ProbeMedia(this.work, this.role) : super(playbackVolume: 0);
+  ProbeMedia(this.work, this.role) : super(playbackVolume: checkPcm ? 1 : 0);
   final Directory work;
   final String role;
   final levels = VoiceAudioLevels();
@@ -194,6 +201,15 @@ Future<void> sampleAudio(Directory work, String role, String phase, ProbeMedia m
     await Future<void>.delayed(const Duration(milliseconds: 200));
   }
   await flag(work, '$role-$phase-metrics.json', jsonEncode(samples));
+  if (checkPcm) {
+    double energy(Map<String, Object> sample) =>
+        (sample['reports'] as List).cast<Map<String, dynamic>>()
+            .where((report) => report['type'] == 'inbound-rtp')
+            .fold(0.0, (sum, report) => sum + ((report['totalAudioEnergy'] as num?)?.toDouble() ?? 0));
+    if (energy(samples.last) <= energy(samples.first)) {
+      throw StateError('Получены сэмплы без энергии тестового PCM-сигнала');
+    }
+  }
 }
 
 Future<void> scenario(Directory work, String origin, String role) async {

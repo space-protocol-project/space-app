@@ -55,11 +55,27 @@ Future<void> show(Widget child, String text) async {
 }
 
 Future<void> screens(ChatController chat, SpaceSession session) async {
-  await show(ChatView(controller: chat, openConnection: () {}), 'baseline message');
-  await show(ForumView(session: session, sectionId: 'baseline_forum',
-      initialThread: 'topic-1'), 'baseline topic');
-  await show(FeedView(session: session, active: true, sectionId: 'baseline_feed',
-      initialPost: 'post-1'), 'baseline post');
+  await show(
+    ChatView(controller: chat, openConnection: () {}),
+    'baseline message',
+  );
+  await show(
+    ForumView(
+      session: session,
+      sectionId: 'baseline_forum',
+      initialThread: 'topic-1',
+    ),
+    'baseline topic',
+  );
+  await show(
+    FeedView(
+      session: session,
+      active: true,
+      sectionId: 'baseline_feed',
+      initialPost: 'post-1',
+    ),
+    'baseline post',
+  );
 }
 
 Future<void> measure(Directory work, String origin) async {
@@ -68,12 +84,21 @@ Future<void> measure(Directory work, String origin) async {
   final session = await SpaceSession.connect(discovery, vault);
   ChatController? chat;
   try {
-    for (final (id, view) in [('baseline_forum', 'forum'), ('baseline_feed', 'feed')]) {
-      await session.adminRequest('/api/v1/channels', method: 'POST',
-          body: {'channelId': id, 'title': id, 'viewType': view});
+    for (final (id, view) in [
+      ('baseline_forum', 'forum'),
+      ('baseline_feed', 'feed'),
+    ]) {
+      await session.adminRequest(
+        '/api/v1/channels',
+        method: 'POST',
+        body: {'channelId': id, 'title': id, 'viewType': view},
+      );
     }
     final ready = File('${work.path}/ready.tmp');
-    await ready.writeAsString(jsonEncode({'principal': session.principalId}), flush: true);
+    await ready.writeAsString(
+      jsonEncode({'principal': session.principalId}),
+      flush: true,
+    );
     await ready.rename('${work.path}/ready.json');
     await waitFor(() => File('${work.path}/seeded').existsSync());
     await session.refreshChannels();
@@ -88,10 +113,15 @@ Future<void> measure(Directory work, String origin) async {
     }
     if (failures.isNotEmpty) throw StateError(failures.join('\n'));
     await phase(work, 'complete');
-    await File('${work.path}/result.json').writeAsString(jsonEncode({
-      'success': true, 'pid': pid, 'cycles': 5,
-      'screens': ['ChatView', 'ForumView', 'FeedView'],
-    }), flush: true);
+    await File('${work.path}/result.json').writeAsString(
+      jsonEncode({
+        'success': true,
+        'pid': pid,
+        'cycles': 5,
+        'screens': ['ChatView', 'ForumView', 'FeedView'],
+      }),
+      flush: true,
+    );
   } finally {
     screen.value = const SizedBox();
     chat?.dispose();
@@ -103,7 +133,9 @@ Future<void> main() async {
   if (Platform.environment['SPACE_P0_MEMORY_CHECK'] != '1') exit(2);
   final origin = Platform.environment['SPACE_P0_ORIGIN'] ?? '';
   final uri = Uri.tryParse(origin);
-  if (uri == null || uri.scheme != 'http' || !InternetAddress(uri.host).isLoopback) {
+  if (uri == null ||
+      uri.scheme != 'http' ||
+      !InternetAddress(uri.host).isLoopback) {
     exit(2);
   }
   final work = Directory(Platform.environment['SPACE_P0_WORK']!);
@@ -112,13 +144,19 @@ Future<void> main() async {
     failures.add(details.exceptionAsString());
     FlutterError.presentError(details);
   };
-  runApp(MaterialApp(
-    locale: const Locale('ru'),
-    supportedLocales: AppLocalizations.supportedLocales,
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
-    home: Scaffold(body: ValueListenableBuilder<Widget>(
-      valueListenable: screen, builder: (_, child, _) => child)),
-  ));
+  runApp(
+    MaterialApp(
+      locale: const Locale('ru'),
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      home: Scaffold(
+        body: ValueListenableBuilder<Widget>(
+          valueListenable: screen,
+          builder: (_, child, _) => child,
+        ),
+      ),
+    ),
+  );
   await WidgetsBinding.instance.endOfFrame;
   try {
     await measure(work, origin);

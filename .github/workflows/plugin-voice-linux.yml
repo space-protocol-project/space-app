@@ -55,8 +55,10 @@ jobs:
         run: |
           pulseaudio --start --exit-idle-time=-1
           pactl load-module module-null-sink sink_name=p0 sink_properties=device.description=P0
-          pactl set-default-source p0.monitor
-          pactl set-default-sink p0
+          pactl load-module module-null-sink sink_name=p0_output sink_properties=device.description=P0Output
+          pactl load-module module-remap-source master=p0.monitor source_name=p0_input source_properties=device.description=P0Input
+          pactl set-default-source p0_input
+          pactl set-default-sink p0_output
           xvfb-run -a python3 tools/check_p0_voice_linux.py --server "$RUNNER_TEMP/space-voice-server" --turn "$RUNNER_TEMP/space-voice-turn" --client client/build/linux/x64/release/bundle/space_client --output "$RUNNER_TEMP/p0-voice"
           lscpu > "$RUNNER_TEMP/p0-voice/cpu.txt"
           free -b > "$RUNNER_TEMP/p0-voice/ram.txt"

@@ -41,7 +41,7 @@ def measure(args, round_number):
     http, grpc = free_ports()
     origin = f'http://127.0.0.1:{http}'
     env = dict(os.environ, SPACE_DATABASE_URL=f'postgres://space:ci-only-password@127.0.0.1:5432/{database}?sslmode=disable',
-               SPACE_VOICE_TURN_CHECK='1', SPACE_VOICE_DESKTOP_CHECK='1', SPACE_VOICE_RECOVERY_CHECK='1')
+               SPACE_VOICE_TURN_CHECK='1', SPACE_VOICE_DESKTOP_CHECK='1', SPACE_VOICE_RECOVERY_CHECK='1', SPACE_VOICE_PCM_CHECK='1')
     for key in ('SPACE_SETUP_CODE', 'SPACE_VOICE_STUN_URLS', 'SPACE_VOICE_PUBLIC_IP', 'SPACE_VOICE_UDP_MIN', 'SPACE_VOICE_UDP_MAX', 'SPACE_VOICE_TURN_SECRET_FILE'):
         env.pop(key, None)
     workers, logs = [], []
@@ -55,7 +55,7 @@ def measure(args, round_number):
     command = [str(args.server), '-http', f'127.0.0.1:{http}', '-grpc', f'127.0.0.1:{grpc}', '-managed']
     try:
         (work / 'baseline.json').write_text(json.dumps({'round': round_number, 'platform': platform.platform(),
-            'relay': 'tcp', 'recovery': True, 'audio': 'PulseAudio null sink monitor, PCM 48 kHz sine 440 Hz',
+            'relay': 'tcp', 'recovery': True, 'audio': 'PulseAudio remapped input and separate output sink, PCM 48 kHz sine 440 Hz; studio profile, fixed gate -60 dB; received energy must increase',
             'app': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
             'server': subprocess.check_output(['git', '-C', 'server-source', 'rev-parse', 'HEAD'], text=True).strip()}))
         turn = launch([str(args.turn), str(work)], 'turn')
