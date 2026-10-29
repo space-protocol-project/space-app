@@ -15,6 +15,7 @@
 - [Копии на сервере пространства: угрозы и восстановление](docs/REMOTE-DIRECTORY-BACKUP.md).
 - [Передача каталога при сопряжении: модель угроз, Noise/Snow и правила подтверждения](docs/DIRECTORY-PAIRING.md).
 - [Аварийное восстановление каталога: SIGKILL, холодный запуск и журнал](docs/DIRECTORY-CRASH-RECOVERY.md).
+- [macOS: системный login Keychain, сохранение ключей и аварийная проверка](docs/MACOS-DIRECTORY-CRASH.md).
 - [Перенос отдельного домашнего пространства и рабочего состояния MLS](docs/FULL-MIGRATION.md).
 - [Диск, резервные копии и безопасная очистка](docs/HOME-DISK.md).
 - [Управление сервером](docs/ADMIN-GUIDE.md).
@@ -45,6 +46,8 @@
 ## Текущий выпуск
 
 Опубликован клиент [v0.8.1+61](https://github.com/space-protocol-project/space-app/releases/tag/v0.8.1) с закреплённым [runtime v0.8.0](https://github.com/space-protocol-project/space-server/releases/tag/v0.8.0): схема PostgreSQL **46**, голосовой профиль **3**. Новые установки получают исправление экспорта и восстановления между дисками Windows. Обновление уже установленного сервера подтверждает владелец; перед ним сохраните резервную копию пространства. [Релизный CI](https://github.com/space-protocol-project/space-app/actions/runs/40791498361) и [проверка публичных файлов, подписи Android и встроенного каталога](https://github.com/space-protocol-project/space-app/actions/runs/40870483924) успешны. [Изменения](Changelog.md), [границы восстановления](docs/CLEAN-INSTALL-RECOVERY.md).
+
+В `main` подготовлено исправление macOS для сборок без Apple-подписи: системный login Keychain вместо недоступного Data Protection Keychain (ошибка −34018). [Аварийный CI и правила сохранения ключей](docs/MACOS-DIRECTORY-CRASH.md) подтверждены; опубликованный v0.8.1 ещё не содержит это исправление.
 
 [Результаты выпуска отметок чтения](docs/FEED-READ.md): CI, опубликованные установщики и контрольные суммы. Предыдущие пары: [поиск и сводка v0.7.20 / v0.7.16](docs/COMMUNITIES-RELEASE.md), [первый срез ленты v0.7.19 / v0.7.15](docs/FEED-RELEASE.md).
 
