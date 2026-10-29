@@ -1,0 +1,75 @@
+name: Память Flutter и runtime P0
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  memory:
+    runs-on: windows-2025
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: 78303322c4d99475fafcc6c03cca84aa58462764
+          path: server-source
+      - uses: actions/setup-go@v5
+        with: {go-version-file: server-source/go.mod, cache-dependency-path: server-source/go.sum}
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - uses: actions/cache@v4
+        with:
+          path: |
+            client/build
+            client/.dart_tool/hooks_runner
+          key: p0-memory-windows-v1-${{ hashFiles('client/pubspec.lock', 'native/**/Cargo.lock', 'client/windows/**') }}
+      - name: Подготовка и анализ
+        working-directory: client
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal
+          flutter pub get
+          if ($LASTEXITCODE) { throw 'Зависимости не получены' }
+          dart format tool/p0_memory_probe.dart
+          flutter analyze
+          if ($LASTEXITCODE) { throw 'Анализ не прошёл' }
+      - name: Сборка Flutter и отдельного runtime
+        run: |
+          go build -C server-source -o "$env:RUNNER_TEMP/space-memory-server.exe" ./cmd/space-server
+          if ($LASTEXITCODE) { throw 'Runtime не собран' }
+          Push-Location client
+          flutter build windows --release --target tool/p0_memory_probe.dart
+          if ($LASTEXITCODE) { throw 'Flutter не собран' }
+          Pop-Location
+      - name: Закреплённая PostgreSQL
+        run: |
+          $entry = (Get-Content client/assets/home/runtime-manifest.json -Raw | ConvertFrom-Json).'windows-x64'
+          $archive = Join-Path $env:RUNNER_TEMP 'memory-runtime.zip'
+          Invoke-WebRequest -Uri $entry.url -OutFile $archive
+          if ((Get-Item $archive).Length -ne $entry.bytes -or (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne $entry.sha256) { throw 'Архив не прошёл проверку' }
+          Expand-Archive -LiteralPath $archive -DestinationPath "$env:RUNNER_TEMP/memory-runtime"
+      - name: Шесть независимых прогонов с настоящими экранами
+        run: |
+          python tools/check_p0_memory.py --postgres "$env:RUNNER_TEMP/memory-runtime" --server "$env:RUNNER_TEMP/space-memory-server.exe" --client client/build/windows/x64/runner/Release/space_client.exe --output "$env:RUNNER_TEMP/p0-memory"
+          if ($LASTEXITCODE) { throw 'Измерение памяти не прошло' }
+          git rev-parse HEAD > "$env:RUNNER_TEMP/p0-memory/app-sha.txt"
+          git -C server-source rev-parse HEAD > "$env:RUNNER_TEMP/p0-memory/server-sha.txt"
+          Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,NumberOfLogicalProcessors | ConvertTo-Json > "$env:RUNNER_TEMP/p0-memory/cpu.json"
+          Get-CimInstance Win32_ComputerSystem | Select-Object TotalPhysicalMemory | ConvertTo-Json > "$env:RUNNER_TEMP/p0-memory/ram.json"
+          & "$env:RUNNER_TEMP/memory-runtime/postgres/bin/psql.exe" --version > "$env:RUNNER_TEMP/p0-memory/postgres-version.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p0-flutter-runtime-memory
+          retention-days: 30
+          path: |
+            ${{ runner.temp }}/p0-memory/*.json
+            ${{ runner.temp }}/p0-memory/*.txt
+            ${{ runner.temp }}/p0-memory/*.log
+            ${{ runner.temp }}/p0-memory/*/memory.json
+            ${{ runner.temp }}/p0-memory/*/result.json
+            ${{ runner.temp }}/p0-memory/*/failure.txt
+            ${{ runner.temp }}/p0-memory/*/*.log
+            client/tool/p0_memory_probe.dart
