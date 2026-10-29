@@ -80,7 +80,7 @@ class CrashRun:
         if sys.platform in ('linux', 'darwin') and role != 'cleanup':
             proof = json.loads((self.root / f'storage-proof-{role}.json').read_text(encoding='utf-8'))
             done = json.loads((self.root / f'done-{role}.json').read_text(encoding='utf-8'))
-            protected = 'data_protection' if sys.platform == 'darwin' else 'encrypted_keyring'
+            protected = 'system_keychain' if sys.platform == 'darwin' else 'encrypted_keyring'
             if (proof['pid'] != done['pid'] or proof['file_fixture'] or
                     not proof['independent_read'] or not proof[protected]):
                 raise RuntimeError('Процесс не подтвердил настоящее системное хранилище')
@@ -286,7 +286,7 @@ def main():
             (args.output / 'report.json').write_text(json.dumps(reports, indent=2) + '\n', encoding='utf-8')
             for file in sorted(args.output.rglob('*.log')):
                 print(f'\n{file.relative_to(args.output)}\n{file.read_text(encoding="utf-8", errors="replace")}')
-    storage = {'win32': 'Windows DPAPI', 'darwin': 'macOS Data Protection Keychain',
+    storage = {'win32': 'Windows DPAPI', 'darwin': 'macOS system login Keychain',
                'linux': 'Linux libsecret/GNOME Keyring'}[sys.platform]
     print(f'DIRECTORY_CRASH_CI_OK: {len(reports)} проверок, {storage}, принудительное завершение и холодный запуск')
 

@@ -34,15 +34,18 @@ jobs:
         working-directory: app/client
         run: |
           flutter pub get
-          dart format test/probes/directory_crash*.dart
+          dart format lib/src/secure_vault.dart test/secure_storage_macos_test.dart test/probes/directory_crash*.dart
           flutter analyze
-          flutter test test/directory*_test.dart test/pairing*_test.dart test/recovery_test.dart test/recovery_spaces_test.dart
+          flutter test test/secure_storage*_test.dart test/directory*_test.dart test/pairing*_test.dart test/recovery_test.dart test/recovery_spaces_test.dart
           python3 -m py_compile ../tools/check_directory_crash.py ../tools/check_directory_macos.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: directory-macos-checked-source
-          path: app/client/test/probes/directory_crash*.dart
+          path: |
+            app/client/test/probes/directory_crash*.dart
+            app/client/test/secure_storage_macos_test.dart
+            app/client/lib/src/secure_vault.dart
       - name: Сборка сервера и нативного стенда
         run: |
           cd server

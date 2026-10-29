@@ -2,6 +2,9 @@
 import hashlib
 import json
 import os
+import secrets
+import shlex
+from contextlib import contextmanager
 from pathlib import Path
 import subprocess
 import sys
@@ -13,6 +16,37 @@ from check_community_interop import free_ports
 
 def command(args, **kwargs):
     subprocess.run([str(value) for value in args], check=True, **kwargs)
+
+
+def security(*args):
+    result = subprocess.run(['/usr/bin/security', *map(str, args)], capture_output=True, text=True)
+    if result.returncode:
+        # В аргументах создания может быть пароль одноразового хранилища CI.
+        raise RuntimeError('Системная команда Keychain не выполнена: ' + args[0])
+    return result.stdout
+
+
+@contextmanager
+def isolated_keychain(root):
+    previous = shlex.split(security('list-keychains', '-d', 'user'))
+    default = shlex.split(security('default-keychain', '-d', 'user'))[0]
+    path = root / 'ci-login.keychain-db'
+    password = secrets.token_urlsafe(32)
+    security('create-keychain', '-p', password, path)
+    try:
+        security('unlock-keychain', '-p', password, path)
+        security('set-keychain-settings', '-t', '3600', path)
+        security('list-keychains', '-d', 'user', '-s', path, *previous)
+        security('default-keychain', '-d', 'user', '-s', path)
+        yield path
+    finally:
+        try:
+            security('default-keychain', '-d', 'user', '-s', default)
+        finally:
+            try:
+                security('list-keychains', '-d', 'user', '-s', *previous)
+            finally:
+                security('delete-keychain', path)
 
 
 def postgres(root, app):
@@ -60,9 +94,11 @@ def main():
             started = True
             environment = dict(os.environ)
             environment['SPACE_DATABASE_URL'] = f'postgres://space_test@127.0.0.1:{port}/postgres?sslmode=disable'
-            command([sys.executable, app / 'tools/check_directory_crash.py', '--app',
-                     app / 'client/build/macos/Build/Products/Debug/Space.app/Contents/MacOS/Space',
-                     '--server', binary, '--output', root / 'cases'], env=environment)
+            with isolated_keychain(root) as keychain:
+                environment['DIRECTORY_CRASH_KEYCHAIN'] = str(keychain)
+                command([sys.executable, app / 'tools/check_directory_crash.py', '--app',
+                         app / 'client/build/macos/Build/Products/Debug/Space.app/Contents/MacOS/Space',
+                         '--server', binary, '--output', root / 'cases'], env=environment)
         finally:
             if started:
                 command([pg / 'pg_ctl', '-D', database, '-m', 'fast', '-w', 'stop'], stdout=log, stderr=log)

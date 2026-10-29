@@ -30,10 +30,10 @@ Future<void> verifyCrashMacOSStorage(CrashContext context) async {
     'Обнаружена файловая фикстура ключей',
   );
   await context.hooks.signal('storage-proof-${context.hooks.role}', {
-    'backend': 'PlatformKeyStorage/macOS Data Protection Keychain',
+    'backend': 'PlatformKeyStorage/macOS system login Keychain',
     'file_fixture': false,
     'independent_read': true,
-    'data_protection': true,
+    'system_keychain': true,
     'pid': pid,
   });
 }

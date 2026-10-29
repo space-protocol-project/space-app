@@ -19,7 +19,11 @@ class _PartitionOptions extends WindowsOptions {
 class PlatformKeyStorage implements SecureKeyStorage {
   const PlatformKeyStorage();
   static const androidOptions = AndroidOptions(resetOnError: false);
-  static const _storage = FlutterSecureStorage(aOptions: androidOptions);
+  static const macOptions = MacOsOptions(usesDataProtectionKeychain: false);
+  static const _storage = FlutterSecureStorage(
+    aOptions: androidOptions,
+    mOptions: macOptions,
+  );
   WindowsOptions options(String key) => Platform.isWindows
       ? _PartitionOptions(key)
       : WindowsOptions.defaultOptions;

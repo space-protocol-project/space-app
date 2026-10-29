@@ -35,6 +35,7 @@ private struct KeychainStatus: Error { let status: OSStatus }
 
 private struct KeychainCrashProbe {
   let namespace: String
+  let keychain: SecKeychain
   let service = "flutter_secure_storage_service"
 
   init() throws {
@@ -44,11 +45,21 @@ private struct KeychainCrashProbe {
       value.range(of: "^space-ci-[a-f0-9]{64}$", options: .regularExpression) != nil
     else { throw KeychainStatus(status: errSecParam) }
     namespace = value + "."
+    let interaction = SecKeychainSetUserInteractionAllowed(false)
+    guard interaction == errSecSuccess else { throw KeychainStatus(status: interaction) }
+    guard let path = env["DIRECTORY_CRASH_KEYCHAIN"], let root = env["RUNNER_TEMP"],
+      URL(fileURLWithPath: path).resolvingSymlinksInPath().path.hasPrefix(
+        URL(fileURLWithPath: root).resolvingSymlinksInPath().path + "/")
+    else { throw KeychainStatus(status: errSecParam) }
+    var opened: SecKeychain?
+    let status = SecKeychainOpen(path, &opened)
+    guard status == errSecSuccess, let opened = opened else { throw KeychainStatus(status: status) }
+    keychain = opened
   }
 
   var query: [CFString: Any] {
     [kSecClass: kSecClassGenericPassword, kSecAttrService: service,
-     kSecUseDataProtectionKeychain: true, kSecAttrSynchronizable: false]
+     kSecUseDataProtectionKeychain: false, kSecMatchSearchList: [keychain]]
   }
 
   func verify(_ expected: String?) throws -> Bool {
