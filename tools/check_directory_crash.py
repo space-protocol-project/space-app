@@ -37,7 +37,9 @@ class CrashRun:
         })
         log = (self.root / f'{role}-{len(self.processes)}.log').open('w', encoding='utf-8')
         self.logs.append(log)
-        command = ['dbus-run-session', '--', str(self.args.app.resolve())]
+        command = ['dbus-run-session', '--', sys.executable,
+                   str(Path(__file__).with_name('directory_keyring_session.py')),
+                   str(self.args.app.resolve())]
         if os.name == 'nt':
             # Mutex вычисляется по пути exe. Разные профили запускаются параллельно.
             bundle = profile / 'bundle'
@@ -68,6 +70,12 @@ class CrashRun:
         code = process.wait(timeout=timeout)
         if code or not (self.root / f'done-{role}.json').exists():
             raise RuntimeError(f'Роль {role} не подтверждена: {code}')
+        if sys.platform == 'linux':
+            proof = json.loads((self.root / f'storage-proof-{role}.json').read_text(encoding='utf-8'))
+            done = json.loads((self.root / f'done-{role}.json').read_text(encoding='utf-8'))
+            if (proof['pid'] != done['pid'] or proof['file_fixture'] or
+                    not proof['independent_read'] or not proof['encrypted_keyring']):
+                raise RuntimeError('Процесс не подтвердил настоящее системное хранилище')
 
     def run(self, role):
         self.finish(self.start(role), role)
@@ -205,6 +213,8 @@ def apply_cases(args, origin, reports):
             case.finish(source, 'source')
             unapplied = stage in ('journal-before', 'encrypted-journal')
             case.run('inspect' if unapplied else 'resume')
+            if not unapplied:
+                case.run('verify')
             reports.append({'case': name, 'result': 'passed'})
             print(f'DIRECTORY_CRASH_CASE_OK: {name}', flush=True)
             if unapplied:
@@ -249,7 +259,7 @@ def main():
         (args.output / 'report.json').write_text(json.dumps(reports, indent=2) + '\n', encoding='utf-8')
         for file in sorted(args.output.rglob('*.log')):
             print(f'\n{file.relative_to(args.output)}\n{file.read_text(encoding="utf-8", errors="replace")}')
-    storage = 'Windows DPAPI' if os.name == 'nt' else 'Linux file fixture'
+    storage = 'Windows DPAPI' if os.name == 'nt' else 'Linux libsecret/GNOME Keyring'
     print(f'DIRECTORY_CRASH_CI_OK: {len(reports)} проверок, {storage}, принудительное завершение и холодный запуск')
 
 

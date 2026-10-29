@@ -79,7 +79,7 @@ jobs:
         run: |
           printf 'https://archive.ubuntu.com/ubuntu\n' | sudo tee /etc/apt/apt-mirrors.txt
           timeout 180s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 update
-          timeout 480s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 install -y --no-install-recommends libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb xauth dbus-x11
+          timeout 480s sudo apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=1 -o Acquire::http::Timeout=15 install -y --no-install-recommends libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb xauth dbus-x11 gnome-keyring libsecret-tools
       - name: Ограничения relay с настоящей PostgreSQL
         working-directory: server
         run: |
@@ -164,6 +164,8 @@ jobs:
             ${{ runner.temp }}/directory-crash/**/*.log
             ${{ runner.temp }}/directory-crash/**/killed-*.json
             ${{ runner.temp }}/directory-crash/**/checkpoint-*.json
+            ${{ runner.temp }}/directory-crash/**/storage-proof-*.json
+            ${{ runner.temp }}/directory-crash/**/keyring-session-*.json
   android:
     if: inputs.platforms
     runs-on: ubuntu-24.04

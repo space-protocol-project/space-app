@@ -1,4 +1,4 @@
-// Windows использует настоящее системное хранилище, Linux — файловую фикстуру.
+// Оба стенда используют штатное системное хранилище; обёртка добавляет точки сбоя.
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -66,13 +66,9 @@ class CrashStorage implements SecureKeyStorage {
   CrashStorage(this.hooks);
   final CrashHooks hooks;
   bool armed = false;
-  File _file(String key) =>
-      File('${hooks.profile.path}/vault/${url64(utf8.encode(key))}.json');
   @override
   Future<String?> read({required String key}) async {
-    if (Platform.isWindows) return const PlatformKeyStorage().read(key: key);
-    final file = _file(key);
-    return await file.exists() ? file.readAsString() : null;
+    return const PlatformKeyStorage().read(key: key);
   }
 
   @override
@@ -80,17 +76,16 @@ class CrashStorage implements SecureKeyStorage {
     final journal = key == DirectoryRepository.key;
     final pending = journal && (jsonDecode(value) as Map)['pending'] != null;
     if (armed && pending) await hooks.hit('journal-before');
-    if (Platform.isWindows) {
-      if (armed && pending && hooks.stage == 'encrypted-journal') {
-        await hooks.signal('checkpoint-${hooks.role}', {
-          'pid': pid,
-          'stage': 'encrypted-journal',
-        });
-      }
-      await const PlatformKeyStorage().write(key: key, value: value);
-    } else {
-      await atomicCrashFile(_file(key), value);
+    if (Platform.isWindows &&
+        armed &&
+        pending &&
+        hooks.stage == 'encrypted-journal') {
+      await hooks.signal('checkpoint-${hooks.role}', {
+        'pid': pid,
+        'stage': 'encrypted-journal',
+      });
     }
+    await const PlatformKeyStorage().write(key: key, value: value);
     if (armed && journal) {
       await hooks.hit(pending ? 'journal-written' : 'journal-cleared');
     }
@@ -98,12 +93,7 @@ class CrashStorage implements SecureKeyStorage {
 
   @override
   Future<void> delete({required String key}) async {
-    if (Platform.isWindows) {
-      await const PlatformKeyStorage().delete(key: key);
-      return;
-    }
-    final file = _file(key);
-    if (await file.exists()) await file.delete();
+    await const PlatformKeyStorage().delete(key: key);
   }
 }
 

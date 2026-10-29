@@ -10,6 +10,7 @@ import 'package:space_client/src/directory_transfer_rpc.dart';
 import 'package:space_client/src/settings_snapshot.dart';
 
 import 'directory_crash_support.dart';
+import 'directory_crash_linux.dart';
 import 'directory_crash_verify.dart';
 import 'directory_crash_windows.dart';
 
@@ -173,6 +174,7 @@ Future<void> main() async {
     await context.open();
     await runCrashRole(context);
     await verifyCrashWindowsStorage();
+    await verifyCrashLinuxStorage(context.hooks);
     await context.preferences.flush();
     await context.preferences.close();
     await context.hooks.signal('done-${context.hooks.role}', {'pid': pid});
