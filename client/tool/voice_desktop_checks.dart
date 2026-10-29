@@ -141,6 +141,7 @@ Future<void> checkReconnect(
       role == 'A' ? 'B-resumed-microphone' : 'A-resumed-microphone',
     );
     final counts = await waitForAudio(media.last);
+    await sampleAudio(work, role, 'recovered', media.last);
     await flag(work, '$role-recovered-audio', jsonEncode(counts));
     await barrier(
       work,

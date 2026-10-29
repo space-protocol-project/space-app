@@ -176,6 +176,26 @@ Future<Map<String, int>> waitForAudio(NativeVoiceMedia media) async {
   }
 }
 
+// RTT и jitter buffer характеризуют медиатранспорт, а не акустическую задержку.
+Future<void> sampleAudio(Directory work, String role, String phase, ProbeMedia media) async {
+  await Future<void>.delayed(const Duration(seconds: 2));
+  final clock = Stopwatch()..start();
+  final samples = <Map<String, Object>>[];
+  for (var index = 0; index < 50; index++) {
+    final reports = await media.statistics();
+    samples.add({
+      'milliseconds': clock.elapsedMilliseconds,
+      'reports': [
+        for (final report in reports)
+          if (['inbound-rtp', 'outbound-rtp', 'remote-inbound-rtp', 'candidate-pair'].contains(report.type))
+            {'id': report.id, 'type': report.type, ...report.values},
+      ],
+    });
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+  }
+  await flag(work, '$role-$phase-metrics.json', jsonEncode(samples));
+}
+
 Future<void> scenario(Directory work, String origin, String role) async {
   await flag(work, '$role-progress', 'connect');
   final server = await discover(origin);
@@ -195,7 +215,13 @@ Future<void> scenario(Directory work, String origin, String role) async {
     heartbeat: const Duration(milliseconds: 250),
   );
   final traceClock = Stopwatch()..start();
+  final timeline = <Map<String, Object>>[];
+  VoicePhase? previousPhase;
   final trace = controller.stream.listen((state) {
+    if (state.phase != previousPhase) {
+      timeline.add({'phase': state.phase.name, 'milliseconds': traceClock.elapsedMilliseconds});
+      previousPhase = state.phase;
+    }
     debugPrint('VOICE_STATE ${jsonEncode({
       'role': role,
       'milliseconds': traceClock.elapsedMilliseconds,
@@ -285,6 +311,7 @@ Future<void> scenario(Directory work, String origin, String role) async {
     }
     await flag(work, '$role-audio', jsonEncode(counts));
     await barrier(work, role == 'A' ? 'B-audio' : 'A-audio');
+    await sampleAudio(work, role, 'initial', mediaInstances.last);
     await checkPushToTalk(controller, mediaInstances.last);
     if (Platform.isAndroid) {
       await checkAndroidAudio(work, controller, mediaInstances.last);
@@ -319,6 +346,7 @@ Future<void> scenario(Directory work, String origin, String role) async {
     rethrow;
   } finally {
     await trace.cancel();
+    await flag(work, '$role-timeline.json', jsonEncode(timeline));
     try {
       await controller.close().timeout(const Duration(seconds: 5));
     } finally {

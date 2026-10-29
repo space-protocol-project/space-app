@@ -6,6 +6,7 @@ $serverRoot=Join-Path (Split-Path $appRoot -Parent) 'space-server'
 $id=[guid]::NewGuid().ToString('N')
 $work=Join-Path $appRoot ".local/voice-check-$id"
 New-Item -ItemType Directory -Path $work | Out-Null
+@{round=$env:SPACE_VOICE_BASELINE_ROUND; app=(git -C $appRoot rev-parse HEAD); server=(git -C $serverRoot rev-parse HEAD); relay=$Relay; recovery=[bool]$Recovery; cpu=(Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,NumberOfLogicalProcessors); ram=(Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory} | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $work 'baseline.json') -Encoding utf8NoBOM
 $pgBin=Join-Path $Runtime 'postgres/bin'
 $data=Join-Path $work 'postgres'
 $serverExe=Join-Path $work 'space-server.exe'
