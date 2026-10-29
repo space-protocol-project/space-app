@@ -1,0 +1,47 @@
+name: Голосовые комнаты P0
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  voice:
+    runs-on: windows-2025
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with: {path: space-app}
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: 78303322c4d99475fafcc6c03cca84aa58462764
+          path: space-server
+      - uses: actions/setup-go@v5
+        with: {go-version-file: space-server/go.mod}
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - run: flutter pub get
+        working-directory: space-app/client
+      - name: Закреплённый комплект PostgreSQL
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $manifest = Get-Content space-app/client/assets/home/runtime-manifest.json -Raw | ConvertFrom-Json
+          $entry = $manifest.'windows-x64'
+          $archive = Join-Path $env:RUNNER_TEMP 'voice-runtime.zip'
+          Invoke-WebRequest -Uri $entry.url -OutFile $archive
+          if ((Get-Item $archive).Length -ne $entry.bytes -or (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne $entry.sha256) { throw 'Архив не прошёл проверку' }
+          Expand-Archive -LiteralPath $archive -DestinationPath (Join-Path $env:RUNNER_TEMP 'voice-runtime')
+      - name: Два Windows-клиента, TURN TCP и перезапуск сервера
+        shell: pwsh
+        working-directory: space-app
+        run: ./tools/check_voice_rooms.ps1 -Runtime "$env:RUNNER_TEMP/voice-runtime" -Relay tcp -Recovery
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p0-voice-tcp-recovery
+          retention-days: 30
+          path: |
+            space-app/.local/voice-check-*/A.json
+            space-app/.local/voice-check-*/B.json
+            space-app/.local/voice-check-*/*.log
