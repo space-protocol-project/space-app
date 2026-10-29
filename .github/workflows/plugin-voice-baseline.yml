@@ -4,6 +4,8 @@ on:
 permissions:
   contents: read
 jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
   voice:
     runs-on: windows-2025
     timeout-minutes: 50
@@ -22,6 +24,20 @@ jobs:
       - run: rustup toolchain install 1.99.1 --profile minimal
       - run: flutter pub get
         working-directory: space-app/client
+      - uses: actions/cache@v4
+        with:
+          path: |
+            space-app/client/build
+            space-app/client/.dart_tool/hooks_runner
+          key: p0-voice-windows-v1-${{ hashFiles('space-app/client/pubspec.lock', 'space-app/native/**/Cargo.lock', 'space-app/client/windows/**') }}
+          save-always: true
+      - name: Анализ и регрессия голоса
+        working-directory: space-app/client
+        run: |
+          flutter analyze
+          if ($LASTEXITCODE) { throw 'Анализ не прошёл' }
+          flutter test test/voice_controller_test.dart test/voice_recovery_test.dart test/voice_network_test.dart
+          if ($LASTEXITCODE) { throw 'Регрессия голоса' }
       - name: Закреплённый комплект PostgreSQL
         shell: pwsh
         run: |

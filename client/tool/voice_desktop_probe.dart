@@ -168,6 +168,17 @@ Future<void> scenario(Directory work, String origin, String role) async {
     audioDevices: devices,
     heartbeat: const Duration(milliseconds: 250),
   );
+  final traceClock = Stopwatch()..start();
+  final trace = controller.stream.listen((state) {
+    debugPrint('VOICE_STATE ${jsonEncode({
+      'role': role,
+      'milliseconds': traceClock.elapsedMilliseconds,
+      'phase': state.phase.name,
+      'error': state.error,
+      'muted': state.muted,
+      'deafened': state.deafened,
+    })}');
+  });
   try {
     await devices.refresh();
     final input = Platform.environment['SPACE_VOICE_INPUT_ID'];
@@ -281,6 +292,7 @@ Future<void> scenario(Directory work, String origin, String role) async {
     await flag(work, '$role-failure', '$error\n$stack');
     rethrow;
   } finally {
+    await trace.cancel();
     try {
       await controller.close().timeout(const Duration(seconds: 5));
     } finally {
