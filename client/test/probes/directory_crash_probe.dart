@@ -11,6 +11,7 @@ import 'package:space_client/src/settings_snapshot.dart';
 
 import 'directory_crash_support.dart';
 import 'directory_crash_linux.dart';
+import 'directory_crash_macos.dart';
 import 'directory_crash_verify.dart';
 import 'directory_crash_windows.dart';
 
@@ -150,6 +151,8 @@ Future<void> runCrashRole(CrashContext context) async {
       await verifyCrashApplied(context);
     case 'verify':
       await verifyCrashApplied(context);
+    case 'cleanup':
+      await cleanupCrashMacOS();
     default:
       throw StateError('Неизвестная роль стенда');
   }
@@ -169,12 +172,16 @@ Future<void> main() async {
   runApp(const MaterialApp(home: Scaffold(body: Text('Directory crash CI'))));
   await WidgetsBinding.instance.endOfFrame;
   await initializeCrashWindows();
+  initializeCrashMacOS();
   final context = CrashContext(CrashHooks());
   try {
     await context.open();
     await runCrashRole(context);
-    await verifyCrashWindowsStorage();
-    await verifyCrashLinuxStorage(context.hooks);
+    if (context.hooks.role != 'cleanup') {
+      await verifyCrashWindowsStorage();
+      await verifyCrashLinuxStorage(context.hooks);
+      await verifyCrashMacOSStorage(context);
+    }
     await context.preferences.flush();
     await context.preferences.close();
     await context.hooks.signal('done-${context.hooks.role}', {'pid': pid});

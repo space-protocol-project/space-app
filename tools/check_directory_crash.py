@@ -1,6 +1,7 @@
 """SIGKILL настоящих Flutter-процессов и холодное восстановление каталога в CI."""
 import argparse
 import base64
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -35,11 +36,17 @@ class CrashRun:
             'XDG_DATA_HOME': str(profile / 'data'), 'XDG_CONFIG_HOME': str(profile / 'config'),
             'XDG_CACHE_HOME': str(profile / 'cache'), 'LIBGL_ALWAYS_SOFTWARE': '1',
         })
+        if sys.platform == 'darwin':
+            self.args.macos_profiles.add(profile.resolve())
+            environment['DIRECTORY_CRASH_NAMESPACE'] = (
+                'space-ci-' + hashlib.sha256(str(profile.resolve()).encode()).hexdigest())
         log = (self.root / f'{role}-{len(self.processes)}.log').open('w', encoding='utf-8')
         self.logs.append(log)
         command = ['dbus-run-session', '--', sys.executable,
                    str(Path(__file__).with_name('directory_keyring_session.py')),
                    str(self.args.app.resolve())]
+        if sys.platform == 'darwin':
+            command = [str(self.args.app.resolve())]
         if os.name == 'nt':
             # Mutex вычисляется по пути exe. Разные профили запускаются параллельно.
             bundle = profile / 'bundle'
@@ -70,11 +77,12 @@ class CrashRun:
         code = process.wait(timeout=timeout)
         if code or not (self.root / f'done-{role}.json').exists():
             raise RuntimeError(f'Роль {role} не подтверждена: {code}')
-        if sys.platform == 'linux':
+        if sys.platform in ('linux', 'darwin') and role != 'cleanup':
             proof = json.loads((self.root / f'storage-proof-{role}.json').read_text(encoding='utf-8'))
             done = json.loads((self.root / f'done-{role}.json').read_text(encoding='utf-8'))
+            protected = 'data_protection' if sys.platform == 'darwin' else 'encrypted_keyring'
             if (proof['pid'] != done['pid'] or proof['file_fixture'] or
-                    not proof['independent_read'] or not proof['encrypted_keyring']):
+                    not proof['independent_read'] or not proof[protected]):
                 raise RuntimeError('Процесс не подтвердил настоящее системное хранилище')
 
     def run(self, role):
@@ -223,6 +231,20 @@ def apply_cases(args, origin, reports):
             case.cleanup()
 
 
+def cleanup_macos(args, origin):
+    failures = []
+    for index, profile in enumerate(sorted(args.macos_profiles)):
+        case = CrashRun(args, origin, args.output / f'cleanup-{index}', profile=profile)
+        try:
+            case.run('cleanup')
+        except Exception as error:
+            failures.append(str(error))
+        finally:
+            case.cleanup()
+    if failures:
+        raise RuntimeError('Не завершена очистка собственных профилей: ' + '; '.join(failures))
+
+
 def main():
     sys.stdout.reconfigure(encoding='utf-8')
     sys.stderr.reconfigure(encoding='utf-8')
@@ -231,6 +253,7 @@ def main():
     parser.add_argument('--server', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
+    args.macos_profiles = set()
     if os.environ.get('GITHUB_ACTIONS') != 'true' or not os.environ.get('SPACE_DATABASE_URL'):
         raise RuntimeError('Сценарий разрешён только в GitHub CI с отдельной тестовой БД')
     args.output = args.output.resolve()
@@ -256,10 +279,15 @@ def main():
                 stop(server)
                 server = None
     finally:
-        (args.output / 'report.json').write_text(json.dumps(reports, indent=2) + '\n', encoding='utf-8')
-        for file in sorted(args.output.rglob('*.log')):
-            print(f'\n{file.relative_to(args.output)}\n{file.read_text(encoding="utf-8", errors="replace")}')
-    storage = 'Windows DPAPI' if os.name == 'nt' else 'Linux libsecret/GNOME Keyring'
+        try:
+            if sys.platform == 'darwin':
+                cleanup_macos(args, origin)
+        finally:
+            (args.output / 'report.json').write_text(json.dumps(reports, indent=2) + '\n', encoding='utf-8')
+            for file in sorted(args.output.rglob('*.log')):
+                print(f'\n{file.relative_to(args.output)}\n{file.read_text(encoding="utf-8", errors="replace")}')
+    storage = {'win32': 'Windows DPAPI', 'darwin': 'macOS Data Protection Keychain',
+               'linux': 'Linux libsecret/GNOME Keyring'}[sys.platform]
     print(f'DIRECTORY_CRASH_CI_OK: {len(reports)} проверок, {storage}, принудительное завершение и холодный запуск')
 
 

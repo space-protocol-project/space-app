@@ -62,13 +62,18 @@ class CrashHooks {
   }
 }
 
+String crashStorageKey(String key) {
+  if (!Platform.isMacOS) return key;
+  return '${Platform.environment['DIRECTORY_CRASH_NAMESPACE']!}.$key';
+}
+
 class CrashStorage implements SecureKeyStorage {
   CrashStorage(this.hooks);
   final CrashHooks hooks;
   bool armed = false;
   @override
   Future<String?> read({required String key}) async {
-    return const PlatformKeyStorage().read(key: key);
+    return const PlatformKeyStorage().read(key: crashStorageKey(key));
   }
 
   @override
@@ -85,7 +90,7 @@ class CrashStorage implements SecureKeyStorage {
         'stage': 'encrypted-journal',
       });
     }
-    await const PlatformKeyStorage().write(key: key, value: value);
+    await const PlatformKeyStorage().write(key: crashStorageKey(key), value: value);
     if (armed && journal) {
       await hooks.hit(pending ? 'journal-written' : 'journal-cleared');
     }
@@ -93,7 +98,7 @@ class CrashStorage implements SecureKeyStorage {
 
   @override
   Future<void> delete({required String key}) async {
-    await const PlatformKeyStorage().delete(key: key);
+    await const PlatformKeyStorage().delete(key: crashStorageKey(key));
   }
 }
 

@@ -1,0 +1,67 @@
+name: Аварийное восстановление каталога macOS Keychain
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  macos:
+    runs-on: macos-15
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with: {path: app}
+      - name: Совместимый сервер
+        run: echo "SPACE_SERVER_REF=$(cat app/.github/space-server.ref)" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: ${{ env.SPACE_SERVER_REF }}
+          path: server
+      - uses: actions/setup-go@v5
+        with: {go-version-file: server/go.mod, cache-dependency-path: server/go.sum}
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - uses: actions/cache@v4
+        with:
+          path: |
+            app/client/build
+            app/client/.dart_tool/hooks_runner
+          key: directory-macos-3.47.8-v1-${{ hashFiles('app/client/pubspec.lock', 'app/native/**/Cargo.lock', 'app/client/macos/**') }}
+      - name: Анализ, оформление и тесты восстановления
+        working-directory: app/client
+        run: |
+          flutter pub get
+          dart format test/probes/directory_crash*.dart
+          flutter analyze
+          flutter test test/directory*_test.dart test/pairing*_test.dart test/recovery_test.dart test/recovery_spaces_test.dart
+          python3 -m py_compile ../tools/check_directory_crash.py ../tools/check_directory_macos.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: directory-macos-checked-source
+          path: app/client/test/probes/directory_crash*.dart
+      - name: Сборка сервера и нативного стенда
+        run: |
+          cd server
+          go build -o "$RUNNER_TEMP/space-directory-server" ./cmd/space-server
+          cd ../app
+          cp tools/directory_crash_macos.swift client/macos/Runner/MainFlutterWindow.swift
+          cd client
+          flutter build macos --debug --target test/probes/directory_crash_probe.dart
+      - name: SIGKILL, настоящий Keychain и холодное восстановление
+        working-directory: app
+        run: python3 tools/check_directory_macos.py "$RUNNER_TEMP/space-directory-server"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: directory-macos-crash
+          path: |
+            ${{ runner.temp }}/directory-macos-crash/cases/report.json
+            ${{ runner.temp }}/directory-macos-crash/**/*.log
+            ${{ runner.temp }}/directory-macos-crash/**/killed-*.json
+            ${{ runner.temp }}/directory-macos-crash/**/checkpoint-*.json
+            ${{ runner.temp }}/directory-macos-crash/**/storage-proof-*.json
+            ${{ runner.temp }}/directory-macos-crash/**/done-cleanup.json
