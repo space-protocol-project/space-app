@@ -27,9 +27,14 @@ part 'voice_android_checks.dart';
 
 bool get checkPcm => Platform.environment['SPACE_VOICE_PCM_CHECK'] == '1';
 VoiceAudioSettings get probeAudio => checkPcm
-    ? voiceDefaultAudio.copyWith(noiseMode: VoiceNoiseSuppression.disabled,
-        echoCancellation: false, autoGainControl: false, highPassFilter: false,
-        automaticSensitivity: false, thresholdDb: -60)
+    ? voiceDefaultAudio.copyWith(
+        noiseMode: VoiceNoiseSuppression.disabled,
+        echoCancellation: false,
+        autoGainControl: false,
+        highPassFilter: false,
+        automaticSensitivity: false,
+        thresholdDb: -60,
+      )
     : voiceDefaultAudio;
 
 class ProbeSignaling extends SessionVoiceSignaling {
@@ -53,8 +58,12 @@ class ProbeSignaling extends SessionVoiceSignaling {
       trace('join', () => super.join(room, offer));
 
   @override
-  Future<pb.VoiceRoomState> update(String room, String id, bool muted, bool deafened) =>
-      trace('update', () => super.update(room, id, muted, deafened));
+  Future<pb.VoiceRoomState> update(
+    String room,
+    String id,
+    bool muted,
+    bool deafened,
+  ) => trace('update', () => super.update(room, id, muted, deafened));
 }
 
 class ProbePreferences implements VoiceDevicePreferences {
@@ -184,7 +193,12 @@ Future<Map<String, int>> waitForAudio(NativeVoiceMedia media) async {
 }
 
 // RTT и jitter buffer характеризуют медиатранспорт, а не акустическую задержку.
-Future<void> sampleAudio(Directory work, String role, String phase, ProbeMedia media) async {
+Future<void> sampleAudio(
+  Directory work,
+  String role,
+  String phase,
+  ProbeMedia media,
+) async {
   await Future<void>.delayed(const Duration(seconds: 2));
   final clock = Stopwatch()..start();
   final samples = <Map<String, Object>>[];
@@ -194,7 +208,12 @@ Future<void> sampleAudio(Directory work, String role, String phase, ProbeMedia m
       'milliseconds': clock.elapsedMilliseconds,
       'reports': [
         for (final report in reports)
-          if (['inbound-rtp', 'outbound-rtp', 'remote-inbound-rtp', 'candidate-pair'].contains(report.type))
+          if ([
+            'inbound-rtp',
+            'outbound-rtp',
+            'remote-inbound-rtp',
+            'candidate-pair',
+          ].contains(report.type))
             {'id': report.id, 'type': report.type, ...report.values},
       ],
     });
@@ -202,10 +221,14 @@ Future<void> sampleAudio(Directory work, String role, String phase, ProbeMedia m
   }
   await flag(work, '$role-$phase-metrics.json', jsonEncode(samples));
   if (checkPcm) {
-    double energy(Map<String, Object> sample) =>
-        (sample['reports'] as List).cast<Map<dynamic, dynamic>>()
-            .where((report) => report['type'] == 'inbound-rtp')
-            .fold(0.0, (sum, report) => sum + ((report['totalAudioEnergy'] as num?)?.toDouble() ?? 0));
+    double energy(Map<String, Object> sample) => (sample['reports'] as List)
+        .cast<Map<dynamic, dynamic>>()
+        .where((report) => report['type'] == 'inbound-rtp')
+        .fold(
+          0.0,
+          (sum, report) =>
+              sum + ((report['totalAudioEnergy'] as num?)?.toDouble() ?? 0),
+        );
     if (energy(samples.last) <= energy(samples.first)) {
       throw StateError('Получены сэмплы без энергии тестового PCM-сигнала');
     }
@@ -235,17 +258,15 @@ Future<void> scenario(Directory work, String origin, String role) async {
   VoicePhase? previousPhase;
   final trace = controller.stream.listen((state) {
     if (state.phase != previousPhase) {
-      timeline.add({'phase': state.phase.name, 'milliseconds': traceClock.elapsedMilliseconds});
+      timeline.add({
+        'phase': state.phase.name,
+        'milliseconds': traceClock.elapsedMilliseconds,
+      });
       previousPhase = state.phase;
     }
-    debugPrint('VOICE_STATE ${jsonEncode({
-      'role': role,
-      'milliseconds': traceClock.elapsedMilliseconds,
-      'phase': state.phase.name,
-      'error': state.error,
-      'muted': state.muted,
-      'deafened': state.deafened,
-    })}');
+    debugPrint(
+      'VOICE_STATE ${jsonEncode({'role': role, 'milliseconds': traceClock.elapsedMilliseconds, 'phase': state.phase.name, 'error': state.error, 'muted': state.muted, 'deafened': state.deafened})}',
+    );
   });
   try {
     await devices.refresh();
@@ -412,8 +433,16 @@ Future<void> borisControls(Directory work, VoiceController controller) async {
 
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isLinux && Platform.environment['SPACE_VOICE_DESKTOP_CHECK'] == '1') {
-    args = [for (final key in ['SPACE_VOICE_ORIGIN', 'SPACE_VOICE_WORK', 'SPACE_VOICE_ROLE']) Platform.environment[key]!];
+  if (Platform.isLinux &&
+      Platform.environment['SPACE_VOICE_DESKTOP_CHECK'] == '1') {
+    args = [
+      for (final key in [
+        'SPACE_VOICE_ORIGIN',
+        'SPACE_VOICE_WORK',
+        'SPACE_VOICE_ROLE',
+      ])
+        Platform.environment[key]!,
+    ];
   }
   if (Platform.isAndroid &&
       const bool.fromEnvironment('SPACE_VOICE_ANDROID_CHECK')) {

@@ -22,7 +22,9 @@ void probeKey(
 Future<void> expectTransmission(ProbeMedia media, bool value) async {
   await Future<void>.delayed(const Duration(milliseconds: 100));
   if (media.transmitting != value) {
-    throw StateError('РќРµРІРµСЂРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РЅР°С‚РёРІРЅРѕР№ РїРµСЂРµРґР°С‡Рё: РѕР¶РёРґР°РµС‚СЃСЏ $value');
+    throw StateError(
+      'Неверное состояние нативной передачи: ожидается $value',
+    );
   }
 }
 
@@ -33,12 +35,10 @@ Future<void> checkPushToTalk(
   WidgetsBinding.instance.handleAppLifecycleStateChanged(
     AppLifecycleState.resumed,
   );
-  await controller.devices.updateAudio(
-    probeAudio.copyWith(pushToTalk: true),
-  );
+  await controller.devices.updateAudio(probeAudio.copyWith(pushToTalk: true));
   if (!controller.devices.state.audio.pushToTalk || controller.state.muted) {
     throw StateError(
-      'Р РµР¶РёРј СЂР°С†РёРё РЅРµ РїСЂРёРјРµРЅС‘РЅ: ${controller.devices.state.error}; ${controller.state.error}',
+      'Режим рации не применён: ${controller.devices.state.error}; ${controller.state.error}',
     );
   }
   await expectTransmission(media, false);
@@ -100,9 +100,7 @@ Future<void> checkReconnect(
     }
   });
   try {
-    await controller.devices.updateAudio(
-      probeAudio.copyWith(pushToTalk: true),
-    );
+    await controller.devices.updateAudio(probeAudio.copyWith(pushToTalk: true));
     WidgetsBinding.instance.handleAppLifecycleStateChanged(
       AppLifecycleState.resumed,
     );
@@ -115,7 +113,9 @@ Future<void> checkReconnect(
     if (!controller.state.muted ||
         media.length < 2 ||
         media.last.transmitting) {
-      throw StateError('РџРµСЂРµРїРѕРґРєР»СЋС‡РµРЅРёРµ РЅРµ РѕСЃС‚Р°РЅРѕРІРёР»Рѕ РјРёРєСЂРѕС„РѕРЅ');
+      throw StateError(
+        'Переподключение не остановило микрофон',
+      );
     }
     await flag(work, '$role-recovered', 'ready');
     if (Platform.isAndroid) await androidProbeBarrier('foreground-restored');
@@ -123,7 +123,9 @@ Future<void> checkReconnect(
     if (role == 'B') await barrier(work, 'A-resumed-microphone');
     await controller.toggleMicrophone();
     if (controller.state.muted) {
-      throw StateError('РњРёРєСЂРѕС„РѕРЅ РЅРµ РІРєР»СЋС‡РёР»СЃСЏ РІСЂСѓС‡РЅСѓСЋ РїРѕСЃР»Рµ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ');
+      throw StateError(
+        'Микрофон не включился вручную после восстановления',
+      );
     }
     await expectTransmission(media.last, false);
     probeKey(LogicalKeyboardKey.f8, PhysicalKeyboardKey.f8, false);
