@@ -86,27 +86,30 @@ void main() {
     });
     addTearDown(actions.close);
     final semantics = tester.ensureSemantics();
-    addTearDown(semantics.dispose);
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: ExtensionPanel(
-            document: parse(source()),
-            actions: actions,
-            locale: 'ru',
-            originLabel: 'Расширение: Опросы',
-            errorText: 'Повторите действие',
+    try {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ExtensionPanel(
+              document: parse(source()),
+              actions: actions,
+              locale: 'ru',
+              originLabel: 'Расширение: Опросы',
+              errorText: 'Повторите действие',
+            ),
           ),
         ),
-      ),
-    );
-    expect(find.text('Выберите время'), findsOneWidget);
-    expect(find.text('Расширение: Опросы'), findsOneWidget);
-    expect(find.bySemanticsLabel('Проголосовать'), findsOneWidget);
-    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
-    await tester.pumpAndSettle();
-    expect(calls, 1);
+      );
+      expect(find.text('Выберите время'), findsOneWidget);
+      expect(find.text('Расширение: Опросы'), findsOneWidget);
+      expect(find.bySemanticsLabel('Проголосовать'), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(calls, 1);
+    } finally {
+      semantics.dispose();
+    }
   });
 
   testWidgets('Масштаб 3x и узкий экран сохраняют действие', (tester) async {
