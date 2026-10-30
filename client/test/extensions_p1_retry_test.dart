@@ -38,13 +38,23 @@ void main() {
   }
   test('Отказ доступа после потери ответа не доказывает откат', () {
     final first = decideExtensionRetry((
-      code: 'TransportLost', attempt: 1, elapsedMs: 0, remainingMs: 30000,
-      windowKnown: true, sameRequest: true, cancelled: false,
+      code: 'TransportLost',
+      attempt: 1,
+      elapsedMs: 0,
+      remainingMs: 30000,
+      windowKnown: true,
+      sameRequest: true,
+      cancelled: false,
       previousUnknown: false,
     ));
     final denied = decideExtensionRetry((
-      code: 'PermissionDenied', attempt: 2, elapsedMs: 250, remainingMs: 29750,
-      windowKnown: true, sameRequest: true, cancelled: false,
+      code: 'PermissionDenied',
+      attempt: 2,
+      elapsedMs: 250,
+      remainingMs: 29750,
+      windowKnown: true,
+      sameRequest: true,
+      cancelled: false,
       previousUnknown: first.unknown,
     ));
     expect(first.action, 'retry_same_request');
