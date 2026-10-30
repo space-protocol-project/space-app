@@ -16,6 +16,13 @@ jobs:
           repository: space-protocol-project/space-server
           ref: f23b46a5b440383ce2b5fc6d807d62bc45cdf3ef
           path: .local/p1-server
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-protocol
+          ref: 8c0c7bf7408e2d5f856d8ec4b4b2875c523f0e3d
+          path: .local/p1-protocol
+      - name: Shared retry contract
+        run: cmp client/test/fixtures/extensions_p1/retry.json .local/p1-protocol/docs/extensions/p1/retry.json
       - uses: actions/setup-go@v5
         with:
           go-version-file: .local/p1-server/experiments/extensions/go.mod
@@ -38,7 +45,7 @@ jobs:
         working-directory: client
         run: |
           flutter pub get
-          dart format lib/src/extensions_p1/demo_session.dart lib/ui/extensions_p1_demo.dart test/extensions_p1_live_test.dart test/probes/extension_demo_probe.dart
+          dart format lib/src/extensions_p1/retry.dart test/extensions_p1_retry_test.dart lib/src/extensions_p1/demo_session.dart lib/ui/extensions_p1_demo.dart test/extensions_p1_live_test.dart test/probes/extension_demo_probe.dart
           flutter analyze
       - name: HTTP, права, отказ WASM, Flutter и горячий перезапуск
         run: |
@@ -55,6 +62,8 @@ jobs:
             .local/p1-demo/server.log
             .local/p1-demo/worker-probe.txt
             .local/p1-demo-native
+            client/lib/src/extensions_p1/retry.dart
+            client/test/extensions_p1_retry_test.dart
             client/lib/src/extensions_p1/demo_session.dart
             client/lib/ui/extensions_p1_demo.dart
             client/test/extensions_p1_live_test.dart

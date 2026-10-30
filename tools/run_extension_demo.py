@@ -62,7 +62,7 @@ try:
     assert status==200 and body['strings']['ru']['status']=='Готово к проверке'
     env=dict(os.environ,P1_DEMO_URL=address.read_text(),P1_DEMO_EDITOR=credentials['Editor'],P1_DEMO_READER=credentials['Reader'])
     with (out/'widget-tests.txt').open('w') as output:
-        subprocess.run(['flutter','test','test/extensions_p1_test.dart','test/extensions_p1_live_test.dart','--reporter','expanded'],cwd='client',env=env,stdout=output,stderr=subprocess.STDOUT,check=True)
+        subprocess.run(['flutter','test','test/extensions_p1_test.dart','test/extensions_p1_live_test.dart','test/extensions_p1_retry_test.dart','--reporter','expanded'],cwd='client',env=env,stdout=output,stderr=subprocess.STDOUT,check=True)
     subprocess.run(['xvfb-run','-a','python3','tools/check_extension_demo_ui.py'],env=env,check=True)
     (out/'results.json').write_text(json.dumps({'http_checks':checks,'healthy_after_fault':True,'flutter_widgets':'passed','native_restart':'passed'},indent=2)+'\n')
 finally:
