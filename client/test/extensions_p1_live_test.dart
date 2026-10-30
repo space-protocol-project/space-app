@@ -7,7 +7,7 @@ import 'package:space_client/ui/extensions_p1_demo.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  final previousOverrides = HttpOverrides.global;
+  final previousOverrides = HttpOverrides.current;
   setUpAll(() { HttpOverrides.global = null; });
   tearDownAll(() { HttpOverrides.global = previousOverrides; });
   testWidgets('Настоящий dispatcher и WASM обновляют элемент Обзора', (tester) async {
@@ -15,8 +15,9 @@ void main() {
     final session = ExtensionDemoSession(ExtensionDemoConnection(endpoint, Platform.environment['P1_DEMO_EDITOR']!));
     addTearDown(session.close);
     await tester.runAsync(() async {
+      final loaded = session.stream.firstWhere((state) => state is! ExtensionDemoLoading);
       await tester.pumpWidget(MaterialApp(home: Scaffold(body: ExtensionDemoView(session: session))));
-      await session.stream.firstWhere((state) => state is! ExtensionDemoLoading).timeout(const Duration(seconds: 10));
+      await loaded.timeout(const Duration(seconds: 10));
     });
     await tester.pumpAndSettle();
     expect(find.text('Готово к проверке'), findsOneWidget);
@@ -34,8 +35,9 @@ void main() {
     final session = ExtensionDemoSession(ExtensionDemoConnection(Uri.parse(Platform.environment['P1_DEMO_URL']!), Platform.environment['P1_DEMO_READER']!));
     addTearDown(session.close);
     await tester.runAsync(() async {
+      final loaded = session.stream.firstWhere((state) => state is! ExtensionDemoLoading);
       await tester.pumpWidget(MaterialApp(home: Scaffold(body: ExtensionDemoView(session: session))));
-      await session.stream.firstWhere((state) => state is! ExtensionDemoLoading).timeout(const Duration(seconds: 10));
+      await loaded.timeout(const Duration(seconds: 10));
     });
     await tester.pumpAndSettle();
     expect(find.text('Готово к проверке'), findsOneWidget);
