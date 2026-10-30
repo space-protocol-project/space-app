@@ -23,7 +23,7 @@ ExtensionRetryDecision decideExtensionRetry(ExtensionRetryObservation o) {
   final (ambiguous, known) = _retryCode(o.code);
   final unknown = o.previousUnknown || ambiguous || !known;
   final stop = (action: 'stop', unknown: unknown, delayMs: 0);
-  if (o.cancelled || !known || o.code == 'Canceled') return stop;
+  if (o.cancelled || !known || o.code == 'Canceled' || o.code == 'DataLoss') return stop;
   if (o.code == 'Unauthenticated') {
     return (action: 'reauthenticate', unknown: unknown, delayMs: 0);
   }
@@ -47,10 +47,10 @@ int _retryDelay(ExtensionRetryObservation o, bool ambiguous) {
 (bool, bool) _retryCode(String code) {
   return switch (code) {
     'Unknown' || 'Internal' || 'Unavailable' || 'DeadlineExceeded' ||
-    'TransportLost' || 'Canceled' => (true, true),
+    'TransportLost' || 'Canceled' || 'DataLoss' => (true, true),
     'InvalidArgument' || 'NotFound' || 'AlreadyExists' || 'PermissionDenied' ||
     'ResourceExhausted' || 'FailedPrecondition' || 'Aborted' || 'OutOfRange' ||
-    'Unimplemented' || 'DataLoss' || 'Unauthenticated' => (false, true),
+    'Unimplemented' || 'Unauthenticated' => (false, true),
     _ => (false, false),
   };
 }
