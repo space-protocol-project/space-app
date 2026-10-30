@@ -1,0 +1,59 @@
+name: P1 extension end-to-end demo
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  demo:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: 1e7c38889d39a27e6bbc8831bfd10e13e58637e2
+          path: .local/p1-server
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .local/p1-server/experiments/extensions/go.mod
+          cache-dependency-path: .local/p1-server/experiments/extensions/go.sum
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - name: Инструменты стенда
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wabt clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb dbus-x11
+          rustup toolchain install 1.99.1 --profile minimal
+      - name: Настоящий WASM и изолированный сервер
+        working-directory: .local/p1-server/experiments/extensions
+        run: |
+          python3 fixtures.py
+          python3 demo/build.py
+          go build -o p1-worker ./cmd/p1-worker
+          go build -o p1-demo ./cmd/p1-demo
+      - name: Анализ клиента
+        working-directory: client
+        run: |
+          flutter pub get
+          dart format lib/src/extensions_p1/demo_session.dart lib/ui/extensions_p1_demo.dart test/extensions_p1_live_test.dart test/probes/extension_demo_probe.dart
+          flutter analyze
+      - name: HTTP, права, отказ WASM, Flutter и горячий перезапуск
+        run: |
+          sudo sh -c 'echo "+memory +pids +cpu" > /sys/fs/cgroup/cgroup.subtree_control'
+          dbus-run-session -- python3 tools/run_extension_demo.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-extension-demo
+          path: |
+            .local/p1-demo/results.json
+            .local/p1-demo/widget-tests.txt
+            .local/p1-demo/server.log
+            .local/p1-demo-native
+            client/lib/src/extensions_p1/demo_session.dart
+            client/lib/ui/extensions_p1_demo.dart
+            client/test/extensions_p1_live_test.dart
+            client/test/probes/extension_demo_probe.dart
