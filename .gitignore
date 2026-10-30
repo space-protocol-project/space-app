@@ -19,3 +19,6 @@ coverage/
 *.log
 
 __pycache__/
+
+# Зависимости библиотечного UI-пакета закрепляет приложение
+/packages/space_admin_ui/pubspec.lock
