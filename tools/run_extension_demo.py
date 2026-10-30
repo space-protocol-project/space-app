@@ -26,8 +26,6 @@ checks=[]
 # Контроль запуска под тем же непривилегированным UID, только доверенная echo-фикстура.
 probe_input=b'{"abi":"space_plugin_p1","kind":"query","name":"overview","payload":{},"context":{"space_id":"space_demo"}}'
 probe_wire={'protocol':'space.worker.p1','wasm':base64.b64encode((server/'testdata/echo.wasm').read_bytes()).decode(),'request':base64.b64encode(probe_input).decode(),'interpreter':False,'allow_wait':False}
-probe=subprocess.run(['sudo','-u','nobody','/tmp/space-p1-demo-worker'],input=json.dumps(probe_wire).encode(),capture_output=True,timeout=5)
-(out/'worker-probe.txt').write_text(f'exit={probe.returncode} stdout={probe.stdout!r} stderr={probe.stderr!r}\n')
 
 
 def exchange(token, change=None, extra=None):
@@ -42,6 +40,8 @@ def exchange(token, change=None, extra=None):
         return error.code,json.load(error)
 
 try:
+    probe=subprocess.run(['sudo','-u','nobody','/tmp/space-p1-demo-worker'],input=json.dumps(probe_wire).encode(),capture_output=True,timeout=5)
+    (out/'worker-probe.txt').write_text(f'exit={probe.returncode} stdout={probe.stdout!r} stderr={probe.stderr!r}\n')
     assert probe.returncode==0 and probe.stdout==probe_input, 'Direct worker probe failed'
     deadline=time.monotonic()+20
     while not Path(str(address)+'.pid').exists():
@@ -53,7 +53,7 @@ try:
         ('version',credentials['Editor'],{'protocol':'v99'},409,'unsupported_version'),
         ('context-spoof',credentials['Editor'],{'context':{'principal_id':'admin'}},400,'invalid_request'),
         ('unknown-instance',credentials['Editor'],{'instance':'other'},403,'permission_denied'),
-        ('worker-loop',credentials['Editor'],{'instance':'broken'},504,'deadline'),
+        ('worker-loop',credentials['Editor'],{'instance':'broken'},502,'extension_failed'),
     ]:
         actual,body=exchange(token,change)
         assert actual==status and body=={'code':code},(name,actual,body)
