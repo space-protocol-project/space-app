@@ -42,4 +42,21 @@ extension type ExtensionP1ServiceClient (connect.Transport _transport) {
       onTrailer: onTrailer,
     );
   }
+
+  Future<spacev1extensions_p1.ReconcileExtensionCommandResponse> reconcileExtensionCommand(
+    spacev1extensions_p1.ReconcileExtensionCommandRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ExtensionP1Service.reconcileExtensionCommand,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
 }

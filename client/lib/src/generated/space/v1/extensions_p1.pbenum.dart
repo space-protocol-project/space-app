@@ -40,5 +40,33 @@ class ExtensionCommandEffect extends $pb.ProtobufEnum {
   const ExtensionCommandEffect._(super.value, super.name);
 }
 
+class ExtensionCommandOutcome extends $pb.ProtobufEnum {
+  static const ExtensionCommandOutcome EXTENSION_COMMAND_OUTCOME_UNSPECIFIED =
+      ExtensionCommandOutcome._(
+          0, _omitEnumNames ? '' : 'EXTENSION_COMMAND_OUTCOME_UNSPECIFIED');
+
+  /// Квитанция отсутствует; это НЕ доказательство отсутствия эффекта.
+  static const ExtensionCommandOutcome EXTENSION_COMMAND_OUTCOME_UNKNOWN =
+      ExtensionCommandOutcome._(
+          1, _omitEnumNames ? '' : 'EXTENSION_COMMAND_OUTCOME_UNKNOWN');
+  static const ExtensionCommandOutcome EXTENSION_COMMAND_OUTCOME_CONFIRMED =
+      ExtensionCommandOutcome._(
+          2, _omitEnumNames ? '' : 'EXTENSION_COMMAND_OUTCOME_CONFIRMED');
+
+  static const $core.List<ExtensionCommandOutcome> values =
+      <ExtensionCommandOutcome>[
+    EXTENSION_COMMAND_OUTCOME_UNSPECIFIED,
+    EXTENSION_COMMAND_OUTCOME_UNKNOWN,
+    EXTENSION_COMMAND_OUTCOME_CONFIRMED,
+  ];
+
+  static final $core.List<ExtensionCommandOutcome?> _byValue =
+      $pb.ProtobufEnum.$_initByValueList(values, 2);
+  static ExtensionCommandOutcome? valueOf($core.int value) =>
+      value < 0 || value >= _byValue.length ? null : _byValue[value];
+
+  const ExtensionCommandOutcome._(super.value, super.name);
+}
+
 const $core.bool _omitEnumNames =
     $core.bool.fromEnvironment('protobuf.omit_enum_names');

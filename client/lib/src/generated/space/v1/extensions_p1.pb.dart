@@ -410,6 +410,184 @@ class ExecuteExtensionCommandResponse extends $pb.GeneratedMessage {
   void clearReplayed() => $_clearField(4);
 }
 
+/// Проверяет точный исходный запрос, не исполняя команду и не вызывая WASM.
+class ReconcileExtensionCommandRequest extends $pb.GeneratedMessage {
+  factory ReconcileExtensionCommandRequest({
+    ExecuteExtensionCommandRequest? command,
+  }) {
+    final result = ReconcileExtensionCommandRequest._();
+    if (command != null) result.command = command;
+    return result;
+  }
+
+  ReconcileExtensionCommandRequest._();
+
+  factory ReconcileExtensionCommandRequest.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ReconcileExtensionCommandRequest()..mergeFromBuffer(data, registry);
+  factory ReconcileExtensionCommandRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ReconcileExtensionCommandRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ReconcileExtensionCommandRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ReconcileExtensionCommandRequest.$_createMessage)
+    ..aOM<ExecuteExtensionCommandRequest>(1, _omitFieldNames ? '' : 'command',
+        subBuilder: ExecuteExtensionCommandRequest.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ReconcileExtensionCommandRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ReconcileExtensionCommandRequest copyWith(
+          void Function(ReconcileExtensionCommandRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as ReconcileExtensionCommandRequest))
+          as ReconcileExtensionCommandRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ReconcileExtensionCommandRequest() / ReconcileExtensionCommandRequest.new instead')
+  static ReconcileExtensionCommandRequest create() =>
+      ReconcileExtensionCommandRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ReconcileExtensionCommandRequest._();
+  @$core.override
+  ReconcileExtensionCommandRequest createEmptyInstance() =>
+      ReconcileExtensionCommandRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ReconcileExtensionCommandRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ReconcileExtensionCommandRequest>(
+          ReconcileExtensionCommandRequest.$_createMessage);
+  static ReconcileExtensionCommandRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ExecuteExtensionCommandRequest get command => $_getN(0);
+  @$pb.TagNumber(1)
+  set command(ExecuteExtensionCommandRequest value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasCommand() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearCommand() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ExecuteExtensionCommandRequest ensureCommand() => $_ensure(0);
+}
+
+class ReconcileExtensionCommandResponse extends $pb.GeneratedMessage {
+  factory ReconcileExtensionCommandResponse({
+    ExtensionCommandOutcome? outcome,
+    ExecuteExtensionCommandResponse? receipt,
+    $core.bool? retryWindowKnown,
+    $fixnum.Int64? retryWindowRemainingMs,
+  }) {
+    final result = ReconcileExtensionCommandResponse._();
+    if (outcome != null) result.outcome = outcome;
+    if (receipt != null) result.receipt = receipt;
+    if (retryWindowKnown != null) result.retryWindowKnown = retryWindowKnown;
+    if (retryWindowRemainingMs != null)
+      result.retryWindowRemainingMs = retryWindowRemainingMs;
+    return result;
+  }
+
+  ReconcileExtensionCommandResponse._();
+
+  factory ReconcileExtensionCommandResponse.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ReconcileExtensionCommandResponse()..mergeFromBuffer(data, registry);
+  factory ReconcileExtensionCommandResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ReconcileExtensionCommandResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ReconcileExtensionCommandResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ReconcileExtensionCommandResponse.$_createMessage)
+    ..aE<ExtensionCommandOutcome>(1, _omitFieldNames ? '' : 'outcome',
+        enumValues: ExtensionCommandOutcome.values)
+    ..aOM<ExecuteExtensionCommandResponse>(2, _omitFieldNames ? '' : 'receipt',
+        subBuilder: ExecuteExtensionCommandResponse.$_createMessage)
+    ..aOB(3, _omitFieldNames ? '' : 'retryWindowKnown')
+    ..a<$fixnum.Int64>(
+        4, _omitFieldNames ? '' : 'retryWindowRemainingMs', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ReconcileExtensionCommandResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ReconcileExtensionCommandResponse copyWith(
+          void Function(ReconcileExtensionCommandResponse) updates) =>
+      super.copyWith((message) =>
+              updates(message as ReconcileExtensionCommandResponse))
+          as ReconcileExtensionCommandResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ReconcileExtensionCommandResponse() / ReconcileExtensionCommandResponse.new instead')
+  static ReconcileExtensionCommandResponse create() =>
+      ReconcileExtensionCommandResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ReconcileExtensionCommandResponse._();
+  @$core.override
+  ReconcileExtensionCommandResponse createEmptyInstance() =>
+      ReconcileExtensionCommandResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ReconcileExtensionCommandResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ReconcileExtensionCommandResponse>(
+          ReconcileExtensionCommandResponse.$_createMessage);
+  static ReconcileExtensionCommandResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ExtensionCommandOutcome get outcome => $_getN(0);
+  @$pb.TagNumber(1)
+  set outcome(ExtensionCommandOutcome value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasOutcome() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearOutcome() => $_clearField(1);
+
+  /// Только для CONFIRMED; выдача требует текущих прав исполнения команды.
+  @$pb.TagNumber(2)
+  ExecuteExtensionCommandResponse get receipt => $_getN(1);
+  @$pb.TagNumber(2)
+  set receipt(ExecuteExtensionCommandResponse value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasReceipt() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearReceipt() => $_clearField(2);
+  @$pb.TagNumber(2)
+  ExecuteExtensionCommandResponse ensureReceipt() => $_ensure(1);
+
+  /// P1 пока возвращает false/0: срок хранения и tombstone ещё не реализованы.
+  /// UNKNOWN никогда не разрешает повторную отправку сам по себе.
+  @$pb.TagNumber(3)
+  $core.bool get retryWindowKnown => $_getBF(2);
+  @$pb.TagNumber(3)
+  set retryWindowKnown($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasRetryWindowKnown() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearRetryWindowKnown() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get retryWindowRemainingMs => $_getI64(3);
+  @$pb.TagNumber(4)
+  set retryWindowRemainingMs($fixnum.Int64 value) => $_setInt64(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasRetryWindowRemainingMs() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearRetryWindowRemainingMs() => $_clearField(4);
+}
+
 /// Недоверенное предложение WASM, не SQL и не разрешение записи.
 /// Приёмка требует новой проверки сессии/ACL внутри транзакции записи.
 class ExtensionMutationPlan extends $pb.GeneratedMessage {
@@ -682,6 +860,14 @@ class ExtensionP1ServiceApi {
           'ExecuteExtensionCommand',
           request,
           ExecuteExtensionCommandResponse());
+  $async.Future<ReconcileExtensionCommandResponse> reconcileExtensionCommand(
+          $pb.ClientContext? ctx, ReconcileExtensionCommandRequest request) =>
+      _client.invoke<ReconcileExtensionCommandResponse>(
+          ctx,
+          'ExtensionP1Service',
+          'ReconcileExtensionCommand',
+          request,
+          ReconcileExtensionCommandResponse());
 }
 
 const $core.bool _omitFieldNames =

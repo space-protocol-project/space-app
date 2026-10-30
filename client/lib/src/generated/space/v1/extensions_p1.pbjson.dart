@@ -31,6 +31,22 @@ final $typed_data.Uint8List extensionCommandEffectDescriptor = $convert.base64De
     'NQRUNJRklFRBAAEiEKHUVYVEVOU0lPTl9DT01NQU5EX0VGRkVDVF9OT05FEAESJQohRVhURU5T'
     'SU9OX0NPTU1BTkRfRUZGRUNUX01VVEFUSU9OEAI=');
 
+@$core.Deprecated('Use extensionCommandOutcomeDescriptor instead')
+const ExtensionCommandOutcome$json = {
+  '1': 'ExtensionCommandOutcome',
+  '2': [
+    {'1': 'EXTENSION_COMMAND_OUTCOME_UNSPECIFIED', '2': 0},
+    {'1': 'EXTENSION_COMMAND_OUTCOME_UNKNOWN', '2': 1},
+    {'1': 'EXTENSION_COMMAND_OUTCOME_CONFIRMED', '2': 2},
+  ],
+};
+
+/// Descriptor for `ExtensionCommandOutcome`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List extensionCommandOutcomeDescriptor = $convert.base64Decode(
+    'ChdFeHRlbnNpb25Db21tYW5kT3V0Y29tZRIpCiVFWFRFTlNJT05fQ09NTUFORF9PVVRDT01FX1'
+    'VOU1BFQ0lGSUVEEAASJQohRVhURU5TSU9OX0NPTU1BTkRfT1VUQ09NRV9VTktOT1dOEAESJwoj'
+    'RVhURU5TSU9OX0NPTU1BTkRfT1VUQ09NRV9DT05GSVJNRUQQAg==');
+
 @$core.Deprecated('Use queryExtensionRequestDescriptor instead')
 const QueryExtensionRequest$json = {
   '1': 'QueryExtensionRequest',
@@ -123,6 +139,72 @@ final $typed_data.Uint8List executeExtensionCommandResponseDescriptor =
         'YW5kRWZmZWN0UgZlZmZlY3QSJQoOc3RhdGVfcmV2aXNpb24YAyABKARSDXN0YXRlUmV2aXNpb2'
         '4SGgoIcmVwbGF5ZWQYBCABKAhSCHJlcGxheWVk');
 
+@$core.Deprecated('Use reconcileExtensionCommandRequestDescriptor instead')
+const ReconcileExtensionCommandRequest$json = {
+  '1': 'ReconcileExtensionCommandRequest',
+  '2': [
+    {
+      '1': 'command',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.ExecuteExtensionCommandRequest',
+      '10': 'command'
+    },
+  ],
+};
+
+/// Descriptor for `ReconcileExtensionCommandRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List reconcileExtensionCommandRequestDescriptor =
+    $convert.base64Decode(
+        'CiBSZWNvbmNpbGVFeHRlbnNpb25Db21tYW5kUmVxdWVzdBJCCgdjb21tYW5kGAEgASgLMiguc3'
+        'BhY2UudjEuRXhlY3V0ZUV4dGVuc2lvbkNvbW1hbmRSZXF1ZXN0Ugdjb21tYW5k');
+
+@$core.Deprecated('Use reconcileExtensionCommandResponseDescriptor instead')
+const ReconcileExtensionCommandResponse$json = {
+  '1': 'ReconcileExtensionCommandResponse',
+  '2': [
+    {
+      '1': 'outcome',
+      '3': 1,
+      '4': 1,
+      '5': 14,
+      '6': '.space.v1.ExtensionCommandOutcome',
+      '10': 'outcome'
+    },
+    {
+      '1': 'receipt',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.space.v1.ExecuteExtensionCommandResponse',
+      '10': 'receipt'
+    },
+    {
+      '1': 'retry_window_known',
+      '3': 3,
+      '4': 1,
+      '5': 8,
+      '10': 'retryWindowKnown'
+    },
+    {
+      '1': 'retry_window_remaining_ms',
+      '3': 4,
+      '4': 1,
+      '5': 4,
+      '10': 'retryWindowRemainingMs'
+    },
+  ],
+};
+
+/// Descriptor for `ReconcileExtensionCommandResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List reconcileExtensionCommandResponseDescriptor = $convert.base64Decode(
+    'CiFSZWNvbmNpbGVFeHRlbnNpb25Db21tYW5kUmVzcG9uc2USOwoHb3V0Y29tZRgBIAEoDjIhLn'
+    'NwYWNlLnYxLkV4dGVuc2lvbkNvbW1hbmRPdXRjb21lUgdvdXRjb21lEkMKB3JlY2VpcHQYAiAB'
+    'KAsyKS5zcGFjZS52MS5FeGVjdXRlRXh0ZW5zaW9uQ29tbWFuZFJlc3BvbnNlUgdyZWNlaXB0Ei'
+    'wKEnJldHJ5X3dpbmRvd19rbm93bhgDIAEoCFIQcmV0cnlXaW5kb3dLbm93bhI5ChlyZXRyeV93'
+    'aW5kb3dfcmVtYWluaW5nX21zGAQgASgEUhZyZXRyeVdpbmRvd1JlbWFpbmluZ01z');
+
 @$core.Deprecated('Use extensionMutationPlanDescriptor instead')
 const ExtensionMutationPlan$json = {
   '1': 'ExtensionMutationPlan',
@@ -207,6 +289,11 @@ const $core.Map<$core.String, $core.dynamic> ExtensionP1ServiceBase$json = {
       '2': '.space.v1.ExecuteExtensionCommandRequest',
       '3': '.space.v1.ExecuteExtensionCommandResponse'
     },
+    {
+      '1': 'ReconcileExtensionCommand',
+      '2': '.space.v1.ReconcileExtensionCommandRequest',
+      '3': '.space.v1.ReconcileExtensionCommandResponse'
+    },
   ],
 };
 
@@ -219,6 +306,10 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
       ExecuteExtensionCommandRequest$json,
   '.space.v1.ExecuteExtensionCommandResponse':
       ExecuteExtensionCommandResponse$json,
+  '.space.v1.ReconcileExtensionCommandRequest':
+      ReconcileExtensionCommandRequest$json,
+  '.space.v1.ReconcileExtensionCommandResponse':
+      ReconcileExtensionCommandResponse$json,
 };
 
 /// Descriptor for `ExtensionP1Service`. Decode as a `google.protobuf.ServiceDescriptorProto`.
@@ -226,4 +317,7 @@ final $typed_data.Uint8List extensionP1ServiceDescriptor = $convert.base64Decode
     'ChJFeHRlbnNpb25QMVNlcnZpY2USUwoOUXVlcnlFeHRlbnNpb24SHy5zcGFjZS52MS5RdWVyeU'
     'V4dGVuc2lvblJlcXVlc3QaIC5zcGFjZS52MS5RdWVyeUV4dGVuc2lvblJlc3BvbnNlEm4KF0V4'
     'ZWN1dGVFeHRlbnNpb25Db21tYW5kEiguc3BhY2UudjEuRXhlY3V0ZUV4dGVuc2lvbkNvbW1hbm'
-    'RSZXF1ZXN0Gikuc3BhY2UudjEuRXhlY3V0ZUV4dGVuc2lvbkNvbW1hbmRSZXNwb25zZQ==');
+    'RSZXF1ZXN0Gikuc3BhY2UudjEuRXhlY3V0ZUV4dGVuc2lvbkNvbW1hbmRSZXNwb25zZRJ0ChlS'
+    'ZWNvbmNpbGVFeHRlbnNpb25Db21tYW5kEiouc3BhY2UudjEuUmVjb25jaWxlRXh0ZW5zaW9uQ2'
+    '9tbWFuZFJlcXVlc3QaKy5zcGFjZS52MS5SZWNvbmNpbGVFeHRlbnNpb25Db21tYW5kUmVzcG9u'
+    'c2U=');

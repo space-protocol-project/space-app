@@ -24,4 +24,11 @@ abstract final class ExtensionP1Service {
     spacev1extensions_p1.ExecuteExtensionCommandRequest.new,
     spacev1extensions_p1.ExecuteExtensionCommandResponse.new,
   );
+
+  static const reconcileExtensionCommand = connect.Spec(
+    '/$name/ReconcileExtensionCommand',
+    connect.StreamType.unary,
+    spacev1extensions_p1.ReconcileExtensionCommandRequest.new,
+    spacev1extensions_p1.ReconcileExtensionCommandResponse.new,
+  );
 }
