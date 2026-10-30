@@ -32,7 +32,7 @@ jobs:
         run: |
           python3 fixtures.py
           python3 demo/build.py
-          go build -o p1-worker ./cmd/p1-worker
+          go build -o /tmp/space-p1-demo-worker ./cmd/p1-worker
           go build -o p1-demo ./cmd/p1-demo
       - name: Анализ клиента
         working-directory: client

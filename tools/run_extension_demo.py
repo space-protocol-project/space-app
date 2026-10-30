@@ -20,7 +20,7 @@ root = '/sys/fs/cgroup/space-p1-demo'
 subprocess.run(['sudo','mkdir',root],check=True)
 subprocess.run(['sudo','sh','-c',f'echo "+memory +pids +cpu" > {root}/cgroup.subtree_control'],check=True)
 log = (out/'server.log').open('w')
-process = subprocess.Popen(['sudo','-n',str(server/'p1-demo'),'-cgroup',root,'-worker',str(server/'p1-worker'),'-credentials',str(credential_file),'-address-file',str(address)],cwd=server,stdout=log,stderr=log)
+process = subprocess.Popen(['sudo','-n',str(server/'p1-demo'),'-cgroup',root,'-worker','/tmp/space-p1-demo-worker','-credentials',str(credential_file),'-address-file',str(address)],cwd=server,stdout=log,stderr=log)
 checks=[]
 
 def exchange(token, change=None, extra=None):
