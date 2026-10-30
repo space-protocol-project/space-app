@@ -1,0 +1,74 @@
+name: Генерация контрактов расширений P1
+on:
+  workflow_dispatch:
+    inputs:
+      protocol_ref:
+        required: true
+        type: string
+      app_ref:
+        required: true
+        type: string
+      server_ref:
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  generate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-app
+          ref: ${{ inputs.app_ref }}
+          path: app
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: ${{ inputs.server_ref }}
+          path: server
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-protocol
+          ref: ${{ inputs.protocol_ref }}
+          path: protocol
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.8'
+          channel: stable
+          cache: true
+      - name: Закреплённые генераторы проекта
+        run: |
+          go install github.com/bufbuild/buf/cmd/buf@v1.75.0
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.2
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.32.0
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.32.0
+          dart pub global activate protoc_plugin 25.1.0
+          dart pub global activate connectrpc 2.0.1
+      - name: Проверка контракта и генерация только нового RPC
+        env:
+          SCHEMA: ${{ runner.temp }}/extensions-p1-schema
+        run: |
+          (cd protocol && buf lint)
+          mkdir -p "$SCHEMA/space/v1"
+          cp protocol/protocol/proto/space/v1/extensions_p1.proto "$SCHEMA/space/v1/"
+          (cd protocol && buf generate "$SCHEMA" --template buf.gen.yaml)
+          (cd server && buf generate "$SCHEMA" --template buf.gen.yaml)
+          (cd server && buf generate "$SCHEMA" --template buf.connect.gen.yaml)
+          (cd app && buf generate "$SCHEMA" --template client/buf.gen.yaml)
+          (cd app && buf generate "$SCHEMA" --template client/buf.connect.gen.yaml)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: generated-extension-p1
+          path: |
+            protocol/protocol/openapi/space/v1/extensions_p1.swagger.json
+            server/gen/space/v1/extensions_p1*.go
+            server/gen/space/v1/spacev1connect/extensions_p1.connect.go
+            app/client/lib/src/generated/space/v1/extensions_p1*.dart
+          if-no-files-found: error
