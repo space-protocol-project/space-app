@@ -8,9 +8,12 @@ import 'document.dart';
 // Экспериментальный транспорт. Рабочие сессии и навигация его не используют.
 class ExtensionDemoConnection {
   ExtensionDemoConnection(this.endpoint, this.token) {
-    if (endpoint.scheme != 'http' || endpoint.host != '127.0.0.1' ||
-        endpoint.path != '/dispatch' || endpoint.hasQuery ||
-        endpoint.hasFragment || endpoint.userInfo.isNotEmpty) {
+    if (endpoint.scheme != 'http' ||
+        endpoint.host != '127.0.0.1' ||
+        endpoint.path != '/dispatch' ||
+        endpoint.hasQuery ||
+        endpoint.hasFragment ||
+        endpoint.userInfo.isNotEmpty) {
       throw ArgumentError('Требуется loopback-стенд P1');
     }
   }
@@ -20,20 +23,35 @@ class ExtensionDemoConnection {
   Future<ExtensionDocument> fetch(String kind, String name) async {
     final client = http.Client();
     try {
-      final bytes = await _exchange(client, kind, name)
-          .timeout(const Duration(seconds: 5));
+      final bytes = await _exchange(
+        client,
+        kind,
+        name,
+      ).timeout(const Duration(seconds: 5));
       return ExtensionDocument.parse(bytes, {'acknowledge'});
     } finally {
       client.close();
     }
   }
 
-  Future<List<int>> _exchange(http.Client client, String kind, String name) async {
+  Future<List<int>> _exchange(
+    http.Client client,
+    String kind,
+    String name,
+  ) async {
     final request = http.Request('POST', endpoint)
       ..followRedirects = false
-      ..headers.addAll({'Content-Type': 'application/json', 'Authorization': 'Bearer $token'})
-      ..body = jsonEncode({'protocol': 'space.dispatch.p1', 'instance': 'demo',
-        'kind': kind, 'name': name, 'payload': <String, Object?>{}});
+      ..headers.addAll({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      })
+      ..body = jsonEncode({
+        'protocol': 'space.dispatch.p1',
+        'instance': 'demo',
+        'kind': kind,
+        'name': name,
+        'payload': <String, Object?>{},
+      });
     final response = await client.send(request);
     if (response.statusCode != 200 ||
         response.headers['content-type'] != 'application/json') {
@@ -50,13 +68,22 @@ class ExtensionDemoConnection {
   }
 }
 
-sealed class ExtensionDemoState { const ExtensionDemoState(); }
-class ExtensionDemoLoading extends ExtensionDemoState { const ExtensionDemoLoading(); }
+sealed class ExtensionDemoState {
+  const ExtensionDemoState();
+}
+
+class ExtensionDemoLoading extends ExtensionDemoState {
+  const ExtensionDemoLoading();
+}
+
 class ExtensionDemoLoaded extends ExtensionDemoState {
   const ExtensionDemoLoaded(this.document);
   final ExtensionDocument document;
 }
-class ExtensionDemoUnavailable extends ExtensionDemoState { const ExtensionDemoUnavailable(); }
+
+class ExtensionDemoUnavailable extends ExtensionDemoState {
+  const ExtensionDemoUnavailable();
+}
 
 class ExtensionDemoSession extends Cubit<ExtensionDemoState> {
   ExtensionDemoSession(this.connection) : super(const ExtensionDemoLoading());

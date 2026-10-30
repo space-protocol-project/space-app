@@ -17,7 +17,9 @@ class ExtensionDemoView extends StatefulWidget {
 }
 
 class _ExtensionDemoViewState extends State<ExtensionDemoView> {
-  late final actions = ExtensionActions({'acknowledge': widget.session.acknowledge});
+  late final actions = ExtensionActions({
+    'acknowledge': widget.session.acknowledge,
+  });
 
   @override
   void initState() {
@@ -32,18 +34,29 @@ class _ExtensionDemoViewState extends State<ExtensionDemoView> {
   }
 
   @override
-  Widget build(BuildContext context) => BlocBuilder<ExtensionDemoSession, ExtensionDemoState>(
-    bloc: widget.session,
-    builder: (context, state) => switch (state) {
-      ExtensionDemoLoading() => const Center(child: CircularProgressIndicator()),
-      ExtensionDemoLoaded(:final document) => ExtensionPanel(
-        document: document, actions: actions, locale: 'ru',
-        originLabel: 'Демонстрация P1', errorText: 'Расширение недоступно',
-      ),
-      ExtensionDemoUnavailable() => Column(children: [
-        const Text('Расширение недоступно'),
-        FilledButton(onPressed: widget.session.load, child: const Text('Повторить')),
-      ]),
-    },
-  );
+  Widget build(BuildContext context) =>
+      BlocBuilder<ExtensionDemoSession, ExtensionDemoState>(
+        bloc: widget.session,
+        builder: (context, state) => switch (state) {
+          ExtensionDemoLoading() => const Center(
+            child: CircularProgressIndicator(),
+          ),
+          ExtensionDemoLoaded(:final document) => ExtensionPanel(
+            document: document,
+            actions: actions,
+            locale: 'ru',
+            originLabel: 'Демонстрация P1',
+            errorText: 'Расширение недоступно',
+          ),
+          ExtensionDemoUnavailable() => Column(
+            children: [
+              const Text('Расширение недоступно'),
+              FilledButton(
+                onPressed: widget.session.load,
+                child: const Text('Повторить'),
+              ),
+            ],
+          ),
+        },
+      );
 }

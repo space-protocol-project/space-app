@@ -1,5 +1,6 @@
 """Запуск loopback-стенда с cgroup только в GitHub CI."""
 import json
+import base64
 import os
 from pathlib import Path
 import secrets
@@ -22,6 +23,12 @@ subprocess.run(['sudo','sh','-c',f'echo "+memory +pids +cpu" > {root}/cgroup.sub
 log = (out/'server.log').open('w')
 process = subprocess.Popen(['sudo','-n',str(server/'p1-demo'),'-cgroup',root,'-worker','/tmp/space-p1-demo-worker','-credentials',str(credential_file),'-address-file',str(address)],cwd=server,stdout=log,stderr=log)
 checks=[]
+# Контроль запуска под тем же непривилегированным UID, только доверенная echo-фикстура.
+probe_input=b'{"abi":"space_plugin_p1","kind":"query","name":"overview","payload":{},"context":{"space_id":"space_demo"}}'
+probe_wire={'protocol':'space.worker.p1','wasm':base64.b64encode((server/'testdata/echo.wasm').read_bytes()).decode(),'request':base64.b64encode(probe_input).decode(),'interpreter':False,'allow_wait':False}
+probe=subprocess.run(['sudo','-u','nobody','/tmp/space-p1-demo-worker'],input=json.dumps(probe_wire).encode(),capture_output=True,timeout=5)
+(out/'worker-probe.txt').write_text(f'exit={probe.returncode} stdout={probe.stdout!r} stderr={probe.stderr!r}\n')
+
 
 def exchange(token, change=None, extra=None):
     body={'protocol':'space.dispatch.p1','instance':'demo','kind':'query','name':'overview','payload':{}}
@@ -35,6 +42,7 @@ def exchange(token, change=None, extra=None):
         return error.code,json.load(error)
 
 try:
+    assert probe.returncode==0 and probe.stdout==probe_input, 'Direct worker probe failed'
     deadline=time.monotonic()+20
     while not Path(str(address)+'.pid').exists():
         if process.poll() is not None or time.monotonic()>deadline: raise RuntimeError('Demo server did not become ready')

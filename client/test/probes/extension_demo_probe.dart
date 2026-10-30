@@ -16,9 +16,18 @@ void main() {
     debugPrint('COMMUNITY_UI_ERROR: $error');
     return true;
   };
-  final session = ExtensionDemoSession(ExtensionDemoConnection(
-    Uri.parse(Platform.environment['P1_DEMO_URL']!), Platform.environment['P1_DEMO_EDITOR']!,
-  ));
-  runApp(MaterialApp(home: Scaffold(body: ExtensionDemoView(session: session))));
-  WidgetsBinding.instance.addPostFrameCallback((_) => debugPrint('COMMUNITY_UI_READY'));
+  final session = ExtensionDemoSession(
+    ExtensionDemoConnection(
+      Uri.parse(Platform.environment['P1_DEMO_URL']!),
+      Platform.environment['P1_DEMO_EDITOR']!,
+    ),
+  );
+  runApp(
+    MaterialApp(
+      home: Scaffold(body: ExtensionDemoView(session: session)),
+    ),
+  );
+  WidgetsBinding.instance.addPostFrameCallback(
+    (_) => debugPrint('COMMUNITY_UI_READY'),
+  );
 }
