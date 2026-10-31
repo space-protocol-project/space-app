@@ -59,4 +59,21 @@ extension type ExtensionP1ServiceClient (connect.Transport _transport) {
       onTrailer: onTrailer,
     );
   }
+
+  Future<spacev1extensions_p1.GetExtensionMutationContextResponse> getExtensionMutationContext(
+    spacev1extensions_p1.GetExtensionMutationContextRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ExtensionP1Service.getExtensionMutationContext,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
 }

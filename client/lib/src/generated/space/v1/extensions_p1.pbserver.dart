@@ -27,6 +27,9 @@ abstract class ExtensionP1ServiceBase extends $pb.GeneratedService {
       $pb.ServerContext ctx, $0.ExecuteExtensionCommandRequest request);
   $async.Future<$0.ReconcileExtensionCommandResponse> reconcileExtensionCommand(
       $pb.ServerContext ctx, $0.ReconcileExtensionCommandRequest request);
+  $async.Future<$0.GetExtensionMutationContextResponse>
+      getExtensionMutationContext(
+          $pb.ServerContext ctx, $0.GetExtensionMutationContextRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
@@ -36,6 +39,8 @@ abstract class ExtensionP1ServiceBase extends $pb.GeneratedService {
         return $0.ExecuteExtensionCommandRequest();
       case 'ReconcileExtensionCommand':
         return $0.ReconcileExtensionCommandRequest();
+      case 'GetExtensionMutationContext':
+        return $0.GetExtensionMutationContextRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -52,6 +57,9 @@ abstract class ExtensionP1ServiceBase extends $pb.GeneratedService {
       case 'ReconcileExtensionCommand':
         return reconcileExtensionCommand(
             ctx, request as $0.ReconcileExtensionCommandRequest);
+      case 'GetExtensionMutationContext':
+        return getExtensionMutationContext(
+            ctx, request as $0.GetExtensionMutationContextRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }

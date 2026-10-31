@@ -47,6 +47,34 @@ final $typed_data.Uint8List extensionCommandOutcomeDescriptor = $convert.base64D
     'VOU1BFQ0lGSUVEEAASJQohRVhURU5TSU9OX0NPTU1BTkRfT1VUQ09NRV9VTktOT1dOEAESJwoj'
     'RVhURU5TSU9OX0NPTU1BTkRfT1VUQ09NRV9DT05GSVJNRUQQAg==');
 
+@$core.Deprecated('Use getExtensionMutationContextRequestDescriptor instead')
+const GetExtensionMutationContextRequest$json = {
+  '1': 'GetExtensionMutationContextRequest',
+  '2': [
+    {'1': 'instance_id', '3': 1, '4': 1, '5': 9, '10': 'instanceId'},
+  ],
+};
+
+/// Descriptor for `GetExtensionMutationContextRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getExtensionMutationContextRequestDescriptor =
+    $convert.base64Decode(
+        'CiJHZXRFeHRlbnNpb25NdXRhdGlvbkNvbnRleHRSZXF1ZXN0Eh8KC2luc3RhbmNlX2lkGAEgAS'
+        'gJUgppbnN0YW5jZUlk');
+
+@$core.Deprecated('Use getExtensionMutationContextResponseDescriptor instead')
+const GetExtensionMutationContextResponse$json = {
+  '1': 'GetExtensionMutationContextResponse',
+  '2': [
+    {'1': 'history_id', '3': 1, '4': 1, '5': 9, '10': 'historyId'},
+  ],
+};
+
+/// Descriptor for `GetExtensionMutationContextResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getExtensionMutationContextResponseDescriptor =
+    $convert.base64Decode(
+        'CiNHZXRFeHRlbnNpb25NdXRhdGlvbkNvbnRleHRSZXNwb25zZRIdCgpoaXN0b3J5X2lkGAEgAS'
+        'gJUgloaXN0b3J5SWQ=');
+
 @$core.Deprecated('Use queryExtensionRequestDescriptor instead')
 const QueryExtensionRequest$json = {
   '1': 'QueryExtensionRequest',
@@ -101,6 +129,7 @@ const ExecuteExtensionCommandRequest$json = {
       '5': 4,
       '10': 'expectedStateRevision'
     },
+    {'1': 'history_id', '3': 7, '4': 1, '5': 9, '10': 'historyId'},
   ],
 };
 
@@ -111,7 +140,7 @@ final $typed_data.Uint8List executeExtensionCommandRequestDescriptor = $convert.
     'KAxSC3BheWxvYWRKc29uEjgKBmVmZmVjdBgEIAEoDjIgLnNwYWNlLnYxLkV4dGVuc2lvbkNvbW'
     '1hbmRFZmZlY3RSBmVmZmVjdBInCg9pZGVtcG90ZW5jeV9rZXkYBSABKAlSDmlkZW1wb3RlbmN5'
     'S2V5EjYKF2V4cGVjdGVkX3N0YXRlX3JldmlzaW9uGAYgASgEUhVleHBlY3RlZFN0YXRlUmV2aX'
-    'Npb24=');
+    'Npb24SHQoKaGlzdG9yeV9pZBgHIAEoCVIJaGlzdG9yeUlk');
 
 @$core.Deprecated('Use executeExtensionCommandResponseDescriptor instead')
 const ExecuteExtensionCommandResponse$json = {
@@ -294,6 +323,11 @@ const $core.Map<$core.String, $core.dynamic> ExtensionP1ServiceBase$json = {
       '2': '.space.v1.ReconcileExtensionCommandRequest',
       '3': '.space.v1.ReconcileExtensionCommandResponse'
     },
+    {
+      '1': 'GetExtensionMutationContext',
+      '2': '.space.v1.GetExtensionMutationContextRequest',
+      '3': '.space.v1.GetExtensionMutationContextResponse'
+    },
   ],
 };
 
@@ -310,6 +344,10 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
       ReconcileExtensionCommandRequest$json,
   '.space.v1.ReconcileExtensionCommandResponse':
       ReconcileExtensionCommandResponse$json,
+  '.space.v1.GetExtensionMutationContextRequest':
+      GetExtensionMutationContextRequest$json,
+  '.space.v1.GetExtensionMutationContextResponse':
+      GetExtensionMutationContextResponse$json,
 };
 
 /// Descriptor for `ExtensionP1Service`. Decode as a `google.protobuf.ServiceDescriptorProto`.
@@ -320,4 +358,6 @@ final $typed_data.Uint8List extensionP1ServiceDescriptor = $convert.base64Decode
     'RSZXF1ZXN0Gikuc3BhY2UudjEuRXhlY3V0ZUV4dGVuc2lvbkNvbW1hbmRSZXNwb25zZRJ0ChlS'
     'ZWNvbmNpbGVFeHRlbnNpb25Db21tYW5kEiouc3BhY2UudjEuUmVjb25jaWxlRXh0ZW5zaW9uQ2'
     '9tbWFuZFJlcXVlc3QaKy5zcGFjZS52MS5SZWNvbmNpbGVFeHRlbnNpb25Db21tYW5kUmVzcG9u'
-    'c2U=');
+    'c2USegobR2V0RXh0ZW5zaW9uTXV0YXRpb25Db250ZXh0Eiwuc3BhY2UudjEuR2V0RXh0ZW5zaW'
+    '9uTXV0YXRpb25Db250ZXh0UmVxdWVzdBotLnNwYWNlLnYxLkdldEV4dGVuc2lvbk11dGF0aW9u'
+    'Q29udGV4dFJlc3BvbnNl');

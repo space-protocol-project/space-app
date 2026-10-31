@@ -22,6 +22,137 @@ export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 export 'extensions_p1.pbenum.dart';
 
+/// Доверенный контекст получают до первой отправки и сохраняют вместе с командой.
+class GetExtensionMutationContextRequest extends $pb.GeneratedMessage {
+  factory GetExtensionMutationContextRequest({
+    $core.String? instanceId,
+  }) {
+    final result = GetExtensionMutationContextRequest._();
+    if (instanceId != null) result.instanceId = instanceId;
+    return result;
+  }
+
+  GetExtensionMutationContextRequest._();
+
+  factory GetExtensionMutationContextRequest.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetExtensionMutationContextRequest()..mergeFromBuffer(data, registry);
+  factory GetExtensionMutationContextRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetExtensionMutationContextRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetExtensionMutationContextRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetExtensionMutationContextRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'instanceId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetExtensionMutationContextRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetExtensionMutationContextRequest copyWith(
+          void Function(GetExtensionMutationContextRequest) updates) =>
+      super.copyWith((message) =>
+              updates(message as GetExtensionMutationContextRequest))
+          as GetExtensionMutationContextRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetExtensionMutationContextRequest() / GetExtensionMutationContextRequest.new instead')
+  static GetExtensionMutationContextRequest create() =>
+      GetExtensionMutationContextRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      GetExtensionMutationContextRequest._();
+  @$core.override
+  GetExtensionMutationContextRequest createEmptyInstance() =>
+      GetExtensionMutationContextRequest._();
+  @$core.pragma('dart2js:noInline')
+  static GetExtensionMutationContextRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetExtensionMutationContextRequest>(
+          GetExtensionMutationContextRequest.$_createMessage);
+  static GetExtensionMutationContextRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get instanceId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set instanceId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasInstanceId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearInstanceId() => $_clearField(1);
+}
+
+class GetExtensionMutationContextResponse extends $pb.GeneratedMessage {
+  factory GetExtensionMutationContextResponse({
+    $core.String? historyId,
+  }) {
+    final result = GetExtensionMutationContextResponse._();
+    if (historyId != null) result.historyId = historyId;
+    return result;
+  }
+
+  GetExtensionMutationContextResponse._();
+
+  factory GetExtensionMutationContextResponse.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetExtensionMutationContextResponse()..mergeFromBuffer(data, registry);
+  factory GetExtensionMutationContextResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetExtensionMutationContextResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetExtensionMutationContextResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetExtensionMutationContextResponse.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'historyId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetExtensionMutationContextResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetExtensionMutationContextResponse copyWith(
+          void Function(GetExtensionMutationContextResponse) updates) =>
+      super.copyWith((message) =>
+              updates(message as GetExtensionMutationContextResponse))
+          as GetExtensionMutationContextResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetExtensionMutationContextResponse() / GetExtensionMutationContextResponse.new instead')
+  static GetExtensionMutationContextResponse create() =>
+      GetExtensionMutationContextResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      GetExtensionMutationContextResponse._();
+  @$core.override
+  GetExtensionMutationContextResponse createEmptyInstance() =>
+      GetExtensionMutationContextResponse._();
+  @$core.pragma('dart2js:noInline')
+  static GetExtensionMutationContextResponse getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<
+              GetExtensionMutationContextResponse>(
+          GetExtensionMutationContextResponse.$_createMessage);
+  static GetExtensionMutationContextResponse? _defaultInstance;
+
+  /// 32 строчных шестнадцатеричных символа; меняется при restore, но не restart.
+  @$pb.TagNumber(1)
+  $core.String get historyId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set historyId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasHistoryId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearHistoryId() => $_clearField(1);
+}
+
 class QueryExtensionRequest extends $pb.GeneratedMessage {
   factory QueryExtensionRequest({
     $core.String? instanceId,
@@ -186,6 +317,7 @@ class ExecuteExtensionCommandRequest extends $pb.GeneratedMessage {
     ExtensionCommandEffect? effect,
     $core.String? idempotencyKey,
     $fixnum.Int64? expectedStateRevision,
+    $core.String? historyId,
   }) {
     final result = ExecuteExtensionCommandRequest._();
     if (instanceId != null) result.instanceId = instanceId;
@@ -195,6 +327,7 @@ class ExecuteExtensionCommandRequest extends $pb.GeneratedMessage {
     if (idempotencyKey != null) result.idempotencyKey = idempotencyKey;
     if (expectedStateRevision != null)
       result.expectedStateRevision = expectedStateRevision;
+    if (historyId != null) result.historyId = historyId;
     return result;
   }
 
@@ -221,6 +354,7 @@ class ExecuteExtensionCommandRequest extends $pb.GeneratedMessage {
     ..a<$fixnum.Int64>(
         6, _omitFieldNames ? '' : 'expectedStateRevision', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOS(7, _omitFieldNames ? '' : 'historyId')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -305,6 +439,17 @@ class ExecuteExtensionCommandRequest extends $pb.GeneratedMessage {
   $core.bool hasExpectedStateRevision() => $_has(5);
   @$pb.TagNumber(6)
   void clearExpectedStateRevision() => $_clearField(6);
+
+  /// Обязателен для исполнения MUTATION. При повторе менять запрещено.
+  /// Для сверки старой квитанции сохраняется исходное значение, включая пустое v1/v2.
+  @$pb.TagNumber(7)
+  $core.String get historyId => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set historyId($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasHistoryId() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearHistoryId() => $_clearField(7);
 }
 
 class ExecuteExtensionCommandResponse extends $pb.GeneratedMessage {
@@ -868,6 +1013,15 @@ class ExtensionP1ServiceApi {
           'ReconcileExtensionCommand',
           request,
           ReconcileExtensionCommandResponse());
+  $async.Future<GetExtensionMutationContextResponse>
+      getExtensionMutationContext($pb.ClientContext? ctx,
+              GetExtensionMutationContextRequest request) =>
+          _client.invoke<GetExtensionMutationContextResponse>(
+              ctx,
+              'ExtensionP1Service',
+              'GetExtensionMutationContext',
+              request,
+              GetExtensionMutationContextResponse());
 }
 
 const $core.bool _omitFieldNames =

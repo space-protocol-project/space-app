@@ -31,4 +31,11 @@ abstract final class ExtensionP1Service {
     spacev1extensions_p1.ReconcileExtensionCommandRequest.new,
     spacev1extensions_p1.ReconcileExtensionCommandResponse.new,
   );
+
+  static const getExtensionMutationContext = connect.Spec(
+    '/$name/GetExtensionMutationContext',
+    connect.StreamType.unary,
+    spacev1extensions_p1.GetExtensionMutationContextRequest.new,
+    spacev1extensions_p1.GetExtensionMutationContextResponse.new,
+  );
 }
