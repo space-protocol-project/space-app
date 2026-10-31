@@ -61,6 +61,10 @@ class ExtensionCommandCubit extends Cubit<ExtensionCommandState> {
     if (await journal.read() != null) {
       throw StateError('Сначала сверить сохранённую команду');
     }
+    if (!_sameBinding || _cancelled) {
+      _stop(false);
+      return;
+    }
     final grant = await transport.context(request.instanceId);
     if (!_sameBinding || _cancelled) {
       _stop(false);
@@ -136,6 +140,10 @@ class ExtensionCommandCubit extends Cubit<ExtensionCommandState> {
       if (snapshot == null) {
         throw StateError('Нет сохранённой команды');
       }
+      if (!_sameBinding || _cancelled) {
+        _stop(true);
+        return;
+      }
       emit((phase: 'reconciling', unknown: true, attempts: state.attempts));
       final result = await transport.reconcile(snapshot.request);
       final confirmed =
@@ -149,11 +157,18 @@ class ExtensionCommandCubit extends Cubit<ExtensionCommandState> {
         unknown: !confirmed,
         attempts: state.attempts,
       ));
-    } catch (_) {
-      _stop(true);
+    } catch (error) {
+      _reconcileFailed(error);
     } finally {
       _busy = false;
     }
+  }
+
+  void _reconcileFailed(Object error) {
+    final reauthenticate = !_cancelled && _sameBinding &&
+        extensionCommandErrorCode(error) == 'Unauthenticated';
+    emit((phase: reauthenticate ? 'reauthenticate' : 'stop',
+      unknown: true, attempts: state.attempts));
   }
 
   Future<void> _delay(int ms) async {

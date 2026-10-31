@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:connectrpc/connect.dart' as connect;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fixnum/fixnum.dart';
@@ -17,8 +19,12 @@ const binding = (
 class MemoryJournalStorage implements SecureKeyStorage {
   final values = <String, String>{};
   bool failWrite = false;
+  Completer<void>? readGate;
   @override
-  Future<String?> read({required String key}) async => values[key];
+  Future<String?> read({required String key}) async {
+    await readGate?.future;
+    return values[key];
+  }
   @override
   Future<void> write({required String key, required String value}) async {
     if (failWrite) throw StateError('Запись недоступна');
@@ -38,6 +44,7 @@ class ProbeTransport implements ExtensionCommandTransport {
   int cancellations = 0;
   connect.Code? firstFailure = connect.Code.unavailable;
   bool confirmed = true;
+  connect.Code? reconcileFailure;
   void Function()? afterFailure;
   @override
   Future<GetExtensionMutationContextResponse> context(String instance) async {
@@ -69,6 +76,9 @@ class ProbeTransport implements ExtensionCommandTransport {
     ExecuteExtensionCommandRequest request,
   ) async {
     reconciles++;
+    if (reconcileFailure != null) {
+      throw connect.ConnectException(reconcileFailure!, 'Сессия недействительна');
+    }
     return ReconcileExtensionCommandResponse(
       outcome: confirmed
           ? ExtensionCommandOutcome.EXTENSION_COMMAND_OUTCOME_CONFIRMED
@@ -224,6 +234,44 @@ void main() {
     expect(transport.sent, hasLength(1));
     expect(timed.state.unknown, isTrue);
     await timed.close();
+  });
+
+  test('Сверка просит вход и после обновления сессии не исполняет команду', () async {
+    await cubit.start(command());
+    final sends = transport.sent.length;
+    transport.reconcileFailure = connect.Code.unauthenticated;
+    await cubit.reconcile();
+    expect(cubit.state.phase, 'reauthenticate');
+    expect(cubit.state.unknown, isTrue);
+    transport.reconcileFailure = null;
+    await cubit.reconcile();
+    expect(cubit.state.phase, 'confirmed');
+    expect(transport.sent.length, sends);
+    expect(transport.contexts, 1);
+  });
+
+  test('Отмена во время чтения журнала запрещает RPC сверки', () async {
+    await cubit.start(command());
+    final gate = Completer<void>();
+    storage.readGate = gate;
+    final pending = cubit.reconcile();
+    cubit.cancel();
+    gate.complete();
+    await pending;
+    expect(transport.reconciles, 0);
+    expect(cubit.state.unknown, isTrue);
+  });
+
+  test('Смена пользователя во время чтения журнала запрещает RPC', () async {
+    await cubit.start(command());
+    final gate = Completer<void>();
+    storage.readGate = gate;
+    final pending = cubit.reconcile();
+    current = (server: binding.server, space: binding.space, installation: binding.installation, principal: 'bob');
+    gate.complete();
+    await pending;
+    expect(transport.reconciles, 0);
+    expect(cubit.state.unknown, isTrue);
   });
 
   test('Сохранённый контекст нельзя заменить новым', () async {
