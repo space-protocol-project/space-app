@@ -44,14 +44,14 @@ class ProbeTransport implements ExtensionCommandTransport {
       afterFailure?.call();
       throw connect.ConnectException(firstFailure!, 'Потеря ответа');
     }
-    return ExecuteExtensionCommandResponse(effect: request.effect, stateRevision: request.expectedStateRevision + 1);
+    return ExecuteExtensionCommandResponse(documentJson: [123, 125], effect: request.effect, stateRevision: request.expectedStateRevision + 1);
   }
   @override
   Future<ReconcileExtensionCommandResponse> reconcile(ExecuteExtensionCommandRequest request) async {
     reconciles++;
     return ReconcileExtensionCommandResponse(
       outcome: confirmed ? ExtensionCommandOutcome.EXTENSION_COMMAND_OUTCOME_CONFIRMED : ExtensionCommandOutcome.EXTENSION_COMMAND_OUTCOME_UNKNOWN,
-      receipt: confirmed ? ExecuteExtensionCommandResponse(effect: request.effect, stateRevision: request.expectedStateRevision + 1) : null,
+      receipt: confirmed ? ExecuteExtensionCommandResponse(documentJson: [123, 125], effect: request.effect, stateRevision: request.expectedStateRevision + 1) : null,
     );
   }
   @override
@@ -145,6 +145,24 @@ void main() {
     expect(transport.sent, hasLength(1));
     expect(cubit.state.unknown, isTrue);
     expect(transport.cancellations, 1);
+  });
+
+  test('Удалить снимок можно только после подтверждения результата', () async {
+    await expectLater(cubit.acknowledgeConfirmed(), throwsStateError);
+    await cubit.start(command());
+    await cubit.acknowledgeConfirmed();
+    expect(await journal.read(), isNull);
+    expect(cubit.state.phase, 'idle');
+  });
+
+  test('Истёкшее монотонное окно запрещает повтор', () async {
+    var elapsed = 0;
+    final timed = ExtensionCommandCubit(transport, journal, () => current, elapsedMilliseconds: () => elapsed);
+    transport.afterFailure = () { elapsed = 30000; };
+    await timed.start(command());
+    expect(transport.sent, hasLength(1));
+    expect(timed.state.unknown, isTrue);
+    await timed.close();
   });
 
   test('Сохранённый контекст нельзя заменить новым', () async {

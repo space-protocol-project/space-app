@@ -19,7 +19,7 @@ class ExtensionConnectCommandTransport implements ExtensionCommandTransport {
   RpcCall? _active;
 
   Future<T> _call<T>(Future<T> Function(RpcCall) invoke, int seconds) async {
-    if (_active != null) throw StateError('RPC уже выполняется');
+    if (_active != null) { throw StateError('RPC уже выполняется'); }
     final call = RpcCall(RpcOptions(metadata: metadata()), Duration(seconds: seconds));
     _active = call;
     try {
@@ -55,7 +55,7 @@ class ExtensionConnectCommandTransport implements ExtensionCommandTransport {
 }
 
 String extensionCommandErrorCode(Object error) {
-  if (error is! connect.ConnectException) return 'TransportLost';
+  if (error is! connect.ConnectException) { return 'TransportLost'; }
   return switch (error.code.value) {
     1 => 'Canceled', 2 => 'Unknown', 3 => 'InvalidArgument',
     4 => 'DeadlineExceeded', 5 => 'NotFound', 6 => 'AlreadyExists',

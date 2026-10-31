@@ -32,7 +32,7 @@ class ExtensionCommandSnapshot {
   });
 
   static ExtensionCommandSnapshot decode(String raw) {
-    if (raw.length > 40000) throw const FormatException('Большой снимок');
+    if (raw.length > 40000) { throw const FormatException('Большой снимок'); }
     final value = jsonDecode(raw);
     if (value is! Map<String, dynamic> || value.length != 3 ||
         value['version'] != 1 || value['binding'] is! String ||
@@ -76,7 +76,7 @@ class ExtensionCommandJournal {
 
   Future<ExtensionCommandSnapshot?> read() async {
     final raw = await storage.read(key: key);
-    if (raw == null) return null;
+    if (raw == null) { return null; }
     final snapshot = ExtensionCommandSnapshot.decode(raw);
     if (snapshot.binding != bindingKey) {
       throw const FormatException('Изменилась привязка команды');
