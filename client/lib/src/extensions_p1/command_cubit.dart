@@ -165,10 +165,15 @@ class ExtensionCommandCubit extends Cubit<ExtensionCommandState> {
   }
 
   void _reconcileFailed(Object error) {
-    final reauthenticate = !_cancelled && _sameBinding &&
+    final reauthenticate =
+        !_cancelled &&
+        _sameBinding &&
         extensionCommandErrorCode(error) == 'Unauthenticated';
-    emit((phase: reauthenticate ? 'reauthenticate' : 'stop',
-      unknown: true, attempts: state.attempts));
+    emit((
+      phase: reauthenticate ? 'reauthenticate' : 'stop',
+      unknown: true,
+      attempts: state.attempts,
+    ));
   }
 
   Future<void> _delay(int ms) async {

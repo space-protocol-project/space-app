@@ -25,6 +25,7 @@ class MemoryJournalStorage implements SecureKeyStorage {
     await readGate?.future;
     return values[key];
   }
+
   @override
   Future<void> write({required String key, required String value}) async {
     if (failWrite) throw StateError('Запись недоступна');
@@ -77,7 +78,10 @@ class ProbeTransport implements ExtensionCommandTransport {
   ) async {
     reconciles++;
     if (reconcileFailure != null) {
-      throw connect.ConnectException(reconcileFailure!, 'Сессия недействительна');
+      throw connect.ConnectException(
+        reconcileFailure!,
+        'Сессия недействительна',
+      );
     }
     return ReconcileExtensionCommandResponse(
       outcome: confirmed
@@ -236,19 +240,22 @@ void main() {
     await timed.close();
   });
 
-  test('Сверка просит вход и после обновления сессии не исполняет команду', () async {
-    await cubit.start(command());
-    final sends = transport.sent.length;
-    transport.reconcileFailure = connect.Code.unauthenticated;
-    await cubit.reconcile();
-    expect(cubit.state.phase, 'reauthenticate');
-    expect(cubit.state.unknown, isTrue);
-    transport.reconcileFailure = null;
-    await cubit.reconcile();
-    expect(cubit.state.phase, 'confirmed');
-    expect(transport.sent.length, sends);
-    expect(transport.contexts, 1);
-  });
+  test(
+    'Сверка просит вход и после обновления сессии не исполняет команду',
+    () async {
+      await cubit.start(command());
+      final sends = transport.sent.length;
+      transport.reconcileFailure = connect.Code.unauthenticated;
+      await cubit.reconcile();
+      expect(cubit.state.phase, 'reauthenticate');
+      expect(cubit.state.unknown, isTrue);
+      transport.reconcileFailure = null;
+      await cubit.reconcile();
+      expect(cubit.state.phase, 'confirmed');
+      expect(transport.sent.length, sends);
+      expect(transport.contexts, 1);
+    },
+  );
 
   test('Отмена во время чтения журнала запрещает RPC сверки', () async {
     await cubit.start(command());
@@ -267,7 +274,12 @@ void main() {
     final gate = Completer<void>();
     storage.readGate = gate;
     final pending = cubit.reconcile();
-    current = (server: binding.server, space: binding.space, installation: binding.installation, principal: 'bob');
+    current = (
+      server: binding.server,
+      space: binding.space,
+      installation: binding.installation,
+      principal: 'bob',
+    );
     gate.complete();
     await pending;
     expect(transport.reconciles, 0);

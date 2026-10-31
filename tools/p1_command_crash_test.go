@@ -203,6 +203,9 @@ func checkCommandCrash(t *testing.T, stage string) {
 	if stage == "after-commit" {
 		select {
 		case <-b.committed:
+		case <-p.done:
+			log, _ := os.ReadFile(p.log)
+			t.Fatalf("Клиент завершился до commit: %v\n%s", p.err, log)
 		case <-time.After(45 * time.Second):
 			t.Fatal("Нет commit")
 		}

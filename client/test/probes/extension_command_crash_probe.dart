@@ -100,7 +100,8 @@ Future<void> runRole() async {
     if (role == 'start') {
       await cubit.start(ExecuteExtensionCommandRequest(
         instanceId: 'demo', command: 'acknowledge',
-        payloadJson: utf8.encode(jsonEncode({'text': 'x' * 12000})),
+        // Контракт demo допускает только {}; пробелы проверяют большой журнал.
+        payloadJson: utf8.encode('{${' ' * 12000}}'),
         effect: ExtensionCommandEffect.EXTENSION_COMMAND_EFFECT_MUTATION,
         idempotencyKey: 'native-crash-command-001',
       ));
