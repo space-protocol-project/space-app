@@ -769,7 +769,7 @@ class ReconcileExtensionCommandResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   ExecuteExtensionCommandResponse ensureReceipt() => $_ensure(1);
 
-  /// P1 пока возвращает false/0: гарантированное окно до первой отправки ещё не реализовано.
+  /// Сверка возвращает false/0 и не открывает окно заново. Короткое окно выдаёт контекст новой команды.
   /// UNKNOWN никогда не разрешает повторную отправку сам по себе.
   @$pb.TagNumber(3)
   $core.bool get retryWindowKnown => $_getBF(2);
