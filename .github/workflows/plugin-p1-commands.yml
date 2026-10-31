@@ -35,6 +35,8 @@ jobs:
         with: {flutter-version: '3.47.8', channel: stable, cache: true}
       - name: Подготовка клиента
         run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev
           rustup toolchain install 1.99.1 --profile minimal
           cd client
           flutter pub get

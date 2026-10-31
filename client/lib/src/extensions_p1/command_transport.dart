@@ -6,8 +6,12 @@ import '../rpc_connection.dart';
 
 abstract interface class ExtensionCommandTransport {
   Future<GetExtensionMutationContextResponse> context(String instance);
-  Future<ExecuteExtensionCommandResponse> execute(ExecuteExtensionCommandRequest request);
-  Future<ReconcileExtensionCommandResponse> reconcile(ExecuteExtensionCommandRequest request);
+  Future<ExecuteExtensionCommandResponse> execute(
+    ExecuteExtensionCommandRequest request,
+  );
+  Future<ReconcileExtensionCommandResponse> reconcile(
+    ExecuteExtensionCommandRequest request,
+  );
   void cancel();
 }
 
@@ -19,8 +23,13 @@ class ExtensionConnectCommandTransport implements ExtensionCommandTransport {
   RpcCall? _active;
 
   Future<T> _call<T>(Future<T> Function(RpcCall) invoke, int seconds) async {
-    if (_active != null) { throw StateError('RPC уже выполняется'); }
-    final call = RpcCall(RpcOptions(metadata: metadata()), Duration(seconds: seconds));
+    if (_active != null) {
+      throw StateError('RPC уже выполняется');
+    }
+    final call = RpcCall(
+      RpcOptions(metadata: metadata()),
+      Duration(seconds: seconds),
+    );
     _active = call;
     try {
       return await invoke(call);
@@ -33,21 +42,38 @@ class ExtensionConnectCommandTransport implements ExtensionCommandTransport {
   @override
   Future<GetExtensionMutationContextResponse> context(String instance) => _call(
     (call) => client.getExtensionMutationContext(
-      GetExtensionMutationContextRequest(instanceId: instance, requestRetryWindow: true),
-      headers: call.headers, signal: call,
-    ), 2,
+      GetExtensionMutationContextRequest(
+        instanceId: instance,
+        requestRetryWindow: true,
+      ),
+      headers: call.headers,
+      signal: call,
+    ),
+    2,
   );
 
   @override
-  Future<ExecuteExtensionCommandResponse> execute(ExecuteExtensionCommandRequest request) => _call(
-    (call) => client.executeExtensionCommand(request, headers: call.headers, signal: call), 5,
+  Future<ExecuteExtensionCommandResponse> execute(
+    ExecuteExtensionCommandRequest request,
+  ) => _call(
+    (call) => client.executeExtensionCommand(
+      request,
+      headers: call.headers,
+      signal: call,
+    ),
+    5,
   );
 
   @override
-  Future<ReconcileExtensionCommandResponse> reconcile(ExecuteExtensionCommandRequest request) => _call(
+  Future<ReconcileExtensionCommandResponse> reconcile(
+    ExecuteExtensionCommandRequest request,
+  ) => _call(
     (call) => client.reconcileExtensionCommand(
-      ReconcileExtensionCommandRequest(command: request), headers: call.headers, signal: call,
-    ), 5,
+      ReconcileExtensionCommandRequest(command: request),
+      headers: call.headers,
+      signal: call,
+    ),
+    5,
   );
 
   @override
@@ -55,13 +81,26 @@ class ExtensionConnectCommandTransport implements ExtensionCommandTransport {
 }
 
 String extensionCommandErrorCode(Object error) {
-  if (error is! connect.ConnectException) { return 'TransportLost'; }
+  if (error is! connect.ConnectException) {
+    return 'TransportLost';
+  }
   return switch (error.code.value) {
-    1 => 'Canceled', 2 => 'Unknown', 3 => 'InvalidArgument',
-    4 => 'DeadlineExceeded', 5 => 'NotFound', 6 => 'AlreadyExists',
-    7 => 'PermissionDenied', 8 => 'ResourceExhausted',
-    9 => 'FailedPrecondition', 10 => 'Aborted', 11 => 'OutOfRange',
-    12 => 'Unimplemented', 13 => 'Internal', 14 => 'Unavailable',
-    15 => 'DataLoss', 16 => 'Unauthenticated', _ => 'Unknown',
+    1 => 'Canceled',
+    2 => 'Unknown',
+    3 => 'InvalidArgument',
+    4 => 'DeadlineExceeded',
+    5 => 'NotFound',
+    6 => 'AlreadyExists',
+    7 => 'PermissionDenied',
+    8 => 'ResourceExhausted',
+    9 => 'FailedPrecondition',
+    10 => 'Aborted',
+    11 => 'OutOfRange',
+    12 => 'Unimplemented',
+    13 => 'Internal',
+    14 => 'Unavailable',
+    15 => 'DataLoss',
+    16 => 'Unauthenticated',
+    _ => 'Unknown',
   };
 }

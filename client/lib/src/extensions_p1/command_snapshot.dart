@@ -12,9 +12,8 @@ typedef ExtensionCommandBinding = ({
   String principal,
 });
 
-String commandBindingKey(ExtensionCommandBinding b) => jsonEncode([
-  b.server, b.space, b.installation, b.principal,
-]);
+String commandBindingKey(ExtensionCommandBinding b) =>
+    jsonEncode([b.server, b.space, b.installation, b.principal]);
 
 // Снимок содержит точные protobuf-байты. Токен сессии в него не входит.
 class ExtensionCommandSnapshot {
@@ -28,14 +27,20 @@ class ExtensionCommandSnapshot {
       ExecuteExtensionCommandRequest.fromBuffer(bytes);
 
   String encode() => jsonEncode({
-    'version': 1, 'binding': binding, 'request': base64Encode(bytes),
+    'version': 1,
+    'binding': binding,
+    'request': base64Encode(bytes),
   });
 
   static ExtensionCommandSnapshot decode(String raw) {
-    if (raw.length > 40000) { throw const FormatException('Большой снимок'); }
+    if (raw.length > 40000) {
+      throw const FormatException('Большой снимок');
+    }
     final value = jsonDecode(raw);
-    if (value is! Map<String, dynamic> || value.length != 3 ||
-        value['version'] != 1 || value['binding'] is! String ||
+    if (value is! Map<String, dynamic> ||
+        value.length != 3 ||
+        value['version'] != 1 ||
+        value['binding'] is! String ||
         value['request'] is! String) {
       throw const FormatException('Некорректный снимок');
     }
@@ -43,23 +48,26 @@ class ExtensionCommandSnapshot {
     final request = ExecuteExtensionCommandRequest.fromBuffer(bytes);
     validateNewExtensionCommand(request, contextRequired: true);
     return ExtensionCommandSnapshot._(
-      value['binding'] as String, List<int>.unmodifiable(bytes),
+      value['binding'] as String,
+      List<int>.unmodifiable(bytes),
     );
   }
 }
 
 void validateNewExtensionCommand(
-  ExecuteExtensionCommandRequest r, {bool contextRequired = false}
-) {
+  ExecuteExtensionCommandRequest r, {
+  bool contextRequired = false,
+}) {
   if (r.effect != ExtensionCommandEffect.EXTENSION_COMMAND_EFFECT_MUTATION ||
-      r.instanceId.isEmpty || r.command.isEmpty ||
+      r.instanceId.isEmpty ||
+      r.command.isEmpty ||
       !RegExp(r'^[A-Za-z0-9_-]{16,128}$').hasMatch(r.idempotencyKey) ||
       r.payloadJson.length > 16384) {
     throw const FormatException('Некорректная команда');
   }
   if (contextRequired &&
       (!RegExp(r'^[0-9a-f]{32}$').hasMatch(r.historyId) ||
-       !RegExp(r'^[0-9a-f]{32}$').hasMatch(r.retryLeaseId))) {
+          !RegExp(r'^[0-9a-f]{32}$').hasMatch(r.retryLeaseId))) {
     throw const FormatException('Отсутствует контекст команды');
   }
 }
@@ -69,14 +77,17 @@ void validateNewExtensionCommand(
 class ExtensionCommandJournal {
   ExtensionCommandJournal(this.storage, ExtensionCommandBinding binding)
     : bindingKey = commandBindingKey(binding),
-      key = 'space.p1.command.${sha256.convert(utf8.encode(commandBindingKey(binding)))}';
+      key =
+          'space.p1.command.${sha256.convert(utf8.encode(commandBindingKey(binding)))}';
   final SecureKeyStorage storage;
   final String bindingKey;
   final String key;
 
   Future<ExtensionCommandSnapshot?> read() async {
     final raw = await storage.read(key: key);
-    if (raw == null) { return null; }
+    if (raw == null) {
+      return null;
+    }
     final snapshot = ExtensionCommandSnapshot.decode(raw);
     if (snapshot.binding != bindingKey) {
       throw const FormatException('Изменилась привязка команды');
