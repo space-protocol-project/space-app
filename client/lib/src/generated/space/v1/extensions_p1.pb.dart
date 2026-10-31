@@ -567,7 +567,7 @@ class ReconcileExtensionCommandResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   ExecuteExtensionCommandResponse ensureReceipt() => $_ensure(1);
 
-  /// P1 пока возвращает false/0: срок хранения и tombstone ещё не реализованы.
+  /// P1 пока возвращает false/0: гарантированное окно до первой отправки ещё не реализовано.
   /// UNKNOWN никогда не разрешает повторную отправку сам по себе.
   @$pb.TagNumber(3)
   $core.bool get retryWindowKnown => $_getBF(2);
