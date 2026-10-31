@@ -52,6 +52,13 @@ const GetExtensionMutationContextRequest$json = {
   '1': 'GetExtensionMutationContextRequest',
   '2': [
     {'1': 'instance_id', '3': 1, '4': 1, '5': 9, '10': 'instanceId'},
+    {
+      '1': 'request_retry_window',
+      '3': 2,
+      '4': 1,
+      '5': 8,
+      '10': 'requestRetryWindow'
+    },
   ],
 };
 
@@ -59,13 +66,22 @@ const GetExtensionMutationContextRequest$json = {
 final $typed_data.Uint8List getExtensionMutationContextRequestDescriptor =
     $convert.base64Decode(
         'CiJHZXRFeHRlbnNpb25NdXRhdGlvbkNvbnRleHRSZXF1ZXN0Eh8KC2luc3RhbmNlX2lkGAEgAS'
-        'gJUgppbnN0YW5jZUlk');
+        'gJUgppbnN0YW5jZUlkEjAKFHJlcXVlc3RfcmV0cnlfd2luZG93GAIgASgIUhJyZXF1ZXN0UmV0'
+        'cnlXaW5kb3c=');
 
 @$core.Deprecated('Use getExtensionMutationContextResponseDescriptor instead')
 const GetExtensionMutationContextResponse$json = {
   '1': 'GetExtensionMutationContextResponse',
   '2': [
     {'1': 'history_id', '3': 1, '4': 1, '5': 9, '10': 'historyId'},
+    {'1': 'retry_lease_id', '3': 2, '4': 1, '5': 9, '10': 'retryLeaseId'},
+    {
+      '1': 'retry_window_remaining_ms',
+      '3': 3,
+      '4': 1,
+      '5': 4,
+      '10': 'retryWindowRemainingMs'
+    },
   ],
 };
 
@@ -73,7 +89,8 @@ const GetExtensionMutationContextResponse$json = {
 final $typed_data.Uint8List getExtensionMutationContextResponseDescriptor =
     $convert.base64Decode(
         'CiNHZXRFeHRlbnNpb25NdXRhdGlvbkNvbnRleHRSZXNwb25zZRIdCgpoaXN0b3J5X2lkGAEgAS'
-        'gJUgloaXN0b3J5SWQ=');
+        'gJUgloaXN0b3J5SWQSJAoOcmV0cnlfbGVhc2VfaWQYAiABKAlSDHJldHJ5TGVhc2VJZBI5Chly'
+        'ZXRyeV93aW5kb3dfcmVtYWluaW5nX21zGAMgASgEUhZyZXRyeVdpbmRvd1JlbWFpbmluZ01z');
 
 @$core.Deprecated('Use queryExtensionRequestDescriptor instead')
 const QueryExtensionRequest$json = {
@@ -130,6 +147,7 @@ const ExecuteExtensionCommandRequest$json = {
       '10': 'expectedStateRevision'
     },
     {'1': 'history_id', '3': 7, '4': 1, '5': 9, '10': 'historyId'},
+    {'1': 'retry_lease_id', '3': 8, '4': 1, '5': 9, '10': 'retryLeaseId'},
   ],
 };
 
@@ -140,7 +158,8 @@ final $typed_data.Uint8List executeExtensionCommandRequestDescriptor = $convert.
     'KAxSC3BheWxvYWRKc29uEjgKBmVmZmVjdBgEIAEoDjIgLnNwYWNlLnYxLkV4dGVuc2lvbkNvbW'
     '1hbmRFZmZlY3RSBmVmZmVjdBInCg9pZGVtcG90ZW5jeV9rZXkYBSABKAlSDmlkZW1wb3RlbmN5'
     'S2V5EjYKF2V4cGVjdGVkX3N0YXRlX3JldmlzaW9uGAYgASgEUhVleHBlY3RlZFN0YXRlUmV2aX'
-    'Npb24SHQoKaGlzdG9yeV9pZBgHIAEoCVIJaGlzdG9yeUlk');
+    'Npb24SHQoKaGlzdG9yeV9pZBgHIAEoCVIJaGlzdG9yeUlkEiQKDnJldHJ5X2xlYXNlX2lkGAgg'
+    'ASgJUgxyZXRyeUxlYXNlSWQ=');
 
 @$core.Deprecated('Use executeExtensionCommandResponseDescriptor instead')
 const ExecuteExtensionCommandResponse$json = {

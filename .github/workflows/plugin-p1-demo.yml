@@ -45,7 +45,7 @@ jobs:
         working-directory: client
         run: |
           flutter pub get
-          dart format lib/src/extensions_p1/retry.dart test/extensions_p1_retry_test.dart lib/src/extensions_p1/demo_session.dart lib/ui/extensions_p1_demo.dart test/extensions_p1_live_test.dart test/probes/extension_demo_probe.dart
+          dart format lib/src/extensions_p1/command_cubit.dart lib/src/extensions_p1/command_snapshot.dart lib/src/extensions_p1/command_transport.dart test/extensions_p1_command_test.dart lib/src/extensions_p1/retry.dart test/extensions_p1_retry_test.dart lib/src/extensions_p1/demo_session.dart lib/ui/extensions_p1_demo.dart test/extensions_p1_live_test.dart test/probes/extension_demo_probe.dart
           flutter analyze
       - name: HTTP, права, отказ WASM, Flutter и горячий перезапуск
         run: |
@@ -62,6 +62,8 @@ jobs:
             .local/p1-demo/server.log
             .local/p1-demo/worker-probe.txt
             .local/p1-demo-native
+            client/lib/src/extensions_p1/command*.dart
+            client/test/extensions_p1_command_test.dart
             client/lib/src/extensions_p1/retry.dart
             client/test/extensions_p1_retry_test.dart
             client/lib/src/extensions_p1/demo_session.dart

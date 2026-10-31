@@ -26,9 +26,12 @@ export 'extensions_p1.pbenum.dart';
 class GetExtensionMutationContextRequest extends $pb.GeneratedMessage {
   factory GetExtensionMutationContextRequest({
     $core.String? instanceId,
+    $core.bool? requestRetryWindow,
   }) {
     final result = GetExtensionMutationContextRequest._();
     if (instanceId != null) result.instanceId = instanceId;
+    if (requestRetryWindow != null)
+      result.requestRetryWindow = requestRetryWindow;
     return result;
   }
 
@@ -47,6 +50,7 @@ class GetExtensionMutationContextRequest extends $pb.GeneratedMessage {
       package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
       createEmptyInstance: GetExtensionMutationContextRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'instanceId')
+    ..aOB(2, _omitFieldNames ? '' : 'requestRetryWindow')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -85,14 +89,29 @@ class GetExtensionMutationContextRequest extends $pb.GeneratedMessage {
   $core.bool hasInstanceId() => $_has(0);
   @$pb.TagNumber(1)
   void clearInstanceId() => $_clearField(1);
+
+  /// Только перед новой командой; повтор не запрашивает новое разрешение.
+  @$pb.TagNumber(2)
+  $core.bool get requestRetryWindow => $_getBF(1);
+  @$pb.TagNumber(2)
+  set requestRetryWindow($core.bool value) => $_setBool(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasRequestRetryWindow() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRequestRetryWindow() => $_clearField(2);
 }
 
 class GetExtensionMutationContextResponse extends $pb.GeneratedMessage {
   factory GetExtensionMutationContextResponse({
     $core.String? historyId,
+    $core.String? retryLeaseId,
+    $fixnum.Int64? retryWindowRemainingMs,
   }) {
     final result = GetExtensionMutationContextResponse._();
     if (historyId != null) result.historyId = historyId;
+    if (retryLeaseId != null) result.retryLeaseId = retryLeaseId;
+    if (retryWindowRemainingMs != null)
+      result.retryWindowRemainingMs = retryWindowRemainingMs;
     return result;
   }
 
@@ -111,6 +130,10 @@ class GetExtensionMutationContextResponse extends $pb.GeneratedMessage {
       package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
       createEmptyInstance: GetExtensionMutationContextResponse.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'historyId')
+    ..aOS(2, _omitFieldNames ? '' : 'retryLeaseId')
+    ..a<$fixnum.Int64>(
+        3, _omitFieldNames ? '' : 'retryWindowRemainingMs', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -151,6 +174,27 @@ class GetExtensionMutationContextResponse extends $pb.GeneratedMessage {
   $core.bool hasHistoryId() => $_has(0);
   @$pb.TagNumber(1)
   void clearHistoryId() => $_clearField(1);
+
+  /// Короткое разрешение, привязанное к principal, экземпляру и истории.
+  /// Недействительно после перезапуска исполнителя. Не сохранять как новое окно при resume.
+  @$pb.TagNumber(2)
+  $core.String get retryLeaseId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set retryLeaseId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasRetryLeaseId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRetryLeaseId() => $_clearField(2);
+
+  /// 30000 мс от выдачи; клиент отсчитывает от начала RPC монотонными часами.
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get retryWindowRemainingMs => $_getI64(2);
+  @$pb.TagNumber(3)
+  set retryWindowRemainingMs($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasRetryWindowRemainingMs() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearRetryWindowRemainingMs() => $_clearField(3);
 }
 
 class QueryExtensionRequest extends $pb.GeneratedMessage {
@@ -318,6 +362,7 @@ class ExecuteExtensionCommandRequest extends $pb.GeneratedMessage {
     $core.String? idempotencyKey,
     $fixnum.Int64? expectedStateRevision,
     $core.String? historyId,
+    $core.String? retryLeaseId,
   }) {
     final result = ExecuteExtensionCommandRequest._();
     if (instanceId != null) result.instanceId = instanceId;
@@ -328,6 +373,7 @@ class ExecuteExtensionCommandRequest extends $pb.GeneratedMessage {
     if (expectedStateRevision != null)
       result.expectedStateRevision = expectedStateRevision;
     if (historyId != null) result.historyId = historyId;
+    if (retryLeaseId != null) result.retryLeaseId = retryLeaseId;
     return result;
   }
 
@@ -355,6 +401,7 @@ class ExecuteExtensionCommandRequest extends $pb.GeneratedMessage {
         6, _omitFieldNames ? '' : 'expectedStateRevision', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOS(7, _omitFieldNames ? '' : 'historyId')
+    ..aOS(8, _omitFieldNames ? '' : 'retryLeaseId')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -450,6 +497,16 @@ class ExecuteExtensionCommandRequest extends $pb.GeneratedMessage {
   $core.bool hasHistoryId() => $_has(6);
   @$pb.TagNumber(7)
   void clearHistoryId() => $_clearField(7);
+
+  /// Неизменная часть команды/digest. Пустое значение не разрешает автоматический повтор.
+  @$pb.TagNumber(8)
+  $core.String get retryLeaseId => $_getSZ(7);
+  @$pb.TagNumber(8)
+  set retryLeaseId($core.String value) => $_setString(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasRetryLeaseId() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearRetryLeaseId() => $_clearField(8);
 }
 
 class ExecuteExtensionCommandResponse extends $pb.GeneratedMessage {
