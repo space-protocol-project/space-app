@@ -38,4 +38,32 @@ abstract final class ExtensionP1Service {
     spacev1extensions_p1.GetExtensionMutationContextRequest.new,
     spacev1extensions_p1.GetExtensionMutationContextResponse.new,
   );
+
+  static const listExtensionInstallations = connect.Spec(
+    '/$name/ListExtensionInstallations',
+    connect.StreamType.unary,
+    spacev1extensions_p1.ListExtensionInstallationsRequest.new,
+    spacev1extensions_p1.ListExtensionInstallationsResponse.new,
+  );
+
+  static const getExtensionInstallation = connect.Spec(
+    '/$name/GetExtensionInstallation',
+    connect.StreamType.unary,
+    spacev1extensions_p1.GetExtensionInstallationRequest.new,
+    spacev1extensions_p1.GetExtensionInstallationResponse.new,
+  );
+
+  static const changeExtensionInstallation = connect.Spec(
+    '/$name/ChangeExtensionInstallation',
+    connect.StreamType.unary,
+    spacev1extensions_p1.ChangeExtensionInstallationRequest.new,
+    spacev1extensions_p1.ChangeExtensionInstallationResponse.new,
+  );
+
+  static const listExtensionInstallationAudit = connect.Spec(
+    '/$name/ListExtensionInstallationAudit',
+    connect.StreamType.unary,
+    spacev1extensions_p1.ListExtensionInstallationAuditRequest.new,
+    spacev1extensions_p1.ListExtensionInstallationAuditResponse.new,
+  );
 }

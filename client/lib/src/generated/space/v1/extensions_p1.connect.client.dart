@@ -76,4 +76,72 @@ extension type ExtensionP1ServiceClient (connect.Transport _transport) {
       onTrailer: onTrailer,
     );
   }
+
+  Future<spacev1extensions_p1.ListExtensionInstallationsResponse> listExtensionInstallations(
+    spacev1extensions_p1.ListExtensionInstallationsRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ExtensionP1Service.listExtensionInstallations,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1extensions_p1.GetExtensionInstallationResponse> getExtensionInstallation(
+    spacev1extensions_p1.GetExtensionInstallationRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ExtensionP1Service.getExtensionInstallation,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1extensions_p1.ChangeExtensionInstallationResponse> changeExtensionInstallation(
+    spacev1extensions_p1.ChangeExtensionInstallationRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ExtensionP1Service.changeExtensionInstallation,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
+  Future<spacev1extensions_p1.ListExtensionInstallationAuditResponse> listExtensionInstallationAudit(
+    spacev1extensions_p1.ListExtensionInstallationAuditRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ExtensionP1Service.listExtensionInstallationAudit,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
 }

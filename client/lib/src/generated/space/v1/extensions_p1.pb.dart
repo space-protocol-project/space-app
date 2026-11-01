@@ -22,6 +22,966 @@ export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 export 'extensions_p1.pbenum.dart';
 
+/// Административный API P1: текущая сессия с space.manage, владелец и manage ACL
+/// всех каналов установки. Не устанавливает пакеты и не принимает роль system.
+class ExtensionInstallation extends $pb.GeneratedMessage {
+  factory ExtensionInstallation({
+    $core.String? installationId,
+    $core.String? state,
+    $fixnum.Int64? revision,
+    $core.String? generation,
+    $core.List<$core.int>? bindingSha256,
+  }) {
+    final result = ExtensionInstallation._();
+    if (installationId != null) result.installationId = installationId;
+    if (state != null) result.state = state;
+    if (revision != null) result.revision = revision;
+    if (generation != null) result.generation = generation;
+    if (bindingSha256 != null) result.bindingSha256 = bindingSha256;
+    return result;
+  }
+
+  ExtensionInstallation._();
+
+  factory ExtensionInstallation.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ExtensionInstallation()..mergeFromBuffer(data, registry);
+  factory ExtensionInstallation.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ExtensionInstallation()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ExtensionInstallation',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ExtensionInstallation.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'installationId')
+    ..aOS(2, _omitFieldNames ? '' : 'state')
+    ..aInt64(3, _omitFieldNames ? '' : 'revision')
+    ..aOS(4, _omitFieldNames ? '' : 'generation')
+    ..a<$core.List<$core.int>>(
+        5, _omitFieldNames ? '' : 'bindingSha256', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ExtensionInstallation clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ExtensionInstallation copyWith(
+          void Function(ExtensionInstallation) updates) =>
+      super.copyWith((message) => updates(message as ExtensionInstallation))
+          as ExtensionInstallation;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ExtensionInstallation() / ExtensionInstallation.new instead')
+  static ExtensionInstallation create() => ExtensionInstallation._();
+  static $pb.GeneratedMessage $_createMessage() => ExtensionInstallation._();
+  @$core.override
+  ExtensionInstallation createEmptyInstance() => ExtensionInstallation._();
+  @$core.pragma('dart2js:noInline')
+  static ExtensionInstallation getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ExtensionInstallation>(
+          ExtensionInstallation.$_createMessage);
+  static ExtensionInstallation? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get installationId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set installationId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasInstallationId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearInstallationId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get state => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set state($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasState() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearState() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get revision => $_getI64(2);
+  @$pb.TagNumber(3)
+  set revision($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasRevision() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearRevision() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get generation => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set generation($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasGeneration() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearGeneration() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.List<$core.int> get bindingSha256 => $_getN(4);
+  @$pb.TagNumber(5)
+  set bindingSha256($core.List<$core.int> value) => $_setBytes(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasBindingSha256() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearBindingSha256() => $_clearField(5);
+}
+
+class ListExtensionInstallationsRequest extends $pb.GeneratedMessage {
+  factory ListExtensionInstallationsRequest({
+    $core.String? afterInstallationId,
+    $core.int? pageSize,
+    $core.String? generation,
+  }) {
+    final result = ListExtensionInstallationsRequest._();
+    if (afterInstallationId != null)
+      result.afterInstallationId = afterInstallationId;
+    if (pageSize != null) result.pageSize = pageSize;
+    if (generation != null) result.generation = generation;
+    return result;
+  }
+
+  ListExtensionInstallationsRequest._();
+
+  factory ListExtensionInstallationsRequest.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListExtensionInstallationsRequest()..mergeFromBuffer(data, registry);
+  factory ListExtensionInstallationsRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListExtensionInstallationsRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListExtensionInstallationsRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListExtensionInstallationsRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'afterInstallationId')
+    ..aI(2, _omitFieldNames ? '' : 'pageSize')
+    ..aOS(3, _omitFieldNames ? '' : 'generation')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListExtensionInstallationsRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListExtensionInstallationsRequest copyWith(
+          void Function(ListExtensionInstallationsRequest) updates) =>
+      super.copyWith((message) =>
+              updates(message as ListExtensionInstallationsRequest))
+          as ListExtensionInstallationsRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListExtensionInstallationsRequest() / ListExtensionInstallationsRequest.new instead')
+  static ListExtensionInstallationsRequest create() =>
+      ListExtensionInstallationsRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ListExtensionInstallationsRequest._();
+  @$core.override
+  ListExtensionInstallationsRequest createEmptyInstance() =>
+      ListExtensionInstallationsRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ListExtensionInstallationsRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListExtensionInstallationsRequest>(
+          ListExtensionInstallationsRequest.$_createMessage);
+  static ListExtensionInstallationsRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get afterInstallationId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set afterInstallationId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasAfterInstallationId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearAfterInstallationId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.int get pageSize => $_getIZ(1);
+  @$pb.TagNumber(2)
+  set pageSize($core.int value) => $_setSignedInt32(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasPageSize() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearPageSize() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get generation => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set generation($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasGeneration() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearGeneration() => $_clearField(3);
+}
+
+class ListExtensionInstallationsResponse extends $pb.GeneratedMessage {
+  factory ListExtensionInstallationsResponse({
+    $core.Iterable<ExtensionInstallation>? installations,
+    $core.String? nextAfterInstallationId,
+    $core.String? generation,
+  }) {
+    final result = ListExtensionInstallationsResponse._();
+    if (installations != null) result.installations.addAll(installations);
+    if (nextAfterInstallationId != null)
+      result.nextAfterInstallationId = nextAfterInstallationId;
+    if (generation != null) result.generation = generation;
+    return result;
+  }
+
+  ListExtensionInstallationsResponse._();
+
+  factory ListExtensionInstallationsResponse.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListExtensionInstallationsResponse()..mergeFromBuffer(data, registry);
+  factory ListExtensionInstallationsResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListExtensionInstallationsResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListExtensionInstallationsResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListExtensionInstallationsResponse.$_createMessage)
+    ..pPM<ExtensionInstallation>(1, _omitFieldNames ? '' : 'installations',
+        subBuilder: ExtensionInstallation.$_createMessage)
+    ..aOS(2, _omitFieldNames ? '' : 'nextAfterInstallationId')
+    ..aOS(3, _omitFieldNames ? '' : 'generation')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListExtensionInstallationsResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListExtensionInstallationsResponse copyWith(
+          void Function(ListExtensionInstallationsResponse) updates) =>
+      super.copyWith((message) =>
+              updates(message as ListExtensionInstallationsResponse))
+          as ListExtensionInstallationsResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListExtensionInstallationsResponse() / ListExtensionInstallationsResponse.new instead')
+  static ListExtensionInstallationsResponse create() =>
+      ListExtensionInstallationsResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ListExtensionInstallationsResponse._();
+  @$core.override
+  ListExtensionInstallationsResponse createEmptyInstance() =>
+      ListExtensionInstallationsResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ListExtensionInstallationsResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListExtensionInstallationsResponse>(
+          ListExtensionInstallationsResponse.$_createMessage);
+  static ListExtensionInstallationsResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<ExtensionInstallation> get installations => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $core.String get nextAfterInstallationId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set nextAfterInstallationId($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasNextAfterInstallationId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearNextAfterInstallationId() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get generation => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set generation($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasGeneration() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearGeneration() => $_clearField(3);
+}
+
+class GetExtensionInstallationRequest extends $pb.GeneratedMessage {
+  factory GetExtensionInstallationRequest({
+    $core.String? installationId,
+  }) {
+    final result = GetExtensionInstallationRequest._();
+    if (installationId != null) result.installationId = installationId;
+    return result;
+  }
+
+  GetExtensionInstallationRequest._();
+
+  factory GetExtensionInstallationRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetExtensionInstallationRequest()..mergeFromBuffer(data, registry);
+  factory GetExtensionInstallationRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetExtensionInstallationRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetExtensionInstallationRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetExtensionInstallationRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'installationId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetExtensionInstallationRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetExtensionInstallationRequest copyWith(
+          void Function(GetExtensionInstallationRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as GetExtensionInstallationRequest))
+          as GetExtensionInstallationRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetExtensionInstallationRequest() / GetExtensionInstallationRequest.new instead')
+  static GetExtensionInstallationRequest create() =>
+      GetExtensionInstallationRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      GetExtensionInstallationRequest._();
+  @$core.override
+  GetExtensionInstallationRequest createEmptyInstance() =>
+      GetExtensionInstallationRequest._();
+  @$core.pragma('dart2js:noInline')
+  static GetExtensionInstallationRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetExtensionInstallationRequest>(
+          GetExtensionInstallationRequest.$_createMessage);
+  static GetExtensionInstallationRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get installationId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set installationId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasInstallationId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearInstallationId() => $_clearField(1);
+}
+
+class GetExtensionInstallationResponse extends $pb.GeneratedMessage {
+  factory GetExtensionInstallationResponse({
+    ExtensionInstallation? installation,
+  }) {
+    final result = GetExtensionInstallationResponse._();
+    if (installation != null) result.installation = installation;
+    return result;
+  }
+
+  GetExtensionInstallationResponse._();
+
+  factory GetExtensionInstallationResponse.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetExtensionInstallationResponse()..mergeFromBuffer(data, registry);
+  factory GetExtensionInstallationResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetExtensionInstallationResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'GetExtensionInstallationResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: GetExtensionInstallationResponse.$_createMessage)
+    ..aOM<ExtensionInstallation>(1, _omitFieldNames ? '' : 'installation',
+        subBuilder: ExtensionInstallation.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetExtensionInstallationResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetExtensionInstallationResponse copyWith(
+          void Function(GetExtensionInstallationResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as GetExtensionInstallationResponse))
+          as GetExtensionInstallationResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use GetExtensionInstallationResponse() / GetExtensionInstallationResponse.new instead')
+  static GetExtensionInstallationResponse create() =>
+      GetExtensionInstallationResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      GetExtensionInstallationResponse._();
+  @$core.override
+  GetExtensionInstallationResponse createEmptyInstance() =>
+      GetExtensionInstallationResponse._();
+  @$core.pragma('dart2js:noInline')
+  static GetExtensionInstallationResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetExtensionInstallationResponse>(
+          GetExtensionInstallationResponse.$_createMessage);
+  static GetExtensionInstallationResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ExtensionInstallation get installation => $_getN(0);
+  @$pb.TagNumber(1)
+  set installation(ExtensionInstallation value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasInstallation() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearInstallation() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ExtensionInstallation ensureInstallation() => $_ensure(0);
+}
+
+class ChangeExtensionInstallationRequest extends $pb.GeneratedMessage {
+  factory ChangeExtensionInstallationRequest({
+    $core.String? installationId,
+    $core.String? generation,
+    $fixnum.Int64? expectedRevision,
+    $core.String? action,
+  }) {
+    final result = ChangeExtensionInstallationRequest._();
+    if (installationId != null) result.installationId = installationId;
+    if (generation != null) result.generation = generation;
+    if (expectedRevision != null) result.expectedRevision = expectedRevision;
+    if (action != null) result.action = action;
+    return result;
+  }
+
+  ChangeExtensionInstallationRequest._();
+
+  factory ChangeExtensionInstallationRequest.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ChangeExtensionInstallationRequest()..mergeFromBuffer(data, registry);
+  factory ChangeExtensionInstallationRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ChangeExtensionInstallationRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ChangeExtensionInstallationRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ChangeExtensionInstallationRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'installationId')
+    ..aOS(2, _omitFieldNames ? '' : 'generation')
+    ..aInt64(3, _omitFieldNames ? '' : 'expectedRevision')
+    ..aOS(4, _omitFieldNames ? '' : 'action')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ChangeExtensionInstallationRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ChangeExtensionInstallationRequest copyWith(
+          void Function(ChangeExtensionInstallationRequest) updates) =>
+      super.copyWith((message) =>
+              updates(message as ChangeExtensionInstallationRequest))
+          as ChangeExtensionInstallationRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ChangeExtensionInstallationRequest() / ChangeExtensionInstallationRequest.new instead')
+  static ChangeExtensionInstallationRequest create() =>
+      ChangeExtensionInstallationRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ChangeExtensionInstallationRequest._();
+  @$core.override
+  ChangeExtensionInstallationRequest createEmptyInstance() =>
+      ChangeExtensionInstallationRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ChangeExtensionInstallationRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ChangeExtensionInstallationRequest>(
+          ChangeExtensionInstallationRequest.$_createMessage);
+  static ChangeExtensionInstallationRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get installationId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set installationId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasInstallationId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearInstallationId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get generation => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set generation($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasGeneration() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearGeneration() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get expectedRevision => $_getI64(2);
+  @$pb.TagNumber(3)
+  set expectedRevision($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasExpectedRevision() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearExpectedRevision() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get action => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set action($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasAction() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearAction() => $_clearField(4);
+}
+
+class ChangeExtensionInstallationResponse extends $pb.GeneratedMessage {
+  factory ChangeExtensionInstallationResponse({
+    $core.String? state,
+    $fixnum.Int64? revision,
+    $core.String? generation,
+  }) {
+    final result = ChangeExtensionInstallationResponse._();
+    if (state != null) result.state = state;
+    if (revision != null) result.revision = revision;
+    if (generation != null) result.generation = generation;
+    return result;
+  }
+
+  ChangeExtensionInstallationResponse._();
+
+  factory ChangeExtensionInstallationResponse.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ChangeExtensionInstallationResponse()..mergeFromBuffer(data, registry);
+  factory ChangeExtensionInstallationResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ChangeExtensionInstallationResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ChangeExtensionInstallationResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ChangeExtensionInstallationResponse.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'state')
+    ..aInt64(2, _omitFieldNames ? '' : 'revision')
+    ..aOS(3, _omitFieldNames ? '' : 'generation')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ChangeExtensionInstallationResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ChangeExtensionInstallationResponse copyWith(
+          void Function(ChangeExtensionInstallationResponse) updates) =>
+      super.copyWith((message) =>
+              updates(message as ChangeExtensionInstallationResponse))
+          as ChangeExtensionInstallationResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ChangeExtensionInstallationResponse() / ChangeExtensionInstallationResponse.new instead')
+  static ChangeExtensionInstallationResponse create() =>
+      ChangeExtensionInstallationResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ChangeExtensionInstallationResponse._();
+  @$core.override
+  ChangeExtensionInstallationResponse createEmptyInstance() =>
+      ChangeExtensionInstallationResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ChangeExtensionInstallationResponse getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<
+              ChangeExtensionInstallationResponse>(
+          ChangeExtensionInstallationResponse.$_createMessage);
+  static ChangeExtensionInstallationResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get state => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set state($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasState() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearState() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get revision => $_getI64(1);
+  @$pb.TagNumber(2)
+  set revision($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasRevision() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRevision() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get generation => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set generation($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasGeneration() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearGeneration() => $_clearField(3);
+}
+
+class ExtensionInstallationAuditEntry extends $pb.GeneratedMessage {
+  factory ExtensionInstallationAuditEntry({
+    $fixnum.Int64? revision,
+    $core.String? generation,
+    $core.String? action,
+    $core.String? actor,
+    $core.String? principalId,
+    $core.String? previousState,
+    $core.String? state,
+    $core.String? createdAt,
+  }) {
+    final result = ExtensionInstallationAuditEntry._();
+    if (revision != null) result.revision = revision;
+    if (generation != null) result.generation = generation;
+    if (action != null) result.action = action;
+    if (actor != null) result.actor = actor;
+    if (principalId != null) result.principalId = principalId;
+    if (previousState != null) result.previousState = previousState;
+    if (state != null) result.state = state;
+    if (createdAt != null) result.createdAt = createdAt;
+    return result;
+  }
+
+  ExtensionInstallationAuditEntry._();
+
+  factory ExtensionInstallationAuditEntry.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ExtensionInstallationAuditEntry()..mergeFromBuffer(data, registry);
+  factory ExtensionInstallationAuditEntry.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ExtensionInstallationAuditEntry()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ExtensionInstallationAuditEntry',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ExtensionInstallationAuditEntry.$_createMessage)
+    ..aInt64(1, _omitFieldNames ? '' : 'revision')
+    ..aOS(2, _omitFieldNames ? '' : 'generation')
+    ..aOS(3, _omitFieldNames ? '' : 'action')
+    ..aOS(4, _omitFieldNames ? '' : 'actor')
+    ..aOS(5, _omitFieldNames ? '' : 'principalId')
+    ..aOS(6, _omitFieldNames ? '' : 'previousState')
+    ..aOS(7, _omitFieldNames ? '' : 'state')
+    ..aOS(8, _omitFieldNames ? '' : 'createdAt')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ExtensionInstallationAuditEntry clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ExtensionInstallationAuditEntry copyWith(
+          void Function(ExtensionInstallationAuditEntry) updates) =>
+      super.copyWith(
+              (message) => updates(message as ExtensionInstallationAuditEntry))
+          as ExtensionInstallationAuditEntry;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ExtensionInstallationAuditEntry() / ExtensionInstallationAuditEntry.new instead')
+  static ExtensionInstallationAuditEntry create() =>
+      ExtensionInstallationAuditEntry._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ExtensionInstallationAuditEntry._();
+  @$core.override
+  ExtensionInstallationAuditEntry createEmptyInstance() =>
+      ExtensionInstallationAuditEntry._();
+  @$core.pragma('dart2js:noInline')
+  static ExtensionInstallationAuditEntry getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ExtensionInstallationAuditEntry>(
+          ExtensionInstallationAuditEntry.$_createMessage);
+  static ExtensionInstallationAuditEntry? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $fixnum.Int64 get revision => $_getI64(0);
+  @$pb.TagNumber(1)
+  set revision($fixnum.Int64 value) => $_setInt64(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasRevision() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearRevision() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get generation => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set generation($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasGeneration() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearGeneration() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get action => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set action($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAction() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAction() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get actor => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set actor($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasActor() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearActor() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get principalId => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set principalId($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasPrincipalId() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearPrincipalId() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get previousState => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set previousState($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasPreviousState() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearPreviousState() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.String get state => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set state($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasState() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearState() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.String get createdAt => $_getSZ(7);
+  @$pb.TagNumber(8)
+  set createdAt($core.String value) => $_setString(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasCreatedAt() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearCreatedAt() => $_clearField(8);
+}
+
+class ListExtensionInstallationAuditRequest extends $pb.GeneratedMessage {
+  factory ListExtensionInstallationAuditRequest({
+    $core.String? installationId,
+    $core.String? generation,
+    $fixnum.Int64? afterRevision,
+    $fixnum.Int64? throughRevision,
+    $core.int? pageSize,
+  }) {
+    final result = ListExtensionInstallationAuditRequest._();
+    if (installationId != null) result.installationId = installationId;
+    if (generation != null) result.generation = generation;
+    if (afterRevision != null) result.afterRevision = afterRevision;
+    if (throughRevision != null) result.throughRevision = throughRevision;
+    if (pageSize != null) result.pageSize = pageSize;
+    return result;
+  }
+
+  ListExtensionInstallationAuditRequest._();
+
+  factory ListExtensionInstallationAuditRequest.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListExtensionInstallationAuditRequest()..mergeFromBuffer(data, registry);
+  factory ListExtensionInstallationAuditRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListExtensionInstallationAuditRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListExtensionInstallationAuditRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance:
+          ListExtensionInstallationAuditRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'installationId')
+    ..aOS(2, _omitFieldNames ? '' : 'generation')
+    ..aInt64(3, _omitFieldNames ? '' : 'afterRevision')
+    ..aInt64(4, _omitFieldNames ? '' : 'throughRevision')
+    ..aI(5, _omitFieldNames ? '' : 'pageSize')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListExtensionInstallationAuditRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListExtensionInstallationAuditRequest copyWith(
+          void Function(ListExtensionInstallationAuditRequest) updates) =>
+      super.copyWith((message) =>
+              updates(message as ListExtensionInstallationAuditRequest))
+          as ListExtensionInstallationAuditRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListExtensionInstallationAuditRequest() / ListExtensionInstallationAuditRequest.new instead')
+  static ListExtensionInstallationAuditRequest create() =>
+      ListExtensionInstallationAuditRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ListExtensionInstallationAuditRequest._();
+  @$core.override
+  ListExtensionInstallationAuditRequest createEmptyInstance() =>
+      ListExtensionInstallationAuditRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ListExtensionInstallationAuditRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<
+              ListExtensionInstallationAuditRequest>(
+          ListExtensionInstallationAuditRequest.$_createMessage);
+  static ListExtensionInstallationAuditRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get installationId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set installationId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasInstallationId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearInstallationId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get generation => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set generation($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasGeneration() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearGeneration() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get afterRevision => $_getI64(2);
+  @$pb.TagNumber(3)
+  set afterRevision($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAfterRevision() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAfterRevision() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get throughRevision => $_getI64(3);
+  @$pb.TagNumber(4)
+  set throughRevision($fixnum.Int64 value) => $_setInt64(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasThroughRevision() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearThroughRevision() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.int get pageSize => $_getIZ(4);
+  @$pb.TagNumber(5)
+  set pageSize($core.int value) => $_setSignedInt32(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasPageSize() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearPageSize() => $_clearField(5);
+}
+
+class ListExtensionInstallationAuditResponse extends $pb.GeneratedMessage {
+  factory ListExtensionInstallationAuditResponse({
+    $core.Iterable<ExtensionInstallationAuditEntry>? entries,
+    $fixnum.Int64? nextAfterRevision,
+    $fixnum.Int64? throughRevision,
+    $core.String? generation,
+  }) {
+    final result = ListExtensionInstallationAuditResponse._();
+    if (entries != null) result.entries.addAll(entries);
+    if (nextAfterRevision != null) result.nextAfterRevision = nextAfterRevision;
+    if (throughRevision != null) result.throughRevision = throughRevision;
+    if (generation != null) result.generation = generation;
+    return result;
+  }
+
+  ListExtensionInstallationAuditResponse._();
+
+  factory ListExtensionInstallationAuditResponse.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListExtensionInstallationAuditResponse()..mergeFromBuffer(data, registry);
+  factory ListExtensionInstallationAuditResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListExtensionInstallationAuditResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListExtensionInstallationAuditResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance:
+          ListExtensionInstallationAuditResponse.$_createMessage)
+    ..pPM<ExtensionInstallationAuditEntry>(1, _omitFieldNames ? '' : 'entries',
+        subBuilder: ExtensionInstallationAuditEntry.$_createMessage)
+    ..aInt64(2, _omitFieldNames ? '' : 'nextAfterRevision')
+    ..aInt64(3, _omitFieldNames ? '' : 'throughRevision')
+    ..aOS(4, _omitFieldNames ? '' : 'generation')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListExtensionInstallationAuditResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListExtensionInstallationAuditResponse copyWith(
+          void Function(ListExtensionInstallationAuditResponse) updates) =>
+      super.copyWith((message) =>
+              updates(message as ListExtensionInstallationAuditResponse))
+          as ListExtensionInstallationAuditResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListExtensionInstallationAuditResponse() / ListExtensionInstallationAuditResponse.new instead')
+  static ListExtensionInstallationAuditResponse create() =>
+      ListExtensionInstallationAuditResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ListExtensionInstallationAuditResponse._();
+  @$core.override
+  ListExtensionInstallationAuditResponse createEmptyInstance() =>
+      ListExtensionInstallationAuditResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ListExtensionInstallationAuditResponse getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<
+              ListExtensionInstallationAuditResponse>(
+          ListExtensionInstallationAuditResponse.$_createMessage);
+  static ListExtensionInstallationAuditResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<ExtensionInstallationAuditEntry> get entries => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get nextAfterRevision => $_getI64(1);
+  @$pb.TagNumber(2)
+  set nextAfterRevision($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasNextAfterRevision() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearNextAfterRevision() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get throughRevision => $_getI64(2);
+  @$pb.TagNumber(3)
+  set throughRevision($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasThroughRevision() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearThroughRevision() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get generation => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set generation($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasGeneration() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearGeneration() => $_clearField(4);
+}
+
 /// Доверенный контекст получают до первой отправки и сохраняют вместе с командой.
 class GetExtensionMutationContextRequest extends $pb.GeneratedMessage {
   factory GetExtensionMutationContextRequest({
@@ -1079,6 +2039,40 @@ class ExtensionP1ServiceApi {
               'GetExtensionMutationContext',
               request,
               GetExtensionMutationContextResponse());
+  $async.Future<ListExtensionInstallationsResponse> listExtensionInstallations(
+          $pb.ClientContext? ctx, ListExtensionInstallationsRequest request) =>
+      _client.invoke<ListExtensionInstallationsResponse>(
+          ctx,
+          'ExtensionP1Service',
+          'ListExtensionInstallations',
+          request,
+          ListExtensionInstallationsResponse());
+  $async.Future<GetExtensionInstallationResponse> getExtensionInstallation(
+          $pb.ClientContext? ctx, GetExtensionInstallationRequest request) =>
+      _client.invoke<GetExtensionInstallationResponse>(
+          ctx,
+          'ExtensionP1Service',
+          'GetExtensionInstallation',
+          request,
+          GetExtensionInstallationResponse());
+  $async.Future<ChangeExtensionInstallationResponse>
+      changeExtensionInstallation($pb.ClientContext? ctx,
+              ChangeExtensionInstallationRequest request) =>
+          _client.invoke<ChangeExtensionInstallationResponse>(
+              ctx,
+              'ExtensionP1Service',
+              'ChangeExtensionInstallation',
+              request,
+              ChangeExtensionInstallationResponse());
+  $async.Future<ListExtensionInstallationAuditResponse>
+      listExtensionInstallationAudit($pb.ClientContext? ctx,
+              ListExtensionInstallationAuditRequest request) =>
+          _client.invoke<ListExtensionInstallationAuditResponse>(
+              ctx,
+              'ExtensionP1Service',
+              'ListExtensionInstallationAudit',
+              request,
+              ListExtensionInstallationAuditResponse());
 }
 
 const $core.bool _omitFieldNames =

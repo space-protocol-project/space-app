@@ -30,6 +30,17 @@ abstract class ExtensionP1ServiceBase extends $pb.GeneratedService {
   $async.Future<$0.GetExtensionMutationContextResponse>
       getExtensionMutationContext(
           $pb.ServerContext ctx, $0.GetExtensionMutationContextRequest request);
+  $async.Future<$0.ListExtensionInstallationsResponse>
+      listExtensionInstallations(
+          $pb.ServerContext ctx, $0.ListExtensionInstallationsRequest request);
+  $async.Future<$0.GetExtensionInstallationResponse> getExtensionInstallation(
+      $pb.ServerContext ctx, $0.GetExtensionInstallationRequest request);
+  $async.Future<$0.ChangeExtensionInstallationResponse>
+      changeExtensionInstallation(
+          $pb.ServerContext ctx, $0.ChangeExtensionInstallationRequest request);
+  $async.Future<$0.ListExtensionInstallationAuditResponse>
+      listExtensionInstallationAudit($pb.ServerContext ctx,
+          $0.ListExtensionInstallationAuditRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
@@ -41,6 +52,14 @@ abstract class ExtensionP1ServiceBase extends $pb.GeneratedService {
         return $0.ReconcileExtensionCommandRequest();
       case 'GetExtensionMutationContext':
         return $0.GetExtensionMutationContextRequest();
+      case 'ListExtensionInstallations':
+        return $0.ListExtensionInstallationsRequest();
+      case 'GetExtensionInstallation':
+        return $0.GetExtensionInstallationRequest();
+      case 'ChangeExtensionInstallation':
+        return $0.ChangeExtensionInstallationRequest();
+      case 'ListExtensionInstallationAudit':
+        return $0.ListExtensionInstallationAuditRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -60,6 +79,18 @@ abstract class ExtensionP1ServiceBase extends $pb.GeneratedService {
       case 'GetExtensionMutationContext':
         return getExtensionMutationContext(
             ctx, request as $0.GetExtensionMutationContextRequest);
+      case 'ListExtensionInstallations':
+        return listExtensionInstallations(
+            ctx, request as $0.ListExtensionInstallationsRequest);
+      case 'GetExtensionInstallation':
+        return getExtensionInstallation(
+            ctx, request as $0.GetExtensionInstallationRequest);
+      case 'ChangeExtensionInstallation':
+        return changeExtensionInstallation(
+            ctx, request as $0.ChangeExtensionInstallationRequest);
+      case 'ListExtensionInstallationAudit':
+        return listExtensionInstallationAudit(
+            ctx, request as $0.ListExtensionInstallationAuditRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
