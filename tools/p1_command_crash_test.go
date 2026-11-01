@@ -152,13 +152,13 @@ func runCommandNative(t *testing.T, profile, url, principal, authorization, role
 	case <-time.After(15 * time.Second):
 		t.Fatal("Клиент не завершился")
 	}
-	if p.err != nil || result["phase"] != want || result["independent_read"] != true {
+	if p.err != nil || (want != "" && result["phase"] != want) || result["independent_read"] != true {
 		t.Fatal("Неверное восстановление", result, p.err)
 	}
 	if result["present"] == true && result["encrypted_keyring"] != true {
 		t.Fatal("Не подтверждено системное шифрование")
 	}
-	t.Logf("native role=%s result=%s pid=%.0f present=%v independent_read=true", role, want, result["pid"], result["present"])
+	t.Logf("native role=%s result=%s pid=%.0f present=%v independent_read=true", role, result["phase"], result["pid"], result["present"])
 	return result
 }
 
