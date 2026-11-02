@@ -59,6 +59,7 @@ void _validateEntry(Map<String, Object?> entry) {
   if (![
     'disabled',
     'enabled',
+    'draining',
     'removed',
     'updating',
     'ready',

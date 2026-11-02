@@ -94,6 +94,48 @@ void main() {
     );
   });
 
+  test(
+    'повторное открытие закрывает активные состояния и старое поколение',
+    () {
+      var registry = LocalExtensionRegistry.open(
+        path,
+        device: 'device',
+        profile: 'profile',
+      );
+      final before = registry.snapshot;
+      final entries = sample();
+      entries['games']!['state'] = 'enabled';
+      entries['other'] = {...entries['games']!, 'state': 'draining'};
+      registry.commit(
+        expectedRevision: before.revision,
+        generation: before.generation,
+        entries: entries,
+        action: 'activate',
+      );
+      registry.close();
+      registry = LocalExtensionRegistry.open(
+        path,
+        device: 'device',
+        profile: 'profile',
+      );
+      final recovered = registry.snapshot;
+      expect(
+        recovered.entries.values.map((entry) => entry['state']),
+        everyElement('disabled'),
+      );
+      expect(
+        () => registry.commit(
+          expectedRevision: recovered.revision,
+          generation: before.generation,
+          entries: entries,
+          action: 'stale_generation',
+        ),
+        throwsStateError,
+      );
+      registry.close();
+    },
+  );
+
   test('ошибка после COMMIT закрывает оболочку до повторного открытия', () {
     final registry = LocalExtensionRegistry.open(
       path,

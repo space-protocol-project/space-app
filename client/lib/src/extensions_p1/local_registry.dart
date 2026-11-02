@@ -43,7 +43,9 @@ class LocalExtensionRegistry {
   void _recover() {
     final entries = copyRegistryEntries(_snapshot.entries);
     for (final entry in entries.values) {
-      if (entry['state'] == 'enabled') entry['state'] = 'disabled';
+      if (['enabled', 'draining'].contains(entry['state'])) {
+        entry['state'] = 'disabled';
+      }
     }
     _write(entries, 'reopen', generation: _newGeneration());
   }
