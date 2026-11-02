@@ -32,10 +32,13 @@ class RegistryJournal {
 
   RegistrySnapshot read(String scope) {
     final length = _file.lengthSync();
-    if (length > registryJournalLimit)
+    if (length > registryJournalLimit) {
       throw const FormatException('journal_limit');
+    }
     _file.setPositionSync(0);
     final bytes = _file.readSync(length);
+    if (bytes.length != length)
+      throw const FormatException('journal_short_read');
     final last = bytes.lastIndexOf(10);
     final complete = bytes.sublist(0, last + 1);
     var current = RegistrySnapshot.initial(scope);
@@ -57,7 +60,7 @@ class RegistryJournal {
     RegistrySnapshot current,
     String scope,
   ) {
-    if (line.length > registryFrameLimit || line.length < 66) {
+    if (utf8.encode(line).length + 1 > registryFrameLimit || line.length < 66) {
       throw const FormatException('registry_frame');
     }
     final raw = line.substring(65);
