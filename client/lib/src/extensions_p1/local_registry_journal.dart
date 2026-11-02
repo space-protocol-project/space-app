@@ -37,8 +37,9 @@ class RegistryJournal {
     }
     _file.setPositionSync(0);
     final bytes = _file.readSync(length);
-    if (bytes.length != length)
+    if (bytes.length != length) {
       throw const FormatException('journal_short_read');
+    }
     final last = bytes.lastIndexOf(10);
     final complete = bytes.sublist(0, last + 1);
     var current = RegistrySnapshot.initial(scope);
