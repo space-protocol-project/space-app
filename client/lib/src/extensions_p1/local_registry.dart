@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 
 import 'local_registry_codec.dart';
 import 'local_registry_journal.dart';
+import 'local_lifecycle_record.dart';
 
 class LocalExtensionRegistry {
   LocalExtensionRegistry._(this._journal, this._snapshot, this._scope);
@@ -46,7 +47,11 @@ class LocalExtensionRegistry {
       if (['enabled', 'draining'].contains(entry['state'])) {
         entry['state'] = 'disabled';
       }
+      if (entry.containsKey('lifecycle')) {
+        advanceLifecycleRecord(entry, 'reopen', 'kernel');
+      }
     }
+    validateRegistryEntries(entries);
     _write(entries, 'reopen', generation: _newGeneration());
   }
 
