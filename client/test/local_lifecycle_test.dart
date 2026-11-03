@@ -97,6 +97,10 @@ void main() {
     await fixture.act(LocalLifecycleAction.enable);
     await fixture.act(LocalLifecycleAction.reopen);
     expect(fixture.entry['state'], 'disabled');
+    await expectLater(
+      fixture.act(LocalLifecycleAction.prepare, plan: fixture.plan()),
+      throwsStateError,
+    );
   });
 
   test(
@@ -248,10 +252,24 @@ void main() {
         instance: 'games',
         entry: saved,
       );
+      await fixture.act(
+        LocalLifecycleAction.revoke,
+        root: fixture.authority.root,
+      );
+      await fixture.act(LocalLifecycleAction.grant);
+      final grantBefore =
+          ((fixture.record['grants']! as Map)[fixture.authority.root]
+                  as Map)['revision']!
+              as int;
       final revision = fixture.record['revision']! as int;
       await fixture.act(LocalLifecycleAction.restore);
       expect(fixture.entry['state'], 'disabled');
       expect(fixture.record['revision'], revision + 1);
+      expect(
+        ((fixture.record['grants']! as Map)[fixture.authority.root]
+            as Map)['revision'],
+        grantBefore + 1,
+      );
       expect(
         (fixture.record['grants']! as Map).values.every(
           (g) => (g as Map)['active'] == false,

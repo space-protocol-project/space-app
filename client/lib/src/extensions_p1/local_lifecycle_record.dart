@@ -238,3 +238,19 @@ void advanceLifecycleRecord(
   });
   // Все пределы проверяются до записи снимка, включая журнал аудита и grants.
 }
+
+void mergeRestoredGrants(
+  Map<String, Object?> current,
+  Map<String, Object?> restored,
+) {
+  final grants = registryObject(restored['grants']);
+  for (final item in registryObject(current['grants']).entries) {
+    final existing = registryObject(item.value);
+    final saved = grants[item.key];
+    if (saved == null ||
+        (registryObject(saved)['revision']! as int) <
+            (existing['revision']! as int)) {
+      grants[item.key] = {'revision': existing['revision'], 'active': false};
+    }
+  }
+}

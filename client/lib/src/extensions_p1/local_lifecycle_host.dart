@@ -267,6 +267,7 @@ class LocalLifecycleHost {
     await transition.consent(package.digest);
     final old = lifecycleOf(previous);
     final record = lifecycleOf(entry);
+    mergeRestoredGrants(old, record);
     for (final key in ['revision', 'epoch', 'audit']) {
       record[key] = old[key];
     }
