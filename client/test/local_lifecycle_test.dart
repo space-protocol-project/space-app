@@ -260,6 +260,94 @@ void main() {
     },
   );
 
+  test(
+    'разрешение привязано к выбранному корню, блокировка отзывает все корни',
+    () async {
+      await fixture.act(LocalLifecycleAction.install);
+      await fixture.act(LocalLifecycleAction.enable);
+      await fixture.act(LocalLifecycleAction.grant);
+      expect(fixture.authority.confirmedRoot, '1' * 32);
+      fixture.authority.root = '3' * 32;
+      await fixture.act(LocalLifecycleAction.grant);
+      expect(fixture.authority.confirmedRoot, '3' * 32);
+      expect((fixture.record['grants']! as Map).length, 2);
+      fixture.sessions.lock();
+      fixture.session = fixture.sessions.unlock('device', 'profile', 'owner');
+      expect(
+        (fixture.record['grants']! as Map).values.every(
+          (g) => (g as Map)['active'] == false,
+        ),
+        true,
+      );
+    },
+  );
+
+  test('незаявленная возможность и отказ согласия не создают grant', () async {
+    fixture.authority.requested = [];
+    await fixture.act(LocalLifecycleAction.install);
+    await fixture.act(LocalLifecycleAction.enable);
+    await expectLater(
+      fixture.act(LocalLifecycleAction.grant),
+      throwsStateError,
+    );
+    expect(fixture.record['grants'], isEmpty);
+  });
+
+  test('невозможный переход и чужая установка не меняют запись', () async {
+    await fixture.act(LocalLifecycleAction.install);
+    final before = fixture.host.snapshot(fixture.session).encode();
+    await expectLater(
+      fixture.act(LocalLifecycleAction.publish),
+      throwsStateError,
+    );
+    final valid = fixture.command(LocalLifecycleAction.enable);
+    final foreign = LocalLifecycleCommand(
+      action: valid.action,
+      installation: 'other',
+      instance: valid.instance,
+      revision: valid.revision,
+      generation: valid.generation,
+    );
+    await expectLater(
+      fixture.host.execute(fixture.session, foreign),
+      throwsStateError,
+    );
+    final stale = LocalLifecycleCommand(
+      action: valid.action,
+      installation: valid.installation,
+      instance: valid.instance,
+      revision: valid.revision + 1,
+      generation: valid.generation,
+    );
+    await expectLater(
+      fixture.host.execute(fixture.session, stale),
+      throwsStateError,
+    );
+    expect(fixture.host.snapshot(fixture.session).encode(), before);
+  });
+
+  test(
+    'отказ согласия на каталог и неверный checkpoint не фиксируются',
+    () async {
+      await fixture.act(LocalLifecycleAction.install);
+      fixture.authority.checkpointOk = false;
+      await expectLater(
+        fixture.act(LocalLifecycleAction.prepare, plan: fixture.plan()),
+        throwsStateError,
+      );
+      expect(fixture.entry['staged'], isNull);
+      fixture.authority.checkpointOk = true;
+      await fixture.act(LocalLifecycleAction.enable);
+      fixture.authority.consent = false;
+      final before = fixture.host.snapshot(fixture.session).encode();
+      await expectLater(
+        fixture.act(LocalLifecycleAction.grant),
+        throwsStateError,
+      );
+      expect(fixture.host.snapshot(fixture.session).encode(), before);
+    },
+  );
+
   for (final phase in ['before', 'partial', 'after']) {
     test(
       'ошибка $phase закрывает допуск, восстановление сохраняет атомарность',

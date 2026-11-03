@@ -66,7 +66,12 @@ abstract interface class LocalExtensionAuthority {
   Future<LocalVerifiedPackage> verifyPackage(String digest);
   Future<void> verifyCheckpoint(String digest, String data);
   Future<String> migrate(Map<String, Object?> plan, int step, String data);
-  Future<bool> confirm(String action, String instance, String package);
+  Future<bool> confirm(
+    String action,
+    String instance,
+    String package, {
+    String? root,
+  });
   Future<String> selectDirectory(String instance, String package);
   Future<LocalRestoreSnapshot> restore(String checkpoint);
 }

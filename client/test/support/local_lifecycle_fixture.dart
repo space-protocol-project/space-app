@@ -15,6 +15,7 @@ class FixtureAuthority implements LocalExtensionAuthority {
   Completer<void>? barrier;
   LocalRestoreSnapshot? saved;
   String root = '1' * 32;
+  String? confirmedRoot;
   List<String> requested = ['device.catalog.read'];
 
   @override
@@ -31,8 +32,16 @@ class FixtureAuthority implements LocalExtensionAuthority {
   }
 
   @override
-  Future<bool> confirm(String action, String instance, String package) async =>
-      consent;
+  Future<bool> confirm(
+    String action,
+    String instance,
+    String package, {
+    String? root,
+  }) async {
+    confirmedRoot = root;
+    return consent;
+  }
+
   @override
   Future<String> selectDirectory(String instance, String package) async => root;
   @override

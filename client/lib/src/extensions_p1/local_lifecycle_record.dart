@@ -92,6 +92,23 @@ void validateLifecycleRecord(Map<String, Object?> entry) {
   _validateGrants(registryObject(record['grants']));
   _validateAudit(record['audit'], record['revision']! as int);
   _validatePending(entry, record);
+  _validateAccess(entry, record);
+}
+
+void _validateAccess(Map<String, Object?> entry, Map<String, Object?> record) {
+  if (record['present'] == false &&
+      (entry['state'] != 'removed' ||
+          entry['data'] != 'null' ||
+          entry['staged'] != null)) {
+    throw const FormatException('purged_state');
+  }
+  for (final value in registryObject(record['grants']).values) {
+    if (registryObject(value)['active'] != true) continue;
+    if (entry['state'] != 'enabled' ||
+        !(record['requested']! as List).contains('device.catalog.read')) {
+      throw const FormatException('active_grant_state');
+    }
+  }
 }
 
 void _validateHistory(Object? value) {
@@ -148,11 +165,36 @@ void _validatePending(Map<String, Object?> entry, Map<String, Object?> record) {
   }
   final value = registryObject(plan);
   validateLifecyclePlan(value);
+  _validatePlanBinding(entry, record, value);
   final staged = registryObject(entry['staged']);
   if (staged['package'] != value['target'] ||
       staged['schema'] != value['schema_to'] ||
       (staged['cursor']! as int) > (value['steps']! as int)) {
     throw const FormatException('stage_binding');
+  }
+  final complete = staged['cursor'] == value['steps'];
+  if (entry['state'] == 'ready' && !complete ||
+      entry['state'] == 'updating' && complete) {
+    throw const FormatException('stage_state');
+  }
+}
+
+void _validatePlanBinding(
+  Map<String, Object?> entry,
+  Map<String, Object?> record,
+  Map<String, Object?> plan,
+) {
+  if (!['updating', 'ready', 'quarantined'].contains(entry['state']) ||
+      plan['source'] != entry['package'] ||
+      plan['schema_from'] != entry['schema'] ||
+      plan['source'] == plan['target'] ||
+      plan['data_revision'] != record['data_revision']) {
+    throw const FormatException('plan_binding');
+  }
+  if ((plan['schema_to']! as int) - (plan['schema_from']! as int) !=
+          plan['steps'] ||
+      (record['history']! as List).contains(plan['plan_id'])) {
+    throw const FormatException('plan_history');
   }
 }
 

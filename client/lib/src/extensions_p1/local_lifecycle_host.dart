@@ -221,7 +221,12 @@ class LocalLifecycleHost {
     final digest = entry['package']! as String;
     final root = await _authority.selectDirectory(command.instance, digest);
     lifecycleToken(root);
-    if (!await _authority.confirm('grant', command.instance, digest)) {
+    if (!await _authority.confirm(
+      'grant',
+      command.instance,
+      digest,
+      root: root,
+    )) {
       {
         throw StateError('PermissionDenied');
       }
