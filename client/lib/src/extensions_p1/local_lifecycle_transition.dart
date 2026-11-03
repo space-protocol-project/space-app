@@ -75,9 +75,10 @@ class LocalLifecycleTransition {
 
   Future<LocalVerifiedPackage> verified(String digest, int schema) async {
     final package = await authority.verifyPackage(digest);
-    if (package.digest != digest || package.schema != schema) { {
-      throw StateError('UntrustedPackage');
-    }
+    if (package.digest != digest || package.schema != schema) {
+      {
+        throw StateError('UntrustedPackage');
+      }
     }
     return package;
   }
@@ -97,9 +98,10 @@ class LocalLifecycleTransition {
       entry['package']! as String,
       entry['schema']! as int,
     );
-    if (jsonEncode(package.requested) != jsonEncode(record['requested'])) { {
-      throw StateError('UntrustedPackage');
-    }
+    if (jsonEncode(package.requested) != jsonEncode(record['requested'])) {
+      {
+        throw StateError('UntrustedPackage');
+      }
     }
     await consent(package.digest);
     entry['state'] = 'enabled';
@@ -123,9 +125,10 @@ class LocalLifecycleTransition {
 
   Future<void> checkpoint(String digest) async {
     final data = entry['data']! as String;
-    if (sha256.convert(utf8.encode(data)).toString() != digest) { {
-      throw StateError('InvalidCheckpoint');
-    }
+    if (sha256.convert(utf8.encode(data)).toString() != digest) {
+      {
+        throw StateError('InvalidCheckpoint');
+      }
     }
     await authority.verifyCheckpoint(digest, data);
   }

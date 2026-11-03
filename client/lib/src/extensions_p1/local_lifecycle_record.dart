@@ -19,17 +19,13 @@ void lifecycleInteger(
   int maximum = 2147483646,
 }) {
   if (value is! int || value < minimum || value > maximum) {
-    {
-      throw const FormatException('lifecycle_integer');
-    }
+    throw const FormatException('lifecycle_integer');
   }
 }
 
 void lifecycleToken(Object? value) {
   if (value is! String || !RegExp(r'^[0-9a-f]{32}$').hasMatch(value)) {
-    {
-      throw const FormatException('lifecycle_token');
-    }
+    throw const FormatException('lifecycle_token');
   }
 }
 
@@ -78,9 +74,7 @@ void validateLifecycleRecord(Map<String, Object?> entry) {
     'audit',
   ]);
   if (record['version'] != 1 || record['present'] is! bool) {
-    {
-      throw const FormatException('lifecycle_version');
-    }
+    throw const FormatException('lifecycle_version');
   }
   for (final key in ['revision', 'epoch']) {
     lifecycleInteger(record[key], minimum: 1);
@@ -135,14 +129,13 @@ void _validateGrants(Map<String, Object?> grants) {
 
 void _validateAudit(Object? value, int revision) {
   if (value is! List || value.isEmpty || value.length > 256) {
-    {
-      throw const FormatException('audit_limit');
-    }
+    throw const FormatException('audit_limit');
   }
   var previous = 0;
   for (final item in value) {
     final event = registryObject(item);
-    registryKeys(event, ['action', 'actor', 'revision']);
+    registryKeys(event, ['action', 'actor', 'revision', 'package']);
+    registryDigest(event['package']);
     validateRegistryName(event['action']! as String);
     validateRegistryName(event['actor']! as String);
     lifecycleInteger(
@@ -198,22 +191,25 @@ void _validatePlanBinding(
   }
 }
 
-Map<String, Object?> newLifecycleRecord(List<String> requested, String actor) =>
-    {
-      'version': 1,
-      'revision': 1,
-      'generation': localGeneration(),
-      'epoch': 1,
-      'data_revision': 0,
-      'present': true,
-      'requested': requested,
-      'plan': null,
-      'history': <String>[],
-      'grants': <String, Object?>{},
-      'audit': <Object?>[
-        {'action': 'install', 'actor': actor, 'revision': 1},
-      ],
-    };
+Map<String, Object?> newLifecycleRecord(
+  List<String> requested,
+  String actor,
+  String package,
+) => {
+  'version': 1,
+  'revision': 1,
+  'generation': localGeneration(),
+  'epoch': 1,
+  'data_revision': 0,
+  'present': true,
+  'requested': requested,
+  'plan': null,
+  'history': <String>[],
+  'grants': <String, Object?>{},
+  'audit': <Object?>[
+    {'action': 'install', 'actor': actor, 'revision': 1, 'package': package},
+  ],
+};
 
 void advanceLifecycleRecord(
   Map<String, Object?> entry,
@@ -238,6 +234,7 @@ void advanceLifecycleRecord(
     'action': action,
     'actor': actor,
     'revision': revision,
+    'package': entry['package'],
   });
   // Все пределы проверяются до записи снимка, включая журнал аудита и grants.
 }

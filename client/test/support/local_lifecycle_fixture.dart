@@ -16,6 +16,7 @@ class FixtureAuthority implements LocalExtensionAuthority {
   LocalRestoreSnapshot? saved;
   String root = '1' * 32;
   String? confirmedRoot;
+  int confirmations = 0;
   List<String> requested = ['device.catalog.read'];
 
   @override
@@ -39,6 +40,7 @@ class FixtureAuthority implements LocalExtensionAuthority {
     String? root,
   }) async {
     confirmedRoot = root;
+    confirmations++;
     return consent;
   }
 

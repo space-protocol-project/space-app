@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'local_lifecycle_record.dart';
+import 'local_authority_scope.dart';
 import 'local_lifecycle_transition.dart';
 import 'local_lifecycle_types.dart';
 import 'local_registry.dart';
@@ -54,7 +55,7 @@ class LocalLifecycleHost {
     final entry = before.entries[command.instance];
     _guard(command, entry, before.generation);
     _requireIdle(command);
-    final next = await _prepare(session, command, entry, before.scope);
+    final next = await _prepare(session, command, entry, before);
     // Согласие, проверка пакета и миграция могут пережить блокировку профиля.
     _require(session, before.scope);
     _requireIdle(command);
@@ -137,9 +138,7 @@ class LocalLifecycleHost {
       return;
     }
     if (entry == null || entry['installation'] != command.installation) {
-      {
-        throw StateError('StaleBinding');
-      }
+      throw StateError('StaleBinding');
     }
     final record = lifecycleOf(entry);
     if (command.generation != record['generation']) {
@@ -148,9 +147,7 @@ class LocalLifecycleHost {
     if (command.revision != record['revision']) throw StateError('Conflict');
     final allowed = localTransitionStates[command.action];
     if (allowed != null && !allowed.contains(entry['state'])) {
-      {
-        throw StateError('FailedPrecondition');
-      }
+      throw StateError('FailedPrecondition');
     }
   }
 
@@ -158,17 +155,23 @@ class LocalLifecycleHost {
     LocalExtensionSession session,
     LocalLifecycleCommand command,
     Map<String, Object?>? previous,
-    String scope,
+    RegistrySnapshot before,
   ) async {
+    final authority = ScopedLocalAuthority(_authority, () {
+      _require(session, before.scope);
+      if (_registry.snapshot.revision != before.revision) {
+        throw StateError('Conflict');
+      }
+    });
     if (command.action == LocalLifecycleAction.install) {
-      return _install(session, command);
+      return _install(session, command, authority);
     }
     var entry = previous!;
     if (command.action == LocalLifecycleAction.restore) {
-      entry = await _restore(command, entry, scope);
+      entry = await _restore(command, entry, before.scope, authority);
     }
-    final root = await _permission(command, entry);
-    await LocalLifecycleTransition(_authority, command, entry).apply();
+    final root = await _permission(command, entry, authority);
+    await LocalLifecycleTransition(authority, command, entry).apply();
     advanceLifecycleRecord(entry, command.action.name, session.actor);
     if (root != null) {
       final grants = registryObject(lifecycleOf(entry)['grants']);
@@ -184,9 +187,10 @@ class LocalLifecycleHost {
   Future<Map<String, Object?>> _install(
     LocalExtensionSession session,
     LocalLifecycleCommand command,
+    LocalExtensionAuthority authority,
   ) async {
     registryDigest(command.package);
-    final package = await _authority.verifyPackage(command.package!);
+    final package = await authority.verifyPackage(command.package!);
     if (package.digest != command.package) throw StateError('UntrustedPackage');
     return {
       'installation': command.installation,
@@ -195,41 +199,40 @@ class LocalLifecycleHost {
       'state': 'disabled',
       'data': '{}',
       'staged': null,
-      'lifecycle': newLifecycleRecord(package.requested, session.actor),
+      'lifecycle': newLifecycleRecord(
+        package.requested,
+        session.actor,
+        package.digest,
+      ),
     };
   }
 
   Future<String?> _permission(
     LocalLifecycleCommand command,
     Map<String, Object?> entry,
+    LocalExtensionAuthority authority,
   ) async {
     final record = lifecycleOf(entry);
     if (command.action == LocalLifecycleAction.revoke) {
       lifecycleToken(command.root);
       if (!registryObject(record['grants']).containsKey(command.root)) {
-        {
-          throw StateError('StaleBinding');
-        }
+        throw StateError('StaleBinding');
       }
     }
     if (command.action != LocalLifecycleAction.grant) return null;
     if (!(record['requested']! as List).contains('device.catalog.read')) {
-      {
-        throw StateError('PermissionDenied');
-      }
+      throw StateError('PermissionDenied');
     }
     final digest = entry['package']! as String;
-    final root = await _authority.selectDirectory(command.instance, digest);
+    final root = await authority.selectDirectory(command.instance, digest);
     lifecycleToken(root);
-    if (!await _authority.confirm(
+    if (!await authority.confirm(
       'grant',
       command.instance,
       digest,
       root: root,
     )) {
-      {
-        throw StateError('PermissionDenied');
-      }
+      throw StateError('PermissionDenied');
     }
     return root;
   }
@@ -238,9 +241,10 @@ class LocalLifecycleHost {
     LocalLifecycleCommand command,
     Map<String, Object?> previous,
     String scope,
+    LocalExtensionAuthority authority,
   ) async {
     registryDigest(command.checkpoint);
-    final restored = await _authority.restore(command.checkpoint!);
+    final restored = await authority.restore(command.checkpoint!);
     final entry = registryObject(jsonDecode(jsonEncode(restored.entry)));
     validateRegistryEntries({command.instance: entry});
     if (restored.scope != scope ||
@@ -249,11 +253,9 @@ class LocalLifecycleHost {
       throw StateError('StaleBinding');
     }
     if (previous['state'] == 'removed' && entry['state'] != 'removed') {
-      {
-        throw StateError('FailedPrecondition');
-      }
+      throw StateError('FailedPrecondition');
     }
-    final transition = LocalLifecycleTransition(_authority, command, entry);
+    final transition = LocalLifecycleTransition(authority, command, entry);
     final package = await transition.verified(
       entry['package']! as String,
       entry['schema']! as int,

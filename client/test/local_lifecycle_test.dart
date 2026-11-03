@@ -175,6 +175,7 @@ void main() {
     fixture.sessions.lock();
     fixture.authority.barrier!.complete();
     await expectation;
+    expect(fixture.authority.confirmations, 0);
     fixture.session = fixture.sessions.unlock('device', 'profile', 'owner');
     expect(fixture.entry['state'], 'disabled');
   });
