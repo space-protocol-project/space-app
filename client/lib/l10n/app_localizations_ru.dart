@@ -3307,4 +3307,55 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get archiveCleanupConfirmed => 'Документ удалён вручную';
+
+  @override
+  String get localProfileTitle => 'Локальный доступ к расширениям';
+
+  @override
+  String get localProfileCreate => 'Создать пароль';
+
+  @override
+  String get localProfileUnlock => 'Разблокировать';
+
+  @override
+  String get localProfileLock => 'Заблокировать';
+
+  @override
+  String get localProfilePassword => 'Пароль локального профиля';
+
+  @override
+  String get localProfileConfirm => 'Повторите пароль';
+
+  @override
+  String get localProfileSetupHelp =>
+      'Создайте отдельный пароль для доступа к расширениям на этом устройстве. Минимум 12 символов. Сохраните пароль: автоматического сброса пока нет.';
+
+  @override
+  String get localProfileUnlockHelp =>
+      'Введите пароль локального профиля этого устройства.';
+
+  @override
+  String get localProfileUnavailable =>
+      'Не удалось открыть локальный профиль. Проверьте доступность системного хранилища и попробуйте снова.';
+
+  @override
+  String get localProfilePasswordRule =>
+      'Используйте пароль длиной от 12 до 256 символов.';
+
+  @override
+  String get localProfileMismatch => 'Пароли не совпадают.';
+
+  @override
+  String get localProfileDenied => 'Неверный пароль.';
+
+  @override
+  String get localProfileThrottled =>
+      'Слишком много попыток. Повторите через 30 секунд.';
+
+  @override
+  String get localProfileOpen =>
+      'Локальный профиль разблокирован. Разрешения каталогов выдаются отдельно.';
+
+  @override
+  String get localProfileClosed => 'Локальный профиль заблокирован.';
 }

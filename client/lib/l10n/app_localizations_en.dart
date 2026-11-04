@@ -3289,4 +3289,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get archiveCleanupConfirmed => 'Document deleted manually';
+
+  @override
+  String get localProfileTitle => 'Local extension access';
+
+  @override
+  String get localProfileCreate => 'Create password';
+
+  @override
+  String get localProfileUnlock => 'Unlock';
+
+  @override
+  String get localProfileLock => 'Lock';
+
+  @override
+  String get localProfilePassword => 'Local profile password';
+
+  @override
+  String get localProfileConfirm => 'Repeat password';
+
+  @override
+  String get localProfileSetupHelp =>
+      'Create a separate password for extension access on this device. Use at least 12 characters. Keep it safe: automatic reset is not available yet.';
+
+  @override
+  String get localProfileUnlockHelp =>
+      'Enter this device’s local profile password.';
+
+  @override
+  String get localProfileUnavailable =>
+      'Could not open the local profile. Check that system secure storage is available and try again.';
+
+  @override
+  String get localProfilePasswordRule =>
+      'Use a password between 12 and 256 characters.';
+
+  @override
+  String get localProfileMismatch => 'Passwords do not match.';
+
+  @override
+  String get localProfileDenied => 'Incorrect password.';
+
+  @override
+  String get localProfileThrottled =>
+      'Too many attempts. Try again in 30 seconds.';
+
+  @override
+  String get localProfileOpen =>
+      'Local profile unlocked. Directory permissions are granted separately.';
+
+  @override
+  String get localProfileClosed => 'Local profile locked.';
 }

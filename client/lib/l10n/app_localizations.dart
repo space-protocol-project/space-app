@@ -5955,6 +5955,96 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Документ удалён вручную'**
   String get archiveCleanupConfirmed;
+
+  /// No description provided for @localProfileTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Локальный доступ к расширениям'**
+  String get localProfileTitle;
+
+  /// No description provided for @localProfileCreate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать пароль'**
+  String get localProfileCreate;
+
+  /// No description provided for @localProfileUnlock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разблокировать'**
+  String get localProfileUnlock;
+
+  /// No description provided for @localProfileLock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заблокировать'**
+  String get localProfileLock;
+
+  /// No description provided for @localProfilePassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль локального профиля'**
+  String get localProfilePassword;
+
+  /// No description provided for @localProfileConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторите пароль'**
+  String get localProfileConfirm;
+
+  /// No description provided for @localProfileSetupHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создайте отдельный пароль для доступа к расширениям на этом устройстве. Минимум 12 символов. Сохраните пароль: автоматического сброса пока нет.'**
+  String get localProfileSetupHelp;
+
+  /// No description provided for @localProfileUnlockHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите пароль локального профиля этого устройства.'**
+  String get localProfileUnlockHelp;
+
+  /// No description provided for @localProfileUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось открыть локальный профиль. Проверьте доступность системного хранилища и попробуйте снова.'**
+  String get localProfileUnavailable;
+
+  /// No description provided for @localProfilePasswordRule.
+  ///
+  /// In ru, this message translates to:
+  /// **'Используйте пароль длиной от 12 до 256 символов.'**
+  String get localProfilePasswordRule;
+
+  /// No description provided for @localProfileMismatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароли не совпадают.'**
+  String get localProfileMismatch;
+
+  /// No description provided for @localProfileDenied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неверный пароль.'**
+  String get localProfileDenied;
+
+  /// No description provided for @localProfileThrottled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Слишком много попыток. Повторите через 30 секунд.'**
+  String get localProfileThrottled;
+
+  /// No description provided for @localProfileOpen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Локальный профиль разблокирован. Разрешения каталогов выдаются отдельно.'**
+  String get localProfileOpen;
+
+  /// No description provided for @localProfileClosed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Локальный профиль заблокирован.'**
+  String get localProfileClosed;
 }
 
 class _AppLocalizationsDelegate

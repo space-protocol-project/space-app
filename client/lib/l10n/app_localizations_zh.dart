@@ -3045,6 +3045,52 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get archiveCleanupConfirmed => '已手动删除文档';
+
+  @override
+  String get localProfileTitle => '本地扩展访问';
+
+  @override
+  String get localProfileCreate => '创建密码';
+
+  @override
+  String get localProfileUnlock => '解锁';
+
+  @override
+  String get localProfileLock => '锁定';
+
+  @override
+  String get localProfilePassword => '本地配置文件密码';
+
+  @override
+  String get localProfileConfirm => '重复密码';
+
+  @override
+  String get localProfileSetupHelp =>
+      '请为此设备上的扩展访问创建单独密码，至少 12 个字符。请妥善保管：暂不支持自动重置。';
+
+  @override
+  String get localProfileUnlockHelp => '请输入此设备的本地配置文件密码。';
+
+  @override
+  String get localProfileUnavailable => '无法打开本地配置文件。请检查系统安全存储是否可用，然后重试。';
+
+  @override
+  String get localProfilePasswordRule => '请使用 12 至 256 个字符的密码。';
+
+  @override
+  String get localProfileMismatch => '密码不匹配。';
+
+  @override
+  String get localProfileDenied => '密码错误。';
+
+  @override
+  String get localProfileThrottled => '尝试次数过多。请在 30 秒后重试。';
+
+  @override
+  String get localProfileOpen => '本地配置文件已解锁。目录权限需单独授予。';
+
+  @override
+  String get localProfileClosed => '本地配置文件已锁定。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4468,4 +4514,50 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get directorySettingsOff => '关闭';
+
+  @override
+  String get localProfileTitle => '本地扩展访问';
+
+  @override
+  String get localProfileCreate => '创建密码';
+
+  @override
+  String get localProfileUnlock => '解锁';
+
+  @override
+  String get localProfileLock => '锁定';
+
+  @override
+  String get localProfilePassword => '本地配置文件密码';
+
+  @override
+  String get localProfileConfirm => '重复密码';
+
+  @override
+  String get localProfileSetupHelp =>
+      '请为此设备上的扩展访问创建单独密码，至少 12 个字符。请妥善保管：暂不支持自动重置。';
+
+  @override
+  String get localProfileUnlockHelp => '请输入此设备的本地配置文件密码。';
+
+  @override
+  String get localProfileUnavailable => '无法打开本地配置文件。请检查系统安全存储是否可用，然后重试。';
+
+  @override
+  String get localProfilePasswordRule => '请使用 12 至 256 个字符的密码。';
+
+  @override
+  String get localProfileMismatch => '密码不匹配。';
+
+  @override
+  String get localProfileDenied => '密码错误。';
+
+  @override
+  String get localProfileThrottled => '尝试次数过多。请在 30 秒后重试。';
+
+  @override
+  String get localProfileOpen => '本地配置文件已解锁。目录权限需单独授予。';
+
+  @override
+  String get localProfileClosed => '本地配置文件已锁定。';
 }
