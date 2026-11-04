@@ -35,7 +35,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p ../.local/registry
-          flutter test test/local_session_scope_test.dart test/app_test.dart test/app_shutdown_test.dart test/local_lifecycle_test.dart test/local_registry_test.dart test/extensions_p1_test.dart test/extensions_p1_retry_test.dart --reporter expanded > ../.local/registry/unit.txt
+          flutter test test/local_profile_test.dart test/local_profile_widget_test.dart test/device_panel_test.dart test/local_session_scope_test.dart test/app_test.dart test/app_shutdown_test.dart test/local_lifecycle_test.dart test/local_registry_test.dart test/extensions_p1_test.dart test/extensions_p1_retry_test.dart --reporter expanded > ../.local/registry/unit.txt
       - name: Настоящий исполняемый процесс Dart
         working-directory: client
         run: dart compile exe test/probes/local_registry_probe.dart -o ../.local/registry/probe.exe
@@ -57,3 +57,8 @@ jobs:
             .local/registry/crash.json
             .local/registry/lifecycle-crash.json
           include-hidden-files: true
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Linux'
+        with:
+          name: profile-localizations
+          path: client/lib/l10n/app_localizations*.dart

@@ -1183,5 +1183,20 @@
   "archiveDelete": "删除私有副本",
   "archiveManualCleanup": "在提供程序中清理",
   "archiveManualCleanupHelp": "请使用系统文件管理器删除所选位置中未完成的 Space-device 文档。仅在删除后确认：应用将停止自动清理重试。私有归档将保留。",
-  "archiveCleanupConfirmed": "已手动删除文档"
+  "archiveCleanupConfirmed": "已手动删除文档",
+  "localProfileTitle": "本地扩展访问",
+  "localProfileCreate": "创建密码",
+  "localProfileUnlock": "解锁",
+  "localProfileLock": "锁定",
+  "localProfilePassword": "本地配置文件密码",
+  "localProfileConfirm": "重复密码",
+  "localProfileSetupHelp": "请为此设备上的扩展访问创建单独密码，至少 12 个字符。请妥善保管：暂不支持自动重置。",
+  "localProfileUnlockHelp": "请输入此设备的本地配置文件密码。",
+  "localProfileUnavailable": "无法打开本地配置文件。请检查系统安全存储是否可用，然后重试。",
+  "localProfilePasswordRule": "请使用 12 至 256 个字符的密码。",
+  "localProfileMismatch": "密码不匹配。",
+  "localProfileDenied": "密码错误。",
+  "localProfileThrottled": "尝试次数过多。请在 30 秒后重试。",
+  "localProfileOpen": "本地配置文件已解锁。目录权限需单独授予。",
+  "localProfileClosed": "本地配置文件已锁定。"
 }

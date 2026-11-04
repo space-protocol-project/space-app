@@ -14,6 +14,8 @@ import 'pairing_selection.dart';
 import '../src/directory_repository.dart';
 import '../src/directory_backup.dart';
 import 'directory_transfer.dart';
+import 'local_profile_unlock.dart';
+import '../src/extensions_p1/local_session_cubit.dart';
 
 class DevicePanel extends StatefulWidget {
   const DevicePanel({
@@ -24,8 +26,10 @@ class DevicePanel extends StatefulWidget {
     required this.onRestored,
     this.directoryRepository,
     this.directoryService,
+    this.extensionAccess,
   });
   final ServerWorkspaces workspaces;
+  final LocalSessionCubit? extensionAccess;
   final DirectoryRepository? directoryRepository;
   final DirectoryBackupService? directoryService;
   final ChatController fallback;
@@ -74,6 +78,8 @@ class _DevicePanelState extends State<DevicePanel> {
             title: context.strings.myDevice,
             description: context.strings.myDeviceDescription,
             children: [
+              if (widget.extensionAccess case final access?)
+                LocalProfileAccessCard(access: access),
               SurfaceCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

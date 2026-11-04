@@ -57,6 +57,7 @@ import '../src/home_migration.dart';
 import '../src/device_migration.dart';
 import '../src/saved_drafts.dart';
 import '../src/app_shutdown.dart';
+import '../src/extensions_p1/local_session_cubit.dart';
 import 'device_transfer_area.dart';
 import 'directory_backup.dart';
 import '../src/directory_backup.dart';
@@ -127,9 +128,11 @@ class SpaceShell extends StatefulWidget {
     this.startupReady,
     this.hostingEnabled = true,
     this.shutdown,
+    this.extensionAccess,
   });
   final bool hostingEnabled;
   final AppShutdown? shutdown;
+  final LocalSessionCubit? extensionAccess;
   final AppPreferences preferences;
   final AppUpdates? updates;
   final SystemNotifications? notifications;
@@ -2111,6 +2114,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
                               prepareInstall: prepareAppInstall,
                             ),
                             DevicePanel(
+                              extensionAccess: widget.extensionAccess,
                               directoryService: directoryService,
                               directoryRepository: directoryRepository,
                               workspaces: workspaces,

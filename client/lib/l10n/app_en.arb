@@ -1183,5 +1183,20 @@
   "archiveDelete": "Delete private copy",
   "archiveManualCleanup": "Clean up at the provider",
   "archiveManualCleanupHelp": "Delete the unfinished Space-device document in the chosen location using the system file manager. Confirm only after deleting it: the app will stop retrying automatic cleanup. The private archive is retained.",
-  "archiveCleanupConfirmed": "Document deleted manually"
+  "archiveCleanupConfirmed": "Document deleted manually",
+  "localProfileTitle": "Local extension access",
+  "localProfileCreate": "Create password",
+  "localProfileUnlock": "Unlock",
+  "localProfileLock": "Lock",
+  "localProfilePassword": "Local profile password",
+  "localProfileConfirm": "Repeat password",
+  "localProfileSetupHelp": "Create a separate password for extension access on this device. Use at least 12 characters. Keep it safe: automatic reset is not available yet.",
+  "localProfileUnlockHelp": "Enter this device’s local profile password.",
+  "localProfileUnavailable": "Could not open the local profile. Check that system secure storage is available and try again.",
+  "localProfilePasswordRule": "Use a password between 12 and 256 characters.",
+  "localProfileMismatch": "Passwords do not match.",
+  "localProfileDenied": "Incorrect password.",
+  "localProfileThrottled": "Too many attempts. Try again in 30 seconds.",
+  "localProfileOpen": "Local profile unlocked. Directory permissions are granted separately.",
+  "localProfileClosed": "Local profile locked."
 }

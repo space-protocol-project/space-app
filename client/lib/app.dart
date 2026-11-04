@@ -14,6 +14,12 @@ import 'ui/interface_scale.dart';
 import 'ui/app_shutdown_gate.dart';
 import 'ui/local_extension_session_scope.dart';
 import 'src/extensions_p1/local_session_cubit.dart';
+import 'src/extensions_p1/local_profile_verifier.dart';
+import 'src/secure_vault.dart';
+import 'ui/local_profile_unlock.dart';
+
+import 'package:path/path.dart' as paths;
+import 'package:path_provider/path_provider.dart';
 
 class SpaceApp extends StatefulWidget {
   const SpaceApp({
@@ -31,6 +37,29 @@ class SpaceApp extends StatefulWidget {
 
 class _SpaceAppState extends State<SpaceApp> with WidgetsBindingObserver {
   final preferences = AppPreferences();
+  final navigatorKey = GlobalKey<NavigatorState>();
+  late final profileVerifier = LocalProfileVerifier(
+    const PlatformKeyStorage(),
+    lockPath: () async => paths.join(
+      (await getApplicationSupportDirectory()).path,
+      'extensions-profile.lock',
+    ),
+  );
+  late final defaultAccess = LocalSessionCubit(
+    authenticate: _authenticateProfile,
+  );
+  LocalSessionCubit get extensionAccess =>
+      widget.extensionAccess ?? defaultAccess;
+  Future<LocalProfileIdentity?> _authenticateProfile() async {
+    final context = navigatorKey.currentContext;
+    if (!mounted || context == null) return null;
+    return showDialog<LocalProfileIdentity>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => LocalProfileUnlockDialog(service: profileVerifier),
+    );
+  }
+
   late final Future<void> startupReady;
   @override
   void initState() {
@@ -52,6 +81,7 @@ class _SpaceAppState extends State<SpaceApp> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     preferences.dispose();
+    unawaited(defaultAccess.close());
     super.dispose();
   }
 
@@ -60,11 +90,12 @@ class _SpaceAppState extends State<SpaceApp> with WidgetsBindingObserver {
       BlocBuilder<AppPreferences, PreferencesState>(
         bloc: preferences,
         builder: (context, state) => MaterialApp(
+          navigatorKey: navigatorKey,
           title: 'Space',
           builder: (context, child) => InterfaceScale(
             scale: state.uiScale,
             child: LocalExtensionSessionScope(
-              access: widget.extensionAccess,
+              access: extensionAccess,
               shutdown: widget.shutdown,
               child: AppShutdownGate(
                 shutdown: widget.shutdown,
@@ -82,6 +113,7 @@ class _SpaceAppState extends State<SpaceApp> with WidgetsBindingObserver {
           ],
           supportedLocales: AppLocalizations.supportedLocales,
           home: SpaceShell(
+            extensionAccess: extensionAccess,
             preferences: preferences,
             startupReady: startupReady,
             controller: widget.controller,
