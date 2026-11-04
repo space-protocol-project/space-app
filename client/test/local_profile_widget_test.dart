@@ -33,10 +33,12 @@ class WidgetVerifier extends LocalProfileVerifier {
     calls++;
     creating = create;
     await pause?.future;
-    if (!active())
+    if (!active()) {
       throw const LocalProfileException(LocalProfileFailure.cancelled);
-    if (password != 'valid password')
+    }
+    if (password != 'valid password') {
       throw const LocalProfileException(LocalProfileFailure.denied);
+    }
     return (device: 'device', profile: 'profile', actor: 'owner');
   }
 }
@@ -73,8 +75,9 @@ void main() {
 
   Future<void> submit(WidgetTester tester, String value) async {
     await tester.enterText(password, value);
-    if (confirmation.evaluate().isNotEmpty)
+    if (confirmation.evaluate().isNotEmpty) {
       await tester.enterText(confirmation, value);
+    }
     await tester.tap(
       find.descendant(
         of: find.byType(AlertDialog),

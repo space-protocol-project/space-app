@@ -11,13 +11,12 @@ import 'local_session_cubit.dart';
 class LocalProfileVerifier {
   LocalProfileVerifier(
     this._storage, {
-    required Future<String> Function() lockPath,
+    required this.lockPath,
     DateTime Function()? now,
-  }) : _lockPath = lockPath,
-       _now = now ?? DateTime.now;
+  }) : _now = now ?? DateTime.now;
   static const storageKey = 'space.extensions.local-profile.v1';
   final SecureKeyStorage _storage;
-  final Future<String> Function() _lockPath;
+  final Future<String> Function() lockPath;
   final DateTime Function() _now;
   bool _busy = false;
 
@@ -27,7 +26,7 @@ class LocalProfileVerifier {
     RegistryJournal? lock;
     try {
       // Используется только владение файловой блокировкой; кадры не записываются.
-      lock = RegistryJournal.open(await _lockPath());
+      lock = RegistryJournal.open(await lockPath());
       return await operation();
     } finally {
       _busy = false;

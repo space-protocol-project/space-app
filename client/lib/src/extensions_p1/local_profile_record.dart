@@ -40,8 +40,9 @@ class LocalProfileRecord {
   String encode() => jsonEncode(value);
 
   static LocalProfileRecord decode(String raw) {
-    if (utf8.encode(raw).length > 4096)
+    if (utf8.encode(raw).length > 4096) {
       throw const FormatException('profile_size');
+    }
     final value = registryObject(jsonDecode(raw));
     registryKeys(value, [
       'version',
@@ -85,8 +86,9 @@ class LocalProfileRecord {
   }
 
   void reserveAttempt(int now) {
-    if (blockedUntil > now)
+    if (blockedUntil > now) {
       throw const LocalProfileException(LocalProfileFailure.throttled);
+    }
     final next = (failures == 5 ? 0 : failures) + 1;
     value['failures'] = next;
     value['blocked_until'] = next == 5 ? now + 30000 : 0;
