@@ -1,0 +1,65 @@
+name: P1 нативное хранилище локального профиля
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-24.04, target: linux, binary: client/build/linux/x64/debug/bundle/space_client}
+          - {os: windows-2025, target: windows, binary: client/build/windows/x64/runner/Debug/space_client.exe}
+          - {os: macos-15, target: macos, binary: client/build/macos/Build/Products/Debug/Space.app/Contents/MacOS/Space}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.13'}
+      - name: Зависимости Linux
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev libsecret-tools gnome-keyring dbus-x11 xvfb
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Анализ и регрессионные тесты
+        working-directory: client
+        run: |
+          flutter pub get
+          flutter analyze
+          mkdir -p ../.local/profile-native
+          flutter test test/local_profile_test.dart test/local_profile_widget_test.dart test/local_session_scope_test.dart test/secure_storage_macos_test.dart --reporter expanded > ../.local/profile-native/unit.txt
+      - name: Независимое чтение Keychain в стенде macOS
+        if: runner.os == 'macOS'
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          source = Path('tools/directory_crash_macos.swift').read_text()
+          assert 'namespace + "space.directory.v1"' in source
+          Path('client/macos/Runner/MainFlutterWindow.swift').write_text(source.replace('namespace + "space.directory.v1"', 'namespace + "space.extensions.local-profile.v1"'))
+          PY
+      - name: Настоящее настольное приложение
+        working-directory: client
+        run: flutter build ${{ matrix.target }} --debug --target test/probes/local_profile_native_probe.dart
+      - name: Перезапуск и системное хранилище Linux
+        if: runner.os == 'Linux'
+        run: xvfb-run -a python tools/check_local_profile_native.py '${{ matrix.binary }}'
+      - name: Перезапуск и системное хранилище Windows/macOS
+        if: runner.os != 'Linux'
+        run: python tools/check_local_profile_native.py '${{ matrix.binary }}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: profile-native-${{ matrix.os }}
+          path: |
+            .local/profile-native/unit.txt
+            ${{ runner.temp }}/local-profile-native/report.json
+            ${{ runner.temp }}/local-profile-native/*.log
+          include-hidden-files: true
