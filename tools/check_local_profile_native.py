@@ -24,8 +24,11 @@ def run_role(binary, root, role, environment, kill=False):
         process = subprocess.Popen(command, env=env, stdout=log, stderr=log)
         try:
             deadline = time.monotonic() + 120
-            while not marker.exists():
-                if process.poll() is not None or time.monotonic() > deadline:
+            while True:
+                code = process.poll()
+                if marker.exists():
+                    break
+                if code is not None or time.monotonic() > deadline:
                     raise RuntimeError(f'Не завершён сценарий {role}')
                 time.sleep(.1)
             child_pid = int(marker.read_text())
