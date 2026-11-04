@@ -29,6 +29,7 @@ class LocalExtensionSessions {
   }
 
   void lock() {
+    if (_current == null) return;
     _current = null;
     for (final listener in List.of(_listeners)) {
       listener();

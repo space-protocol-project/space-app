@@ -12,6 +12,11 @@ class AppShutdown extends Cubit<AppShutdownState> {
   final Duration timeout;
   Future<void> Function()? prepare;
   Future<bool>? _pending;
+  final _stopBarriers = <void Function()>{};
+
+  void addStopBarrier(void Function() barrier) => _stopBarriers.add(barrier);
+  void removeStopBarrier(void Function() barrier) =>
+      _stopBarriers.remove(barrier);
 
   Future<bool> request() {
     if (state == AppShutdownState.stopped) return Future.value(true);
@@ -20,7 +25,12 @@ class AppShutdown extends Cubit<AppShutdownState> {
 
   Future<bool> _run() async {
     emit(AppShutdownState.stopping);
-    final operation = Future<void>.sync(() => prepare?.call());
+    final operation = Future<void>.sync(() {
+      for (final barrier in List.of(_stopBarriers)) {
+        barrier();
+      }
+      return prepare?.call();
+    });
     // timeout не отменяет Future. Не запускаем вторую очистку поверх первой.
     unawaited(
       operation

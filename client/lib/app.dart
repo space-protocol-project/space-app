@@ -12,11 +12,19 @@ import 'l10n/app_localizations.dart';
 import 'ui/shell.dart';
 import 'ui/interface_scale.dart';
 import 'ui/app_shutdown_gate.dart';
+import 'ui/local_extension_session_scope.dart';
+import 'src/extensions_p1/local_session_cubit.dart';
 
 class SpaceApp extends StatefulWidget {
-  const SpaceApp({super.key, this.controller, this.shutdown});
+  const SpaceApp({
+    super.key,
+    this.controller,
+    this.shutdown,
+    this.extensionAccess,
+  });
   final ChatController? controller;
   final AppShutdown? shutdown;
+  final LocalSessionCubit? extensionAccess;
   @override
   State<SpaceApp> createState() => _SpaceAppState();
 }
@@ -55,9 +63,13 @@ class _SpaceAppState extends State<SpaceApp> with WidgetsBindingObserver {
           title: 'Space',
           builder: (context, child) => InterfaceScale(
             scale: state.uiScale,
-            child: AppShutdownGate(
+            child: LocalExtensionSessionScope(
+              access: widget.extensionAccess,
               shutdown: widget.shutdown,
-              child: child ?? const SizedBox.shrink(),
+              child: AppShutdownGate(
+                shutdown: widget.shutdown,
+                child: child ?? const SizedBox.shrink(),
+              ),
             ),
           ),
           debugShowCheckedModeBanner: false,
