@@ -139,7 +139,9 @@ Future<void> main() async {
   try {
     await initializeCrashWindows();
     await execute();
-    await File('$root/done-$role').writeAsString('$pid', flush: true);
+    final marker = File('$root/done-$role.tmp');
+    await marker.writeAsString('$pid', flush: true);
+    await marker.rename('$root/done-$role');
     if (role == 'create' || role == 'wrong') {
       await Future<void>.delayed(const Duration(minutes: 5));
     }
