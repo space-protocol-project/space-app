@@ -130,6 +130,7 @@ void main() {
     );
     await tester.pumpWidget(const SizedBox());
     expect(() => access.session, throwsStateError);
+    expect(await access.unlock(), false);
     host.close();
     await access.close();
     directory.deleteSync(recursive: true);

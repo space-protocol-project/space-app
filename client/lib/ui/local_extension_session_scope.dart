@@ -51,7 +51,7 @@ class _LocalExtensionSessionScopeState extends State<LocalExtensionSessionScope>
 
   void _detach(AppShutdown? shutdown) {
     shutdown?.removeStopBarrier(access.stop);
-    access.lock();
+    access.setForeground(false);
     if (owned) unawaited(access.close());
   }
 
