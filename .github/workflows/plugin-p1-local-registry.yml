@@ -30,7 +30,7 @@ jobs:
           go build -o ../../.local/registry/space-catalog.exe .
       - name: Нативные зависимости Linux
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb xdotool dbus-x11
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb dbus-x11
       - name: Инструменты собственных нативных пакетов
         run: rustup toolchain install 1.99.1 --profile minimal
       - name: Подготовка
@@ -54,7 +54,8 @@ jobs:
           SPACE_CATALOG_HELPER: ${{ github.workspace }}/.local/registry/space-catalog.exe
         run: |
           flutter build linux --debug --target test/probes/desktop_catalog_picker_probe.dart
-          dbus-run-session -- xvfb-run -a python ../tools/check_desktop_catalog_picker.py build/linux/x64/debug/bundle/space_client ../.local/registry/picker.json
+          cc -shared -fPIC ../tools/catalog_picker_gtk.c -o "$RUNNER_TEMP/catalog-picker.so" $(pkg-config --cflags --libs gtk+-3.0)
+          dbus-run-session -- xvfb-run -a python ../tools/check_desktop_catalog_picker.py build/linux/x64/debug/bundle/space_client ../.local/registry/picker.json "$RUNNER_TEMP/catalog-picker.so"
       - name: Настоящий исполняемый процесс Dart
         working-directory: client
         run: dart compile exe test/probes/local_registry_probe.dart -o ../.local/registry/probe.exe

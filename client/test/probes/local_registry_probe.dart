@@ -31,7 +31,9 @@ void main(List<String> args) {
         if (phase != args[3]) return;
         stdout.writeln('checkpoint:$phase');
         // Родитель завершает процесс принудительно, без close/finally.
-        stdin.readLineSync();
+        while (true) {
+          sleep(const Duration(seconds: 1));
+        }
       },
     );
     stdout.writeln('committed');

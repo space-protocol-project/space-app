@@ -113,7 +113,13 @@ extension LocalLifecycleAccess on LocalLifecycleHost {
       if (binding == null || binding.instance != instance) {
         throw StateError('StaleBinding');
       }
-      final value = await operation(binding.root);
+      late T value;
+      try {
+        value = await operation(binding.root);
+      } catch (_) {
+        if (lease.isCancelled) throw StateError('PermissionDenied');
+        rethrow;
+      }
       deliver(lease.deliver(value));
     } finally {
       lease.close();
@@ -121,12 +127,7 @@ extension LocalLifecycleAccess on LocalLifecycleHost {
   }
 
   void _cancel(String? instance) {
-    for (final item in _pendingRoots.entries.toList()) {
-      if (instance == null || item.value == instance) {
-        _pendingRoots.remove(item.key);
-        item.key.close();
-      }
-    }
+    _cancelPendingSelections(instance);
     for (final item in _roots.entries.toList()) {
       if (instance == null || item.value.instance == instance) {
         _roots.remove(item.key);
@@ -135,6 +136,14 @@ extension LocalLifecycleAccess on LocalLifecycleHost {
     }
     for (final call in _calls) {
       if (instance == null || call.instance == instance) call._cancelled = true;
+    }
+  }
+
+  void _cancelPendingSelections(String? instance) {
+    for (final item in _pendingRoots.entries.toList()) {
+      if (instance != null && item.value != instance) continue;
+      _pendingRoots.remove(item.key);
+      item.key.close();
     }
   }
 

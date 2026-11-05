@@ -1,5 +1,7 @@
 """Проверка атомарной публикации через хост жизненного цикла, не прямую запись."""
 import json
+import os
+import signal
 import subprocess
 import sys
 import tempfile
@@ -24,6 +26,8 @@ for repetition in range(3):
                         process.kill()
                         raise
                 process.kill()
+                expected = 1 if os.name == 'nt' else -signal.SIGKILL
+                assert process.wait(timeout=15) == expected
                 process.communicate(timeout=15)
             finally:
                 if process.poll() is None:

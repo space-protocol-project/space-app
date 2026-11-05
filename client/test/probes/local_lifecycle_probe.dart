@@ -19,7 +19,9 @@ Future<void> main(List<String> args) async {
           checkpoint: (phase) {
             if (phase != args[2]) return;
             stdout.writeln('checkpoint:$phase');
-            stdin.readLineSync();
+            while (true) {
+              sleep(const Duration(seconds: 1));
+            }
           },
         );
       case 'read':

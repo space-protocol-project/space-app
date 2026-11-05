@@ -222,7 +222,16 @@ void main() {
         limit: 65536,
       );
       f.sessions.lock();
-      await expectLater(pending, throwsStateError);
+      await expectLater(
+        pending,
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'reason',
+            'PermissionDenied',
+          ),
+        ),
+      );
       await picker.stopped;
       expect(delivered, false);
     },

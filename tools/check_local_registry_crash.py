@@ -1,5 +1,7 @@
 """Настоящее завершение Dart-процесса на границах записи журнала."""
 import json
+import os
+import signal
 import subprocess
 import sys
 import tempfile
@@ -56,6 +58,8 @@ for repetition, kind in product(range(3), ('prepare', 'advance', 'publish')):
                 contender = subprocess.run([exe,str(path),'read'],capture_output=True,timeout=15)
                 assert contender.returncode != 0
                 process.kill()
+                expected = 1 if os.name == 'nt' else -signal.SIGKILL
+                assert process.wait(timeout=15) == expected
                 process.communicate(timeout=15)
             finally:
                 if process.poll() is None: process.kill(); process.wait(timeout=15)

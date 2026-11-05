@@ -129,7 +129,10 @@ class _DesktopRoot extends LocalCatalogRoot {
   }
 
   @override
-  Future<CatalogPage> list(int limit, String? cursor) => _serial(() async {
+  Future<CatalogPage> list(int limit, String? cursor) =>
+      _serial(() => _page(limit, cursor));
+
+  Future<CatalogPage> _page(int limit, String? cursor) async {
     if (limit < 1 || limit > 128) throw StateError('ResourceLimit');
     if (cursor != next || (snapshot != null && cursor == null)) {
       throw StateError('StaleBinding');
@@ -142,7 +145,8 @@ class _DesktopRoot extends LocalCatalogRoot {
     index += page.length;
     next = index < all.length ? localGeneration() : null;
     return (entries: page, next: next);
-  });
+  }
+
   @override
   Future<CatalogChunk> read(String handle, int offset, int limit) =>
       _serial(() async {
