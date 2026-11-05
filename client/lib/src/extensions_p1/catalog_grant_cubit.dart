@@ -134,7 +134,7 @@ class CatalogGrantCubit extends Cubit<CatalogScreenState> {
     emit(const CatalogWorking());
     try {
       _checkHost(intent);
-      final id = await intent.approve(access.session);
+      final id = await intent.approve(access.session, () => _checkHost(intent));
       if (!_current(epoch)) return;
       _discard();
       emit(CatalogGranted(intent.instance, id));

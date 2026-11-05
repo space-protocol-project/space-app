@@ -15,6 +15,7 @@ class CatalogGrantPage extends StatelessWidget {
   final SpaceCatalogRuntime runtime;
   @override
   Widget build(BuildContext context) => BlocProvider(
+    key: ValueKey((access, runtime)),
     create: (_) => CatalogGrantCubit(access, runtime),
     child: const _Page(),
   );

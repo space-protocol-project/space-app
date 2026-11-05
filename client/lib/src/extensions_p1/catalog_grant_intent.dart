@@ -36,6 +36,7 @@ final class CatalogGrantIntent {
         throw StateError('Unavailable');
       }
       _root = root;
+      host._pendingRoots[root] = instance;
     } catch (_) {
       root.close();
       rethrow;
@@ -50,8 +51,16 @@ final class CatalogGrantIntent {
     host._require(session, '${original.device}/${original.profile}');
   }
 
-  Future<String> approve(LocalExtensionSession session) async {
-    check(session);
+  Future<String> approve(
+    LocalExtensionSession session,
+    void Function() guardContext,
+  ) async {
+    void guard() {
+      check(session);
+      guardContext();
+    }
+
+    guard();
     final root = _root!;
     final before = host.snapshot(session);
     final entry = before.entries[instance]!;
@@ -60,8 +69,8 @@ final class CatalogGrantIntent {
     host._requireIdle(enable);
     // Оба перехода готовятся на частном снимке. Отказ во второй проверке
     // оставляет экземпляр отключённым, включая прежнюю ревизию реестра.
-    await host._prepare(session, enable, entry, before, (_) {}, active: _live);
-    check(session);
+    await host._prepare(session, enable, entry, before, (_) {}, active: guard);
+    guard();
     final grant = _command(LocalLifecycleAction.grant, entry);
     host._guard(grant, entry, before.generation);
     await host._prepare(
@@ -71,11 +80,12 @@ final class CatalogGrantIntent {
       before,
       (_) {},
       prepared: root,
-      active: _live,
+      active: guard,
     );
-    check(session);
+    guard();
     host._requireIdle(grant);
     host._commit(before, 'grant', null);
+    host._pendingRoots.remove(root);
     host._cancel(instance);
     host._roots[root.id] = (instance: instance, root: root);
     _root = null;
@@ -100,6 +110,7 @@ final class CatalogGrantIntent {
 
   void close() {
     _closed = true;
+    host._pendingRoots.remove(_root);
     _root?.close();
     _root = null;
   }

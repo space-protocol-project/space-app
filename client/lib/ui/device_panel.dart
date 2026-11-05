@@ -80,12 +80,13 @@ class _DevicePanelState extends State<DevicePanel> {
             children: [
               if (widget.extensionAccess case final access?) ...[
                 LocalProfileAccessCard(access: access),
-                ListTile(
-                  leading: const Icon(Icons.folder_open),
-                  title: Text(context.strings.catalogFolders),
-                  onTap: () =>
-                      Navigator.of(context).pushNamed('/device/catalogs'),
-                ),
+                if (Platform.isLinux || Platform.isWindows || Platform.isMacOS)
+                  ListTile(
+                    leading: const Icon(Icons.folder_open),
+                    title: Text(context.strings.catalogFolders),
+                    onTap: () =>
+                        Navigator.of(context).pushNamed('/device/catalogs'),
+                  ),
               ],
               SurfaceCard(
                 child: Column(

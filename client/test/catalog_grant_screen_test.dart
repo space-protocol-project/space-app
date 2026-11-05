@@ -49,9 +49,10 @@ class Harness {
   final authority = FixtureAuthority();
   final picker = Picker();
   String actor = 'owner';
+  String profile = 'profile';
   late final access = LocalSessionCubit(
     authenticate: () async =>
-        (profile: 'profile', device: 'device', actor: actor),
+        (profile: profile, device: 'device', actor: actor),
   );
   late LocalLifecycleHost host;
   Future<void> init() async {
@@ -136,6 +137,34 @@ void main() {
     h.actor = 'another';
     await c.unlock();
     expect(c.state, isA<CatalogFailed>());
+    expect(h.picker.root.closed, true);
+    await c.close();
+    await h.close();
+  });
+  test('смена профиля требует нового выбора папки', () async {
+    final h = Harness();
+    await h.init();
+    final c = CatalogGrantCubit(h.access, h.runtime);
+    await c.choose('games');
+    h.profile = 'other';
+    await c.unlock();
+    expect(c.state, isA<CatalogFailed>());
+    expect(h.picker.root.closed, true);
+    await c.close();
+    await h.close();
+  });
+  test('отключённый во время согласия хост не публикует доступ', () async {
+    final h = Harness();
+    await h.init();
+    final c = CatalogGrantCubit(h.access, h.runtime);
+    await c.choose('games');
+    await c.unlock();
+    final before = h.host.snapshot(h.access.session);
+    h.authority.beforeGrantConsent = () async {
+      h.runtime.detach(h.host);
+    };
+    await c.approve();
+    expect(h.host.snapshot(h.access.session).revision, before.revision);
     expect(h.picker.root.closed, true);
     await c.close();
     await h.close();

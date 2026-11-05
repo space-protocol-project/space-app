@@ -9,6 +9,7 @@ import 'package:space_client/src/extensions_p1/catalog_grant_cubit.dart';
 import 'package:space_client/src/extensions_p1/desktop_catalog.dart';
 import 'package:space_client/src/extensions_p1/local_lifecycle_host.dart';
 import 'package:space_client/src/extensions_p1/local_lifecycle_types.dart';
+import 'package:space_client/src/extensions_p1/local_lifecycle_record.dart';
 import 'package:space_client/src/extensions_p1/local_profile_verifier.dart';
 import 'package:space_client/src/extensions_p1/local_profile_record.dart';
 import 'package:space_client/src/extensions_p1/local_session_cubit.dart';
@@ -29,8 +30,11 @@ class FocusTrace with WidgetsBindingObserver {
 T? findWidget<T extends Widget>([Object? key]) {
   T? found;
   void visit(Element e) {
-    if (e.widget is T && (key == null || e.widget.key == ValueKey(key)))
+    final widgetKey = e.widget.key;
+    if (e.widget is T &&
+        (key == null || widgetKey is ValueKey && widgetKey.value == key)) {
       found = e.widget as T;
+    }
     if (found == null) e.visitChildren(visit);
   }
 
@@ -52,8 +56,9 @@ Future<void> password(String value, {bool create = false}) async {
     () => findWidget<TextField>('local-profile-password') != null,
   );
   findWidget<TextField>('local-profile-password')!.controller!.text = value;
-  if (create)
+  if (create) {
     findWidget<TextField>('local-profile-confirm')!.controller!.text = value;
+  }
   findWidget<FilledButton>('local-profile-submit')!.onPressed!();
 }
 
@@ -113,6 +118,17 @@ Future<void> main() async {
         revision: 0,
         generation: host.snapshot(session).generation,
         package: 'a' * 64,
+      ),
+    );
+    final record = lifecycleOf(host.snapshot(session).entries['games']!);
+    await host.execute(
+      session,
+      LocalLifecycleCommand(
+        action: LocalLifecycleAction.enable,
+        installation: 'games',
+        instance: 'games',
+        revision: record['revision']! as int,
+        generation: record['generation']! as String,
       ),
     );
     runtime.attach(session, host);
