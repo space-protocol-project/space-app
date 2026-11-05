@@ -98,7 +98,7 @@ Future<void> main() async {
   final trace = FocusTrace();
   WidgetsBinding.instance.addObserver(trace);
   final root = Platform.environment['CATALOG_DRILL']!;
-  final folder = '$root/Games';
+  final folder = paths.join(root, 'Games');
   final runtime = SpaceCatalogRuntime();
   final storage = NativeProfileStorage();
   final service = LocalProfileVerifier(
