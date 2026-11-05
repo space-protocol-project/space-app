@@ -43,8 +43,15 @@ func platformServe(input io.Reader, output io.Writer) error {
 		_, _ = io.Copy(socket, io.LimitReader(input, 128<<10))
 		_ = socket.CloseWrite()
 	}()
-	_, err = io.Copy(output, io.LimitReader(socket, 32<<10))
-	return err
+	written, err := io.Copy(output, io.LimitReader(socket, 32<<10))
+	if err != nil {
+		return err
+	}
+	// EOF после ready не означает успешное выполнение гостя.
+	if written <= int64(len("{\"ready\":true}\n")) {
+		return host.ErrWorker
+	}
+	return nil
 }
 
 func peerUID(connection *net.UnixConn) (uint32, error) {

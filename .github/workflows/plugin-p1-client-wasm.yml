@@ -98,6 +98,10 @@ jobs:
       - name: Сборка приложения со штатным файловым процессом
         working-directory: client
         run: flutter build ${{ matrix.target }} --release --target test/probes/installed_catalog_probe.dart
+      - name: Packaged Linux bridge
+        if: matrix.target == 'linux'
+        working-directory: native/space_client_wasm
+        run: SPACE_CLIENT_WASM_BINARY="$GITHUB_WORKSPACE/client/build/linux/x64/release/bundle/space-client-wasm" go test -run TestProtectedWorker -count=1 ./...
       - name: Установщик Windows
         if: matrix.target == 'windows'
         shell: pwsh
