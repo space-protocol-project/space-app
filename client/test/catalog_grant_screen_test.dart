@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -92,6 +91,10 @@ void main() {
   testWidgets(
     'маршрут SpaceApp требует повторной разблокировки и явного согласия',
     (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1440, 900);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       SharedPreferences.setMockInitialValues({});
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       final h = Harness();
@@ -100,11 +103,13 @@ void main() {
       );
       await tester.pumpAndSettle();
       await h.init();
-      final nav = tester
-          .widget<MaterialApp>(find.byType(MaterialApp))
-          .navigatorKey!
-          .currentState!;
-      unawaited(nav.pushNamed('/device/catalogs'));
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('my-device-tab')).first,
+      );
+      await tester.tap(find.byKey(const ValueKey('my-device-tab')).first);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.byKey(const ValueKey('device-catalogs')));
+      await tester.tap(find.byKey(const ValueKey('device-catalogs')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('catalog-target-games')));
       await tester.pumpAndSettle();

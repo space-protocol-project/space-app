@@ -26,14 +26,11 @@ jobs:
       - name: Сборка файлового процесса
         working-directory: native/space_catalog
         run: go build -o ../../space-catalog.exe .
-      - name: Анализ и регрессионные проверки
+      - name: Анализ Flutter
         working-directory: client
-        env:
-          SPACE_CATALOG_HELPER: ${{ github.workspace }}/space-catalog.exe
         run: |
           flutter pub get
           flutter analyze
-          flutter test test/catalog_grant_screen_test.dart test/probes/desktop_catalog_acceptance.dart test/local_profile_widget_test.dart test/local_session_scope_test.dart test/app_test.dart --reporter expanded | tee ../focus-tests.txt
       - name: Драйвер кнопки системного окна
         run: python tools/catalog_native_dialog_ci.py
       - name: Сборка SpaceApp
@@ -43,6 +40,13 @@ jobs:
         env:
           SPACE_CATALOG_HELPER: ${{ github.workspace }}/space-catalog.exe
         run: python tools/check_catalog_focus.py '${{ matrix.binary }}' focus.json
+      - name: Регрессионные проверки
+        if: success() || failure()
+        working-directory: client
+        env:
+          SPACE_CATALOG_HELPER: ${{ github.workspace }}/space-catalog.exe
+        run: |
+          flutter test test/catalog_grant_screen_test.dart test/probes/desktop_catalog_acceptance.dart test/local_profile_widget_test.dart test/local_session_scope_test.dart test/app_test.dart --reporter expanded | tee ../focus-tests.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -51,5 +55,5 @@ jobs:
             focus-tests.txt
             focus.json
       - uses: actions/upload-artifact@v4
-        if: matrix.target == 'windows'
+        if: always() && matrix.target == 'windows'
         with: {name: catalog-focus-translations, path: 'client/lib/l10n/app_localizations*.dart'}

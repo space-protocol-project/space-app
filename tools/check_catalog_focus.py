@@ -17,7 +17,12 @@ def run():
         (folder / 'sample').write_text('catalog-focus-ci')
         env = dict(os.environ, CATALOG_DRILL=path, DIRECTORY_CRASH_NAMESPACE='space-ci-'+hashlib.sha256(path.encode()).hexdigest())
         with isolated_keychain(root) if sys.platform == 'darwin' else nullcontext():
-            subprocess.run([str(binary)], env=env, check=True, timeout=180)
+            try:
+                subprocess.run([str(binary)], env=env, check=True, timeout=180)
+            finally:
+                progress = root / 'progress.log'
+                if progress.exists():
+                    print(progress.read_text(encoding='utf-8'))
         data = json.loads((root / 'report.json').read_text())
         assert all(data[k] for k in ['fresh_session','wrong_password_rejected','confirmed_read','relocked'])
         assert 'inactive' in data['focus'] and 'resumed' in data['focus']

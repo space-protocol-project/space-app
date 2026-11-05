@@ -18,12 +18,17 @@ import 'package:space_client/ui/shell.dart';
 import '../support/local_lifecycle_fixture.dart';
 import 'local_profile_native_probe.dart' show NativeProfileStorage, secret;
 
+void stage(String stage) {
+  File('${Platform.environment['CATALOG_DRILL']}/progress.log')
+      .writeAsStringSync('$stage\n', mode: FileMode.append, flush: true);
+}
+
 class FocusTrace with WidgetsBindingObserver {
   final events = <String>[];
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     events.add(state.name);
-    stderr.writeln('focus: ${state.name}');
+    stage('focus ${state.name}');
   }
 }
 
@@ -43,6 +48,7 @@ T? findWidget<T extends Widget>([Object? key]) {
 }
 
 Future<void> until(String reason, bool Function() test) async {
+  stage(reason);
   final deadline = DateTime.now().add(const Duration(seconds: 40));
   while (!test()) {
     if (DateTime.now().isAfter(deadline)) throw StateError(reason);
@@ -211,7 +217,7 @@ Future<void> main() async {
       }),
     );
   } catch (error, stack) {
-    stderr.writeln('$error\n$stack');
+    stage('$error\n$stack');
     exitCode = 1;
   } finally {
     owner?.close();
