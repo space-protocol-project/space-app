@@ -161,6 +161,11 @@ void main() {
 
   Future<String> grant() async {
     final screen = CatalogGrantCubit(access, runtime);
+    if (screen.state is! CatalogTargets) {
+      await screen.stream
+          .firstWhere((state) => state is CatalogTargets)
+          .timeout(const Duration(seconds: 3));
+    }
     await screen.choose('games');
     await screen.unlock();
     await screen.approve();
