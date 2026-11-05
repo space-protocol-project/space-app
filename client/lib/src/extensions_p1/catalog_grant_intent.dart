@@ -63,9 +63,14 @@ final class CatalogGrantIntent {
     guard();
     final root = _root!;
     final authority = host._authority;
-    final delegate = authority is CatalogConsentProvider
-        ? authority.catalogConsent(instance, package, root.id)
-        : authority;
+    final delegate = switch (authority) {
+      CatalogConsentProvider provider => provider.catalogConsent(
+        instance,
+        package,
+        root.id,
+      ),
+      _ => authority,
+    };
     final before = host.snapshot(session);
     final entry = before.entries[instance]!;
     final enable = _command(LocalLifecycleAction.enable, entry);
