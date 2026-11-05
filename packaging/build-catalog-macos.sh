@@ -2,7 +2,10 @@
 set -euo pipefail
 source_dir="${PROJECT_DIR}/../../native/space_catalog"
 output="${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/space-catalog"
-mkdir -p "$(dirname "$output")"
+checksum="${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/space-catalog.sha256"
+mkdir -p "$(dirname "$output")" "$(dirname "$checksum")"
+# Старый результат этой фазы не должен мешать подписи при повторной сборке.
+rm -f "$output.sha256"
 temporary=$(mktemp -d)
 trap 'rm -rf "$temporary"' EXIT
 parts=()
@@ -17,4 +20,4 @@ for arch in ${ARCHS}; do
 done
 lipo -create "${parts[@]}" -output "$output"
 codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY:--}" "$output"
-shasum -a 256 "$output" | cut -d ' ' -f 1 > "$output.sha256"
+shasum -a 256 "$output" | cut -d ' ' -f 1 > "$checksum"

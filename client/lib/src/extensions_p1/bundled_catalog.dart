@@ -23,7 +23,14 @@ class BundledCatalog {
       directory,
       Platform.isWindows ? 'space-catalog.exe' : 'space-catalog',
     );
-    final digest = utf8.decode(await boundedFile('$binary.sha256', 128)).trim();
+    final checksum = Platform.isMacOS
+        ? paths.join(
+            paths.dirname(directory),
+            'Resources',
+            'space-catalog.sha256',
+          )
+        : '$binary.sha256';
+    final digest = utf8.decode(await boundedFile(checksum, 128)).trim();
     registryDigest(digest);
     final result = BundledCatalog._(binary, digest);
     await result.verify();

@@ -237,17 +237,31 @@ void main() {
     'поставляемый процесс не ищется в PATH и повторно проверяет хеш',
     () async {
       final name = Platform.isWindows ? 'space-catalog.exe' : 'space-catalog';
-      final helper = File(paths.join(root.path, name));
+      final directory = Platform.isMacOS
+          ? paths.join(root.path, 'Contents', 'MacOS')
+          : root.path;
+      Directory(directory).createSync(recursive: true);
+      final application = paths.join(directory, 'app');
+      final helper = File(paths.join(directory, name));
       await expectLater(
-        BundledCatalog.resolve(application: paths.join(root.path, 'app')),
+        BundledCatalog.resolve(application: application),
         throwsStateError,
       );
       helper.writeAsBytesSync(bytes);
       File('${helper.path}.sha256').writeAsStringSync(package.digest);
-      final bundled = await BundledCatalog.resolve(
-        application: paths.join(root.path, 'app'),
-      );
-    expect(bundled.executable, helper.resolveSymbolicLinksSync());
+      if (Platform.isMacOS) {
+        await expectLater(
+          BundledCatalog.resolve(application: application),
+          throwsStateError,
+        );
+        final resources = Directory(
+          paths.join(root.path, 'Contents', 'Resources'),
+        )..createSync();
+        File(paths.join(resources.path, 'space-catalog.sha256'))
+            .writeAsStringSync(package.digest);
+      }
+      final bundled = await BundledCatalog.resolve(application: application);
+      expect(bundled.executable, helper.resolveSymbolicLinksSync());
       helper.writeAsBytesSync([1]);
       await expectLater(bundled.verify(), throwsStateError);
     },

@@ -51,7 +51,9 @@ def installed(root):
 def phases(root, binary, environment, output):
     helper = binary.parent / ('space-catalog.exe' if sys.platform == 'win32' else 'space-catalog')
     digest = hashlib.sha256(helper.read_bytes()).hexdigest()
-    assert helper.with_suffix(helper.suffix + '.sha256').read_text().strip() == digest
+    checksum = (binary.parent.parent / 'Resources/space-catalog.sha256' if sys.platform == 'darwin'
+                else helper.with_suffix(helper.suffix + '.sha256'))
+    assert checksum.read_text().strip() == digest
     if sys.platform == 'darwin':
         command(['codesign', '--verify', '--strict', helper])
     results = []
