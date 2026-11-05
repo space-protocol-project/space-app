@@ -82,10 +82,13 @@ jobs:
           sudo apt-get update && sudo apt-get install -y strace
           python -c 'import socket; s=socket.socket(socket.AF_UNIX); s.connect("/run/space-client-wasm/control.sock"); print(s.recv(128)); s.close()'
           pid=$(systemctl show space-client-wasm.service -p MainPID --value)
+          sudo cat /proc/"$pid"/status
+          sudo cat /proc/"$pid"/attr/current
+          systemctl show space-client-wasm.service -p CapabilityBoundingSet -p AmbientCapabilities -p SecureBits -p NoNewPrivileges
           sudo strace -f -o client-wasm-linux-trace.txt -e trace=process,setuid,setgid,setgroups,prctl -p "$pid" &
           tracer=$!
           sleep 1
-          SPACE_CLIENT_WASM_BROKER_TEST=1 python tools/check_client_wasm_linux.py || { sudo journalctl -u space-client-wasm.service --no-pager; sudo cat client-wasm-linux-trace.txt; exit 1; }
+          SPACE_CLIENT_WASM_BROKER_TEST=1 python tools/check_client_wasm_linux.py || { sudo journalctl -u space-client-wasm.service --no-pager; sudo cat client-wasm-linux-trace.txt; sudo journalctl -k --no-pager | tail -n 40; exit 1; }
           sudo kill "$tracer" || true
           cd native/space_client_wasm
           SPACE_CLIENT_WASM_BROKER_TEST=1 go test -race -v ./...
