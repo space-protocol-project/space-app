@@ -43,6 +43,13 @@ jobs:
         env:
           SPACE_CATALOG_HELPER: ${{ github.workspace }}/space-catalog.exe
         run: python tools/check_catalog_focus.py '${{ matrix.binary }}' focus.json
+      - name: Повторение первого запуска Windows с новыми профилями
+        if: matrix.target == 'windows'
+        env:
+          SPACE_CATALOG_HELPER: ${{ github.workspace }}/space-catalog.exe
+        run: |
+          python tools/check_catalog_focus.py '${{ matrix.binary }}' focus-2.json
+          python tools/check_catalog_focus.py '${{ matrix.binary }}' focus-3.json
       - name: Регрессионные проверки
         if: (success() || failure()) && steps.analysis.conclusion == 'success'
         working-directory: client
@@ -57,6 +64,7 @@ jobs:
           path: |
             focus-tests.txt
             focus.json
+            focus-*.json
       - uses: actions/upload-artifact@v4
         if: always() && matrix.target == 'windows'
         with: {name: catalog-focus-translations, path: 'client/lib/l10n/app_localizations*.dart'}

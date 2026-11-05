@@ -15,6 +15,38 @@ import 'support/local_lifecycle_fixture.dart';
 const identity = (device: 'device', profile: 'profile', actor: 'owner');
 
 void main() {
+  testWidgets('первый вход требует активного окна и явного действия', (
+    tester,
+  ) async {
+    var authentications = 0;
+    final access = LocalSessionCubit(
+      authenticate: () async {
+        authentications++;
+        return identity;
+      },
+    );
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.detached);
+    await tester.pumpWidget(
+      LocalExtensionSessionScope(access: access, child: const SizedBox()),
+    );
+    for (final state in [
+      AppLifecycleState.detached,
+      AppLifecycleState.hidden,
+      AppLifecycleState.inactive,
+    ]) {
+      tester.binding.handleAppLifecycleStateChanged(state);
+      expect(await access.unlock(), false);
+      expect(authentications, 0);
+    }
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    expect(access.state, LocalSessionStatus.locked);
+    expect(authentications, 0);
+    expect(await access.unlock(), true);
+    expect(authentications, 1);
+    await tester.pumpWidget(const SizedBox());
+    await access.close();
+  });
+
   test('без службы аутентификации доступ закрыт', () async {
     final access = LocalSessionCubit()..setForeground(true);
     expect(await access.unlock(), false);
