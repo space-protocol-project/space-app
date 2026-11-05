@@ -247,7 +247,7 @@ void main() {
       final bundled = await BundledCatalog.resolve(
         application: paths.join(root.path, 'app'),
       );
-      expect(bundled.executable, helper.path);
+    expect(bundled.executable, helper.resolveSymbolicLinksSync());
       helper.writeAsBytesSync([1]);
       await expectLater(bundled.verify(), throwsStateError);
     },

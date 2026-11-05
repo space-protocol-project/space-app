@@ -48,6 +48,7 @@ Future<void> main() async {
         shutdown: shutdown,
       ),
     );
+    await WidgetsBinding.instance.endOfFrame;
     final deadline = DateTime.now().add(const Duration(seconds: 30));
     while (WidgetsBinding.instance.lifecycleState !=
         AppLifecycleState.resumed) {
