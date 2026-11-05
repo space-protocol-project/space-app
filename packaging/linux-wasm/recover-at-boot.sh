@@ -34,6 +34,7 @@ recover_pending() {
   restore_files
   systemctl disable space-client-wasm.socket >/dev/null 2>&1 || true
   systemctl daemon-reload
+  systemctl reset-failed space-client-wasm.service space-client-wasm.socket >/dev/null 2>&1 || true
   if test -f "$state/pending/enabled"; then
     systemctl enable space-client-wasm.socket
     rm -f -- /run/space-client-wasm-recovery-blocked

@@ -16,7 +16,7 @@ BLOCKED = Path('/run/space-client-wasm-recovery-blocked')
 def stop_for_boot():
     control('stop', 'space-client-wasm.socket', 'space-client-wasm.service')
     control('stop', RECOVERY)
-    control('reset-failed')
+    control('reset-failed', RECOVERY, 'space-client-wasm.socket', 'space-client-wasm.service')
     root('rm', '-f', BLOCKED)
 
 

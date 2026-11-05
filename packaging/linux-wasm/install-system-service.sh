@@ -41,7 +41,7 @@ rollback() {
   if test -f "$state/pending/enabled"; then
     systemctl enable space-client-wasm.socket || return 1
   fi
-  systemctl reset-failed space-client-wasm.service >/dev/null 2>&1 || true
+  systemctl reset-failed space-client-wasm.service space-client-wasm.socket >/dev/null 2>&1 || true
   if test -f "$state/pending/socket-active"; then
     systemctl start space-client-wasm.socket || return 1
   fi
@@ -173,7 +173,7 @@ activate_candidate() {
   sync -f "$destination"
   sync -f "$units"
   systemctl daemon-reload
-  systemctl reset-failed space-client-wasm.service >/dev/null 2>&1 || true
+  systemctl reset-failed space-client-wasm.service space-client-wasm.socket >/dev/null 2>&1 || true
   rm -f -- /run/space-client-wasm-recovery-blocked
   systemctl enable --now space-client-wasm.socket
   # Реальная компиляция и вызов WASM через обычный UID; Flutter не повышает права.

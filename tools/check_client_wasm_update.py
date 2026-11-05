@@ -52,6 +52,7 @@ def failed_update(binary, kind, service=None, broken=False):
         result = subprocess.run(args, capture_output=True, text=True, timeout=60)
         assert result.returncode != 0, kind
         assert 'Restoring previous WASM service' in result.stderr, result.stderr
+        assert 'Rollback failed' not in result.stderr, result.stderr
     assert snapshot() == before, kind
     usable()
     return {'case': kind, 'files_restored': True, 'wasm_after_rollback': True}
