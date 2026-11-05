@@ -19,6 +19,14 @@ def run():
         with isolated_keychain(root) if sys.platform == 'darwin' else nullcontext():
             try:
                 if sys.platform == 'darwin':
+                    # XCUITest загружается отдельным процессом и наследует пути
+                    # CocoaPods от приложения. Делаем готовые фреймворки видимыми
+                    # также по стандартному пути BUILT_PRODUCTS_DIR для тестов.
+                    products = binary.parents[3]
+                    for framework in (binary.parents[1] / 'Frameworks').glob('*.framework'):
+                        link = products / framework.name
+                        if not link.exists() and not link.is_symlink():
+                            link.symlink_to(framework, target_is_directory=True)
                     config = Path(os.environ['RUNNER_TEMP']) / 'catalog-focus-xctest.json'
                     config.write_text(json.dumps({k:env[k] for k in ('GITHUB_ACTIONS','CATALOG_DRILL','DIRECTORY_CRASH_NAMESPACE','SPACE_CATALOG_HELPER')}))
                     subprocess.run(['xcodebuild','test','-workspace','client/macos/Runner.xcworkspace','-scheme','Runner','-configuration','Debug','-destination','platform=macOS','-derivedDataPath','client/build/macos','-parallel-testing-enabled','NO','-only-testing:RunnerTests/CatalogUITests/testSystemFolder','CODE_SIGN_STYLE=Manual','CODE_SIGN_IDENTITY=-','FLUTTER_TARGET=test/probes/catalog_focus_probe.dart'],check=True,timeout=1000)

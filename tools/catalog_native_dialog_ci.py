@@ -18,7 +18,7 @@ if sys.platform == 'darwin':
     source = project.read_text()
     assert 'com.apple.product-type.bundle.unit-test' in source
     source = source.replace('com.apple.product-type.bundle.unit-test', 'com.apple.product-type.bundle.ui-testing')
-    source = source.replace('BUNDLE_LOADER = "$(TEST_HOST)";', 'TEST_TARGET_NAME = Runner;')
+    source = source.replace('BUNDLE_LOADER = "$(TEST_HOST)";', 'TEST_TARGET_NAME = Runner; OTHER_LDFLAGS = ""; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "$(BUILT_PRODUCTS_DIR)/Space.app/Contents/Frameworks");')
     source = source.replace('TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Space.app/Contents/MacOS/Space";', '')
     project.write_text(source)
     config = Path(os.environ['RUNNER_TEMP']) / 'catalog-focus-xctest.json'
@@ -34,11 +34,14 @@ else:
     insert('client/windows/runner/flutter_window.cpp','    this->Show();', '''
     SetTimer(GetHandle(), 9874, 1400, [](HWND window, UINT, UINT_PTR timer, DWORD) {
       KillTimer(window, timer);
-      ShowWindow(window, SW_RESTORE);
-      SetActiveWindow(window);
-      SetForegroundWindow(window);
-      SetFocus(nullptr);
-      SetFocus(GetWindow(window, GW_CHILD));
+      ShowWindow(window, SW_MINIMIZE);
+      SetTimer(window, 9875, 1000, [](HWND target, UINT, UINT_PTR restore, DWORD) {
+        KillTimer(target, restore);
+        ShowWindow(target, SW_RESTORE);
+        SetActiveWindow(target);
+        SetForegroundWindow(target);
+        SetFocus(GetWindow(target, GW_CHILD));
+      });
     });
 ''')
     path = 'client/vendor/file_selector_windows/windows/file_dialog_controller.cpp'
