@@ -8,7 +8,7 @@ final class CatalogUITests: XCTestCase {
     let app = XCUIApplication()
     app.launchEnvironment = env
     app.launch()
-    let button = app.buttons["Space CI Select"].firstMatch
+    let button = app.windows.descendants(matching: .button).matching(identifier: "Space CI Select").firstMatch
     XCTAssertTrue(button.waitForExistence(timeout: 90), app.debugDescription)
     let finder = XCUIApplication(bundleIdentifier: "com.apple.finder")
     finder.activate()

@@ -14,7 +14,8 @@ def run():
     binary = Path(sys.argv[1]).resolve(strict=True)
     with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP']) as path:
         root = Path(path); folder = root / 'Games'; folder.mkdir()
-        (folder / 'sample').write_text('catalog-focus-ci')
+        (folder / 'sample').write_bytes(b'catalog-focus-ci')
+        assert (folder / 'sample').read_bytes() == b'catalog-focus-ci'
         env = dict(os.environ, CATALOG_DRILL=path, DIRECTORY_CRASH_NAMESPACE='space-ci-'+hashlib.sha256(path.encode()).hexdigest())
         with isolated_keychain(root) if sys.platform == 'darwin' else nullcontext():
             try:

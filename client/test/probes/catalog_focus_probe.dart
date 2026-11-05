@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path/path.dart' as paths;
 import 'package:space_client/app.dart';
 import 'package:space_client/src/extensions_p1/catalog_grant_cubit.dart';
 import 'package:space_client/src/extensions_p1/desktop_catalog.dart';
@@ -45,6 +47,18 @@ T? findWidget<T extends Widget>([Object? key]) {
 
   WidgetsBinding.instance.rootElement?.visitChildren(visit);
   return found;
+}
+
+CatalogScreenState? screenState() {
+  CatalogScreenState? state;
+  void visit(Element e) {
+    if (e.widget is BlocBuilder<CatalogGrantCubit, CatalogScreenState>)
+      state = e.read<CatalogGrantCubit>().state;
+    e.visitChildren(visit);
+  }
+
+  WidgetsBinding.instance.rootElement?.visitChildren(visit);
+  return state;
 }
 
 Future<void> until(String reason, bool Function() test) async {
@@ -181,6 +195,14 @@ Future<void> main() async {
       'review',
       () => findWidget<FilledButton>('catalog-approve') != null,
     );
+    final state = screenState();
+    if (state is! CatalogReview ||
+        !paths.equals(state.path, paths.join(root, 'Games'))) {
+      throw StateError(
+        'wrong selection: ${state is CatalogReview ? state.path : state.runtimeType}; expected ${paths.join(root, 'Games')}',
+      );
+    }
+    stage('verified selected Games directory');
     final fresh = access.session;
     if (identical(fresh, session) ||
         host.snapshot(fresh).entries['games']!['state'] != 'disabled') {
@@ -193,19 +215,21 @@ Future<void> main() async {
     );
     final id = authority.confirmedRoot!;
     late String handle;
-    await host.listCatalog(
-      fresh,
-      'games',
-      id,
-      (p) => handle = p.entries.single.handle,
-    );
+    await host.listCatalog(fresh, 'games', id, (p) {
+      stage('entries: ${p.entries.map((e) => e.name).toList()}');
+      if (p.entries.single.name != 'sample') throw StateError('wrong entry');
+      handle = p.entries.single.handle;
+    });
     late String data;
     await host.readCatalog(
       fresh,
       'games',
       id,
       handle,
-      (c) => data = utf8.decode(c.bytes),
+      (c) {
+        stage('fixture bytes: ${c.bytes.toList()}');
+        data = utf8.decode(c.bytes);
+      },
       offset: 0,
       limit: 64,
     );
