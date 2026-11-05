@@ -73,7 +73,7 @@ jobs:
           cp "$SPACE_CLIENT_WASM_BINARY" /tmp/space-client-wasm-ci
           sudo env PATH="$PATH" WASM_FIXTURES="$WASM_FIXTURES" SPACE_CLIENT_WASM_BINARY=/tmp/space-client-wasm-ci SPACE_CLIENT_WASM_CGROUP=/sys/fs/cgroup/space-client-wasm-ci go test -count=1 ./...
           sudo rmdir /sys/fs/cgroup/space-client-wasm-ci
-      - name: Ñèñòåìíûé Linux broker è íåïðèâèëåãèðîâàííûé êëèåíò
+      - name: Ð¡Ð¸ÑÑ‚ÐµÐ¼Ð½Ñ‹Ð¹ Linux broker Ð¸ Ð½ÐµÐ¿Ñ€Ð¸Ð²Ð¸Ð»ÐµÐ³Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð½Ñ‹Ð¹ ÐºÐ»Ð¸ÐµÐ½Ñ‚
         if: matrix.target == 'linux'
         run: |
           sha256sum "$SPACE_CLIENT_WASM_BINARY" | cut -d ' ' -f 1 > "$SPACE_CLIENT_WASM_BINARY.sha256"
