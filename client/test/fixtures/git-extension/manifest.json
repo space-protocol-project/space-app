@@ -1,0 +1,1 @@
+{"format":"space.package-profile.p1","plugin_id":"org.spaceprotocol.ci-games","version":"0.1.0","profile":"client","modules":{"client":{"entrypoint":"client.wasm","host_api":"space.client.p1","wasm_abi":"space_client_p1","data_schema":1,"permissions":["device.catalog.read"],"platforms":["windows","linux","macos"]}},"contributions":[]}
