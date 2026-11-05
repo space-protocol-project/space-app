@@ -134,8 +134,9 @@ Future<void> main() async {
           WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed,
     );
     final access = findWidget<SpaceShell>()!.extensionAccess!;
-    if (access.state != LocalSessionStatus.locked)
+    if (access.state != LocalSessionStatus.locked) {
       throw StateError('startup unlocked');
+    }
     await write('boot', await snapshot(access));
     final commandFile = File(paths.join(root.path, 'command.json'));
     String? previous = commandFile.existsSync()

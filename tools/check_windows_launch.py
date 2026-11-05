@@ -137,6 +137,7 @@ def run():
     command('maximize')
     duplicate = subprocess.run([str(install / 'space_client.exe')], timeout=30)
     assert duplicate.returncode == 0
+    assert foreground(report['cold']['pid'])
     assert ctypes.windll.user32.IsZoomed(win32gui.GetForegroundWindow())
     report['maximized_preserved'] = True
     current = command('quit')['pid']
@@ -160,6 +161,16 @@ if __name__ == '__main__':
     finally:
         output = Path('launch-results')
         output.mkdir(exist_ok=True)
+        if not (root / 'report.json').exists():
+            # Диагностика только отдельного рабочего стола CI.
+            Desktop(backend='win32').window(handle=win32gui.GetDesktopWindow()).capture_as_image().save(output / 'failure.png')
+            details = []
+            for window in Desktop(backend='uia').windows():
+                try:
+                    details.append({'title': window.window_text(), 'pid': window.process_id(), 'texts': [c.window_text() for c in window.descendants(control_type='Text')]})
+                except Exception as error:
+                    details.append({'error': str(error)})
+            (output / 'desktop.json').write_text(json.dumps(details, ensure_ascii=False), encoding='utf-8')
         for name in ('report.json', 'error.json', 'boot.json', 'state.json', 'install.log'):
             if (root / name).exists():
                 (output / name).write_bytes((root / name).read_bytes())
