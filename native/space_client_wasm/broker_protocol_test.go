@@ -7,6 +7,7 @@ import (
 	"net"
 	"strings"
 	"testing"
+	"testing/iotest"
 	"time"
 )
 
@@ -65,5 +66,12 @@ func TestBrokerBufferedPayload(t *testing.T) {
 	payload, err := io.ReadAll(input)
 	if err != nil || string(payload) != "data" {
 		t.Fatal("buffered payload lost")
+	}
+}
+
+func TestBrokerFragmentedHello(t *testing.T) {
+	input := bufio.NewReaderSize(iotest.OneByteReader(strings.NewReader(brokerHello)), 512)
+	if err := readBrokerHello(input); err != nil {
+		t.Fatal(err)
 	}
 }

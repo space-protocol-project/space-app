@@ -8,7 +8,7 @@ import subprocess
 import sys
 import tempfile
 
-from check_client_wasm_linux import HELLO, SOCKET, call, request
+from check_client_wasm_linux import HELLO, SOCKET, call, expect_frame, request
 
 
 def fake_broker(kind):
@@ -70,7 +70,7 @@ def reject_client(payload):
     with socket.socket(socket.AF_UNIX) as client:
         client.settimeout(5)
         client.connect(SOCKET)
-        assert client.recv(512) == HELLO
+        expect_frame(client, HELLO)
         client.sendall(payload)
         try:
             response = client.recv(32768)
@@ -108,7 +108,7 @@ def exercise():
     with socket.socket(socket.AF_UNIX) as held:
         held.settimeout(5)
         held.connect(SOCKET)
-        assert held.recv(512) == HELLO
+        expect_frame(held, HELLO)
         updated = install(binary)
         assert updated.returncode == 0, updated.stderr
         assert held.recv(128) == b""
