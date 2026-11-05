@@ -53,8 +53,9 @@ Future<void> main() async {
       ),
     );
     await WidgetsBinding.instance.endOfFrame;
-    await File(paths.join(root, '$role.ready'))
-        .writeAsString('$pid', flush: true);
+    final ready = File(paths.join(root, '$role.ready.next'));
+    await ready.writeAsString('$pid', flush: true);
+    await ready.rename(paths.join(root, '$role.ready'));
     final deadline = DateTime.now().add(const Duration(seconds: 30));
     while (WidgetsBinding.instance.lifecycleState !=
         AppLifecycleState.resumed) {

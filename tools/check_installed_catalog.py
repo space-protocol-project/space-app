@@ -62,7 +62,8 @@ def launch(args, root, role, environment, log):
             if process.poll() is not None or time.monotonic() > deadline:
                 raise RuntimeError('Приложение не подготовило первое окно')
             time.sleep(.05)
-        assert ready.read_text() == str(process.pid)
+        actual_pid = ready.read_text()
+        assert actual_pid == str(process.pid), f'PID: expected {process.pid}, got {actual_pid!r}'
         command(['/usr/bin/open', Path(args[0]).parents[2]], env=environment)
         if process.wait(timeout=180) != 0:
             raise RuntimeError('Нативная проверка macOS завершилась ошибкой')
