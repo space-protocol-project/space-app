@@ -87,6 +87,10 @@ class TestPicker extends DesktopCatalogPicker {
 }
 
 void main() {
+  final nativeSupported =
+      Platform.isWindows ||
+      (Platform.isLinux &&
+          Platform.environment['SPACE_CLIENT_WASM_BROKER_TEST'] == '1');
   late Directory directory;
   late LocalSessionCubit access;
   late SpaceCatalogRuntime runtime;
@@ -325,7 +329,7 @@ void main() {
     await runtime.ensure(access.session);
     await install();
     final root = await grant();
-    if (Platform.isWindows) {
+    if (nativeSupported) {
       expect(
         await runtime.invoke(access.session, 'games', root),
         base64Encode(utf8.encode('installed catalog')),
@@ -397,13 +401,13 @@ void main() {
       files.entered = Completer<void>();
       final pending = runtime.invoke(access.session, 'games', root);
       final rejected = expectLater(pending, throwsStateError);
-      if (Platform.isWindows) {
+      if (nativeSupported) {
         await files.entered!.future.timeout(const Duration(seconds: 8));
         await revoke(root);
         files.gate!.complete();
       }
       await rejected;
-      if (!Platform.isWindows) expect(files.reads, 0);
+      if (!nativeSupported) expect(files.reads, 0);
     },
   );
 }

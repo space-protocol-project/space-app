@@ -36,7 +36,7 @@ func TestProtectedWorker(t *testing.T) {
 			}
 			defer command.Process.Kill()
 			lines := bufio.NewScanner(output)
-			supported := runtime.GOOS == "windows" || (runtime.GOOS == "linux" && os.Getenv("SPACE_CLIENT_WASM_CGROUP") != "")
+			supported := runtime.GOOS == "windows" || (runtime.GOOS == "linux" && (os.Getenv("SPACE_CLIENT_WASM_CGROUP") != "" || os.Getenv("SPACE_CLIENT_WASM_BROKER_TEST") == "1"))
 			if !supported {
 				if lines.Scan() {
 					t.Fatal("unprotected worker became ready")

@@ -1,0 +1,12 @@
+[Unit]
+Description=Space client WASM broker socket
+
+[Socket]
+ListenStream=/run/space-client-wasm/control.sock
+SocketMode=0666
+DirectoryMode=0755
+RemoveOnStop=yes
+Backlog=8
+
+[Install]
+WantedBy=sockets.target

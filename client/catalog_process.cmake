@@ -43,3 +43,8 @@ add_custom_target(space_client_wasm ALL DEPENDS "${SPACE_WASM_OUTPUT}" "${SPACE_
 add_dependencies(${BINARY_NAME} space_client_wasm)
 install(PROGRAMS "${SPACE_WASM_OUTPUT}" DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT Runtime)
 install(FILES "${SPACE_WASM_OUTPUT}.sha256" DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT Runtime)
+
+if(UNIX AND NOT APPLE)
+  install(DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/../packaging/linux-wasm/"
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/linux-wasm" COMPONENT Runtime)
+endif()

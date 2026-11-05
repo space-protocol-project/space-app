@@ -1,0 +1,36 @@
+[Unit]
+Description=Space isolated client WASM broker
+Requires=space-client-wasm.socket
+After=space-client-wasm.socket
+
+[Service]
+ExecStart=/usr/libexec/space-client-wasm/space-client-wasm --linux-broker
+User=root
+Group=root
+Delegate=memory pids cpu
+DelegateSubgroup=supervisor
+MemoryMax=640M
+MemorySwapMax=0
+TasksMax=128
+CPUQuota=100%
+KillMode=control-group
+TimeoutStopSec=5
+Restart=on-failure
+RestartSec=1
+NoNewPrivileges=yes
+CapabilityBoundingSet=CAP_SETUID CAP_SETGID CAP_KILL
+PrivateNetwork=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictSUIDSGID=yes
+LockPersonality=yes
+UMask=0077
+Environment=GOMAXPROCS=2 GOMEMLIMIT=64MiB
+StandardOutput=null
+StandardError=journal

@@ -73,6 +73,15 @@ jobs:
           cp "$SPACE_CLIENT_WASM_BINARY" /tmp/space-client-wasm-ci
           sudo env PATH="$PATH" WASM_FIXTURES="$WASM_FIXTURES" SPACE_CLIENT_WASM_BINARY=/tmp/space-client-wasm-ci SPACE_CLIENT_WASM_CGROUP=/sys/fs/cgroup/space-client-wasm-ci go test -count=1 ./...
           sudo rmdir /sys/fs/cgroup/space-client-wasm-ci
+      - name: Системный Linux broker и непривилегированный клиент
+        if: matrix.target == 'linux'
+        run: |
+          sha256sum "$SPACE_CLIENT_WASM_BINARY" | cut -d ' ' -f 1 > "$SPACE_CLIENT_WASM_BINARY.sha256"
+          sudo bash packaging/linux-wasm/install-system-service.sh "$SPACE_CLIENT_WASM_BINARY"
+          echo 'SPACE_CLIENT_WASM_BROKER_TEST=1' >> "$GITHUB_ENV"
+          SPACE_CLIENT_WASM_BROKER_TEST=1 python tools/check_client_wasm_linux.py
+          cd native/space_client_wasm
+          SPACE_CLIENT_WASM_BROKER_TEST=1 go test -race -v ./...
       - run: rustup toolchain install 1.99.1 --profile minimal
       - name: Р—Р°РІРёСЃРёРјРѕСЃС‚Рё Linux
         if: matrix.target == 'linux'
@@ -113,3 +122,4 @@ jobs:
           path: |
             installed-tests.txt
             installed-catalog-results
+            client-wasm-linux.json

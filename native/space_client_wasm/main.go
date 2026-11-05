@@ -21,7 +21,9 @@ func main() {
 	if len(os.Args) == 1 {
 		err = host.Worker(os.Stdin, os.Stdout)
 	} else if len(os.Args) == 2 && os.Args[1] == "--serve" {
-		err = serve(os.Stdin, os.Stdout)
+		err = platformServe(os.Stdin, os.Stdout)
+	} else if len(os.Args) == 2 && os.Args[1] == "--linux-broker" {
+		err = linuxBroker()
 	} else {
 		err = fmt.Errorf("arguments")
 	}
@@ -47,6 +49,10 @@ func serve(input io.Reader, output io.Writer) error {
 		return err
 	}
 	defer runtime.Close()
+	return serveCall(runtime, input, output)
+}
+
+func serveCall(runtime *host.ProcessHost, input io.Reader, output io.Writer) error {
 	encoder := json.NewEncoder(output)
 	if err = encoder.Encode(map[string]bool{"ready": true}); err != nil {
 		return err
