@@ -71,8 +71,9 @@ class GitInstallCubit extends Cubit<GitInstallState> {
 
   Future<void> unlock() async {
     if (state is! GitLocked) return;
+    final pending = owner.access.unlock();
     final epoch = _epoch;
-    final unlocked = await owner.access.unlock();
+    final unlocked = await pending;
     if (!isClosed && epoch == _epoch && unlocked) emit(const GitIdle());
   }
 

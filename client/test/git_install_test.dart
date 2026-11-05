@@ -357,4 +357,20 @@ void main() {
     expect(installer.state, isA<GitFailed>());
     expect(entries(), isEmpty);
   });
+
+  test(
+    'разблокировка экрана после блокировки и внешнего повторного входа',
+    () async {
+      access.lock();
+      expect(installer.state, isA<GitLocked>());
+      await installer.unlock();
+      expect(installer.state, isA<GitIdle>());
+      await access.unlock();
+      expect(installer.state, isA<GitLocked>());
+      await installer.unlock();
+      expect(installer.state, isA<GitIdle>());
+      await prepare();
+      expect(installer.state, isA<GitReview>());
+    },
+  );
 }
