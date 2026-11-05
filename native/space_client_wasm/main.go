@@ -54,13 +54,13 @@ func serve(input io.Reader, output io.Writer) error {
 
 func serveCall(runtime *host.ProcessHost, input io.Reader, output io.Writer) error {
 	encoder := json.NewEncoder(output)
-	if err = encoder.Encode(map[string]bool{"ready": true}); err != nil {
+	if err := encoder.Encode(map[string]bool{"ready": true}); err != nil {
 		return err
 	}
 	decoder := json.NewDecoder(io.LimitReader(input, 128<<10))
 	decoder.DisallowUnknownFields()
 	var call request
-	if err = decoder.Decode(&call); err != nil {
+	if err := decoder.Decode(&call); err != nil {
 		return err
 	}
 	// Клиентский посредник держит stdin открытым до завершения запроса.

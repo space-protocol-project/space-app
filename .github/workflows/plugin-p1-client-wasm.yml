@@ -71,7 +71,7 @@ jobs:
           sudo sh -c 'echo "+memory +pids +cpu" > /sys/fs/cgroup/cgroup.subtree_control'
           sudo sh -c 'echo "+memory +pids +cpu" > /sys/fs/cgroup/space-client-wasm-ci/cgroup.subtree_control'
           cp "$SPACE_CLIENT_WASM_BINARY" /tmp/space-client-wasm-ci
-          sudo env PATH="$PATH" WASM_FIXTURES="$WASM_FIXTURES" SPACE_CLIENT_WASM_BINARY=/tmp/space-client-wasm-ci SPACE_CLIENT_WASM_CGROUP=/sys/fs/cgroup/space-client-wasm-ci go test -count=1 ./...
+          sudo env PATH="$PATH" WASM_FIXTURES="$WASM_FIXTURES" SPACE_CLIENT_WASM_BINARY=/tmp/space-client-wasm-ci SPACE_CLIENT_WASM_CGROUP=/sys/fs/cgroup/space-client-wasm-ci go test -v -count=1 ./... | tee ../../client-wasm-linux-quota.txt
           sudo rmdir /sys/fs/cgroup/space-client-wasm-ci
       - name: Системный Linux broker и непривилегированный клиент
         if: matrix.target == 'linux'
@@ -123,3 +123,4 @@ jobs:
             installed-tests.txt
             installed-catalog-results
             client-wasm-linux.json
+            client-wasm-linux-quota.txt
