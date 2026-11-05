@@ -70,7 +70,7 @@ def wizard():
         for window in Desktop(backend='win32').windows(class_name='TWizardForm'):
             for button in window.children(class_name='TNewButton'):
                 title = button.window_text().replace('&', '').strip()
-                if title not in ('Next >', 'Install', 'Finish') or not button.is_visible() or not button.is_enabled():
+                if title not in ('Next', 'Next >', 'Install', 'Finish') or not button.is_visible() or not button.is_enabled():
                     continue
                 if title == 'Finish':
                     (install / 'launch-ci.json').write_text(json.dumps({'root': str(root)}), encoding='utf-8')
@@ -101,7 +101,7 @@ def click_toast(title):
             except (psutil.NoSuchProcess, RuntimeError):
                 continue
         if not opened:
-            keyboard.send_keys('#n')
+            keyboard.send_keys('{LWIN down}n{LWIN up}')
             opened = True
         time.sleep(.3)
     raise AssertionError('Native notification not found: ' + title)
