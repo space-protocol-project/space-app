@@ -31,7 +31,7 @@ def interrupted(binary):
                    'boot-test', str(marker), args[2], args[3]]
         with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as process:
             wait_for(lambda: marker.exists() and marker.read_text().strip().isdigit())
-            wait_for(lambda: SERVICE.read_text() == service and
+            wait_for(lambda: SERVICE.exists() and SERVICE.read_text() == service and
                      subprocess.check_output(['systemctl', 'show', 'space-client-wasm.service',
                                               '-p', 'ActiveState', '--value'], text=True).strip() == 'activating')
             root('kill', '-KILL', marker.read_text().strip())
