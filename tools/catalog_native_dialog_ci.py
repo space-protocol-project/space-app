@@ -31,19 +31,6 @@ if sys.platform == 'darwin':
 ''')
 else:
     assert os.name == 'nt'
-    insert('client/windows/runner/flutter_window.cpp','    this->Show();', '''
-    SetTimer(GetHandle(), 9874, 1400, [](HWND window, UINT, UINT_PTR timer, DWORD) {
-      KillTimer(window, timer);
-      ShowWindow(window, SW_MINIMIZE);
-      SetTimer(window, 9875, 1000, [](HWND target, UINT, UINT_PTR restore, DWORD) {
-        KillTimer(target, restore);
-        ShowWindow(target, SW_RESTORE);
-        SetActiveWindow(target);
-        SetForegroundWindow(target);
-        SetFocus(GetWindow(target, GW_CHILD));
-      });
-    });
-''')
     path = 'client/vendor/file_selector_windows/windows/file_dialog_controller.cpp'
     insert(path, 'HRESULT FileDialogController::Show(HWND parent)', '''
 static BOOL CALLBACK SubmitFolder(HWND hwnd, LPARAM timer) {

@@ -38,7 +38,8 @@ def run():
                 if progress.exists():
                     print(progress.read_text(encoding='utf-8'))
         data = json.loads((root / 'report.json').read_text())
-        assert all(data[k] for k in ['fresh_session','wrong_password_rejected','confirmed_read','relocked'])
+        assert all(data[k] for k in ['startup_locked','first_unlock','fresh_session','wrong_password_rejected','confirmed_read','relocked'])
+        assert not {'hidden', 'paused'}.intersection(data['startup_focus'])
         assert 'inactive' in data['focus'] and 'resumed' in data['focus']
         Path(sys.argv[2]).write_bytes((root/'report.json').read_bytes())
 

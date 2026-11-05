@@ -209,7 +209,7 @@ Win32Window::MessageHandler(HWND hwnd,
 
     case WM_ACTIVATE:
       UpdateTheme(hwnd);
-      if (child_content_ != nullptr) {
+      if (LOWORD(wparam) != WA_INACTIVE && child_content_ != nullptr) {
         SetFocus(child_content_);
       }
       return 0;
@@ -249,7 +249,11 @@ void Win32Window::SetChildContent(HWND content) {
   MoveWindow(content, frame.left, frame.top, frame.right - frame.left,
              frame.bottom - frame.top, true);
 
-  SetFocus(child_content_);
+  // Первичный фокус передаётся при WM_ACTIVATE после показа окна.
+  // До подключения обработчика Dart движок может потерять это событие.
+  if (IsWindowVisible(window_handle_) && GetActiveWindow() == window_handle_) {
+    SetFocus(child_content_);
+  }
 }
 
 RECT Win32Window::GetClientArea() {

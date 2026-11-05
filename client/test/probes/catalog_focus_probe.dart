@@ -114,7 +114,14 @@ Future<void> main() async {
           findWidget<SpaceShell>() != null &&
           WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed,
     );
+    final startupFocus = List<String>.of(trace.events);
+    if (startupFocus.contains('hidden') || startupFocus.contains('paused')) {
+      throw StateError('startup required a hidden window: $startupFocus');
+    }
     final access = findWidget<SpaceShell>()!.extensionAccess!;
+    if (access.state != LocalSessionStatus.locked) {
+      throw StateError('startup must remain locked');
+    }
     final first = access.unlock();
     await password(secret, create: true);
     if (!await first) throw StateError('first unlock');
@@ -240,6 +247,9 @@ Future<void> main() async {
     await File('$root/report.json').writeAsString(
       jsonEncode({
         'os': Platform.operatingSystem,
+        'startup_focus': startupFocus,
+        'startup_locked': true,
+        'first_unlock': true,
         'focus': trace.events,
         'wrong_password_rejected': true,
         'fresh_session': true,
