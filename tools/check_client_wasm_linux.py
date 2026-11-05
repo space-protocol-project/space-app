@@ -10,12 +10,15 @@ import sys
 import time
 
 SOCKET = "/run/space-client-wasm/control.sock"
+HELLO = b'{"protocol":"space.client.wasm.linux.p1","version":1}\n'
 
 
 def connect():
     client = socket.socket(socket.AF_UNIX)
     client.settimeout(5)
     client.connect(SOCKET)
+    assert client.recv(512) == HELLO
+    client.sendall(HELLO)
     assert client.recv(128) == b'{"ready":true}\n'
     return client
 

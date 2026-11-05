@@ -39,11 +39,15 @@ func platformServe(input io.Reader, output io.Writer) error {
 		return host.ErrIsolation
 	}
 	_ = socket.SetDeadline(time.Now().Add(5 * time.Second))
+	replies, err := clientHandshake(socket)
+	if err != nil {
+		return err
+	}
 	go func() {
 		_, _ = io.Copy(socket, io.LimitReader(input, 128<<10))
 		_ = socket.CloseWrite()
 	}()
-	written, err := io.Copy(output, io.LimitReader(socket, 32<<10))
+	written, err := io.Copy(output, io.LimitReader(replies, 32<<10))
 	if err != nil {
 		return err
 	}
@@ -115,7 +119,11 @@ func linuxBroker() error {
 					return
 				}
 				_ = socket.SetDeadline(time.Now().Add(4 * time.Second))
-				_ = serveCall(runtime, socket, socket)
+				input, err := serverHandshake(socket)
+				if err != nil {
+					return
+				}
+				_ = serveCall(runtime, input, socket)
 			}()
 		default:
 			_ = connection.Close()
