@@ -111,8 +111,9 @@ class InstalledPackages {
   Future<Uint8List> clientModule(String digest) async {
     final accepted = await verify(digest);
     final bytes = await boundedFile(_path(digest), byteLimit);
-    if (sha256.convert(bytes).toString() != digest)
+    if (sha256.convert(bytes).toString() != digest) {
       throw StateError('UntrustedPackage');
+    }
     final bundle = registryObject(jsonDecode(utf8.decode(bytes)));
     registryKeys(bundle, [
       'format',
@@ -121,8 +122,9 @@ class InstalledPackages {
       'publisher',
       'files',
     ]);
-    if (bundle['format'] != 'space.client.bundle.p1')
+    if (bundle['format'] != 'space.client.bundle.p1') {
       throw StateError('ClientAbi');
+    }
     final files = registryObject(bundle['files']);
     registryKeys(files, ['manifest.json', 'client.wasm', 'LICENSE']);
     final manifest = gitManifest(

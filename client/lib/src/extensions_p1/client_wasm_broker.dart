@@ -36,15 +36,18 @@ class ClientWasmBroker {
       expired = true;
       _active?.cancel();
     });
+    void guard() {
+      lease.deliver(null);
+      if (_closed || expired) throw StateError('Cancelled');
+    }
+
     try {
       final entry = host.snapshot(session).entries[instance]!;
       final module = await packages.clientModule(entry['package']! as String);
-      lease.deliver(null);
-      if (_closed || expired) throw StateError('Cancelled');
+      guard();
       final process = _active = await worker();
       lease.onCancel = process.cancel;
-      lease.deliver(null);
-      if (_closed || expired) throw StateError('Cancelled');
+      guard();
       return await _steps(
         process,
         module,
@@ -53,14 +56,18 @@ class ClientWasmBroker {
         instance,
         root,
         lease,
+        guard,
       );
     } finally {
       deadline.cancel();
-      await _active?.close();
-      _active = null;
-      lease.close();
-      _busy = false;
-      done.complete();
+      try {
+        await _active?.close();
+      } finally {
+        _active = null;
+        lease.close();
+        _busy = false;
+        done.complete();
+      }
     }
   }
 
@@ -72,21 +79,23 @@ class ClientWasmBroker {
     String instance,
     String root,
     LocalReadLease lease,
+    void Function() guard,
   ) async {
     Object? input = {'event': 'start'};
     for (var step = 0; step < 8; step++) {
-      lease.deliver(null);
+      guard();
       final bytes = utf8.encode(jsonEncode(input));
       extensionJson(bytes);
       final reply = registryObject(
         extensionJson(lease.deliver(await process.invoke(module, bytes))),
       );
+      guard();
       if (reply['op'] == 'done') {
         registryKeys(reply, ['op', 'value']);
         return lease.deliver(reply['value']);
       }
       input = await _catalog(reply, host, session, instance, root);
-      lease.deliver(null);
+      guard();
     }
     throw StateError('ResourceLimit');
   }
@@ -113,8 +122,9 @@ class ClientWasmBroker {
     registryKeys(request, ['op', 'limit', 'cursor', 'state']);
     final limit = _limit(request['limit'], 32);
     final cursor = request['cursor'] as String?;
-    if (cursor != null && cursor.length > 256)
+    if (cursor != null && cursor.length > 256) {
       throw StateError('ResourceLimit');
+    }
     Object? result;
     await host.listCatalog(
       session,
@@ -171,8 +181,9 @@ class ClientWasmBroker {
   }
 
   int _limit(Object? value, int max) {
-    if (value is! int || value < 1 || value > max)
+    if (value is! int || value < 1 || value > max) {
       throw StateError('ResourceLimit');
+    }
     return value;
   }
 

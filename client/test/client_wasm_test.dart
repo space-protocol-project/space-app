@@ -12,7 +12,6 @@ import 'package:space_client/src/extensions_p1/desktop_catalog.dart';
 import 'package:space_client/src/extensions_p1/git_install_cubit.dart';
 import 'package:space_client/src/extensions_p1/installed_extensions_cubit.dart';
 import 'package:space_client/src/extensions_p1/local_catalog_types.dart';
-import 'package:space_client/src/extensions_p1/local_lifecycle_host.dart';
 import 'package:space_client/src/extensions_p1/local_lifecycle_types.dart';
 import 'package:space_client/src/extensions_p1/local_lifecycle_record.dart';
 import 'package:space_client/src/extensions_p1/local_session_cubit.dart';
@@ -359,4 +358,47 @@ void main() {
       },
     );
   }
+
+  test(
+    'второе задание не получает отдельный бюджет во время первого',
+    () async {
+      await install();
+      final root = await grant();
+      final entered = Completer<void>(), release = Completer<Object?>();
+      fake.script = (_, _) {
+        entered.complete();
+        return release.future;
+      };
+      final pending = runtime.invoke(access.session, 'games', root);
+      await entered.future;
+      await expectLater(
+        runtime.invoke(access.session, 'games', root),
+        throwsStateError,
+      );
+      expect(created, 1);
+      release.complete({'op': 'done', 'value': 'ok'});
+      expect(await pending, 'ok');
+    },
+  );
+
+  test(
+    'настоящий гость не получает поздние байты после отзыва чтения',
+    () async {
+      factory = () async =>
+          ClientWasmProcess(Platform.environment['SPACE_CLIENT_WASM_BINARY']!);
+      await install();
+      final root = await grant();
+      files.gate = Completer<void>();
+      files.entered = Completer<void>();
+      final pending = runtime.invoke(access.session, 'games', root);
+      final rejected = expectLater(pending, throwsStateError);
+      if (Platform.isWindows) {
+        await files.entered!.future.timeout(const Duration(seconds: 8));
+        await revoke(root);
+        files.gate!.complete();
+      }
+      await rejected;
+      if (!Platform.isWindows) expect(files.reads, 0);
+    },
+  );
 }

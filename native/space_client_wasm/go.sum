@@ -1,3 +1,5 @@
+github.com/space-protocol-project/space-server/experiments/extensions v0.0.0-20261105100920-b9d2c05eb8b0 h1:6ZfU+RXyl1Ie3ZGw4Xx57p60hytimG8SbZGf+8y+6fU=
+github.com/space-protocol-project/space-server/experiments/extensions v0.0.0-20261105100920-b9d2c05eb8b0/go.mod h1:/8gRc+dnMQrVxREhluTyVd8wKjst6KprN0XPinVr7hs=
 github.com/tetratelabs/wazero v1.12.0 h1:DuWcpNu/FzgEXgGBDp8J1Spc+CWOvvtvVyjKlaZopYU=
 github.com/tetratelabs/wazero v1.12.0/go.mod h1:LvKtzl2RqO4gyF27BiXU+nKAjcV8f38U+kP/q2vgxh0=
 golang.org/x/sys v0.44.0 h1:ildZl3J4uzeKP07r2F++Op7E9B29JRUy+a27EibtBTQ=
