@@ -9,6 +9,7 @@ import '../secure_vault.dart';
 import 'local_lifecycle_types.dart';
 import 'registry_validation.dart';
 import 'git_source.dart';
+import 'git_manifest.dart';
 
 Future<Uint8List> boundedFile(String path, int limit) async {
   if (await FileSystemEntity.type(path, followLinks: false) !=
@@ -105,6 +106,36 @@ class InstalledPackages {
       throw StateError('UntrustedPackage');
     }
     return package;
+  }
+
+  Future<Uint8List> clientModule(String digest) async {
+    final accepted = await verify(digest);
+    final bytes = await boundedFile(_path(digest), byteLimit);
+    if (sha256.convert(bytes).toString() != digest)
+      throw StateError('UntrustedPackage');
+    final bundle = registryObject(jsonDecode(utf8.decode(bytes)));
+    registryKeys(bundle, [
+      'format',
+      'index',
+      'signature',
+      'publisher',
+      'files',
+    ]);
+    if (bundle['format'] != 'space.client.bundle.p1')
+      throw StateError('ClientAbi');
+    final files = registryObject(bundle['files']);
+    registryKeys(files, ['manifest.json', 'client.wasm', 'LICENSE']);
+    final manifest = gitManifest(
+      base64Decode(files['manifest.json'] as String),
+    );
+    if (manifest.schema != accepted.schema ||
+        jsonEncode(manifest.permissions) != jsonEncode(accepted.requested)) {
+      throw StateError('UntrustedPackage');
+    }
+    final module = base64Decode(files['client.wasm'] as String);
+    if (module.length > 65536) throw StateError('ResourceLimit');
+    gitWasmShape(module);
+    return module;
   }
 }
 

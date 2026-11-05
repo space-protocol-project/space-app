@@ -99,6 +99,9 @@ def phases(root, binary, environment, output):
         result = json.loads((root / f'{role}.json').read_text())
         assert result['passed'] and result['sha256'] == digest
         assert Path(result['helper']).resolve() == helper.resolve()
+        wasm = binary.parent / ('space-client-wasm.exe' if sys.platform == 'win32' else 'space-client-wasm')
+        assert Path(result['wasm_helper']).resolve() == wasm.resolve()
+        assert result['wasm_sha256'] == hashlib.sha256(wasm.read_bytes()).hexdigest()
         results.append(result)
         source = root / 'git-source.json'
         if source.exists():

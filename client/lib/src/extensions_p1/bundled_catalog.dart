@@ -15,20 +15,22 @@ class BundledCatalog {
   static bool get supported =>
       !kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS);
 
-  static Future<BundledCatalog> resolve({String? application}) async {
+  static Future<BundledCatalog> resolve({
+    String? application,
+    String name = 'space-catalog',
+  }) async {
+    if (!['space-catalog', 'space-client-wasm'].contains(name)) {
+      throw StateError('Unavailable');
+    }
     final directory = await Directory(
       paths.dirname(application ?? Platform.resolvedExecutable),
     ).resolveSymbolicLinks();
     final binary = paths.join(
       directory,
-      Platform.isWindows ? 'space-catalog.exe' : 'space-catalog',
+      Platform.isWindows ? '$name.exe' : name,
     );
     final checksum = Platform.isMacOS
-        ? paths.join(
-            paths.dirname(directory),
-            'Resources',
-            'space-catalog.sha256',
-          )
+        ? paths.join(paths.dirname(directory), 'Resources', '$name.sha256')
         : '$binary.sha256';
     final digest = utf8.decode(await boundedFile(checksum, 128)).trim();
     registryDigest(digest);

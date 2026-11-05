@@ -15,6 +15,7 @@ final class LocalReadLease {
   final String _generation;
   bool _cancelled = false;
   bool _closed = false;
+  void Function()? onCancel;
   bool get isCancelled => _cancelled || _closed;
 
   T deliver<T>(T value) {
@@ -27,6 +28,7 @@ final class LocalReadLease {
   }
 
   void close() {
+    onCancel = null;
     _closed = true;
     _host._calls.remove(this);
   }
@@ -135,7 +137,10 @@ extension LocalLifecycleAccess on LocalLifecycleHost {
       }
     }
     for (final call in _calls) {
-      if (instance == null || call.instance == instance) call._cancelled = true;
+      if (instance == null || call.instance == instance) {
+        call._cancelled = true;
+        call.onCancel?.call();
+      }
     }
   }
 

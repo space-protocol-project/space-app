@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
-source_dir="${PROJECT_DIR}/../../native/space_catalog"
-output="${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/space-catalog"
-checksum="${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/space-catalog.sha256"
+for name in space-catalog space-client-wasm; do
+source_dir="${PROJECT_DIR}/../../native/${name//-/_}"
+output="${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/${name}"
+checksum="${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/${name}.sha256"
 mkdir -p "$(dirname "$output")" "$(dirname "$checksum")"
 # Старый результат этой фазы не должен мешать подписи при повторной сборке.
 rm -f "$output.sha256"
@@ -21,3 +22,6 @@ done
 lipo -create "${parts[@]}" -output "$output"
 codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY:--}" "$output"
 shasum -a 256 "$output" | cut -d ' ' -f 1 > "$checksum"
+rm -rf "$temporary"
+trap - EXIT
+done

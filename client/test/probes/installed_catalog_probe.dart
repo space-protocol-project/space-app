@@ -33,6 +33,7 @@ Future<void> main() async {
   final runtime = SpaceCatalogRuntime();
   final shutdown = AppShutdown();
   final helper = await BundledCatalog.resolve();
+  final wasmHelper = await BundledCatalog.resolve(name: 'space-client-wasm');
   final picker = helper.picker(choose: () async => paths.join(root, 'Games'));
   final owner = InstalledExtensionsCubit(
     access,
@@ -140,6 +141,8 @@ Future<void> main() async {
         'role': role,
         'pid': pid,
         'helper': helper.executable,
+        'wasm_helper': wasmHelper.executable,
+        'wasm_sha256': wasmHelper.digest,
         'sha256': helper.digest,
         'passed': true,
       }),
@@ -213,9 +216,7 @@ Future<void> verifyGitReceipt(String root, Map<String, Object?> entry) async {
 }
 
 class _GitProbeTransport implements GitObjectTransport {
-  final delegate = GithubTransport(
-    Platform.environment['SPACE_GIT_CI_TOKEN'],
-  );
+  final delegate = GithubTransport(Platform.environment['SPACE_GIT_CI_TOKEN']);
   @override
   Future<Map<String, dynamic>> get(String path) async {
     try {

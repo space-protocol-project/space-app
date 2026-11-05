@@ -9,6 +9,17 @@ import 'local_lifecycle_host.dart';
 class SpaceCatalogRuntime extends Cubit<int> {
   SpaceCatalogRuntime() : super(0);
   Future<void> Function(LocalExtensionSession)? prepare;
+  Future<Object?> Function(LocalExtensionSession, String, String)? execute;
+  Future<Object?> invoke(
+    LocalExtensionSession session,
+    String instance,
+    String root,
+  ) async {
+    final run = execute;
+    if (run == null) throw StateError('IsolationUnavailable');
+    return run(session, instance, root);
+  }
+
   Future<void> ensure(LocalExtensionSession session) async =>
       await prepare?.call(session);
   void changed() {

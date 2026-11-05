@@ -16,6 +16,7 @@ import 'local_lifecycle_record.dart';
 import 'local_lifecycle_types.dart';
 import 'local_session_cubit.dart';
 import 'local_sessions.dart';
+import 'client_wasm_broker.dart';
 
 enum InstalledExtensionsState { idle, loading, ready, unavailable, stopped }
 
@@ -27,10 +28,13 @@ class InstalledExtensionsCubit extends Cubit<InstalledExtensionsState> {
     Future<String> Function()? directory,
     Future<DesktopCatalogPicker> Function()? picker,
     this.shutdown,
+    ClientWasmBroker? wasm,
   }) : directory = directory ?? _directory,
+       wasm = wasm ?? ClientWasmBroker(),
        picker = picker ?? _picker,
        super(InstalledExtensionsState.idle) {
     runtime.prepare = _loader;
+    runtime.execute = _executor;
     access.sessions.addListener(_locked);
     _subscription = access.stream.listen((state) {
       if (state == LocalSessionStatus.unlocked) _loadCurrent();
@@ -46,6 +50,8 @@ class InstalledExtensionsCubit extends Cubit<InstalledExtensionsState> {
   final Future<String> Function() directory;
   final Future<DesktopCatalogPicker> Function() picker;
   final AppShutdown? shutdown;
+  final ClientWasmBroker wasm;
+  late final _executor = _execute;
   late final _loader = ensure;
   late final StreamSubscription<LocalSessionStatus> _subscription;
   LocalLifecycleHost? _host, _pendingHost;
@@ -61,6 +67,16 @@ class InstalledExtensionsCubit extends Cubit<InstalledExtensionsState> {
     (await getApplicationSupportDirectory()).path,
     'extensions-p1',
   );
+  Future<Object?> _execute(
+    LocalExtensionSession session,
+    String instance,
+    String root,
+  ) async {
+    await ensure(session);
+    _guard(session, _epoch);
+    return wasm.invoke(_packages!, _host!, session, instance, root);
+  }
+
   static Future<DesktopCatalogPicker> _picker() async =>
       (await BundledCatalog.resolve()).picker();
   void _loadCurrent() {
@@ -235,12 +251,17 @@ class InstalledExtensionsCubit extends Cubit<InstalledExtensionsState> {
     _stopping = true;
     _epoch++;
     if (runtime.prepare == _loader) runtime.prepare = null;
+    if (runtime.execute == _executor) runtime.execute = null;
+    wasm.stop();
     _pendingHost?.close();
     _retire();
     emit(InstalledExtensionsState.stopped);
   }
 
-  Future<void> drain() => _draining;
+  Future<void> drain() async {
+    await _draining;
+    await wasm.drain();
+  }
 
   @override
   Future<void> close() async {

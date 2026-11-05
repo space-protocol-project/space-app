@@ -1,0 +1,115 @@
+name: P1 исполнение клиентского WASM и разрешения каталогов
+on: workflow_dispatch
+permissions: {contents: read}
+jobs:
+  fixtures:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: {go-version-file: native/space_client_wasm/go.mod, cache: false}
+      - run: sudo apt-get update && sudo apt-get install -y clang lld
+      - working-directory: native/space_client_wasm
+        run: |
+          go mod tidy
+          mkdir -p testdata/bin
+          for variant in catalog loop trap; do
+            flag=""
+            if [ "$variant" = loop ]; then flag=-DSPIN; fi
+            if [ "$variant" = trap ]; then flag=-DTRAP; fi
+            clang --target=wasm32 -O2 -fno-builtin -nostdlib $flag -Wl,--no-entry -Wl,--export-memory -Wl,--initial-memory=131072 -Wl,--max-memory=262144 -Wl,-z,stack-size=16384 -Wl,--export=space_alloc -Wl,--export=space_free -Wl,--export=space_handle testdata/catalog.c -o testdata/bin/$variant.wasm
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: client-wasm-fixtures
+          path: |
+            native/space_client_wasm/go.mod
+            native/space_client_wasm/go.sum
+            native/space_client_wasm/testdata/bin
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  installed:
+    needs: fixtures
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-24.04, target: linux}
+          - {os: windows-2025, target: windows}
+          - {os: macos-15, target: macos}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    defaults: {run: {shell: bash}}
+    env:
+      PYTHONUTF8: '1'
+      WASM_FIXTURES: ${{ github.workspace }}/native/space_client_wasm/testdata/bin
+      SPACE_CLIENT_WASM_BINARY: ${{ github.workspace }}/native/space_client_wasm/space-client-wasm${{ matrix.target == 'windows' && '.exe' || '' }}
+      SPACE_CATALOG_BINARY: ${{ github.workspace }}/native/space_catalog/space-catalog${{ matrix.target == 'windows' && '.exe' || '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {name: client-wasm-fixtures, path: native/space_client_wasm}
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: native/space_catalog/go.mod, cache: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.13'}
+      - working-directory: native/space_client_wasm
+        run: |
+          go build -trimpath -o "$SPACE_CLIENT_WASM_BINARY" .
+          go test ./...
+          go vet ./...
+          go mod verify
+      - working-directory: native/space_catalog
+        run: go build -trimpath -o "$SPACE_CATALOG_BINARY" .
+      - name: Protected Linux worker
+        if: matrix.target == 'linux'
+        working-directory: native/space_client_wasm
+        run: |
+          sudo mkdir /sys/fs/cgroup/space-client-wasm-ci
+          sudo sh -c 'echo "+memory +pids +cpu" > /sys/fs/cgroup/cgroup.subtree_control'
+          sudo sh -c 'echo "+memory +pids +cpu" > /sys/fs/cgroup/space-client-wasm-ci/cgroup.subtree_control'
+          cp "$SPACE_CLIENT_WASM_BINARY" /tmp/space-client-wasm-ci
+          sudo env PATH="$PATH" WASM_FIXTURES="$WASM_FIXTURES" SPACE_CLIENT_WASM_BINARY=/tmp/space-client-wasm-ci SPACE_CLIENT_WASM_CGROUP=/sys/fs/cgroup/space-client-wasm-ci go test -count=1 ./...
+          sudo rmdir /sys/fs/cgroup/space-client-wasm-ci
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Зависимости Linux
+        if: matrix.target == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb xauth dbus-x11 gnome-keyring libsecret-tools
+      - name: Анализ и регрессионные проверки
+        working-directory: client
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test test/client_wasm_test.dart test/git_install_test.dart test/installed_extensions_test.dart test/catalog_grant_screen_test.dart test/local_lifecycle_test.dart test/local_registry_test.dart test/local_session_scope_test.dart test/app_shutdown_test.dart test/app_test.dart --reporter expanded | tee ../installed-tests.txt
+      - name: Проверка файлового процесса
+        working-directory: native/space_catalog
+        run: go test ./...
+      - name: Сборка приложения со штатным файловым процессом
+        working-directory: client
+        run: flutter build ${{ matrix.target }} --release --target test/probes/installed_catalog_probe.dart
+      - name: Установщик Windows
+        if: matrix.target == 'windows'
+        shell: pwsh
+        run: '& "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" packaging/windows.iss'
+      - name: Установщик Linux
+        if: matrix.target == 'linux'
+        run: bash packaging/build-linux.sh
+      - name: Образ macOS
+        if: matrix.target == 'macos'
+        run: bash packaging/build-macos.sh
+      - name: Установка, перезапуск и отказ повреждённого пакета
+        run: |
+          if [ '${{ matrix.target }}' = linux ]; then
+            xvfb-run -a python tools/check_installed_catalog.py
+          else
+            python tools/check_installed_catalog.py
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: client-wasm-${{ matrix.target }}
+          path: |
+            installed-tests.txt
+            installed-catalog-results
