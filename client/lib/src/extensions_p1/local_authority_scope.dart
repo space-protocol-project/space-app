@@ -3,7 +3,8 @@ import 'local_lifecycle_types.dart';
 // Проверяем контекст с обеих сторон каждого ожидания: поздний ответ
 // не должен даже открывать следующий диалог в уже заблокированном профиле.
 class ScopedLocalAuthority implements LocalExtensionAuthority {
-  ScopedLocalAuthority(this._delegate, this._guard);
+  ScopedLocalAuthority(this._delegate, this._guard, {this.select});
+  final Future<String> Function(String, String)? select;
   final LocalExtensionAuthority _delegate;
   final void Function() _guard;
 
@@ -32,7 +33,7 @@ class ScopedLocalAuthority implements LocalExtensionAuthority {
   }) => _run(() => _delegate.confirm(action, instance, package, root: root));
   @override
   Future<String> selectDirectory(String instance, String package) =>
-      _run(() => _delegate.selectDirectory(instance, package));
+      _run(() => (select ?? _delegate.selectDirectory)(instance, package));
   @override
   Future<LocalRestoreSnapshot> restore(String checkpoint) =>
       _run(() => _delegate.restore(checkpoint));

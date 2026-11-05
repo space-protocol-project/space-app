@@ -1,3 +1,5 @@
+import 'package:space_client/src/extensions_p1/local_catalog_types.dart';
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -61,11 +63,12 @@ class FixtureAuthority implements LocalExtensionAuthority {
 }
 
 class LifecycleFixture {
-  LifecycleFixture(this.path) {
+  LifecycleFixture(this.path, {this.picker}) {
     session = sessions.unlock('device', 'profile', 'owner');
     open();
   }
   final String path;
+  final LocalCatalogPicker? picker;
   final sessions = LocalExtensionSessions();
   final authority = FixtureAuthority();
   late LocalExtensionSession session;
@@ -77,6 +80,7 @@ class LifecycleFixture {
       profile: 'profile',
       sessions: sessions,
       authority: authority,
+      picker: picker,
     );
   }
 

@@ -69,7 +69,64 @@ extension LocalLifecycleAccess on LocalLifecycleHost {
     return entry;
   }
 
+  Future<void> listCatalog(
+    LocalExtensionSession session,
+    String instance,
+    String root,
+    void Function(CatalogPage) deliver, {
+    int limit = 128,
+    String? cursor,
+  }) => _catalogCall(
+    session,
+    instance,
+    root,
+    (source) => source.list(limit, cursor),
+    deliver,
+  );
+
+  Future<void> readCatalog(
+    LocalExtensionSession session,
+    String instance,
+    String root,
+    String handle,
+    void Function(CatalogChunk) deliver, {
+    required int offset,
+    required int limit,
+  }) => _catalogCall(
+    session,
+    instance,
+    root,
+    (source) => source.read(handle, offset, limit),
+    deliver,
+  );
+
+  Future<void> _catalogCall<T>(
+    LocalExtensionSession session,
+    String instance,
+    String root,
+    Future<T> Function(LocalCatalogRoot) operation,
+    void Function(T) deliver,
+  ) async {
+    final lease = beginRead(session, instance, root);
+    try {
+      final binding = _roots[root];
+      if (binding == null || binding.instance != instance) {
+        throw StateError('StaleBinding');
+      }
+      final value = await operation(binding.root);
+      deliver(lease.deliver(value));
+    } finally {
+      lease.close();
+    }
+  }
+
   void _cancel(String? instance) {
+    for (final item in _roots.entries.toList()) {
+      if (instance == null || item.value.instance == instance) {
+        _roots.remove(item.key);
+        item.value.root.close();
+      }
+    }
     for (final call in _calls) {
       if (instance == null || call.instance == instance) call._cancelled = true;
     }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'local_catalog_types.dart';
 import 'local_lifecycle_record.dart';
 import 'local_authority_scope.dart';
 import 'local_lifecycle_transition.dart';
@@ -11,7 +12,12 @@ import 'local_sessions.dart';
 part 'local_lifecycle_access.dart';
 
 class LocalLifecycleHost {
-  LocalLifecycleHost._(this._registry, this._sessions, this._authority) {
+  LocalLifecycleHost._(
+    this._registry,
+    this._sessions,
+    this._authority,
+    this._picker,
+  ) {
     _sessions.addListener(_locked);
   }
 
@@ -21,15 +27,19 @@ class LocalLifecycleHost {
     required String profile,
     required LocalExtensionSessions sessions,
     required LocalExtensionAuthority authority,
+    LocalCatalogPicker? picker,
   }) => LocalLifecycleHost._(
     LocalExtensionRegistry.open(path, device: device, profile: profile),
     sessions,
     authority,
+    picker,
   );
 
   final LocalExtensionRegistry _registry;
   final LocalExtensionSessions _sessions;
   final LocalExtensionAuthority _authority;
+  final LocalCatalogPicker? _picker;
+  final _roots = <String, ({String instance, LocalCatalogRoot root})>{};
   final _calls = <LocalReadLease>{};
   bool _failed = false;
   bool _closed = false;
@@ -55,13 +65,27 @@ class LocalLifecycleHost {
     final entry = before.entries[command.instance];
     _guard(command, entry, before.generation);
     _requireIdle(command);
-    final next = await _prepare(session, command, entry, before);
-    // Согласие, проверка пакета и миграция могут пережить блокировку профиля.
-    _require(session, before.scope);
-    _requireIdle(command);
-    before.entries[command.instance] = next;
-    _commit(before, command.action.name, checkpoint);
-    _cancel(command.instance);
+    LocalCatalogRoot? selected;
+    try {
+      final next = await _prepare(
+        session,
+        command,
+        entry,
+        before,
+        (root) => selected = root,
+      );
+      _require(session, before.scope);
+      _requireIdle(command);
+      before.entries[command.instance] = next;
+      _commit(before, command.action.name, checkpoint);
+      _cancel(command.instance);
+      if (selected case final root?) {
+        _roots[root.id] = (instance: command.instance, root: root);
+        selected = null;
+      }
+    } finally {
+      selected?.close();
+    }
   }
 
   void _commit(
@@ -156,13 +180,27 @@ class LocalLifecycleHost {
     LocalLifecycleCommand command,
     Map<String, Object?>? previous,
     RegistrySnapshot before,
+    void Function(LocalCatalogRoot) retain,
   ) async {
-    final authority = ScopedLocalAuthority(_authority, () {
+    void guard() {
       _require(session, before.scope);
       if (_registry.snapshot.revision != before.revision) {
         throw StateError('Conflict');
       }
-    });
+    }
+
+    final picker = _picker;
+    final authority = ScopedLocalAuthority(
+      _authority,
+      guard,
+      select: picker == null
+          ? null
+          : (instance, package) async {
+              final root = await picker.select(instance, package, guard);
+              retain(root);
+              return root.id;
+            },
+    );
     if (command.action == LocalLifecycleAction.install) {
       return _install(session, command, authority);
     }
