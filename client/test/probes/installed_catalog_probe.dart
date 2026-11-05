@@ -214,7 +214,7 @@ Future<void> verifyGitReceipt(String root, Map<String, Object?> entry) async {
 
 class _GitProbeTransport implements GitObjectTransport {
   final delegate = GithubTransport(
-    accessToken: Platform.environment['SPACE_GIT_CI_TOKEN'],
+    Platform.environment['SPACE_GIT_CI_TOKEN'],
   );
   @override
   Future<Map<String, dynamic>> get(String path) async {

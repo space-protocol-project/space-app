@@ -30,7 +30,7 @@ bool _specialAddress(Uint8List b) => switch (b[0]) {
 };
 
 class GithubTransport implements GitObjectTransport {
-  GithubTransport({String? accessToken}) : _accessToken = accessToken {
+  GithubTransport([this._accessToken]) {
     _client.findProxy = (_) => 'DIRECT';
     _client.autoUncompress = false;
     _client.connectionTimeout = const Duration(seconds: 10);
