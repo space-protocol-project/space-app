@@ -1,0 +1,16 @@
+[Unit]
+Description=Recover interrupted Space WASM service update before socket activation
+DefaultDependencies=no
+After=local-fs.target
+Before=sockets.target space-client-wasm.socket space-client-wasm.service
+RequiresMountsFor=/var/lib/space-client-wasm-updater /usr/libexec /etc/systemd/system
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/bash /usr/libexec/space-client-wasm-recovery-v1/recover-at-boot.sh
+TimeoutStartSec=30
+UMask=0077
+
+[Install]
+WantedBy=sockets.target

@@ -13,6 +13,7 @@ trap 'rm -f "$archive"; rm -rf "$probe"' EXIT
 ./dist/Space-linux-x64.run --extract "$probe"
 test -x "$probe/space_client"
 test -f "$probe/data/flutter_assets/FontManifest.json"
-for name in install-system-service.sh space-client-wasm.service space-client-wasm.socket; do
+for path in packaging/linux-wasm/*; do
+  name=$(basename "$path")
   cmp "packaging/linux-wasm/$name" "$probe/linux-wasm/$name"
 done

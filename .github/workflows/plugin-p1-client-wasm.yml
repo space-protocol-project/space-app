@@ -28,6 +28,28 @@ jobs:
             native/space_client_wasm/testdata/bin
   complexity:
     uses: ./.github/workflows/complexity.yml
+  boot-recovery:
+    needs: fixtures
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      SPACE_CLIENT_WASM_BINARY: ${{ github.workspace }}/native/space_client_wasm/space-client-wasm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {name: client-wasm-fixtures, path: native/space_client_wasm}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: native/space_client_wasm/go.mod, cache: false}
+      - working-directory: native/space_client_wasm
+        run: CGO_ENABLED=0 go build -trimpath -o "$SPACE_CLIENT_WASM_BINARY" .
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 qemu-utils cloud-image-utils
+          if [ -e /dev/kvm ]; then sudo chmod 666 /dev/kvm; fi
+      - run: python3 tools/check_client_wasm_boot_vm.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: client-wasm-boot-vm, path: client-wasm-boot-vm}
   installed:
     needs: fixtures
     strategy:
@@ -82,6 +104,7 @@ jobs:
           SPACE_CLIENT_WASM_BROKER_TEST=1 python tools/check_client_wasm_linux.py
           python tools/check_client_wasm_protocol.py
           python tools/check_client_wasm_update.py
+          python tools/check_client_wasm_boot.py
           cd native/space_client_wasm
           SPACE_CLIENT_WASM_BROKER_TEST=1 go test -race -v ./...
       - run: rustup toolchain install 1.99.1 --profile minimal
@@ -132,3 +155,5 @@ jobs:
             client-wasm-linux-quota.txt
             client-wasm-linux-protocol.json
             client-wasm-linux-update.json
+            client-wasm-linux-boot.json
+            client-wasm-linux-boot.log
