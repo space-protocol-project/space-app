@@ -72,6 +72,9 @@ def wizard():
                 title = button.window_text().replace('&', '').strip()
                 if title not in ('Next >', 'Install', 'Finish') or not button.is_visible() or not button.is_enabled():
                     continue
+                if title == 'Finish':
+                    (install / 'launch-ci.json').write_text(json.dumps({'root': str(root)}), encoding='utf-8')
+                print('Installer button:', title, flush=True)
                 button.click_input()
                 clicked.append(title)
                 time.sleep(.5)
@@ -89,7 +92,7 @@ def click_toast(title):
         for window in Desktop(backend='uia').windows():
             try:
                 process = psutil.Process(window.process_id()).name().lower()
-                if process not in ('shellexperiencehost.exe', 'explorer.exe'):
+                if process not in ('shellexperiencehost.exe', 'shellhost.exe', 'explorer.exe'):
                     continue
                 for control in window.descendants(control_type='Text'):
                     if control.window_text() == title and control.is_visible():
@@ -117,8 +120,6 @@ def run():
         except FileNotFoundError:
             pass
     root.mkdir(parents=True)
-    install.mkdir()
-    (install / 'launch-ci.json').write_text(json.dumps({'root': str(root)}), encoding='utf-8')
     report = {'wizard': wizard()}
     initial = active()
     report['installer'] = initial
@@ -161,9 +162,13 @@ if __name__ == '__main__':
     finally:
         output = Path('launch-results')
         output.mkdir(exist_ok=True)
+        for name in ('report.json', 'error.json', 'boot.json', 'state.json', 'install.log'):
+            if (root / name).exists():
+                (output / name).write_bytes((root / name).read_bytes())
         if not (root / 'report.json').exists():
             # Диагностика только отдельного рабочего стола CI.
-            Desktop(backend='win32').window(handle=win32gui.GetDesktopWindow()).capture_as_image().save(output / 'failure.png')
+            from PIL import ImageGrab
+            ImageGrab.grab().save(output / 'failure.png')
             details = []
             for window in Desktop(backend='uia').windows():
                 try:
@@ -171,9 +176,6 @@ if __name__ == '__main__':
                 except Exception as error:
                     details.append({'error': str(error)})
             (output / 'desktop.json').write_text(json.dumps(details, ensure_ascii=False), encoding='utf-8')
-        for name in ('report.json', 'error.json', 'boot.json', 'state.json', 'install.log'):
-            if (root / name).exists():
-                (output / name).write_bytes((root / name).read_bytes())
         # Завершаем только процессы из созданного каталога стенда.
         for process in psutil.process_iter(['exe']):
             if process.info['exe'] and Path(process.info['exe']).parent == install:
