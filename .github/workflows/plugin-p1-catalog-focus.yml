@@ -22,6 +22,8 @@ jobs:
         with: {go-version-file: native/space_catalog/go.mod, cache: false}
       - uses: actions/setup-python@v5
         with: {python-version: '3.13'}
+      - name: Проверка синтаксиса драйверов CI
+        run: python -m py_compile tools/check_catalog_focus.py tools/catalog_native_dialog_ci.py
       - run: rustup toolchain install 1.99.1 --profile minimal
       - name: Сборка файлового процесса
         working-directory: native/space_catalog
