@@ -78,6 +78,13 @@ void ShowToast(const EncodableMap& args) {
 }
 
 struct ForwardData { std::string token; std::wstring executable; bool delivered = false; };
+
+void ActivateWindow(HWND window) {
+  // Не снимаем максимизацию уже открытого окна.
+  ShowWindowAsync(window, IsIconic(window) ? SW_RESTORE : SW_SHOW);
+  SetForegroundWindow(window);
+}
+
 BOOL CALLBACK ForwardWindow(HWND window, LPARAM param) {
   auto& data = *reinterpret_cast<ForwardData*>(param);
   wchar_t class_name[128]{};
@@ -92,9 +99,10 @@ BOOL CALLBACK ForwardWindow(HWND window, LPARAM param) {
   const BOOL read = QueryFullProcessImageNameW(process, 0, path, &size);
   CloseHandle(process);
   if (!read || _wcsicmp(path, data.executable.c_str()) != 0) return TRUE;
+  // Запуск из оболочки может передать право активации прежнему процессу.
+  AllowSetForegroundWindow(pid);
   if (data.token.empty()) {
-    ShowWindowAsync(window, SW_RESTORE);
-    SetForegroundWindow(window);
+    ActivateWindow(window);
     data.delivered = true;
     return FALSE;
   }
@@ -103,6 +111,7 @@ BOOL CALLBACK ForwardWindow(HWND window, LPARAM param) {
   DWORD_PTR result = 0;
   data.delivered = SendMessageTimeoutW(window, WM_COPYDATA, 0,
       reinterpret_cast<LPARAM>(&copy), SMTO_ABORTIFHUNG, 2000, &result) && result == 1;
+  if (data.delivered) ActivateWindow(window);
   return data.delivered ? FALSE : TRUE;
 }
 }  // namespace

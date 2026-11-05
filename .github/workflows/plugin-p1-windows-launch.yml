@@ -1,0 +1,41 @@
+name: P1 запуск из установщика и уведомлений Windows
+on: workflow_dispatch
+permissions: {contents: read}
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.13'}
+      - run: python -m pip install pywinauto==0.6.9 psutil==7.0.0
+      - run: python -m py_compile tools/check_windows_launch.py
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Анализ и регрессионные тесты до сборки
+        working-directory: client
+        shell: bash
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test test/local_session_scope_test.dart test/local_profile_widget_test.dart test/notification_targets_test.dart test/app_test.dart --reporter expanded | tee ../launch-tests.txt
+      - name: Сборка установленного SpaceApp
+        working-directory: client
+        run: flutter build windows --release --target test/probes/windows_launch_probe.dart --dart-define=SPACE_LAUNCH_CI=true
+      - name: Рабочий установщик Inno Setup
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DAppVersion=0.9.0 /DAppNumericVersion=0.9.0 packaging/windows.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Установка, системные карточки и повторная разблокировка
+        run: python tools/check_windows_launch.py dist/Space-Setup-windows-x64.exe
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-launch
+          path: |
+            launch-results/
+            launch-tests.txt
