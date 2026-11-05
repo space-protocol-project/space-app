@@ -12,6 +12,8 @@ import 'l10n/app_localizations.dart';
 import 'ui/shell.dart';
 import 'ui/catalog_grant_page.dart';
 import 'src/extensions_p1/catalog_grant_cubit.dart';
+import 'src/extensions_p1/bundled_catalog.dart';
+import 'src/extensions_p1/installed_extensions_cubit.dart';
 import 'ui/interface_scale.dart';
 import 'ui/app_shutdown_gate.dart';
 import 'ui/local_extension_session_scope.dart';
@@ -43,6 +45,7 @@ class SpaceApp extends StatefulWidget {
 
 class _SpaceAppState extends State<SpaceApp> with WidgetsBindingObserver {
   final catalogs = SpaceCatalogRuntime();
+  InstalledExtensionsCubit? installations;
   final preferences = AppPreferences();
   final navigatorKey = GlobalKey<NavigatorState>();
   late final profileVerifier = LocalProfileVerifier(
@@ -75,6 +78,37 @@ class _SpaceAppState extends State<SpaceApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     startupReady = preferences.load();
+    _bindInstallations();
+  }
+
+  void _bindInstallations() {
+    if (widget.catalogRuntime != null || !BundledCatalog.supported) return;
+    installations = InstalledExtensionsCubit(
+      extensionAccess,
+      catalogs,
+      shutdown: widget.shutdown,
+    );
+  }
+
+  @override
+  void didUpdateWidget(SpaceApp oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.extensionAccess == widget.extensionAccess &&
+        oldWidget.catalogRuntime == widget.catalogRuntime &&
+        oldWidget.shutdown == widget.shutdown) {
+      return;
+    }
+    final previous = installations;
+    installations = null;
+    if (previous != null) unawaited(previous.close());
+    _bindInstallations();
+  }
+
+  Widget _installationScope(Widget child) {
+    final owner = installations;
+    return owner == null
+        ? child
+        : BlocProvider.value(value: owner, child: child);
   }
 
   @override
@@ -90,6 +124,9 @@ class _SpaceAppState extends State<SpaceApp> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     preferences.dispose();
+    final owner = installations;
+    if (owner != null) unawaited(owner.close());
+    unawaited(catalogs.close());
     unawaited(defaultAccess.close());
     super.dispose();
   }
@@ -107,16 +144,18 @@ class _SpaceAppState extends State<SpaceApp> with WidgetsBindingObserver {
               runtime: widget.catalogRuntime ?? catalogs,
             ),
           },
-          builder: (context, child) => InterfaceScale(
-            scale: state.uiScale,
-            child: RepositoryProvider.value(
-              value: widget.catalogRuntime ?? catalogs,
-              child: LocalExtensionSessionScope(
-                access: extensionAccess,
-                shutdown: widget.shutdown,
-                child: AppShutdownGate(
+          builder: (context, child) => _installationScope(
+            InterfaceScale(
+              scale: state.uiScale,
+              child: RepositoryProvider.value(
+                value: widget.catalogRuntime ?? catalogs,
+                child: LocalExtensionSessionScope(
+                  access: extensionAccess,
                   shutdown: widget.shutdown,
-                  child: child ?? const SizedBox.shrink(),
+                  child: AppShutdownGate(
+                    shutdown: widget.shutdown,
+                    child: child ?? const SizedBox.shrink(),
+                  ),
                 ),
               ),
             ),

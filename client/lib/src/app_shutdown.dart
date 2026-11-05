@@ -13,6 +13,11 @@ class AppShutdown extends Cubit<AppShutdownState> {
   Future<void> Function()? prepare;
   Future<bool>? _pending;
   final _stopBarriers = <void Function()>{};
+  final _drainBarriers = <Future<void> Function()>{};
+  void addDrainBarrier(Future<void> Function() barrier) =>
+      _drainBarriers.add(barrier);
+  void removeDrainBarrier(Future<void> Function() barrier) =>
+      _drainBarriers.remove(barrier);
 
   void addStopBarrier(void Function() barrier) => _stopBarriers.add(barrier);
   void removeStopBarrier(void Function() barrier) =>
@@ -25,9 +30,12 @@ class AppShutdown extends Cubit<AppShutdownState> {
 
   Future<bool> _run() async {
     emit(AppShutdownState.stopping);
-    final operation = Future<void>.sync(() {
+    final operation = Future<void>.sync(() async {
       for (final barrier in List.of(_stopBarriers)) {
         barrier();
+      }
+      if (_drainBarriers.isNotEmpty) {
+        await Future.wait(List.of(_drainBarriers).map((drain) => drain()));
       }
       return prepare?.call();
     });

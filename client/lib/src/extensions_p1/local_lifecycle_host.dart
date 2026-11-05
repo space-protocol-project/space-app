@@ -184,6 +184,7 @@ class LocalLifecycleHost {
     void Function(LocalCatalogRoot) retain, {
     LocalCatalogRoot? prepared,
     void Function()? active,
+    LocalExtensionAuthority? delegate,
   }) async {
     void guard() {
       active?.call();
@@ -195,7 +196,7 @@ class LocalLifecycleHost {
 
     final picker = _picker;
     final authority = ScopedLocalAuthority(
-      _authority,
+      delegate ?? _authority,
       guard,
       select: picker == null
           ? null

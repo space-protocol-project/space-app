@@ -6,15 +6,27 @@ import 'local_session_cubit.dart';
 import 'local_sessions.dart';
 import 'local_lifecycle_host.dart';
 
-class SpaceCatalogRuntime {
+class SpaceCatalogRuntime extends Cubit<int> {
+  SpaceCatalogRuntime() : super(0);
+  Future<void> Function(LocalExtensionSession)? prepare;
+  Future<void> ensure(LocalExtensionSession session) async =>
+      await prepare?.call(session);
+  void changed() {
+    if (!isClosed) emit(state + 1);
+  }
+
   final _hosts = <String, LocalLifecycleHost>{};
   void attach(LocalExtensionSession session, LocalLifecycleHost host) {
     host.snapshot(session);
     _hosts['${session.device}/${session.profile}'] = host;
+    changed();
   }
 
-  void detach(LocalLifecycleHost host) =>
-      _hosts.removeWhere((_, h) => identical(h, host));
+  void detach(LocalLifecycleHost host) {
+    _hosts.removeWhere((_, h) => identical(h, host));
+    changed();
+  }
+
   LocalLifecycleHost? forSession(LocalExtensionSession session) =>
       _hosts['${session.device}/${session.profile}'];
 }
@@ -57,14 +69,37 @@ class CatalogFailed extends CatalogScreenState {
 class CatalogGrantCubit extends Cubit<CatalogScreenState> {
   CatalogGrantCubit(this.access, this.runtime) : super(const CatalogLocked()) {
     access.sessions.addListener(_locked);
-    refresh();
+    _runtimeChanges = runtime.stream.listen((_) {
+      if (state is CatalogTargets) refresh();
+    });
+    if (runtime.prepare == null) {
+      refresh();
+    } else {
+      unawaited(_load());
+    }
   }
   final LocalSessionCubit access;
   final SpaceCatalogRuntime runtime;
+  late final StreamSubscription<int> _runtimeChanges;
   CatalogGrantIntent? _intent;
   Timer? _expiry;
   int _epoch = 0;
   bool _ownLock = false;
+  Future<void> _load() async {
+    if (access.state != LocalSessionStatus.unlocked) {
+      refresh();
+      return;
+    }
+    final epoch = _epoch;
+    emit(const CatalogWorking());
+    try {
+      await runtime.ensure(access.session);
+      if (_current(epoch)) refresh();
+    } catch (_) {
+      if (_current(epoch)) emit(const CatalogFailed());
+    }
+  }
+
   void refresh() {
     if (access.state != LocalSessionStatus.unlocked) {
       emit(const CatalogLocked());
@@ -89,6 +124,8 @@ class CatalogGrantCubit extends Cubit<CatalogScreenState> {
     emit(const CatalogWorking());
     try {
       if (!await access.unlock()) throw StateError('PermissionDenied');
+      if (!_current(epoch)) return;
+      await runtime.ensure(access.session);
       if (!_current(epoch)) return;
       if (intent == null) {
         refresh();
@@ -171,13 +208,14 @@ class CatalogGrantCubit extends Cubit<CatalogScreenState> {
 
   void cancel() {
     _discard();
-    refresh();
+    unawaited(_load());
   }
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
     access.sessions.removeListener(_locked);
     _discard();
-    return super.close();
+    await _runtimeChanges.cancel();
+    await super.close();
   }
 }

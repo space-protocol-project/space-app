@@ -9,15 +9,21 @@ import 'local_catalog_types.dart';
 import 'local_lifecycle_record.dart';
 
 class DesktopCatalogPicker implements LocalCatalogPicker {
-  DesktopCatalogPicker(this.executable, {Future<String?> Function()? choose})
-    : _choose = choose ?? getDirectoryPath;
+  DesktopCatalogPicker(
+    this.executable, {
+    Future<String?> Function()? choose,
+    this.verify,
+  }) : _choose = choose ?? getDirectoryPath;
   final String executable;
+  final Future<void> Function()? verify;
   final Future<String?> Function() _choose;
   final _paths = <String, String>{};
   bool _choosing = false;
+  Completer<void>? _selection;
   final _processes = <Process>{};
 
   Future<void> get stopped async {
+    await _selection?.future;
     await Future.wait(_processes.map((child) => child.exitCode));
   }
 
@@ -33,6 +39,7 @@ class DesktopCatalogPicker implements LocalCatalogPicker {
     if (_choosing || _processes.length >= 4) throw StateError('ResourceLimit');
     if (!paths.isAbsolute(executable)) throw StateError('Unavailable');
     _choosing = true;
+    final selection = _selection = Completer<void>();
     _DesktopRoot? root;
     try {
       guard();
@@ -40,6 +47,8 @@ class DesktopCatalogPicker implements LocalCatalogPicker {
       guard();
       if (path == null) throw StateError('Cancelled');
       if (!paths.isAbsolute(path)) throw StateError('PermissionDenied');
+      await verify?.call();
+      guard();
       final process = await Process.start(executable, [path]);
       _processes.add(process);
       unawaited(
@@ -58,6 +67,8 @@ class DesktopCatalogPicker implements LocalCatalogPicker {
       throw StateError('Unavailable');
     } finally {
       _choosing = false;
+      selection.complete();
+      _selection = null;
     }
   }
 }

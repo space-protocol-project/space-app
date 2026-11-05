@@ -64,6 +64,8 @@ jobs:
       PYTHONUTF8: '1'
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: {go-version-file: native/space_catalog/go.mod, cache: false}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

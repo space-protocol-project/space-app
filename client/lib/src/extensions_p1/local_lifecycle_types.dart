@@ -75,3 +75,12 @@ abstract interface class LocalExtensionAuthority {
   Future<String> selectDirectory(String instance, String package);
   Future<LocalRestoreSnapshot> restore(String checkpoint);
 }
+
+// Создаёт контекст подтверждения только для явного approve доверенного экрана.
+abstract interface class CatalogConsentProvider {
+  LocalExtensionAuthority catalogConsent(
+    String instance,
+    String package,
+    String root,
+  );
+}

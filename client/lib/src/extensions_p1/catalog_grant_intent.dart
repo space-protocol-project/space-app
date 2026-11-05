@@ -62,6 +62,10 @@ final class CatalogGrantIntent {
 
     guard();
     final root = _root!;
+    final authority = host._authority;
+    final delegate = authority is CatalogConsentProvider
+        ? authority.catalogConsent(instance, package, root.id)
+        : authority;
     final before = host.snapshot(session);
     final entry = before.entries[instance]!;
     final enable = _command(LocalLifecycleAction.enable, entry);
@@ -69,7 +73,15 @@ final class CatalogGrantIntent {
     host._requireIdle(enable);
     // Оба перехода готовятся на частном снимке. Отказ во второй проверке
     // оставляет экземпляр отключённым, включая прежнюю ревизию реестра.
-    await host._prepare(session, enable, entry, before, (_) {}, active: guard);
+    await host._prepare(
+      session,
+      enable,
+      entry,
+      before,
+      (_) {},
+      active: guard,
+      delegate: delegate,
+    );
     guard();
     final grant = _command(LocalLifecycleAction.grant, entry);
     host._guard(grant, entry, before.generation);
@@ -81,6 +93,7 @@ final class CatalogGrantIntent {
       (_) {},
       prepared: root,
       active: guard,
+      delegate: delegate,
     );
     guard();
     host._requireIdle(grant);
