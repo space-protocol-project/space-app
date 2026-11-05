@@ -31,7 +31,7 @@ class InstalledPackages {
   static const byteLimit = 16 * 1024 * 1024;
 
   String _key(String digest) =>
-      'space.extensions.accepted.${sha256.convert(utf8.encode(scope))}.$digest';
+      'space.extensions.accepted.${sha256.convert(utf8.encode(jsonEncode([scope, digest])))}';
   String _path(String digest) => paths.join(directory, '$digest.package');
 
   // Вызывает только доверенный установщик после проверки источника и согласия.

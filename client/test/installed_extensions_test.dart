@@ -23,11 +23,13 @@ import 'package:space_client/ui/local_extension_session_scope.dart';
 
 class MemoryKeys implements SecureKeyStorage {
   final values = <String, String>{};
+  void Function()? afterWrite;
   @override
   Future<String?> read({required String key}) async => values[key];
   @override
   Future<void> write({required String key, required String value}) async {
     values[key] = value;
+    afterWrite?.call();
   }
 
   @override
@@ -86,6 +88,7 @@ void main() {
     'принятая установка подключается и восстанавливается после открытия',
     () async {
       await install();
+      expect(keys.values.keys.single.length, lessThanOrEqualTo(100));
       expect(
         runtime.forSession(access.session)!.catalogInstances(access.session),
         ['games'],
@@ -172,6 +175,28 @@ void main() {
       runtime.forSession(access.session)!.snapshot(access.session).entries,
       isEmpty,
     );
+  });
+  test('блокировка после записи принятия не публикует установку', () async {
+    keys.afterWrite = access.lock;
+    await expectLater(install(), throwsStateError);
+    expect(keys.values, isNotEmpty);
+    await owner.close();
+    keys.afterWrite = null;
+    await access.unlock();
+    owner = create();
+    await runtime.ensure(access.session);
+    expect(
+      runtime.forSession(access.session)!.snapshot(access.session).entries,
+      isEmpty,
+    );
+  });
+  test('потеря записи принятия закрывает доступ к прежней установке', () async {
+    await install();
+    await owner.close();
+    keys.values.clear();
+    owner = create();
+    await expectLater(runtime.ensure(access.session), throwsStateError);
+    expect(runtime.forSession(access.session), isNull);
   });
   test('поздняя подготовка после блокировки не подключает хост', () async {
     await owner.close();

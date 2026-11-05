@@ -96,7 +96,7 @@ def main():
         (root / 'Games/sample').write_bytes(b'installed catalog')
         environment = dict(os.environ, DIRECTORY_CRASH_CONTROL=str(root),
                            DIRECTORY_CRASH_PROFILE=str(profile),
-                           DIRECTORY_CRASH_NAMESPACE='space-ci-' + hashlib.sha256(temporary.encode()).hexdigest(),
+                           DIRECTORY_CRASH_NAMESPACE='space-ci-' + hashlib.sha256(temporary.encode()).hexdigest()[:16],
                            XDG_DATA_HOME=str(profile / 'data'), XDG_CONFIG_HOME=str(profile / 'config'),
                            XDG_CACHE_HOME=str(profile / 'cache'), LIBGL_ALWAYS_SOFTWARE='1')
         with isolated_keychain(root) if sys.platform == 'darwin' else nullcontext() as keychain:
