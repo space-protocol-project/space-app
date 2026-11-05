@@ -57,6 +57,8 @@ def inspect():
                     assert fields["Gid"].split() == ["65534"] * 4
                     assert fields["Groups"].strip() == ""
                     assert fields["CapEff"].strip() == "0000000000000000"
+                    assert fields["CapPrm"].strip() == "0000000000000000"
+                    assert fields["CapAmb"].strip() == "0000000000000000"
                     assert fields["NoNewPrivs"].strip() == "1"
                     assert os.readlink(f"/proc/{pid}/ns/net") != os.readlink("/proc/self/ns/net")
                     assert not os.path.exists(f"/proc/{pid}/root/home/runner")
