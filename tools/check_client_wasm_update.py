@@ -157,6 +157,22 @@ def disabled_rollback(binary):
     return {'case': 'disabled_rollback', 'disabled_inactive_preserved': True}
 
 
+def runtime_enabled_refused(binary):
+    control('disable', 'space-client-wasm.socket')
+    control('enable', '--runtime', 'space-client-wasm.socket')
+    before = snapshot()
+    pid = root('systemctl', 'show', 'space-client-wasm.service', '-p', 'MainPID', '--value')
+    result = install(binary)
+    assert result.returncode != 0 and 'Unsupported socket enable state' in result.stderr
+    assert snapshot() == before
+    assert root('systemctl', 'show', 'space-client-wasm.service', '-p', 'MainPID', '--value') == pid
+    assert root('systemctl', 'is-enabled', 'space-client-wasm.socket') == 'enabled-runtime'
+    control('disable', '--runtime', 'space-client-wasm.socket')
+    control('enable', 'space-client-wasm.socket')
+    usable()
+    return {'case': 'runtime_enabled_refused', 'unchanged_before_stop': True}
+
+
 def main():
     assert os.environ.get('GITHUB_ACTIONS') == 'true' and os.geteuid() != 0
     binary = Path(os.environ['SPACE_CLIENT_WASM_BINARY'])
@@ -172,6 +188,7 @@ def main():
         cases.append(interrupted_update(binary, delayed, sig))
     cases.append(failed_first_install(binary))
     cases.append(disabled_rollback(binary))
+    cases.append(runtime_enabled_refused(binary))
     assert root('stat', '-c', '%u:%a', STATE) == '0:700'
     assert root('stat', '-c', '%u:%a', INSTALLED) == '0:755'
     root('test', '-d', STATE / 'previous')

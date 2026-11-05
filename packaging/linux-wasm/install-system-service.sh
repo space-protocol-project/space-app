@@ -89,6 +89,25 @@ finalize_commit() {
   fi
 }
 
+capture_state() {
+  local enabled active unit marker
+  enabled=$(systemctl is-enabled space-client-wasm.socket 2>/dev/null || true)
+  case "$enabled" in
+    enabled) touch "$state/staging/enabled" ;;
+    disabled|not-found) ;;
+    *) echo "Unsupported socket enable state: $enabled" >&2; return 1 ;;
+  esac
+  for unit in socket service; do
+    active=$(systemctl show "space-client-wasm.$unit" -p ActiveState --value)
+    marker="$state/staging/$unit-active"
+    case "$active" in
+      active) touch "$marker" ;;
+      inactive|failed) ;;
+      *) echo "Service is transitioning: $active" >&2; return 1 ;;
+    esac
+  done
+}
+
 prepare_candidate() {
   local binary source_dir expected actual index
   binary=$(realpath -- "$1")
@@ -108,12 +127,12 @@ prepare_candidate() {
     test ! -L "${targets[$index]}.next"
     if test -e "${targets[$index]}"; then
       test -f "${targets[$index]}"
+      test "$(stat -c %u "${targets[$index]}")" = 0
+      test "$(( 8#$(stat -c %a "${targets[$index]}") & 8#22 ))" = 0
       cp -p -- "${targets[$index]}" "$state/staging/old/${names[$index]}"
     fi
   done
-  if systemctl is-enabled --quiet space-client-wasm.socket; then touch "$state/staging/enabled"; fi
-  if systemctl is-active --quiet space-client-wasm.socket; then touch "$state/staging/socket-active"; fi
-  if systemctl is-active --quiet space-client-wasm.service; then touch "$state/staging/service-active"; fi
+  capture_state
   sync -f "$state"
   mv -- "$state/staging" "$state/pending"
   sync -f "$state"
