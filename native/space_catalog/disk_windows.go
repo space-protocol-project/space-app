@@ -19,6 +19,10 @@ func localDisk(f *os.File) bool {
 		return false
 	}
 	name := strings.TrimPrefix(syscall.UTF16ToString(buf[:n]), `\\?\`)
+	return permittedRoot(name)
+}
+
+func permittedRoot(name string) bool {
 	vol := filepath.VolumeName(name)
 	if len(vol) != 2 {
 		return false

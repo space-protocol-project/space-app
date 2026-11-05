@@ -18,5 +18,6 @@ abstract class LocalCatalogRoot {
   final id = localGeneration();
   Future<CatalogPage> list(int limit, String? cursor);
   Future<CatalogChunk> read(String handle, int offset, int limit);
+  // Освобождает ресурсы и допускает повторный вызов после отзыва.
   void close();
 }

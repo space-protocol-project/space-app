@@ -19,6 +19,7 @@ class FixtureAuthority implements LocalExtensionAuthority {
   String root = '1' * 32;
   String? confirmedRoot;
   int confirmations = 0;
+  Future<void> Function()? beforeGrantConsent;
   List<String> requested = ['device.catalog.read'];
 
   @override
@@ -43,6 +44,7 @@ class FixtureAuthority implements LocalExtensionAuthority {
   }) async {
     confirmedRoot = root;
     confirmations++;
+    if (action == 'grant') await beforeGrantConsent?.call();
     return consent;
   }
 

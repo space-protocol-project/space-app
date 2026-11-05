@@ -33,3 +33,5 @@ func mountID(f *os.File) string {
 	return ""
 }
 func sameDisk(a, b *os.File) bool { id := mountID(a); return id != "" && id == mountID(b) }
+
+func permittedRoot(string) bool { return true }

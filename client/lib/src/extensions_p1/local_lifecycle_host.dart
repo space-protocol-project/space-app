@@ -39,6 +39,7 @@ class LocalLifecycleHost {
   final LocalExtensionSessions _sessions;
   final LocalExtensionAuthority _authority;
   final LocalCatalogPicker? _picker;
+  final _pendingRoots = <LocalCatalogRoot, String>{};
   final _roots = <String, ({String instance, LocalCatalogRoot root})>{};
   final _calls = <LocalReadLease>{};
   bool _failed = false;
@@ -67,23 +68,22 @@ class LocalLifecycleHost {
     _requireIdle(command);
     LocalCatalogRoot? selected;
     try {
-      final next = await _prepare(
-        session,
-        command,
-        entry,
-        before,
-        (root) => selected = root,
-      );
+      final next = await _prepare(session, command, entry, before, (root) {
+        selected = root;
+        _pendingRoots[root] = command.instance;
+      });
       _require(session, before.scope);
       _requireIdle(command);
       before.entries[command.instance] = next;
       _commit(before, command.action.name, checkpoint);
+      _pendingRoots.remove(selected);
       _cancel(command.instance);
       if (selected case final root?) {
         _roots[root.id] = (instance: command.instance, root: root);
         selected = null;
       }
     } finally {
+      _pendingRoots.remove(selected);
       selected?.close();
     }
   }

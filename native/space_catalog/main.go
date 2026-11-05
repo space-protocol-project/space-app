@@ -39,7 +39,7 @@ type query struct {
 }
 
 func openCatalog(path string) (*catalog, error) {
-	if !filepath.IsAbs(path) {
+	if !filepath.IsAbs(path) || !permittedRoot(path) {
 		return nil, denied
 	}
 	selected, err := os.Lstat(path)

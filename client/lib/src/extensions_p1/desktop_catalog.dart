@@ -73,6 +73,7 @@ class _DesktopRoot extends LocalCatalogRoot {
   final void Function(String) release;
   final StreamIterator<String> replies;
   List<CatalogEntry>? snapshot;
+  final issued = <String>{};
   String? next;
   int index = 0;
   bool busy = false;
@@ -133,8 +134,11 @@ class _DesktopRoot extends LocalCatalogRoot {
     if (cursor != next || (snapshot != null && cursor == null)) {
       throw StateError('StaleBinding');
     }
-    final all = snapshot ??= await _entries();
+    final all = snapshot ?? await _entries();
+    if (closed) throw StateError('PermissionDenied');
+    snapshot = all;
     final page = List<CatalogEntry>.unmodifiable(all.skip(index).take(limit));
+    issued.addAll(page.map((item) => item.handle));
     index += page.length;
     next = index < all.length ? localGeneration() : null;
     return (entries: page, next: next);
@@ -143,6 +147,7 @@ class _DesktopRoot extends LocalCatalogRoot {
   Future<CatalogChunk> read(String handle, int offset, int limit) =>
       _serial(() async {
         lifecycleToken(handle);
+        if (!issued.contains(handle)) throw StateError('StaleBinding');
         if (limit < 1 ||
             limit > 65536 ||
             offset < 0 ||
@@ -165,8 +170,19 @@ class _DesktopRoot extends LocalCatalogRoot {
     if (closed) return;
     closed = true;
     snapshot = null;
+    issued.clear();
     release(id);
     process.kill(ProcessSignal.sigkill);
     unawaited(replies.cancel());
+    unawaited(_closeInput());
+  }
+
+  Future<void> _closeInput() async {
+    try {
+      await process.exitCode;
+      await process.stdin.close();
+    } on IOException {
+      // Канал мог закрыться при завершении процесса во время записи запроса.
+    }
   }
 }

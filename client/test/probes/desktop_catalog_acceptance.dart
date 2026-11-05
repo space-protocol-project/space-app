@@ -190,6 +190,43 @@ void main() {
     expect(picker.selectedPath(f.authority.confirmedRoot!), isNull);
     expect(f.record['grants'], isEmpty);
   });
+  test(
+    'блокировка во время согласия сразу закрывает подготовленный процесс',
+    () async {
+      await setup();
+      f.authority.beforeGrantConsent = () async {
+        final root = f.authority.confirmedRoot!;
+        expect(picker.selectedPath(root), folder.path);
+        f.sessions.lock();
+        expect(picker.selectedPath(root), isNull);
+        await picker.stopped;
+      };
+      await expectLater(grant(), throwsStateError);
+    },
+  );
+  test(
+    'блокировка при незавершённом запросе прекращает файловый процесс',
+    () async {
+      File('${folder.path}/game').writeAsBytesSync(List.filled(65536, 1));
+      await setup();
+      final root = await grant();
+      final handle = (await page(root)).entries.single.handle;
+      var delivered = false;
+      final pending = f.host.readCatalog(
+        f.session,
+        'games',
+        root,
+        handle,
+        (_) => delivered = true,
+        offset: 0,
+        limit: 65536,
+      );
+      f.sessions.lock();
+      await expectLater(pending, throwsStateError);
+      await picker.stopped;
+      expect(delivered, false);
+    },
+  );
   test('блокировка во время выбора запрещает подтверждение', () async {
     await setup();
     final calls = f.authority.confirmations;

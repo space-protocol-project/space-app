@@ -121,6 +121,12 @@ extension LocalLifecycleAccess on LocalLifecycleHost {
   }
 
   void _cancel(String? instance) {
+    for (final item in _pendingRoots.entries.toList()) {
+      if (instance == null || item.value == instance) {
+        _pendingRoots.remove(item.key);
+        item.key.close();
+      }
+    }
     for (final item in _roots.entries.toList()) {
       if (instance == null || item.value.instance == instance) {
         _roots.remove(item.key);
