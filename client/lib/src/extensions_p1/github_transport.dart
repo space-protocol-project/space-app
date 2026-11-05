@@ -89,7 +89,10 @@ class GithubTransport implements GitObjectTransport {
       throw StateError('GitLimit');
     }
     try {
-      return await _get(path).timeout(const Duration(seconds: 20));
+      final remaining = _deadline.difference(DateTime.now());
+      const requestLimit = Duration(seconds: 20);
+      return await _get(path)
+          .timeout(remaining < requestLimit ? remaining : requestLimit);
     } catch (_) {
       close();
       rethrow;

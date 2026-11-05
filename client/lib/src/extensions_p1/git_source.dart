@@ -9,6 +9,7 @@ void gitObjectId(Object? value) {
 String gitRepository(String value) {
   final uri = Uri.parse(value);
   if (value.length > 256 ||
+      !RegExp(r'^https://github\.com/', caseSensitive: false).hasMatch(value) ||
       uri.scheme != 'https' ||
       uri.host != 'github.com' ||
       uri.hasPort ||

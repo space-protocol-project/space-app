@@ -10,6 +10,7 @@ import 'package:space_client/src/app_shutdown.dart';
 import 'package:space_client/src/extensions_p1/bundled_catalog.dart';
 import 'package:space_client/src/extensions_p1/catalog_grant_cubit.dart';
 import 'package:space_client/src/extensions_p1/git_install_cubit.dart';
+import 'package:space_client/src/extensions_p1/github_transport.dart';
 import 'package:space_client/src/extensions_p1/installed_packages.dart';
 import 'package:space_client/src/extensions_p1/installed_extensions_cubit.dart';
 import 'package:space_client/src/extensions_p1/local_lifecycle_host.dart';
@@ -159,7 +160,7 @@ Future<void> main() async {
 }
 
 Future<void> installGit(InstalledExtensionsCubit owner) async {
-  final installer = GitInstallCubit(owner);
+  final installer = GitInstallCubit(owner, transport: _GitProbeTransport.new);
   try {
     await installer.prepare(
       'https://github.com/space-protocol-project/space-app',
@@ -195,6 +196,35 @@ Future<void> verifyGitReceipt(String root, Map<String, Object?> entry) async {
       source['plugin'] != 'org.spaceprotocol.ci-games') {
     throw StateError('Git receipt');
   }
+  final trustKey = sha256.convert(
+    utf8.encode(
+      jsonEncode(['device/profile', source['repository'], source['plugin']]),
+    ),
+  );
+  final trust = await NativeProfileStorage().read(
+    key: 'space.git.trust.$trustKey',
+  );
+  if (trust == null ||
+      (jsonDecode(trust) as Map)['publisher'] != source['publisher']) {
+    throw StateError('Git trust restart');
+  }
   await File(paths.join(root, 'git-source.json'))
       .writeAsString(jsonEncode(source), flush: true);
+}
+
+class _GitProbeTransport implements GitObjectTransport {
+  final delegate = GithubTransport();
+  @override
+  Future<Map<String, dynamic>> get(String path) async {
+    try {
+      return await delegate.get(path);
+    } catch (error) {
+      // Только публичный тестовый источник, без credentials и содержимого ответа.
+      stderr.writeln('Git transport $path: $error');
+      rethrow;
+    }
+  }
+
+  @override
+  void close() => delegate.close();
 }

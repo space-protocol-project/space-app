@@ -316,4 +316,45 @@ void main() {
       await tester.pumpWidget(const SizedBox());
     },
   );
+
+  test(
+    'изменение источника после просмотра не меняет принятые байты',
+    () async {
+      await prepare();
+      final review = installer.state as GitReview;
+      final calls = git.calls.length;
+      git.files['client.wasm'] = Uint8List.fromList([0]);
+      await installer.confirm(trustUnknown: true);
+      expect(installer.state, isA<GitInstalled>());
+      expect(entries()['games']!['package'], review.candidate.package.digest);
+      expect(git.calls.length, calls);
+    },
+  );
+
+  test('отозванное после просмотра доверие требует нового согласия', () async {
+    await prepare();
+    await installer.confirm(trustUnknown: true);
+    await prepare('second');
+    expect((installer.state as GitReview).known, true);
+    keys.values.removeWhere((key, _) => key.startsWith('space.git.trust.'));
+    await installer.confirm();
+    expect((installer.state as GitFailed).reason, 'TrustChanged');
+    expect(entries().keys, ['games']);
+  });
+
+  for (final name in ['extra.txt', 'MANIFEST.JSON', '.gitmodules']) {
+    test('лишний файл или коллизия имён запрещены: $name', () async {
+      git.files[name] = Uint8List(0);
+      await prepare();
+      expect(installer.state, isA<GitFailed>());
+      expect(keys.values, isEmpty);
+    });
+  }
+
+  test('подписанный неверный digest происхождения отклоняется', () async {
+    await git.sign(originChanges: {'digest': '0' * 64});
+    await prepare();
+    expect(installer.state, isA<GitFailed>());
+    expect(entries(), isEmpty);
+  });
 }
