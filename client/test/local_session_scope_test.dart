@@ -25,10 +25,11 @@ void main() {
         return identity;
       },
     );
-    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.detached);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await tester.pumpWidget(
       LocalExtensionSessionScope(access: access, child: const SizedBox()),
     );
+    expect(find.byType(LocalExtensionSessionScope), findsOneWidget);
     for (final state in [
       AppLifecycleState.detached,
       AppLifecycleState.hidden,
