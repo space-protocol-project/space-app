@@ -10,6 +10,8 @@ import 'src/app_shutdown.dart';
 import 'src/preferences.dart';
 import 'l10n/app_localizations.dart';
 import 'ui/shell.dart';
+import 'ui/catalog_grant_page.dart';
+import 'src/extensions_p1/catalog_grant_cubit.dart';
 import 'ui/interface_scale.dart';
 import 'ui/app_shutdown_gate.dart';
 import 'ui/local_extension_session_scope.dart';
@@ -27,15 +29,20 @@ class SpaceApp extends StatefulWidget {
     this.controller,
     this.shutdown,
     this.extensionAccess,
+    this.catalogRuntime,
+    this.profileVerifier,
   });
   final ChatController? controller;
   final AppShutdown? shutdown;
   final LocalSessionCubit? extensionAccess;
+  final SpaceCatalogRuntime? catalogRuntime;
+  final LocalProfileVerifier? profileVerifier;
   @override
   State<SpaceApp> createState() => _SpaceAppState();
 }
 
 class _SpaceAppState extends State<SpaceApp> with WidgetsBindingObserver {
+  final catalogs = SpaceCatalogRuntime();
   final preferences = AppPreferences();
   final navigatorKey = GlobalKey<NavigatorState>();
   late final profileVerifier = LocalProfileVerifier(
@@ -56,7 +63,9 @@ class _SpaceAppState extends State<SpaceApp> with WidgetsBindingObserver {
     return showDialog<LocalProfileIdentity>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => LocalProfileUnlockDialog(service: profileVerifier),
+      builder: (_) => LocalProfileUnlockDialog(
+        service: widget.profileVerifier ?? profileVerifier,
+      ),
     );
   }
 
@@ -92,14 +101,23 @@ class _SpaceAppState extends State<SpaceApp> with WidgetsBindingObserver {
         builder: (context, state) => MaterialApp(
           navigatorKey: navigatorKey,
           title: 'Space',
+          routes: {
+            '/device/catalogs': (_) => CatalogGrantPage(
+              access: extensionAccess,
+              runtime: widget.catalogRuntime ?? catalogs,
+            ),
+          },
           builder: (context, child) => InterfaceScale(
             scale: state.uiScale,
-            child: LocalExtensionSessionScope(
-              access: extensionAccess,
-              shutdown: widget.shutdown,
-              child: AppShutdownGate(
+            child: RepositoryProvider.value(
+              value: widget.catalogRuntime ?? catalogs,
+              child: LocalExtensionSessionScope(
+                access: extensionAccess,
                 shutdown: widget.shutdown,
-                child: child ?? const SizedBox.shrink(),
+                child: AppShutdownGate(
+                  shutdown: widget.shutdown,
+                  child: child ?? const SizedBox.shrink(),
+                ),
               ),
             ),
           ),

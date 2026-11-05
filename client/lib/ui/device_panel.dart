@@ -78,8 +78,15 @@ class _DevicePanelState extends State<DevicePanel> {
             title: context.strings.myDevice,
             description: context.strings.myDeviceDescription,
             children: [
-              if (widget.extensionAccess case final access?)
+              if (widget.extensionAccess case final access?) ...[
                 LocalProfileAccessCard(access: access),
+                ListTile(
+                  leading: const Icon(Icons.folder_open),
+                  title: Text(context.strings.catalogFolders),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed('/device/catalogs'),
+                ),
+              ],
               SurfaceCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

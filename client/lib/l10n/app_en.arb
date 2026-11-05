@@ -1198,5 +1198,12 @@
   "localProfileDenied": "Incorrect password.",
   "localProfileThrottled": "Too many attempts. Try again in 30 seconds.",
   "localProfileOpen": "Local profile unlocked. Directory permissions are granted separately.",
-  "localProfileClosed": "Local profile locked."
+  "localProfileClosed": "Local profile locked.",
+  "catalogFolders": "Extension folders",
+  "catalogEmpty": "This profile has no connected extensions that request folder access.",
+  "catalogUnlockAgain": "Unlock this profile again to review the folder and extension.",
+  "catalogApprove": "Enable extension and allow reading",
+  "catalogGranted": "Folder access granted",
+  "catalogFailed": "Folder access was interrupted. Select the folder again.",
+  "catalogRetry": "Back to list"
 }

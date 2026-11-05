@@ -47,7 +47,7 @@ class DesktopCatalogPicker implements LocalCatalogPicker {
           _processes.remove(process);
         }),
       );
-      root = _DesktopRoot(process, _paths.remove);
+      root = _DesktopRoot(process, _paths.remove, path);
       await root.ready();
       guard();
       _paths[root.id] = path;
@@ -63,12 +63,14 @@ class DesktopCatalogPicker implements LocalCatalogPicker {
 }
 
 class _DesktopRoot extends LocalCatalogRoot {
-  _DesktopRoot(this.process, this.release)
+  _DesktopRoot(this.process, this.release, this.displayPath)
     : replies = StreamIterator(
         process.stdout.transform(utf8.decoder).transform(const LineSplitter()),
       ) {
     unawaited(process.stderr.drain<void>());
   }
+  @override
+  final String displayPath;
   final Process process;
   final void Function(String) release;
   final StreamIterator<String> replies;

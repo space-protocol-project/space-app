@@ -82,6 +82,7 @@ class _LocalProfileUnlockDialogState extends State<LocalProfileUnlockDialog>
             ),
             if (state case ProfileReady(:final creating))
               FilledButton(
+                key: const ValueKey('local-profile-submit'),
                 onPressed: _submit,
                 child: Text(
                   creating
@@ -126,6 +127,7 @@ class _LocalProfileUnlockDialogState extends State<LocalProfileUnlockDialog>
         const SizedBox(height: 12),
         Text(
           _failure(failure),
+          key: ValueKey(failure),
           style: TextStyle(color: Theme.of(context).colorScheme.error),
         ),
       ],

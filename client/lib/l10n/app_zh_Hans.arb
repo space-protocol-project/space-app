@@ -551,5 +551,12 @@
   "localProfileDenied": "密码错误。",
   "localProfileThrottled": "尝试次数过多。请在 30 秒后重试。",
   "localProfileOpen": "本地配置文件已解锁。目录权限需单独授予。",
-  "localProfileClosed": "本地配置文件已锁定。"
+  "localProfileClosed": "本地配置文件已锁定。",
+  "catalogFolders": "扩展文件夹",
+  "catalogEmpty": "此配置中没有请求文件夹访问权限的已连接扩展。",
+  "catalogUnlockAgain": "请再次解锁此配置，核对文件夹和扩展。",
+  "catalogApprove": "启用扩展并允许读取",
+  "catalogGranted": "已授予文件夹访问权限",
+  "catalogFailed": "授权已中断，请重新选择文件夹。",
+  "catalogRetry": "返回列表"
 }

@@ -10,6 +10,7 @@ import 'local_registry_codec.dart';
 import 'local_sessions.dart';
 
 part 'local_lifecycle_access.dart';
+part 'catalog_grant_intent.dart';
 
 class LocalLifecycleHost {
   LocalLifecycleHost._(
@@ -180,9 +181,12 @@ class LocalLifecycleHost {
     LocalLifecycleCommand command,
     Map<String, Object?>? previous,
     RegistrySnapshot before,
-    void Function(LocalCatalogRoot) retain,
-  ) async {
+    void Function(LocalCatalogRoot) retain, {
+    LocalCatalogRoot? prepared,
+    void Function()? active,
+  }) async {
     void guard() {
+      active?.call();
       _require(session, before.scope);
       if (_registry.snapshot.revision != before.revision) {
         throw StateError('Conflict');
@@ -196,7 +200,8 @@ class LocalLifecycleHost {
       select: picker == null
           ? null
           : (instance, package) async {
-              final root = await picker.select(instance, package, guard);
+              final root =
+                  prepared ?? await picker.select(instance, package, guard);
               retain(root);
               return root.id;
             },

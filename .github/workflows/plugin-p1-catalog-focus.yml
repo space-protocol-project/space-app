@@ -1,0 +1,55 @@
+name: P1 экран разрешения на каталог
+on: workflow_dispatch
+permissions: {contents: read}
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  focus:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: windows-2025, target: windows, binary: client/build/windows/x64/runner/Debug/space_client.exe}
+          - {os: macos-15, target: macos, binary: client/build/macos/Build/Products/Debug/Space.app/Contents/MacOS/Space}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    defaults: {run: {shell: bash}}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: native/space_catalog/go.mod, cache: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.13'}
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Сборка файлового процесса
+        working-directory: native/space_catalog
+        run: go build -o ../../space-catalog.exe .
+      - name: Анализ и регрессионные проверки
+        working-directory: client
+        env:
+          SPACE_CATALOG_HELPER: ${{ github.workspace }}/space-catalog.exe
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test test/catalog_grant_screen_test.dart test/probes/desktop_catalog_acceptance.dart test/local_profile_widget_test.dart test/local_session_scope_test.dart test/app_test.dart --reporter expanded | tee ../focus-tests.txt
+      - name: Драйвер кнопки системного окна
+        run: python tools/catalog_native_dialog_ci.py
+      - name: Сборка SpaceApp
+        working-directory: client
+        run: flutter build ${{ matrix.target }} --debug --target test/probes/catalog_focus_probe.dart
+      - name: Потеря фокуса и повторная проверка пароля
+        env:
+          SPACE_CATALOG_HELPER: ${{ github.workspace }}/space-catalog.exe
+        run: python tools/check_catalog_focus.py '${{ matrix.binary }}' focus.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: catalog-focus-${{ matrix.target }}
+          path: |
+            focus-tests.txt
+            focus.json
+      - uses: actions/upload-artifact@v4
+        if: matrix.target == 'windows'
+        with: {name: catalog-focus-translations, path: 'client/lib/l10n/app_localizations*.dart'}
