@@ -52,8 +52,9 @@ T? findWidget<T extends Widget>([Object? key]) {
 CatalogScreenState? screenState() {
   CatalogScreenState? state;
   void visit(Element e) {
-    if (e.widget is BlocBuilder<CatalogGrantCubit, CatalogScreenState>)
+    if (e.widget is BlocBuilder<CatalogGrantCubit, CatalogScreenState>) {
       state = e.read<CatalogGrantCubit>().state;
+    }
     e.visitChildren(visit);
   }
 

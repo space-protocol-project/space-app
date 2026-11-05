@@ -29,6 +29,7 @@ jobs:
         working-directory: native/space_catalog
         run: go build -o ../../space-catalog.exe .
       - name: Анализ Flutter
+        id: analysis
         working-directory: client
         run: |
           flutter pub get
@@ -43,7 +44,7 @@ jobs:
           SPACE_CATALOG_HELPER: ${{ github.workspace }}/space-catalog.exe
         run: python tools/check_catalog_focus.py '${{ matrix.binary }}' focus.json
       - name: Регрессионные проверки
-        if: success() || failure()
+        if: (success() || failure()) && steps.analysis.conclusion == 'success'
         working-directory: client
         env:
           SPACE_CATALOG_HELPER: ${{ github.workspace }}/space-catalog.exe
