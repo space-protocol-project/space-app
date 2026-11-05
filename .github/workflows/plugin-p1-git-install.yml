@@ -54,6 +54,8 @@ jobs:
         if: matrix.target == 'macos'
         run: bash packaging/build-macos.sh
       - name: Установка, перезапуск и отказ повреждённого пакета
+        env:
+          SPACE_GIT_CI_TOKEN: ${{ github.token }}
         run: |
           if [ '${{ matrix.target }}' = linux ]; then
             xvfb-run -a python tools/check_installed_catalog.py

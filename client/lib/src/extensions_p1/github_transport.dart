@@ -30,13 +30,15 @@ bool _specialAddress(Uint8List b) => switch (b[0]) {
 };
 
 class GithubTransport implements GitObjectTransport {
-  GithubTransport() {
+  GithubTransport({String? accessToken}) : _accessToken = accessToken {
     _client.findProxy = (_) => 'DIRECT';
     _client.autoUncompress = false;
     _client.connectionTimeout = const Duration(seconds: 10);
     _client.connectionFactory = _connect;
   }
   final _client = HttpClient();
+  // Только доверенный вызывающий компонент; UI не читает credentials из среды.
+  final String? _accessToken;
   final _deadline = DateTime.now().add(const Duration(minutes: 2));
   int _requests = 0, _bytes = 0;
   bool _closed = false;
@@ -107,10 +109,15 @@ class GithubTransport implements GitObjectTransport {
     request.headers.set('Accept', 'application/vnd.github+json');
     request.headers.set('Accept-Encoding', 'identity');
     request.headers.set('User-Agent', 'Space-P1-client-installer');
+    if (_accessToken case final token?) {
+      request.headers.set('Authorization', 'Bearer $token');
+    }
     final response = await request.close();
-    if (response.statusCode != 200 ||
-        response.headers.value('content-encoding') != null) {
-      throw StateError('GitUnavailable');
+    if (response.statusCode != 200) {
+      throw StateError('GitHttp${response.statusCode}');
+    }
+    if (response.headers.value('content-encoding') != null) {
+      throw StateError('GitEncoding');
     }
     final body = BytesBuilder(copy: false);
     await for (final chunk in response) {
