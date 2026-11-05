@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import time
 
 from check_directory_macos import isolated_keychain
 
@@ -48,6 +49,29 @@ def installed(root):
         yield destination / 'space_client'
 
 
+def launch(args, root, role, environment, log):
+    if sys.platform != 'darwin':
+        command(args, env=environment, stdout=log, stderr=subprocess.STDOUT)
+        return
+    # Как flutter_tools: после готовности процесса open выводит его на передний план.
+    process = subprocess.Popen(list(map(str, args)), env=environment, stdout=log, stderr=subprocess.STDOUT)
+    try:
+        ready = root / f'{role}.ready'
+        deadline = time.monotonic() + 30
+        while not ready.exists():
+            if process.poll() is not None or time.monotonic() > deadline:
+                raise RuntimeError('Приложение не подготовило первое окно')
+            time.sleep(.05)
+        assert ready.read_text() == str(process.pid)
+        command(['/usr/bin/open', Path(args[0]).parents[2]], env=environment)
+        if process.wait(timeout=180) != 0:
+            raise RuntimeError('Нативная проверка macOS завершилась ошибкой')
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.wait(timeout=10)
+
+
 def phases(root, binary, environment, output):
     helper = binary.parent / ('space-catalog.exe' if sys.platform == 'win32' else 'space-catalog')
     digest = hashlib.sha256(helper.read_bytes()).hexdigest()
@@ -67,7 +91,7 @@ def phases(root, binary, environment, output):
             args = ['dbus-run-session', '--', sys.executable, 'tools/directory_keyring_session.py', binary]
         with (output / f'{role}.log').open('w', encoding='utf-8') as log:
             try:
-                command(args, env=env, stdout=log, stderr=subprocess.STDOUT)
+                launch(args, root, role, env, log)
             finally:
                 error = root / 'error.json'
                 if error.exists():
