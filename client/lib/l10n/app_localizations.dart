@@ -6045,6 +6045,48 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Локальный профиль заблокирован.'**
   String get localProfileClosed;
+
+  /// No description provided for @catalogFolders.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каталоги расширений'**
+  String get catalogFolders;
+
+  /// No description provided for @catalogEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'У этого профиля нет подключённых расширений с доступом к каталогам.'**
+  String get catalogEmpty;
+
+  /// No description provided for @catalogUnlockAgain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подтвердите профиль ещё раз, чтобы проверить выбранную папку и получателя доступа.'**
+  String get catalogUnlockAgain;
+
+  /// No description provided for @catalogApprove.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включить расширение и разрешить чтение'**
+  String get catalogApprove;
+
+  /// No description provided for @catalogGranted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ к папке выдан'**
+  String get catalogGranted;
+
+  /// No description provided for @catalogFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выдача доступа прервана. Выберите папку заново.'**
+  String get catalogFailed;
+
+  /// No description provided for @catalogRetry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вернуться к списку'**
+  String get catalogRetry;
 }
 
 class _AppLocalizationsDelegate

@@ -3358,4 +3358,27 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get localProfileClosed => 'Локальный профиль заблокирован.';
+
+  @override
+  String get catalogFolders => 'Каталоги расширений';
+
+  @override
+  String get catalogEmpty =>
+      'У этого профиля нет подключённых расширений с доступом к каталогам.';
+
+  @override
+  String get catalogUnlockAgain =>
+      'Подтвердите профиль ещё раз, чтобы проверить выбранную папку и получателя доступа.';
+
+  @override
+  String get catalogApprove => 'Включить расширение и разрешить чтение';
+
+  @override
+  String get catalogGranted => 'Доступ к папке выдан';
+
+  @override
+  String get catalogFailed => 'Выдача доступа прервана. Выберите папку заново.';
+
+  @override
+  String get catalogRetry => 'Вернуться к списку';
 }

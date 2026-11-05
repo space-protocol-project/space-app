@@ -3340,4 +3340,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get localProfileClosed => 'Local profile locked.';
+
+  @override
+  String get catalogFolders => 'Extension folders';
+
+  @override
+  String get catalogEmpty =>
+      'This profile has no connected extensions that request folder access.';
+
+  @override
+  String get catalogUnlockAgain =>
+      'Unlock this profile again to review the folder and extension.';
+
+  @override
+  String get catalogApprove => 'Enable extension and allow reading';
+
+  @override
+  String get catalogGranted => 'Folder access granted';
+
+  @override
+  String get catalogFailed =>
+      'Folder access was interrupted. Select the folder again.';
+
+  @override
+  String get catalogRetry => 'Back to list';
 }

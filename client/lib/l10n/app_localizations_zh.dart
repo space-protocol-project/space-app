@@ -3091,6 +3091,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get localProfileClosed => '本地配置文件已锁定。';
+
+  @override
+  String get catalogFolders => '扩展文件夹';
+
+  @override
+  String get catalogEmpty => '此配置中没有请求文件夹访问权限的已连接扩展。';
+
+  @override
+  String get catalogUnlockAgain => '请再次解锁此配置，核对文件夹和扩展。';
+
+  @override
+  String get catalogApprove => '启用扩展并允许读取';
+
+  @override
+  String get catalogGranted => '已授予文件夹访问权限';
+
+  @override
+  String get catalogFailed => '授权已中断，请重新选择文件夹。';
+
+  @override
+  String get catalogRetry => '返回列表';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4560,4 +4581,25 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get localProfileClosed => '本地配置文件已锁定。';
+
+  @override
+  String get catalogFolders => '扩展文件夹';
+
+  @override
+  String get catalogEmpty => '此配置中没有请求文件夹访问权限的已连接扩展。';
+
+  @override
+  String get catalogUnlockAgain => '请再次解锁此配置，核对文件夹和扩展。';
+
+  @override
+  String get catalogApprove => '启用扩展并允许读取';
+
+  @override
+  String get catalogGranted => '已授予文件夹访问权限';
+
+  @override
+  String get catalogFailed => '授权已中断，请重新选择文件夹。';
+
+  @override
+  String get catalogRetry => '返回列表';
 }

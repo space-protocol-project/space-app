@@ -18,7 +18,12 @@ def run():
         env = dict(os.environ, CATALOG_DRILL=path, DIRECTORY_CRASH_NAMESPACE='space-ci-'+hashlib.sha256(path.encode()).hexdigest())
         with isolated_keychain(root) if sys.platform == 'darwin' else nullcontext():
             try:
-                subprocess.run([str(binary)], env=env, check=True, timeout=180)
+                if sys.platform == 'darwin':
+                    config = Path(os.environ['RUNNER_TEMP']) / 'catalog-focus-xctest.json'
+                    config.write_text(json.dumps({k:env[k] for k in ('GITHUB_ACTIONS','CATALOG_DRILL','DIRECTORY_CRASH_NAMESPACE','SPACE_CATALOG_HELPER')}))
+                    subprocess.run(['xcodebuild','test','-workspace','client/macos/Runner.xcworkspace','-scheme','Runner','-configuration','Debug','-destination','platform=macOS','-derivedDataPath','client/build/macos','-parallel-testing-enabled','NO','-only-testing:RunnerTests/CatalogUITests/testSystemFolder','CODE_SIGN_STYLE=Manual','CODE_SIGN_IDENTITY=-','FLUTTER_TARGET=test/probes/catalog_focus_probe.dart'],check=True,timeout=1000)
+                else:
+                    subprocess.run([str(binary)], env=env, check=True, timeout=180)
             finally:
                 progress = root / 'progress.log'
                 if progress.exists():

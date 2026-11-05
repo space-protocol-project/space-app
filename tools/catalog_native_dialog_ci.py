@@ -14,20 +14,15 @@ def insert(path, needle, addition):
 if os.environ.get('GITHUB_ACTIONS') != 'true':
     raise SystemExit('Только CI')
 if sys.platform == 'darwin':
-    path = 'client/vendor/file_selector_macos/macos/file_selector_macos/Sources/file_selector_macos/FileSelectorPlugin.swift'
-    insert(path, '    panelController.display(panel, for: viewProvider.view?.window) { (selection: [URL]?) in', '''
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-      guard panel.isVisible && panel.canChooseDirectories else { return }
-      NSLog("catalog-ci: visible NSOpenPanel")
-      NSApp.deactivate()
-      NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.finder").first?.activate(options: [.activateIgnoringOtherApps])
-      DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-        NSApp.activate(ignoringOtherApps: true)
-        panel.makeKeyAndOrderFront(nil)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { panel.ok(nil) }
-      }
-    }
-''')
+    project = Path('client/macos/Runner.xcodeproj/project.pbxproj')
+    source = project.read_text()
+    assert 'com.apple.product-type.bundle.unit-test' in source
+    source = source.replace('com.apple.product-type.bundle.unit-test', 'com.apple.product-type.bundle.ui-testing')
+    source = source.replace('BUNDLE_LOADER = "$(TEST_HOST)";', 'TEST_TARGET_NAME = Runner;')
+    source = source.replace('TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Space.app/Contents/MacOS/Space";', '')
+    project.write_text(source)
+    config = Path(os.environ['RUNNER_TEMP']) / 'catalog-focus-xctest.json'
+    Path('client/macos/RunnerTests/RunnerTests.swift').write_text(Path('tools/catalog_focus_ui.swift').read_text().replace('__CONFIG__', str(config)))
     insert('client/macos/Runner/MainFlutterWindow.swift','    super.awakeFromNib()', '''
     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
       NSApp.activate(ignoringOtherApps: true)
@@ -36,6 +31,16 @@ if sys.platform == 'darwin':
 ''')
 else:
     assert os.name == 'nt'
+    insert('client/windows/runner/flutter_window.cpp','    this->Show();', '''
+    SetTimer(GetHandle(), 9874, 1400, [](HWND window, UINT, UINT_PTR timer, DWORD) {
+      KillTimer(window, timer);
+      ShowWindow(window, SW_RESTORE);
+      SetActiveWindow(window);
+      SetForegroundWindow(window);
+      SetFocus(nullptr);
+      SetFocus(GetWindow(window, GW_CHILD));
+    });
+''')
     path = 'client/vendor/file_selector_windows/windows/file_dialog_controller.cpp'
     insert(path, 'HRESULT FileDialogController::Show(HWND parent)', '''
 static BOOL CALLBACK SubmitFolder(HWND hwnd, LPARAM timer) {

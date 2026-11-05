@@ -51,7 +51,11 @@ Future<void> until(String reason, bool Function() test) async {
   stage(reason);
   final deadline = DateTime.now().add(const Duration(seconds: 40));
   while (!test()) {
-    if (DateTime.now().isAfter(deadline)) throw StateError(reason);
+    if (DateTime.now().isAfter(deadline)) {
+      throw StateError(
+        '$reason (shell=${findWidget<SpaceShell>() != null}, lifecycle=${WidgetsBinding.instance.lifecycleState}, error=${findWidget<ErrorWidget>()?.message})',
+      );
+    }
     await Future<void>.delayed(const Duration(milliseconds: 100));
   }
 }
@@ -102,8 +106,10 @@ Future<void> main() async {
     final session = access.session;
     final picker = DesktopCatalogPicker(
       Platform.environment['SPACE_CATALOG_HELPER']!,
-      choose: () =>
-          getDirectoryPath(initialDirectory: Directory(folder).absolute.path),
+      choose: () => getDirectoryPath(
+        confirmButtonText: 'Space CI Select',
+        initialDirectory: Directory(folder).absolute.path,
+      ),
     );
     final authority = FixtureAuthority();
     final host = LocalLifecycleHost.open(
