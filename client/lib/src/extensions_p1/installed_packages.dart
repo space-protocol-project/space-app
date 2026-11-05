@@ -8,6 +8,7 @@ import 'package:path/path.dart' as paths;
 import '../secure_vault.dart';
 import 'local_lifecycle_types.dart';
 import 'registry_validation.dart';
+import 'git_source.dart';
 
 Future<Uint8List> boundedFile(String path, int limit) async {
   if (await FileSystemEntity.type(path, followLinks: false) !=
@@ -53,6 +54,7 @@ class InstalledPackages {
       'digest': package.digest,
       'schema': package.schema,
       'requested': package.requested,
+      if (package.source case final source?) 'source': source.json,
     });
     final previous = await storage.read(key: _key(package.digest));
     guard();
@@ -79,7 +81,14 @@ class InstalledPackages {
     final raw = await storage.read(key: _key(digest));
     if (raw == null || raw.length > 8192) throw StateError('UntrustedPackage');
     final data = registryObject(jsonDecode(raw));
-    registryKeys(data, ['v', 'scope', 'digest', 'schema', 'requested']);
+    registryKeys(data, [
+      'v',
+      'scope',
+      'digest',
+      'schema',
+      'requested',
+      if (data.containsKey('source')) 'source',
+    ]);
     if (data['v'] != 1 || data['scope'] != scope || data['digest'] != digest) {
       throw StateError('UntrustedPackage');
     }
@@ -87,6 +96,9 @@ class InstalledPackages {
       digest,
       data['schema'] as int,
       (data['requested'] as List).cast<String>(),
+      source: data.containsKey('source')
+          ? GitPackageSource(registryObject(data['source']))
+          : null,
     );
     final bytes = await boundedFile(_path(digest), byteLimit);
     if (sha256.convert(bytes).toString() != digest) {

@@ -80,7 +80,19 @@ class _DevicePanelState extends State<DevicePanel> {
             children: [
               if (widget.extensionAccess case final access?) ...[
                 LocalProfileAccessCard(access: access),
-                if (Platform.isLinux || Platform.isWindows || Platform.isMacOS)
+                if (Platform.isLinux ||
+                    Platform.isWindows ||
+                    Platform.isMacOS) ...[
+                  Card(
+                    child: ListTile(
+                      key: const ValueKey('device-git-extensions'),
+                      leading: const Icon(Icons.extension),
+                      title: const Text('Установить расширение из Git'),
+                      onTap: () =>
+                          Navigator.of(context)
+                              .pushNamed('/device/extensions/install'),
+                    ),
+                  ),
                   Card(
                     child: ListTile(
                       key: const ValueKey('device-catalogs'),
@@ -90,6 +102,7 @@ class _DevicePanelState extends State<DevicePanel> {
                           Navigator.of(context).pushNamed('/device/catalogs'),
                     ),
                   ),
+                ],
               ],
               SurfaceCard(
                 child: Column(

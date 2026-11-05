@@ -9,6 +9,8 @@ import 'package:space_client/app.dart';
 import 'package:space_client/src/app_shutdown.dart';
 import 'package:space_client/src/extensions_p1/bundled_catalog.dart';
 import 'package:space_client/src/extensions_p1/catalog_grant_cubit.dart';
+import 'package:space_client/src/extensions_p1/git_install_cubit.dart';
+import 'package:space_client/src/extensions_p1/installed_packages.dart';
 import 'package:space_client/src/extensions_p1/installed_extensions_cubit.dart';
 import 'package:space_client/src/extensions_p1/local_lifecycle_host.dart';
 import 'package:space_client/src/extensions_p1/local_lifecycle_types.dart';
@@ -71,7 +73,10 @@ Future<void> main() async {
     } else {
       await runtime.ensure(access.session);
       final bytes = [0, 97, 115, 109, 1, 0, 0, 0];
-      if (role == 'install') {
+      if (role == 'install' &&
+          Platform.environment['GIT_INSTALL_DRILL'] == 'true') {
+        await installGit(owner);
+      } else if (role == 'install') {
         await owner.installAccepted(
           access.session,
           LocalVerifiedPackage(sha256.convert(bytes).toString(), 1, [
@@ -83,6 +88,12 @@ Future<void> main() async {
         );
       }
       final host = runtime.forSession(access.session)!;
+      if (Platform.environment['GIT_INSTALL_DRILL'] == 'true') {
+        await verifyGitReceipt(
+          root,
+          host.snapshot(access.session).entries['games']!,
+        );
+      }
       if (host.snapshot(access.session).entries['games']!['state'] !=
           'disabled') {
         throw StateError('restored access');
@@ -145,4 +156,43 @@ Future<void> main() async {
     await shutdown.close();
   }
   exit(exitCode);
+}
+
+Future<void> installGit(InstalledExtensionsCubit owner) async {
+  final installer = GitInstallCubit(owner);
+  try {
+    await installer.prepare(
+      'https://github.com/space-protocol-project/space-app',
+      Platform.environment['GIT_FIXTURE_REF']!,
+      'client/test/fixtures/git-extension',
+      'games',
+    );
+    final review = installer.state;
+    if (review is! GitReview || review.known)
+      throw StateError('Git review ${installer.state}');
+    await installer.confirm();
+    if (installer.state is! GitReview) throw StateError('implicit consent');
+    await installer.confirm(trustUnknown: true);
+    if (installer.state is! GitInstalled)
+      throw StateError('Git install ${installer.state}');
+  } finally {
+    await installer.close();
+  }
+}
+
+Future<void> verifyGitReceipt(String root, Map<String, Object?> entry) async {
+  final packages = InstalledPackages(
+    paths.join(root, 'extensions', 'device', 'profile', 'packages'),
+    'device/profile',
+    NativeProfileStorage(),
+  );
+  final package = await packages.verify(entry['package']! as String);
+  final source = package.source!.json;
+  if (source['commit'] != 'a17b181880f745d4b6e08cbc047565418c1087b6' ||
+      source['ref_commit'] != Platform.environment['GIT_FIXTURE_REF'] ||
+      source['plugin'] != 'org.spaceprotocol.ci-games') {
+    throw StateError('Git receipt');
+  }
+  await File(paths.join(root, 'git-source.json'))
+      .writeAsString(jsonEncode(source), flush: true);
 }

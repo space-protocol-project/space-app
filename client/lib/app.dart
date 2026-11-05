@@ -11,6 +11,7 @@ import 'src/preferences.dart';
 import 'l10n/app_localizations.dart';
 import 'ui/shell.dart';
 import 'ui/catalog_grant_page.dart';
+import 'ui/git_install_page.dart';
 import 'src/extensions_p1/catalog_grant_cubit.dart';
 import 'src/extensions_p1/bundled_catalog.dart';
 import 'src/extensions_p1/installed_extensions_cubit.dart';
@@ -139,6 +140,13 @@ class _SpaceAppState extends State<SpaceApp> with WidgetsBindingObserver {
           navigatorKey: navigatorKey,
           title: 'Space',
           routes: {
+            '/device/extensions/install': (_) => installations == null
+                ? const Scaffold(
+                    body: Center(
+                      child: Text('Установка расширений недоступна.'),
+                    ),
+                  )
+                : GitInstallPage(owner: installations!),
             '/device/catalogs': (_) => CatalogGrantPage(
               access: extensionAccess,
               runtime: widget.catalogRuntime ?? catalogs,

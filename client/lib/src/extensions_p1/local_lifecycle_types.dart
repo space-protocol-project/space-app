@@ -1,5 +1,6 @@
 import 'registry_validation.dart';
 import 'local_lifecycle_record.dart';
+import 'git_source.dart';
 
 enum LocalLifecycleAction {
   install,
@@ -44,8 +45,12 @@ class LocalLifecycleCommand {
 }
 
 class LocalVerifiedPackage {
-  LocalVerifiedPackage(this.digest, this.schema, List<String> requested)
-    : requested = List.unmodifiable(requested) {
+  LocalVerifiedPackage(
+    this.digest,
+    this.schema,
+    List<String> requested, {
+    this.source,
+  }) : requested = List.unmodifiable(requested) {
     registryDigest(digest);
     registrySchema(schema);
     validateRequested(requested);
@@ -53,6 +58,7 @@ class LocalVerifiedPackage {
   final String digest;
   final int schema;
   final List<String> requested;
+  final GitPackageSource? source;
 }
 
 typedef LocalRestoreSnapshot = ({

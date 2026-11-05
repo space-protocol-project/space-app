@@ -100,6 +100,9 @@ def phases(root, binary, environment, output):
         assert result['passed'] and result['sha256'] == digest
         assert Path(result['helper']).resolve() == helper.resolve()
         results.append(result)
+        source = root / 'git-source.json'
+        if source.exists():
+            (output / f'{role}-git-source.json').write_bytes(source.read_bytes())
     assert len({result['pid'] for result in results}) == 3
     (output / 'result.json').write_text(json.dumps({
         'platform': sys.platform, 'phases': results,

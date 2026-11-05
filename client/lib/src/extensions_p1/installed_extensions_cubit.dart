@@ -164,15 +164,29 @@ class InstalledExtensionsCubit extends Cubit<InstalledExtensionsState> {
     List<int> bytes, {
     required String installation,
     required String instance,
+    int? expectedRevision,
+    void Function()? active,
+    Future<void> Function()? beforeAdmit,
   }) async {
     if (_installing) throw StateError('Busy');
     _installing = true;
     final epoch = _epoch;
+    void guard() {
+      _guard(session, epoch);
+      active?.call();
+      if (expectedRevision != null &&
+          _host!.snapshot(session).revision != expectedRevision) {
+        throw StateError('Conflict');
+      }
+    }
+
     try {
       await ensure(session);
-      _guard(session, epoch);
-      await _packages!.admit(package, bytes, () => _guard(session, epoch));
-      _guard(session, epoch);
+      guard();
+      await beforeAdmit?.call();
+      guard();
+      await _packages!.admit(package, bytes, guard);
+      guard();
       final host = _host!;
       final before = host.snapshot(session);
       await host.execute(
@@ -185,6 +199,7 @@ class InstalledExtensionsCubit extends Cubit<InstalledExtensionsState> {
           generation: before.generation,
           package: package.digest,
         ),
+        active: guard,
       );
       _guard(session, epoch);
       runtime.changed();

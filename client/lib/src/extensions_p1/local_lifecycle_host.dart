@@ -61,7 +61,9 @@ class LocalLifecycleHost {
     LocalExtensionSession session,
     LocalLifecycleCommand input, {
     void Function(String phase)? checkpoint,
+    void Function()? active,
   }) async {
+    active?.call();
     final before = snapshot(session);
     final command = _freeze(input);
     final entry = before.entries[command.instance];
@@ -72,8 +74,9 @@ class LocalLifecycleHost {
       final next = await _prepare(session, command, entry, before, (root) {
         selected = root;
         _pendingRoots[root] = command.instance;
-      });
+      }, active: active);
       _require(session, before.scope);
+      active?.call();
       _requireIdle(command);
       before.entries[command.instance] = next;
       _commit(before, command.action.name, checkpoint);
