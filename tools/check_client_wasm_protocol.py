@@ -44,7 +44,7 @@ def control(*arguments):
 
 def install(binary):
     return subprocess.run(["sudo", "bash", "packaging/linux-wasm/install-system-service.sh",
-                           str(binary)], capture_output=True, text=True, timeout=20)
+                           str(binary)], capture_output=True, text=True, timeout=60)
 
 
 def main_pid():

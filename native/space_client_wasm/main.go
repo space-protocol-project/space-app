@@ -24,6 +24,8 @@ func main() {
 		err = platformServe(os.Stdin, os.Stdout)
 	} else if len(os.Args) == 2 && os.Args[1] == "--linux-broker" {
 		err = linuxBroker()
+	} else if len(os.Args) == 2 && os.Args[1] == "--check-linux-broker" {
+		err = checkLinuxBroker()
 	} else {
 		err = fmt.Errorf("arguments")
 	}

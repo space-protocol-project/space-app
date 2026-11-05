@@ -81,6 +81,7 @@ jobs:
           echo 'SPACE_CLIENT_WASM_BROKER_TEST=1' >> "$GITHUB_ENV"
           SPACE_CLIENT_WASM_BROKER_TEST=1 python tools/check_client_wasm_linux.py
           python tools/check_client_wasm_protocol.py
+          python tools/check_client_wasm_update.py
           cd native/space_client_wasm
           SPACE_CLIENT_WASM_BROKER_TEST=1 go test -race -v ./...
       - run: rustup toolchain install 1.99.1 --profile minimal
@@ -130,3 +131,4 @@ jobs:
             client-wasm-linux.json
             client-wasm-linux-quota.txt
             client-wasm-linux-protocol.json
+            client-wasm-linux-update.json
