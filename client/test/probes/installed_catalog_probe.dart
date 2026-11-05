@@ -168,13 +168,15 @@ Future<void> installGit(InstalledExtensionsCubit owner) async {
       'games',
     );
     final review = installer.state;
-    if (review is! GitReview || review.known)
+    if (review is! GitReview || review.known) {
       throw StateError('Git review ${installer.state}');
+    }
     await installer.confirm();
     if (installer.state is! GitReview) throw StateError('implicit consent');
     await installer.confirm(trustUnknown: true);
-    if (installer.state is! GitInstalled)
+    if (installer.state is! GitInstalled) {
       throw StateError('Git install ${installer.state}');
+    }
   } finally {
     await installer.close();
   }

@@ -1,4 +1,4 @@
-name: P1 установленные расширения и файловый процесс
+name: P1 установка клиентских расширений из Git
 on: workflow_dispatch
 permissions: {contents: read}
 jobs:
