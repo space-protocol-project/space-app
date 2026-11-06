@@ -151,3 +151,5 @@ Windows прошла нативные стенды аудио и перепод�
 Выпуск v0.7.16 добавляет жалобы, очередь и решения модератора с причиной и аудитом. Требуется runtime v0.7.13 со схемой 30 / `core.forum.reports.v1`. [Сценарий и ограничения](docs/FORUM.md), [полное приложение](docs/screenshots/forum-reports-app/README.md).
 
 [Клиентские WASM-расширения и пример «Игры»](https://github.com/space-protocol-project/space-protocol/blob/main/docs/SPACE-PLUGINS-CLIENT.md): целевая установка из Git в работающее приложение, локальные данные и разрешения устройства. Статус — проектирование; клиентский хост и CI-приёмка ещё предстоят.
+
+Продолжение E03: [проверка подписи и целостности образа перед запуском macOS VM](https://github.com/space-protocol-project/space-protocol/blob/main/docs/SPACE-PLUGINS-P1-MACOS-IMAGE.md). Релиз отложен до завершения согласованного плана; E03 и P1 остаются открытыми.
