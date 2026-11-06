@@ -153,3 +153,5 @@ Windows прошла нативные стенды аудио и перепод�
 [Клиентские WASM-расширения и пример «Игры»](https://github.com/space-protocol-project/space-protocol/blob/main/docs/SPACE-PLUGINS-CLIENT.md): целевая установка из Git в работающее приложение, локальные данные и разрешения устройства. Статус — проектирование; клиентский хост и CI-приёмка ещё предстоят.
 
 Продолжение E03: [проверка подписи и целостности образа перед запуском macOS VM](https://github.com/space-protocol-project/space-protocol/blob/main/docs/SPACE-PLUGINS-P1-MACOS-IMAGE.md). Релиз отложен до завершения согласованного плана; E03 и P1 остаются открытыми.
+
+Продолжение E03: [отдельный прототип Windows LPAC без capabilities](https://github.com/space-protocol-project/space-protocol/blob/main/docs/SPACE-PLUGINS-P1-WINDOWS-LPAC.md). Рабочее приложение пока не переключено на этот профиль; аварийная очистка и расширенная проверка прав остаются открытыми.
