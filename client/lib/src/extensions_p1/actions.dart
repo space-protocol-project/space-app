@@ -14,7 +14,8 @@ class ExtensionRunning extends ExtensionActionState {
 }
 
 class ExtensionFailed extends ExtensionActionState {
-  const ExtensionFailed();
+  const ExtensionFailed({this.handledByForm = false});
+  final bool handledByForm;
 }
 
 // Карта приходит из доверенной оболочки; она не является серверной авторизацией.
@@ -37,13 +38,18 @@ class ExtensionActions extends Cubit<ExtensionActionState> {
     return _run(
       command,
       action == null ? null : () => action(Map.unmodifiable(payload)),
+      handledByForm: true,
     );
   }
 
-  Future<bool> _run(String command, Future<void> Function()? action) async {
+  Future<bool> _run(
+    String command,
+    Future<void> Function()? action, {
+    bool handledByForm = false,
+  }) async {
     if (isClosed || state is ExtensionRunning) return false;
     if (action == null) {
-      emit(const ExtensionFailed());
+      emit(ExtensionFailed(handledByForm: handledByForm));
       return false;
     }
     emit(ExtensionRunning(command));
@@ -52,7 +58,7 @@ class ExtensionActions extends Cubit<ExtensionActionState> {
       if (!isClosed) emit(const ExtensionReady());
       return true;
     } catch (_) {
-      if (!isClosed) emit(const ExtensionFailed());
+      if (!isClosed) emit(ExtensionFailed(handledByForm: handledByForm));
       return false;
     }
   }

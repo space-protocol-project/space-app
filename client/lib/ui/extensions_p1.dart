@@ -35,7 +35,7 @@ class ExtensionPanel extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
-            if (state is ExtensionFailed)
+            if (state is ExtensionFailed && !state.handledByForm)
               Semantics(liveRegion: true, child: Text(errorText)),
             for (final node in document.body)
               _node(context, node, state is ExtensionRunning),

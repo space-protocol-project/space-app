@@ -9,6 +9,7 @@ import 'package:space_client/ui/extensions_p1.dart';
 
 import 'extensions_p1_form_test.dart' as forms;
 import 'extensions_p1_contributions_test.dart' as contributions;
+import 'extensions_p1_test.dart' as renderer;
 
 Widget panel(
   ExtensionActions actions, {
@@ -55,6 +56,19 @@ Future<void> fill(WidgetTester tester) async {
 }
 
 void main() {
+  testWidgets('E06: ошибка обычной кнопки остаётся видимой', (tester) async {
+    final actions = ExtensionActions({
+      'vote': () async => throw StateError('private failure'),
+    });
+    addTearDown(actions.close);
+    await tester.pumpWidget(
+      panel(actions, document: renderer.parse(renderer.source())),
+    );
+    await tester.tap(find.text('Проголосовать'));
+    await tester.pumpAndSettle();
+    expect(find.text('Повторите действие'), findsOneWidget);
+    expect(find.textContaining('private failure'), findsNothing);
+  });
   testWidgets('E06: contributions доступны с клавиатуры при 3x', (
     tester,
   ) async {
@@ -143,8 +157,8 @@ void main() {
           (widget) =>
               widget is Semantics && widget.properties.liveRegion == true,
         );
-        expect(announcements, findsWidgets);
-        expect(find.bySemanticsLabel('Повторите действие'), findsWidgets);
+        expect(announcements, findsOneWidget);
+        expect(find.bySemanticsLabel('Повторите действие'), findsOneWidget);
         await tester.tap(find.text('Отправить'));
         await tester.pumpAndSettle();
         expect(attempts, 2);
