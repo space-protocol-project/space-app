@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: space-protocol-project/space-server
-          ref: 681868587df81d07a9d3bf3cd3faf349a2c9fef5
+          ref: 0ceae688e620cf9966d24fac30c8b59c2b998d48
           path: .local/p1-server
       - uses: actions/setup-go@v5
         with:
@@ -111,7 +111,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: space-protocol-project/space-server
-          ref: 681868587df81d07a9d3bf3cd3faf349a2c9fef5
+          ref: 0ceae688e620cf9966d24fac30c8b59c2b998d48
           path: .local/p1-server
       - uses: actions/setup-go@v5
         with:
