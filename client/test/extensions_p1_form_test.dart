@@ -9,9 +9,13 @@ import 'package:space_client/src/extensions_p1/document.dart';
 import 'package:space_client/src/extensions_p1/form_cubit.dart';
 import 'package:space_client/ui/extensions_p1.dart';
 
-Map<String, dynamic> source() => jsonDecode(
-  File('test/fixtures/extensions_p1/ui-form.json').readAsStringSync(),
-) as Map<String, dynamic>;
+Map<String, dynamic> source() =>
+    jsonDecode(File('$fixtureRoot/ui-form.json').readAsStringSync())
+        as Map<String, dynamic>;
+const fixtureRoot = String.fromEnvironment(
+  'P1_FIXTURES',
+  defaultValue: 'test/fixtures/extensions_p1',
+);
 ExtensionDocument parse(Map<String, dynamic> value) =>
     ExtensionDocument.parse(utf8.encode(jsonEncode(value)), {'acknowledge'});
 ExtensionDocument document() => parse(source());

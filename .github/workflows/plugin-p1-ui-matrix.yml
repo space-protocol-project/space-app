@@ -1,0 +1,56 @@
+name: P1 E06 final UI matrix
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  forms:
+    uses: ./.github/workflows/plugin-p1-form.yml
+  contributions:
+    uses: ./.github/workflows/plugin-p1-contributions-client.yml
+  matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            device: linux
+          - os: windows-2025
+            device: windows
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - name: Нативные зависимости Linux
+        if: runner.os == 'Linux'
+        run: bash tools/install_contributions_linux_deps.sh clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb dbus-x11
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Анализ и полная матрица widget-тестов
+        working-directory: client
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test test/extensions_p1_test.dart test/extensions_p1_form_test.dart test/extensions_p1_ui_matrix_test.dart test/extensions_p1_contributions_test.dart --reporter expanded > ui-matrix-widget.txt
+      - name: Та же матрица в нативном движке Flutter
+        working-directory: client
+        run: |
+          fixture_root="$(pwd)/test/fixtures/extensions_p1"
+          if [ "$RUNNER_OS" = Windows ]; then
+            fixture_root="$(cygpath -m "$fixture_root")"
+            flutter test integration_test/extensions_p1_ui_matrix_test.dart -d windows --dart-define="P1_FIXTURES=$fixture_root" --reporter expanded > ui-matrix-native.txt 2>&1
+          else
+            dbus-run-session -- xvfb-run -a flutter test integration_test/extensions_p1_ui_matrix_test.dart -d linux --dart-define="P1_FIXTURES=$fixture_root" --reporter expanded > ui-matrix-native.txt 2>&1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-matrix-${{ matrix.device }}
+          path: |
+            client/ui-matrix-widget.txt
+            client/ui-matrix-native.txt
+          retention-days: 7
