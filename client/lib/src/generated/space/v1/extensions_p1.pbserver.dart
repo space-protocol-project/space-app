@@ -21,6 +21,9 @@ import 'extensions_p1.pbjson.dart';
 export 'extensions_p1.pb.dart';
 
 abstract class ExtensionP1ServiceBase extends $pb.GeneratedService {
+  $async.Future<$0.ListExtensionContributionsResponse>
+      listExtensionContributions(
+          $pb.ServerContext ctx, $0.ListExtensionContributionsRequest request);
   $async.Future<$0.QueryExtensionResponse> queryExtension(
       $pb.ServerContext ctx, $0.QueryExtensionRequest request);
   $async.Future<$0.ExecuteExtensionCommandResponse> executeExtensionCommand(
@@ -44,6 +47,8 @@ abstract class ExtensionP1ServiceBase extends $pb.GeneratedService {
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
+      case 'ListExtensionContributions':
+        return $0.ListExtensionContributionsRequest();
       case 'QueryExtension':
         return $0.QueryExtensionRequest();
       case 'ExecuteExtensionCommand':
@@ -68,6 +73,9 @@ abstract class ExtensionP1ServiceBase extends $pb.GeneratedService {
   $async.Future<$pb.GeneratedMessage> handleCall($pb.ServerContext ctx,
       $core.String methodName, $pb.GeneratedMessage request) {
     switch (methodName) {
+      case 'ListExtensionContributions':
+        return listExtensionContributions(
+            ctx, request as $0.ListExtensionContributionsRequest);
       case 'QueryExtension':
         return queryExtension(ctx, request as $0.QueryExtensionRequest);
       case 'ExecuteExtensionCommand':

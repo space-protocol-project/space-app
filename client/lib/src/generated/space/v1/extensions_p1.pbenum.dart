@@ -14,6 +14,33 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
+/// Тип элемента, а не разрешение на доступ к данным или нативному UI.
+class ExtensionContributionKind extends $pb.ProtobufEnum {
+  static const ExtensionContributionKind
+      EXTENSION_CONTRIBUTION_KIND_UNSPECIFIED = ExtensionContributionKind._(
+          0, _omitEnumNames ? '' : 'EXTENSION_CONTRIBUTION_KIND_UNSPECIFIED');
+  static const ExtensionContributionKind EXTENSION_CONTRIBUTION_KIND_OVERVIEW =
+      ExtensionContributionKind._(
+          1, _omitEnumNames ? '' : 'EXTENSION_CONTRIBUTION_KIND_OVERVIEW');
+  static const ExtensionContributionKind EXTENSION_CONTRIBUTION_KIND_SECTION =
+      ExtensionContributionKind._(
+          2, _omitEnumNames ? '' : 'EXTENSION_CONTRIBUTION_KIND_SECTION');
+
+  static const $core.List<ExtensionContributionKind> values =
+      <ExtensionContributionKind>[
+    EXTENSION_CONTRIBUTION_KIND_UNSPECIFIED,
+    EXTENSION_CONTRIBUTION_KIND_OVERVIEW,
+    EXTENSION_CONTRIBUTION_KIND_SECTION,
+  ];
+
+  static final $core.List<ExtensionContributionKind?> _byValue =
+      $pb.ProtobufEnum.$_initByValueList(values, 2);
+  static ExtensionContributionKind? valueOf($core.int value) =>
+      value < 0 || value >= _byValue.length ? null : _byValue[value];
+
+  const ExtensionContributionKind._(super.value, super.name);
+}
+
 class ExtensionCommandEffect extends $pb.ProtobufEnum {
   static const ExtensionCommandEffect EXTENSION_COMMAND_EFFECT_UNSPECIFIED =
       ExtensionCommandEffect._(

@@ -15,6 +15,22 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use extensionContributionKindDescriptor instead')
+const ExtensionContributionKind$json = {
+  '1': 'ExtensionContributionKind',
+  '2': [
+    {'1': 'EXTENSION_CONTRIBUTION_KIND_UNSPECIFIED', '2': 0},
+    {'1': 'EXTENSION_CONTRIBUTION_KIND_OVERVIEW', '2': 1},
+    {'1': 'EXTENSION_CONTRIBUTION_KIND_SECTION', '2': 2},
+  ],
+};
+
+/// Descriptor for `ExtensionContributionKind`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List extensionContributionKindDescriptor = $convert.base64Decode(
+    'ChlFeHRlbnNpb25Db250cmlidXRpb25LaW5kEisKJ0VYVEVOU0lPTl9DT05UUklCVVRJT05fS0'
+    'lORF9VTlNQRUNJRklFRBAAEigKJEVYVEVOU0lPTl9DT05UUklCVVRJT05fS0lORF9PVkVSVklF'
+    'VxABEicKI0VYVEVOU0lPTl9DT05UUklCVVRJT05fS0lORF9TRUNUSU9OEAI=');
+
 @$core.Deprecated('Use extensionCommandEffectDescriptor instead')
 const ExtensionCommandEffect$json = {
   '1': 'ExtensionCommandEffect',
@@ -46,6 +62,96 @@ final $typed_data.Uint8List extensionCommandOutcomeDescriptor = $convert.base64D
     'ChdFeHRlbnNpb25Db21tYW5kT3V0Y29tZRIpCiVFWFRFTlNJT05fQ09NTUFORF9PVVRDT01FX1'
     'VOU1BFQ0lGSUVEEAASJQohRVhURU5TSU9OX0NPTU1BTkRfT1VUQ09NRV9VTktOT1dOEAESJwoj'
     'RVhURU5TSU9OX0NPTU1BTkRfT1VUQ09NRV9DT05GSVJNRUQQAg==');
+
+@$core.Deprecated('Use extensionContributionDescriptor instead')
+const ExtensionContribution$json = {
+  '1': 'ExtensionContribution',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    {
+      '1': 'kind',
+      '3': 2,
+      '4': 1,
+      '5': 14,
+      '6': '.space.v1.ExtensionContributionKind',
+      '10': 'kind'
+    },
+    {
+      '1': 'title',
+      '3': 3,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.ExtensionContribution.TitleEntry',
+      '10': 'title'
+    },
+    {'1': 'query', '3': 4, '4': 1, '5': 9, '10': 'query'},
+  ],
+  '3': [ExtensionContribution_TitleEntry$json],
+};
+
+@$core.Deprecated('Use extensionContributionDescriptor instead')
+const ExtensionContribution_TitleEntry$json = {
+  '1': 'TitleEntry',
+  '2': [
+    {'1': 'key', '3': 1, '4': 1, '5': 9, '10': 'key'},
+    {'1': 'value', '3': 2, '4': 1, '5': 9, '10': 'value'},
+  ],
+  '7': {'7': true},
+};
+
+/// Descriptor for `ExtensionContribution`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List extensionContributionDescriptor = $convert.base64Decode(
+    'ChVFeHRlbnNpb25Db250cmlidXRpb24SDgoCaWQYASABKAlSAmlkEjcKBGtpbmQYAiABKA4yIy'
+    '5zcGFjZS52MS5FeHRlbnNpb25Db250cmlidXRpb25LaW5kUgRraW5kEkAKBXRpdGxlGAMgAygL'
+    'Miouc3BhY2UudjEuRXh0ZW5zaW9uQ29udHJpYnV0aW9uLlRpdGxlRW50cnlSBXRpdGxlEhQKBX'
+    'F1ZXJ5GAQgASgJUgVxdWVyeRo4CgpUaXRsZUVudHJ5EhAKA2tleRgBIAEoCVIDa2V5EhQKBXZh'
+    'bHVlGAIgASgJUgV2YWx1ZToCOAE=');
+
+@$core.Deprecated('Use listExtensionContributionsRequestDescriptor instead')
+const ListExtensionContributionsRequest$json = {
+  '1': 'ListExtensionContributionsRequest',
+  '2': [
+    {'1': 'instance_id', '3': 1, '4': 1, '5': 9, '10': 'instanceId'},
+    {
+      '1': 'kind',
+      '3': 2,
+      '4': 1,
+      '5': 14,
+      '6': '.space.v1.ExtensionContributionKind',
+      '10': 'kind'
+    },
+  ],
+};
+
+/// Descriptor for `ListExtensionContributionsRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listExtensionContributionsRequestDescriptor =
+    $convert.base64Decode(
+        'CiFMaXN0RXh0ZW5zaW9uQ29udHJpYnV0aW9uc1JlcXVlc3QSHwoLaW5zdGFuY2VfaWQYASABKA'
+        'lSCmluc3RhbmNlSWQSNwoEa2luZBgCIAEoDjIjLnNwYWNlLnYxLkV4dGVuc2lvbkNvbnRyaWJ1'
+        'dGlvbktpbmRSBGtpbmQ=');
+
+@$core.Deprecated('Use listExtensionContributionsResponseDescriptor instead')
+const ListExtensionContributionsResponse$json = {
+  '1': 'ListExtensionContributionsResponse',
+  '2': [
+    {
+      '1': 'contributions',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.space.v1.ExtensionContribution',
+      '10': 'contributions'
+    },
+    {'1': 'registry_sha256', '3': 2, '4': 1, '5': 12, '10': 'registrySha256'},
+  ],
+};
+
+/// Descriptor for `ListExtensionContributionsResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listExtensionContributionsResponseDescriptor =
+    $convert.base64Decode(
+        'CiJMaXN0RXh0ZW5zaW9uQ29udHJpYnV0aW9uc1Jlc3BvbnNlEkUKDWNvbnRyaWJ1dGlvbnMYAS'
+        'ADKAsyHy5zcGFjZS52MS5FeHRlbnNpb25Db250cmlidXRpb25SDWNvbnRyaWJ1dGlvbnMSJwoP'
+        'cmVnaXN0cnlfc2hhMjU2GAIgASgMUg5yZWdpc3RyeVNoYTI1Ng==');
 
 @$core.Deprecated('Use extensionInstallationDescriptor instead')
 const ExtensionInstallation$json = {
@@ -556,6 +662,11 @@ const $core.Map<$core.String, $core.dynamic> ExtensionP1ServiceBase$json = {
   '1': 'ExtensionP1Service',
   '2': [
     {
+      '1': 'ListExtensionContributions',
+      '2': '.space.v1.ListExtensionContributionsRequest',
+      '3': '.space.v1.ListExtensionContributionsResponse'
+    },
+    {
       '1': 'QueryExtension',
       '2': '.space.v1.QueryExtensionRequest',
       '3': '.space.v1.QueryExtensionResponse'
@@ -601,6 +712,13 @@ const $core.Map<$core.String, $core.dynamic> ExtensionP1ServiceBase$json = {
 @$core.Deprecated('Use extensionP1ServiceDescriptor instead')
 const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
     ExtensionP1ServiceBase$messageJson = {
+  '.space.v1.ListExtensionContributionsRequest':
+      ListExtensionContributionsRequest$json,
+  '.space.v1.ListExtensionContributionsResponse':
+      ListExtensionContributionsResponse$json,
+  '.space.v1.ExtensionContribution': ExtensionContribution$json,
+  '.space.v1.ExtensionContribution.TitleEntry':
+      ExtensionContribution_TitleEntry$json,
   '.space.v1.QueryExtensionRequest': QueryExtensionRequest$json,
   '.space.v1.QueryExtensionResponse': QueryExtensionResponse$json,
   '.space.v1.ExecuteExtensionCommandRequest':
@@ -638,21 +756,23 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
 
 /// Descriptor for `ExtensionP1Service`. Decode as a `google.protobuf.ServiceDescriptorProto`.
 final $typed_data.Uint8List extensionP1ServiceDescriptor = $convert.base64Decode(
-    'ChJFeHRlbnNpb25QMVNlcnZpY2USUwoOUXVlcnlFeHRlbnNpb24SHy5zcGFjZS52MS5RdWVyeU'
-    'V4dGVuc2lvblJlcXVlc3QaIC5zcGFjZS52MS5RdWVyeUV4dGVuc2lvblJlc3BvbnNlEm4KF0V4'
-    'ZWN1dGVFeHRlbnNpb25Db21tYW5kEiguc3BhY2UudjEuRXhlY3V0ZUV4dGVuc2lvbkNvbW1hbm'
-    'RSZXF1ZXN0Gikuc3BhY2UudjEuRXhlY3V0ZUV4dGVuc2lvbkNvbW1hbmRSZXNwb25zZRJ0ChlS'
-    'ZWNvbmNpbGVFeHRlbnNpb25Db21tYW5kEiouc3BhY2UudjEuUmVjb25jaWxlRXh0ZW5zaW9uQ2'
-    '9tbWFuZFJlcXVlc3QaKy5zcGFjZS52MS5SZWNvbmNpbGVFeHRlbnNpb25Db21tYW5kUmVzcG9u'
-    'c2USegobR2V0RXh0ZW5zaW9uTXV0YXRpb25Db250ZXh0Eiwuc3BhY2UudjEuR2V0RXh0ZW5zaW'
-    '9uTXV0YXRpb25Db250ZXh0UmVxdWVzdBotLnNwYWNlLnYxLkdldEV4dGVuc2lvbk11dGF0aW9u'
-    'Q29udGV4dFJlc3BvbnNlEncKGkxpc3RFeHRlbnNpb25JbnN0YWxsYXRpb25zEisuc3BhY2Uudj'
-    'EuTGlzdEV4dGVuc2lvbkluc3RhbGxhdGlvbnNSZXF1ZXN0Giwuc3BhY2UudjEuTGlzdEV4dGVu'
-    'c2lvbkluc3RhbGxhdGlvbnNSZXNwb25zZRJxChhHZXRFeHRlbnNpb25JbnN0YWxsYXRpb24SKS'
-    '5zcGFjZS52MS5HZXRFeHRlbnNpb25JbnN0YWxsYXRpb25SZXF1ZXN0Giouc3BhY2UudjEuR2V0'
-    'RXh0ZW5zaW9uSW5zdGFsbGF0aW9uUmVzcG9uc2USegobQ2hhbmdlRXh0ZW5zaW9uSW5zdGFsbG'
-    'F0aW9uEiwuc3BhY2UudjEuQ2hhbmdlRXh0ZW5zaW9uSW5zdGFsbGF0aW9uUmVxdWVzdBotLnNw'
-    'YWNlLnYxLkNoYW5nZUV4dGVuc2lvbkluc3RhbGxhdGlvblJlc3BvbnNlEoMBCh5MaXN0RXh0ZW'
-    '5zaW9uSW5zdGFsbGF0aW9uQXVkaXQSLy5zcGFjZS52MS5MaXN0RXh0ZW5zaW9uSW5zdGFsbGF0'
-    'aW9uQXVkaXRSZXF1ZXN0GjAuc3BhY2UudjEuTGlzdEV4dGVuc2lvbkluc3RhbGxhdGlvbkF1ZG'
-    'l0UmVzcG9uc2U=');
+    'ChJFeHRlbnNpb25QMVNlcnZpY2USdwoaTGlzdEV4dGVuc2lvbkNvbnRyaWJ1dGlvbnMSKy5zcG'
+    'FjZS52MS5MaXN0RXh0ZW5zaW9uQ29udHJpYnV0aW9uc1JlcXVlc3QaLC5zcGFjZS52MS5MaXN0'
+    'RXh0ZW5zaW9uQ29udHJpYnV0aW9uc1Jlc3BvbnNlElMKDlF1ZXJ5RXh0ZW5zaW9uEh8uc3BhY2'
+    'UudjEuUXVlcnlFeHRlbnNpb25SZXF1ZXN0GiAuc3BhY2UudjEuUXVlcnlFeHRlbnNpb25SZXNw'
+    'b25zZRJuChdFeGVjdXRlRXh0ZW5zaW9uQ29tbWFuZBIoLnNwYWNlLnYxLkV4ZWN1dGVFeHRlbn'
+    'Npb25Db21tYW5kUmVxdWVzdBopLnNwYWNlLnYxLkV4ZWN1dGVFeHRlbnNpb25Db21tYW5kUmVz'
+    'cG9uc2USdAoZUmVjb25jaWxlRXh0ZW5zaW9uQ29tbWFuZBIqLnNwYWNlLnYxLlJlY29uY2lsZU'
+    'V4dGVuc2lvbkNvbW1hbmRSZXF1ZXN0Gisuc3BhY2UudjEuUmVjb25jaWxlRXh0ZW5zaW9uQ29t'
+    'bWFuZFJlc3BvbnNlEnoKG0dldEV4dGVuc2lvbk11dGF0aW9uQ29udGV4dBIsLnNwYWNlLnYxLk'
+    'dldEV4dGVuc2lvbk11dGF0aW9uQ29udGV4dFJlcXVlc3QaLS5zcGFjZS52MS5HZXRFeHRlbnNp'
+    'b25NdXRhdGlvbkNvbnRleHRSZXNwb25zZRJ3ChpMaXN0RXh0ZW5zaW9uSW5zdGFsbGF0aW9ucx'
+    'IrLnNwYWNlLnYxLkxpc3RFeHRlbnNpb25JbnN0YWxsYXRpb25zUmVxdWVzdBosLnNwYWNlLnYx'
+    'Lkxpc3RFeHRlbnNpb25JbnN0YWxsYXRpb25zUmVzcG9uc2UScQoYR2V0RXh0ZW5zaW9uSW5zdG'
+    'FsbGF0aW9uEikuc3BhY2UudjEuR2V0RXh0ZW5zaW9uSW5zdGFsbGF0aW9uUmVxdWVzdBoqLnNw'
+    'YWNlLnYxLkdldEV4dGVuc2lvbkluc3RhbGxhdGlvblJlc3BvbnNlEnoKG0NoYW5nZUV4dGVuc2'
+    'lvbkluc3RhbGxhdGlvbhIsLnNwYWNlLnYxLkNoYW5nZUV4dGVuc2lvbkluc3RhbGxhdGlvblJl'
+    'cXVlc3QaLS5zcGFjZS52MS5DaGFuZ2VFeHRlbnNpb25JbnN0YWxsYXRpb25SZXNwb25zZRKDAQ'
+    'oeTGlzdEV4dGVuc2lvbkluc3RhbGxhdGlvbkF1ZGl0Ei8uc3BhY2UudjEuTGlzdEV4dGVuc2lv'
+    'bkluc3RhbGxhdGlvbkF1ZGl0UmVxdWVzdBowLnNwYWNlLnYxLkxpc3RFeHRlbnNpb25JbnN0YW'
+    'xsYXRpb25BdWRpdFJlc3BvbnNl');

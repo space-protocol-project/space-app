@@ -21,12 +21,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: space-protocol-project/space-server
-          ref: 31a9ee557467b5c493e532ff94102611f6df757d
+          ref: e2fddda476d3335538ef0301ad4c5dfc8befb622
           path: .local/p1-server
       - uses: actions/checkout@v4
         with:
           repository: space-protocol-project/space-protocol
-          ref: 4df076de4033f37a64d80cb76ea31f4c36c6e2e0
+          ref: 484f1eba6e1fb710756a20d4ce3a98e360a54b29
           path: .local/p1-protocol
       - uses: actions/setup-go@v5
         with:

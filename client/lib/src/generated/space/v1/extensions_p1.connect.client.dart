@@ -9,6 +9,23 @@ import "extensions_p1.connect.spec.dart" as specs;
 
 /// Эксперимент P1. Отдельная регистрация, без публичной capability v1.
 extension type ExtensionP1ServiceClient (connect.Transport _transport) {
+  Future<spacev1extensions_p1.ListExtensionContributionsResponse> listExtensionContributions(
+    spacev1extensions_p1.ListExtensionContributionsRequest input, {
+    connect.Headers? headers,
+    connect.AbortSignal? signal,
+    Function(connect.Headers)? onHeader,
+    Function(connect.Headers)? onTrailer,
+  }) {
+    return connect.Client(_transport).unary(
+      specs.ExtensionP1Service.listExtensionContributions,
+      input,
+      signal: signal,
+      headers: headers,
+      onHeader: onHeader,
+      onTrailer: onTrailer,
+    );
+  }
+
   Future<spacev1extensions_p1.QueryExtensionResponse> queryExtension(
     spacev1extensions_p1.QueryExtensionRequest input, {
     connect.Headers? headers,

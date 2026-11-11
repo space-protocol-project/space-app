@@ -11,6 +11,13 @@ abstract final class ExtensionP1Service {
   /// Fully-qualified name of the ExtensionP1Service service.
   static const name = 'space.v1.ExtensionP1Service';
 
+  static const listExtensionContributions = connect.Spec(
+    '/$name/ListExtensionContributions',
+    connect.StreamType.unary,
+    spacev1extensions_p1.ListExtensionContributionsRequest.new,
+    spacev1extensions_p1.ListExtensionContributionsResponse.new,
+  );
+
   static const queryExtension = connect.Spec(
     '/$name/QueryExtension',
     connect.StreamType.unary,

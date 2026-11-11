@@ -22,6 +22,251 @@ export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 export 'extensions_p1.pbenum.dart';
 
+class ExtensionContribution extends $pb.GeneratedMessage {
+  factory ExtensionContribution({
+    $core.String? id,
+    ExtensionContributionKind? kind,
+    $core.Iterable<$core.MapEntry<$core.String, $core.String>>? title,
+    $core.String? query,
+  }) {
+    final result = ExtensionContribution._();
+    if (id != null) result.id = id;
+    if (kind != null) result.kind = kind;
+    if (title != null) result.title.addEntries(title);
+    if (query != null) result.query = query;
+    return result;
+  }
+
+  ExtensionContribution._();
+
+  factory ExtensionContribution.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ExtensionContribution()..mergeFromBuffer(data, registry);
+  factory ExtensionContribution.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ExtensionContribution()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ExtensionContribution',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ExtensionContribution.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'id')
+    ..aE<ExtensionContributionKind>(2, _omitFieldNames ? '' : 'kind',
+        enumValues: ExtensionContributionKind.values)
+    ..m<$core.String, $core.String>(3, _omitFieldNames ? '' : 'title',
+        entryClassName: 'ExtensionContribution.TitleEntry',
+        keyFieldType: $pb.PbFieldType.OS,
+        valueFieldType: $pb.PbFieldType.OS,
+        packageName: const $pb.PackageName('space.v1'))
+    ..aOS(4, _omitFieldNames ? '' : 'query')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ExtensionContribution clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ExtensionContribution copyWith(
+          void Function(ExtensionContribution) updates) =>
+      super.copyWith((message) => updates(message as ExtensionContribution))
+          as ExtensionContribution;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ExtensionContribution() / ExtensionContribution.new instead')
+  static ExtensionContribution create() => ExtensionContribution._();
+  static $pb.GeneratedMessage $_createMessage() => ExtensionContribution._();
+  @$core.override
+  ExtensionContribution createEmptyInstance() => ExtensionContribution._();
+  @$core.pragma('dart2js:noInline')
+  static ExtensionContribution getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ExtensionContribution>(
+          ExtensionContribution.$_createMessage);
+  static ExtensionContribution? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  ExtensionContributionKind get kind => $_getN(1);
+  @$pb.TagNumber(2)
+  set kind(ExtensionContributionKind value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasKind() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearKind() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $pb.PbMap<$core.String, $core.String> get title => $_getMap(2);
+
+  @$pb.TagNumber(4)
+  $core.String get query => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set query($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasQuery() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearQuery() => $_clearField(4);
+}
+
+/// Чтение конкретного экземпляра: сессия, read ACL и enabled lifecycle.
+/// Пустой instance_id не означает перечисление всего пространства.
+class ListExtensionContributionsRequest extends $pb.GeneratedMessage {
+  factory ListExtensionContributionsRequest({
+    $core.String? instanceId,
+    ExtensionContributionKind? kind,
+  }) {
+    final result = ListExtensionContributionsRequest._();
+    if (instanceId != null) result.instanceId = instanceId;
+    if (kind != null) result.kind = kind;
+    return result;
+  }
+
+  ListExtensionContributionsRequest._();
+
+  factory ListExtensionContributionsRequest.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListExtensionContributionsRequest()..mergeFromBuffer(data, registry);
+  factory ListExtensionContributionsRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListExtensionContributionsRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListExtensionContributionsRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListExtensionContributionsRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'instanceId')
+    ..aE<ExtensionContributionKind>(2, _omitFieldNames ? '' : 'kind',
+        enumValues: ExtensionContributionKind.values)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListExtensionContributionsRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListExtensionContributionsRequest copyWith(
+          void Function(ListExtensionContributionsRequest) updates) =>
+      super.copyWith((message) =>
+              updates(message as ListExtensionContributionsRequest))
+          as ListExtensionContributionsRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListExtensionContributionsRequest() / ListExtensionContributionsRequest.new instead')
+  static ListExtensionContributionsRequest create() =>
+      ListExtensionContributionsRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ListExtensionContributionsRequest._();
+  @$core.override
+  ListExtensionContributionsRequest createEmptyInstance() =>
+      ListExtensionContributionsRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ListExtensionContributionsRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListExtensionContributionsRequest>(
+          ListExtensionContributionsRequest.$_createMessage);
+  static ListExtensionContributionsRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get instanceId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set instanceId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasInstanceId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearInstanceId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  ExtensionContributionKind get kind => $_getN(1);
+  @$pb.TagNumber(2)
+  set kind(ExtensionContributionKind value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasKind() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearKind() => $_clearField(2);
+}
+
+class ListExtensionContributionsResponse extends $pb.GeneratedMessage {
+  factory ListExtensionContributionsResponse({
+    $core.Iterable<ExtensionContribution>? contributions,
+    $core.List<$core.int>? registrySha256,
+  }) {
+    final result = ListExtensionContributionsResponse._();
+    if (contributions != null) result.contributions.addAll(contributions);
+    if (registrySha256 != null) result.registrySha256 = registrySha256;
+    return result;
+  }
+
+  ListExtensionContributionsResponse._();
+
+  factory ListExtensionContributionsResponse.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListExtensionContributionsResponse()..mergeFromBuffer(data, registry);
+  factory ListExtensionContributionsResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListExtensionContributionsResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ListExtensionContributionsResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'space.v1'),
+      createEmptyInstance: ListExtensionContributionsResponse.$_createMessage)
+    ..pPM<ExtensionContribution>(1, _omitFieldNames ? '' : 'contributions',
+        subBuilder: ExtensionContribution.$_createMessage)
+    ..a<$core.List<$core.int>>(
+        2, _omitFieldNames ? '' : 'registrySha256', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListExtensionContributionsResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListExtensionContributionsResponse copyWith(
+          void Function(ListExtensionContributionsResponse) updates) =>
+      super.copyWith((message) =>
+              updates(message as ListExtensionContributionsResponse))
+          as ListExtensionContributionsResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ListExtensionContributionsResponse() / ListExtensionContributionsResponse.new instead')
+  static ListExtensionContributionsResponse create() =>
+      ListExtensionContributionsResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      ListExtensionContributionsResponse._();
+  @$core.override
+  ListExtensionContributionsResponse createEmptyInstance() =>
+      ListExtensionContributionsResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ListExtensionContributionsResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListExtensionContributionsResponse>(
+          ListExtensionContributionsResponse.$_createMessage);
+  static ListExtensionContributionsResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<ExtensionContribution> get contributions => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get registrySha256 => $_getN(1);
+  @$pb.TagNumber(2)
+  set registrySha256($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasRegistrySha256() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRegistrySha256() => $_clearField(2);
+}
+
 /// Административный API P1: текущая сессия с space.manage, владелец и manage ACL
 /// всех каналов установки. Не устанавливает пакеты и не принимает роль system.
 class ExtensionInstallation extends $pb.GeneratedMessage {
@@ -2010,6 +2255,14 @@ class ExtensionP1ServiceApi {
 
   ExtensionP1ServiceApi(this._client);
 
+  $async.Future<ListExtensionContributionsResponse> listExtensionContributions(
+          $pb.ClientContext? ctx, ListExtensionContributionsRequest request) =>
+      _client.invoke<ListExtensionContributionsResponse>(
+          ctx,
+          'ExtensionP1Service',
+          'ListExtensionContributions',
+          request,
+          ListExtensionContributionsResponse());
   $async.Future<QueryExtensionResponse> queryExtension(
           $pb.ClientContext? ctx, QueryExtensionRequest request) =>
       _client.invoke<QueryExtensionResponse>(ctx, 'ExtensionP1Service',
