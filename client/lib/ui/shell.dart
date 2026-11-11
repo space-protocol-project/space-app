@@ -1224,6 +1224,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
         setState(() => selectedVoiceRooms[controller.knownOrigin] = channel);
         select(Section.rooms);
       case 'space.discussions':
+        select(Section.forum);
         showCommunityTarget(
           DashboardCommunityTarget(
             origin: controller.knownOrigin,
@@ -1232,6 +1233,7 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
           ),
         );
       case 'space.feed':
+        select(Section.feed);
         showCommunityTarget(
           DashboardCommunityTarget(
             origin: controller.knownOrigin,

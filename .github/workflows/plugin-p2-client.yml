@@ -18,13 +18,16 @@ jobs:
       - uses: subosito/flutter-action@v2
         with: {flutter-version: '3.47.8', channel: stable, cache: true}
       - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Нативные зависимости Linux
+        if: runner.os == 'Linux'
+        run: bash tools/install_contributions_linux_deps.sh clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev
       - run: flutter pub get
         working-directory: client
       - run: flutter analyze --no-pub
         working-directory: client
       - name: Cubit, виджет, защита допуска и ограниченные повторы
         working-directory: client
-        run: flutter test --no-pub test/builtin_test.dart
+        run: flutter test --no-pub test/builtin_test.dart test/shell_test.dart test/rpc_connection_test.dart test/rpc_budget_test.dart
   core:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -62,6 +65,9 @@ jobs:
           go test -race ./internal/postgres -run '^TestBuiltinRegistry' -count=1
           go vet ./internal/postgres
           go mod verify
+      - name: Нативные зависимости Linux
+        if: runner.os == 'Linux'
+        run: bash tools/install_contributions_linux_deps.sh clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev
       - run: flutter pub get
         working-directory: client
       - name: Запись, потерянный ответ, ACL и отзыв сессии
