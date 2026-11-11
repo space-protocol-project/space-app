@@ -3,15 +3,29 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:space_client/src/extensions_p1/actions.dart';
 import 'package:space_client/src/extensions_p1/document.dart';
+import 'package:space_client/src/extensions_p1/contributions_cubit.dart';
+import 'package:space_client/ui/extension_contributions.dart';
 import 'package:space_client/ui/extensions_p1.dart';
 
 import 'extensions_p1_form_test.dart' as forms;
+import 'extensions_p1_contributions_test.dart' as contributions;
 
 Widget panel(
   ExtensionActions actions, {
   ExtensionDocument? document,
   double scale = 1,
-}) => MaterialApp(
+}) => sizedApp(
+  ExtensionPanel(
+    document: document ?? forms.document(),
+    actions: actions,
+    locale: 'ru',
+    originLabel: 'Расширение: форма',
+    errorText: 'Повторите действие',
+  ),
+  scale: scale,
+);
+
+Widget sizedApp(Widget child, {double scale = 1}) => MaterialApp(
   builder: (context, child) => Align(
     alignment: Alignment.topLeft,
     child: SizedBox(
@@ -24,15 +38,7 @@ Widget panel(
       ),
     ),
   ),
-  home: Scaffold(
-    body: ExtensionPanel(
-      document: document ?? forms.document(),
-      actions: actions,
-      locale: 'ru',
-      originLabel: 'Расширение: форма',
-      errorText: 'Повторите действие',
-    ),
-  ),
+  home: Scaffold(body: child),
 );
 
 Future<void> key(WidgetTester tester, LogicalKeyboardKey value) async {
@@ -49,6 +55,43 @@ Future<void> fill(WidgetTester tester) async {
 }
 
 void main() {
+  testWidgets('E06: contributions доступны с клавиатуры при 3x', (
+    tester,
+  ) async {
+    final transport = contributions.FakeContributions();
+    transport.response.contributions.last.title['en'] =
+        'Long extension section title';
+    final cubit = ContributionsCubit(transport);
+    final actions = ExtensionActions({});
+    addTearDown(cubit.close);
+    addTearDown(actions.close);
+    final semantics = tester.ensureSemantics();
+    try {
+      await cubit.load();
+      await tester.pumpWidget(
+        sizedApp(
+          ExtensionContributionsView(cubit: cubit, actions: actions),
+          scale: 3,
+        ),
+      );
+      expect(
+        find.bySemanticsLabel(RegExp('Long extension section title')),
+        findsOneWidget,
+      );
+      await key(tester, LogicalKeyboardKey.tab);
+      await key(tester, LogicalKeyboardKey.tab);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(transport.queries, ['details']);
+      transport.pending.single.complete(contributions.document('Содержимое'));
+      await tester.pumpAndSettle();
+      expect(find.text('Содержимое'), findsOneWidget);
+      expect(find.bySemanticsLabel('К списку'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    } finally {
+      semantics.dispose();
+    }
+  });
   testWidgets('E06: клавиатура проходит все поля и отправляет форму', (
     tester,
   ) async {
