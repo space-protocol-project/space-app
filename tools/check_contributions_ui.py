@@ -7,24 +7,25 @@ from check_community_ui import FlutterMachine
 
 out = Path('.local/p1-contributions-client')
 private = out / 'private'
-config = json.loads((private / 'connection.json').read_text())
+config = json.loads((private / 'connection.json').read_text(encoding='utf-8'))
 os.environ['P1_CONTRIBUTIONS_URL'] = config['url']
 os.environ['P1_CONTRIBUTIONS_AUTH'] = config['authorization']
 
 def change(command):
     temporary = private / 'next-control'
-    temporary.write_text(command)
+    temporary.write_text(command, encoding='ascii')
     temporary.replace(private / 'control')
     deadline = time.monotonic() + 10
     while time.monotonic() < deadline:
         complete = private / 'completed'
-        if complete.exists() and complete.read_text() == command:
+        if complete.exists() and complete.read_text(encoding='ascii') == command:
             return
         time.sleep(.05)
     raise RuntimeError('Стенд не подтвердил изменение')
 
 with (out / 'native-ui.log').open('w', encoding='utf-8') as log:
-    machine = FlutterMachine(Path('client'), log, 'test/probes/contributions_probe.dart', device='linux')
+    machine = FlutterMachine(Path('client'), log, 'test/probes/contributions_probe.dart',
+                             device='windows' if os.name == 'nt' else 'linux')
     try:
         machine.wait(lambda _: machine.app is not None and machine.ready >= 1)
         machine.driver('set_frame_sync', enabled='false')
@@ -63,5 +64,6 @@ with (out / 'native-ui.log').open('w', encoding='utf-8') as log:
 (out / 'native-result.json').write_text(json.dumps({
     'overview_and_section_twice': 'passed', 'hot_reload': 'passed', 'hot_restart': 'passed',
     'acl_revoke_before_open': 'passed', 'restore_and_retry': 'passed', 'logout_before_list': 'passed',
-    'transport': 'Connect / PostgreSQL / isolated WASM', 'platform': 'linux',
-}) + '\n')
+    'transport': 'Connect / PostgreSQL / isolated WASM',
+    'platform': 'windows' if os.name == 'nt' else 'linux',
+}) + '\n', encoding='utf-8')

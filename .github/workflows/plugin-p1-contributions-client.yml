@@ -40,6 +40,55 @@ jobs:
           name: contributions-${{ matrix.os }}
           path: client/contributions-tests.txt
           retention-days: 7
+  native-windows:
+    runs-on: windows-2025
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: f12558aecaa8901685cb44a1f7b6b77a2b7ad6fd
+          path: .local/p1-server
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .local/p1-server/go.mod
+          cache-dependency-path: |
+            .local/p1-server/go.sum
+            .local/p1-server/experiments/extensions/go.sum
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Сборка ядра с race и WASM-worker для Windows
+        shell: pwsh
+        run: |
+          $nativeBin = Join-Path $env:GITHUB_WORKSPACE '.local/p1-native-bin'
+          New-Item -ItemType Directory -Path $nativeBin -Force | Out-Null
+          Push-Location .local/p1-server
+          go test -race -c -o "$nativeBin/space-contributions-fixture.exe" ./internal/postgres
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Push-Location experiments/extensions
+          go build -o "$nativeBin/space-contributions-worker.exe" ./cmd/p1-worker
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Pop-Location
+          Pop-Location
+      - run: flutter pub get
+        working-directory: client
+      - name: Нативный список, открытие, ACL, сессия и перезапуск Windows
+        run: python tools/run_contributions_ui.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: contributions-native-windows
+          include-hidden-files: true
+          path: |
+            .local/p1-contributions-client/native-result.json
+            .local/p1-contributions-client/native-ui.log
+            .local/p1-contributions-client/server.log
+            .local/p1-contributions-client/postgres.log
+            .local/p1-contributions-client/postgres-source.json
+            .local/p1-contributions-client/postgres-stop.json
+          retention-days: 7
   native:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
