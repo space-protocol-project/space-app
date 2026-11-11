@@ -30,7 +30,7 @@ jobs:
         run: flutter test --no-pub test/builtin_test.dart test/shell_test.dart test/rpc_connection_test.dart test/rpc_budget_test.dart
   core:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 45
     services:
       postgres:
         image: postgres:17.11
@@ -70,6 +70,9 @@ jobs:
         run: bash tools/install_contributions_linux_deps.sh clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev
       - run: flutter pub get
         working-directory: client
+      - name: Холодная сборка клиента до выдачи временной сессии
+        working-directory: client
+        run: flutter test --no-pub test/builtin_test.dart
       - name: Запись, потерянный ответ, ACL и отзыв сессии
         run: python3 tools/run_builtin_client_ci.py
       - uses: actions/upload-artifact@v4
