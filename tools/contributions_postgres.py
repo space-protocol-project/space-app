@@ -38,18 +38,24 @@ def binaries(out):
 
 
 @contextmanager
-def windows_database(out, private):
+def windows_database(out):
     directory = binaries(out)
     data = out / 'postgres-data'
-    password_file = private / 'postgres-password'
+    # initdb перезапускается с ограниченным Windows-токеном. Одноразовый файл
+    # наследует ACL каталога CI и удаляется сразу после инициализации.
+    # Каталог с токеном сессии ядра остаётся закрытым.
+    password_file = out / 'postgres-bootstrap-password'
     password = secrets.token_hex(32)
     password_file.write_text(password, encoding='ascii')
     control = [str(directory / 'pg_ctl.exe'), '-D', str(data)]
     started = False
     try:
-        subprocess.run([str(directory / 'initdb.exe'), '-D', str(data), '-U', 'space',
-                        '--encoding=UTF8', '--locale=C', '--auth=scram-sha-256',
-                        '--pwfile=' + str(password_file)], check=True)
+        try:
+            subprocess.run([str(directory / 'initdb.exe'), '-D', str(data), '-U', 'space',
+                            '--encoding=UTF8', '--locale=C', '--auth=scram-sha-256',
+                            '--pwfile=' + str(password_file)], check=True)
+        finally:
+            password_file.unlink(missing_ok=True)
         with socket.socket() as reservation:
             reservation.bind(('127.0.0.1', 0))
             port = reservation.getsockname()[1]
@@ -68,9 +74,9 @@ def windows_database(out, private):
 
 
 @contextmanager
-def database(out, private):
+def database(out):
     if os.name == 'nt':
-        with windows_database(out, private) as url:
+        with windows_database(out) as url:
             yield url
     else:
         yield os.environ['SPACE_TEST_DATABASE_URL']

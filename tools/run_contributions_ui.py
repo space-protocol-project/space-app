@@ -79,7 +79,7 @@ def main():
     out = Path('.local/p1-contributions-client').resolve()
     private = out / 'private'
     private.mkdir(parents=True, mode=0o700)
-    with database(out, private) as url:
+    with database(out) as url:
         run_native(out, private, url)
 
 
