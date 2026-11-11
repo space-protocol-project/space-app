@@ -17,9 +17,10 @@ class ExtensionDemoView extends StatefulWidget {
 }
 
 class _ExtensionDemoViewState extends State<ExtensionDemoView> {
-  late final actions = ExtensionActions({
-    'acknowledge': widget.session.acknowledge,
-  });
+  late final actions = ExtensionActions(
+    {'acknowledge': widget.session.acknowledge},
+    forms: {'acknowledge': widget.session.submit},
+  );
 
   @override
   void initState() {

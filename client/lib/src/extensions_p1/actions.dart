@@ -19,24 +19,41 @@ class ExtensionFailed extends ExtensionActionState {
 
 // Карта приходит из доверенной оболочки; она не является серверной авторизацией.
 class ExtensionActions extends Cubit<ExtensionActionState> {
-  ExtensionActions(Map<String, Future<void> Function()> commands)
-    : commands = Map.unmodifiable(commands),
-      super(const ExtensionReady());
+  ExtensionActions(
+    Map<String, Future<void> Function()> commands, {
+    Map<String, Future<void> Function(Map<String, Object>)> forms = const {},
+  }) : commands = Map.unmodifiable(commands),
+       forms = Map.unmodifiable(forms),
+       super(const ExtensionReady());
   final Map<String, Future<void> Function()> commands;
+  final Map<String, Future<void> Function(Map<String, Object>)> forms;
 
   Future<void> invoke(String command) async {
-    if (isClosed || state is ExtensionRunning) return;
-    final action = commands[command];
+    await _run(command, commands[command]);
+  }
+
+  Future<bool> submit(String command, Map<String, Object> payload) {
+    final action = forms[command];
+    return _run(
+      command,
+      action == null ? null : () => action(Map.unmodifiable(payload)),
+    );
+  }
+
+  Future<bool> _run(String command, Future<void> Function()? action) async {
+    if (isClosed || state is ExtensionRunning) return false;
     if (action == null) {
       emit(const ExtensionFailed());
-      return;
+      return false;
     }
     emit(ExtensionRunning(command));
     try {
       await action();
       if (!isClosed) emit(const ExtensionReady());
+      return true;
     } catch (_) {
       if (!isClosed) emit(const ExtensionFailed());
+      return false;
     }
   }
 }

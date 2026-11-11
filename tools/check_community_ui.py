@@ -4,14 +4,15 @@ import json
 from pathlib import Path
 import queue
 import subprocess
+import shutil
 import threading
 import time
 
 
 class FlutterMachine:
-    def __init__(self, client, log, target='test/probes/community_favorites_probe.dart'):
+    def __init__(self, client, log, target='test/probes/community_favorites_probe.dart', device='linux'):
         self.process = subprocess.Popen(
-            ['flutter', 'run', '--machine', '-d', 'linux', '--debug', '--no-pub',
+            [shutil.which('flutter') or 'flutter', 'run', '--machine', '-d', device, '--debug', '--no-pub',
              '--enable-software-rendering', '--no-enable-impeller', '--target', target],
             cwd=client, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             text=True, encoding='utf-8', bufsize=1)

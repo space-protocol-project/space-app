@@ -1,0 +1,82 @@
+name: P1 native declarative forms
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  form:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: 31a9ee557467b5c493e532ff94102611f6df757d
+          path: .local/p1-server
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-protocol
+          ref: 4df076de4033f37a64d80cb76ea31f4c36c6e2e0
+          path: .local/p1-protocol
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .local/p1-server/experiments/extensions/go.mod
+          cache-dependency-path: .local/p1-server/experiments/extensions/go.sum
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - name: Инструменты Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libx11-dev libxi-dev libsecret-1-dev libnotify-dev xvfb dbus-x11
+          sudo sh -c 'echo "+memory +pids +cpu" > /sys/fs/cgroup/cgroup.subtree_control'
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Общие байты контракта
+        run: |
+          for file in ui-form.json form-payload.schema.json form-payload.json; do
+            cmp client/test/fixtures/extensions_p1/$file .local/p1-protocol/docs/extensions/p1/$file
+          done
+      - name: Сборка изолированного стенда
+        working-directory: .local/p1-server/experiments/extensions
+        run: |
+          if [ "$RUNNER_OS" = Windows ]; then
+            go build -o p1-worker.exe ./cmd/p1-worker
+            go build -o p1-demo.exe ./cmd/p1-demo
+          else
+            go build -o /tmp/space-p1-form-worker ./cmd/p1-worker
+            go build -o p1-demo ./cmd/p1-demo
+          fi
+      - name: Анализ и проверки интерфейса
+        working-directory: client
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test test/extensions_p1_test.dart test/extensions_p1_form_test.dart --reporter expanded > form-tests.txt
+      - name: HTTP, нативный интерфейс и перезапуск
+        run: |
+          if [ "$RUNNER_OS" = Windows ]; then
+            python tools/run_extension_form.py
+          else
+            dbus-run-session -- python3 tools/run_extension_form.py
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-form-${{ matrix.os }}
+          include-hidden-files: true
+          path: |
+            client/form-tests.txt
+            .local/p1-form/http-results.json
+            .local/p1-form/native-result.json
+            .local/p1-form/native-ui.log
+            .local/p1-form/server.log

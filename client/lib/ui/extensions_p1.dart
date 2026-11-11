@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../src/extensions_p1/actions.dart';
 import '../src/extensions_p1/document.dart';
+import 'extension_form.dart';
 
 // Прототип не зарегистрирован в навигации рабочего приложения.
 class ExtensionPanel extends StatelessWidget {
@@ -47,6 +48,14 @@ class ExtensionPanel extends StatelessWidget {
   Widget _node(BuildContext context, ExtensionNode node, bool busy) {
     final text = document.text(locale, node.label);
     final child = switch (node.component) {
+      'form.v1' => ExtensionForm(
+        node: node,
+        document: document,
+        actions: actions,
+        locale: locale,
+        busy: busy,
+        errorText: errorText,
+      ),
       'text.v1' => Text(text),
       'button.v1' => FilledButton(
         onPressed: busy ? null : () => actions.invoke(node.command),

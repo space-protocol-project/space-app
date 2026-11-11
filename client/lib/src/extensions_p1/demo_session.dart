@@ -20,13 +20,18 @@ class ExtensionDemoConnection {
   final Uri endpoint;
   final String token;
 
-  Future<ExtensionDocument> fetch(String kind, String name) async {
+  Future<ExtensionDocument> fetch(
+    String kind,
+    String name, {
+    Map<String, Object> payload = const {},
+  }) async {
     final client = http.Client();
     try {
       final bytes = await _exchange(
         client,
         kind,
         name,
+        payload,
       ).timeout(const Duration(seconds: 5));
       return ExtensionDocument.parse(bytes, {'acknowledge'});
     } finally {
@@ -38,6 +43,7 @@ class ExtensionDemoConnection {
     http.Client client,
     String kind,
     String name,
+    Map<String, Object> payload,
   ) async {
     final request = http.Request('POST', endpoint)
       ..followRedirects = false
@@ -50,7 +56,7 @@ class ExtensionDemoConnection {
         'instance': 'demo',
         'kind': kind,
         'name': name,
-        'payload': <String, Object?>{},
+        'payload': payload,
       });
     final response = await client.send(request);
     if (response.statusCode != 200 ||
@@ -92,6 +98,18 @@ class ExtensionDemoSession extends Cubit<ExtensionDemoState> {
 
   Future<void> load() => _request('query', 'overview');
   Future<void> acknowledge() => _request('command', 'acknowledge');
+
+  // Stateless-форма сохраняет черновик; ответ всё равно проходит проверку UI.
+  Future<void> submit(Map<String, Object> payload) async {
+    if (isClosed || _running) throw StateError('Сессия недоступна');
+    _running = true;
+    try {
+      await connection.fetch('command', 'acknowledge', payload: payload);
+      if (isClosed) throw StateError('Сессия закрыта');
+    } finally {
+      _running = false;
+    }
+  }
 
   Future<void> _request(String kind, String name) async {
     if (isClosed || _running) return;

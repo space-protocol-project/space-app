@@ -1,4 +1,5 @@
 import 'strict_json.dart';
+part 'form_document.dart';
 
 class ExtensionNode {
   const ExtensionNode(
@@ -6,10 +7,12 @@ class ExtensionNode {
     this.component,
     this.label,
     this.command,
-    this.children,
-  );
+    this.children, {
+    this.field,
+  });
   final String id, component, label, command;
   final List<ExtensionNode> children;
+  final ExtensionField? field;
 }
 
 class ExtensionDocument {
@@ -80,14 +83,16 @@ class _Nodes {
   final ids = <String>{};
   int count = 0;
 
-  List<ExtensionNode> list(Object? value, int depth) {
+  List<ExtensionNode> list(Object? value, int depth, {bool inForm = false}) {
     if (value is! List || value.isEmpty || value.length > 32) {
       throw const FormatException('Список UI');
     }
-    return List.unmodifiable(value.map((item) => node(item, depth)));
+    return List.unmodifiable(
+      value.map((item) => node(item, depth, inForm: inForm)),
+    );
   }
 
-  ExtensionNode node(Object? value, int depth) {
+  ExtensionNode node(Object? value, int depth, {bool inForm = false}) {
     if (++count > 64 || depth > 4) throw const FormatException('Бюджет UI');
     final map = object(value, {
       'id',
@@ -97,14 +102,58 @@ class _Nodes {
       'children',
       'required',
       'fallback',
+      'max_length',
+      'options',
     });
     final id = identifier(map['id']);
     if (!ids.add(id)) throw const FormatException('Повтор ID');
     final component = identifier(map['component']);
+    if (inForm) return field(map, id, component);
+    if ({'input.v1', 'toggle.v1', 'choice.v1'}.contains(component)) {
+      throw const FormatException('Поле вне формы');
+    }
+    if (component == 'form.v1') return form(map, id, depth);
     if (!{'section.v1', 'text.v1', 'button.v1'}.contains(component)) {
       return fallback(map, depth);
     }
     return known(map, id, component, depth);
+  }
+
+  ExtensionNode form(Map<String, dynamic> map, String id, int depth) {
+    object(map, {'id', 'component', 'label_key', 'command', 'children'});
+    final command = identifier(map['command']);
+    if (!commands.contains(command)) {
+      throw const FormatException('Команда формы');
+    }
+    final children = list(map['children'], depth + 1, inForm: true);
+    if (children.length > 16) throw const FormatException('Число полей формы');
+    return ExtensionNode(
+      id,
+      'form.v1',
+      translated(map['label_key']),
+      command,
+      children,
+    );
+  }
+
+  ExtensionNode field(Map<String, dynamic> map, String id, String component) {
+    final field = _field(map, component, translated);
+    return ExtensionNode(
+      id,
+      component,
+      translated(map['label_key']),
+      '',
+      const [],
+      field: field,
+    );
+  }
+
+  String translated(Object? value) {
+    final key = identifier(value);
+    if (!strings['en']!.containsKey(key)) {
+      throw const FormatException('Нет текста');
+    }
+    return key;
   }
 
   ExtensionNode fallback(Map<String, dynamic> map, int depth) {
