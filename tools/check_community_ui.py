@@ -87,6 +87,9 @@ class FlutterMachine:
         return response.get('result')
 
     def driver(self, command, **params):
+        # Вывод приложения может прийти раньше подключения VM service daemon.
+        if self.started_at is None:
+            self.wait(lambda _: self.started_at is not None, timeout=45)
         result = self.command('app.callServiceExtension', {
             'appId': self.app, 'methodName': 'ext.flutter.driver',
             'params': {'command': command, 'timeout': '15000', **params},
