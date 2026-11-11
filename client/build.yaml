@@ -3,6 +3,7 @@ targets:
     builders:
       freezed:
         generate_for:
+          - lib/src/builtin/navigation_cubit.dart
           - lib/src/extensions_p1/contributions_cubit.dart
           - lib/src/extensions_p1/form_cubit.dart
           - lib/src/archive_transfer_cubit.dart

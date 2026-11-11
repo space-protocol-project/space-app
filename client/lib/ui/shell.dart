@@ -1,5 +1,8 @@
 import 'package:fixnum/fixnum.dart';
 
+import 'builtin_navigation.dart';
+import '../src/generated/space/v1/builtin.pb.dart';
+
 import '../src/personal_notifications_controller.dart';
 import '../src/personal_inbox_controller.dart';
 import '../src/personal_notification_scope.dart';
@@ -1192,6 +1195,53 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
   String get spaceLabel => controller.spaceTitle.isNotEmpty
       ? controller.spaceTitle
       : controller.preview?.origin.authority ?? context.strings.yourSpace;
+  Future<void> openBuiltinSections() async {
+    final session = controller.mlsSession;
+    if (session == null) return;
+    final section = await showDialog<BuiltinSection>(
+      context: context,
+      builder: (_) => BuiltinNavigation(
+        transport: session.builtins,
+        closing: session.closing,
+      ),
+    );
+    if (!mounted ||
+        section == null ||
+        !identical(session, controller.mlsSession)) {
+      return;
+    }
+    await showBuiltinSection(section);
+  }
+
+  Future<void> showBuiltinSection(BuiltinSection section) async {
+    final target = controller;
+    final channel = section.channel.id;
+    switch (section.pluginId) {
+      case 'space.chat':
+        await target.selectChannel(channel);
+        if (mounted && identical(target, controller)) select(Section.chat);
+      case 'space.rooms':
+        setState(() => selectedVoiceRooms[controller.knownOrigin] = channel);
+        select(Section.rooms);
+      case 'space.discussions':
+        showCommunityTarget(
+          DashboardCommunityTarget(
+            origin: controller.knownOrigin,
+            channel: channel,
+            destination: DashboardDestination.forum,
+          ),
+        );
+      case 'space.feed':
+        showCommunityTarget(
+          DashboardCommunityTarget(
+            origin: controller.knownOrigin,
+            channel: channel,
+            destination: DashboardDestination.feed,
+          ),
+        );
+    }
+  }
+
   Widget chatGroup() => SurfaceCard(
     key: const ValueKey('server-chats'),
     color: Theme.of(context).colorScheme.surfaceContainerHigh,
@@ -1210,6 +1260,11 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
                   controller.selectChannel(controller.channelId);
                   select(Section.chat);
                 },
+        ),
+        TextButton.icon(
+          onPressed: controller.connected ? openBuiltinSections : null,
+          icon: const Icon(Icons.extension_outlined),
+          label: const Text('Все разделы'),
         ),
         for (final channel in controller.channels) _channelTile(channel),
       ],
@@ -1485,6 +1540,11 @@ class _SpaceShellState extends State<SpaceShell> with WidgetsBindingObserver {
           ),
           if (controller.preview != null || controller.connected)
             _sidebarSection(Section.chat),
+          ListTile(
+            leading: const Icon(Icons.extension_outlined),
+            title: const Text('Разделы пространства'),
+            onTap: openBuiltinSections,
+          ),
           _sidebarSection(Section.rooms),
           _sidebarSection(Section.forum),
           _sidebarSection(Section.feed),

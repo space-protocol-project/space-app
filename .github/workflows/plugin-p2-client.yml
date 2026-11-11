@@ -1,0 +1,78 @@
+name: P2 клиентский RPC и навигация
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complexity:
+    uses: ./.github/workflows/complexity.yml
+  client:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - run: flutter pub get
+        working-directory: client
+      - run: flutter analyze --no-pub
+        working-directory: client
+      - name: Cubit, виджет, защита допуска и ограниченные повторы
+        working-directory: client
+        run: flutter test --no-pub test/builtin_test.dart
+  core:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17.11
+        env:
+          POSTGRES_DB: space_test
+          POSTGRES_USER: space
+          POSTGRES_PASSWORD: ci-only-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U space -d space_test"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      SPACE_TEST_DATABASE_URL: postgres://space:ci-only-password@127.0.0.1:5432/space_test?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: space-protocol-project/space-server
+          ref: 948b3c40720038d131ec4aed25266fb44fe8d584
+          path: .local/p2-server
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .local/p2-server/go.mod
+          cache-dependency-path: .local/p2-server/go.sum
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: '3.47.8', channel: stable, cache: true}
+      - run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Настоящее ядро с обнаружением гонок
+        working-directory: .local/p2-server
+        run: |
+          go test -race -c -o ../p2-server-fixture ./internal/postgres
+          go test -race ./internal/postgres -run '^TestBuiltinRegistry' -count=1
+          go vet ./internal/postgres
+          go mod verify
+      - run: flutter pub get
+        working-directory: client
+      - name: Запись, потерянный ответ, ACL и отзыв сессии
+        run: python3 tools/run_builtin_client_ci.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-client-core
+          path: |
+            .local/p2-client/result.json
+            .local/p2-client/client.jsonl
+            .local/p2-client/server.log
+          include-hidden-files: true
+          retention-days: 7

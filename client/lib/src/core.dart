@@ -1,3 +1,4 @@
+import 'builtin/transport.dart';
 import 'community_reactions_api.dart';
 import 'generated/space/v1/remote_backup.pb.dart' as remote_backup_pb;
 import 'generated/space/v1/remote_backup.connect.spec.dart'
@@ -760,6 +761,12 @@ class SpaceSession
   final _closing = StreamController<void>.broadcast();
   Stream<void> get closing => _closing.stream;
   SpaceSession._(this.server, this.record, this.vault, this.channel);
+  late final builtins = ConnectBuiltinTransport(
+    channel,
+    () => _options,
+    _ensureSession,
+    () => record.grantId,
+  );
   Future<MlsClient>? _mlsClient;
   String _mlsGrant = '';
   Future<MlsClient> mlsClient() {

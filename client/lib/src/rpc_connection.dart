@@ -1,4 +1,7 @@
 import 'dart:async';
+
+import 'package:protobuf/well_known_types/google/protobuf/any.pb.dart';
+
 import 'dart:io';
 
 import 'package:connectrpc/connect.dart' as connect;
@@ -44,6 +47,7 @@ class RpcConnection {
       ),
     );
   }
+  Future<Any>? Function(GeneratedMessage, RpcOptions?)? commandAdapter;
   final connect.Codec _codec;
   String _setupCode;
   void clearSetupCode() => _setupCode = '';
@@ -103,6 +107,17 @@ class RpcConnection {
     RpcOptions? options,
   }) async {
     if (_closed) throw const GrpcError.unavailable('RPC-соединение закрыто');
+    final adapted = commandAdapter?.call(request, options);
+    if (adapted != null) {
+      final payload = await adapted;
+      final output = spec.outputFactory();
+      if (payload.typeUrl !=
+          'type.googleapis.com/${output.info_.qualifiedMessageName}') {
+        throw const GrpcError.dataLoss('Неверный тип ответа команды');
+      }
+      output.mergeFromBuffer(payload.value);
+      return output;
+    }
     await _recoverRoute();
     final call = _begin(options, const Duration(seconds: 10));
     try {

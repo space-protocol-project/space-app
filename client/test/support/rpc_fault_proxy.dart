@@ -1,11 +1,19 @@
 import 'package:connectrpc/connect.dart' as connect;
 import 'package:protobuf/protobuf.dart';
+import 'package:protobuf/well_known_types/google/protobuf/any.pb.dart';
 import 'package:space_client/src/rpc_connection.dart';
 
 // Общая точка мутации между настоящим/тестовым RPC и клиентом.
 class RpcFaultProxy implements RpcConnection {
   RpcFaultProxy(this.target);
   final RpcConnection target;
+  @override
+  Future<Any>? Function(GeneratedMessage, RpcOptions?)? get commandAdapter =>
+      target.commandAdapter;
+  @override
+  set commandAdapter(
+    Future<Any>? Function(GeneratedMessage, RpcOptions?)? value,
+  ) => target.commandAdapter = value;
   @override
   void clearSetupCode() => target.clearSetupCode();
   GeneratedMessage Function(String method, GeneratedMessage response)? mutate;
