@@ -764,7 +764,7 @@ class SpaceSession
   late final builtins = ConnectBuiltinTransport(
     channel,
     () => _options,
-    _ensureSession,
+    refreshChannels,
     () => record.grantId,
   );
   Future<MlsClient>? _mlsClient;
