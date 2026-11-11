@@ -188,4 +188,4 @@ Windows прошла нативные стенды аудио и перепод�
 
 Продолжение транспорта P1: [общее окно HTTP/2-соединения и два независимых медленных клиента](https://github.com/space-protocol-project/space-protocol/blob/main/docs/SPACE-PLUGINS-P1-DELIVERY-CONNECTION.md).
 
-[Сводная ревизия P1 от 11 ноября: E01–E07 и конечный план закрытия](https://github.com/space-protocol-project/space-protocol/blob/main/docs/SPACE-PLUGINS-P1-AUDIT.md). Следующий блок — архив групповой истории нескольких экземпляров; стабильный 0.9.0 требует завершения P1–P3 и остаётся отложенным.
+[Сводная ревизия P1 от 11 ноября: E01–E07 и конечный план закрытия](https://github.com/space-protocol-project/space-protocol/blob/main/docs/SPACE-PLUGINS-P1-AUDIT.md). [Групповые архивы приняты в CI](https://github.com/space-protocol-project/space-protocol/blob/main/docs/SPACE-PLUGINS-P1-GROUP-ARCHIVE.md): 142 конечных результата на Linux/Windows/macOS, регрессия одиночных архивов и ядра успешна. Следующий блок — кандидат контрактов и бюджет истории; стабильный 0.9.0 требует завершения P1–P3 и остаётся отложенным.
